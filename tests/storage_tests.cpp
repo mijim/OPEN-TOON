@@ -58,7 +58,7 @@ TEST_CASE("Saving a stale revision cannot overwrite another writer") {
 }
 TEST_CASE("Unknown versions and excessive nesting do not enter the document model") {
     auto text = serializeDocument(makeDocument());
-    auto position = text.find("\"version\":1");
+    auto position = text.find("\"version\":2");
     REQUIRE(position != std::string::npos);
     text.replace(position, 11, "\"version\":9");
     REQUIRE_THROWS(deserializeDocument(text));
@@ -77,8 +77,15 @@ TEST_CASE("Abrupt process termination at each save boundary leaves a recoverable
         auto next = first;
         next.name = "Committed child revision";
         // Exceed SQLite page cache so the failure creates a hot rollback journal.
-        next.editableDrawing(next.layers.front().id, 0).image =
-            ImageAsset{1024, 1024, std::vector<std::uint8_t>(1024 * 1024 * 4, 128)};
+        std::vector<std::uint8_t> noise(1024 * 1024 * 4);
+        std::uint32_t random = 42;
+        for (auto& pixel : noise) {
+            random ^= random << 13;
+            random ^= random >> 17;
+            random ^= random << 5;
+            pixel = static_cast<std::uint8_t>(random);
+        }
+        next.editableDrawing(next.layers.front().id, 0).image = ImageAsset{1024, 1024, std::move(noise)};
         const auto child = fork();
         REQUIRE(child >= 0);
         if (child == 0) {
@@ -125,4 +132,105 @@ TEST_CASE("Future database versions are rejected before saving and missing loads
     REQUIRE_THROWS(ProjectStore::load(p.file));
     REQUIRE_THROWS(ProjectStore::save(p.file, makeDocument()));
     REQUIRE(std::filesystem::file_size(p.file) == size);
+}
+
+#include <sqlite3.h>
+namespace {
+struct FixtureDatabase {
+    sqlite3* db = nullptr;
+    explicit FixtureDatabase(const std::filesystem::path& path) {
+        const auto utf8 = path.u8string();
+        REQUIRE(sqlite3_open(reinterpret_cast<const char*>(utf8.c_str()), &db) == SQLITE_OK);
+    }
+    ~FixtureDatabase() { sqlite3_close(db); }
+    void execute(const char* sql) { REQUIRE(sqlite3_exec(db, sql, nullptr, nullptr, nullptr) == SQLITE_OK); }
+    int count(const char* sql) {
+        sqlite3_stmt* query = nullptr;
+        REQUIRE(sqlite3_prepare_v2(db, sql, -1, &query, nullptr) == SQLITE_OK);
+        const auto result = sqlite3_step(query);
+        const int count = result == SQLITE_ROW ? sqlite3_column_int(query, 0) : -1;
+        sqlite3_finalize(query);
+        REQUIRE(result == SQLITE_ROW);
+        return count;
+    }
+};
+} // namespace
+TEST_CASE("Version one projects migrate with an independently readable original backup") {
+    TemporaryProject p;
+    std::filesystem::copy_file(std::filesystem::path(OPENTOON_SOURCE_DIR) / "tests/fixtures/v1-scene.otoon",
+                               p.file);
+    const auto original = ProjectStore::load(p.file);
+    {
+        FixtureDatabase db(p.file);
+        REQUIRE(db.count("PRAGMA user_version") == 1);
+    }
+    auto changed = original.document;
+    changed.name = "Migrated scene";
+    const auto revision = ProjectStore::save(p.file, changed, "Upgrade", original.revision);
+    REQUIRE(ProjectStore::load(p.file).document == changed);
+    REQUIRE(ProjectStore::load(p.file, original.revision).document == original.document);
+    auto backup = p.file;
+    backup += ".pre-v2.bak";
+    REQUIRE(ProjectStore::load(backup).document == original.document);
+    {
+        FixtureDatabase db(backup);
+        REQUIRE(db.count("PRAGMA user_version") == 1);
+    }
+    REQUIRE(revision > original.revision);
+}
+TEST_CASE("Immutable media is shared across snapshots and deduplicated across stored revisions") {
+    TemporaryProject p;
+    auto d = makeDocument();
+    auto& drawing = d.editableDrawing(d.layers.front().id, 0);
+    drawing.image = ImageAsset{1, 1, {10, 20, 30, 255}};
+    drawing.raster = RasterImage{128, 128, {}};
+    std::vector<std::uint16_t> pixels(64 * 64 * 4, 16000);
+    drawing.raster->tiles[{0, 0}] = pixels;
+    drawing.raster->tiles[{1, 0}] = pixels;
+    auto snapshot = d;
+    REQUIRE(snapshot.drawings.begin()->second.image->rgba.data() == drawing.image->rgba.data());
+    auto head = ProjectStore::save(p.file, d);
+    for (int n = 0; n < 3; ++n) {
+        d.name += " next";
+        head = ProjectStore::save(p.file, d, "Metadata only", head);
+    }
+    REQUIRE(ProjectStore::load(p.file).document == d);
+    FixtureDatabase db(p.file);
+    REQUIRE(db.count("SELECT count(*) FROM resources") == 2);
+    REQUIRE(db.count("SELECT count(*) FROM revision_resources") == 8);
+    REQUIRE(db.count("SELECT max(length(document)) FROM revisions") < 4096);
+    REQUIRE_THROWS(ProjectStore::compact(p.file, 1, head - 1));
+    const auto result = ProjectStore::compact(p.file, 1, head);
+    REQUIRE(result.retainedRevisions == 1);
+    REQUIRE(ProjectStore::revisions(result.backup).size() == 4);
+    REQUIRE(ProjectStore::load(result.backup, 1).document == snapshot);
+    REQUIRE(ProjectStore::load(p.file).document == d);
+}
+TEST_CASE("Corrupted and missing resources fail instead of returning damaged artwork") {
+    for (const auto* damage : {"UPDATE resources SET data=zeroblob(length(data))", "DELETE FROM resources",
+                               "UPDATE resources SET raw_size=raw_size+4"}) {
+        TemporaryProject p;
+        auto d = makeDocument();
+        d.editableDrawing(d.layers.front().id, 0).image = ImageAsset{1, 1, {0, 0, 0, 255}};
+        (void)ProjectStore::save(p.file, d);
+        {
+            FixtureDatabase db(p.file);
+            db.execute(damage);
+        }
+        REQUIRE_THROWS(ProjectStore::load(p.file));
+    }
+}
+TEST_CASE("Compaction collects only resources no retained revision needs") {
+    TemporaryProject p;
+    auto d = makeDocument();
+    auto& drawing = d.editableDrawing(d.layers.front().id, 0);
+    drawing.image = ImageAsset{1, 1, {0, 0, 0, 255}};
+    auto first = ProjectStore::save(p.file, d);
+    drawing.image = ImageAsset{1, 1, {255, 255, 255, 255}};
+    auto second = ProjectStore::save(p.file, d, "Replace image", first);
+    auto result = ProjectStore::compact(p.file, 1, second);
+    REQUIRE(ProjectStore::load(p.file).document == d);
+    FixtureDatabase db(p.file);
+    REQUIRE(db.count("SELECT count(*) FROM resources") == 1);
+    REQUIRE(ProjectStore::load(result.backup, first).document.drawings.begin()->second.image->rgba[0] == 0);
 }

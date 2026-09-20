@@ -2,6 +2,7 @@
 #include <QPainterPath>
 #include <cmath>
 #include <stdexcept>
+#include <unordered_map>
 namespace opentoon {
 namespace {
 QColor qtColor(Color c) {
@@ -15,11 +16,45 @@ QTransform localTransform(Transform t) {
     m.translate(-t.pivotX, -t.pivotY);
     return m;
 }
+QImage rasterTile(const SharedBuffer<std::uint16_t>& tile) {
+    struct Entry {
+        SharedBuffer<std::uint16_t> source;
+        QImage image;
+    };
+    // Each render worker owns its cache. Retaining the immutable source prevents
+    // allocator address reuse from aliasing a different tile.
+    thread_local std::unordered_map<const std::uint16_t*, Entry> cache;
+    if (auto found = cache.find(tile.data()); found != cache.end())
+        return found->second.image;
+    if (cache.size() >= 2048)
+        cache.clear(); // <=96 MiB including retained source data.
+    QImage image(64, 64, QImage::Format_ARGB32_Premultiplied);
+    for (int y = 0; y < 64; ++y) {
+        auto* row = reinterpret_cast<QRgb*>(image.scanLine(y));
+        for (int x = 0; x < 64; ++x) {
+            auto i = std::size_t((y * 64 + x) * 4);
+            auto channel = [&](int n) { return (std::uint32_t(tile[i + n]) * 255 + 16384) / 32768; };
+            row[x] = qRgba(channel(0), channel(1), channel(2), channel(3));
+        }
+    }
+    cache.emplace(tile.data(), Entry{tile, image});
+    return image;
+}
 void drawing(QPainter& painter, const Drawing& d, const std::vector<Swatch>& palette) {
     if (d.image) {
         const auto& im = *d.image;
         QImage image(im.rgba.data(), im.width, im.height, im.width * 4, QImage::Format_RGBA8888);
         painter.drawImage(QPointF(0, 0), image);
+    }
+    if (d.raster) {
+        painter.save();
+        // Antialiasing tile rectangles creates translucent seams at fractional zoom.
+        // The brush pixels already contain their own antialiased coverage.
+        painter.setRenderHint(QPainter::Antialiasing, false);
+        painter.setClipRect(QRect(0, 0, d.raster->width, d.raster->height), Qt::IntersectClip);
+        for (const auto& [key, tile] : d.raster->tiles)
+            painter.drawImage(QPoint(key.first * 64, key.second * 64), rasterTile(tile));
+        painter.restore();
     }
     for (int art = 0; art < 4; ++art)
         for (const auto& s : d.strokes)
@@ -132,7 +167,10 @@ void SceneRenderer::paint(QPainter& painter, const Document& d, Frame frame, Ren
             }
             painter.setOpacity(opacity);
         }
-        if (const auto* current = d.drawingAt(l.id, frame))
+        const auto* current = options.previewDrawing && options.previewLayer == l.id
+                                  ? options.previewDrawing
+                                  : d.drawingAt(l.id, frame);
+        if (current)
             drawing(painter, *current, d.palette);
         painter.restore();
     }

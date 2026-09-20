@@ -1,8 +1,13 @@
 {
     "version": "0.5",
     "requires": [
+        "zstd/1.5.7#b68ca8e3de04ba5957761751d1d661f4%1760955092.069",
+        "zlib/1.3.2#1cb806da49011867778ffb6ac7190fcb%1777558780.503",
         "sqlite3/3.53.4#89fcf5cda598966acb7f3e185b19c58d%1785239491.603",
+        "openssl/3.5.8#19f279813c32a9d544795e4a7853cf09%1787920039.935",
         "nlohmann_json/3.12.0#2d634ab0ec8d9f56353e5ccef6d6612c%1744735883.94",
+        "miniaudio/0.11.25#bb742f61dfe4946a1c8635c3b364bf31%1788781587.87",
+        "json-c/0.18#d3e85078359ab5ceaeb0504ed74a083e%1743412206.39",
         "catch2/3.15.0#dad1ca2786e3f2c80129053a4ddc094f%1779369722.174"
     ],
     "build_requires": [

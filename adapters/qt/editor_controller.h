@@ -1,5 +1,6 @@
 #pragma once
 #include "opentoon/session.h"
+#include "opentoon/timeline.h"
 #include <QColor>
 #include <QElapsedTimer>
 #include <QObject>
@@ -10,6 +11,11 @@
 #include <thread>
 class EditorController final : public QObject {
     Q_OBJECT
+    Q_PROPERTY(int rangeStart READ rangeStart NOTIFY rangeChanged)
+    Q_PROPERTY(int rangeEnd READ rangeEnd NOTIFY rangeChanged)
+    Q_PROPERTY(QVariantList selectedLayers READ selectedLayers NOTIFY rangeChanged)
+    Q_PROPERTY(QVariantList markers READ markers NOTIFY changed)
+    Q_PROPERTY(bool hasClipboard READ hasClipboard NOTIFY rangeChanged)
     Q_PROPERTY(QString sceneName READ sceneName NOTIFY changed)
     Q_PROPERTY(QString projectPath READ projectPath NOTIFY changed)
     Q_PROPERTY(QString status READ status NOTIFY statusChanged)
@@ -28,6 +34,7 @@ class EditorController final : public QObject {
     Q_PROPERTY(int fpsDenominator READ fpsDenominator NOTIFY changed)
     Q_PROPERTY(int selectedLayer READ selectedLayer WRITE setSelectedLayer NOTIFY selectionChanged)
     Q_PROPERTY(int selectedSwatch READ selectedSwatch WRITE setSelectedSwatch NOTIFY selectionChanged)
+    Q_PROPERTY(bool savingRecovery READ savingRecovery NOTIFY recoveryChanged)
     Q_PROPERTY(QString tool READ tool WRITE setTool NOTIFY toolChanged)
     Q_PROPERTY(double brushSize READ brushSize WRITE setBrushSize NOTIFY toolChanged)
     Q_PROPERTY(bool onionSkin READ onionSkin WRITE setOnionSkin NOTIFY toolChanged)
@@ -42,6 +49,21 @@ class EditorController final : public QObject {
     explicit EditorController(QObject* parent = nullptr);
     ~EditorController() override;
     const opentoon::Document& document() const { return session_.document(); }
+    int rangeStart() const { return rangeStart_; }
+    int rangeEnd() const { return rangeEnd_; }
+    QVariantList selectedLayers() const;
+    QVariantList markers() const;
+    bool hasClipboard() const { return clipboard_.duration > 0; }
+    Q_INVOKABLE void selectTimelineRange(int firstFrame, int lastFrame, int firstRow, int lastRow);
+    Q_INVOKABLE void copyTimelineRange();
+    Q_INVOKABLE void pasteTimelineRange(int content = 0, bool insert = false);
+    Q_INVOKABLE void clearTimelineRange(bool keys = false);
+    Q_INVOKABLE void repeatTimelineRange(int repeats);
+    Q_INVOKABLE void retimeTimelineRange(int frames);
+    Q_INVOKABLE void timeSelectedDrawings(int step);
+    Q_INVOKABLE void moveTimelineRange(int destination, bool insert = false);
+    Q_INVOKABLE void setSceneMarker(QString name);
+    Q_INVOKABLE void exportXsheet(QUrl);
     QString sceneName() const;
     QString projectPath() const { return path_; }
     QString status() const { return status_; }
@@ -78,6 +100,9 @@ class EditorController final : public QObject {
     void setOnionSkin(bool);
     void setFilled(bool);
     void setArtLayer(int);
+    bool savingRecovery() const { return savingRecovery_; }
+    Q_INVOKABLE void compactProject(int retain);
+    void commitRaster(opentoon::RasterImage);
     void commitStroke(std::vector<opentoon::Point>);
     void eraseGesture(std::vector<opentoon::Point>);
     void translateStroke(opentoon::Id, double, double);
@@ -119,6 +144,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE void autosave();
     Q_INVOKABLE void report(QString message);
   signals:
+    void rangeChanged();
     void changed();
     void frameChanged();
     void selectionChanged();
@@ -126,9 +152,15 @@ class EditorController final : public QObject {
     void statusChanged();
     void playbackChanged();
     void exportChanged();
+    void recoveryChanged();
 
   private:
     opentoon::Session session_;
+    opentoon::ExposureClipboard clipboard_;
+    std::vector<opentoon::Id> rangeLayers_;
+    int rangeStart_ = 0, rangeEnd_ = 1;
+    std::uint64_t sceneGeneration_ = 0, clipboardGeneration_ = 0;
+    std::vector<opentoon::Id> validRangeLayers() const;
     opentoon::Id layer_ = 0, swatch_ = 0;
     int frame_ = 0, artLayer_ = 2;
     QString tool_ = "Pencil", path_, status_ = "Ready", recovery_, previousRecovery_;
@@ -141,7 +173,8 @@ class EditorController final : public QObject {
     bool exporting_ = false;
     double exportProgress_ = 0;
     std::atomic_bool cancelExport_{false};
-    std::thread exportThread_;
+    std::thread exportThread_, recoveryThread_;
+    bool savingRecovery_ = false;
     bool edit(const std::string&, const std::function<void(opentoon::Document&)>&);
     void resetSelection();
     void stopPlayback();

@@ -1,4 +1,5 @@
 #include "editor_controller.h"
+#include "project_store.h"
 #include "scene_renderer.h"
 #include <QCoreApplication>
 #include <QDir>
@@ -7,6 +8,7 @@
 #include <QGuiApplication>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QSettings>
 #include <QStandardPaths>
 #include <QTemporaryDir>
 #include <QThread>
@@ -76,6 +78,26 @@ TEST_CASE("Cancellation publishes an explicitly partial export and the next job 
     REQUIRE(next.size() == 2);
     next.removeAll(first.front());
     REQUIRE(manifest(root, next.front())["status"].toString() == "complete");
+}
+TEST_CASE("Recovery saves an immutable snapshot without clearing newer unsaved edits") {
+    EditorController editor;
+    editor.setScene("Before autosave", 128, 128, 48, 24, 1);
+    const auto saved = editor.document();
+    editor.autosave();
+    REQUIRE(editor.savingRecovery());
+    editor.setScene("After autosave", 128, 128, 48, 24, 1);
+    QElapsedTimer timeout;
+    timeout.start();
+    while (editor.savingRecovery() && timeout.elapsed() < 30000) {
+        QCoreApplication::processEvents();
+        QThread::msleep(1);
+    }
+    REQUIRE_FALSE(editor.savingRecovery());
+    REQUIRE(editor.modified());
+    REQUIRE(editor.sceneName() == "After autosave");
+    auto path = QSettings().value("recoveryPath").toString();
+    REQUIRE(opentoon::ProjectStore::load(std::filesystem::path(path.toStdString())).document == saved);
+    QFile::remove(path);
 }
 int main(int argc, char** argv) {
     QGuiApplication application(argc, argv);

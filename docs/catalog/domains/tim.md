@@ -74,7 +74,7 @@ Distinguish pasting exposures, drawings, keyframes and combinations.
 
 **Initial acceptance:** Pasting exposures does not add transform keyframes.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -84,7 +84,7 @@ Repeat sequences with shared drawings and an explicit time limit.
 
 **Initial acceptance:** Correcting the original drawing corrects its linked repetitions.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -104,7 +104,7 @@ Move blocks with controlled insertion and overwrite options.
 
 **Initial acceptance:** The editor previews the range to be replaced before dropping.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -124,7 +124,7 @@ Create named markers and ranges with duration and notes.
 
 **Initial acceptance:** A locked marker does not move when dragging the ruler.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -154,6 +154,6 @@ Export or print sheets with columns, timing, numbering and annotations.
 
 **Initial acceptance:** A multi-page sheet repeats headers and omits no frames.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Evidence:** `proposal`.

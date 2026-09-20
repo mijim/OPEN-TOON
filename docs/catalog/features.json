@@ -1142,7 +1142,7 @@
         "An empty layer exports with zero alpha."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "drawing-raster",
@@ -1151,7 +1151,8 @@
         "UI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/status.json; experimental subset, complete catalog acceptance remains open"
     },
     {
       "id": "RAS-002",
@@ -1162,7 +1163,7 @@
         "A long stroke maintains stable density as drawing speed changes."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "drawing-raster",
@@ -1171,7 +1172,8 @@
         "UI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/status.json; experimental subset, complete catalog acceptance remains open"
     },
     {
       "id": "RAS-003",
@@ -1182,7 +1184,7 @@
         "Erasing does not introduce opaque black pixels at the edge."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "drawing-raster",
@@ -1191,7 +1193,8 @@
         "UI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/status.json; experimental subset, complete catalog acceptance remains open"
     },
     {
       "id": "RAS-004",
@@ -1700,7 +1703,7 @@
         "Pasting exposures does not add transform keyframes."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "timeline",
@@ -1708,7 +1711,8 @@
         "LYR"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/status.json; experimental subset, complete catalog acceptance remains open"
     },
     {
       "id": "TIM-007",
@@ -1719,7 +1723,7 @@
         "Correcting the original drawing corrects its linked repetitions."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "timeline",
@@ -1727,7 +1731,8 @@
         "LYR"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/status.json; experimental subset, complete catalog acceptance remains open"
     },
     {
       "id": "TIM-008",
@@ -1747,7 +1752,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/status.json; experimental subset only, catalog acceptance not closed"
+      "implementation_evidence": "docs/implementation/status.json; experimental subset, complete catalog acceptance remains open"
     },
     {
       "id": "TIM-009",
@@ -1758,7 +1763,7 @@
         "The editor previews the range to be replaced before dropping."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "timeline",
@@ -1766,7 +1771,8 @@
         "LYR"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/status.json; experimental subset, complete catalog acceptance remains open"
     },
     {
       "id": "TIM-010",
@@ -1797,7 +1803,7 @@
         "A locked marker does not move when dragging the ruler."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "timeline",
@@ -1805,7 +1811,8 @@
         "LYR"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/status.json; experimental subset, complete catalog acceptance remains open"
     },
     {
       "id": "TIM-012",
@@ -1854,7 +1861,7 @@
         "A multi-page sheet repeats headers and omits no frames."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "timeline",
@@ -1862,7 +1869,8 @@
         "LYR"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/status.json; experimental subset, complete catalog acceptance remains open"
     },
     {
       "id": "FBF-001",

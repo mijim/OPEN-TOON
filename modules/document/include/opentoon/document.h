@@ -1,4 +1,5 @@
 #pragma once
+#include "opentoon/shared_buffer.h"
 #include <algorithm>
 #include <array>
 #include <compare>
@@ -45,14 +46,23 @@ struct Stroke {
 };
 struct ImageAsset {
     int width = 0, height = 0;
-    std::vector<std::uint8_t> rgba;
+    SharedBuffer<std::uint8_t> rgba;
     auto operator<=>(const ImageAsset&) const = default;
+};
+struct RasterImage {
+    static constexpr int tileSize = 64;
+    static constexpr int channels = 4;
+    int width = 1920, height = 1080;
+    // Premultiplied RGBA at 15-bit precision, matching the MyPaint surface contract.
+    std::map<std::pair<int, int>, SharedBuffer<std::uint16_t>> tiles;
+    auto operator<=>(const RasterImage&) const = default;
 };
 struct Drawing {
     Id id = 0;
     std::string name;
     std::vector<Stroke> strokes;
     std::optional<ImageAsset> image;
+    std::optional<RasterImage> raster;
     auto operator<=>(const Drawing&) const = default;
 };
 struct Exposure {
@@ -88,7 +98,7 @@ struct Marker {
     auto operator<=>(const Marker&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 1;
+    static constexpr int formatVersion = 2;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;

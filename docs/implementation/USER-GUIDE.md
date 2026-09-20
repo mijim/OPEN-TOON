@@ -1,6 +1,6 @@
 # Experimental editor guide
 
-OPEN-TOON currently supports a small offline vector animation workflow. It is an experimental editor, not the P11 production release. All first-party UI is English; scene and layer names can contain other languages.
+OPEN-TOON currently supports a offline vector and raster animation workflow. It is an experimental editor, not the P11 production release. All first-party UI is English; scene and layer names can contain other languages.
 
 ## Make a short animation
 
@@ -16,6 +16,7 @@ The built-in bouncing-ball example provides 24 distinct drawings exposed on twos
 ## Drawing and view controls
 
 - **Pencil:** sampled vector centerline with round segments and pressure-weighted width.
+- **Raster ink:** select the filled-circle tool, then choose Ink, Soft, Dry, Smudge or Eraser from the preset menu. Paint with the mouse or pressure input. Each gesture is undoable; Escape cancels the preview. Raster pixels retain the color painted and do not recolor with palette edits. Imported images remain separate; paint appears above the image and below vector art.
 - **Eraser:** cuts sampled strokes approximately. Analytic shape erasing and region topology are not implemented.
 - **Rectangle / Ellipse:** drag to create a primitive; enable the filled option for a solid shape.
 - **Select:** select and drag one stroke. Delete removes it. There is no lasso or multi-selection yet.
@@ -40,12 +41,22 @@ The inspector edits position, rotation, scale, opacity and pivot. Add transform 
 
 Each manual save appends a complete revision. Scene history can restore a saved revision as an undoable edit. A stale writer is rejected if another writer changed the revision on disk; save a separate copy or reopen to resolve it.
 
-Every 60 seconds, a modified document is saved to a recovery file. On a later launch, recovery can open that snapshot as an unsaved scene. Save it under a chosen name. Autosave is synchronous and can pause large scenes. Recovery from operating-system power loss and multiple simultaneous application instances has not been qualified.
+Every 60 seconds, a modified document is saved to a recovery file. On a later launch, recovery can open that snapshot as an unsaved scene. Save it under a chosen name. Autosave runs from an immutable snapshot in a worker, so newer edits stay unsaved until the next save. Manual saves remain synchronous. Recovery from operating-system power loss and multiple simultaneous application instances has not been qualified.
 
-The current format limits each serialized revision to 64 MiB. Inline image bytes expand when represented as JSON. History is not compacted, and undo keeps full snapshots under an approximate retention budget. These are prototype limits, not production storage targets.
+Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and total decoded media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening a version 1 project remains supported. Its first save creates a `.pre-v2.bak` copy before upgrading. The old editor requires that backup to reopen the original format.
+
+**Scene → Compact project history** retains the chosen number of newest saved revisions and removes unreachable media, after creating a full `.pre-compact.bak` backup. Save pending edits first. This is an explicit operation and is not part of autosave.
+
+## Timeline ranges
+
+Drag over cells to select a rectangular frame/layer range. **Edit → Timeline range** provides copy, paste (linked exposures, independent drawings, keys, or all), insertion, repeats, stretch and timing on ones/twos/threes. Copy/Paste shortcuts work when the timeline has focus. Paste starts at the playhead and can extend the scene. Copied exposures from another open scene become independent drawings with remapped palette IDs.
+
+Alt-drag inside a selection to move it; the shaded destination shows the overwrite range. Escape cancels a pending move. Stretch refuses any compression that would remove a drawing or merge keys. Timing on ones/twos/threes removes gaps within the selection and overwrites the resulting destination span. Locked selected layers reject the whole edit.
+
+Use **Edit → Set marker** to label the current frame; an empty name removes its marker. **Export Xsheet PDF** writes a paginated sheet, limited to 200 pages to keep the synchronous operation bounded.
 
 ## Export and limitations
 
 PNG export evaluates an immutable snapshot, so later edits do not change the running export. Cancel stops between frames. `manifest.json` records the rational frame rate, frame count and completion/cancellation/failure state. A cancelled or failed directory contains partial output and must not be treated as a complete sequence.
 
-Image import loads a single image up to 4096 × 4096, subject to scene memory/save limits. Raster painting, image sequences, layered PSD, audio, video output, lip sync, deformation, node effects, OCIO, reusable rig libraries and production installers are still pending. Consult the [phase status](STATUS.md) for the complete boundary.
+Image import loads a single image up to 4096 × 4096, subject to scene memory/save limits. Image sequences, layered PSD, audio, video output, lip sync, deformation, node effects, OCIO, reusable rig libraries and production installers are still pending. Consult the [phase status](STATUS.md) for the complete boundary.

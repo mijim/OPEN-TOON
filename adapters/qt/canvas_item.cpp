@@ -28,7 +28,10 @@ void CanvasItem::setEditor(EditorController* editor) {
         disconnect(editor_, nullptr, this, nullptr);
     editor_ = editor;
     if (editor) {
-        connect(editor, &EditorController::changed, this, [this] { update(); });
+        connect(editor, &EditorController::changed, this, [this] {
+            cancelGesture();
+            update();
+        });
         connect(editor, &EditorController::frameChanged, this, [this] {
             cancelGesture();
             selectedStroke_ = 0;
@@ -104,15 +107,17 @@ void CanvasItem::paint(QPainter* p) {
     p->save();
     p->setWorldTransform(view, true);
     p->fillRect(QRectF(-1, -1, editor_->sceneWidth() + 2, editor_->sceneHeight() + 2), QColor("#454545"));
-    SceneRenderer::paint(*p, editor_->document(), editor_->frame(), {true, editor_->onionSkin(), 1, 0});
+    SceneRenderer::paint(*p, editor_->document(), editor_->frame(),
+                         {true, editor_->onionSkin(), 1, 0, rasterBrush_ ? Id(editor_->selectedLayer()) : 0,
+                          rasterBrush_ ? &rasterPreview_ : nullptr});
     if (editor_->selectedLayer()) {
         p->save();
         p->setWorldTransform(
             SceneRenderer::worldTransform(
                 editor_->document(), editor_->document().layer(editor_->selectedLayer()), editor_->frame()),
             true);
-        if (drawing_ && !samples_.empty() && editor_->tool() != "Eraser" && editor_->tool() != "Select" &&
-            editor_->tool() != "Recolor" && editor_->tool() != "Edit points") {
+        if (!rasterBrush_ && drawing_ && !samples_.empty() && editor_->tool() != "Eraser" &&
+            editor_->tool() != "Select" && editor_->tool() != "Recolor" && editor_->tool() != "Edit points") {
             Stroke stroke{0,
                           Id(editor_->selectedSwatch()),
                           editor_->brushSize(),
@@ -166,6 +171,30 @@ void CanvasItem::begin(QPointF position, double pressure) {
     }
     try {
         auto point = localPoint(position, pressure);
+        if (editor_->tool().startsWith("Raster ")) {
+            const auto* existing = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame());
+            rasterPreview_ = existing ? *existing : Drawing{};
+            RasterImage surface = rasterPreview_.raster.value_or(
+                RasterImage{editor_->sceneWidth(), editor_->sceneHeight(), {}});
+            Color color{0, 0, 0, 1};
+            for (const auto& swatch : editor_->document().palette)
+                if (swatch.id == Id(editor_->selectedSwatch()))
+                    color = swatch.color;
+            auto preset = BrushPreset::Ink;
+            if (editor_->tool() == "Raster soft")
+                preset = BrushPreset::Soft;
+            if (editor_->tool() == "Raster dry")
+                preset = BrushPreset::Dry;
+            if (editor_->tool() == "Raster smudge")
+                preset = BrushPreset::Smudge;
+            if (editor_->tool() == "Raster eraser")
+                preset = BrushPreset::Eraser;
+            rasterBrush_ = std::make_unique<RasterBrush>(
+                surface, BrushSettings{std::clamp(editor_->brushSize(), 1.0, 1024.0), 1, color, preset});
+            rasterBrush_->sample(point, 1.0 / 120, tiltX_, tiltY_);
+            rasterPreview_.raster = rasterBrush_->snapshot();
+            sampleClock_.start();
+        }
         samples_ = {point};
         drawing_ = true;
         selectionDelta_ = {};
@@ -197,6 +226,7 @@ void CanvasItem::begin(QPointF position, double pressure) {
         }
         update();
     } catch (const std::exception& e) {
+        cancelGesture();
         editor_->report(e.what());
     }
 }
@@ -210,7 +240,12 @@ void CanvasItem::move(QPointF position, double pressure) {
         return;
     try {
         auto point = localPoint(position, pressure);
-        if (editor_->tool() == "Edit points")
+        if (rasterBrush_) {
+            const auto elapsed = std::max(0.001, sampleClock_.nsecsElapsed() / 1e9);
+            sampleClock_.restart();
+            rasterBrush_->sample(point, elapsed, tiltX_, tiltY_);
+            rasterPreview_.raster = rasterBrush_->snapshot();
+        } else if (editor_->tool() == "Edit points")
             pointPreview_ = point;
         else if (editor_->tool() == "Select")
             selectionDelta_ = {point.x - samples_.front().x, point.y - samples_.front().y};
@@ -240,7 +275,11 @@ void CanvasItem::end() {
     drawing_ = false;
     auto points = std::move(samples_);
     samples_.clear();
-    if (editor_->tool() == "Edit points") {
+    if (rasterBrush_) {
+        auto raster = std::move(*rasterPreview_.raster);
+        rasterBrush_.reset();
+        editor_->commitRaster(std::move(raster));
+    } else if (editor_->tool() == "Edit points") {
         if (selectedStroke_ && selectedPoint_ >= 0)
             editor_->movePoint(selectedStroke_, selectedPoint_, pointPreview_);
     } else if (editor_->tool() == "Eraser")
@@ -254,6 +293,8 @@ void CanvasItem::end() {
     update();
 }
 void CanvasItem::cancelGesture() {
+    rasterBrush_.reset();
+    rasterPreview_ = {};
     drawing_ = false;
     panning_ = false;
     samples_.clear();
@@ -269,8 +310,10 @@ void CanvasItem::mousePressEvent(QMouseEvent* e) {
         panning_ = true;
         last_ = e->position();
         panStart_ = pan_;
-    } else
+    } else {
+        tiltX_ = tiltY_ = 0;
         begin(e->position(), 1);
+    }
     e->accept();
 }
 void CanvasItem::mouseMoveEvent(QMouseEvent* e) {
@@ -308,6 +351,8 @@ bool CanvasItem::eventFilter(QObject*, QEvent* event) {
         event->type() == QEvent::TabletRelease) {
         auto* e = static_cast<QTabletEvent*>(event);
         auto point = mapFromScene(e->position());
+        tiltX_ = std::clamp(e->xTilt() / 90.0, -1.0, 1.0);
+        tiltY_ = std::clamp(e->yTilt() / 90.0, -1.0, 1.0);
         if (event->type() == QEvent::TabletPress) {
             if (!contains(point))
                 return false;

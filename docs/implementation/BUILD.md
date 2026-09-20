@@ -26,7 +26,7 @@ To build without Qt, add `-DOPENTOON_DESKTOP=OFF`. The document, commands, seria
 ## Convenient system-package build on macOS
 
 ```sh
-brew install cmake ninja qtbase qtdeclarative qtsvg nlohmann-json catch2
+brew install cmake ninja qtbase qtdeclarative qtsvg nlohmann-json catch2 json-c zstd openssl@3
 cmake --preset desktop -DCMAKE_PREFIX_PATH=/opt/homebrew
 cmake --build --preset desktop --parallel
 ctest --preset desktop
@@ -54,3 +54,15 @@ build/locked/open-toon.app/Contents/MacOS/open-toon \
 CMake contains Qt deployment rules. A local development bundle is not a signed/notarized release or evidence of clean-machine compatibility. Split Homebrew Qt formulae can require explicit library/import paths for `macdeployqt`; validate the resulting bundle independently. CI currently builds/tests source and does not publish installers.
 
 See [status](STATUS.md), [user guide](USER-GUIDE.md), [dependency record](DEPENDENCIES.md) and [ADR-011](../architecture/adr/011-experimental-desktop-slice.md) before making support or performance claims.
+
+## Raster benchmark
+
+The locked build also produces `opentoon_brush_benchmark`. Pass a new project path;
+existing files are refused. The command measures 11,520 samples on a 4K canvas,
+11 saves sharing media and verified reopening. It emits JSON timing data. See
+[the measurement report](BRUSH-BENCHMARK.md) for the current result and limitations.
+
+libmypaint is fetched during configuration from a source commit and SHA-256 pinned
+in `cmake/MyPaint.cmake`; the build requires Python and a C11 compiler as well as C++20.
+The current branch's platform CI must pass before extending the previous version's
+cross-platform claim to these dependencies.

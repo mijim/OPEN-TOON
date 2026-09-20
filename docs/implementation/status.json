@@ -28,8 +28,8 @@
     {
       "id": "P03",
       "status": "in_progress",
-      "available": "Synchronized virtualized timeline/Xsheet, create/hold/clear exposures, insert/remove frames and navigate drawings.",
-      "remaining": "Range selection/clipboard, drag/retime operations, annotations/thumbnails and advanced paperless workflows."
+      "available": "Synchronized virtualized timeline/Xsheet, create/hold/clear exposures, insert/remove frames and navigate drawings. Multi-layer range clipboard, independent drawing paste, key paste, cycles, ones/twos/threes, overwrite retiming, Alt-drag moves, markers and bounded Xsheet PDF export.",
+      "remaining": "Frame annotations/thumbnails, advanced onion/tracing controls, paperless workflows and artist acceptance."
     },
     {
       "id": "P04",
@@ -39,9 +39,9 @@
     },
     {
       "id": "P05",
-      "status": "planned",
-      "available": "Single still-image import is available as a prerequisite only.",
-      "remaining": "Raster tile engine, MyPaint integration, textured brushes, raster selection/transforms, image resource storage and benchmarks."
+      "status": "in_progress",
+      "available": "Sparse immutable 15-bit premultiplied tiles, libmypaint ink/soft/dry/smudge/eraser presets, pressure input, cancellable gestures, shared preview/export and compressed project resources.",
+      "remaining": "Brush texture/import/preset management, raster selection/transforms, production workload and physical-device qualification."
     },
     {
       "id": "P06",
@@ -76,15 +76,15 @@
     {
       "id": "P11",
       "status": "planned",
-      "available": "Saved revisions, recovery UX, English guide, regression tests and source CI are initial prerequisites.",
-      "remaining": "All required journeys, compaction/migration, hardening, supported device/OS matrix, accessibility, notices/SBOM and signed/installable releases."
+      "available": "Saved revisions, recovery UX, English guide, regression tests and source CI are initial prerequisites. Format 1 migration backups, checked format 2 resources, explicit backed-up compaction and asynchronous recovery snapshots.",
+      "remaining": "All required journeys, remaining hardening, supported device/OS matrix, accessibility, complete notices/SBOM and signed/installable releases."
     }
   ],
   "verification": {
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 19,
+      "count": 32,
       "command": "ctest --test-dir build/locked --output-on-failure"
     },
     "native_input_workflow": {
@@ -98,7 +98,11 @@
         "undo/redo",
         "save/reopen",
         "usable canvas layout",
-        "window screenshot"
+        "window screenshot",
+        "raster mouse painting",
+        "raster pixel equivalence after reopen",
+        "cancelled raster gesture",
+        "timeline range clipboard"
       ]
     },
     "png_fixture": {
@@ -115,7 +119,7 @@
       "reason": "Owner currently has no tablet; mouse input is required and available."
     },
     "other_operating_systems": {
-      "status": "ci_passed",
+      "status": "previous_version_passed_new_changes_pending",
       "source_commit": "982f88f79f02700b504c0d70843075475384716d",
       "run_url": "https://github.com/mijim/OPEN-TOON/actions/runs/35528441504",
       "qt_version": "6.8.3",
@@ -133,23 +137,29 @@
     },
     "sanitizers": {
       "status": "passed",
-      "count": 15,
-      "command": "ctest --preset sanitize",
-      "scope": "Qt-free core, AddressSanitizer and UndefinedBehaviorSanitizer, local system dependencies"
+      "count": 27,
+      "command": "ctest --test-dir build/p11-sanitized --output-on-failure",
+      "scope": "Qt-free document, storage, application and MyPaint adapter; locked Debug dependencies. AddressSanitizer and UndefinedBehaviorSanitizer."
     },
     "export_workflows": {
       "status": "passed",
-      "cases": 2,
+      "cases": 3,
       "ctest_entry": "export_workflows",
       "covers": [
         "immutable snapshot during concurrent edit",
         "48 PNG files",
         "rational frame rate manifest",
         "partial cancellation manifest",
-        "successful job after cancellation"
+        "successful job after cancellation",
+        "asynchronous recovery preserves original snapshot and newer unsaved edits"
       ]
     },
-    "total_local_ctest_entries": 20
+    "total_local_ctest_entries": 33,
+    "brush_benchmark": {
+      "status": "measured",
+      "report": "docs/implementation/BRUSH-BENCHMARK.md",
+      "scope": "Synthetic 4K engine and snapshot timing; not full input-to-display latency"
+    }
   },
   "ownership": {
     "document": "modules/document",
@@ -159,6 +169,7 @@
     "input_and_presentation": "adapters/qt",
     "ui": "ui",
     "desktop_and_cli": "apps/desktop",
-    "behavioral_tests": "tests"
+    "behavioral_tests": "tests",
+    "raster_brush": "adapters/brush"
   }
 }

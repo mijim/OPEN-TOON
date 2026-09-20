@@ -24,7 +24,7 @@ Paint pixel images with a defined resolution and transparency.
 
 **Initial acceptance:** An empty layer exports with zero alpha.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -34,7 +34,7 @@ Support brush tip, spacing, opacity and dynamics for raster strokes.
 
 **Initial acceptance:** A long stroke maintains stable density as drawing speed changes.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -44,7 +44,7 @@ Remove or reduce alpha with configurable edge softness and opacity.
 
 **Initial acceptance:** Erasing does not introduce opaque black pixels at the edge.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 

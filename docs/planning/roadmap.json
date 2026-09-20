@@ -409,7 +409,7 @@
     {
       "id": "P05",
       "title": "Raster and textured brush engine",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [
         "P04"
       ],

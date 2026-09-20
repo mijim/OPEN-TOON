@@ -48,6 +48,8 @@ EditorController::~EditorController() {
     cancelExport_ = true;
     if (exportThread_.joinable())
         exportThread_.join();
+    if (recoveryThread_.joinable())
+        recoveryThread_.join();
 }
 QString EditorController::sceneName() const {
     return QString::fromStdString(document().name);
@@ -57,6 +59,11 @@ void EditorController::report(QString message) {
     emit statusChanged();
 }
 void EditorController::resetSelection() {
+    ++sceneGeneration_;
+    rangeStart_ = 0;
+    rangeEnd_ = 1;
+    rangeLayers_.clear();
+    emit rangeChanged();
     layer_ = document().layers.empty() ? 0 : document().layers.back().id;
     swatch_ = document().palette.empty() ? 0 : document().palette.front().id;
     frame_ = 0;
@@ -154,8 +161,9 @@ void EditorController::setSelectedSwatch(int value) {
         }
 }
 void EditorController::setTool(QString value) {
-    if (QStringList{"Pencil", "Eraser", "Select", "Rectangle", "Ellipse", "Recolor", "Edit points"}.contains(
-            value)) {
+    if (QStringList{"Pencil", "Eraser", "Select", "Rectangle", "Ellipse", "Recolor", "Edit points",
+                    "Raster ink", "Raster soft", "Raster dry", "Raster smudge", "Raster eraser"}
+            .contains(value)) {
         tool_ = std::move(value);
         emit toolChanged();
     }
@@ -673,14 +681,50 @@ void EditorController::cancelExport() {
     cancelExport_ = true;
 }
 void EditorController::autosave() {
-    if (!modified())
+    if (!modified() || savingRecovery_)
         return;
+    if (recoveryThread_.joinable())
+        recoveryThread_.join();
+    const auto snapshot = session_.snapshot();
+    const auto generation = sceneGeneration_;
+    const auto destination = recovery_;
+    savingRecovery_ = true;
+    emit recoveryChanged();
+    recoveryThread_ = std::thread([this, snapshot, generation, destination] {
+        QString error;
+        try {
+            (void)ProjectStore::save(nativePath(destination), *snapshot, "Recovery snapshot");
+            // Persist even when the application closes before queued UI delivery.
+            QSettings settings;
+            settings.setValue("recoveryPath", destination);
+            settings.sync();
+        } catch (const std::exception& e) {
+            error = QString::fromUtf8(e.what());
+        }
+        QMetaObject::invokeMethod(
+            this,
+            [this, generation, error] {
+                savingRecovery_ = false;
+                emit recoveryChanged();
+                if (generation == sceneGeneration_)
+                    report(error.isEmpty() ? "Recovery snapshot saved" : "Autosave failed: " + error);
+            },
+            Qt::QueuedConnection);
+    });
+}
+void EditorController::compactProject(int retain) {
+    if (path_.isEmpty() || modified()) {
+        report("Save this scene before compacting its history.");
+        return;
+    }
     try {
-        (void)ProjectStore::save(nativePath(recovery_), document(), "Recovery snapshot");
-        QSettings().setValue("recoveryPath", recovery_);
-        report("Recovery snapshot saved");
+        auto result = ProjectStore::compact(nativePath(path_), retain, diskRevision_);
+        report(QString("Retained %1 revisions. Original history backup: %2")
+                   .arg(result.retainedRevisions)
+                   .arg(QString::fromStdString(result.backup.string())));
+        emit changed();
     } catch (const std::exception& e) {
-        report("Autosave failed: " + QString::fromUtf8(e.what()));
+        report(QString::fromUtf8(e.what()));
     }
 }
 void EditorController::recover() {
@@ -726,5 +770,13 @@ void EditorController::deleteStroke(Id strokeId) {
     edit("Delete stroke", [&](Document& d) {
         auto& drawing = d.editableDrawing(layer_, frame_);
         std::erase_if(drawing.strokes, [=](const Stroke& stroke) { return stroke.id == strokeId; });
+    });
+}
+
+void EditorController::commitRaster(opentoon::RasterImage image) {
+    edit("Raster brush gesture", [&](Document& d) {
+        if (d.layer(layer_).locked)
+            throw std::runtime_error("Unlock the layer before painting.");
+        d.editableDrawing(layer_, frame_).raster = std::move(image);
     });
 }

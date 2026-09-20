@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 import OpenToon.Native
 import "components" as C
+import "dialogs" as D
 
 ApplicationWindow {
     id: root
@@ -70,6 +71,42 @@ ApplicationWindow {
         }
     }
 
+    Shortcut {
+        sequences: [StandardKey.Copy]
+        enabled: !root.textEditing && timeline.activeFocus
+        onActivated: editor.copyTimelineRange()
+    }
+    Shortcut {
+        sequences: [StandardKey.Paste]
+        enabled: !root.textEditing && timeline.activeFocus
+        onActivated: editor.pasteTimelineRange(0, false)
+    }
+    D.TimelineRangeDialog {
+        id: rangeDialog
+        controller: root.backend
+    }
+    Dialog {
+        id: markerDialog
+        title: "Scene marker"
+        modal: true
+        anchors.centerIn: parent
+        standardButtons: Dialog.Ok | Dialog.Cancel
+        onAccepted: editor.setSceneMarker(markerName.text)
+        TextField {
+            id: markerName
+            placeholderText: "Marker label (empty removes marker)"
+            width: 330
+            selectByMouse: true
+        }
+    }
+    FileDialog {
+        id: xsheetDialog
+        title: "Export Xsheet PDF"
+        fileMode: FileDialog.SaveFile
+        defaultSuffix: "pdf"
+        nameFilters: ["PDF files (*.pdf)"]
+        onAccepted: editor.exportXsheet(selectedFile)
+    }
     Shortcut {
         sequences: [StandardKey.New]
         onActivated: root.requestAction("new")
@@ -184,8 +221,14 @@ ApplicationWindow {
                 onTriggered: root.requestAction("demo")
             }
             Action {
-                text: "Save recovery snapshot"
+                text: editor.savingRecovery ? "Saving recovery snapshot…" : "Save recovery snapshot"
+                enabled: !editor.savingRecovery
                 onTriggered: editor.autosave()
+            }
+            Action {
+                text: "Compact project history…"
+                enabled: editor.projectPath.length > 0 && !editor.modified
+                onTriggered: compactDialog.open()
             }
             Action {
                 text: "Quit"
@@ -194,6 +237,29 @@ ApplicationWindow {
         }
         Menu {
             title: "Edit"
+            Action {
+                text: "Timeline range…"
+                onTriggered: rangeDialog.open()
+            }
+            Action {
+                text: "Copy timeline range"
+                onTriggered: editor.copyTimelineRange()
+            }
+            Action {
+                text: "Paste exposures"
+                enabled: editor.hasClipboard
+                onTriggered: editor.pasteTimelineRange(0, false)
+            }
+            Action {
+                text: "Scene marker…"
+                onTriggered: markerDialog.open()
+            }
+            Action {
+                text: "Export Xsheet PDF…"
+                onTriggered: xsheetDialog.open()
+            }
+            MenuSeparator {}
+
             Action {
                 text: "Undo"
                 enabled: editor.canUndo
@@ -365,6 +431,15 @@ ApplicationWindow {
                     color: "#e5e5e5"
                     Layout.preferredWidth: 76
                 }
+                ComboBox {
+                    visible: editor.tool.startsWith("Raster ")
+                    model: ["Raster ink", "Raster soft", "Raster dry", "Raster smudge", "Raster eraser"]
+                    currentIndex: Math.max(0, model.indexOf(editor.tool))
+                    implicitHeight: 28
+                    implicitWidth: 138
+                    onActivated: editor.tool = currentText
+                    Accessible.name: "Raster brush preset"
+                }
                 Text {
                     text: "Size"
                     color: "#858585"
@@ -461,6 +536,11 @@ ApplicationWindow {
                                 name: "Pencil",
                                 icon: "╱",
                                 key: "B"
+                            },
+                            {
+                                name: "Raster ink",
+                                icon: "◉",
+                                key: ""
                             },
                             {
                                 name: "Eraser",
@@ -1005,6 +1085,18 @@ ApplicationWindow {
                         const oy = timelineScroll.contentY;
                         ctx.font = "10px Menlo";
                         ctx.textBaseline = "middle";
+                        for (let selected = 0; selected < data.length; selected++) {
+                            if (editor.selectedLayers.indexOf(data[selected].id) < 0)
+                                continue;
+                            const a = timelineInput.moving ? timelineInput.previewFrame : editor.rangeStart;
+                            const b = a + editor.rangeEnd - editor.rangeStart;
+                            ctx.fillStyle = timelineInput.moving ? "#555555" : "#303030";
+                            if (root.xsheet)
+                                ctx.fillRect(48 + selected * 100 - ox, 30 + a * root.timelineRow - oy, 100, (b - a) * root.timelineRow);
+                            else
+                                ctx.fillRect(a * root.timelineCell - ox, 30 + selected * root.timelineRow - oy, (b - a) * root.timelineCell, root.timelineRow);
+                        }
+
                         if (!root.xsheet) {
                             const first = Math.max(0, Math.floor(ox / root.timelineCell));
                             const last = Math.min(editor.duration, Math.ceil((ox + width) / root.timelineCell));
@@ -1049,6 +1141,11 @@ ApplicationWindow {
                                     ctx.fillText("◇", x, y + 17);
                                 }
                             }
+                            for (let m = 0; m < editor.markers.length; ++m) {
+                                const marker = editor.markers[m];
+                                ctx.fillStyle = "#cccccc";
+                                ctx.fillText("▼ " + marker.name, marker.frame * root.timelineCell - ox + 3, 24 - oy);
+                            }
                             const px = editor.frame * root.timelineCell - ox;
                             ctx.fillStyle = "#ededed";
                             ctx.fillRect(px, 0, 2, height);
@@ -1059,7 +1156,7 @@ ApplicationWindow {
                             for (let f = first; f < last; f++) {
                                 const y = 30 + f * root.timelineRow - oy;
                                 ctx.fillStyle = f === editor.frame ? "#343434" : "#141414";
-                                ctx.fillRect(0, y, width, root.timelineRow);
+                                ctx.fillRect(0, y, Math.max(0, 48 - ox), root.timelineRow);
                                 ctx.fillStyle = "#999999";
                                 ctx.fillText(String(f + 1), 6, y + 17);
                                 for (let r = 0; r < data.length; r++) {
@@ -1084,24 +1181,60 @@ ApplicationWindow {
                         }
                     }
                     MouseArea {
+                        id: timelineInput
                         anchors.fill: parent
+                        property int anchorFrame: 0
+                        property int anchorRow: -1
+                        property bool moving: false
+                        property int previewFrame: -1
+                        function frameAt(mouse) {
+                            return root.xsheet ? Math.floor((mouse.y + timelineScroll.contentY - 30) / root.timelineRow) : Math.floor((mouse.x + timelineScroll.contentX) / root.timelineCell);
+                        }
+                        function rowAt(mouse) {
+                            return root.xsheet ? Math.floor((mouse.x + timelineScroll.contentX - 48) / 100) : Math.floor((mouse.y + timelineScroll.contentY - 30) / root.timelineRow);
+                        }
                         onPressed: function (mouse) {
-                            let row;
-                            if (root.xsheet) {
-                                editor.frame = Math.floor((mouse.y + timelineScroll.contentY - 30) / root.timelineRow);
-                                row = Math.floor((mouse.x + timelineScroll.contentX - 48) / 100);
-                            } else {
-                                editor.frame = Math.floor((mouse.x + timelineScroll.contentX) / root.timelineCell);
-                                row = Math.floor((mouse.y + timelineScroll.contentY - 30) / root.timelineRow);
-                            }
-                            if (row >= 0 && row < editor.layers.length)
-                                editor.selectedLayer = editor.layers[row].id;
+                            timeline.forceActiveFocus();
+                            anchorFrame = frameAt(mouse);
+                            anchorRow = rowAt(mouse);
+                            moving = (mouse.modifiers & Qt.AltModifier) && anchorRow >= 0;
+                            if (moving)
+                                previewFrame = anchorFrame;
+                            else if (anchorRow >= 0 && anchorRow < editor.layers.length)
+                                editor.selectTimelineRange(anchorFrame, anchorFrame, anchorRow, anchorRow);
+                            else
+                                editor.frame = anchorFrame;
                         }
                         onPositionChanged: function (mouse) {
-                            if (pressed)
-                                editor.frame = root.xsheet ? Math.floor((mouse.y + timelineScroll.contentY - 30) / root.timelineRow) : Math.floor((mouse.x + timelineScroll.contentX) / root.timelineCell);
+                            if (!pressed)
+                                return;
+                            if (moving) {
+                                previewFrame = Math.max(0, Math.min(editor.duration - 1, frameAt(mouse)));
+                                editor.report("Move preview: replace frames " + (previewFrame + 1) + "–" + (previewFrame + editor.rangeEnd - editor.rangeStart) + ". Release to overwrite; Escape cancels.");
+                                timeline.requestPaint();
+                            } else if (anchorRow >= 0)
+                                editor.selectTimelineRange(anchorFrame, frameAt(mouse), anchorRow, rowAt(mouse));
+                            else
+                                editor.frame = frameAt(mouse);
+                        }
+                        onReleased: {
+                            if (moving && previewFrame >= 0)
+                                editor.moveTimelineRange(previewFrame, false);
+                            moving = false;
+                            previewFrame = -1;
+                            timeline.requestPaint();
+                        }
+                        onCanceled: {
+                            moving = false;
+                            previewFrame = -1;
+                            timeline.requestPaint();
                         }
                         onDoubleClicked: editor.newDrawing(false)
+                    }
+                    Keys.onEscapePressed: {
+                        timelineInput.moving = false;
+                        timelineInput.previewFrame = -1;
+                        requestPaint();
                     }
                 }
                 Connections {
@@ -1113,6 +1246,9 @@ ApplicationWindow {
                         timeline.requestPaint();
                     }
                     function onSelectionChanged() {
+                        timeline.requestPaint();
+                    }
+                    function onRangeChanged() {
                         timeline.requestPaint();
                     }
                 }
@@ -1311,6 +1447,34 @@ ApplicationWindow {
             }
         }
         onAccepted: editor.setScene(sceneName.text, Number(sceneW.text), Number(sceneH.text), Number(sceneDuration.text), Number(rateN.text), Number(rateD.text))
+    }
+    Dialog {
+        id: compactDialog
+        title: "Compact project history"
+        anchors.centerIn: parent
+        width: 470
+        modal: true
+        standardButtons: Dialog.Ok | Dialog.Cancel
+        ColumnLayout {
+            anchors.fill: parent
+            Label {
+                Layout.fillWidth: true
+                wrapMode: Text.WordWrap
+                text: "Keep the newest revisions and remove unused media. A complete backup of the original history will be created beside the project before any revisions are removed."
+            }
+            Label {
+                text: "Revisions to retain"
+            }
+            SpinBox {
+                id: retainedRevisions
+                from: 1
+                to: 1000
+                value: 20
+                editable: true
+                Accessible.name: "Revisions to retain"
+            }
+        }
+        onAccepted: editor.compactProject(retainedRevisions.value)
     }
     Dialog {
         id: historyDialog

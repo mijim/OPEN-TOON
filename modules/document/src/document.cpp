@@ -145,13 +145,33 @@ void Document::validate() const {
                             p.pressure <= 1,
                         "Invalid stroke sample.");
         }
+        if (d.raster) {
+            const auto& raster = *d.raster;
+            require(raster.width > 0 && raster.width <= 8192 && raster.height > 0 && raster.height <= 8192,
+                    "Invalid raster dimensions.");
+            require(raster.tiles.size() <= 16384, "Raster tile limit exceeded.");
+            for (const auto& [position, tile] : raster.tiles) {
+                require(position.first >= 0 && position.second >= 0 &&
+                            position.first < (raster.width + 63) / 64 &&
+                            position.second < (raster.height + 63) / 64,
+                        "Raster tile lies outside its canvas.");
+                require(tile.size() == 64 * 64 * 4, "Invalid raster tile size.");
+                totalPixels += tile.size() * sizeof(std::uint16_t);
+                require(totalPixels <= 512 * 1024 * 1024, "Media memory budget exceeded.");
+                for (std::size_t index = 0; index < tile.size(); index += 4)
+                    require(tile[index + 3] <= 32768 && tile[index] <= tile[index + 3] &&
+                                tile[index + 1] <= tile[index + 3] && tile[index + 2] <= tile[index + 3],
+                            "Invalid premultiplied raster pixel.");
+            }
+        }
         if (d.image) {
             const auto& image = *d.image;
             require(image.width > 0 && image.width <= 8192 && image.height > 0 && image.height <= 8192,
                     "Invalid image size.");
             const auto size = static_cast<std::size_t>(image.width) * image.height * 4;
             totalPixels += size;
-            require(image.rgba.size() == size && totalPixels <= 256 * 1024 * 1024,
+            require(image.rgba.size() == size && size <= 256 * 1024 * 1024 &&
+                        totalPixels <= 512 * 1024 * 1024,
                     "Invalid image buffer or image memory limit exceeded.");
         }
     }

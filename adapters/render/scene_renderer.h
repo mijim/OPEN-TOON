@@ -9,6 +9,8 @@ struct RenderOptions {
     bool onionSkin = false;
     int onionRange = 1;
     Id isolatedLayer = 0;
+    Id previewLayer = 0;
+    const Drawing* previewDrawing = nullptr;
 };
 class SceneRenderer {
   public:

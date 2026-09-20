@@ -25,7 +25,7 @@ void limit(const Json& j, std::size_t max) {
         throw std::runtime_error("Invalid array or resource limit exceeded.");
 }
 } // namespace
-std::string serializeDocument(const Document& d) {
+std::string serializeDocument(const Document& d, ResourceWriter write) {
     d.validate();
     Json j = {{"format", "OPEN-TOON"},
               {"version", Document::formatVersion},
@@ -56,10 +56,34 @@ std::string serializeDocument(const Document& d) {
                                     {"artLayer", s.artLayer},
                                     {"points", points}});
         }
-        if (drawing.image)
-            x["image"] = {{"width", drawing.image->width},
-                          {"height", drawing.image->height},
-                          {"rgba", drawing.image->rgba}};
+        if (drawing.image) {
+            Json im = {{"width", drawing.image->width}, {"height", drawing.image->height}};
+            if (write)
+                im["resource"] = write({drawing.image->rgba.data(), drawing.image->rgba.size()});
+            else
+                im["rgba"] = drawing.image->rgba.values();
+            x["image"] = std::move(im);
+        }
+        if (drawing.raster) {
+            Json raster = {{"width", drawing.raster->width},
+                           {"height", drawing.raster->height},
+                           {"tiles", Json::array()}};
+            for (const auto& [position, tile] : drawing.raster->tiles) {
+                std::vector<std::uint8_t> bytes;
+                bytes.reserve(tile.size() * 2);
+                for (auto value : tile) {
+                    bytes.push_back(value & 255);
+                    bytes.push_back(value >> 8);
+                }
+                Json t = {{"x", position.first}, {"y", position.second}};
+                if (write)
+                    t["resource"] = write(bytes);
+                else
+                    t["bytes"] = std::move(bytes);
+                raster["tiles"].push_back(std::move(t));
+            }
+            x["raster"] = std::move(raster);
+        }
         j["drawings"].push_back(std::move(x));
     }
     for (const auto& l : d.layers) {
@@ -84,7 +108,7 @@ std::string serializeDocument(const Document& d) {
         j["markers"].push_back({m.frame, m.name});
     return j.dump();
 }
-Document deserializeDocument(const std::string& text) {
+Document deserializeDocument(const std::string& text, ResourceReader read) {
     if (text.size() > 64 * 1024 * 1024)
         throw std::runtime_error("Project revision exceeds the 64 MiB prototype limit.");
     auto callback = [](int depth, Json::parse_event_t, const Json&) {
@@ -93,7 +117,8 @@ Document deserializeDocument(const std::string& text) {
         return true;
     };
     const auto j = Json::parse(text, callback);
-    if (j.at("format") != "OPEN-TOON" || j.at("version") != Document::formatVersion)
+    if (j.at("format") != "OPEN-TOON" ||
+        (j.at("version").get<int>() < 1 || j.at("version").get<int>() > Document::formatVersion))
         throw std::runtime_error(
             "Unsupported project format version. The original file has not been changed.");
     Document d;
@@ -137,11 +162,52 @@ Document deserializeDocument(const std::string& text) {
         }
         if (x.contains("image")) {
             const auto& im = x.at("image");
-            pixels += im.at("rgba").size();
-            if (pixels > 256 * 1024 * 1024)
+            std::vector<std::uint8_t> bytes;
+            if (im.contains("resource")) {
+                if (!read)
+                    throw std::runtime_error("An external image resource resolver is required.");
+                bytes = read(im.at("resource"));
+            } else
+                bytes = im.at("rgba").get<std::vector<std::uint8_t>>();
+            pixels += bytes.size();
+            if (pixels > 512 * 1024 * 1024)
                 throw std::runtime_error("Image budget exceeded.");
-            drawing.image =
-                ImageAsset{im.at("width"), im.at("height"), im.at("rgba").get<std::vector<std::uint8_t>>()};
+            drawing.image = ImageAsset{im.at("width"), im.at("height"), std::move(bytes)};
+        }
+        if (x.contains("raster")) {
+            const auto& im = x.at("raster");
+            RasterImage raster;
+            raster.width = im.at("width");
+            raster.height = im.at("height");
+            limit(im.at("tiles"), 16384);
+            for (const auto& tile : im.at("tiles")) {
+                std::vector<std::uint8_t> bytes;
+                if (tile.contains("resource")) {
+                    if (!read)
+                        throw std::runtime_error("An external tile resource resolver is required.");
+                    bytes = read(tile.at("resource"));
+                } else
+                    bytes = tile.at("bytes").get<std::vector<std::uint8_t>>();
+                pixels += bytes.size();
+                if (bytes.size() != 64 * 64 * 4 * 2 || pixels > 512 * 1024 * 1024)
+                    throw std::runtime_error("Invalid raster tile or memory budget exceeded.");
+                std::vector<std::uint16_t> values;
+                values.reserve(bytes.size() / 2);
+                for (std::size_t i = 0; i < bytes.size(); i += 2) {
+                    auto value = std::uint16_t(bytes[i] | (std::uint16_t(bytes[i + 1]) << 8));
+                    if (value > 32768)
+                        throw std::runtime_error("Raster channel exceeds 15-bit range.");
+                    values.push_back(value);
+                }
+                for (std::size_t i = 0; i < values.size(); i += 4)
+                    if (values[i] > values[i + 3] || values[i + 1] > values[i + 3] ||
+                        values[i + 2] > values[i + 3])
+                        throw std::runtime_error("Raster tile is not premultiplied.");
+                if (!raster.tiles.emplace(std::pair<int, int>{tile.at("x"), tile.at("y")}, std::move(values))
+                         .second)
+                    throw std::runtime_error("Duplicate raster tile coordinate.");
+            }
+            drawing.raster = std::move(raster);
         }
         if (!d.drawings.emplace(drawing.id, std::move(drawing)).second)
             throw std::runtime_error("Duplicate drawing identity.");

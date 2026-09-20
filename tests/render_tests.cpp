@@ -49,3 +49,22 @@ TEST_CASE("Soloing a parent renders its visible descendants and hides unrelated 
     d.layers.back().visible = false;
     REQUIRE(SceneRenderer::render(d, 0, QSize(240, 135)) != normal);
 }
+
+TEST_CASE("Opaque raster tiles have no internal seams at fractional viewport scales") {
+    auto document = makeDocument();
+    document.width = 128;
+    document.height = 64;
+    auto& drawing = document.editableDrawing(document.layers.front().id, 0);
+    drawing.raster = RasterImage{128, 64, {}};
+    std::vector<std::uint16_t> pixels(64 * 64 * 4);
+    for (std::size_t i = 0; i < pixels.size(); i += 4)
+        pixels[i + 3] = 32768;
+    drawing.raster->tiles[{0, 0}] = pixels;
+    drawing.raster->tiles[{1, 0}] = pixels;
+    for (auto size : {QSize{81, 41}, QSize{199, 99}, QSize{47, 23}}) {
+        auto image = SceneRenderer::render(document, 0, size);
+        for (int y = 1; y < size.height() - 1; ++y)
+            for (int x = 1; x < size.width() - 1; ++x)
+                REQUIRE(image.pixelColor(x, y) == QColor(Qt::black));
+    }
+}

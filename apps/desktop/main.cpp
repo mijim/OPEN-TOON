@@ -155,7 +155,41 @@ int main(int argc, char** argv) {
                     send(QEvent::MouseButtonRelease, start + QPointF(50, 10), Qt::LeftButton, Qt::NoButton);
                     if (editor.document() != beforeCancel)
                         throw std::runtime_error("Cancelled gesture changed the document.");
-                    editor.loadDemo();
+                    editor.setTool("Raster ink");
+                    editor.setBrushSize(48);
+                    send(QEvent::MouseButtonPress, start, Qt::LeftButton, Qt::LeftButton);
+                    for (int i = 1; i <= 30; ++i)
+                        send(QEvent::MouseMove, start + QPointF(i * 5, 40), Qt::NoButton, Qt::LeftButton);
+                    send(QEvent::MouseButtonRelease, start + QPointF(150, 40), Qt::LeftButton, Qt::NoButton);
+                    const auto painted = editor.document();
+                    const auto* rasterDrawing = painted.drawingAt(editor.selectedLayer(), 0);
+                    if (!rasterDrawing || !rasterDrawing->raster || rasterDrawing->raster->tiles.empty())
+                        throw std::runtime_error("Native mouse input did not paint raster tiles: " +
+                                                 editor.status().toStdString());
+                    const auto rendered = opentoon::SceneRenderer::render(painted, 0);
+                    editor.undo();
+                    if (editor.document() != beforeCancel)
+                        throw std::runtime_error("Raster undo changed previous artwork.");
+                    editor.redo();
+                    if (editor.document() != painted)
+                        throw std::runtime_error("Raster redo mismatch.");
+                    const auto rasterPath = QUrl::fromLocalFile(temp.path() + "/raster.otoon");
+                    if (!editor.saveProject(rasterPath) || !editor.openProject(rasterPath) ||
+                        opentoon::SceneRenderer::render(editor.document(), 0) != rendered)
+                        throw std::runtime_error("Raster save and reopen changed rendered pixels.");
+                    send(QEvent::MouseButtonPress, start, Qt::LeftButton, Qt::LeftButton);
+                    send(QEvent::MouseMove, start + QPointF(80, 60), Qt::NoButton, Qt::LeftButton);
+                    canvas->cancelGesture();
+                    send(QEvent::MouseButtonRelease, start + QPointF(80, 60), Qt::LeftButton, Qt::NoButton);
+                    if (editor.document() != painted)
+                        throw std::runtime_error("Cancelled raster gesture changed artwork.");
+                    editor.selectTimelineRange(0, 5, 0, 0);
+                    editor.copyTimelineRange();
+                    editor.setFrame(6);
+                    editor.pasteTimelineRange(0, false);
+                    if (!editor.document().drawingAt(editor.selectedLayer(), 6))
+                        throw std::runtime_error("Timeline range paste failed.");
+                    editor.setTool("Raster ink");
                     QTimer::singleShot(250, &app, [&, window] {
                         auto image = window->grabWindow();
                         if (image.isNull() || !image.save("build/ui-smoke.png")) {
@@ -163,7 +197,8 @@ int main(int argc, char** argv) {
                             return;
                         }
                         std::cout << "UI smoke passed: mouse stroke, synthetic pen pressure, cancelled "
-                                     "gesture, undo/redo, save/reopen, canvas layout "
+                                     "gesture, raster painting and pixel round trip, range clipboard, "
+                                     "undo/redo, save/reopen, canvas layout "
                                      "and screenshot.\n";
                         app.exit(0);
                     });

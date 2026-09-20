@@ -16,6 +16,8 @@ Proposed ADRs require evidence before becoming implementation commitments. Accep
 
 | ADR-011 | Bounded experimental CPU renderer and SQLite snapshot storage | Accepted for prototype | Production performance/storage gates |
 
+See [ADR-012](012-immutable-media-and-raster.md) for the format 2 and brush contracts.
+
 See [ADR-011](011-experimental-desktop-slice.md) for current implementation evidence and deviations.
 
 Existing IDs are retained; removed entries are not renumbered.

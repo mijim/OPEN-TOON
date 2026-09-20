@@ -1,6 +1,8 @@
 #pragma once
 #include "editor_controller.h"
 #include "opentoon/document.h"
+#include "raster_brush.h"
+#include <QElapsedTimer>
 #include <QPointer>
 #include <QQuickPaintedItem>
 class CanvasItem : public QQuickPaintedItem {
@@ -48,6 +50,10 @@ class CanvasItem : public QQuickPaintedItem {
     int selectedPoint_ = -1;
     opentoon::Point pointPreview_;
     std::vector<opentoon::Point> samples_;
+    std::unique_ptr<opentoon::RasterBrush> rasterBrush_;
+    opentoon::Drawing rasterPreview_;
+    QElapsedTimer sampleClock_;
+    double tiltX_ = 0, tiltY_ = 0;
     QTransform viewTransform() const;
     opentoon::Point localPoint(QPointF, double) const;
     void begin(QPointF, double);
