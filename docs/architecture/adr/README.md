@@ -61,3 +61,6 @@ See [ADR-018](018-pose-key-block-editing.md) for shared pose-key selection, bloc
 See [ADR-019](019-canvas-motion-path-editing.md) for canvas trajectory key editing, parent-space mapping and its interpolation limits.
 
 See [ADR-020](020-additive-vector-selection.md) for additive/subtractive whole-vector selection and duplicate identity ownership.
+
+See [ADR-021](021-vector-authoring-and-key-patterns.md) for lasso, vector clipboard,
+arrangement, group styles, cleanup, guides and batch key patterns.

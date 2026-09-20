@@ -85,3 +85,35 @@ bool EditorController::deletePoint(opentoon::Id id, int point) {
         throw std::runtime_error("The selected stroke no longer exists.");
     });
 }
+
+bool EditorController::editVectors(const std::vector<Id>& ids, QString operation, double value) {
+    if (!layer_)
+        return false;
+    return edit("Edit vector group", [&](Document& d) {
+        auto& drawing = d.editableDrawing(layer_, frame_);
+        if (operation == "arrange") {
+            if (!std::isfinite(value) || value != std::floor(value) || value < 0 || value > 7)
+                throw std::invalid_argument("Invalid alignment operation.");
+            arrangeVectors(drawing, ids, static_cast<VectorLayout>(int(value)));
+        } else if (operation == "order") {
+            if (!std::isfinite(value) || value != std::floor(value) || value < 0 || value > 3)
+                throw std::invalid_argument("Invalid stacking operation.");
+            orderVectors(drawing, ids, static_cast<VectorOrder>(int(value)));
+        } else if (operation == "smooth")
+            smoothVectors(drawing, ids, value);
+        else if (operation == "simplify")
+            simplifyVectors(drawing, ids, value);
+        else
+            styleVectors(drawing, ids, operation.toStdString(), value);
+    });
+}
+bool EditorController::pasteVectorBlock(const VectorBlock& block, std::vector<Id>& result) {
+    if (!layer_)
+        return false;
+    std::vector<Id> incoming;
+    if (!edit("Paste vectors in local coordinates",
+              [&](Document& d) { incoming = pasteVectors(d, layer_, frame_, block); }))
+        return false;
+    result = std::move(incoming);
+    return true;
+}

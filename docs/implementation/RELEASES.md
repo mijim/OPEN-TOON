@@ -1,5 +1,26 @@
 # Experimental releases
 
+## 0.2.0-experimental.10 — vector authoring and animation patterns
+
+- Whole-vector lasso with additive/subtractive selection, select all and invert.
+- Independent vector cut/copy/paste between drawings/scenes with preserved colors.
+- Alignment, center distribution, stable art-layer stacking and keyboard nudges.
+- Batch width, palette, art-layer and fill edits in selection-owned Properties.
+- Adjustable corner-aware smoothing and pressure-aware sampled-pencil simplification.
+- Line tool, constrained primitives and drawing-local grid/snapping.
+- Batch full-pose interpolation/easing and collision-safe key-block repetition.
+- Professional project README and expanded English workflows/contracts.
+- Downloadable macOS arm64 preview, macOS 15 minimum, bundled runtime and notices,
+  matching dependency sources/recipes, checksums and verified ad-hoc signatures.
+
+65/65 CTest entries and all native authoring/animation smoke journeys passed. The
+release ZIP also passes those native journeys after extraction outside the workspace,
+with no external Homebrew or developer-home runtime libraries loaded. Format 3 remains
+unchanged; no new application library was adopted. P04/P06 remain partial. Physical
+tablets, Intel, clean-machine validation and new Windows/Linux binaries remain pending.
+The macOS preview is not Developer ID signed or Apple-notarized. See [ADR-021](../architecture/adr/021-vector-authoring-and-key-patterns.md)
+and [installation notes](MACOS-PREVIEW.md).
+
 ## 0.2.0-experimental.9 — additive vector selection
 
 - Shift adds and Alt subtracts whole vectors by click or rectangular marquee.

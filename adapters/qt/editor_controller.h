@@ -3,6 +3,7 @@
 #include "opentoon/key_block.h"
 #include "opentoon/session.h"
 #include "opentoon/timeline.h"
+#include "opentoon/vector_edit.h"
 #include <QColor>
 #include <QElapsedTimer>
 #include <QObject>
@@ -75,6 +76,11 @@ class EditorController final : public QObject {
     Q_INVOKABLE bool moveSelectedPoseKeys(int offset, bool duplicate = false);
     Q_INVOKABLE bool stretchSelectedPoseKeys(int last);
     Q_INVOKABLE bool deleteSelectedPoseKeys();
+    Q_INVOKABLE bool interpolateSelectedPoseKeys(int preset);
+    Q_INVOKABLE bool repeatSelectedPoseKeys(int copies);
+    bool editVectors(const std::vector<opentoon::Id>&, QString operation, double value);
+    bool pasteVectorBlock(const opentoon::VectorBlock&, std::vector<opentoon::Id>& result);
+
     Q_INVOKABLE QVariantList curveSamples(QString channel, int samples = 400) const;
     Q_INVOKABLE void nextKey(int direction);
     Q_INVOKABLE bool updateKey(int source, int destination, QString channel, double value, int interpolation);

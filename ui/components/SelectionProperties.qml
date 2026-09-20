@@ -98,6 +98,12 @@ ColumnLayout {
             Accessible.name: "Selected object color"
         }
     }
+    VectorTools {
+        Layout.fillWidth: true
+        drawingCanvas: root.drawingCanvas
+        controller: root.controller
+        enabled: !root.objectData.locked
+    }
     Label {
         visible: root.objectData.locked || false
         text: "Layer locked"

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "as_of": "2026-09-20",
+  "as_of": "2026-09-21",
   "features": [
     {
       "id": "PRJ-001",
@@ -768,7 +768,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/status.json; docs/architecture/adr/020-additive-vector-selection.md; whole-stroke additive/subtractive selection only; lasso and partial geometry pending"
+      "implementation_evidence": "docs/architecture/adr/021-vector-authoring-and-key-patterns.md; Whole-footprint vector lasso, additive/subtractive selection, clipboard and direct transforms; raster masks and partial contours pending."
     },
     {
       "id": "VEC-010",
@@ -870,7 +870,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/status.json; experimental subset only, catalog acceptance not closed"
+      "implementation_evidence": "docs/architecture/adr/021-vector-authoring-and-key-patterns.md; Adjustable open-pencil smoothing protects endpoints, pressure and sharp corners; analytic contour smoothing pending."
     },
     {
       "id": "VEC-015",
@@ -891,7 +891,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/status.json; experimental subset only, catalog acceptance not closed"
+      "implementation_evidence": "docs/architecture/adr/021-vector-authoring-and-key-patterns.md; Two-point Line, constrained Rectangle/Ellipse and 45-degree line angles; broader primitive acceptance pending."
     },
     {
       "id": "VEC-016",
@@ -1022,7 +1022,7 @@
         "Simplification respects a published visual-error tolerance."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "drawing-vector",
@@ -1031,7 +1031,8 @@
         "UI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/architecture/adr/021-vector-authoring-and-key-patterns.md; Bounded open-pencil centerline simplification with local geometric and pressure tolerances; combining and analytic contour optimization pending."
     },
     {
       "id": "VEC-023",
@@ -1082,7 +1083,7 @@
         "Disabling snapping permits points between grid lines."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "drawing-vector",
@@ -1091,7 +1092,8 @@
         "UI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/architecture/adr/021-vector-authoring-and-key-patterns.md; Drawing-local grid and optional snapping for sampled tools/primitives; session-only settings, advanced reference guides pending."
     },
     {
       "id": "VEC-026",
@@ -2209,7 +2211,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/status.json; experimental subset only, catalog acceptance not closed"
+      "implementation_evidence": "docs/architecture/adr/021-vector-authoring-and-key-patterns.md; Batch full-pose Linear/Step/Smooth interpolation on one layer; independent channel keys pending."
     },
     {
       "id": "ANI-005",
@@ -2272,7 +2274,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/status.json; docs/architecture/adr/016-visual-animation-and-bezier.md; docs/architecture/adr/017-combined-motion-and-point-editing.md; bounded visual-editing subset only, catalog acceptance not closed"
+      "implementation_evidence": "docs/architecture/adr/021-vector-authoring-and-key-patterns.md; Batch outgoing easing/overshoot presets across full-pose channels; independent spatial velocity pending."
     },
     {
       "id": "ANI-008",
@@ -2314,7 +2316,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/status.json; docs/architecture/adr/018-pose-key-block-editing.md; single-layer full-pose block operations in local units only; catalog acceptance not closed"
+      "implementation_evidence": "docs/architecture/adr/021-vector-authoring-and-key-patterns.md; Sparse key-block repeat with preserved poses/easing, duration extension and collision rejection; channel masks and cross-layer batching pending."
     },
     {
       "id": "ANI-010",

@@ -35,6 +35,11 @@ QCursor toolCursor(const QString& tool) {
         p.drawLine(14, 21, 28, 21);
         if (tool == "Add selection")
             p.drawLine(21, 14, 21, 28);
+    } else if (tool == "Lasso") {
+        p.drawEllipse(12, 12, 16, 12);
+        p.drawLine(19, 24, 16, 29);
+    } else if (tool == "Line") {
+        p.drawLine(13, 27, 28, 12);
     } else if (tool == "Ellipse")
         p.drawEllipse(13, 13, 14, 12);
     else if (tool == "Edit points") {
@@ -105,11 +110,12 @@ void CanvasItem::updateCursor(QPointF point) {
             setCursor(motionPathFrameAt(point) >= 0 ? Qt::PointingHandCursor : Qt::CrossCursor);
         return;
     }
-    if ((tool == "Select" || tool == "Marquee") && !transforming_ && (shift_ || subtract_)) {
+    if ((tool == "Select" || tool == "Marquee" || tool == "Lasso") && !transforming_ &&
+        (shift_ || subtract_)) {
         setCursor(toolCursor(subtract_ ? "Subtract selection" : "Add selection"));
         return;
     }
-    if (tool == "Select" || tool == "Marquee" || tool == "Animate") {
+    if (tool == "Select" || tool == "Marquee" || tool == "Lasso" || tool == "Animate") {
         if (hasRegion()) {
             for (int h = 8; h >= 0; --h) {
                 if (!handleVisible(h))

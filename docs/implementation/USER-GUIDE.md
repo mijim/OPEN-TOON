@@ -277,3 +277,48 @@ the document cancels an active preview. Locked layers cannot be edited.
 This edits pose positions, not an independent spatial spline. Curves still controls
 X/Y easing; separate path geometry and velocity, spatial Bezier handles and multi-key
 path movement remain pending. Dense trajectories are sampled at integer frames.
+
+## Compose and clean up vector drawings
+
+Use **Lasso (L)** to surround whole strokes. Only fully enclosed footprints are
+selected; hold Shift to add or Alt to subtract. Escape cancels. Select, Marquee and
+Lasso preserve the same explicit vector group. **Edit → Select all / Invert selection**
+works on vectors in the current drawing.
+
+With the canvas focused, Cmd/Ctrl+C copies the selected vectors, Cmd/Ctrl+X cuts them,
+and Cmd/Ctrl+V pastes them in place into the current drawing. Move the new selection
+with its handles. The application clipboard also works after opening another scene;
+it preserves colors and creates independent vector IDs. It does not exchange artwork
+with other apps. Curve/timeline focus uses the separate motion or exposure clipboard;
+text fields keep their normal shortcuts.
+
+Use **Properties → Align** for edges/centers or horizontal/vertical distribution
+(at least three vectors). **Order** moves selected strokes forward/backward or to the
+front/back within their art layers. Arrow keys nudge one local pixel; Shift nudges ten.
+Properties can apply a width, palette swatch, art layer or filled/outline state to the
+whole selection. A mixed width displays **Mixed** until you enter a replacement.
+
+**Pencil cleanup** offers Light/Medium/Strong smoothing and simplification tolerances
+of 0.25, 0.5, 1, 2 or 4 local pixels. These affect sampled open pencil strokes, preserve
+endpoints and pressure, and leave analytic primitives alone. Smoothing protects sharp
+corners. Simplification bounds centerline and pressure changes, not the final painted
+outline. Each action is one undo step; excessive work rejects without a partial edit.
+
+Use **Line** for straight strokes. Hold Shift for 45-degree angles, or while drawing
+Rectangle/Ellipse for squares/circles. **Guides** shows a drawing-local grid and enables
+snapping for Pencil/Line/Rectangle/Ellipse. Constraints take priority over snapping.
+Guides are session preferences; they are neither saved in the scene nor exported.
+
+## Apply animation patterns
+
+Select pose diamonds, then open **Curves → Keys** to apply Linear, Step, Smooth,
+Ease in/out, Overshoot or Fast start / Soft stop to the selected keys. Easing presets
+affect all outgoing pose channels and skip a final key with no following segment.
+Use highlighted channels and round handles for further visual curve adjustments.
+
+**Append 1 copy / Append 3 copies** repeats the selected sparse block after its last
+frame, preserving all poses and easing. The period includes both selection endpoints.
+Scene duration grows if needed and the new keys become selected. Existing keys are
+never overwritten: any collision rejects the whole operation. Undo restores the
+original block and duration. Matching start/end poses for a seamless loop remains
+an artistic choice; repetition does not generate that transition automatically.

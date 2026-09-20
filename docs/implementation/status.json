@@ -34,8 +34,8 @@
     {
       "id": "P04",
       "status": "in_progress",
-      "available": "Sampled vector strokes, approximate eraser, primitives, single-stroke selection, point editing/smoothing, stable palette IDs and shape recoloring. Rectangular whole-stroke multi-selection, move/duplicate/delete, flips and quarter turns preserve editable geometry, swatch and art-layer IDs. On-canvas scale/rotation handles with live previews and explicit selected-vector properties. Thin vectors have a constant screen-space hit margin respecting art order; point dragging previews the complete stroke, with contextual tool/handle cursors. Pencil/polygon points can be inserted on segments by double-click and deleted individually while preserving identity, pressure interpolation and minimum geometry. Shift/Alt add/subtract whole vectors by click or marquee, with sparse membership, individual selection bounds, tool-switch preservation and identity-safe duplication.",
-      "remaining": "Region topology/fill, analytic erasing, Bezier/contour/width editors, presets/textures/guides, lasso/partial geometry selection and vector optimization."
+      "available": "Sampled vector strokes, approximate eraser, primitives, single-stroke selection, point editing/smoothing, stable palette IDs and shape recoloring. Rectangular whole-stroke multi-selection, move/duplicate/delete, flips and quarter turns preserve editable geometry, swatch and art-layer IDs. On-canvas scale/rotation handles with live previews and explicit selected-vector properties. Thin vectors have a constant screen-space hit margin respecting art order; point dragging previews the complete stroke, with contextual tool/handle cursors. Pencil/polygon points can be inserted on segments by double-click and deleted individually while preserving identity, pressure interpolation and minimum geometry. Shift/Alt add/subtract whole vectors by click or marquee, with sparse membership, individual selection bounds, tool-switch preservation and identity-safe duplication. Whole-footprint vector lasso with modifiers, select all/invert, cross-scene vector cut/copy/paste, local nudges, alignment/distribution, art-layer stacking, batch styles, corner-aware smoothing, pressure-aware simplification, constrained lines/primitives and drawing-local grid/snapping.",
+      "remaining": "Region topology/fill, analytic erasing, Bezier/contour/width editors, presets/textures, advanced guides, partial contour and raster lasso selection, geometry combining and production-scale optimization."
     },
     {
       "id": "P05",
@@ -46,7 +46,7 @@
     {
       "id": "P06",
       "status": "in_progress",
-      "available": "Layer transform keys with linear/held/smooth interpolation, inherited transforms/opacity, explicit Setup/Animate and Auto key, key navigation/state, editable pose-channel graph and key-only multi-layer retiming with collision rejection. Curves stay in the main workspace; timeline/Xsheet range-end dragging stretches timing. Animate (A) records layer poses directly with move/scale/rotation handles and an initial anchor. Per-channel normalized Bezier handles, overshoot presets, graph key creation and a evaluated canvas trajectory share evaluation with export. All motion defaults to normalized combined channels with in-place channel selection, square-key editing, linked/unlinked easing handles, a full-pose retiming lane and time zoom/panning. Shared sparse pose-key selection, direct group drag/Alt-duplicate, right-edge timing stretch, keyboard nudges/delete and local-unit motion copy/paste with collision protection and atomic undo. Animate Path mode edits individual pose positions directly on the canvas, with fixed drawing references, animated-parent mapping, screen-axis constraints, sampled pose insertion and atomic preview/undo.",
+      "available": "Layer transform keys with linear/held/smooth interpolation, inherited transforms/opacity, explicit Setup/Animate and Auto key, key navigation/state, editable pose-channel graph and key-only multi-layer retiming with collision rejection. Curves stay in the main workspace; timeline/Xsheet range-end dragging stretches timing. Animate (A) records layer poses directly with move/scale/rotation handles and an initial anchor. Per-channel normalized Bezier handles, overshoot presets, graph key creation and a evaluated canvas trajectory share evaluation with export. All motion defaults to normalized combined channels with in-place channel selection, square-key editing, linked/unlinked easing handles, a full-pose retiming lane and time zoom/panning. Shared sparse pose-key selection, direct group drag/Alt-duplicate, right-edge timing stretch, keyboard nudges/delete and local-unit motion copy/paste with collision protection and atomic undo. Animate Path mode edits individual pose positions directly on the canvas, with fixed drawing references, animated-parent mapping, screen-axis constraints, sampled pose insertion and atomic preview/undo. Batch full-pose interpolation/easing and append-key-block repetition preserve poses, reject collisions atomically and extend duration with one undo.",
       "remaining": "Independent channel keys, linked/free analytic tangents, separate spatial paths and velocity, multi-layer/channel-mask batched editing and world-space motion retargeting, cameras and multiplane evaluation."
     },
     {
@@ -76,15 +76,15 @@
     {
       "id": "P11",
       "status": "planned",
-      "available": "Saved revisions, recovery UX, English guide, regression tests and source CI are initial prerequisites. Format 1/2 migration backups, format 3 curve metadata and checked compressed media resources, explicit backed-up compaction and asynchronous recovery snapshots.",
-      "remaining": "All required journeys, remaining hardening, supported device/OS matrix, accessibility, complete notices/SBOM and signed/installable releases."
+      "available": "Saved revisions, recovery UX, English guide, regression tests and source CI are initial prerequisites. Format 1/2 migration backups, format 3 curve metadata and checked compressed media resources, explicit backed-up compaction and asynchronous recovery snapshots. Requested arm64 macOS preview now includes audited runtime dependencies, notices, matching source archives/recipes and verified ad-hoc signatures.",
+      "remaining": "All required journeys, remaining hardening, supported device/OS matrix, accessibility, reproducible release SBOM automation, clean-machine validation and Developer ID signed/notarized releases."
     }
   ],
   "verification": {
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 55,
+      "count": 64,
       "command": "ctest --test-dir build/locked --output-on-failure"
     },
     "native_input_workflow": {
@@ -148,7 +148,13 @@
         "Shift/Alt whole-vector picking and marquee with actual Properties counts",
         "vector selection survives Select/Marquee switching and rejects enclosed bystanders",
         "sparse group movement in mirrored/rotated views, scaling, cancellation and atomic undo",
-        "overlapping duplicate selection identity, move/delete and pixel-equivalent persistence"
+        "overlapping duplicate selection identity, move/delete and pixel-equivalent persistence",
+        "native constrained line/circle and snapped endpoints",
+        "native lasso modifiers, select all/invert and vector nudge/undo",
+        "focus-aware native vector copy/cut/paste across drawings with locked-target rejection",
+        "group styles, alignment/distribution and cleanup undo",
+        "batch key interpolation/repetition, duration and collision rejection",
+        "authoring semantic and rendered-pixel persistence"
       ],
       "limits": "Synthetic mouse/tablet events on macOS; no physical tablet available. Window-layout flush required for occluded native smoke instances."
     },
@@ -176,11 +182,24 @@
         "windows-2022": "32 CTest entries passed with Qt 6.8.3; POSIX process termination test excluded",
         "sanitizers": "27 Qt-free core and MyPaint cases passed with AddressSanitizer and UndefinedBehaviorSanitizer"
       },
-      "limits": "Build/test evidence only; Windows crash-termination test is not implemented, GUI interaction outside macOS, physical tablets and clean-machine installation remain unqualified. Historical evidence; experimental.9 is macOS-validated only under the source-release policy."
+      "limits": "Build/test evidence only; Windows crash-termination test is not implemented, GUI interaction outside macOS, physical tablets and clean-machine installation remain unqualified. Historical evidence; experimental.10 is macOS-validated only ; new Windows/Linux binaries are deferred."
     },
     "standalone_package": {
-      "status": "failed",
-      "reason": "Split Homebrew Qt deployment failed plugin/framework resolution. Build-tree application works; no installer was published."
+      "status": "passed",
+      "version": "0.2.0-experimental.10",
+      "architecture": "arm64",
+      "minimum_macos": "15.0",
+      "host": "macOS 15.5",
+      "deployed_macho_files": 124,
+      "signature": "ad-hoc; no Developer ID or Apple notarization",
+      "scope": "Release ZIP extracted outside workspace; all native smoke journeys pass with Qt/QML/DYLD SDK overrides removed. Loader trace contains zero Homebrew or developer-home runtime libraries. Nested code signatures verified with codesign --deep --strict.",
+      "assets": [
+        "OPEN-TOON-0.2.0-experimental.10-macOS-arm64.zip",
+        "OPEN-TOON-0.2.0-experimental.10-dependency-sources.tar.gz",
+        "runtime-manifest.json",
+        "SHA256SUMS.txt"
+      ],
+      "limits": "Development-host relocation only, not clean-machine/Intel/physical-tablet or complete supported-OS qualification."
     },
     "sanitizers": {
       "status": "passed",
@@ -207,7 +226,7 @@
         "motion-path X/Y commands retain non-position pose fields and easing, with locked-edit rejection and saved pixel equivalence"
       ]
     },
-    "total_local_ctest_entries": 56,
+    "total_local_ctest_entries": 65,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -234,8 +253,8 @@
     "key_blocks": {
       "status": "passed",
       "platform": "macOS",
-      "core_cases": 4,
-      "scope": "Sparse moves, proportional retiming, rounded/cross-key collisions, duplicates, local pose/pivot/easing clipboard transfer, locked edits, undo/redo and persistence. Native grouped input gestures and focus-safe shortcuts.",
+      "core_cases": 6,
+      "scope": "Sparse moves, proportional retiming, rounded/cross-key collisions, duplicates, local pose/pivot/easing clipboard transfer, locked edits, undo/redo and persistence. Native grouped input gestures and focus-safe shortcuts. Batch interpolation removes stale easing; full-pose outgoing presets and bounded repetition preserve gaps and reject collisions atomically.",
       "limitations": "Full poses on one selected layer. No world-space retargeting or channel masks; no production-size performance or physical-device qualification."
     },
     "motion_path": {
@@ -243,6 +262,14 @@
       "platform": "macOS",
       "scope": "Direct X/Y key editing on evaluated canvas trajectories with atomic preview, parent-space mapping and fixed local references. Native hierarchy, view, insertion and persistence checks.",
       "limitations": "Integer-frame sampled display. No independent spatial spline, path tangents, separate velocity, parent-key editing, dense-scene or physical-device qualification."
+    },
+    "vector_authoring": {
+      "status": "passed",
+      "domain_cases": 6,
+      "render_cases": 1,
+      "scope": "Cross-scene clipboard and swatches, explicit vector arrangement/stacking, batch style rejection, protected-corner smoothing, bounded pressure-aware simplification and concave whole-footprint lasso. Native authoring journey with Undo and persistence.",
+      "screenshot": "docs/implementation/authoring.png",
+      "limitations": "Whole vectors only; clipboard is application-local; no raster lasso, partial contours, analytic topology or production-scale qualification."
     }
   },
   "ownership": {
@@ -256,11 +283,11 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.9",
+  "version": "0.2.0-experimental.10",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
-    "release_artifacts": "source only",
+    "release_artifacts": "Source and requested macOS arm64 preview for experimental.10; Windows/Linux binaries deferred",
     "cross_platform_builds": "manual future compiled-release qualification"
   }
 }

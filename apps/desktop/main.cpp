@@ -1,3 +1,4 @@
+#include "authoring_smoke.h"
 #include "canvas_item.h"
 #include "editor_controller.h"
 #include "key_block_smoke.h"
@@ -430,6 +431,7 @@ int main(int argc, char** argv) {
                                     visualEditingSmoke(editor, *canvas, *window);
                                     keyBlockSmoke(editor, *window);
                                     vectorSelectionSmoke(editor, *canvas, *window);
+                                    authoringSmoke(editor, *canvas, *window);
                                     motionPathSmoke(editor, *canvas, *window);
                                     QTimer::singleShot(150, &app, [&, window] {
                                         auto image = window->grabWindow();

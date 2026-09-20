@@ -73,3 +73,10 @@ macOS once, fixing failures iteratively. The Native editor GitHub workflow is ma
 only; pushes, pull requests and source tags do not build Linux/Windows. Dispatch it
 when qualifying a future compiled release. Binary installers are not part of the
 current source-release workflow.
+
+## Download or package the macOS preview
+
+Experimental.10 includes a standalone arm64 ZIP. See [MACOS-PREVIEW.md](MACOS-PREVIEW.md)
+for installation, runtime/source inventories, ad-hoc signing and packaging commands.
+This owner-requested artifact supersedes the source-only policy for this release;
+Linux/Windows builds remain deferred.

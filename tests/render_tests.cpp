@@ -107,3 +107,17 @@ TEST_CASE("Bezier motion uses identical preview and reopened rendering") {
         REQUIRE(SceneRenderer::render(d, f, QSize(240, 135)) ==
                 SceneRenderer::render(reopened, f, QSize(240, 135)));
 }
+
+TEST_CASE("Whole-vector lasso respects concavity and stroke width instead of just sample points") {
+    Drawing d;
+    d.strokes = {{1, 1, 2, Shape::Stroke, false, 2, {{10, 10, 1}, {20, 10, 1}}},
+                 {2, 1, 2, Shape::Stroke, false, 2, {{10, 20, 1}, {80, 20, 1}}},
+                 {3, 1, 8, Shape::Ellipse, false, 2, {{5, 5, 1}, {25, 25, 1}}},
+                 {4, 1, 2, Shape::Rectangle, true, 2, {{70, 70, 1}, {80, 80, 1}}}};
+    std::vector<Point> concave{{0, 0},   {100, 0}, {100, 100}, {60, 100},
+                               {60, 15}, {40, 15}, {40, 100},  {0, 100}};
+    REQUIRE(enclosedVectorsByLasso(d, concave) == std::vector<Id>{1, 3, 4});
+    std::vector<Point> small{{4, 4}, {26, 4}, {26, 26}, {4, 26}};
+    REQUIRE(enclosedVectorsByLasso(d, small) == std::vector<Id>{1});
+    REQUIRE(enclosedVectorsByLasso(d, {{0, 0}, {1, 1}}).empty());
+}

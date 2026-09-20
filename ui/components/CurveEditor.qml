@@ -288,6 +288,24 @@ FocusScope {
                 onClicked: root.controller.pastePoseKeys()
             }
             C.ToolButton {
+                text: "Keys ▾"
+                hint: "Interpolation and repetition for the selected full-pose block"
+                enabled: root.controller.selectedPoseFrames.length > 0
+                onClicked: keyBlockMenu.open()
+                Menu {
+                    id: keyBlockMenu
+                    MenuItem { text: "Linear segments"; onTriggered: root.controller.interpolateSelectedPoseKeys(0) }
+                    MenuItem { text: "Hold poses"; onTriggered: root.controller.interpolateSelectedPoseKeys(1) }
+                    MenuItem { text: "Smooth segments"; onTriggered: root.controller.interpolateSelectedPoseKeys(2) }
+                    MenuItem { text: "Ease in / out"; onTriggered: root.controller.interpolateSelectedPoseKeys(3) }
+                    MenuItem { text: "Overshoot"; onTriggered: root.controller.interpolateSelectedPoseKeys(4) }
+                    MenuItem { text: "Fast start / soft stop"; onTriggered: root.controller.interpolateSelectedPoseKeys(5) }
+                    MenuSeparator {}
+                    MenuItem { text: "Append one copy"; onTriggered: root.controller.repeatSelectedPoseKeys(1) }
+                    MenuItem { text: "Append three copies"; onTriggered: root.controller.repeatSelectedPoseKeys(3) }
+                }
+            }
+            C.ToolButton {
                 text: "Values"
                 enabled: !root.combined
                 hint: "Show precise numeric key controls"

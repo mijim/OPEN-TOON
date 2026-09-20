@@ -47,6 +47,8 @@ ApplicationWindow {
     property string pendingAction: ""
     property bool allowClose: false
     property bool textEditing: activeFocusItem instanceof TextInput || activeFocusItem instanceof TextEdit
+    readonly property bool drawingSelectionTool: ["Select", "Marquee", "Lasso"].includes(editor.tool)
+    readonly property bool canvasEditingFocused: canvas.activeFocus && drawingSelectionTool
     property bool xsheet: false
     readonly property bool keyWorkspaceFocused: (showCurves && curveEditor.activeFocus) || (!showCurves && keyEditing && timeline.activeFocus)
     property bool keyEditing: editor.tool === "Animate"
@@ -92,19 +94,31 @@ ApplicationWindow {
 
     Shortcut {
         sequences: [StandardKey.Copy]
-        enabled: !root.textEditing && (root.keyWorkspaceFocused || timeline.activeFocus)
-        onActivated: root.keyWorkspaceFocused ? editor.copyPoseKeys() : editor.copyTimelineRange()
+        enabled: !root.textEditing && (root.keyWorkspaceFocused || timeline.activeFocus || root.canvasEditingFocused)
+        onActivated: root.canvasEditingFocused ? canvas.copyVectorSelection() : root.keyWorkspaceFocused ? editor.copyPoseKeys() : editor.copyTimelineRange()
     }
     Shortcut {
         sequences: [StandardKey.Paste]
-        enabled: !root.textEditing && (root.keyWorkspaceFocused || timeline.activeFocus)
-        onActivated: root.keyWorkspaceFocused ? editor.pastePoseKeys() : editor.pasteTimelineRange(0, false)
+        enabled: !root.textEditing && (root.keyWorkspaceFocused || timeline.activeFocus || root.canvasEditingFocused)
+        onActivated: root.canvasEditingFocused ? canvas.pasteVectorSelection() : root.keyWorkspaceFocused ? editor.pastePoseKeys() : editor.pasteTimelineRange(0, false)
     }
     Shortcut {
         sequences: [StandardKey.SelectAll]
-        enabled: !root.textEditing && root.keyWorkspaceFocused
-        onActivated: editor.selectPoseRange(0, editor.duration - 1)
+        enabled: !root.textEditing && (root.keyWorkspaceFocused || root.canvasEditingFocused)
+        onActivated: root.canvasEditingFocused ? canvas.selectAllVectors() : editor.selectPoseRange(0, editor.duration - 1)
     }
+    Shortcut {
+        sequences: [StandardKey.Cut]
+        enabled: !root.textEditing && root.canvasEditingFocused
+        onActivated: canvas.copyVectorSelection(true)
+    }
+    Shortcut { sequence: "L"; enabled: !root.textEditing; onActivated: editor.tool = "Lasso" }
+    Shortcut { sequence: "Shift+Right"; enabled: root.canvasEditingFocused && !root.textEditing; onActivated: canvas.nudgeVectorSelection(10, 0) }
+    Shortcut { sequence: "Shift+Left"; enabled: root.canvasEditingFocused && !root.textEditing; onActivated: canvas.nudgeVectorSelection(-10, 0) }
+    Shortcut { sequence: "Up"; enabled: root.canvasEditingFocused && !root.textEditing; onActivated: canvas.nudgeVectorSelection(0, -1) }
+    Shortcut { sequence: "Down"; enabled: root.canvasEditingFocused && !root.textEditing; onActivated: canvas.nudgeVectorSelection(0, 1) }
+    Shortcut { sequence: "Shift+Up"; enabled: root.canvasEditingFocused && !root.textEditing; onActivated: canvas.nudgeVectorSelection(0, -10) }
+    Shortcut { sequence: "Shift+Down"; enabled: root.canvasEditingFocused && !root.textEditing; onActivated: canvas.nudgeVectorSelection(0, 10) }
     Dialog {
         id: markerDialog
         title: "Scene marker"
@@ -181,12 +195,12 @@ ApplicationWindow {
     Shortcut {
         sequence: "Right"
         enabled: !root.textEditing
-        onActivated: root.keyWorkspaceFocused && editor.selectedPoseFrames.length ? editor.moveSelectedPoseKeys(1) : editor.frame++
+        onActivated: root.canvasEditingFocused ? canvas.nudgeVectorSelection(1, 0) : root.keyWorkspaceFocused && editor.selectedPoseFrames.length ? editor.moveSelectedPoseKeys(1) : editor.frame++
     }
     Shortcut {
         sequence: "Left"
         enabled: !root.textEditing
-        onActivated: root.keyWorkspaceFocused && editor.selectedPoseFrames.length ? editor.moveSelectedPoseKeys(-1) : editor.frame--
+        onActivated: root.canvasEditingFocused ? canvas.nudgeVectorSelection(-1, 0) : root.keyWorkspaceFocused && editor.selectedPoseFrames.length ? editor.moveSelectedPoseKeys(-1) : editor.frame--
     }
     Shortcut {
         sequence: "F"
@@ -481,13 +495,13 @@ ApplicationWindow {
                     Accessible.name: "Raster brush preset"
                 }
                 Text {
-                    visible: editor.tool !== "Marquee" && editor.tool !== "Select" && editor.tool !== "Animate"
+                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate"
                     text: "Size"
                     color: "#858585"
                     font.pixelSize: 11
                 }
                 Slider {
-                    visible: editor.tool !== "Marquee" && editor.tool !== "Select" && editor.tool !== "Animate"
+                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate"
                     from: 0.5
                     to: 100
                     value: editor.brushSize
@@ -496,7 +510,7 @@ ApplicationWindow {
                     Accessible.name: "Brush size"
                 }
                 Text {
-                    visible: editor.tool !== "Marquee" && editor.tool !== "Select" && editor.tool !== "Animate"
+                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate"
                     text: editor.brushSize.toFixed(1) + " px"
                     color: "#aaaaaa"
                     Layout.preferredWidth: 58
@@ -528,6 +542,26 @@ ApplicationWindow {
                     color: "#bbbbbb"
                 }
                 C.ToolButton {
+                    text: "Guides ▾"
+                    hint: "Drawing-local grid and optional snapping for pencil and primitives"
+                    onClicked: gridMenu.open()
+                    Menu {
+                        id: gridMenu
+                        MenuItem { text: "Show grid"; checkable: true; checked: canvas.gridVisible; onTriggered: canvas.gridVisible = !canvas.gridVisible }
+                        MenuItem { text: "Snap pencil and shapes"; checkable: true; checked: canvas.snapToGrid; onTriggered: canvas.snapToGrid = !canvas.snapToGrid }
+                        MenuSeparator {}
+                        MenuItem { text: "Spacing · 10 px"; onTriggered: canvas.gridSpacing = 10 }
+                        MenuItem { text: "Spacing · 20 px"; onTriggered: canvas.gridSpacing = 20 }
+                        MenuItem { text: "Spacing · 40 px"; onTriggered: canvas.gridSpacing = 40 }
+                        MenuItem { text: "Spacing · 80 px"; onTriggered: canvas.gridSpacing = 80 }
+                    }
+                }
+                Label {
+                    visible: ["Line", "Rectangle", "Ellipse"].includes(editor.tool)
+                    text: "Shift constrains · " + (canvas.snapToGrid ? "Grid snap on" : "Free placement")
+                    color: "#bbbbbb"
+                }
+                C.ToolButton {
                     objectName: "motionPathModeButton"
                     text: "Path"
                     visible: editor.tool === "Animate"
@@ -551,43 +585,58 @@ ApplicationWindow {
                     Accessible.name: "Drawing selection media"
                 }
                 Label {
-                    visible: editor.tool === "Select" || (editor.tool === "Marquee" && canvas.selectionMedia === 0)
+                    visible: editor.tool === "Select" || editor.tool === "Lasso" || (editor.tool === "Marquee" && canvas.selectionMedia === 0)
                     text: "Shift adds · Alt subtracts · Drag handles to transform"
                     color: "#bbbbbb"
                 }
                 C.ToolButton {
-                    visible: editor.tool === "Marquee" || editor.tool === "Select"
+                    visible: root.drawingSelectionTool
+                    text: "Edit ▾"
+                    hint: "Vector clipboard and selection"
+                    onClicked: vectorEditMenu.open()
+                    Menu {
+                        id: vectorEditMenu
+                        MenuItem { text: "Select all vectors"; onTriggered: canvas.selectAllVectors() }
+                        MenuItem { text: "Invert vector selection"; onTriggered: canvas.selectAllVectors(true) }
+                        MenuSeparator {}
+                        MenuItem { text: "Copy vectors"; enabled: !!canvas.objectProperties.vectorOnly && canvas.hasRegion; onTriggered: canvas.copyVectorSelection() }
+                        MenuItem { text: "Cut vectors"; enabled: !!canvas.objectProperties.vectorOnly && canvas.hasRegion; onTriggered: canvas.copyVectorSelection(true) }
+                        MenuItem { text: "Paste vectors in place"; enabled: canvas.hasVectorClipboard; onTriggered: canvas.pasteVectorSelection() }
+                    }
+                }
+                C.ToolButton {
+                    visible: root.drawingSelectionTool
                     text: "Duplicate"
                     enabled: canvas.hasRegion
                     onClicked: canvas.transformRegion(1, 24, 24)
                 }
                 C.ToolButton {
-                    visible: editor.tool === "Marquee" || editor.tool === "Select"
+                    visible: root.drawingSelectionTool
                     text: "Flip H"
                     enabled: canvas.hasRegion
                     onClicked: canvas.transformRegion(3)
                 }
                 C.ToolButton {
-                    visible: editor.tool === "Marquee" || editor.tool === "Select"
+                    visible: root.drawingSelectionTool
                     text: "Flip V"
                     enabled: canvas.hasRegion
                     onClicked: canvas.transformRegion(4)
                 }
                 C.ToolButton {
-                    visible: editor.tool === "Marquee" || editor.tool === "Select"
+                    visible: root.drawingSelectionTool
                     text: "Deselect"
                     enabled: canvas.hasRegion
                     onClicked: canvas.clearRegion()
                 }
                 C.ToolButton {
                     text: "Fill shape"
-                    visible: !editor.tool.startsWith("Raster ") && editor.tool !== "Marquee" && editor.tool !== "Select" && editor.tool !== "Animate"
+                    visible: !editor.tool.startsWith("Raster ") && editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate"
                     active: editor.filled
                     onClicked: editor.filled = !editor.filled
                     hint: "Fill new rectangles and ellipses"
                 }
                 C.CompactComboBox {
-                    visible: !editor.tool.startsWith("Raster ") && editor.tool !== "Marquee" && editor.tool !== "Select" && editor.tool !== "Animate"
+                    visible: !editor.tool.startsWith("Raster ") && editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate"
                     model: ["Underlay Art", "Color Art", "Line Art", "Overlay Art"]
                     currentIndex: editor.artLayer
                     implicitHeight: 28
@@ -669,6 +718,8 @@ ApplicationWindow {
                                     icon: "▧",
                                     key: "M"
                                 },
+                                { name: "Lasso", icon: "♧", key: "L" },
+                                { name: "Line", icon: "╲", key: "" },
                                 {
                                     name: "Pencil",
                                     icon: "╱",
@@ -1959,7 +2010,7 @@ ApplicationWindow {
         Label {
             width: parent.width
             wrapMode: Text.WordWrap
-            text: "B — Pencil\nE — Eraser\nV — Select and move vectors (Shift adds, Alt subtracts)\nA — Animate layer poses on canvas\nM — Rectangular vector/raster selection\nO — Onion skin\nF — Fit canvas\nSpace — Play / pause\nLeft / Right — Previous / next frame\nCmd/Ctrl+Z — Undo\n\nDraw with the left mouse button. Pan with the middle button or trackpad scroll. Ctrl+scroll zooms. Double-click a timeline cell to create a new drawing.\n\nTablets use pressure when available; physical tablet validation is pending. This is an experimental build, not the P11 release."
+            text: "B — Pencil\nE — Eraser\nV — Select and move vectors (Shift adds, Alt subtracts)\nA — Animate layer poses on canvas\nM — Rectangular vector/raster selection\nL — Whole-vector lasso\nO — Onion skin\nF — Fit canvas\nSpace — Play / pause\nLeft / Right — Previous / next frame\nCmd/Ctrl+Z — Undo\n\nDraw with the left mouse button. Pan with the middle button or trackpad scroll. Ctrl+scroll zooms. Double-click a timeline cell to create a new drawing.\n\nTablets use pressure when available; physical tablet validation is pending. This is an experimental build, not the P11 release."
         }
     }
     Dialog {

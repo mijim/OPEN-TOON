@@ -1,5 +1,6 @@
 #include "canvas_item.h"
 #include <QPainter>
+#include <QScopedValueRollback>
 #include <set>
 using namespace opentoon;
 SelectionMedia CanvasItem::activeSelectionMedia() const {
@@ -45,7 +46,7 @@ void CanvasItem::modifyVectorSelection(const std::vector<Id>& hits, int operatio
 }
 void CanvasItem::paintVectorSelection(QPainter* painter, const QTransform& itemTransform) {
     if (!editor_ || !vectorSelection_ || regionStrokes_.size() < 2 ||
-        (editor_->tool() != "Select" && editor_->tool() != "Marquee"))
+        (editor_->tool() != "Select" && editor_->tool() != "Marquee" && editor_->tool() != "Lasso"))
         return;
     const auto* drawing = transforming_
                               ? &transformPreview_
@@ -68,4 +69,80 @@ void CanvasItem::paintVectorSelection(QPainter* painter, const QTransform& itemT
         }
     }
     painter->restore();
+}
+
+void CanvasItem::selectAllVectors(bool invert) {
+    if (!editor_ || !editor_->selectedLayer())
+        return;
+    cancelGesture();
+    const auto* drawing = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame());
+    const std::set<Id> current(regionStrokes_.begin(), regionStrokes_.end());
+    std::vector<Id> ids;
+    if (drawing)
+        for (const auto& s : drawing->strokes)
+            if (!invert || !current.contains(s.id))
+                ids.push_back(s.id);
+    setVectorSelection(std::move(ids));
+}
+bool CanvasItem::copyVectorSelection(bool cut) {
+    if (!editor_ || !vectorSelection_ || regionStrokes_.empty())
+        return false;
+    try {
+        auto block = opentoon::copyVectors(editor_->document(), editor_->selectedLayer(), editor_->frame(),
+                                           regionStrokes_);
+        if (cut) {
+            auto ids = regionStrokes_;
+            QScopedValueRollback<bool> guard(committing_, true);
+            if (!editor_->editDrawingRegion(region_, SelectionMedia::Vectors, SelectionAction::Delete, 0, 0,
+                                            &ids))
+                return false;
+            clearRegion();
+        }
+        vectorClipboard_ = std::move(block);
+        emit regionChanged();
+        editor_->report(QString("%1 %2 vectors in local drawing coordinates")
+                            .arg(cut ? "Cut" : "Copied")
+                            .arg(vectorClipboard_.strokes.size()));
+        return true;
+    } catch (const std::exception& e) {
+        editor_->report(e.what());
+        return false;
+    }
+}
+bool CanvasItem::pasteVectorSelection() {
+    if (!editor_ || !hasVectorClipboard())
+        return false;
+    setMotionPathEditing(false);
+    cancelGesture();
+    std::vector<Id> ids;
+    QScopedValueRollback<bool> guard(committing_, true);
+    if (!editor_->pasteVectorBlock(vectorClipboard_, ids))
+        return false;
+    editor_->setTool("Select");
+    previousTool_ = "Select";
+    setVectorSelection(std::move(ids));
+    forceActiveFocus();
+    return true;
+}
+bool CanvasItem::editVectorSelection(QString operation, double value) {
+    if (!editor_ || !vectorSelection_ || regionStrokes_.empty())
+        return false;
+    cancelGesture();
+    const auto ids = regionStrokes_;
+    QScopedValueRollback<bool> guard(committing_, true);
+    const bool success = editor_->editVectors(ids, operation, value);
+    if (success)
+        setVectorSelection(ids);
+    return success;
+}
+bool CanvasItem::nudgeVectorSelection(int dx, int dy) {
+    if (!editor_ || !vectorSelection_ || regionStrokes_.empty())
+        return false;
+    cancelGesture();
+    const auto ids = regionStrokes_;
+    QScopedValueRollback<bool> guard(committing_, true);
+    if (!editor_->editDrawingRegion(region_, SelectionMedia::Vectors, SelectionAction::Move, dx, dy, &ids))
+        return false;
+    setVectorSelection(ids);
+    return true;
 }

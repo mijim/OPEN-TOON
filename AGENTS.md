@@ -17,7 +17,7 @@
 4. Review the owning architecture contract and the library register before adding dependencies.
 5. Node inventory entries may describe families. Their specification owner must expand operators and parameters before implementation; never count entries as implemented effects.
 
-- Every update to the official `README.md` must include a playful detail that truthfully reflects current project coverage. Keep partial phases and unsupported functionality explicit.
+- Keep the official `README.md` concise and professional. Link detailed coverage and limitations from implementation records; do not restore the removed mascot or long experimental feature inventory. The owner superseded the earlier playful-README policy.
 
 ## Maintain the planning records
 
@@ -50,7 +50,7 @@
 ## Verification and publication
 
 - Current owner policy: implement coherent functionality blocks, then run meaningful macOS tests at the end and fix failures iteratively. Do not rebuild or test after every small edit.
-- Development releases currently publish source only. Linux/Windows builds and the full native CI matrix are manual qualification work for future compiled releases, not every push or source tag. Preserve portability in code without repeatedly building those targets.
+- Develop and test coherent blocks on macOS. The owner requested a downloadable macOS preview for experimental.10; include its dependencies, notices, source correspondence and verification in the release. Linux/Windows builds and the full native CI matrix remain manual future qualification work, not every push or source tag.
 
 - Follow `docs/planning/EXECUTION.md`; choose meaningful invariant, recovery, image, input or artistic workflow checks for the change.
 - Use synthetic or redistributable fixtures with recorded provenance. Do not publish private third-party projects.

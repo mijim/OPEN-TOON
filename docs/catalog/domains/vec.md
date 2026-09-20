@@ -234,7 +234,7 @@ Simplify geometry and combine compatible elements within a configured tolerance.
 
 **Initial acceptance:** Simplification respects a published visual-error tolerance.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -264,7 +264,7 @@ Show a grid and reference guides with optional snapping.
 
 **Initial acceptance:** Disabling snapping permits points between grid lines.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 

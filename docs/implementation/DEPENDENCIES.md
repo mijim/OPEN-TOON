@@ -18,10 +18,28 @@ The Conan lock pins recipe revisions; it is not a byte-identical OS/toolchain/Qt
 
 Qt Test is discovered by the desktop build but is not a runtime dependency of the editor. The smoke workflow uses native events directly. qtmultimedia, Eigen and FFmpeg are available on the development machine but are **not linked into or used by this implementation**. Clipper2, Skia, OCIO, miniaudio, deformation libraries and other roadmap candidates remain unadopted.
 
-## Redistribution work still open
+## macOS preview redistribution
 
-The repository publishes original source under GPL-3.0-or-later. Public binary releases require the exact linked/deployed library inventory, source correspondence, complete license texts, transitive notices, font/asset inventory and installation checks. Those P11 artifacts have not been completed. The local application bundle is a development artifact and has not been published as an installer.
+Experimental.10 ships a macOS arm64 preview with 124 audited Mach-O files. The
+application includes component license/copyright notices under
+`Contents/Resources/ThirdParty`, an exact runtime dependency inventory and source
+correspondence. A separate release asset contains verified upstream source archives,
+Homebrew formulae and patches, Conan recipes and upstream SPDX inventories. See
+[macos-dependencies.json](macos-dependencies.json) and [packaging notes](MACOS-PREVIEW.md).
 
+Deployed Homebrew components include Qt base/declarative/quicktimeline/svg 6.11.2,
+Brotli, D-Bus, double-conversion, FreeType, gettext, GLib, Graphite2, HarfBuzz, ICU,
+libjpeg-turbo, libb2, libpng, md4c, PCRE2, OpenSSL 3.6.4 and Zstandard. Qt's deployed
+plugins introduce dynamic GLib/OpenSSL dependencies even though the MyPaint adapter
+omits GLib and storage uses static OpenSSL Crypto 3.5.8. Only the linked/deployed
+versions in the release inventory describe this binary. Upstream SPDX inventories
+can also describe upstream build dependencies; they are not the app's exact SBOM.
+
+The standalone ZIP passed native smoke outside the workspace without loading
+Homebrew or developer-home libraries. Ad-hoc signatures verify. No third-party
+fonts or artwork are bundled; original presets remain first-party code. Automated
+release-wide SBOM generation, clean-machine qualification, Developer ID signing
+and notarization remain open P11 work.
 Primary sources: [Qt licensing](https://doc.qt.io/qt-6/licensing.html), [SQLite copyright](https://sqlite.org/copyright.html), [nlohmann/json license](https://github.com/nlohmann/json/blob/v3.12.0/LICENSE.MIT), [Catch2 license](https://github.com/catchorg/Catch2/blob/v3.15.0/LICENSE.txt). No proprietary animation source or artwork was copied.
 
 The MyPaint archive hash and minimal upstream build are in `cmake/MyPaint.cmake`.

@@ -326,3 +326,43 @@ TEST_CASE("Motion-path position edits preserve every non-position field and reje
     session.undo();
     REQUIRE(session.document() == before);
 }
+
+TEST_CASE("Batched key interpolation preserves values and endpoints while clearing stale easing") {
+    Layer layer;
+    layer.keys = {{0, {0, 0}}, {10, {100, 40}}, {20, {0, 80}}, {30, {100, 120}}};
+    const auto before = layer;
+    interpolateKeyBlock(layer, {0, 10, 30}, 3);
+    REQUIRE(layer.keys[0].easing.size() == 8);
+    REQUIRE(layer.keys[1].easing.size() == 8);
+    REQUIRE(layer.keys[2] == before.keys[2]);
+    REQUIRE(layer.keys[3] == before.keys[3]);
+    for (int i = 0; i < 4; ++i)
+        REQUIRE(layer.keys[i].value == before.keys[i].value);
+    interpolateKeyBlock(layer, {0, 10}, 1);
+    REQUIRE(layer.keys[0].easing.empty());
+    REQUIRE(evaluateTransform(layer, 9) == layer.keys[0].value);
+    REQUIRE(evaluateTransform(layer, 19) == layer.keys[1].value);
+    const auto held = layer;
+    REQUIRE_THROWS(interpolateKeyBlock(layer, {30}, 4));
+    REQUIRE(layer == held);
+    layer.locked = true;
+    const auto locked = layer;
+    REQUIRE_THROWS(interpolateKeyBlock(layer, {0}, 0));
+    REQUIRE(layer == locked);
+}
+TEST_CASE("Repeating sparse pose keys preserves payload and rejects all collisions atomically") {
+    Layer layer;
+    layer.keys = {{0, {0, 0}}, {4, {10, 20}}, {8, {30, 40}}, {40, {90, 0}}};
+    setPoseEase(layer, 0, {.2, 0, .8, 1.5});
+    const auto before = layer;
+    const auto frames = repeatKeyBlock(layer, {0, 4, 8}, 3);
+    REQUIRE(frames == std::vector<Frame>{9, 13, 17, 18, 22, 26, 27, 31, 35});
+    REQUIRE(layer.keys.back() == before.keys.back());
+    REQUIRE(layer.keys[3].value == before.keys[0].value);
+    REQUIRE(layer.keys[3].easing == before.keys[0].easing);
+    auto unchanged = layer;
+    REQUIRE_THROWS(repeatKeyBlock(layer, {0, 4, 8}, 1));
+    REQUIRE(layer == unchanged);
+    REQUIRE_THROWS(repeatKeyBlock(layer, {0, 4, 8}, 33));
+    REQUIRE(layer == unchanged);
+}

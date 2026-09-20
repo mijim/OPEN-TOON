@@ -1,54 +1,58 @@
 # OPEN-TOON
 
-An independent open-source desktop animation project combining vector and bitmap drawing, frame-by-frame and cut-out animation, rigging, compositing and production tools.
+An open-source desktop application for 2D drawing and animation, built around direct
+canvas editing, an integrated timeline and visual motion curves.
 
-**Current version: 0.2.0-experimental.9. P11 is not complete.** A C++20/Qt Quick application now supports mouse drawing, vector editing, MyPaint raster brushes with opacity, direct vector/raster transform handles, selection-owned Properties, integrated timing/curves, layer and range editing, explicit animation modes, visual pose animation, draggable Bézier easing/overshoot, forgiving thin-line picking, contextual cursors, compact controls and a draggable timeline/curve divider, editable All motion with linked easing and time zoom, shared key selection, group move/stretch/duplication and motion copy/paste, editable canvas trajectory keys, additive/subtractive vector groups with identity-safe duplication, point insertion/deletion, animation-aware Clear, key-only retiming, compressed SQLite project revisions and PNG export. The roadmap still covers 282 capabilities in 26 domains; working subsets are marked partial, with no phase claimed complete.
+![OPEN-TOON drawing workspace](docs/implementation/authoring.png)
 
-**Coverage mascot: a pencil organizing a tiny conga line.** Shift invites another stroke, Alt lets one sit out, and duplicates bring only their own friends. The party still has **0 of 23 fully completed phases**: lasso, independent spatial curves, cameras, audio, deformers and node compositing are waiting for their invitation. Working subsets are useful; phase completion requires every exit criterion. [See the honest coverage ledger](docs/implementation/status.json).
+## Download
 
-Start with the [build instructions](docs/implementation/BUILD.md), [user guide](docs/implementation/USER-GUIDE.md) and [implementation status](docs/implementation/STATUS.md).
+[Download the macOS preview](https://github.com/mijim/OPEN-TOON/releases/tag/v0.2.0-experimental.10)
+for **Apple Silicon, macOS 15 or later**. Extract the ZIP and open `OPEN-TOON.app`.
+The application includes its runtime dependencies. This experimental build is
+ad-hoc signed and has not been notarized by Apple; see the
+[installation notes](docs/implementation/MACOS-PREVIEW.md).
 
-The product will use a clean black, white and gray interface. **The entire first-party product is in English by requirement:** UI, messages, built-in assets, help, code and public documentation. The previous research, Markdown documents and canonical catalogs have also been translated into English. User-created content remains multilingual.
+For development or other platforms, follow the [build instructions](docs/implementation/BUILD.md).
 
-![Sparse vector selection with direct handles and selection-owned Properties](docs/implementation/vector-selection.png)
+## Features
 
-## Start here
+- Vector drawing and MyPaint raster brushes with mouse and pressure input.
+- Direct selection, transforms, vector lasso, clipboard, alignment and cleanup.
+- Layers, exposures, onion skin, playback and integrated Timeline/Xsheet editing.
+- Visual pose animation, editable motion curves and grouped keyframe operations.
+- Local project revisions, recovery snapshots and PNG sequence export.
 
-1. [Documentation map](docs/INDEX.md).
-2. [Long-term development roadmap](docs/planning/README.md).
-3. [23 phases with dependencies and acceptance criteria](docs/planning/PHASES.md).
-4. [Open-source libraries and adoption decisions](docs/planning/LIBRARIES.md).
-5. [Effort and staffing assumptions](docs/planning/ESTIMATES.md).
-6. [First implementation backlog](docs/planning/FIRST-STEPS.md).
-7. [Functional catalog](docs/catalog/README.md).
-8. [Architecture](docs/architecture/02-system-design.md) and [document format](docs/architecture/03-document-model.md).
-9. [Visual design](docs/design/01-design-system.md) and [English language policy](docs/design/02-language-policy.md).
+OPEN-TOON is under active development. The [implementation status](docs/implementation/STATUS.md)
+describes supported workflows and current limitations; the [roadmap](docs/planning/PHASES.md)
+covers planned cameras, audio, rigging, deformation and compositing.
 
-## Technical direction
+## Documentation
 
-**C++20 + Qt 6 / Qt Quick (QML)** for Windows, macOS and Linux, with a UI-independent domain, local storage, a shared headless evaluator and explicit integration adapters. Mature open-source components will provide infrastructure such as storage, brushes, image/media IO, color management and numerical routines. Graphics and other high-risk candidates must pass measured spikes before adoption.
+| Resource | Purpose |
+|---|---|
+| [User guide](docs/implementation/USER-GUIDE.md) | Drawing, animation and editing workflows |
+| [Release notes](docs/implementation/RELEASES.md) | Changes and verification by version |
+| [Documentation index](docs/INDEX.md) | Research, design and engineering references |
+| [Functional catalog](docs/catalog/README.md) | Requirements and acceptance criteria |
+| [Development plan](docs/planning/README.md) | Phases, dependencies and implementation order |
+| [Architecture](docs/architecture/02-system-design.md) | Module boundaries and design decisions |
+| [Dependencies](docs/implementation/DEPENDENCIES.md) | Open-source components and redistribution records |
 
-The experimental first-film workflow can draw, expose, play, save, reopen and export a two-second sequence of 48 PNG frames. Production acceptance and platform qualification remain open. Reliable 2D workflows precede advanced controllers, morphing, 3D, game exports and optional studio/AI extensions. The roadmap provides effort ranges and assumptions, not promised release dates.
+## Development
 
-## For contributors and AI agents
+C++20 and Qt 6/Qt Quick provide the native application. The document and application
+modules are independent of Qt; adapters integrate rendering, input, SQLite storage
+and third-party libraries. Document edits are transactional and undoable.
 
-Read [AGENTS.md](AGENTS.md) and the relevant phase before making changes. Canonical JSON records have stable IDs; generated views must not be edited manually. Planning completion is separate from implementation status.
-
-```sh
-python3 scripts/catalog.py stats
-python3 scripts/catalog.py show DEF-005
-python3 scripts/roadmap.py phase P09
-python3 scripts/roadmap.py feature DEF-005
-python3 scripts/roadmap.py library LIB-MYPAINT
-python3 scripts/catalog.py render
-python3 scripts/roadmap.py render
-python3 scripts/validate_docs.py
-```
-
-Documentation tools require only Python 3.11+ and its standard library. No application dependencies need to be installed to inspect the plan.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md) before contributing.
+Canonical JSON catalogs provide stable feature IDs and machine-readable planning
+context. Validate documentation with `python3 scripts/validate_docs.py`.
 
 ## License
 
-Original contributions are licensed under **GPL-3.0-or-later**; see [LICENSE](LICENSE). Third-party libraries and assets retain their respective licenses, which must be checked for the exact distributed build. Artwork created by users does not acquire the application's license merely through using it.
+Original contributions are licensed under [GPL-3.0-or-later](LICENSE).
+Dependencies retain their respective licenses. Artwork created with the application
+remains the creator's work.
 
-OPEN-TOON is the working project name. Distribution, support and compatibility claims will reflect demonstrated implementation evidence.
+OPEN-TOON is an independent project and is not affiliated with Toon Boom Animation.

@@ -64,8 +64,9 @@ void CanvasItem::setEditor(EditorController* editor) {
             if (committing_)
                 return;
             const auto tool = editor_->tool();
-            const bool keepSelection = (previousTool_ == "Select" || previousTool_ == "Marquee") &&
-                                       (tool == "Select" || tool == "Marquee") && vectorSelection_;
+            const bool keepSelection =
+                (previousTool_ == "Select" || previousTool_ == "Marquee" || previousTool_ == "Lasso") &&
+                (tool == "Select" || tool == "Marquee" || tool == "Lasso") && vectorSelection_;
             previousTool_ = tool;
             if (tool != "Animate")
                 setMotionPathEditing(false);
@@ -188,9 +189,11 @@ void CanvasItem::paint(QPainter* p) {
                                                            displayDocument.layer(editor_->selectedLayer()),
                                                            editor_->frame()),
                              true);
+        paintGrid(p);
         if (!rasterBrush_ && drawing_ && !samples_.empty() && editor_->tool() != "Eraser" &&
-            editor_->tool() != "Select" && editor_->tool() != "Marquee" && editor_->tool() != "Recolor" &&
-            editor_->tool() != "Edit points" && editor_->tool() != "Animate") {
+            editor_->tool() != "Select" && editor_->tool() != "Marquee" && editor_->tool() != "Lasso" &&
+            editor_->tool() != "Recolor" && editor_->tool() != "Edit points" &&
+            editor_->tool() != "Animate") {
             Stroke stroke{0,
                           Id(editor_->selectedSwatch()),
                           editor_->brushSize(),
@@ -203,6 +206,16 @@ void CanvasItem::paint(QPainter* p) {
             if (editor_->tool() == "Ellipse")
                 stroke.shape = Shape::Ellipse;
             SceneRenderer::paintStroke(*p, stroke, editor_->document().palette);
+        }
+        if (editor_->tool() == "Lasso" && drawing_ && !transforming_ && !samples_.empty()) {
+            QPolygonF outline;
+            for (auto point : samples_)
+                outline << QPointF(point.x, point.y);
+            QPen pen(Qt::gray, 1, Qt::DashLine);
+            pen.setCosmetic(true);
+            p->setPen(pen);
+            p->setBrush(QColor(127, 127, 127, 20));
+            p->drawPolygon(outline, Qt::OddEvenFill);
         }
         if (editor_->tool() == "Marquee" && drawing_ && !transforming_ && !samples_.empty()) {
             auto rect = QRectF(QPointF(samples_.front().x, samples_.front().y),
@@ -219,7 +232,8 @@ void CanvasItem::paint(QPainter* p) {
             paintMotionPath(p, displayDocument, itemTransform);
         paintVectorSelection(p, itemTransform);
         if (hasRegion() && !motionPathEditing_ &&
-            (editor_->tool() == "Select" || editor_->tool() == "Marquee" || editor_->tool() == "Animate")) {
+            (editor_->tool() == "Select" || editor_->tool() == "Marquee" || editor_->tool() == "Lasso" ||
+             editor_->tool() == "Animate")) {
             p->save();
             p->setWorldTransform(itemTransform);
             QPen pen(previewValid_ || !transforming_ ? QColor("#777777") : QColor(Qt::red));
@@ -277,9 +291,13 @@ void CanvasItem::begin(QPointF position, double pressure) {
             beginMotionPath(position);
             return;
         }
-        auto point = localPoint(position, pressure);
-        if (editor_->tool() == "Marquee" || editor_->tool() == "Select" || editor_->tool() == "Animate") {
+        auto point = snapDrawingPoint(localPoint(position, pressure));
+        if (editor_->tool() == "Marquee" || editor_->tool() == "Lasso" || editor_->tool() == "Select" ||
+            editor_->tool() == "Animate") {
             const bool selectionTool = editor_->tool() != "Animate";
+            if (editor_->tool() == "Lasso" && hasRegion() &&
+                activeSelectionMedia() != SelectionMedia::Vectors)
+                clearRegion();
             const int operation = subtract_ ? 2 : shift_ ? 1 : 0;
             if (selectionTool && operation) {
                 if ((hasRegion() && activeSelectionMedia() != SelectionMedia::Vectors) ||
@@ -423,7 +441,7 @@ void CanvasItem::move(QPointF position, double pressure) {
             previewMotionPath(position);
             return;
         }
-        auto point = localPoint(position, pressure);
+        auto point = snapDrawingPoint(localPoint(position, pressure));
         if (transforming_) {
             QTransform matrix;
             QRectF box(region_.x, region_.y, region_.width, region_.height);
@@ -475,6 +493,10 @@ void CanvasItem::move(QPointF position, double pressure) {
             sampleClock_.restart();
             rasterBrush_->sample(point, elapsed, tiltX_, tiltY_);
             rasterPreview_.raster = rasterBrush_->snapshot();
+        } else if (editor_->tool() == "Lasso") {
+            if (samples_.size() < 4096 &&
+                std::hypot(point.x - samples_.back().x, point.y - samples_.back().y) >= .5)
+                samples_.push_back(point);
         } else if (editor_->tool() == "Marquee") {
             if (movingRegion_)
                 selectionDelta_ = {std::round(point.x - samples_.front().x),
@@ -490,7 +512,9 @@ void CanvasItem::move(QPointF position, double pressure) {
                     stroke.points[selectedPoint_] = point;
         } else if (editor_->tool() == "Select")
             selectionDelta_ = {point.x - samples_.front().x, point.y - samples_.front().y};
-        else if (editor_->tool() == "Ellipse" || editor_->tool() == "Rectangle") {
+        else if (editor_->tool() == "Ellipse" || editor_->tool() == "Rectangle" ||
+                 editor_->tool() == "Line") {
+            point = constrainedEndpoint(point);
             if (samples_.size() == 1)
                 samples_.push_back(point);
             else
@@ -522,6 +546,15 @@ void CanvasItem::end() {
     samples_.clear();
     if (transforming_) {
         commitTransform();
+    } else if (editor_->tool() == "Lasso") {
+        if (const auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame())) {
+            try {
+                modifyVectorSelection(enclosedVectorsByLasso(*d, points), marqueeOperation_);
+            } catch (const std::exception& e) {
+                editor_->report(e.what());
+            }
+        }
+        marqueeOperation_ = 0;
     } else if (editor_->tool() == "Marquee") {
         if (movingRegion_)
             transformRegion(int(SelectionAction::Move), int(selectionDelta_.x()), int(selectionDelta_.y()));
@@ -704,7 +737,9 @@ void CanvasItem::deleteSelection() {
             editor_->report("Select a control point to delete it.");
         return;
     }
-    if (editor_ && (editor_->tool() == "Marquee" || editor_->tool() == "Select") && hasRegion()) {
+    if (editor_ &&
+        (editor_->tool() == "Marquee" || editor_->tool() == "Lasso" || editor_->tool() == "Select") &&
+        hasRegion()) {
         transformRegion(int(SelectionAction::Delete));
     } else if (editor_ && selectedStroke_) {
         editor_->deleteStroke(selectedStroke_);
@@ -872,7 +907,20 @@ QVariantMap CanvasItem::objectProperties() const {
               {"height", bounds.height()},
               {"rotation", 0.0},
               {"count", int(regionStrokes_.size())},
+              {"vectorOnly", vectorSelection_},
               {"locked", editor_->document().layer(editor_->selectedLayer()).locked}};
+    if (vectorSelection_)
+        if (const auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame())) {
+            std::optional<double> width;
+            bool mixed = false;
+            for (const auto& s : d->strokes)
+                if (std::find(regionStrokes_.begin(), regionStrokes_.end(), s.id) != regionStrokes_.end()) {
+                    if (width && *width != s.width)
+                        mixed = true;
+                    width = s.width;
+                }
+            result.insert("commonStrokeWidth", !mixed && width ? QVariant(*width) : QVariant{});
+        }
     if (selectedStroke_)
         if (auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame()))
             for (const auto& stroke : d->strokes)

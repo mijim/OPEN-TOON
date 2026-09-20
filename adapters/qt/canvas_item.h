@@ -13,6 +13,10 @@ class CanvasItem : public QQuickPaintedItem {
     Q_PROPERTY(QString regionInfo READ regionInfo NOTIFY regionChanged)
     Q_PROPERTY(EditorController* editor READ editor WRITE setEditor NOTIFY editorChanged)
     Q_PROPERTY(bool motionPathEditing READ motionPathEditing WRITE setMotionPathEditing NOTIFY viewChanged)
+    Q_PROPERTY(bool hasVectorClipboard READ hasVectorClipboard NOTIFY regionChanged)
+    Q_PROPERTY(bool gridVisible READ gridVisible WRITE setGridVisible NOTIFY viewChanged)
+    Q_PROPERTY(bool snapToGrid READ snapToGrid WRITE setSnapToGrid NOTIFY viewChanged)
+    Q_PROPERTY(int gridSpacing READ gridSpacing WRITE setGridSpacing NOTIFY viewChanged)
     Q_PROPERTY(double zoom READ zoom WRITE setZoom NOTIFY viewChanged)
     Q_PROPERTY(bool mirrored READ mirrored WRITE setMirrored NOTIFY viewChanged)
     Q_PROPERTY(double rotationAngle READ rotationAngle WRITE setRotationAngle NOTIFY viewChanged)
@@ -25,6 +29,19 @@ class CanvasItem : public QQuickPaintedItem {
     void setSelectionMedia(int);
     QString regionInfo() const;
     Q_INVOKABLE void clearRegion();
+    Q_INVOKABLE void selectAllVectors(bool invert = false);
+    Q_INVOKABLE bool copyVectorSelection(bool cut = false);
+    Q_INVOKABLE bool pasteVectorSelection();
+    Q_INVOKABLE bool editVectorSelection(QString operation, double value);
+    Q_INVOKABLE bool nudgeVectorSelection(int dx, int dy);
+    bool hasVectorClipboard() const { return !vectorClipboard_.strokes.empty(); }
+    bool gridVisible() const { return gridVisible_; }
+    bool snapToGrid() const { return snapToGrid_; }
+    int gridSpacing() const { return gridSpacing_; }
+    void setGridVisible(bool);
+    void setSnapToGrid(bool);
+    void setGridSpacing(int);
+
     Q_INVOKABLE void transformRegion(int action, int dx = 0, int dy = 0);
     explicit CanvasItem(QQuickItem* parent = nullptr);
     EditorController* editor() const { return editor_; }
@@ -103,6 +120,13 @@ class CanvasItem : public QQuickPaintedItem {
     void paintVectorSelection(QPainter*, const QTransform& itemTransform);
     opentoon::SelectionMedia activeSelectionMedia() const;
     bool vectorSelection_ = false, subtract_ = false;
+    opentoon::VectorBlock vectorClipboard_;
+    bool gridVisible_ = false, snapToGrid_ = false;
+    int gridSpacing_ = 40;
+    opentoon::Point snapDrawingPoint(opentoon::Point) const;
+    opentoon::Point constrainedEndpoint(opentoon::Point) const;
+    void paintGrid(QPainter*);
+
     int marqueeOperation_ = 0; // Replace, add, subtract; captured on press.
 
     void startTransform(int);

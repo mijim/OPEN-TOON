@@ -136,3 +136,25 @@ bool EditorController::deleteSelectedPoseKeys() {
     const auto selected = poseSelection_;
     return edit("Delete selected pose keys", [&](Document& d) { deleteKeyBlock(d.layer(layer_), selected); });
 }
+
+bool EditorController::interpolateSelectedPoseKeys(int preset) {
+    if (!layer_)
+        return false;
+    const auto selected = poseSelection_;
+    return edit("Set selected key interpolation",
+                [&](Document& d) { interpolateKeyBlock(d.layer(layer_), selected, preset); });
+}
+bool EditorController::repeatSelectedPoseKeys(int copies) {
+    if (!layer_)
+        return false;
+    const auto selected = poseSelection_;
+    std::vector<Frame> result;
+    if (!edit("Repeat pose-key block", [&](Document& d) {
+            result = repeatKeyBlock(d.layer(layer_), selected, copies);
+            d.duration = std::max(d.duration, result.back() + 1);
+        }))
+        return false;
+    setPoseSelection(result);
+    poseSelectionAnchor_ = result.front();
+    return true;
+}

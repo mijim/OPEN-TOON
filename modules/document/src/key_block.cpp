@@ -1,4 +1,5 @@
 #include "opentoon/key_block.h"
+#include "opentoon/animation.h"
 #include <cmath>
 #include <set>
 #include <stdexcept>
@@ -85,6 +86,50 @@ std::vector<Frame> retimeKeyBlock(Layer& layer, const std::vector<Frame>& frames
         }
     }
     return merge(layer, std::move(remaining), std::move(incoming));
+}
+void interpolateKeyBlock(Layer& layer, const std::vector<Frame>& frames, int preset) {
+    editable(layer);
+    const auto selected = checkedSelection(layer, frames);
+    if (preset < 0 || preset > 5)
+        throw std::invalid_argument("Invalid interpolation preset.");
+    auto candidate = layer;
+    bool affected = false;
+    for (auto& key : candidate.keys) {
+        if (!selected.contains(key.frame))
+            continue;
+        if (preset < 3) {
+            key.interpolation = static_cast<Interpolation>(preset);
+            key.easing.clear();
+        } else {
+            if (key.frame == candidate.keys.back().frame)
+                continue;
+            const BezierEase ease = preset == 3   ? BezierEase{1. / 3, 0, 2. / 3, 1}
+                                    : preset == 4 ? BezierEase{.25, 0, .65, 1.8}
+                                                  : BezierEase{.2, .8, .8, 1};
+            setPoseEase(candidate, key.frame, ease);
+        }
+        affected = true;
+    }
+    if (!affected)
+        throw std::invalid_argument("Easing needs a selected key with a following key.");
+    layer = std::move(candidate);
+}
+std::vector<Frame> repeatKeyBlock(Layer& layer, const std::vector<Frame>& frames, int copies) {
+    editable(layer);
+    const auto selected = checkedSelection(layer, frames);
+    if (copies < 1 || copies > 32 || selected.size() * copies > 100000)
+        throw std::invalid_argument("Repeat needs 1–32 copies and at most 100000 new keys.");
+    const auto block = copyKeyBlock(layer, frames);
+    const std::int64_t period = std::int64_t(*selected.rbegin()) - *selected.begin() + 1;
+    if (*selected.begin() + period * (copies + 1) > 1000000)
+        throw std::invalid_argument("Repeated keys exceed the supported duration.");
+    std::vector<Keyframe> incoming;
+    for (int copy = 1; copy <= copies; ++copy)
+        for (auto key : block.keys) {
+            key.frame += Frame(*selected.begin() + period * copy);
+            incoming.push_back(std::move(key));
+        }
+    return merge(layer, layer.keys, std::move(incoming));
 }
 void deleteKeyBlock(Layer& layer, const std::vector<Frame>& frames) {
     editable(layer);
