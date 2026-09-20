@@ -64,7 +64,7 @@ Transform selected pixels while preserving the mask and alpha channel.
 
 **Initial acceptance:** Rotating the selection does not fill the surrounding area with a solid color.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 

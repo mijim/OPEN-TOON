@@ -189,6 +189,39 @@ int main(int argc, char** argv) {
                     send(QEvent::MouseButtonRelease, start + QPointF(80, 60), Qt::LeftButton, Qt::NoButton);
                     if (editor.document() != painted)
                         throw std::runtime_error("Cancelled raster gesture changed artwork.");
+                    editor.setTool("Marquee");
+                    canvas->setSelectionMedia(2);
+                    const auto selectStart = start + QPointF(-50, -80);
+                    const auto selectEnd = start + QPointF(210, 100);
+                    send(QEvent::MouseButtonPress, selectStart, Qt::LeftButton, Qt::LeftButton);
+                    send(QEvent::MouseMove, selectEnd, Qt::NoButton, Qt::LeftButton);
+                    send(QEvent::MouseButtonRelease, selectEnd, Qt::LeftButton, Qt::NoButton);
+                    if (!canvas->hasRegion())
+                        throw std::runtime_error("Native drawing marquee did not select a region.");
+                    const auto beforeRegionMove = editor.document();
+                    const auto inside = start + QPointF(50, 20);
+                    send(QEvent::MouseButtonPress, inside, Qt::LeftButton, Qt::LeftButton);
+                    send(QEvent::MouseMove, inside + QPointF(20, 10), Qt::NoButton, Qt::LeftButton);
+                    send(QEvent::MouseButtonRelease, inside + QPointF(20, 10), Qt::LeftButton, Qt::NoButton);
+                    if (editor.document() == beforeRegionMove || !canvas->hasRegion())
+                        throw std::runtime_error("Native mixed drawing selection move failed: " +
+                                                 editor.status().toStdString());
+                    const auto afterRegionMove = editor.document();
+                    send(QEvent::MouseButtonPress, inside + QPointF(20, 10), Qt::LeftButton, Qt::LeftButton);
+                    send(QEvent::MouseMove, inside + QPointF(40, 20), Qt::NoButton, Qt::LeftButton);
+                    canvas->cancelGesture();
+                    send(QEvent::MouseButtonRelease, inside + QPointF(40, 20), Qt::LeftButton, Qt::NoButton);
+                    if (editor.document() != afterRegionMove)
+                        throw std::runtime_error("Cancelled region drag changed artwork.");
+                    editor.undo();
+                    if (editor.document() != beforeRegionMove)
+                        throw std::runtime_error("Region move undo changed artwork.");
+                    editor.redo();
+                    const auto selectionPath = QUrl::fromLocalFile(temp.path() + "/selection.otoon");
+                    const auto selectionPixels = opentoon::SceneRenderer::render(editor.document(), 0);
+                    if (!editor.saveProject(selectionPath) || !editor.openProject(selectionPath) ||
+                        opentoon::SceneRenderer::render(editor.document(), 0) != selectionPixels)
+                        throw std::runtime_error("Selection save/reopen changed pixels.");
                     editor.selectTimelineRange(0, 5, 0, 0);
                     editor.copyTimelineRange();
                     editor.setFrame(6);
@@ -278,7 +311,8 @@ int main(int argc, char** argv) {
                         std::cout << "UI smoke passed: mouse stroke, synthetic pen pressure, cancelled "
                                      "gesture, raster painting and pixel round trip, range clipboard, "
                                      "undo/redo, save/reopen, canvas layout "
-                                     "and native curve drag/undo and screenshot.\n";
+                                     "mixed selection move/cancel/reopen, and native curve drag/undo and "
+                                     "screenshot.\n";
                         app.exit(0);
                     });
                 } catch (const std::exception& error) {

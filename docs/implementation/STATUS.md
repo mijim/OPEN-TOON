@@ -12,8 +12,8 @@ The editor runs locally on macOS and supports mouse drawing, sampled-pressure in
 | P01 | in_progress | Native English QML shell, CMake modules, commands, immutable snapshots, undo/redo and validation. | Docking/workspace persistence, configurable shortcuts, full accessibility, scalable resource/cache protocols and cross-platform qualification. |
 | P02 | in_progress | Mouse pencil, exposures, onion skin, playback, save/reopen and 48-frame 1080p PNG export. | Full phase feature acceptance and animator-led workflow checks; large-project behavior and all fixture gates. |
 | P03 | in_progress | Synchronized virtualized timeline/Xsheet, create/hold/clear exposures, insert/remove frames and navigate drawings. Multi-layer range clipboard, independent drawing paste, key paste, cycles, ones/twos/threes, overwrite retiming, Alt-drag moves, markers and bounded Xsheet PDF export. | Frame annotations/thumbnails, advanced onion/tracing controls, paperless workflows and artist acceptance. |
-| P04 | in_progress | Sampled vector strokes, approximate eraser, primitives, single-stroke selection, point editing/smoothing, stable palette IDs and shape recoloring. | Region topology/fill, analytic erasing, Bezier/contour/width editors, presets/textures/guides, robust selection and vector optimization. |
-| P05 | in_progress | Sparse immutable 15-bit premultiplied tiles, libmypaint ink/soft/dry/smudge/eraser presets, pressure input, cancellable gestures, shared preview/export and compressed project resources. | Brush texture/import/preset management, raster selection/transforms, production workload and physical-device qualification. |
+| P04 | in_progress | Sampled vector strokes, approximate eraser, primitives, single-stroke selection, point editing/smoothing, stable palette IDs and shape recoloring. Rectangular whole-stroke multi-selection, move/duplicate/delete, flips and quarter turns preserve editable geometry, swatch and art-layer IDs. | Region topology/fill, analytic erasing, Bezier/contour/width editors, presets/textures/guides, lasso/partial/additive selection and vector optimization. |
+| P05 | in_progress | Sparse immutable 15-bit premultiplied tiles, libmypaint ink/soft/dry/smudge/eraser presets, pressure input, cancellable gestures, shared preview/export and compressed project resources. Brush opacity and rectangular pixel selection with integer move/duplicate/delete, flips and lossless quarter turns, alpha-safe overlap and guarded canvas bounds. | Brush texture/import/preset management, lasso/soft masks, arbitrary selection rotation/scaling, resolution changes, production workload and physical-device qualification. |
 | P06 | in_progress | Layer transform keys with linear/held/smooth interpolation, inherited transforms/opacity, explicit Setup/Animate and Auto key, key navigation/state, editable pose-channel graph and key-only multi-layer retiming with collision rejection. | Independent channel keys, editable tangents, velocity/motion paths, complete batched editing, cameras and multiplane evaluation. |
 | P07 | planned | Exact rational frame-to-sample arithmetic has a domain test; no audio playback. | Audio decode/timeline/waveform/sync, media policies, FFmpeg adapter and video output. |
 | P08 | in_progress | Parented layers, pivots, independent duplicates and linked drawing clones. | Production cut-out tools, asset/template library, substitution workflow, pose preservation, lip sync and animator validation. |
@@ -23,7 +23,7 @@ The editor runs locally on macOS and supports mouse drawing, sampled-pressure in
 
 ## Verification
 
-- Current macOS locked build: 36/36 CTest entries pass (35 core/render cases and four integration cases in one executable). Tests cover failed commands, rational time, exposure edits, hierarchy validation, rendering consistency, stale writers, schema rejection, rollback failures and abrupt process termination with a large image.
+- Current macOS locked build: 41/41 CTest entries pass (40 core/render cases and five integration cases in one executable). Tests cover failed commands, rational time, exposure edits, hierarchy validation, rendering consistency, stale writers, schema rejection, rollback failures and abrupt process termination with a large image.
 - Export integration: 48 PNGs from an immutable snapshot, rational-time metadata, cancellation and a successful subsequent job.
 - Native input smoke: mouse strokes, synthetic pen pressure, cancelled gestures, undo/redo, palette validity after undo, save/reopen and a real window screenshot.
 - Synthetic two-second fixture: 48 PNG frames at 1920 × 1080; reopened document is semantically identical. Initial CPU export measured 3,077 ms on this Mac; it is not a large-scene or pen-latency benchmark.
@@ -55,3 +55,15 @@ Current verification is macOS only. Native UI smoke opens the curve dialog and c
 an actual key drag and undo. The full cross-platform workflow is now manual, and
 source releases do not produce installers. Historical OS/sanitizer results above
 refer to their recorded source, not automatic qualification of new animation code.
+
+## P04/P05 drawing selection source release
+
+Experimental.3 focuses on whole-stroke multi-selection and sparse raster selection:
+move, duplicate, delete, flip and lossless clockwise quarter turns. Raster opacity
+is exposed, and erasing ignores selected swatch alpha. The native smoke checks actual
+marquee/move gestures, cancellation, undo/redo and pixel-identical save/reopen. Four
+core selection cases cover tile overlap, alpha, shared buffers, vector identity and
+atomic rejection. See [ADR-014](../architecture/adr/014-drawing-selection.md).
+
+These are working subsets, not completed P04/P05. Region fill topology, advanced
+vector geometry, lasso/masks, arbitrary raster transforms and brush import remain open.

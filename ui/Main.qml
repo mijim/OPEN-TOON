@@ -26,6 +26,11 @@ ApplicationWindow {
     palette.highlight: "#454545"
     palette.highlightedText: "#ffffff"
     palette.mid: "#393939"
+    D.DrawingSelectionDialog {
+        id: drawingSelectionDialog
+        drawingCanvas: canvas
+        controller: editor
+    }
     D.CurveEditor {
         id: curveEditor
         controller: editor
@@ -146,6 +151,11 @@ ApplicationWindow {
         sequence: "E"
         enabled: !root.textEditing
         onActivated: editor.tool = "Eraser"
+    }
+    Shortcut {
+        sequence: "M"
+        enabled: !root.textEditing
+        onActivated: editor.tool = "Marquee"
     }
     Shortcut {
         sequence: "V"
@@ -445,11 +455,13 @@ ApplicationWindow {
                     Accessible.name: "Raster brush preset"
                 }
                 Text {
+                    visible: editor.tool !== "Marquee"
                     text: "Size"
                     color: "#858585"
                     font.pixelSize: 11
                 }
                 Slider {
+                    visible: editor.tool !== "Marquee"
                     from: 0.5
                     to: 100
                     value: editor.brushSize
@@ -458,21 +470,62 @@ ApplicationWindow {
                     Accessible.name: "Brush size"
                 }
                 Text {
+                    visible: editor.tool !== "Marquee"
                     text: editor.brushSize.toFixed(1) + " px"
                     color: "#aaaaaa"
                     Layout.preferredWidth: 58
                     font.family: "Menlo"
                     font.pixelSize: 10
                 }
+                RowLayout {
+                    visible: editor.tool.startsWith("Raster ")
+                    Label {
+                        text: "Opacity"
+                        color: "#aaaaaa"
+                    }
+                    Slider {
+                        from: 0
+                        to: 1
+                        value: editor.brushOpacity
+                        Layout.preferredWidth: 85
+                        onMoved: editor.brushOpacity = value
+                        Accessible.name: "Raster brush opacity"
+                    }
+                    Label {
+                        text: Math.round(editor.brushOpacity * 100) + "%"
+                        Layout.preferredWidth: 32
+                    }
+                }
+                ComboBox {
+                    visible: editor.tool === "Marquee"
+                    model: ["Vectors", "Raster pixels", "Vectors + raster"]
+                    currentIndex: canvas.selectionMedia
+                    onActivated: canvas.selectionMedia = currentIndex
+                    implicitWidth: 150
+                    implicitHeight: 28
+                    Accessible.name: "Drawing selection media"
+                }
+                C.ToolButton {
+                    visible: editor.tool === "Marquee"
+                    text: "Edit selection"
+                    enabled: canvas.hasRegion
+                    onClicked: drawingSelectionDialog.open()
+                }
+                C.ToolButton {
+                    visible: editor.tool === "Marquee"
+                    text: "Deselect"
+                    enabled: canvas.hasRegion
+                    onClicked: canvas.clearRegion()
+                }
                 C.ToolButton {
                     text: "Fill shape"
-                    visible: !editor.tool.startsWith("Raster ")
+                    visible: !editor.tool.startsWith("Raster ") && editor.tool !== "Marquee"
                     active: editor.filled
                     onClicked: editor.filled = !editor.filled
                     hint: "Fill new rectangles and ellipses"
                 }
                 ComboBox {
-                    visible: !editor.tool.startsWith("Raster ")
+                    visible: !editor.tool.startsWith("Raster ") && editor.tool !== "Marquee"
                     model: ["Underlay Art", "Color Art", "Line Art", "Overlay Art"]
                     currentIndex: editor.artLayer
                     implicitHeight: 28
@@ -537,6 +590,11 @@ ApplicationWindow {
                                 name: "Select",
                                 icon: "↖",
                                 key: "V"
+                            },
+                            {
+                                name: "Marquee",
+                                icon: "▧",
+                                key: "M"
                             },
                             {
                                 name: "Pencil",
@@ -1566,7 +1624,7 @@ ApplicationWindow {
         Label {
             width: parent.width
             wrapMode: Text.WordWrap
-            text: "B — Pencil\nE — Eraser\nV — Select and move a stroke\nO — Onion skin\nF — Fit canvas\nSpace — Play / pause\nLeft / Right — Previous / next frame\nCmd/Ctrl+Z — Undo\n\nDraw with the left mouse button. Pan with the middle button or trackpad scroll. Ctrl+scroll zooms. Double-click a timeline cell to create a new drawing.\n\nTablets use pressure when available; physical tablet validation is pending. This is an experimental build, not the P11 release."
+            text: "B — Pencil\nE — Eraser\nV — Select and move a stroke\nM — Rectangular vector/raster selection\nO — Onion skin\nF — Fit canvas\nSpace — Play / pause\nLeft / Right — Previous / next frame\nCmd/Ctrl+Z — Undo\n\nDraw with the left mouse button. Pan with the middle button or trackpad scroll. Ctrl+scroll zooms. Double-click a timeline cell to create a new drawing.\n\nTablets use pressure when available; physical tablet validation is pending. This is an experimental build, not the P11 release."
         }
     }
     Dialog {

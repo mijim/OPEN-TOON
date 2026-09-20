@@ -87,7 +87,8 @@ struct RasterBrush::Impl : MyPaintTiledSurface {
         set(MYPAINT_BRUSH_SETTING_COLOR_S, color[1]);
         set(MYPAINT_BRUSH_SETTING_COLOR_V, color[2]);
         set(MYPAINT_BRUSH_SETTING_RADIUS_LOGARITHMIC, float(std::log(settings.diameter / 2)));
-        set(MYPAINT_BRUSH_SETTING_OPAQUE, float(settings.opacity * settings.color.a));
+        set(MYPAINT_BRUSH_SETTING_OPAQUE,
+            float(settings.opacity * (settings.preset == BrushPreset::Eraser ? 1 : settings.color.a)));
         set(MYPAINT_BRUSH_SETTING_HARDNESS, settings.preset == BrushPreset::Soft ? 0.25f : 0.85f);
         set(MYPAINT_BRUSH_SETTING_DABS_PER_ACTUAL_RADIUS, 4);
         set(MYPAINT_BRUSH_SETTING_DABS_PER_BASIC_RADIUS, 0);

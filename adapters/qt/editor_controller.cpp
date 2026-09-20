@@ -167,7 +167,7 @@ void EditorController::setSelectedSwatch(int value) {
         }
 }
 void EditorController::setTool(QString value) {
-    if (QStringList{"Pencil", "Eraser", "Select", "Rectangle", "Ellipse", "Recolor", "Edit points",
+    if (QStringList{"Pencil", "Eraser", "Select", "Marquee", "Rectangle", "Ellipse", "Recolor", "Edit points",
                     "Raster ink", "Raster soft", "Raster dry", "Raster smudge", "Raster eraser"}
             .contains(value)) {
         tool_ = std::move(value);

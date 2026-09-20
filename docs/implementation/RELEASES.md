@@ -1,5 +1,19 @@
 # Experimental releases
 
+## 0.2.0-experimental.3 — P04/P05 source release
+
+- Rectangular selection of fully enclosed vector strokes and/or raster pixels.
+- Integer move/duplicate/delete, horizontal/vertical flips and lossless 90° rotation.
+- Shared immutable tiles, alpha-safe overlapping moves, guarded canvas bounds and undo.
+- Raster brush opacity; eraser strength independent of palette alpha.
+- English selection controls, shortcut M and explicit mixed-media behavior documentation.
+- macOS end-of-block validation: 41 CTest entries and native selection move/cancel,
+  undo/redo and pixel-identical save/reopen. No Windows/Linux builds or installers.
+
+P04/P05 remain partial: no topology fill, lasso, soft masks, arbitrary selection
+rotation/scaling, brush texture management or ABR importer. Imported image assets are
+excluded from this selection tool; vector geometry remains editable.
+
 ## 0.2.0-experimental.2 — source release
 
 - Explicit Setup/Animate modes and guarded Auto key.

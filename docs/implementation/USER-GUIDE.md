@@ -85,3 +85,27 @@ Select a range and layers in the timeline before opening Curves. Set Destination
 Length, then **Retime keys only** to move/stretch their keys without changing drawing
 exposures. Endpoint frames map to endpoint frames; rounding collisions reject the
 whole operation. Existing keys outside the range are preserved.
+
+## Rectangular vector and raster selection
+
+Press **M** or choose **Marquee**. Select **Vectors**, **Raster pixels** or
+**Vectors + raster** in the top toolbar. Drag a rectangle around your artwork.
+Vectors must fit completely, including stroke width; crossing strokes stay untouched.
+The rectangle selects raster pixels exactly. Imported image assets are excluded.
+
+Drag inside the rectangle to move it in whole local pixels. The bounds preview the
+move and artwork updates on release. Escape cancels the gesture. **Edit selection**
+offers numeric Move/Duplicate offsets, Delete, horizontal/vertical flips and clockwise
+90° rotation. Rotation keeps the upper-left corner fixed and exchanges width/height.
+**Deselect** clears the selection. Delete/Backspace also deletes a selected region
+while the canvas has focus. Each operation is one undo command.
+
+Raster selections retain transparency. Overlapping destination artwork is composited
+source-over; transparent source pixels do not clear destination pixels. Moving
+nontransparent pixels outside the raster canvas rejects the complete edit. Large
+edits exceeding the 128 MiB mutable tile budget also reject safely. Free rotation,
+scaling, lasso and feathering remain pending. Selection operations edit the shared
+drawing: all its exposures change. Duplicate the drawing first to make it independent.
+
+With a raster brush selected, use **Opacity** in the toolbar to control paint or
+eraser strength. The eraser does not depend on the selected palette color's alpha.

@@ -1,4 +1,5 @@
 #pragma once
+#include "opentoon/drawing_selection.h"
 #include "opentoon/session.h"
 #include "opentoon/timeline.h"
 #include <QColor>
@@ -40,6 +41,7 @@ class EditorController final : public QObject {
     Q_PROPERTY(int selectedSwatch READ selectedSwatch WRITE setSelectedSwatch NOTIFY selectionChanged)
     Q_PROPERTY(bool savingRecovery READ savingRecovery NOTIFY recoveryChanged)
     Q_PROPERTY(QString tool READ tool WRITE setTool NOTIFY toolChanged)
+    Q_PROPERTY(double brushOpacity READ brushOpacity WRITE setBrushOpacity NOTIFY toolChanged)
     Q_PROPERTY(double brushSize READ brushSize WRITE setBrushSize NOTIFY toolChanged)
     Q_PROPERTY(bool onionSkin READ onionSkin WRITE setOnionSkin NOTIFY toolChanged)
     Q_PROPERTY(bool filled READ filled WRITE setFilled NOTIFY toolChanged)
@@ -98,6 +100,10 @@ class EditorController final : public QObject {
     int selectedLayer() const { return static_cast<int>(layer_); }
     int selectedSwatch() const { return static_cast<int>(swatch_); }
     QString tool() const { return tool_; }
+    double brushOpacity() const { return brushOpacity_; }
+    void setBrushOpacity(double);
+    bool editDrawingRegion(opentoon::PixelRect, opentoon::SelectionMedia, opentoon::SelectionAction,
+                           int dx = 0, int dy = 0);
     double brushSize() const { return brushSize_; }
     bool onionSkin() const { return onion_; }
     bool filled() const { return filled_; }
@@ -179,7 +185,7 @@ class EditorController final : public QObject {
     opentoon::Id layer_ = 0, swatch_ = 0;
     int frame_ = 0, artLayer_ = 2;
     QString tool_ = "Pencil", path_, status_ = "Ready", recovery_, previousRecovery_;
-    double brushSize_ = 5;
+    double brushSize_ = 5, brushOpacity_ = 1;
     bool animateMode_ = false, autoKey_ = false;
     bool onion_ = true, filled_ = false;
     QTimer playTimer_, autosaveTimer_;

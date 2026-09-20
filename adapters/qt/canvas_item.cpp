@@ -30,20 +30,24 @@ void CanvasItem::setEditor(EditorController* editor) {
     if (editor) {
         connect(editor, &EditorController::changed, this, [this] {
             cancelGesture();
+            clearRegion();
             update();
         });
         connect(editor, &EditorController::frameChanged, this, [this] {
             cancelGesture();
             selectedStroke_ = 0;
+            clearRegion();
             update();
         });
         connect(editor, &EditorController::toolChanged, this, [this] {
             cancelGesture();
+            clearRegion();
             update();
         });
         connect(editor, &EditorController::selectionChanged, this, [this] {
             cancelGesture();
             selectedStroke_ = 0;
+            clearRegion();
             update();
         });
     }
@@ -96,6 +100,9 @@ Point CanvasItem::localPoint(QPointF p, double pressure) const {
     if (!ok)
         throw std::runtime_error("Cannot draw through a zero-scale transform.");
     auto result = inverse.map(p);
+    if (!std::isfinite(result.x()) || !std::isfinite(result.y()) || std::abs(result.x()) > 10000000 ||
+        std::abs(result.y()) > 10000000)
+        throw std::runtime_error("Drawing coordinates exceed the supported range.");
     return {result.x(), result.y(), std::clamp(pressure, 0.0, 1.0)};
 }
 void CanvasItem::paint(QPainter* p) {
@@ -117,7 +124,8 @@ void CanvasItem::paint(QPainter* p) {
                 editor_->document(), editor_->document().layer(editor_->selectedLayer()), editor_->frame()),
             true);
         if (!rasterBrush_ && drawing_ && !samples_.empty() && editor_->tool() != "Eraser" &&
-            editor_->tool() != "Select" && editor_->tool() != "Recolor" && editor_->tool() != "Edit points") {
+            editor_->tool() != "Select" && editor_->tool() != "Marquee" && editor_->tool() != "Recolor" &&
+            editor_->tool() != "Edit points") {
             Stroke stroke{0,
                           Id(editor_->selectedSwatch()),
                           editor_->brushSize(),
@@ -130,6 +138,40 @@ void CanvasItem::paint(QPainter* p) {
             if (editor_->tool() == "Ellipse")
                 stroke.shape = Shape::Ellipse;
             SceneRenderer::paintStroke(*p, stroke, editor_->document().palette);
+        }
+        if (editor_->tool() == "Marquee") {
+            QRectF rect(region_.x, region_.y, region_.width, region_.height);
+            if (drawing_ && !movingRegion_ && !samples_.empty()) {
+                rect = QRectF(QPointF(samples_.front().x, samples_.front().y),
+                              QPointF(samples_.back().x, samples_.back().y))
+                           .normalized();
+            } else if (movingRegion_)
+                rect.translate(selectionDelta_);
+            if (!rect.isEmpty()) {
+                QPen pen(Qt::white);
+                pen.setCosmetic(true);
+                pen.setStyle(Qt::DashLine);
+                p->setPen(pen);
+                p->setBrush(QColor(255, 255, 255, 15));
+                p->drawRect(rect);
+                if (hasRegion() && selectionMedia_ != SelectionMedia::Raster) {
+                    if (auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame())) {
+                        auto ids = enclosedStrokes(*d, region_);
+                        p->setBrush(Qt::NoBrush);
+                        for (const auto& stroke : d->strokes)
+                            if (std::find(ids.begin(), ids.end(), stroke.id) != ids.end()) {
+                                QRectF bounds(QPointF(stroke.points.front().x, stroke.points.front().y),
+                                              QSizeF(.01, .01));
+                                for (const auto& point : stroke.points)
+                                    bounds = bounds.united(QRectF(point.x, point.y, .01, .01));
+                                if (movingRegion_)
+                                    bounds.translate(selectionDelta_);
+                                p->drawRect(bounds.adjusted(-stroke.width / 2, -stroke.width / 2,
+                                                            stroke.width / 2, stroke.width / 2));
+                            }
+                    }
+                }
+            }
         }
         if (selectedStroke_) {
             if (auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame()))
@@ -171,6 +213,13 @@ void CanvasItem::begin(QPointF position, double pressure) {
     }
     try {
         auto point = localPoint(position, pressure);
+        if (editor_->tool() == "Marquee") {
+            movingRegion_ = hasRegion() && QRectF(region_.x, region_.y, region_.width, region_.height)
+                                               .contains(QPointF(point.x, point.y));
+            if (!movingRegion_)
+                clearRegion();
+            selectedStroke_ = 0;
+        }
         if (editor_->tool().startsWith("Raster ")) {
             const auto* existing = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame());
             rasterPreview_ = existing ? *existing : Drawing{};
@@ -190,7 +239,8 @@ void CanvasItem::begin(QPointF position, double pressure) {
             if (editor_->tool() == "Raster eraser")
                 preset = BrushPreset::Eraser;
             rasterBrush_ = std::make_unique<RasterBrush>(
-                surface, BrushSettings{std::clamp(editor_->brushSize(), 1.0, 1024.0), 1, color, preset});
+                surface, BrushSettings{std::clamp(editor_->brushSize(), 1.0, 1024.0), editor_->brushOpacity(),
+                                       color, preset});
             rasterBrush_->sample(point, 1.0 / 120, tiltX_, tiltY_);
             rasterPreview_.raster = rasterBrush_->snapshot();
             sampleClock_.start();
@@ -245,6 +295,14 @@ void CanvasItem::move(QPointF position, double pressure) {
             sampleClock_.restart();
             rasterBrush_->sample(point, elapsed, tiltX_, tiltY_);
             rasterPreview_.raster = rasterBrush_->snapshot();
+        } else if (editor_->tool() == "Marquee") {
+            if (movingRegion_)
+                selectionDelta_ = {std::round(point.x - samples_.front().x),
+                                   std::round(point.y - samples_.front().y)};
+            else if (samples_.size() == 1)
+                samples_.push_back(point);
+            else
+                samples_.back() = point;
         } else if (editor_->tool() == "Edit points")
             pointPreview_ = point;
         else if (editor_->tool() == "Select")
@@ -275,7 +333,22 @@ void CanvasItem::end() {
     drawing_ = false;
     auto points = std::move(samples_);
     samples_.clear();
-    if (rasterBrush_) {
+    if (editor_->tool() == "Marquee") {
+        if (movingRegion_)
+            transformRegion(int(SelectionAction::Move), int(selectionDelta_.x()), int(selectionDelta_.y()));
+        else if (points.size() > 1) {
+            double x = std::floor(std::min(points.front().x, points.back().x));
+            double y = std::floor(std::min(points.front().y, points.back().y));
+            double right = std::ceil(std::max(points.front().x, points.back().x));
+            double bottom = std::ceil(std::max(points.front().y, points.back().y));
+            if (std::abs(x) <= 10000000 && std::abs(y) <= 10000000 && right - x <= 20000000 &&
+                bottom - y <= 20000000)
+                region_ = {int(x), int(y), int(right - x), int(bottom - y)};
+            emit regionChanged();
+            editor_->report(regionInfo());
+        }
+        movingRegion_ = false;
+    } else if (rasterBrush_) {
         auto raster = std::move(*rasterPreview_.raster);
         rasterBrush_.reset();
         editor_->commitRaster(std::move(raster));
@@ -296,6 +369,7 @@ void CanvasItem::cancelGesture() {
     rasterBrush_.reset();
     rasterPreview_ = {};
     drawing_ = false;
+    movingRegion_ = false;
     panning_ = false;
     samples_.clear();
     selectionDelta_ = {};
@@ -387,9 +461,57 @@ void CanvasItem::smoothSelection() {
         editor_->smoothStroke(selectedStroke_);
 }
 void CanvasItem::deleteSelection() {
-    if (editor_ && selectedStroke_) {
+    if (editor_ && editor_->tool() == "Marquee" && hasRegion()) {
+        transformRegion(int(SelectionAction::Delete));
+    } else if (editor_ && selectedStroke_) {
         editor_->deleteStroke(selectedStroke_);
         selectedStroke_ = 0;
         update();
     }
+}
+
+void CanvasItem::setSelectionMedia(int value) {
+    if (value < 0 || value > 2)
+        return;
+    selectionMedia_ = static_cast<SelectionMedia>(value);
+    emit regionChanged();
+    update();
+}
+QString CanvasItem::regionInfo() const {
+    if (!hasRegion())
+        return "Drag a rectangle. Vectors must fit completely; imported images are excluded.";
+    std::size_t count = 0;
+    if (editor_ && editor_->selectedLayer() && selectionMedia_ != SelectionMedia::Raster) {
+        if (auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame()))
+            count = enclosedStrokes(*d, region_).size();
+    }
+    return QString("%1 × %2 px · %3 vector strokes · drag inside to move; artwork updates on release")
+        .arg(region_.width)
+        .arg(region_.height)
+        .arg(count);
+}
+void CanvasItem::clearRegion() {
+    region_ = {};
+    emit regionChanged();
+    update();
+}
+void CanvasItem::transformRegion(int action, int dx, int dy) {
+    if (!editor_ || !hasRegion() || action < 0 || action > 5)
+        return;
+    auto rect = region_;
+    if (editor_->editDrawingRegion(rect, selectionMedia_, static_cast<SelectionAction>(action), dx, dy)) {
+        if (action == int(SelectionAction::Delete))
+            region_ = {};
+        else {
+            if (action == int(SelectionAction::Move) || action == int(SelectionAction::Duplicate)) {
+                rect.x += dx;
+                rect.y += dy;
+            }
+            if (action == int(SelectionAction::RotateClockwise))
+                std::swap(rect.width, rect.height);
+            region_ = rect;
+        }
+    }
+    emit regionChanged();
+    update();
 }

@@ -62,3 +62,20 @@ TEST_CASE("A raster tap paints and cancelled preview leaves no shared tile chang
     REQUIRE_THROWS(brush.sample({0, 0, -1}));
     REQUIRE_THROWS(brush.sample({0, 0, 1}, 0));
 }
+
+TEST_CASE("Brush opacity reduces coverage and eraser strength ignores selected color alpha") {
+    auto paint = [](double opacity) {
+        RasterBrush brush({256, 256, {}}, {32, opacity, {0.2, 0.4, 0.8, 1}, BrushPreset::Ink});
+        for (int x = 32; x < 224; x += 2)
+            brush.sample({double(x), 128, 1});
+        return brush.snapshot();
+    };
+    auto full = paint(1), faint = paint(.15), empty = paint(0);
+    REQUIRE(coverage(faint) > 0);
+    REQUIRE(coverage(faint) < coverage(full));
+    REQUIRE(coverage(empty) == 0);
+    RasterBrush eraser(full, {32, .5, {0, 0, 0, 0}, BrushPreset::Eraser});
+    for (int x = 32; x < 224; x += 2)
+        eraser.sample({double(x), 128, 1});
+    REQUIRE(coverage(eraser.snapshot()) < coverage(full));
+}

@@ -157,3 +157,23 @@ TEST_CASE("Animation inspector edits, curve sampling, navigation and saved rende
     editor.undo();
     REQUIRE(editor.document().layer(layer).keys.back().frame == 20);
 }
+
+TEST_CASE("Drawing selections respect locked layers and media filters without adding empty drawings") {
+    EditorController editor;
+    const auto empty = editor.document();
+    REQUIRE_FALSE(editor.editDrawingRegion({0, 0, 1920, 1080}, opentoon::SelectionMedia::Both,
+                                           opentoon::SelectionAction::Delete));
+    REQUIRE(editor.document() == empty);
+    editor.loadDemo();
+    const auto before = editor.document();
+    REQUIRE_FALSE(editor.editDrawingRegion({0, 0, 1920, 1080}, opentoon::SelectionMedia::Raster,
+                                           opentoon::SelectionAction::Delete));
+    REQUIRE(editor.document() == before);
+    editor.toggleLayer(editor.selectedLayer(), "locked");
+    const auto locked = editor.document();
+    REQUIRE_FALSE(editor.editDrawingRegion({0, 0, 1920, 1080}, opentoon::SelectionMedia::Both,
+                                           opentoon::SelectionAction::Delete));
+    REQUIRE(editor.document() == locked);
+    editor.setBrushOpacity(.25);
+    REQUIRE(editor.brushOpacity() == .25);
+}
