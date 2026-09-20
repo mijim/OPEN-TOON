@@ -16,7 +16,7 @@
     {
       "id": "P01",
       "status": "in_progress",
-      "available": "Native English QML shell, CMake modules, commands, immutable snapshots, undo/redo and validation.",
+      "available": "Native English QML shell, CMake modules, commands, immutable snapshots, undo/redo and validation. Integrated resizable timing/curve workspace and selection-owned object/layer Properties.",
       "remaining": "Docking/workspace persistence, configurable shortcuts, full accessibility, scalable resource/cache protocols and cross-platform qualification."
     },
     {
@@ -34,19 +34,19 @@
     {
       "id": "P04",
       "status": "in_progress",
-      "available": "Sampled vector strokes, approximate eraser, primitives, single-stroke selection, point editing/smoothing, stable palette IDs and shape recoloring. Rectangular whole-stroke multi-selection, move/duplicate/delete, flips and quarter turns preserve editable geometry, swatch and art-layer IDs.",
+      "available": "Sampled vector strokes, approximate eraser, primitives, single-stroke selection, point editing/smoothing, stable palette IDs and shape recoloring. Rectangular whole-stroke multi-selection, move/duplicate/delete, flips and quarter turns preserve editable geometry, swatch and art-layer IDs. On-canvas scale/rotation handles with live previews and explicit selected-vector properties.",
       "remaining": "Region topology/fill, analytic erasing, Bezier/contour/width editors, presets/textures/guides, lasso/partial/additive selection and vector optimization."
     },
     {
       "id": "P05",
       "status": "in_progress",
-      "available": "Sparse immutable 15-bit premultiplied tiles, libmypaint ink/soft/dry/smudge/eraser presets, pressure input, cancellable gestures, shared preview/export and compressed project resources. Brush opacity and rectangular pixel selection with integer move/duplicate/delete, flips and lossless quarter turns, alpha-safe overlap and guarded canvas bounds.",
-      "remaining": "Brush texture/import/preset management, lasso/soft masks, arbitrary selection rotation/scaling, resolution changes, production workload and physical-device qualification."
+      "available": "Sparse immutable 15-bit premultiplied tiles, libmypaint ink/soft/dry/smudge/eraser presets, pressure input, cancellable gestures, shared preview/export and compressed project resources. Brush opacity and rectangular pixel selection with integer move/duplicate/delete, flips and lossless quarter turns, alpha-safe overlap and guarded canvas bounds. Free scale/rotation preview and commit using nearest-neighbor sampling with transparent surroundings.",
+      "remaining": "Brush texture/import/preset management, lasso/soft masks, high-quality resampling and transform performance qualification, resolution changes, production workload and physical-device qualification."
     },
     {
       "id": "P06",
       "status": "in_progress",
-      "available": "Layer transform keys with linear/held/smooth interpolation, inherited transforms/opacity, explicit Setup/Animate and Auto key, key navigation/state, editable pose-channel graph and key-only multi-layer retiming with collision rejection.",
+      "available": "Layer transform keys with linear/held/smooth interpolation, inherited transforms/opacity, explicit Setup/Animate and Auto key, key navigation/state, editable pose-channel graph and key-only multi-layer retiming with collision rejection. Curves stay in the main workspace; timeline/Xsheet range-end dragging stretches timing.",
       "remaining": "Independent channel keys, editable tangents, velocity/motion paths, complete batched editing, cameras and multiplane evaluation."
     },
     {
@@ -109,8 +109,14 @@
         "native curve key drag and undo",
         "native mixed-media marquee and move",
         "region drag cancellation and undo/redo",
-        "selection pixel equivalence after reopen"
-      ]
+        "selection pixel equivalence after reopen",
+        "on-canvas scale/rotation handles and transactional live preview",
+        "selection-preserving Properties edits",
+        "timeline end-handle retiming and undo",
+        "integrated curve panel layout",
+        "selected vector inspector and visible Retina transform handles"
+      ],
+      "limits": "One startup attempt failed to inject the initial stroke with another development instance running; rerun after closing that disposable instance passed. Real-device qualification remains pending."
     },
     "png_fixture": {
       "status": "passed",
@@ -163,7 +169,7 @@
         "drawing selection locks, media filters and empty-drawing protection"
       ]
     },
-    "total_local_ctest_entries": 41,
+    "total_local_ctest_entries": 43,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -172,8 +178,8 @@
     "drawing_selection": {
       "status": "passed",
       "platform": "macOS",
-      "core_cases": 4,
-      "scope": "Overlapping tile-boundary moves, shared untouched tiles, sparse transparency, source-over compositing, flips and four quarter turns, vector identity and art/palette preservation, undo and atomic rejection."
+      "core_cases": 6,
+      "scope": "Overlapping tile-boundary moves, shared untouched tiles, sparse transparency, source-over compositing, flips and four quarter turns, vector identity and art/palette preservation, undo and atomic rejection. Free affine transforms, transparent raster resampling and explicit vector-ID membership."
     },
     "brush_opacity": {
       "status": "passed",
@@ -191,7 +197,7 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.3",
+  "version": "0.2.0-experimental.4",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",

@@ -4,7 +4,6 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 import OpenToon.Native
 import "components" as C
-import "dialogs" as D
 
 ApplicationWindow {
     id: root
@@ -26,14 +25,16 @@ ApplicationWindow {
     palette.highlight: "#454545"
     palette.highlightedText: "#ffffff"
     palette.mid: "#393939"
-    D.DrawingSelectionDialog {
-        id: drawingSelectionDialog
-        drawingCanvas: canvas
-        controller: editor
-    }
-    D.CurveEditor {
-        id: curveEditor
-        controller: editor
+    property bool showCurves: false
+    property bool showTimingTools: false
+    property string inspectorMode: "none"
+    property real bottomHeight: 230
+    Connections {
+        target: canvas
+        function onRegionChanged() {
+            if (canvas.hasRegion)
+                root.inspectorMode = "object";
+        }
     }
     property var backend: editor
     property string pendingAction: ""
@@ -89,10 +90,6 @@ ApplicationWindow {
         sequences: [StandardKey.Paste]
         enabled: !root.textEditing && timeline.activeFocus
         onActivated: editor.pasteTimelineRange(0, false)
-    }
-    D.TimelineRangeDialog {
-        id: rangeDialog
-        controller: root.backend
     }
     Dialog {
         id: markerDialog
@@ -253,7 +250,7 @@ ApplicationWindow {
             title: "Edit"
             Action {
                 text: "Timeline range…"
-                onTriggered: rangeDialog.open()
+                onTriggered: root.showTimingTools = !root.showTimingTools
             }
             Action {
                 text: "Copy timeline range"
@@ -455,13 +452,13 @@ ApplicationWindow {
                     Accessible.name: "Raster brush preset"
                 }
                 Text {
-                    visible: editor.tool !== "Marquee"
+                    visible: editor.tool !== "Marquee" && editor.tool !== "Select"
                     text: "Size"
                     color: "#858585"
                     font.pixelSize: 11
                 }
                 Slider {
-                    visible: editor.tool !== "Marquee"
+                    visible: editor.tool !== "Marquee" && editor.tool !== "Select"
                     from: 0.5
                     to: 100
                     value: editor.brushSize
@@ -470,7 +467,7 @@ ApplicationWindow {
                     Accessible.name: "Brush size"
                 }
                 Text {
-                    visible: editor.tool !== "Marquee"
+                    visible: editor.tool !== "Marquee" && editor.tool !== "Select"
                     text: editor.brushSize.toFixed(1) + " px"
                     color: "#aaaaaa"
                     Layout.preferredWidth: 58
@@ -506,26 +503,38 @@ ApplicationWindow {
                     Accessible.name: "Drawing selection media"
                 }
                 C.ToolButton {
-                    visible: editor.tool === "Marquee"
-                    text: "Edit selection"
+                    visible: editor.tool === "Marquee" || editor.tool === "Select"
+                    text: "Duplicate"
                     enabled: canvas.hasRegion
-                    onClicked: drawingSelectionDialog.open()
+                    onClicked: canvas.transformRegion(1, 24, 24)
                 }
                 C.ToolButton {
-                    visible: editor.tool === "Marquee"
+                    visible: editor.tool === "Marquee" || editor.tool === "Select"
+                    text: "Flip H"
+                    enabled: canvas.hasRegion
+                    onClicked: canvas.transformRegion(3)
+                }
+                C.ToolButton {
+                    visible: editor.tool === "Marquee" || editor.tool === "Select"
+                    text: "Flip V"
+                    enabled: canvas.hasRegion
+                    onClicked: canvas.transformRegion(4)
+                }
+                C.ToolButton {
+                    visible: editor.tool === "Marquee" || editor.tool === "Select"
                     text: "Deselect"
                     enabled: canvas.hasRegion
                     onClicked: canvas.clearRegion()
                 }
                 C.ToolButton {
                     text: "Fill shape"
-                    visible: !editor.tool.startsWith("Raster ") && editor.tool !== "Marquee"
+                    visible: !editor.tool.startsWith("Raster ") && editor.tool !== "Marquee" && editor.tool !== "Select"
                     active: editor.filled
                     onClicked: editor.filled = !editor.filled
                     hint: "Fill new rectangles and ellipses"
                 }
                 ComboBox {
-                    visible: !editor.tool.startsWith("Raster ") && editor.tool !== "Marquee"
+                    visible: !editor.tool.startsWith("Raster ") && editor.tool !== "Marquee" && editor.tool !== "Select"
                     model: ["Underlay Art", "Color Art", "Line Art", "Overlay Art"]
                     currentIndex: editor.artLayer
                     implicitHeight: 28
@@ -703,165 +712,178 @@ ApplicationWindow {
                             font.letterSpacing: 1.4
                         }
                         Label {
-                            Layout.leftMargin: 16
-                            text: "Transform"
-                            font.pixelSize: 13
-                            font.bold: true
-                        }
-                        RowLayout {
-                            Layout.leftMargin: 16
-                            ComboBox {
-                                model: ["Setup", "Animate"]
-                                currentIndex: editor.animateMode ? 1 : 0
-                                onActivated: editor.animateMode = currentIndex === 1
-                                Accessible.name: "Animation edit mode"
-                                implicitWidth: 105
-                            }
-                            CheckBox {
-                                text: "Auto key"
-                                checked: editor.autoKey
-                                enabled: editor.animateMode
-                                onToggled: editor.autoKey = checked
-                            }
-                        }
-                        Label {
+                            visible: canvas.objectProperties.kind === "none" && root.inspectorMode !== "layer"
                             Layout.leftMargin: 16
                             Layout.rightMargin: 16
                             Layout.fillWidth: true
+                            text: "Select an object on the canvas to edit its properties, or select a layer in the layer list."
                             wrapMode: Text.WordWrap
-                            color: "#aaaaaa"
-                            text: {
-                                const revision = editor.animationKeys;
-                                const mode = editor.animateMode;
-                                return mode ? editor.keyState : "Rest values · existing keys keep their poses";
-                            }
+                            color: "#999999"
                         }
-                        RowLayout {
-                            Layout.leftMargin: 12
-                            C.ToolButton {
-                                text: "‹ Key"
-                                onClicked: editor.nextKey(-1)
-                            }
-                            C.ToolButton {
-                                text: "Key ›"
-                                onClicked: editor.nextKey(1)
-                            }
-                            C.ToolButton {
-                                text: "Curves"
-                                onClicked: curveEditor.open()
-                            }
-                        }
-                        GridLayout {
+                        C.SelectionProperties {
+                            visible: canvas.objectProperties.kind !== "none"
                             Layout.leftMargin: 16
                             Layout.rightMargin: 16
                             Layout.fillWidth: true
-                            columns: 2
-                            columnSpacing: 8
-                            rowSpacing: 8
-                            Repeater {
+                            drawingCanvas: canvas
+                            controller: editor
+                        }
+                        ColumnLayout {
+                            visible: root.inspectorMode === "layer" && canvas.objectProperties.kind === "none"
+                            Layout.fillWidth: true
+                            Label {
+                                Layout.leftMargin: 16
+                                text: "Layer · " + (editor.layers.find(l => l.id === editor.selectedLayer)?.name || "")
+                                font.pixelSize: 13
+                                font.bold: true
+                            }
+                            RowLayout {
+                                Layout.leftMargin: 16
+                                ComboBox {
+                                    model: ["Setup", "Animate"]
+                                    currentIndex: editor.animateMode ? 1 : 0
+                                    onActivated: editor.animateMode = currentIndex === 1
+                                    Accessible.name: "Animation edit mode"
+                                    implicitWidth: 105
+                                }
+                                CheckBox {
+                                    text: "Auto key"
+                                    checked: editor.autoKey
+                                    enabled: editor.animateMode
+                                    onToggled: editor.autoKey = checked
+                                }
+                            }
+                            Label {
+                                Layout.leftMargin: 16
+                                Layout.rightMargin: 16
+                                Layout.fillWidth: true
+                                wrapMode: Text.WordWrap
+                                color: "#aaaaaa"
+                                text: {
+                                    const revision = editor.animationKeys;
+                                    const mode = editor.animateMode;
+                                    return mode ? editor.keyState : "Rest values · existing keys keep their poses";
+                                }
+                            }
+                            RowLayout {
+                                Layout.leftMargin: 12
+                                C.ToolButton {
+                                    text: "‹ Key"
+                                    onClicked: editor.nextKey(-1)
+                                }
+                                C.ToolButton {
+                                    text: "Key ›"
+                                    onClicked: editor.nextKey(1)
+                                }
+                                C.ToolButton {
+                                    text: "Curves"
+                                    onClicked: root.showCurves = true
+                                }
+                            }
+                            GridLayout {
+                                Layout.leftMargin: 16
+                                Layout.rightMargin: 16
+                                Layout.fillWidth: true
+                                columns: 2
+                                columnSpacing: 8
+                                rowSpacing: 8
+                                Repeater {
+                                    model: [
+                                        {
+                                            key: "x",
+                                            name: "Position X"
+                                        },
+                                        {
+                                            key: "y",
+                                            name: "Position Y"
+                                        },
+                                        {
+                                            key: "rotation",
+                                            name: "Rotation °"
+                                        },
+                                        {
+                                            key: "opacity",
+                                            name: "Opacity 0–1"
+                                        },
+                                        {
+                                            key: "scaleX",
+                                            name: "Scale X"
+                                        },
+                                        {
+                                            key: "scaleY",
+                                            name: "Scale Y"
+                                        },
+                                        {
+                                            key: "pivotX",
+                                            name: "Pivot X"
+                                        },
+                                        {
+                                            key: "pivotY",
+                                            name: "Pivot Y"
+                                        }
+                                    ]
+                                    ColumnLayout {
+                                        required property var modelData
+                                        Layout.fillWidth: true
+                                        spacing: 4
+                                        Text {
+                                            text: modelData.name
+                                            color: "#888888"
+                                            font.pixelSize: 10
+                                        }
+                                        C.PropertyNumber {
+                                            Layout.fillWidth: true
+                                            Layout.preferredWidth: 96
+                                            number: {
+                                                const f = editor.frame;
+                                                return Number(editor.transform[modelData.key] || 0);
+                                            }
+                                            label: modelData.name
+                                            onCommitted: value => editor.setTransform(modelData.key, value)
+                                        }
+                                    }
+                                }
+                            }
+                            RowLayout {
+                                Layout.leftMargin: 12
+                                C.ToolButton {
+                                    text: "◇ Add key"
+                                    onClicked: editor.addKey(interpolation.currentIndex)
+                                }
+                                ComboBox {
+                                    id: interpolation
+                                    model: ["Linear", "Hold", "Smooth"]
+                                    implicitWidth: 98
+                                    implicitHeight: 28
+                                    Accessible.name: "Key interpolation"
+                                }
+                            }
+                            ComboBox {
+                                Layout.leftMargin: 16
+                                Layout.rightMargin: 16
+                                Layout.fillWidth: true
+                                implicitHeight: 30
                                 model: [
                                     {
-                                        key: "x",
-                                        name: "Position X"
-                                    },
-                                    {
-                                        key: "y",
-                                        name: "Position Y"
-                                    },
-                                    {
-                                        key: "rotation",
-                                        name: "Rotation °"
-                                    },
-                                    {
-                                        key: "opacity",
-                                        name: "Opacity 0–1"
-                                    },
-                                    {
-                                        key: "scaleX",
-                                        name: "Scale X"
-                                    },
-                                    {
-                                        key: "scaleY",
-                                        name: "Scale Y"
-                                    },
-                                    {
-                                        key: "pivotX",
-                                        name: "Pivot X"
-                                    },
-                                    {
-                                        key: "pivotY",
-                                        name: "Pivot Y"
+                                        id: 0,
+                                        name: "No parent"
                                     }
-                                ]
-                                ColumnLayout {
-                                    required property var modelData
-                                    Layout.fillWidth: true
-                                    spacing: 4
-                                    Text {
-                                        text: modelData.name
-                                        color: "#888888"
-                                        font.pixelSize: 10
-                                    }
-                                    TextField {
-                                        Layout.fillWidth: true
-                                        Layout.preferredWidth: 96
-                                        implicitHeight: 28
-                                        font.family: "Menlo"
-                                        font.pixelSize: 11
-                                        text: {
-                                            const f = editor.frame;
-                                            return Number(editor.transform[modelData.key] === undefined ? 0 : editor.transform[modelData.key]).toFixed(2);
-                                        }
-                                        selectByMouse: true
-                                        validator: DoubleValidator {
-                                            locale: "C"
-                                        }
-                                        onEditingFinished: if (acceptableInput)
-                                            editor.setTransform(modelData.key, Number(text))
-                                        Accessible.name: modelData.name
-                                    }
+                                ].concat(editor.layers.filter(function (l) {
+                                    return l.id !== editor.selectedLayer;
+                                }))
+                                currentIndex: {
+                                    const selected = editor.layers.find(function (l) {
+                                        return l.id === editor.selectedLayer;
+                                    });
+                                    return model.findIndex(function (l) {
+                                        return l.id === (selected ? selected.parent : 0);
+                                    });
                                 }
+                                textRole: "name"
+                                valueRole: "id"
+                                onActivated: editor.setParent(currentValue)
+                                Accessible.name: "Parent layer"
                             }
-                        }
-                        RowLayout {
-                            Layout.leftMargin: 12
-                            C.ToolButton {
-                                text: "◇ Add key"
-                                onClicked: editor.addKey(interpolation.currentIndex)
-                            }
-                            ComboBox {
-                                id: interpolation
-                                model: ["Linear", "Hold", "Smooth"]
-                                implicitWidth: 98
-                                implicitHeight: 28
-                                Accessible.name: "Key interpolation"
-                            }
-                        }
-                        ComboBox {
-                            Layout.leftMargin: 16
-                            Layout.rightMargin: 16
-                            Layout.fillWidth: true
-                            implicitHeight: 30
-                            model: [
-                                {
-                                    id: 0,
-                                    name: "No parent"
-                                }
-                            ].concat(editor.layers.filter(function (l) {
-                                return l.id !== editor.selectedLayer;
-                            }))
-                            currentIndex: {
-                                const selected = editor.layers.find(function (l) {
-                                    return l.id === editor.selectedLayer;
-                                });
-                                return model.findIndex(function (l) {
-                                    return l.id === (selected ? selected.parent : 0);
-                                });
-                            }
-                            textRole: "name"
-                            valueRole: "id"
-                            onActivated: editor.setParent(currentValue)
-                            Accessible.name: "Parent layer"
                         }
                         Rectangle {
                             Layout.fillWidth: true
@@ -967,8 +989,22 @@ ApplicationWindow {
         }
         Rectangle {
             Layout.fillWidth: true
-            height: 1
-            color: "#323232"
+            implicitHeight: 7
+            color: "#252525"
+            MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.SplitVCursor
+                property real startY
+                property real startHeight
+                onPressed: mouse => {
+                    startY = mapToItem(root, mouse.x, mouse.y).y;
+                    startHeight = root.bottomHeight;
+                }
+                onPositionChanged: mouse => {
+                    if (pressed)
+                        root.bottomHeight = Math.max(180, Math.min(root.height - 490, startHeight + startY - mapToItem(root, mouse.x, mouse.y).y));
+                }
+            }
         }
         Rectangle {
             Layout.fillWidth: true
@@ -981,13 +1017,30 @@ ApplicationWindow {
                 spacing: 8
                 C.ToolButton {
                     text: "Timeline"
-                    active: !root.xsheet
-                    onClicked: root.xsheet = false
+                    active: !root.xsheet && !root.showCurves
+                    onClicked: {
+                        root.showCurves = false;
+                        root.xsheet = false;
+                    }
                 }
                 C.ToolButton {
                     text: "Xsheet"
-                    active: root.xsheet
-                    onClicked: root.xsheet = true
+                    active: root.xsheet && !root.showCurves
+                    onClicked: {
+                        root.showCurves = false;
+                        root.xsheet = true;
+                    }
+                }
+                C.ToolButton {
+                    text: "Curves"
+                    active: root.showCurves
+                    onClicked: root.showCurves = true
+                }
+                C.ToolButton {
+                    text: "Timing tools"
+                    active: root.showTimingTools
+                    visible: !root.showCurves
+                    onClicked: root.showTimingTools = !root.showTimingTools
                 }
                 Item {
                     Layout.fillWidth: true
@@ -1039,11 +1092,27 @@ ApplicationWindow {
                 }
             }
         }
+        C.TimingTools {
+            visible: root.showTimingTools && !root.showCurves
+            controller: editor
+            Layout.fillWidth: true
+            Layout.leftMargin: 10
+            Layout.rightMargin: 10
+            Layout.preferredHeight: childrenRect.height
+        }
+        C.CurveEditor {
+            id: curveEditor
+            visible: root.showCurves
+            controller: editor
+            Layout.fillWidth: true
+            Layout.preferredHeight: root.bottomHeight
+        }
         RowLayout {
             Layout.fillWidth: true
-            Layout.preferredHeight: 186
-            Layout.minimumHeight: 186
-            Layout.maximumHeight: 186
+            visible: !root.showCurves
+            Layout.preferredHeight: root.bottomHeight
+            Layout.minimumHeight: root.bottomHeight
+            Layout.maximumHeight: root.bottomHeight
             Layout.fillHeight: false
             spacing: 0
             Rectangle {
@@ -1115,7 +1184,11 @@ ApplicationWindow {
                             color: editor.selectedLayer === modelData.id ? "#292929" : "transparent"
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: editor.selectedLayer = modelData.id
+                                onClicked: {
+                                    canvas.clearRegion();
+                                    root.inspectorMode = "layer";
+                                    editor.selectedLayer = modelData.id;
+                                }
                             }
                             RowLayout {
                                 anchors.fill: parent
@@ -1141,8 +1214,11 @@ ApplicationWindow {
                                     selectByMouse: true
                                     font.pixelSize: 11
                                     onEditingFinished: editor.renameLayer(modelData.id, text)
-                                    onActiveFocusChanged: if (activeFocus)
-                                        editor.selectedLayer = modelData.id
+                                    onActiveFocusChanged: if (activeFocus) {
+                                        canvas.clearRegion();
+                                        root.inspectorMode = "layer";
+                                        editor.selectedLayer = modelData.id;
+                                    }
                                     Accessible.name: "Layer name"
                                 }
                                 C.ToolButton {
@@ -1197,12 +1273,17 @@ ApplicationWindow {
                             if (editor.selectedLayers.indexOf(data[selected].id) < 0)
                                 continue;
                             const a = timelineInput.moving ? timelineInput.previewFrame : editor.rangeStart;
-                            const b = a + editor.rangeEnd - editor.rangeStart;
+                            const b = timelineInput.resizing ? timelineInput.previewEnd : a + editor.rangeEnd - editor.rangeStart;
                             ctx.fillStyle = timelineInput.moving ? "#555555" : "#303030";
                             if (root.xsheet)
                                 ctx.fillRect(48 + selected * 100 - ox, 30 + a * root.timelineRow - oy, 100, (b - a) * root.timelineRow);
                             else
                                 ctx.fillRect(a * root.timelineCell - ox, 30 + selected * root.timelineRow - oy, (b - a) * root.timelineCell, root.timelineRow);
+                            ctx.fillStyle = "#eeeeee";
+                            if (root.xsheet)
+                                ctx.fillRect(50 + selected * 100 - ox, 30 + b * root.timelineRow - oy - 3, 96, 3);
+                            else
+                                ctx.fillRect(b * root.timelineCell - ox - 3, 32 + selected * root.timelineRow - oy, 3, root.timelineRow - 4);
                         }
 
                         if (!root.xsheet) {
@@ -1295,6 +1376,8 @@ ApplicationWindow {
                         property int anchorFrame: 0
                         property int anchorRow: -1
                         property bool moving: false
+                        property bool resizing: false
+                        property int previewEnd: 0
                         property int previewFrame: -1
                         function frameAt(mouse) {
                             return root.xsheet ? Math.floor((mouse.y + timelineScroll.contentY - 30) / root.timelineRow) : Math.floor((mouse.x + timelineScroll.contentX) / root.timelineCell);
@@ -1306,7 +1389,15 @@ ApplicationWindow {
                             timeline.forceActiveFocus();
                             anchorFrame = frameAt(mouse);
                             anchorRow = rowAt(mouse);
-                            moving = (mouse.modifiers & Qt.AltModifier) && anchorRow >= 0 && anchorRow < editor.layers.length && anchorFrame >= editor.rangeStart && anchorFrame < editor.rangeEnd && editor.selectedLayers.indexOf(editor.layers[anchorRow].id) >= 0;
+                            const edge = root.xsheet ? 30 + editor.rangeEnd * root.timelineRow - timelineScroll.contentY : editor.rangeEnd * root.timelineCell - timelineScroll.contentX;
+                            const coordinate = root.xsheet ? mouse.y : mouse.x;
+                            resizing = anchorRow >= 0 && anchorRow < editor.layers.length && editor.selectedLayers.indexOf(editor.layers[anchorRow].id) >= 0 && Math.abs(coordinate - edge) <= 5;
+                            previewEnd = editor.rangeEnd;
+                            moving = !resizing && (mouse.modifiers & Qt.AltModifier) && anchorRow >= 0 && anchorRow < editor.layers.length && anchorFrame >= editor.rangeStart && anchorFrame < editor.rangeEnd && editor.selectedLayers.indexOf(editor.layers[anchorRow].id) >= 0;
+                            if (resizing) {
+                                timeline.requestPaint();
+                                return;
+                            }
                             if (moving)
                                 previewFrame = editor.rangeStart;
                             else if (anchorRow >= 0 && anchorRow < editor.layers.length)
@@ -1317,7 +1408,10 @@ ApplicationWindow {
                         onPositionChanged: function (mouse) {
                             if (!pressed)
                                 return;
-                            if (moving) {
+                            if (resizing) {
+                                previewEnd = Math.max(editor.rangeStart + 1, frameAt(mouse) + 1);
+                                timeline.requestPaint();
+                            } else if (moving) {
                                 previewFrame = Math.max(0, Math.min(editor.duration - 1, editor.rangeStart + frameAt(mouse) - anchorFrame));
                                 editor.report("Move preview: replace frames " + (previewFrame + 1) + "–" + (previewFrame + editor.rangeEnd - editor.rangeStart) + ". Release to overwrite; Escape cancels.");
                                 timeline.requestPaint();
@@ -1327,6 +1421,9 @@ ApplicationWindow {
                                 editor.frame = frameAt(mouse);
                         }
                         onReleased: {
+                            if (resizing)
+                                editor.retimeTimelineRange(previewEnd - editor.rangeStart);
+                            resizing = false;
                             if (moving && previewFrame >= 0)
                                 editor.moveTimelineRange(previewFrame, false);
                             moving = false;
@@ -1334,6 +1431,7 @@ ApplicationWindow {
                             timeline.requestPaint();
                         }
                         onCanceled: {
+                            resizing = false;
                             moving = false;
                             previewFrame = -1;
                             timeline.requestPaint();
@@ -1341,6 +1439,7 @@ ApplicationWindow {
                         onDoubleClicked: editor.newDrawing(false)
                     }
                     Keys.onEscapePressed: {
+                        timelineInput.resizing = false;
                         timelineInput.moving = false;
                         timelineInput.previewFrame = -1;
                         requestPaint();

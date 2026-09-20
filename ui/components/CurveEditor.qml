@@ -2,16 +2,10 @@ import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
 
-Dialog {
+Item {
     id: root
-    objectName: "curveEditorDialog"
+    objectName: "curveEditorPanel"
     required property var controller
-    title: "Animation curves"
-    width: Math.min(960, parent.width - 40)
-    height: Math.min(680, parent.height - 40)
-    anchors.centerIn: parent
-    modal: true
-    standardButtons: Dialog.Close
     property var keys: controller.animationKeys
     property var samples: []
     property string channel: channels.currentValue || "x"
@@ -19,6 +13,8 @@ Dialog {
     property real high: 1
     property var selected: null
     function refresh() {
+        if (!controller || !graph)
+            return;
         samples = controller.curveSamples(channel);
         let lo = Infinity, hi = -Infinity;
         for (const p of samples) {
@@ -43,7 +39,9 @@ Dialog {
             easing.currentIndex = selected.interpolation;
         }
     }
-    onOpened: refresh()
+    onVisibleChanged: if (visible)
+        refresh()
+    Component.onCompleted: refresh()
     onChannelChanged: refresh()
     Connections {
         target: root.controller
@@ -56,8 +54,10 @@ Dialog {
             graph.requestPaint();
         }
     }
-    contentItem: ColumnLayout {
-        spacing: 12
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: 8
+        spacing: 5
         RowLayout {
             ComboBox {
                 id: channels
@@ -97,7 +97,7 @@ Dialog {
                         key: "pivotY"
                     }
                 ]
-                Layout.preferredWidth: 220
+                Layout.preferredWidth: 180
                 Accessible.name: "Curve channel"
             }
             Button {
@@ -116,12 +116,6 @@ Dialog {
                 text: "Frame " + (root.controller.frame + 1)
                 Layout.fillWidth: true
             }
-        }
-        Label {
-            text: "Click to scrub. Drag a key to change its time and this value. Each key stores a full pose; timing and interpolation affect all channels."
-            wrapMode: Text.WordWrap
-            Layout.fillWidth: true
-            color: "#aaaaaa"
         }
         Canvas {
             id: graph
@@ -237,8 +231,7 @@ Dialog {
                         dragKey = null;
                         graph.requestPaint();
                         event.accepted = true;
-                    } else
-                        root.close();
+                    }
                 }
                 Accessible.name: "Animation curve. Use the numeric controls to edit keys without dragging."
             }
@@ -284,43 +277,6 @@ Dialog {
                 enabled: root.selected !== null
                 onClicked: root.controller.deleteKey()
             }
-        }
-        Label {
-            text: "Retime timeline selection: frames " + (root.controller.rangeStart + 1) + "–" + root.controller.rangeEnd + " · " + root.controller.selectedLayers.length + " layers"
-        }
-        RowLayout {
-            Label {
-                text: "Destination"
-            }
-            SpinBox {
-                id: destination
-                from: 1
-                to: 1000000
-                value: root.controller.rangeStart + 1
-                editable: true
-                Accessible.name: "Key range destination"
-            }
-            Label {
-                text: "Length"
-            }
-            SpinBox {
-                id: length
-                from: 1
-                to: 1000000
-                value: root.controller.rangeEnd - root.controller.rangeStart
-                editable: true
-                Accessible.name: "Key range length"
-            }
-            Button {
-                text: "Retime keys only"
-                onClicked: root.controller.retimeSelectedKeys(destination.value - 1, length.value)
-            }
-        }
-        Label {
-            text: root.controller.status
-            Layout.fillWidth: true
-            wrapMode: Text.WordWrap
-            color: "#bbbbbb"
         }
     }
 }

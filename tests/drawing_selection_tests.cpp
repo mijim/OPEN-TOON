@@ -121,3 +121,37 @@ TEST_CASE("Mixed selection operations are atomic and retain vector IDs palette a
     session.undo();
     REQUIRE(session.document() == before);
 }
+
+TEST_CASE("Free raster transforms preserve transparent surroundings and roll back rejected bounds") {
+    auto d = rasterDrawing();
+    put(*d.raster, 10, 20, {1000, 2000, 3000, 4000});
+    const auto original = d;
+    transformDrawingSelection(d, {10, 20, 2, 2}, SelectionMedia::Raster, {}, {2, 0, 0, 2, -10, -20});
+    REQUIRE(get(*d.raster, 10, 20) == Pixel{1000, 2000, 3000, 4000});
+    REQUIRE(get(*d.raster, 11, 21) == Pixel{1000, 2000, 3000, 4000});
+    REQUIRE(get(*d.raster, 12, 20) == Pixel{});
+    d = original;
+    transformDrawingSelection(d, {10, 20, 2, 2}, SelectionMedia::Raster, {}, {0, 1, -1, 0, 32, 10});
+    REQUIRE(get(*d.raster, 11, 20) == Pixel{1000, 2000, 3000, 4000});
+    REQUIRE(get(*d.raster, 10, 20) == Pixel{});
+    auto before = d;
+    REQUIRE_THROWS(
+        transformDrawingSelection(d, {0, 0, 32, 32}, SelectionMedia::Raster, {}, {1, 0, 0, 1, -100, 0}));
+    REQUIRE(d == before);
+    REQUIRE_THROWS(
+        transformDrawingSelection(d, {0, 0, 32, 32}, SelectionMedia::Raster, {}, {0, 0, 0, 1, 0, 0}));
+    REQUIRE(d == before);
+}
+TEST_CASE("Affine vector edits freeze object membership and keep rotated primitives editable") {
+    Drawing d;
+    d.strokes = {{1, 5, 2, Shape::Rectangle, true, 1, {{10, 20, 1}, {20, 30, 1}}},
+                 {2, 5, 2, Shape::Stroke, false, 2, {{10, 20, 1}, {40, 40, 1}}}};
+    auto unrelated = d.strokes.back();
+    transformDrawingSelection(d, {0, 0, 50, 50}, SelectionMedia::Vectors, {1}, {0, 1, -1, 0, 50, 0});
+    REQUIRE(d.strokes.front().shape == Shape::Polygon);
+    REQUIRE(d.strokes.front().points.size() == 4);
+    REQUIRE(d.strokes.front().points.front() == Point{30, 10, 1});
+    REQUIRE(d.strokes.front().id == 1);
+    REQUIRE(d.strokes.front().swatch == 5);
+    REQUIRE(d.strokes.back() == unrelated);
+}

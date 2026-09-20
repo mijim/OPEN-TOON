@@ -69,11 +69,11 @@ Choose **Animate** to edit the current key. Enable **Auto key** to create a full
 key when editing an unkeyed frame, or press **Add key** explicitly. With Auto key off,
 unkeyed edits are rejected. The inspector labels keyed, interpolated and held poses.
 
-**‹ Key / Key ›** navigate the selected layer. **Curves** opens the function editor.
+**‹ Key / Key ›** navigate the selected layer. **Curves** selects the integrated function editor in the bottom workspace.
 Choose a channel, click the graph to scrub, or drag a key to adjust its frame and
 value. Escape cancels a drag. The frame/value/interpolation fields and **Apply key**
 offer precise editing. **Delete** removes the selected pose key. Colliding keys and
-invalid values are rejected; the message appears inside the dialog. Undo restores
+invalid values are rejected; the message appears in the status bar. Undo restores
 an entire drag or numeric edit.
 
 Keys currently contain complete poses: a value edit affects only that field, while
@@ -81,10 +81,10 @@ moving a key or changing Linear/Hold/Smooth interpolation affects all eight chan
 Smooth has fixed easing slopes; editable tangents and independent channel keys remain
 planned. Frames shown in the interface start at 1.
 
-Select a range and layers in the timeline before opening Curves. Set Destination and
-Length, then **Retime keys only** to move/stretch their keys without changing drawing
-exposures. Endpoint frames map to endpoint frames; rounding collisions reject the
-whole operation. Existing keys outside the range are preserved.
+Select a range and layers in the timeline. Drag its right edge (bottom edge in the
+Xsheet) to stretch timing; Alt-drag inside to move. **Timing tools** exposes clipboard,
+repeat and drawing-step controls within the workspace. Drag the separator above the
+timing tabs to resize the lower panel. Timing edits are undoable.
 
 ## Rectangular vector and raster selection
 
@@ -93,19 +93,28 @@ Press **M** or choose **Marquee**. Select **Vectors**, **Raster pixels** or
 Vectors must fit completely, including stroke width; crossing strokes stay untouched.
 The rectangle selects raster pixels exactly. Imported image assets are excluded.
 
-Drag inside the rectangle to move it in whole local pixels. The bounds preview the
-move and artwork updates on release. Escape cancels the gesture. **Edit selection**
-offers numeric Move/Duplicate offsets, Delete, horizontal/vertical flips and clockwise
-90° rotation. Rotation keeps the upper-left corner fixed and exchanges width/height.
-**Deselect** clears the selection. Delete/Backspace also deletes a selected region
-while the canvas has focus. Each operation is one undo command.
+Drag inside the rectangle to move it. Drag an edge/corner handle to scale, or the
+circle above the box to rotate. Artwork previews while dragging and commits on
+release. Shift preserves corner proportions or snaps rotation to 15°; Escape cancels.
+The top toolbar provides Duplicate, Flip H, Flip V and Deselect without opening a
+dialog. Delete/Backspace removes a selected region while the canvas has focus.
+
+**Properties** follows selection. Click a vector with **V** to see and edit its bounds,
+stroke width, fill, art layer and palette swatch. A marquee shows selection bounds.
+Rotate-by applies an additional rotation. Select a layer row/name to inspect its layer
+transforms and animation; with no target selected, Properties shows selection guidance.
+Layer animation and object geometry are distinct targets. Each edit is one undo step.
 
 Raster selections retain transparency. Overlapping destination artwork is composited
 source-over; transparent source pixels do not clear destination pixels. Moving
 nontransparent pixels outside the raster canvas rejects the complete edit. Large
-edits exceeding the 128 MiB mutable tile budget also reject safely. Free rotation,
-scaling, lasso and feathering remain pending. Selection operations edit the shared
+edits exceeding the 128 MiB mutable tile budget also reject safely. Free raster rotation/scaling currently use nearest-neighbor resampling and a
+16-million-output-pixel limit; lasso and feathering remain pending. Selection operations edit the shared
 drawing: all its exposures change. Duplicate the drawing first to make it independent.
 
 With a raster brush selected, use **Opacity** in the toolbar to control paint or
 eraser strength. The eraser does not depend on the selected palette color's alpha.
+
+Rotated rectangles become editable polygons; rotated ellipses use a 128-point polygon
+approximation. Nonuniform scaling applies an average stroke-width scale. These tools
+are experimental and do not yet provide analytic curve-preserving transforms.

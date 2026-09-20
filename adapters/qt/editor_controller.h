@@ -102,8 +102,11 @@ class EditorController final : public QObject {
     QString tool() const { return tool_; }
     double brushOpacity() const { return brushOpacity_; }
     void setBrushOpacity(double);
+    bool transformDrawingRegion(opentoon::PixelRect, opentoon::SelectionMedia,
+                                const std::vector<opentoon::Id>&, opentoon::SelectionTransform);
+    bool setStrokeProperty(opentoon::Id, QString, double);
     bool editDrawingRegion(opentoon::PixelRect, opentoon::SelectionMedia, opentoon::SelectionAction,
-                           int dx = 0, int dy = 0);
+                           int dx = 0, int dy = 0, const std::vector<opentoon::Id>* selectedIds = nullptr);
     double brushSize() const { return brushSize_; }
     bool onionSkin() const { return onion_; }
     bool filled() const { return filled_; }

@@ -2,13 +2,13 @@
 
 An independent open-source desktop animation project combining vector and bitmap drawing, frame-by-frame and cut-out animation, rigging, compositing and production tools.
 
-**Current version: 0.2.0-experimental.3. P11 is not complete.** A C++20/Qt Quick application now supports mouse drawing, vector editing, MyPaint raster brushes with opacity, rectangular vector/raster selection and transforms, layer and range editing, explicit animation modes, editable pose curves, key-only retiming, compressed SQLite project revisions and PNG export. The roadmap still covers 282 capabilities in 26 domains; working subsets are marked partial, with no phase claimed complete.
+**Current version: 0.2.0-experimental.4. P11 is not complete.** A C++20/Qt Quick application now supports mouse drawing, vector editing, MyPaint raster brushes with opacity, direct vector/raster transform handles, selection-owned Properties, integrated timing/curves, layer and range editing, explicit animation modes, editable pose curves, key-only retiming, compressed SQLite project revisions and PNG export. The roadmap still covers 282 capabilities in 26 domains; working subsets are marked partial, with no phase claimed complete.
 
 Start with the [build instructions](docs/implementation/BUILD.md), [user guide](docs/implementation/USER-GUIDE.md) and [implementation status](docs/implementation/STATUS.md).
 
 The product will use a clean black, white and gray interface. **The entire first-party product is in English by requirement:** UI, messages, built-in assets, help, code and public documentation. The previous research, Markdown documents and canonical catalogs have also been translated into English. User-created content remains multilingual.
 
-![Experimental OPEN-TOON editor with vector and MyPaint raster strokes](docs/implementation/raster-editor.png)
+![Direct canvas transforms, selected-object Properties and integrated timing](docs/implementation/direct-editing.png)
 
 ## Start here
 

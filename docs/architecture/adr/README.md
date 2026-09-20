@@ -49,3 +49,5 @@ Prefer maintained libraries for solved infrastructure through explicit adapters.
 See [ADR-013](013-animation-editing.md) for setup/animate, pose curve and key-only retiming semantics.
 
 See [ADR-014](014-drawing-selection.md) for rectangular vector/raster selection, compositing and brush opacity.
+
+See [ADR-015](015-direct-editing-workspace.md) for direct transform handles, integrated timing and selection-owned Properties; it supersedes the earlier dialog interaction.

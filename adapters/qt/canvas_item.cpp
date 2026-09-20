@@ -1,10 +1,12 @@
 #include "canvas_item.h"
 #include "editor_controller.h"
 #include "scene_renderer.h"
+#include <QCursor>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QQuickItemGrabResult>
 #include <QQuickWindow>
+#include <QScopedValueRollback>
 #include <QTabletEvent>
 #include <cmath>
 #include <stdexcept>
@@ -29,25 +31,37 @@ void CanvasItem::setEditor(EditorController* editor) {
     editor_ = editor;
     if (editor) {
         connect(editor, &EditorController::changed, this, [this] {
+            if (committing_)
+                return;
             cancelGesture();
             clearRegion();
+            selectedStroke_ = 0;
             update();
         });
         connect(editor, &EditorController::frameChanged, this, [this] {
+            if (committing_)
+                return;
             cancelGesture();
             selectedStroke_ = 0;
             clearRegion();
+            selectedStroke_ = 0;
             update();
         });
         connect(editor, &EditorController::toolChanged, this, [this] {
+            if (committing_)
+                return;
             cancelGesture();
             clearRegion();
+            selectedStroke_ = 0;
             update();
         });
         connect(editor, &EditorController::selectionChanged, this, [this] {
+            if (committing_)
+                return;
             cancelGesture();
             selectedStroke_ = 0;
             clearRegion();
+            selectedStroke_ = 0;
             update();
         });
     }
@@ -106,6 +120,7 @@ Point CanvasItem::localPoint(QPointF p, double pressure) const {
     return {result.x(), result.y(), std::clamp(pressure, 0.0, 1.0)};
 }
 void CanvasItem::paint(QPainter* p) {
+    const auto itemTransform = p->worldTransform();
     p->fillRect(boundingRect(), QColor("#151515"));
     if (!editor_)
         return;
@@ -114,9 +129,11 @@ void CanvasItem::paint(QPainter* p) {
     p->save();
     p->setWorldTransform(view, true);
     p->fillRect(QRectF(-1, -1, editor_->sceneWidth() + 2, editor_->sceneHeight() + 2), QColor("#454545"));
-    SceneRenderer::paint(*p, editor_->document(), editor_->frame(),
-                         {true, editor_->onionSkin(), 1, 0, rasterBrush_ ? Id(editor_->selectedLayer()) : 0,
-                          rasterBrush_ ? &rasterPreview_ : nullptr});
+    SceneRenderer::paint(
+        *p, editor_->document(), editor_->frame(),
+        {true, editor_->onionSkin(), 1, 0,
+         (rasterBrush_ || (transforming_ && previewValid_)) ? Id(editor_->selectedLayer()) : 0,
+         rasterBrush_ ? &rasterPreview_ : (transforming_ && previewValid_ ? &transformPreview_ : nullptr)});
     if (editor_->selectedLayer()) {
         p->save();
         p->setWorldTransform(
@@ -139,63 +156,47 @@ void CanvasItem::paint(QPainter* p) {
                 stroke.shape = Shape::Ellipse;
             SceneRenderer::paintStroke(*p, stroke, editor_->document().palette);
         }
-        if (editor_->tool() == "Marquee") {
-            QRectF rect(region_.x, region_.y, region_.width, region_.height);
-            if (drawing_ && !movingRegion_ && !samples_.empty()) {
-                rect = QRectF(QPointF(samples_.front().x, samples_.front().y),
-                              QPointF(samples_.back().x, samples_.back().y))
-                           .normalized();
-            } else if (movingRegion_)
-                rect.translate(selectionDelta_);
-            if (!rect.isEmpty()) {
-                QPen pen(Qt::white);
-                pen.setCosmetic(true);
-                pen.setStyle(Qt::DashLine);
-                p->setPen(pen);
-                p->setBrush(QColor(255, 255, 255, 15));
-                p->drawRect(rect);
-                if (hasRegion() && selectionMedia_ != SelectionMedia::Raster) {
-                    if (auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame())) {
-                        auto ids = enclosedStrokes(*d, region_);
-                        p->setBrush(Qt::NoBrush);
-                        for (const auto& stroke : d->strokes)
-                            if (std::find(ids.begin(), ids.end(), stroke.id) != ids.end()) {
-                                QRectF bounds(QPointF(stroke.points.front().x, stroke.points.front().y),
-                                              QSizeF(.01, .01));
-                                for (const auto& point : stroke.points)
-                                    bounds = bounds.united(QRectF(point.x, point.y, .01, .01));
-                                if (movingRegion_)
-                                    bounds.translate(selectionDelta_);
-                                p->drawRect(bounds.adjusted(-stroke.width / 2, -stroke.width / 2,
-                                                            stroke.width / 2, stroke.width / 2));
-                            }
-                    }
-                }
-            }
+        if (editor_->tool() == "Marquee" && drawing_ && !transforming_ && !samples_.empty()) {
+            auto rect = QRectF(QPointF(samples_.front().x, samples_.front().y),
+                               QPointF(samples_.back().x, samples_.back().y))
+                            .normalized();
+            QPen pen(Qt::white);
+            pen.setCosmetic(true);
+            pen.setStyle(Qt::DashLine);
+            p->setPen(pen);
+            p->setBrush(QColor(255, 255, 255, 15));
+            p->drawRect(rect);
         }
-        if (selectedStroke_) {
+        if (hasRegion() && (editor_->tool() == "Select" || editor_->tool() == "Marquee")) {
+            p->save();
+            p->setWorldTransform(itemTransform);
+            QPen pen(previewValid_ || !transforming_ ? QColor("#777777") : QColor(Qt::red));
+            pen.setWidthF(1);
+            p->setPen(pen);
+            p->setBrush(Qt::NoBrush);
+            QPolygonF outline;
+            for (int i : {0, 2, 4, 6, 0})
+                outline << handlePosition(i);
+            p->drawPolyline(outline);
+            p->drawLine(handlePosition(1), handlePosition(8));
+            p->setBrush(QColor("#111111"));
+            for (int i = 0; i < 8; ++i)
+                p->drawRect(QRectF(handlePosition(i) - QPointF(4, 4), QSizeF(8, 8)));
+            p->drawEllipse(handlePosition(8), 5, 5);
+            p->restore();
+        }
+        if (selectedStroke_ && editor_->tool() == "Edit points") {
             if (auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame()))
-                for (const auto& s : d->strokes)
-                    if (s.id == selectedStroke_) {
-                        QRectF rect;
-                        for (auto point : s.points) {
-                            QRectF r(point.x, point.y, 0.01, 0.01);
-                            rect = rect.isNull() ? r : rect.united(r);
-                        }
-                        rect.translate(selectionDelta_);
-                        QPen pen(QColor("#777777"));
+                for (const auto& stroke : d->strokes)
+                    if (stroke.id == selectedStroke_) {
+                        QPen pen(Qt::gray);
                         pen.setCosmetic(true);
-                        pen.setStyle(Qt::DashLine);
                         p->setPen(pen);
-                        p->setBrush(Qt::NoBrush);
-                        p->drawRect(rect.adjusted(-6, -6, 6, 6));
-                        if (editor_->tool() == "Edit points") {
-                            p->setBrush(Qt::white);
-                            for (std::size_t i = 0; i < s.points.size(); ++i) {
-                                auto point =
-                                    (drawing_ && int(i) == selectedPoint_) ? pointPreview_ : s.points[i];
-                                p->drawRect(QRectF(point.x - 3, point.y - 3, 6, 6));
-                            }
+                        p->setBrush(Qt::white);
+                        for (std::size_t i = 0; i < stroke.points.size(); ++i) {
+                            auto point =
+                                drawing_ && int(i) == selectedPoint_ ? pointPreview_ : stroke.points[i];
+                            p->drawRect(QRectF(point.x - 3, point.y - 3, 6, 6));
                         }
                     }
         }
@@ -213,12 +214,37 @@ void CanvasItem::begin(QPointF position, double pressure) {
     }
     try {
         auto point = localPoint(position, pressure);
-        if (editor_->tool() == "Marquee") {
-            movingRegion_ = hasRegion() && QRectF(region_.x, region_.y, region_.width, region_.height)
-                                               .contains(QPointF(point.x, point.y));
-            if (!movingRegion_)
-                clearRegion();
-            selectedStroke_ = 0;
+        if (editor_->tool() == "Marquee" || editor_->tool() == "Select") {
+            if (hasRegion()) {
+                for (int handle = 8; handle >= 0; --handle)
+                    if (QLineF(position, handlePosition(handle)).length() <= 10) {
+                        samples_ = {point};
+                        drawing_ = true;
+                        startTransform(handle);
+                        update();
+                        return;
+                    }
+                if (QRectF(region_.x, region_.y, region_.width, region_.height)
+                        .contains(QPointF(point.x, point.y))) {
+                    samples_ = {point};
+                    drawing_ = true;
+                    startTransform(-1);
+                    update();
+                    return;
+                }
+            }
+            clearRegion();
+            if (editor_->tool() == "Select") {
+                if (auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame()))
+                    selectStroke(hitStroke(*d, point, 8).value_or(0));
+                if (hasRegion()) {
+                    samples_ = {point};
+                    drawing_ = true;
+                    startTransform(-1);
+                }
+                update();
+                return;
+            }
         }
         if (editor_->tool().startsWith("Raster ")) {
             const auto* existing = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame());
@@ -258,6 +284,7 @@ void CanvasItem::begin(QPointF position, double pressure) {
                 editor_->recolorStroke(selectedStroke_);
             }
         }
+        emit regionChanged();
         selectedPoint_ = -1;
         if (editor_->tool() == "Edit points" && selectedStroke_) {
             if (const auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame()))
@@ -290,7 +317,53 @@ void CanvasItem::move(QPointF position, double pressure) {
         return;
     try {
         auto point = localPoint(position, pressure);
-        if (rasterBrush_) {
+        if (transforming_) {
+            QTransform matrix;
+            QRectF box(region_.x, region_.y, region_.width, region_.height);
+            auto first = samples_.front();
+            if (transformHandle_ == -1)
+                matrix.translate(std::round(point.x - first.x), std::round(point.y - first.y));
+            else if (transformHandle_ == 8) {
+                auto center = box.center();
+                double angle = (std::atan2(point.y - center.y(), point.x - center.x()) -
+                                std::atan2(first.y - center.y(), first.x - center.x())) *
+                               180 / 3.14159265358979323846;
+                if (shift_)
+                    angle = std::round(angle / 15) * 15;
+                matrix.translate(center.x(), center.y());
+                matrix.rotate(angle);
+                matrix.translate(-center.x(), -center.y());
+            } else {
+                int h = transformHandle_;
+                bool left = h == 0 || h == 6 || h == 7, right = h == 2 || h == 3 || h == 4;
+                bool top = h == 0 || h == 1 || h == 2, bottom = h == 4 || h == 5 || h == 6;
+                QPointF anchor(left    ? box.right()
+                               : right ? box.left()
+                                       : box.center().x(),
+                               top      ? box.bottom()
+                               : bottom ? box.top()
+                                        : box.center().y());
+                double sx = left    ? (anchor.x() - point.x) / box.width()
+                            : right ? (point.x - anchor.x()) / box.width()
+                                    : 1;
+                double sy = top      ? (anchor.y() - point.y) / box.height()
+                            : bottom ? (point.y - anchor.y()) / box.height()
+                                     : 1;
+                if (shift_ && (left || right) && (top || bottom)) {
+                    double scale = std::max(std::abs(sx), std::abs(sy));
+                    sx = std::copysign(scale, sx);
+                    sy = std::copysign(scale, sy);
+                }
+                if (std::abs(sx) < .01)
+                    sx = std::copysign(.01, sx);
+                if (std::abs(sy) < .01)
+                    sy = std::copysign(.01, sy);
+                matrix.translate(anchor.x(), anchor.y());
+                matrix.scale(sx, sy);
+                matrix.translate(-anchor.x(), -anchor.y());
+            }
+            previewTransform(matrix);
+        } else if (rasterBrush_) {
             const auto elapsed = std::max(0.001, sampleClock_.nsecsElapsed() / 1e9);
             sampleClock_.restart();
             rasterBrush_->sample(point, elapsed, tiltX_, tiltY_);
@@ -333,7 +406,9 @@ void CanvasItem::end() {
     drawing_ = false;
     auto points = std::move(samples_);
     samples_.clear();
-    if (editor_->tool() == "Marquee") {
+    if (transforming_) {
+        commitTransform();
+    } else if (editor_->tool() == "Marquee") {
         if (movingRegion_)
             transformRegion(int(SelectionAction::Move), int(selectionDelta_.x()), int(selectionDelta_.y()));
         else if (points.size() > 1) {
@@ -344,6 +419,9 @@ void CanvasItem::end() {
             if (std::abs(x) <= 10000000 && std::abs(y) <= 10000000 && right - x <= 20000000 &&
                 bottom - y <= 20000000)
                 region_ = {int(x), int(y), int(right - x), int(bottom - y)};
+            if (hasRegion())
+                if (auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame()))
+                    regionStrokes_ = enclosedStrokes(*d, region_);
             emit regionChanged();
             editor_->report(regionInfo());
         }
@@ -366,6 +444,11 @@ void CanvasItem::end() {
     update();
 }
 void CanvasItem::cancelGesture() {
+    transforming_ = false;
+    previewValid_ = false;
+    pendingTransform_ = {};
+    transformPreview_ = {};
+    transformSource_ = {};
     rasterBrush_.reset();
     rasterPreview_ = {};
     drawing_ = false;
@@ -376,6 +459,7 @@ void CanvasItem::cancelGesture() {
     update();
 }
 void CanvasItem::mousePressEvent(QMouseEvent* e) {
+    shift_ = e->modifiers() & Qt::ShiftModifier;
     if (tablet_) {
         e->accept();
         return;
@@ -391,6 +475,7 @@ void CanvasItem::mousePressEvent(QMouseEvent* e) {
     e->accept();
 }
 void CanvasItem::mouseMoveEvent(QMouseEvent* e) {
+    shift_ = e->modifiers() & Qt::ShiftModifier;
     if (!tablet_)
         move(e->position(), 1);
     e->accept();
@@ -425,6 +510,7 @@ bool CanvasItem::eventFilter(QObject*, QEvent* event) {
         event->type() == QEvent::TabletRelease) {
         auto* e = static_cast<QTabletEvent*>(event);
         auto point = mapFromScene(e->position());
+        shift_ = e->modifiers() & Qt::ShiftModifier;
         tiltX_ = std::clamp(e->xTilt() / 90.0, -1.0, 1.0);
         tiltY_ = std::clamp(e->yTilt() / 90.0, -1.0, 1.0);
         if (event->type() == QEvent::TabletPress) {
@@ -485,13 +571,15 @@ QString CanvasItem::regionInfo() const {
         if (auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame()))
             count = enclosedStrokes(*d, region_).size();
     }
-    return QString("%1 × %2 px · %3 vector strokes · drag inside to move; artwork updates on release")
+    return QString("%1 × %2 px · %3 vector strokes · drag handles to scale, top circle to rotate")
         .arg(region_.width)
         .arg(region_.height)
         .arg(count);
 }
 void CanvasItem::clearRegion() {
     region_ = {};
+    regionStrokes_.clear();
+    selectedStroke_ = 0;
     emit regionChanged();
     update();
 }
@@ -499,9 +587,12 @@ void CanvasItem::transformRegion(int action, int dx, int dy) {
     if (!editor_ || !hasRegion() || action < 0 || action > 5)
         return;
     auto rect = region_;
-    if (editor_->editDrawingRegion(rect, selectionMedia_, static_cast<SelectionAction>(action), dx, dy)) {
+    auto ids = regionStrokes_;
+    QScopedValueRollback<bool> guard(committing_, true);
+    if (editor_->editDrawingRegion(rect, selectedStroke_ ? SelectionMedia::Vectors : selectionMedia_,
+                                   static_cast<SelectionAction>(action), dx, dy, &ids)) {
         if (action == int(SelectionAction::Delete))
-            region_ = {};
+            clearRegion();
         else {
             if (action == int(SelectionAction::Move) || action == int(SelectionAction::Duplicate)) {
                 rect.x += dx;
@@ -510,8 +601,179 @@ void CanvasItem::transformRegion(int action, int dx, int dy) {
             if (action == int(SelectionAction::RotateClockwise))
                 std::swap(rect.width, rect.height);
             region_ = rect;
+            if (action == int(SelectionAction::Duplicate)) {
+                if (selectedStroke_)
+                    selectionMedia_ = SelectionMedia::Vectors;
+                selectedStroke_ = 0;
+                if (auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame()))
+                    regionStrokes_ = enclosedStrokes(*d, region_);
+            } else if (selectedStroke_)
+                selectStroke(selectedStroke_);
         }
     }
     emit regionChanged();
     update();
+}
+
+QTransform CanvasItem::selectionWorld() const {
+    if (!editor_ || !editor_->selectedLayer())
+        return viewTransform();
+    return SceneRenderer::worldTransform(
+               editor_->document(), editor_->document().layer(editor_->selectedLayer()), editor_->frame()) *
+           viewTransform();
+}
+QPointF CanvasItem::handlePosition(int handle) const {
+    QRectF r(region_.x, region_.y, region_.width, region_.height);
+    const QPointF points[] = {r.topLeft(),     QPointF(r.center().x(), r.top()),
+                              r.topRight(),    QPointF(r.right(), r.center().y()),
+                              r.bottomRight(), QPointF(r.center().x(), r.bottom()),
+                              r.bottomLeft(),  QPointF(r.left(), r.center().y())};
+    auto world = pendingTransform_ * selectionWorld();
+    if (handle == 8) {
+        auto top = world.map(points[1]), center = world.map(r.center());
+        auto delta = top - center;
+        double length = std::hypot(delta.x(), delta.y());
+        return top + (length > 0 ? delta / length * 28 : QPointF(0, -28));
+    }
+    return world.map(points[std::clamp(handle, 0, 7)]);
+}
+void CanvasItem::selectStroke(Id id) {
+    selectedStroke_ = id;
+    regionStrokes_.clear();
+    region_ = {};
+    if (id && editor_)
+        if (auto* drawing = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame()))
+            for (const auto& stroke : drawing->strokes)
+                if (stroke.id == id && !stroke.points.empty()) {
+                    double x = stroke.points.front().x, y = stroke.points.front().y, right = x, bottom = y;
+                    for (auto p : stroke.points) {
+                        x = std::min(x, p.x);
+                        y = std::min(y, p.y);
+                        right = std::max(right, p.x);
+                        bottom = std::max(bottom, p.y);
+                    }
+                    double half = stroke.width / 2;
+                    x = std::floor(x - half);
+                    y = std::floor(y - half);
+                    right = std::ceil(right + half);
+                    bottom = std::ceil(bottom + half);
+                    region_ = {int(x), int(y), std::max(1, int(right - x)), std::max(1, int(bottom - y))};
+                    regionStrokes_ = {id};
+                }
+    emit regionChanged();
+    update();
+}
+void CanvasItem::startTransform(int handle) {
+    if (!editor_ || !hasRegion())
+        return;
+    if (auto* drawing = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame())) {
+        transformSource_ = *drawing;
+        transformPreview_ = *drawing;
+        transformHandle_ = handle;
+        transforming_ = true;
+        previewValid_ = true;
+        pendingTransform_ = {};
+    }
+}
+void CanvasItem::previewTransform(QTransform matrix) {
+    pendingTransform_ = matrix;
+    try {
+        transformPreview_ = transformSource_;
+        transformDrawingSelection(
+            transformPreview_, region_, selectedStroke_ ? SelectionMedia::Vectors : selectionMedia_,
+            regionStrokes_,
+            {matrix.m11(), matrix.m12(), matrix.m21(), matrix.m22(), matrix.dx(), matrix.dy()});
+        previewValid_ = true;
+    } catch (const std::exception& error) {
+        previewValid_ = false;
+        editor_->report(error.what());
+    }
+    emit regionChanged();
+    update();
+}
+void CanvasItem::commitTransform() {
+    auto matrix = pendingTransform_;
+    auto original = region_;
+    auto id = selectedStroke_;
+    auto ids = regionStrokes_;
+    bool valid = previewValid_;
+    transforming_ = false;
+    pendingTransform_ = {};
+    transformPreview_ = {};
+    transformSource_ = {};
+    if (valid && !matrix.isIdentity()) {
+        QScopedValueRollback<bool> guard(committing_, true);
+        if (editor_->transformDrawingRegion(
+                original, id ? SelectionMedia::Vectors : selectionMedia_, ids,
+                {matrix.m11(), matrix.m12(), matrix.m21(), matrix.m22(), matrix.dx(), matrix.dy()})) {
+            auto r = matrix.mapRect(QRectF(original.x, original.y, original.width, original.height))
+                         .toAlignedRect();
+            region_ = {r.x(), r.y(), r.width(), r.height()};
+            regionStrokes_ = ids;
+            if (id)
+                selectStroke(id);
+        }
+    }
+    emit regionChanged();
+    update();
+}
+QVariantMap CanvasItem::objectProperties() const {
+    QVariantMap result{{"kind", "none"}};
+    if (!hasRegion() || !editor_)
+        return result;
+    auto bounds = pendingTransform_.mapRect(QRectF(region_.x, region_.y, region_.width, region_.height));
+    result = {{"kind", selectedStroke_                             ? "vector"
+                       : selectionMedia_ == SelectionMedia::Raster ? "raster"
+                                                                   : "selection"},
+              {"x", bounds.x()},
+              {"y", bounds.y()},
+              {"width", bounds.width()},
+              {"height", bounds.height()},
+              {"rotation", 0.0},
+              {"count", int(regionStrokes_.size())},
+              {"locked", editor_->document().layer(editor_->selectedLayer()).locked}};
+    if (selectedStroke_)
+        if (auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame()))
+            for (const auto& stroke : d->strokes)
+                if (stroke.id == selectedStroke_) {
+                    result.insert("strokeWidth", stroke.width);
+                    result.insert("filled", stroke.filled);
+                    result.insert("artLayer", stroke.artLayer);
+                    result.insert("swatch", int(stroke.swatch));
+                }
+    return result;
+}
+void CanvasItem::setObjectProperty(QString name, double value) {
+    if (!editor_ || !hasRegion() || !std::isfinite(value))
+        return;
+    if (name == "strokeWidth" || name == "filled" || name == "artLayer" || name == "swatch") {
+        if (selectedStroke_) {
+            auto id = selectedStroke_;
+            QScopedValueRollback<bool> guard(committing_, true);
+            editor_->setStrokeProperty(id, name, value);
+            selectStroke(id);
+        }
+        return;
+    }
+    QTransform matrix;
+    QRectF r(region_.x, region_.y, region_.width, region_.height);
+    if (name == "x")
+        matrix.translate(value - r.x(), 0);
+    else if (name == "y")
+        matrix.translate(0, value - r.y());
+    else if (name == "width" || name == "height") {
+        if (value < 1)
+            return;
+        matrix.translate(r.x(), r.y());
+        matrix.scale(name == "width" ? value / r.width() : 1, name == "height" ? value / r.height() : 1);
+        matrix.translate(-r.x(), -r.y());
+    } else if (name == "rotation") {
+        matrix.translate(r.center().x(), r.center().y());
+        matrix.rotate(value);
+        matrix.translate(-r.center().x(), -r.center().y());
+    } else
+        return;
+    startTransform(-1);
+    previewTransform(matrix);
+    commitTransform();
 }

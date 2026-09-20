@@ -206,6 +206,38 @@ int main(int argc, char** argv) {
                     if (editor.document() == beforeRegionMove || !canvas->hasRegion())
                         throw std::runtime_error("Native mixed drawing selection move failed: " +
                                                  editor.status().toStdString());
+                    const auto beforeScale = editor.document();
+                    auto scaleStart = canvas->mapToScene(canvas->handlePosition(4));
+                    send(QEvent::MouseButtonPress, scaleStart, Qt::LeftButton, Qt::LeftButton);
+                    send(QEvent::MouseMove, scaleStart + QPointF(20, 12), Qt::NoButton, Qt::LeftButton);
+                    if (editor.document() != beforeScale)
+                        throw std::runtime_error("Transform preview modified document before release.");
+                    send(QEvent::MouseButtonRelease, scaleStart + QPointF(20, 12), Qt::LeftButton,
+                         Qt::NoButton);
+                    if (editor.document() == beforeScale || !canvas->hasRegion())
+                        throw std::runtime_error("Scale handle did not commit.");
+                    auto beforeRotate = editor.document();
+                    auto rotateStart = canvas->mapToScene(canvas->handlePosition(8));
+                    send(QEvent::MouseButtonPress, rotateStart, Qt::LeftButton, Qt::LeftButton);
+                    send(QEvent::MouseMove, rotateStart + QPointF(30, 15), Qt::NoButton, Qt::LeftButton);
+                    send(QEvent::MouseButtonRelease, rotateStart + QPointF(30, 15), Qt::LeftButton,
+                         Qt::NoButton);
+                    if (editor.document() == beforeRotate)
+                        throw std::runtime_error("Rotation handle did not commit.");
+                    auto oldWidth = canvas->objectProperties().value("width").toDouble();
+                    canvas->setObjectProperty("width", oldWidth + 10);
+                    if (!canvas->hasRegion() ||
+                        canvas->objectProperties().value("width").toDouble() <= oldWidth)
+                        throw std::runtime_error("Object Properties lost the selection or failed to update.");
+                    // Return to the moved drawing before checking cancellation and undo below.
+                    editor.undo();
+                    editor.undo();
+                    editor.undo();
+                    // Undo clears view selection. Re-select the moved artwork.
+                    send(QEvent::MouseButtonPress, selectStart, Qt::LeftButton, Qt::LeftButton);
+                    send(QEvent::MouseMove, selectEnd + QPointF(50, 40), Qt::NoButton, Qt::LeftButton);
+                    send(QEvent::MouseButtonRelease, selectEnd + QPointF(50, 40), Qt::LeftButton,
+                         Qt::NoButton);
                     const auto afterRegionMove = editor.document();
                     send(QEvent::MouseButtonPress, inside + QPointF(20, 10), Qt::LeftButton, Qt::LeftButton);
                     send(QEvent::MouseMove, inside + QPointF(40, 20), Qt::NoButton, Qt::LeftButton);
@@ -241,6 +273,18 @@ int main(int argc, char** argv) {
                     send(QEvent::MouseButtonRelease, timelinePoint(3), Qt::LeftButton, Qt::NoButton);
                     if (editor.rangeStart() != 0 || editor.rangeEnd() != 4)
                         throw std::runtime_error("Native timeline drag did not select the expected frames.");
+                    const auto beforeStretch = editor.document();
+                    auto rangeEdge = timeline->mapToScene(QPointF(4 * cell - 1, 42));
+                    send(QEvent::MouseButtonPress, rangeEdge, Qt::LeftButton, Qt::LeftButton);
+                    send(QEvent::MouseMove, rangeEdge + QPointF(2 * cell, 0), Qt::NoButton, Qt::LeftButton);
+                    send(QEvent::MouseButtonRelease, rangeEdge + QPointF(2 * cell, 0), Qt::LeftButton,
+                         Qt::NoButton);
+                    if (editor.rangeEnd() != 6)
+                        throw std::runtime_error("Timeline range-end handle failed to stretch.");
+                    editor.undo();
+                    if (editor.document() != beforeStretch)
+                        throw std::runtime_error("Stretch undo changed unrelated timing.");
+                    editor.selectTimelineRange(0, 3, 0, 0);
                     const auto beforeMove = editor.document();
                     send(QEvent::MouseButtonPress, timelinePoint(1), Qt::LeftButton, Qt::LeftButton,
                          Qt::AltModifier);
@@ -261,9 +305,8 @@ int main(int argc, char** argv) {
                     editor.setFrame(24);
                     editor.setTransform("x", 240);
                     editor.setFrame(12);
-                    auto* curveDialog = window->findChild<QObject*>("curveEditorDialog");
-                    if (!curveDialog || !QMetaObject::invokeMethod(curveDialog, "open"))
-                        throw std::runtime_error("Curve editor did not open.");
+                    window->setProperty("showCurves", true);
+                    window->setProperty("bottomHeight", 300);
                     QTimer::singleShot(250, &app, [&, window] {
                         auto* graph = window->findChild<QQuickItem*>("animationCurveCanvas");
                         if (!graph || graph->width() < 200 || graph->height() < 100) {
@@ -313,7 +356,51 @@ int main(int argc, char** argv) {
                                      "undo/redo, save/reopen, canvas layout "
                                      "mixed selection move/cancel/reopen, and native curve drag/undo and "
                                      "screenshot.\n";
-                        app.exit(0);
+                        window->setProperty("showCurves", false);
+                        window->setProperty("showTimingTools", true);
+                        window->setProperty("bottomHeight", 200);
+                        editor.setFrame(0);
+                        editor.setTool("Select");
+                        QTimer::singleShot(100, &app, [&, window] {
+                            auto* canvas = window->findChild<CanvasItem*>("drawingCanvas");
+                            const auto* drawing = editor.document().drawingAt(editor.selectedLayer(), 0);
+                            if (!canvas || !drawing || drawing->strokes.empty()) {
+                                app.exit(1);
+                                return;
+                            }
+                            const auto point = drawing->strokes.front().points.front();
+                            const auto mapped =
+                                opentoon::SceneRenderer::worldTransform(
+                                    editor.document(), editor.document().layer(editor.selectedLayer()), 0)
+                                    .map(QPointF(point.x, point.y));
+                            const auto scale = std::min((canvas->width() - 64) / editor.sceneWidth(),
+                                                        (canvas->height() - 64) / editor.sceneHeight());
+                            const auto pos = canvas->mapToScene(QPointF(
+                                canvas->width() / 2 + (mapped.x() - editor.sceneWidth() / 2.0) * scale,
+                                canvas->height() / 2 + (mapped.y() - editor.sceneHeight() / 2.0) * scale));
+                            QMouseEvent press(QEvent::MouseButtonPress, pos,
+                                              window->mapToGlobal(pos.toPoint()), Qt::LeftButton,
+                                              Qt::LeftButton, Qt::NoModifier);
+                            QMouseEvent release(QEvent::MouseButtonRelease, pos,
+                                                window->mapToGlobal(pos.toPoint()), Qt::LeftButton,
+                                                Qt::NoButton, Qt::NoModifier);
+                            QCoreApplication::sendEvent(window, &press);
+                            QCoreApplication::sendEvent(window, &release);
+                            if (canvas->objectProperties().value("kind").toString() != "vector") {
+                                std::cerr << "Object selection did not reach Properties.\n";
+                                app.exit(1);
+                                return;
+                            }
+                            canvas->setObjectProperty("strokeWidth", 8);
+                            if (canvas->objectProperties().value("strokeWidth").toDouble() != 8) {
+                                app.exit(1);
+                                return;
+                            }
+                            QTimer::singleShot(100, &app, [&, window] {
+                                auto shot = window->grabWindow();
+                                app.exit(!shot.isNull() && shot.save("build/selection-ui-smoke.png") ? 0 : 1);
+                            });
+                        });
                     });
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

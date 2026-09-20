@@ -27,6 +27,11 @@
 - Technology, serialization, time, color and extension-contract changes need an ADR update.
 - A button, mockup or implementation-mirroring test does not complete a capability. Record real behavior and verification evidence separately from the plan.
 
+## Interaction requirements
+
+- Editing and transforms must be direct: canvas bounding boxes with drag handles and live previews. Do not put selection transforms or timing tools in separate dialogs.
+- Timing and curves stay in the main workspace. Properties describes the explicitly selected canvas object/region or layer, with a clear empty state; it must not silently edit a different target.
+
 ## Architecture
 
 - Keep the C++20 domain independent of QML/widgets, filesystem, network and proprietary SDKs. UI calls application use cases; adapters implement ports.

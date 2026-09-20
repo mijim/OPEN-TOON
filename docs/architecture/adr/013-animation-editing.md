@@ -1,5 +1,7 @@
 # ADR-013 — Explicit animation edits and pose curves
 
+The curve editor now lives in the bottom workspace; see [ADR-015](015-direct-editing-workspace.md).
+
 Accepted for the experimental editor, 2026-09-20. Owner: `modules/document/animation`;
 Qt adapter: `adapters/qt/animation_controller.cpp`.
 

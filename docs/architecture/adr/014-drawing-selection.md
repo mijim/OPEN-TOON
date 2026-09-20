@@ -1,5 +1,7 @@
 # ADR-014 — Rectangular mixed-media drawing selection
 
+Interaction and free-transform scope superseded by [ADR-015](015-direct-editing-workspace.md). The following records the experimental.3 contract.
+
 Accepted for experimental.3, 2026-09-20. Owners: Qt-free
 `modules/document/drawing_selection` and the canvas/application adapters. Existing
 MyPaint and immutable raster tiles are reused; no new dependency or format change.

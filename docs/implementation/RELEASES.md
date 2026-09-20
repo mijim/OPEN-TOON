@@ -1,5 +1,21 @@
 # Experimental releases
 
+## 0.2.0-experimental.4 — direct editing workspace
+
+- Removed separate selection, timing and curve dialogs.
+- Canvas box handles move, scale and rotate with live preview; Shift constrains
+  proportions/snaps angle, Escape cancels, release creates one undo command.
+- Properties follows selected objects/regions or explicitly selected layers.
+  Numeric fields rebind after edits; single vectors expose width, fill, art and color.
+- Curves and timing controls remain in the resizable bottom workspace. Timeline and
+  Xsheet range-end handles stretch timing directly.
+- Retina transform overlay alignment corrected during visual verification.
+- macOS: 43 CTest entries plus native handle/Properties/timing journeys. Source only.
+
+Raster free transforms currently use nearest-neighbor sampling. Rotated ellipses
+become 128-point editable polygons. Lasso, soft masks and production-scale transform
+performance remain pending; see ADR-015. No phase completion or binary installer claim.
+
 ## 0.2.0-experimental.3 — P04/P05 source release
 
 - Rectangular selection of fully enclosed vector strokes and/or raster pixels.

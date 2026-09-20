@@ -7,6 +7,7 @@
 #include <QQuickPaintedItem>
 class CanvasItem : public QQuickPaintedItem {
     Q_OBJECT
+    Q_PROPERTY(QVariantMap objectProperties READ objectProperties NOTIFY regionChanged)
     Q_PROPERTY(bool hasRegion READ hasRegion NOTIFY regionChanged)
     Q_PROPERTY(int selectionMedia READ selectionMedia WRITE setSelectionMedia NOTIFY regionChanged)
     Q_PROPERTY(QString regionInfo READ regionInfo NOTIFY regionChanged)
@@ -15,6 +16,9 @@ class CanvasItem : public QQuickPaintedItem {
     Q_PROPERTY(bool mirrored READ mirrored WRITE setMirrored NOTIFY viewChanged)
     Q_PROPERTY(double rotationAngle READ rotationAngle WRITE setRotationAngle NOTIFY viewChanged)
   public:
+    QVariantMap objectProperties() const;
+    Q_INVOKABLE void setObjectProperty(QString, double);
+    Q_INVOKABLE QPointF handlePosition(int) const;
     bool hasRegion() const { return region_.width > 0 && region_.height > 0; }
     int selectionMedia() const { return int(selectionMedia_); }
     void setSelectionMedia(int);
@@ -52,6 +56,16 @@ class CanvasItem : public QQuickPaintedItem {
 
   private:
     opentoon::PixelRect region_;
+    std::vector<opentoon::Id> regionStrokes_;
+    opentoon::Drawing transformSource_, transformPreview_;
+    QTransform pendingTransform_;
+    int transformHandle_ = -2;
+    bool transforming_ = false, previewValid_ = false, committing_ = false, shift_ = false;
+    QTransform selectionWorld() const;
+    void selectStroke(opentoon::Id);
+    void startTransform(int);
+    void previewTransform(QTransform);
+    void commitTransform();
     opentoon::SelectionMedia selectionMedia_ = opentoon::SelectionMedia::Both;
     bool movingRegion_ = false;
     QPointer<EditorController> editor_;
