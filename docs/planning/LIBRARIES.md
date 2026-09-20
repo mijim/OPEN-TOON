@@ -28,7 +28,7 @@ Desktop UI, tablet events, accessibility and platform integration.
 
 Metadata, revision transactions and local indices.
 
-**Boundary:** An adapter implements the project repository; immutable external blobs need their own publication/recovery protocol.
+**Boundary:** Project repository adapter. Format 2 commits compressed immutable resources and revision metadata in one database transaction; ADR-012 supersedes the proposed external blob protocol.
 
 **Evaluation:** SP-03: terminate at every commit boundary, fill disk and recover reachable blobs.
 
@@ -88,7 +88,7 @@ Select one suitable polygon tessellator for the renderer or mesh preparation.
 
 ## LIB-MYPAINT — libmypaint
 
-**Phase:** P05. **Decision:** `candidate_requires_spike`.
+**Phase:** P05. **Decision:** `experimental_adopted`.
 
 Established pressure-sensitive raster brush engine used by several graphics applications.
 
@@ -360,7 +360,7 @@ Readable manifests, configuration and interchange metadata.
 
 ## LIB-ZSTD — Zstandard
 
-**Phase:** P05. **Decision:** `candidate_requires_spike`.
+**Phase:** P05. **Decision:** `experimental_adopted`.
 
 Compress tiles, undo snapshots and packaged resources.
 
@@ -453,6 +453,38 @@ Reproducible native builds, dependency graph and lockfiles.
 **License investigation:** Audit tools and every resolved package; package recipe is not upstream ownership.
 
 **Primary source:** [CMake / Ninja / Conan 2 upstream](https://docs.conan.io/2/).
+
+## LIB-JSON-C — json-c
+
+**Phase:** P05. **Decision:** `experimental_adopted`.
+
+libmypaint settings parser dependency.
+
+**Boundary:** Private dependency of the MyPaint C adapter; document serialization continues to use nlohmann/json.
+
+**Evaluation:** Pinned engine build and deterministic brush replay; external brush JSON imports remain unsupported.
+
+**Fallback:** Keep original programmatic presets and validated engine adapter.
+
+**License investigation:** MIT; notice included in third_party/licenses/json-c.
+
+**Primary source:** [json-c upstream](https://github.com/json-c/json-c).
+
+## LIB-OPENSSL — OpenSSL Crypto
+
+**Phase:** P05. **Decision:** `experimental_adopted`.
+
+SHA-256 resource identity and integrity verification.
+
+**Boundary:** Private storage dependency through EVP_Digest; no TLS or network functionality. Zlib is a locked transitive dependency; NASM and Strawberry Perl are platform-specific build requirements.
+
+**Evaluation:** Corrupt/missing resource rejection, deduplication, atomic save and 4K storage benchmark.
+
+**Fallback:** Replace the digest adapter while retaining the SHA-256 format contract and compatibility fixtures.
+
+**License investigation:** Apache-2.0; notices included in third_party/licenses/openssl.
+
+**Primary source:** [OpenSSL Crypto upstream](https://github.com/openssl/openssl).
 
 ## Additional primary references
 

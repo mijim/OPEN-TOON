@@ -12,7 +12,7 @@
 | Technology | C++20, Qt 6 and Qt Quick/QML | Accepted by user; risky integration paths need spikes |
 | Renderer | CPU QPainter reference adapter; Qt RHI/Skia comparison remains open | Experimental |
 | Storage | SQLite revisions with compressed, checksummed immutable media; format 1 migration backups | See ADR-011 and recovery tests |
-| Open-source reuse | Prefer proven libraries through tested adapters | User requirement; 28 library/tool entries evaluated in the roadmap |
+| Open-source reuse | Prefer proven libraries through tested adapters | User requirement; 30 library/tool entries evaluated in the roadmap |
 | Initial license | GPL-3.0-or-later for original contributions | Adopted |
 | Implementation | Experimental editor; partial catalog coverage | No complete phase or production release |
 | Development roadmap | 23 phases, 69 work packages, complete feature and node ownership mapping | Prepared; estimates subject to evidence |

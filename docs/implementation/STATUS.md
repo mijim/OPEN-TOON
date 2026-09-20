@@ -29,10 +29,10 @@ The editor runs locally on macOS and supports mouse drawing, sampled-pressure in
 - Synthetic two-second fixture: 48 PNG frames at 1920 × 1080; reopened document is semantically identical. Initial CPU export measured 3,077 ms on this Mac; it is not a large-scene or pen-latency benchmark.
 - Address/undefined-behavior sanitizers: 27/27 Qt-free core/brush tests pass with locked Debug dependencies (4.35 seconds).
 - The physical tablet matrix is pending because the owner has no tablet currently. Tilt is routed to MyPaint; built-in presets do not use tilt mappings. Eraser-end behavior is not implemented. Mouse input works independently.
-- [CI run 35528441504](https://github.com/mijim/OPEN-TOON/actions/runs/35528441504) passes for source commit `982f88f`: Windows Server 2022, macOS 14 and Ubuntu 24.04 build and test with Qt 6.8.3, plus Linux core sanitizers. Native mouse/synthetic-pen UI smoke runs on macOS. Windows process-termination recovery, other-platform GUI interaction, physical devices and installation remain unqualified.
+- [CI run 35531337766](https://github.com/mijim/OPEN-TOON/actions/runs/35531337766) passes for source commit `c07414f`: Windows Server 2022, macOS 14 and Ubuntu 24.04 build and test with Qt 6.8.3, plus Linux core sanitizers. Native mouse/synthetic-pen, raster save/reopen and range-drag UI smoke pass on macOS. Windows process-termination recovery, other-platform GUI interaction, physical devices and installation remain unqualified.
 - Standalone bundle deployment with split Homebrew Qt failed plugin/framework resolution. The build-tree application runs. No signed/notarized installer or clean-machine compatibility is claimed.
 
-The [4K brush benchmark](BRUSH-BENCHMARK.md) records measured engine and storage costs. New native input smoke covers raster painting, cancellation, undo/redo, pixel-identical reopening and range clipboard.
+The [4K brush benchmark](BRUSH-BENCHMARK.md) records measured engine and storage costs. Native input smoke covers raster painting, cancellation, undo/redo, pixel-identical reopening, range clipboard and actual range selection/Alt-drag events. Five consecutive local runs passed.
 
 ## Engineering boundaries
 
@@ -42,6 +42,6 @@ The domain and application layers contain no Qt. Commands validate candidates be
 
 ## Continue toward P11
 
-Close the open feasibility/foundation gates, qualify the first-film workflow, then finish P03/P04 before integrating raster brushes. Follow the existing dependency order through camera, audio, rigging, deformation and compositing. Do not substitute buttons or empty module scaffolding for implemented behavior. Device testing can remain pending while independent engineering proceeds.
+Close the open feasibility/foundation gates, qualify the first-film workflow, then finish P03/P04 acceptance and qualify the experimental P05 raster adapter. Follow the existing dependency order through camera, audio, rigging, deformation and compositing. Do not substitute buttons or empty module scaffolding for implemented behavior. Device testing can remain pending while independent engineering proceeds.
 
 Machine-readable source: [status.json](status.json). The catalog and roadmap retain their stable IDs and complete acceptance requirements.

@@ -1,6 +1,6 @@
 # Build and verify the experimental editor
 
-The application is C++20 with Qt 6.8 or newer. Documentation tools use Python 3.11+. The verified local environment is macOS 15.5 arm64, AppleClang 17 and Qt 6.11.2. Qt 6.8.3 builds and automated tests also pass on Windows Server 2022, macOS 14 and Ubuntu 24.04 in [CI](https://github.com/mijim/OPEN-TOON/actions/runs/35528441504). This is build/test coverage, not full device or installer qualification.
+The application is C++20 with Qt 6.8 or newer. Documentation tools use Python 3.11+. The verified local environment is macOS 15.5 arm64, AppleClang 17 and Qt 6.11.2. Qt 6.8.3 builds and automated tests also pass on Windows Server 2022, macOS 14 and Ubuntu 24.04 in [CI](https://github.com/mijim/OPEN-TOON/actions/runs/35531337766). This is build/test coverage, not full device or installer qualification.
 
 ## Locked core dependencies
 
@@ -64,5 +64,4 @@ existing files are refused. The command measures 11,520 samples on a 4K canvas,
 
 libmypaint is fetched during configuration from a source commit and SHA-256 pinned
 in `cmake/MyPaint.cmake`; the build requires Python and a C11 compiler as well as C++20.
-The current branch's platform CI must pass before extending the previous version's
-cross-platform claim to these dependencies.
+[CI run 35531337766](https://github.com/mijim/OPEN-TOON/actions/runs/35531337766) verifies these additions on Windows, macOS and Linux; device and installer qualification remain separate.

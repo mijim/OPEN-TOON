@@ -121,15 +121,15 @@
       "reason": "Owner currently has no tablet; mouse input is required and available."
     },
     "other_operating_systems": {
-      "status": "previous_version_passed_new_changes_pending",
-      "source_commit": "982f88f79f02700b504c0d70843075475384716d",
-      "run_url": "https://github.com/mijim/OPEN-TOON/actions/runs/35528441504",
+      "status": "ci_passed",
+      "source_commit": "c07414f3961a4171bf55f2b589f35f7b7b295d42",
+      "run_url": "https://github.com/mijim/OPEN-TOON/actions/runs/35531337766",
       "qt_version": "6.8.3",
       "jobs": {
-        "ubuntu-24.04": "build, core/storage/render and export tests passed",
-        "macos-14": "build, core/storage/render/export and native mouse/synthetic pen smoke passed",
-        "windows-2022": "build, core/storage/render and export tests passed",
-        "sanitizers": "Linux core AddressSanitizer/UndefinedBehaviorSanitizer passed"
+        "ubuntu-24.04": "33 CTest entries passed with Qt 6.8.3",
+        "macos-14": "33 CTest entries and native mouse, synthetic pressure, raster and timeline drag workflow passed with Qt 6.8.3",
+        "windows-2022": "32 CTest entries passed with Qt 6.8.3; POSIX process termination test excluded",
+        "sanitizers": "27 Qt-free core and MyPaint cases passed with AddressSanitizer and UndefinedBehaviorSanitizer"
       },
       "limits": "Build/test evidence only; Windows crash-termination test is not implemented, GUI interaction outside macOS, physical tablets and clean-machine installation remain unqualified."
     },

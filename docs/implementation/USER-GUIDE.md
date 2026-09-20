@@ -1,6 +1,6 @@
 # Experimental editor guide
 
-OPEN-TOON currently supports a offline vector and raster animation workflow. It is an experimental editor, not the P11 production release. All first-party UI is English; scene and layer names can contain other languages.
+OPEN-TOON currently supports an offline vector and raster animation workflow. It is an experimental editor, not the P11 production release. All first-party UI is English; scene and layer names can contain other languages.
 
 ## Make a short animation
 
@@ -49,11 +49,11 @@ Format 2 compresses and shares media between revisions. The metadata limit is 64
 
 ## Timeline ranges
 
-Drag over cells to select a rectangular frame/layer range. **Edit → Timeline range** provides copy, paste (linked exposures, independent drawings, keys, or all), insertion, repeats, stretch and timing on ones/twos/threes. Copy/Paste shortcuts work when the timeline has focus. Paste starts at the playhead and can extend the scene. Copied exposures from another open scene become independent drawings with remapped palette IDs.
+Drag over cells to select a rectangular frame/layer range. **Edit → Timeline range** provides copy, paste (linked exposures, independent drawings, keys, or all), insertion, repeats, stretch and timing on ones/twos/threes. Copy/Paste shortcuts work when the timeline has focus. Paste starts at the playhead and can extend the scene. Copy a range, open another scene in the same window and paste to create independent drawings with remapped palette IDs. The clipboard is local to that window.
 
 Alt-drag inside a selection to move it; the shaded destination shows the overwrite range. Escape cancels a pending move. Stretch refuses any compression that would remove a drawing or merge keys. Timing on ones/twos/threes removes gaps within the selection and overwrites the resulting destination span. Locked selected layers reject the whole edit.
 
-Use **Edit → Set marker** to label the current frame; an empty name removes its marker. **Export Xsheet PDF** writes a paginated sheet, limited to 200 pages to keep the synchronous operation bounded.
+Use **Edit → Scene marker** to label the current frame; an empty name removes its marker. **Export Xsheet PDF** writes a paginated sheet, limited to 200 pages to keep the synchronous operation bounded.
 
 ## Export and limitations
 

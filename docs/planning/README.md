@@ -7,7 +7,7 @@
 ## Read and query the plan
 
 - [Phase table and individual specifications](PHASES.md): outcomes, dependencies, work packages, acceptance, effort and capability IDs.
-- [Open-source dependency register](LIBRARIES.md): 28 library/tool entries, primary sources, evaluation gates and fallback decisions.
+- [Open-source dependency register](LIBRARIES.md): 30 library/tool entries, primary sources, evaluation gates and fallback decisions.
 - [Engineering execution rules](EXECUTION.md): architecture, quality, dependency adoption and Definition of Done.
 - [Effort, staffing and uncertainty](ESTIMATES.md): honest long-term envelopes and recalibration rules.
 - [First implementation backlog](FIRST-STEPS.md): concrete issues for feasibility and the first usable slice.

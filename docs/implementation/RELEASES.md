@@ -19,6 +19,15 @@ remain in [STATUS.md](STATUS.md) and the canonical roadmap.
 - Pinned dependency additions and source/license records, native range/brush workflow
   checks, migration/corruption/compaction tests and a reproducible synthetic 4K benchmark.
 
+### Verification
+
+[Source commit c07414f passed CI](https://github.com/mijim/OPEN-TOON/actions/runs/35531337766)
+on Windows Server 2022, macOS 14 and Ubuntu 24.04 with Qt 6.8.3. The suite has
+33 CTest entries on macOS/Linux and 32 on Windows (the POSIX process-termination
+case is excluded). Linux additionally passes 27 sanitizer cases. macOS runs native
+mouse/pressure, raster pixel round-trip, timeline selection/Alt-drag and undo checks.
+The subsequent release commit updates documentation and evidence only.
+
 ### Compatibility and limits
 
 The previous editor cannot open format 2. A version 1 project's first new save leaves

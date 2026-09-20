@@ -25,7 +25,7 @@
       "upstream_url": "https://sqlite.org/atomiccommit.html",
       "license_notes": "Public domain; review bundled extensions separately",
       "purpose": "Metadata, revision transactions and local indices.",
-      "integration_boundary": "An adapter implements the project repository; immutable external blobs need their own publication/recovery protocol.",
+      "integration_boundary": "Project repository adapter. Format 2 commits compressed immutable resources and revision metadata in one database transaction; ADR-012 supersedes the proposed external blob protocol.",
       "evaluation": "SP-03: terminate at every commit boundary, fill disk and recover reachable blobs.",
       "fallback": "Keep the repository port; revise the blob protocol before changing database technology.",
       "version": "3.53.4 (Conan lock)",
@@ -77,15 +77,16 @@
       "id": "LIB-MYPAINT",
       "name": "libmypaint",
       "adoption_phase": "P05",
-      "status": "candidate_requires_spike",
+      "status": "experimental_adopted",
       "upstream_url": "https://github.com/mypaint/libmypaint",
       "license_notes": "ISC for core; inspect dependencies and brush asset licenses",
       "purpose": "Established pressure-sensitive raster brush engine used by several graphics applications.",
       "integration_boundary": "Integrate the C engine through our tile surface adapter; do not embed the MyPaint application or GTK. Does not provide ABR import.",
       "evaluation": "B0/B3 pressure replay, latency, tile copies, alpha/color conversion and deterministic preset replay.",
       "fallback": "Keep simple native brushes initially and defer advanced presets if the adapter cannot meet budgets.",
-      "version": null,
-      "installed": false
+      "version": "1.6.1 (commit 2768251dacce3939136c839aeca413f4aa4241d0)",
+      "installed": true,
+      "implementation_evidence": "docs/implementation/BRUSH-BENCHMARK.md; docs/architecture/adr/012-immutable-media-and-raster.md; production acceptance remains open"
     },
     {
       "id": "LIB-DOCK",
@@ -315,15 +316,16 @@
       "id": "LIB-ZSTD",
       "name": "Zstandard",
       "adoption_phase": "P05",
-      "status": "candidate_requires_spike",
+      "status": "experimental_adopted",
       "upstream_url": "https://github.com/facebook/zstd",
       "license_notes": "BSD or GPL options; record chosen eligible license",
       "purpose": "Compress tiles, undo snapshots and packaged resources.",
       "integration_boundary": "Compression policy belongs to storage; bounded decompression and content hashes are still required.",
       "evaluation": "Compression ratio versus edit latency and memory on B3/B6.",
       "fallback": "Store small/hot resources uncompressed if compression harms responsiveness.",
-      "version": null,
-      "installed": false
+      "version": "1.5.7 (Conan lock)",
+      "installed": true,
+      "implementation_evidence": "docs/implementation/BRUSH-BENCHMARK.md; docs/architecture/adr/012-immutable-media-and-raster.md; production acceptance remains open"
     },
     {
       "id": "LIB-ARCHIVE",
@@ -393,6 +395,34 @@
       "evaluation": "Clean builds and dependency restoration on every supported OS.",
       "fallback": "Document a reproducible source-build recipe for dependencies missing a reliable package.",
       "version": "CMake 4.4.3, Ninja 1.13.2, Conan 2.20.1 (local)",
+      "installed": true
+    },
+    {
+      "id": "LIB-JSON-C",
+      "name": "json-c",
+      "adoption_phase": "P05",
+      "status": "experimental_adopted",
+      "upstream_url": "https://github.com/json-c/json-c",
+      "license_notes": "MIT; notice included in third_party/licenses/json-c",
+      "purpose": "libmypaint settings parser dependency.",
+      "integration_boundary": "Private dependency of the MyPaint C adapter; document serialization continues to use nlohmann/json.",
+      "evaluation": "Pinned engine build and deterministic brush replay; external brush JSON imports remain unsupported.",
+      "fallback": "Keep original programmatic presets and validated engine adapter.",
+      "version": "0.18 (Conan lock)",
+      "installed": true
+    },
+    {
+      "id": "LIB-OPENSSL",
+      "name": "OpenSSL Crypto",
+      "adoption_phase": "P05",
+      "status": "experimental_adopted",
+      "upstream_url": "https://github.com/openssl/openssl",
+      "license_notes": "Apache-2.0; notices included in third_party/licenses/openssl",
+      "purpose": "SHA-256 resource identity and integrity verification.",
+      "integration_boundary": "Private storage dependency through EVP_Digest; no TLS or network functionality. Zlib is a locked transitive dependency; NASM and Strawberry Perl are platform-specific build requirements.",
+      "evaluation": "Corrupt/missing resource rejection, deduplication, atomic save and 4K storage benchmark.",
+      "fallback": "Replace the digest adapter while retaining the SHA-256 format contract and compatibility fixtures.",
+      "version": "3.5.8 (Conan lock)",
       "installed": true
     }
   ]
