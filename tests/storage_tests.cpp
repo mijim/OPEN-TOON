@@ -3,6 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <chrono>
 #include <fstream>
+#include <stdexcept>
 using namespace opentoon;
 namespace {
 struct TemporaryProject {

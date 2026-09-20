@@ -7,6 +7,7 @@
 #include <QQuickWindow>
 #include <QTabletEvent>
 #include <cmath>
+#include <stdexcept>
 using namespace opentoon;
 CanvasItem::CanvasItem(QQuickItem* parent) : QQuickPaintedItem(parent) {
     setAcceptedMouseButtons(Qt::LeftButton | Qt::MiddleButton);

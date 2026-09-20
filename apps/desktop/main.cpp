@@ -19,7 +19,9 @@
 #include <QTabletEvent>
 #include <QTemporaryDir>
 #include <QTimer>
+#include <cmath>
 #include <iostream>
+#include <stdexcept>
 int main(int argc, char** argv) {
     QGuiApplication app(argc, argv);
     QCoreApplication::setApplicationName("OPEN-TOON");

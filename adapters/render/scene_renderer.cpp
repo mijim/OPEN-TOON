@@ -1,6 +1,7 @@
 #include "scene_renderer.h"
 #include <QPainterPath>
 #include <cmath>
+#include <stdexcept>
 namespace opentoon {
 namespace {
 QColor qtColor(Color c) {

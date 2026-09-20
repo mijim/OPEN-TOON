@@ -12,6 +12,7 @@
 #include <QStandardPaths>
 #include <QUuid>
 #include <cmath>
+#include <stdexcept>
 using namespace opentoon;
 namespace {
 std::filesystem::path nativePath(const QString& path) {
