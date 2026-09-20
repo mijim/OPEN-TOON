@@ -19,7 +19,7 @@ cmake --build build/locked --parallel
 ctest --test-dir build/locked --output-on-failure
 ```
 
-On Windows, use `build/tooling/Scripts/python.exe -m pip` and `build/tooling/Scripts/conan.exe` instead of the POSIX virtual-environment paths. Pass an absolute toolchain path appropriate to the shell. Run from a developer environment for the chosen compiler. The CI workflow contains a Windows build invocation.
+On Windows, use `build/tooling/Scripts/python.exe -m pip` and `build/tooling/Scripts/conan.exe` instead of the POSIX virtual-environment paths. Pass an absolute toolchain path appropriate to the shell. With MSVC, Conan uses a multi-configuration layout: the toolchain is under `build/dependencies/build/generators/`, without `Release/`. Configure with `-G "Visual Studio 17 2022"`, then build with `--config Release` and test with `-C Release`. The CI workflow contains the Windows invocation.
 
 To build without Qt, add `-DOPENTOON_DESKTOP=OFF`. The document, commands, serialization and storage still compile and test independently. To enable address/undefined-behavior sanitizers on Clang/GCC, add `-DOPENTOON_SANITIZERS=ON`.
 

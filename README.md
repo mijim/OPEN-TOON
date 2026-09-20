@@ -8,6 +8,8 @@ Start with the [build instructions](docs/implementation/BUILD.md), [user guide](
 
 The product will use a clean black, white and gray interface. **The entire first-party product is in English by requirement:** UI, messages, built-in assets, help, code and public documentation. The previous research, Markdown documents and canonical catalogs have also been translated into English. User-created content remains multilingual.
 
+![Experimental OPEN-TOON editor with the generated bouncing-ball scene](docs/implementation/editor.png)
+
 ## Start here
 
 1. [Documentation map](docs/INDEX.md).
