@@ -607,8 +607,9 @@ void EditorController::exportFrames(QUrl url) {
     auto folder = local(url);
     if (folder.isEmpty())
         return;
-    auto destination =
-        folder + "/OPEN-TOON-" + QDateTime::currentDateTimeUtc().toString("yyyyMMdd-HHmmss-zzz");
+    auto destination = folder + "/OPEN-TOON-" +
+                       QDateTime::currentDateTimeUtc().toString("yyyyMMdd-HHmmss-zzz") + "-" +
+                       QUuid::createUuid().toString(QUuid::WithoutBraces).left(8);
     if (!QDir().mkpath(destination)) {
         report("Could not create export directory.");
         return;
@@ -651,9 +652,10 @@ void EditorController::exportFrames(QUrl url) {
                              {"fpsDenominator", snapshot->rate.denominator},
                              {"error", error}};
         QSaveFile file(destination + "/manifest.json");
-        if (file.open(QIODevice::WriteOnly)) {
-            file.write(QJsonDocument(manifest).toJson());
-            file.commit();
+        const auto bytes = QJsonDocument(manifest).toJson();
+        if (!file.open(QIODevice::WriteOnly) || file.write(bytes) != bytes.size() || !file.commit()) {
+            state = "failed";
+            error = "Could not write the export manifest.";
         }
         QMetaObject::invokeMethod(
             this,

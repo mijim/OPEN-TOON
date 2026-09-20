@@ -23,7 +23,8 @@ The editor runs locally on macOS and supports mouse drawing, sampled-pressure in
 
 ## Verification
 
-- Locked core/render build: 19 behavioral tests. Tests cover failed commands, rational time, exposure edits, hierarchy validation, rendering consistency, stale writers, schema rejection, rollback failures and abrupt process termination with a large image.
+- Locked build: 20 CTest entries pass (19 core/render cases plus two export workflows in one integration executable). Tests cover failed commands, rational time, exposure edits, hierarchy validation, rendering consistency, stale writers, schema rejection, rollback failures and abrupt process termination with a large image.
+- Export integration: 48 PNGs from an immutable snapshot, rational-time metadata, cancellation and a successful subsequent job.
 - Native input smoke: mouse strokes, synthetic pen pressure, cancelled gestures, undo/redo, palette validity after undo, save/reopen and a real window screenshot.
 - Synthetic two-second fixture: 48 PNG frames at 1920 × 1080; reopened document is semantically identical. Initial CPU export measured 3,077 ms on this Mac; it is not a large-scene or pen-latency benchmark.
 - Address/undefined-behavior sanitizers: 15/15 Qt-free core tests pass (26.86 seconds with the large crash fixture).

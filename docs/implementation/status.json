@@ -127,7 +127,20 @@
       "count": 15,
       "command": "ctest --preset sanitize",
       "scope": "Qt-free core, AddressSanitizer and UndefinedBehaviorSanitizer, local system dependencies"
-    }
+    },
+    "export_workflows": {
+      "status": "passed",
+      "cases": 2,
+      "ctest_entry": "export_workflows",
+      "covers": [
+        "immutable snapshot during concurrent edit",
+        "48 PNG files",
+        "rational frame rate manifest",
+        "partial cancellation manifest",
+        "successful job after cancellation"
+      ]
+    },
+    "total_local_ctest_entries": 20
   },
   "ownership": {
     "document": "modules/document",
