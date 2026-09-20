@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "id": "16ddb121-ca3f-411d-8a30-70240ae72c26",
+  "title": "Improve tests flow",
+  "summary": "3 files changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T16:49:07.325Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "scripts/roadmap.py",
+      "kind": "created",
+      "area": "tests",
+      "added": 173,
+      "removed": 0
+    },
+    {
+      "path": "docs/planning/node-assignments.json",
+      "kind": "created",
+      "area": "tests",
+      "added": 971,
+      "removed": 0
+    },
+    {
+      "path": "docs/catalog/nonfunctional.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 13,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "4e65e994-26d5-42cd-89fe-b8416402b172",
+        "51353591-aa7c-49c4-87c9-8bc50718a021",
+        "46994347-726e-44be-b71b-290fcf67308d"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "4e65e994-26d5-42cd-89fe-b8416402b172",
+      "title": "Introduce Roadmap",
+      "explanation": "This part of roadmap.py adds 173 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "scripts/roadmap.py",
+      "startLine": 1,
+      "endLine": 173,
+      "area": "tests",
+      "added": 173,
+      "removed": 0
+    },
+    {
+      "id": "51353591-aa7c-49c4-87c9-8bc50718a021",
+      "title": "Introduce Node assignments",
+      "explanation": "This part of node-assignments.json adds 971 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/node-assignments.json",
+      "startLine": 1,
+      "endLine": 971,
+      "area": "tests",
+      "added": 971,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "46994347-726e-44be-b71b-290fcf67308d",
+      "title": "Extend Nonfunctional",
+      "explanation": "This part of nonfunctional.json adds 13 lines. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "docs/catalog/nonfunctional.json",
+      "startLine": 286,
+      "endLine": 298,
+      "area": "tests",
+      "added": 13,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

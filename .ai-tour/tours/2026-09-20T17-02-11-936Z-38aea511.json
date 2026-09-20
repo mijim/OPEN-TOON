@@ -1,0 +1,229 @@
+{
+  "version": 1,
+  "id": "38aea511-54a0-4e4f-a8a3-2f9083da3cca",
+  "title": "Improve api flow",
+  "summary": "4 files changed across 1 area. The tour follows the implementation from api to api. 1104 smaller changes remain in the overview.",
+  "createdAt": "2026-09-20T17:02:11.936Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "docs/catalog/domains.json",
+      "kind": "modified",
+      "area": "api",
+      "added": 78,
+      "removed": 78
+    },
+    {
+      "path": "docs/catalog/features.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 1116,
+      "removed": 1116
+    },
+    {
+      "path": "docs/catalog/node-reference.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 193,
+      "removed": 193
+    },
+    {
+      "path": "docs/catalog/nonfunctional.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 75,
+      "removed": 75
+    }
+  ],
+  "areas": [
+    {
+      "id": "api",
+      "label": "API",
+      "stepIds": [
+        "aa4fcce9-ed66-4893-a03b-9e33a2b29ccb",
+        "19eafe32-c1ce-4ae4-8f6f-297b01aa1a82",
+        "c8e7af6e-3cda-4523-a5e2-eb4a4d91af02",
+        "e6ff50ac-839f-4cff-8c26-512ea4aa7251",
+        "e50801d2-f162-416f-a22e-bac5c40ebfd6",
+        "c5e39090-5644-48b8-818e-ca68a0050ea2",
+        "10dd2bbd-6e27-4eb7-996d-9d31fdeec761",
+        "39946a8a-01e8-4f83-9063-373b5970607c",
+        "043a5bcc-d3ea-4655-990d-d7725798fd1b",
+        "c6370658-f860-4fad-aa13-464e523d806a",
+        "8c390d9e-c034-442e-acbf-c1f81c66148e",
+        "635eb6df-91d7-4aaa-afb5-5ddb91d16aea",
+        "16d4d607-2656-45ca-85f8-972b35632211",
+        "1e5b7aee-e6f8-4b3c-9656-3d4dda5cf7fe"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "aa4fcce9-ed66-4893-a03b-9e33a2b29ccb",
+      "title": "Reshape Domains",
+      "explanation": "This part of domains.json replaces 1 line and adds 1. It updates the boundary where the application exchanges data. This is the first building block in the change.",
+      "file": "docs/catalog/domains.json",
+      "startLine": 6,
+      "endLine": 6,
+      "area": "api",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "id": "19eafe32-c1ce-4ae4-8f6f-297b01aa1a82",
+      "title": "Reshape Domains",
+      "explanation": "This part of domains.json replaces 2 lines and adds 2. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "docs/catalog/domains.json",
+      "startLine": 16,
+      "endLine": 17,
+      "area": "api",
+      "added": 2,
+      "removed": 2,
+      "relation": "Continues the api thread from the previous step."
+    },
+    {
+      "id": "c8e7af6e-3cda-4523-a5e2-eb4a4d91af02",
+      "title": "Reshape Domains",
+      "explanation": "This part of domains.json replaces 1 line and adds 1. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "docs/catalog/domains.json",
+      "startLine": 21,
+      "endLine": 21,
+      "area": "api",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the api thread from the previous step."
+    },
+    {
+      "id": "e6ff50ac-839f-4cff-8c26-512ea4aa7251",
+      "title": "Reshape Domains",
+      "explanation": "This part of domains.json replaces 2 lines and adds 2. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "docs/catalog/domains.json",
+      "startLine": 32,
+      "endLine": 33,
+      "area": "api",
+      "added": 2,
+      "removed": 2,
+      "relation": "Continues the api thread from the previous step."
+    },
+    {
+      "id": "e50801d2-f162-416f-a22e-bac5c40ebfd6",
+      "title": "Reshape Domains",
+      "explanation": "This part of domains.json replaces 1 line and adds 1. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "docs/catalog/domains.json",
+      "startLine": 37,
+      "endLine": 37,
+      "area": "api",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the api thread from the previous step."
+    },
+    {
+      "id": "c5e39090-5644-48b8-818e-ca68a0050ea2",
+      "title": "Reshape Domains",
+      "explanation": "This part of domains.json replaces 2 lines and adds 2. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "docs/catalog/domains.json",
+      "startLine": 49,
+      "endLine": 50,
+      "area": "api",
+      "added": 2,
+      "removed": 2,
+      "relation": "Continues the api thread from the previous step."
+    },
+    {
+      "id": "10dd2bbd-6e27-4eb7-996d-9d31fdeec761",
+      "title": "Reshape Domains",
+      "explanation": "This part of domains.json replaces 1 line and adds 1. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "docs/catalog/domains.json",
+      "startLine": 54,
+      "endLine": 54,
+      "area": "api",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the api thread from the previous step."
+    },
+    {
+      "id": "39946a8a-01e8-4f83-9063-373b5970607c",
+      "title": "Reshape Domains",
+      "explanation": "This part of domains.json replaces 2 lines and adds 2. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "docs/catalog/domains.json",
+      "startLine": 67,
+      "endLine": 68,
+      "area": "api",
+      "added": 2,
+      "removed": 2,
+      "relation": "Continues the api thread from the previous step."
+    },
+    {
+      "id": "043a5bcc-d3ea-4655-990d-d7725798fd1b",
+      "title": "Reshape Domains",
+      "explanation": "This part of domains.json replaces 1 line and adds 1. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "docs/catalog/domains.json",
+      "startLine": 72,
+      "endLine": 72,
+      "area": "api",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the api thread from the previous step."
+    },
+    {
+      "id": "c6370658-f860-4fad-aa13-464e523d806a",
+      "title": "Reshape Domains",
+      "explanation": "This part of domains.json replaces 2 lines and adds 2. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "docs/catalog/domains.json",
+      "startLine": 84,
+      "endLine": 85,
+      "area": "api",
+      "added": 2,
+      "removed": 2,
+      "relation": "Continues the api thread from the previous step."
+    },
+    {
+      "id": "8c390d9e-c034-442e-acbf-c1f81c66148e",
+      "title": "Reshape Domains",
+      "explanation": "This part of domains.json replaces 1 line and adds 1. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "docs/catalog/domains.json",
+      "startLine": 89,
+      "endLine": 89,
+      "area": "api",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the api thread from the previous step."
+    },
+    {
+      "id": "635eb6df-91d7-4aaa-afb5-5ddb91d16aea",
+      "title": "Reshape Domains",
+      "explanation": "This part of domains.json replaces 2 lines and adds 2. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "docs/catalog/domains.json",
+      "startLine": 103,
+      "endLine": 104,
+      "area": "api",
+      "added": 2,
+      "removed": 2,
+      "relation": "Continues the api thread from the previous step."
+    },
+    {
+      "id": "16d4d607-2656-45ca-85f8-972b35632211",
+      "title": "Reshape Domains",
+      "explanation": "This part of domains.json replaces 1 line and adds 1. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "docs/catalog/domains.json",
+      "startLine": 108,
+      "endLine": 108,
+      "area": "api",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the api thread from the previous step."
+    },
+    {
+      "id": "1e5b7aee-e6f8-4b3c-9656-3d4dda5cf7fe",
+      "title": "Reshape Domains",
+      "explanation": "This part of domains.json replaces 2 lines and adds 2. It updates the boundary where the application exchanges data. This completes the path introduced by the earlier steps.",
+      "file": "docs/catalog/domains.json",
+      "startLine": 120,
+      "endLine": 121,
+      "area": "api",
+      "added": 2,
+      "removed": 2,
+      "relation": "Continues the api thread from the previous step."
+    }
+  ]
+}
