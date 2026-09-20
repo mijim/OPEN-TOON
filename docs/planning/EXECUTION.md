@@ -71,3 +71,13 @@ Before a release, require zero known data-loss defects and zero unresolved criti
 Phases are epics; the 69 work packages are planning units. Split them into issues small enough to demonstrate within one iteration. Do not turn the entire long roadmap into hundreds of rigid micro-tasks before the first benchmark. Re-estimate after P00, P02, P07 and P11, and whenever the renderer, format or staffing changes.
 
 Highest early risks: tablet latency, editable vector topology, renderer/color integration and crash safety. Later risks: solver quality, OpenFX isolation, layered interchange semantics, 3D material mapping and distributed revision conflicts. Experiments that fail are valid evidence: narrow scope or change the adapter, document the decision and preserve the last working release.
+
+## Current development verification cadence
+
+Owner direction, 2026-09-20: develop coherent functionality blocks on macOS, then
+run relevant tests at the end and fix failures iteratively. Do not rebuild after
+every small edit. Current releases publish source code. The native cross-platform
+workflow is manual (`workflow_dispatch`); Linux and Windows qualification and binary
+packaging return for future compiled releases. Historical cross-platform results do
+not qualify newly changed source. This cadence does not waive correctness or phase
+acceptance; record which platform and source were actually checked.

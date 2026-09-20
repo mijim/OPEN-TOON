@@ -1,5 +1,19 @@
 # Experimental releases
 
+## 0.2.0-experimental.2 — source release
+
+- Explicit Setup/Animate modes and guarded Auto key.
+- Keyed/interpolated/held inspector state and previous/next key navigation.
+- Pose-channel curve graph with numeric edits, mouse dragging and single-command undo.
+- Key-only multi-layer retiming with collision rejection and unchanged exposures.
+- English usage and animation contracts; no format or dependency changes.
+- Verification at block end on macOS: 36 CTest entries, native drawing/range checks
+  and curve drag/undo. Fixed a QML final-property naming conflict during validation.
+- Native multi-OS CI is manual; no Windows/Linux build or installer for this source release.
+
+P11 remains incomplete. Keys still store whole poses; independent channel timing,
+editable tangents, cameras, audio, advanced rigs, deformation and nodes remain open.
+
 ## 0.2.0-experimental.1
 
 An incremental development release on the path to P11. It does not complete P11 or

@@ -65,3 +65,11 @@ existing files are refused. The command measures 11,520 samples on a 4K canvas,
 libmypaint is fetched during configuration from a source commit and SHA-256 pinned
 in `cmake/MyPaint.cmake`; the build requires Python and a C11 compiler as well as C++20.
 [CI run 35531337766](https://github.com/mijim/OPEN-TOON/actions/runs/35531337766) verifies these additions on Windows, macOS and Linux; device and installer qualification remain separate.
+
+## Active development cadence
+
+For current source releases, implement a functionality block and then build/test on
+macOS once, fixing failures iteratively. The Native editor GitHub workflow is manual
+only; pushes, pull requests and source tags do not build Linux/Windows. Dispatch it
+when qualifying a future compiled release. Binary installers are not part of the
+current source-release workflow.

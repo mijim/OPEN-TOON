@@ -26,6 +26,10 @@ ApplicationWindow {
     palette.highlight: "#454545"
     palette.highlightedText: "#ffffff"
     palette.mid: "#393939"
+    D.CurveEditor {
+        id: curveEditor
+        controller: editor
+    }
     property var backend: editor
     property string pendingAction: ""
     property bool allowClose: false
@@ -645,6 +649,49 @@ ApplicationWindow {
                             text: "Transform"
                             font.pixelSize: 13
                             font.bold: true
+                        }
+                        RowLayout {
+                            Layout.leftMargin: 16
+                            ComboBox {
+                                model: ["Setup", "Animate"]
+                                currentIndex: editor.animateMode ? 1 : 0
+                                onActivated: editor.animateMode = currentIndex === 1
+                                Accessible.name: "Animation edit mode"
+                                implicitWidth: 105
+                            }
+                            CheckBox {
+                                text: "Auto key"
+                                checked: editor.autoKey
+                                enabled: editor.animateMode
+                                onToggled: editor.autoKey = checked
+                            }
+                        }
+                        Label {
+                            Layout.leftMargin: 16
+                            Layout.rightMargin: 16
+                            Layout.fillWidth: true
+                            wrapMode: Text.WordWrap
+                            color: "#aaaaaa"
+                            text: {
+                                const revision = editor.animationKeys;
+                                const mode = editor.animateMode;
+                                return mode ? editor.keyState : "Rest values · existing keys keep their poses";
+                            }
+                        }
+                        RowLayout {
+                            Layout.leftMargin: 12
+                            C.ToolButton {
+                                text: "‹ Key"
+                                onClicked: editor.nextKey(-1)
+                            }
+                            C.ToolButton {
+                                text: "Key ›"
+                                onClicked: editor.nextKey(1)
+                            }
+                            C.ToolButton {
+                                text: "Curves"
+                                onClicked: curveEditor.open()
+                            }
                         }
                         GridLayout {
                             Layout.leftMargin: 16

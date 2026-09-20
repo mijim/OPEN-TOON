@@ -113,3 +113,47 @@ int main(int argc, char** argv) {
     QStandardPaths::setTestModeEnabled(true);
     return Catch::Session().run(argc, argv);
 }
+
+TEST_CASE("Animation inspector edits, curve sampling, navigation and saved rendering agree") {
+    EditorController editor;
+    editor.loadDemo();
+    const auto layer = editor.selectedLayer();
+    editor.setAnimateMode(true);
+    editor.setAutoKey(true);
+    editor.setFrame(0);
+    editor.setTransform("x", 0);
+    editor.setFrame(20);
+    editor.setTransform("x", 200);
+    editor.setAutoKey(false);
+    editor.setFrame(10);
+    const auto before = editor.document();
+    editor.setTransform("x", 999);
+    REQUIRE(editor.document() == before);
+    REQUIRE(editor.keyState() == "Interpolated pose");
+    editor.nextKey(1);
+    REQUIRE(editor.frame() == 20);
+    editor.nextKey(-1);
+    REQUIRE(editor.frame() == 0);
+    REQUIRE(editor.updateKey(20, 24, "x", 240, 1));
+    editor.setFrame(12);
+    REQUIRE(editor.transform()["x"].toDouble() == 120);
+    auto samples = editor.curveSamples("x", 48);
+    REQUIRE_FALSE(samples.empty());
+    for (auto sample : samples) {
+        auto map = sample.toMap();
+        REQUIRE(map["value"].toDouble() ==
+                opentoon::evaluateTransform(editor.document().layer(layer), map["frame"].toInt()).x);
+    }
+    QTemporaryDir dir;
+    auto path = QUrl::fromLocalFile(dir.filePath("animation.otoon"));
+    REQUIRE(editor.saveProject(path));
+    auto image = opentoon::SceneRenderer::render(editor.document(), 12);
+    EditorController reopened;
+    REQUIRE(reopened.openProject(path));
+    REQUIRE(opentoon::SceneRenderer::render(reopened.document(), 12) == image);
+    auto snapshot = editor.document();
+    REQUIRE_FALSE(editor.updateKey(24, 0, "x", 240, 0));
+    REQUIRE(editor.document() == snapshot);
+    editor.undo();
+    REQUIRE(editor.document().layer(layer).keys.back().frame == 20);
+}

@@ -60,3 +60,28 @@ Use **Edit → Scene marker** to label the current frame; an empty name removes 
 PNG export evaluates an immutable snapshot, so later edits do not change the running export. Cancel stops between frames. `manifest.json` records the rational frame rate, frame count and completion/cancellation/failure state. A cancelled or failed directory contains partial output and must not be treated as a complete sequence.
 
 Image import loads a single image up to 4096 × 4096, subject to scene memory/save limits. Image sequences, layered PSD, audio, video output, lip sync, deformation, node effects, OCIO, reusable rig libraries and production installers are still pending. Consult the [phase status](STATUS.md) for the complete boundary.
+
+## Animation edits and curves
+
+Choose **Setup** in Properties to change rest values without creating keys. Existing
+keys retain their poses; the canvas continues to display the evaluated animation.
+Choose **Animate** to edit the current key. Enable **Auto key** to create a full-pose
+key when editing an unkeyed frame, or press **Add key** explicitly. With Auto key off,
+unkeyed edits are rejected. The inspector labels keyed, interpolated and held poses.
+
+**‹ Key / Key ›** navigate the selected layer. **Curves** opens the function editor.
+Choose a channel, click the graph to scrub, or drag a key to adjust its frame and
+value. Escape cancels a drag. The frame/value/interpolation fields and **Apply key**
+offer precise editing. **Delete** removes the selected pose key. Colliding keys and
+invalid values are rejected; the message appears inside the dialog. Undo restores
+an entire drag or numeric edit.
+
+Keys currently contain complete poses: a value edit affects only that field, while
+moving a key or changing Linear/Hold/Smooth interpolation affects all eight channels.
+Smooth has fixed easing slopes; editable tangents and independent channel keys remain
+planned. Frames shown in the interface start at 1.
+
+Select a range and layers in the timeline before opening Curves. Set Destination and
+Length, then **Retime keys only** to move/stretch their keys without changing drawing
+exposures. Endpoint frames map to endpoint frames; rounding collisions reject the
+whole operation. Existing keys outside the range are preserved.

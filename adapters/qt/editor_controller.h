@@ -11,6 +11,10 @@
 #include <thread>
 class EditorController final : public QObject {
     Q_OBJECT
+    Q_PROPERTY(bool animateMode READ animateMode WRITE setAnimateMode NOTIFY animationModeChanged)
+    Q_PROPERTY(bool autoKey READ autoKey WRITE setAutoKey NOTIFY animationModeChanged)
+    Q_PROPERTY(QVariantList animationKeys READ animationKeys NOTIFY changed)
+    Q_PROPERTY(QString keyState READ keyState NOTIFY frameChanged)
     Q_PROPERTY(int rangeStart READ rangeStart NOTIFY rangeChanged)
     Q_PROPERTY(int rangeEnd READ rangeEnd NOTIFY rangeChanged)
     Q_PROPERTY(QVariantList selectedLayers READ selectedLayers NOTIFY rangeChanged)
@@ -49,6 +53,16 @@ class EditorController final : public QObject {
     explicit EditorController(QObject* parent = nullptr);
     ~EditorController() override;
     const opentoon::Document& document() const { return session_.document(); }
+    bool animateMode() const { return animateMode_; }
+    bool autoKey() const { return autoKey_; }
+    void setAnimateMode(bool);
+    void setAutoKey(bool);
+    QVariantList animationKeys() const;
+    QString keyState() const;
+    Q_INVOKABLE QVariantList curveSamples(QString channel, int samples = 400) const;
+    Q_INVOKABLE void nextKey(int direction);
+    Q_INVOKABLE bool updateKey(int source, int destination, QString channel, double value, int interpolation);
+    Q_INVOKABLE void retimeSelectedKeys(int destination, int length);
     int rangeStart() const { return rangeStart_; }
     int rangeEnd() const { return rangeEnd_; }
     QVariantList selectedLayers() const;
@@ -144,6 +158,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE void autosave();
     Q_INVOKABLE void report(QString message);
   signals:
+    void animationModeChanged();
     void rangeChanged();
     void changed();
     void frameChanged();
@@ -165,6 +180,7 @@ class EditorController final : public QObject {
     int frame_ = 0, artLayer_ = 2;
     QString tool_ = "Pencil", path_, status_ = "Ready", recovery_, previousRecovery_;
     double brushSize_ = 5;
+    bool animateMode_ = false, autoKey_ = false;
     bool onion_ = true, filled_ = false;
     QTimer playTimer_, autosaveTimer_;
     QElapsedTimer playClock_;

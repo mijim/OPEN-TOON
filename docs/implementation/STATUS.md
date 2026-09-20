@@ -14,7 +14,7 @@ The editor runs locally on macOS and supports mouse drawing, sampled-pressure in
 | P03 | in_progress | Synchronized virtualized timeline/Xsheet, create/hold/clear exposures, insert/remove frames and navigate drawings. Multi-layer range clipboard, independent drawing paste, key paste, cycles, ones/twos/threes, overwrite retiming, Alt-drag moves, markers and bounded Xsheet PDF export. | Frame annotations/thumbnails, advanced onion/tracing controls, paperless workflows and artist acceptance. |
 | P04 | in_progress | Sampled vector strokes, approximate eraser, primitives, single-stroke selection, point editing/smoothing, stable palette IDs and shape recoloring. | Region topology/fill, analytic erasing, Bezier/contour/width editors, presets/textures/guides, robust selection and vector optimization. |
 | P05 | in_progress | Sparse immutable 15-bit premultiplied tiles, libmypaint ink/soft/dry/smudge/eraser presets, pressure input, cancellable gestures, shared preview/export and compressed project resources. | Brush texture/import/preset management, raster selection/transforms, production workload and physical-device qualification. |
-| P06 | in_progress | Layer transform keys with linear/held/smooth interpolation and inherited transforms/opacity. | Function editor, velocity/motion paths, full key editing, cameras and multiplane evaluation. |
+| P06 | in_progress | Layer transform keys with linear/held/smooth interpolation, inherited transforms/opacity, explicit Setup/Animate and Auto key, key navigation/state, editable pose-channel graph and key-only multi-layer retiming with collision rejection. | Independent channel keys, editable tangents, velocity/motion paths, complete batched editing, cameras and multiplane evaluation. |
 | P07 | planned | Exact rational frame-to-sample arithmetic has a domain test; no audio playback. | Audio decode/timeline/waveform/sync, media policies, FFmpeg adapter and video output. |
 | P08 | in_progress | Parented layers, pivots, independent duplicates and linked drawing clones. | Production cut-out tools, asset/template library, substitution workflow, pose preservation, lip sync and animator validation. |
 | P09 | planned | No deformation subsystem implemented. | Curve/bone/mesh deformation, constraints, binding/weights, deterministic solvers and reference fixtures. |
@@ -23,11 +23,11 @@ The editor runs locally on macOS and supports mouse drawing, sampled-pressure in
 
 ## Verification
 
-- Locked build: 33/33 CTest entries pass (32 core/render cases and three integration cases in one executable). Tests cover failed commands, rational time, exposure edits, hierarchy validation, rendering consistency, stale writers, schema rejection, rollback failures and abrupt process termination with a large image.
+- Current macOS locked build: 36/36 CTest entries pass (35 core/render cases and four integration cases in one executable). Tests cover failed commands, rational time, exposure edits, hierarchy validation, rendering consistency, stale writers, schema rejection, rollback failures and abrupt process termination with a large image.
 - Export integration: 48 PNGs from an immutable snapshot, rational-time metadata, cancellation and a successful subsequent job.
 - Native input smoke: mouse strokes, synthetic pen pressure, cancelled gestures, undo/redo, palette validity after undo, save/reopen and a real window screenshot.
 - Synthetic two-second fixture: 48 PNG frames at 1920 × 1080; reopened document is semantically identical. Initial CPU export measured 3,077 ms on this Mac; it is not a large-scene or pen-latency benchmark.
-- Address/undefined-behavior sanitizers: 27/27 Qt-free core/brush tests pass with locked Debug dependencies (4.35 seconds).
+- Historical experimental.1 address/undefined-behavior sanitizers: 27/27 Qt-free core/brush tests pass with locked Debug dependencies (4.35 seconds).
 - The physical tablet matrix is pending because the owner has no tablet currently. Tilt is routed to MyPaint; built-in presets do not use tilt mappings. Eraser-end behavior is not implemented. Mouse input works independently.
 - [CI run 35531337766](https://github.com/mijim/OPEN-TOON/actions/runs/35531337766) passes for source commit `c07414f`: Windows Server 2022, macOS 14 and Ubuntu 24.04 build and test with Qt 6.8.3, plus Linux core sanitizers. Native mouse/synthetic-pen, raster save/reopen and range-drag UI smoke pass on macOS. Windows process-termination recovery, other-platform GUI interaction, physical devices and installation remain unqualified.
 - Standalone bundle deployment with split Homebrew Qt failed plugin/framework resolution. The build-tree application runs. No signed/notarized installer or clean-machine compatibility is claimed.
@@ -45,3 +45,13 @@ The domain and application layers contain no Qt. Commands validate candidates be
 Close the open feasibility/foundation gates, qualify the first-film workflow, then finish P03/P04 acceptance and qualify the experimental P05 raster adapter. Follow the existing dependency order through camera, audio, rigging, deformation and compositing. Do not substitute buttons or empty module scaffolding for implemented behavior. Device testing can remain pending while independent engineering proceeds.
 
 Machine-readable source: [status.json](status.json). The catalog and roadmap retain their stable IDs and complete acceptance requirements.
+
+## Animation editing source release
+
+Experimental.2 adds explicit rest/animation editing, guarded autokey, key navigation,
+a sampled pose-curve editor with numeric and drag edits, and collision-safe key-only
+retiming. See [ADR-013](../architecture/adr/013-animation-editing.md) for exact limits.
+Current verification is macOS only. Native UI smoke opens the curve dialog and checks
+an actual key drag and undo. The full cross-platform workflow is now manual, and
+source releases do not produce installers. Historical OS/sanitizer results above
+refer to their recorded source, not automatic qualification of new animation code.

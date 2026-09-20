@@ -222,8 +222,54 @@ int main(int argc, char** argv) {
                     if (editor.document() != beforeMove)
                         throw std::runtime_error("Range move undo did not restore exposures.");
                     editor.setFrame(0);
-                    editor.setTool("Raster ink");
+                    editor.setAnimateMode(true);
+                    editor.setAutoKey(true);
+                    editor.setTransform("x", 0);
+                    editor.setFrame(24);
+                    editor.setTransform("x", 240);
+                    editor.setFrame(12);
+                    auto* curveDialog = window->findChild<QObject*>("curveEditorDialog");
+                    if (!curveDialog || !QMetaObject::invokeMethod(curveDialog, "open"))
+                        throw std::runtime_error("Curve editor did not open.");
                     QTimer::singleShot(250, &app, [&, window] {
+                        auto* graph = window->findChild<QQuickItem*>("animationCurveCanvas");
+                        if (!graph || graph->width() < 200 || graph->height() < 100) {
+                            std::cerr << "Curve editor layout failed.\n";
+                            app.exit(1);
+                            return;
+                        }
+                        const auto beforeCurveDrag = editor.document();
+                        auto point = [&](int frame, double value) {
+                            double left = graph->property("plotLeft").toDouble();
+                            double right = graph->property("plotRight").toDouble();
+                            double top = graph->property("plotTop").toDouble();
+                            double bottom = graph->property("plotBottom").toDouble();
+                            return graph->mapToScene(QPointF(left + frame / 47.0 * (right - left),
+                                                             bottom - (value + 36) / 312.0 * (bottom - top)));
+                        };
+                        auto sendCurve = [&](QEvent::Type type, QPointF p, Qt::MouseButton button,
+                                             Qt::MouseButtons buttons) {
+                            QMouseEvent event(type, p, window->mapToGlobal(p.toPoint()), button, buttons,
+                                              Qt::NoModifier);
+                            QCoreApplication::sendEvent(window, &event);
+                        };
+                        sendCurve(QEvent::MouseButtonPress, point(24, 240), Qt::LeftButton, Qt::LeftButton);
+                        sendCurve(QEvent::MouseMove, point(30, 180), Qt::NoButton, Qt::LeftButton);
+                        sendCurve(QEvent::MouseButtonRelease, point(30, 180), Qt::LeftButton, Qt::NoButton);
+                        const auto& keys = editor.document().layer(editor.selectedLayer()).keys;
+                        if (keys.back().frame != 30 || std::abs(keys.back().value.x - 180) > 1) {
+                            std::cerr << "Native curve drag did not commit time and value.\n";
+                            app.exit(1);
+                            return;
+                        }
+                        editor.undo();
+                        if (editor.document() != beforeCurveDrag) {
+                            std::cerr << "Curve drag undo changed other scene data.\n";
+                            app.exit(1);
+                            return;
+                        }
+                        editor.setFrame(24);
+                        QCoreApplication::processEvents();
                         auto image = window->grabWindow();
                         if (image.isNull() || !image.save("build/ui-smoke.png")) {
                             app.exit(1);
@@ -232,7 +278,7 @@ int main(int argc, char** argv) {
                         std::cout << "UI smoke passed: mouse stroke, synthetic pen pressure, cancelled "
                                      "gesture, raster painting and pixel round trip, range clipboard, "
                                      "undo/redo, save/reopen, canvas layout "
-                                     "and screenshot.\n";
+                                     "and native curve drag/undo and screenshot.\n";
                         app.exit(0);
                     });
                 } catch (const std::exception& error) {

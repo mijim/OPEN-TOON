@@ -34,7 +34,7 @@ Separate rest-state changes from keyframe insertion or editing.
 
 **Initial acceptance:** Moving an object in setup mode does not add keyframes.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -74,7 +74,7 @@ Edit curves with visible tangents, ranges, values and units.
 
 **Initial acceptance:** An edited tangent produces the same value in preview and export.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -104,7 +104,7 @@ Move, scale and copy key blocks between compatible tracks.
 
 **Initial acceptance:** Scaling a block preserves order or explains timing collisions.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 

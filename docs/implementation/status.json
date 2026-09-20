@@ -46,8 +46,8 @@
     {
       "id": "P06",
       "status": "in_progress",
-      "available": "Layer transform keys with linear/held/smooth interpolation and inherited transforms/opacity.",
-      "remaining": "Function editor, velocity/motion paths, full key editing, cameras and multiplane evaluation."
+      "available": "Layer transform keys with linear/held/smooth interpolation, inherited transforms/opacity, explicit Setup/Animate and Auto key, key navigation/state, editable pose-channel graph and key-only multi-layer retiming with collision rejection.",
+      "remaining": "Independent channel keys, editable tangents, velocity/motion paths, complete batched editing, cameras and multiplane evaluation."
     },
     {
       "id": "P07",
@@ -104,7 +104,9 @@
         "cancelled raster gesture",
         "timeline range clipboard",
         "native timeline range selection",
-        "native Alt-drag with grab offset and undo"
+        "native Alt-drag with grab offset and undo",
+        "curve dialog layout",
+        "native curve key drag and undo"
       ]
     },
     "png_fixture": {
@@ -131,7 +133,7 @@
         "windows-2022": "32 CTest entries passed with Qt 6.8.3; POSIX process termination test excluded",
         "sanitizers": "27 Qt-free core and MyPaint cases passed with AddressSanitizer and UndefinedBehaviorSanitizer"
       },
-      "limits": "Build/test evidence only; Windows crash-termination test is not implemented, GUI interaction outside macOS, physical tablets and clean-machine installation remain unqualified."
+      "limits": "Build/test evidence only; Windows crash-termination test is not implemented, GUI interaction outside macOS, physical tablets and clean-machine installation remain unqualified. Historical evidence; experimental.2 is macOS-validated only under the source-release policy."
     },
     "standalone_package": {
       "status": "failed",
@@ -141,11 +143,11 @@
       "status": "passed",
       "count": 27,
       "command": "ctest --test-dir build/p11-sanitized --output-on-failure",
-      "scope": "Qt-free document, storage, application and MyPaint adapter; locked Debug dependencies. AddressSanitizer and UndefinedBehaviorSanitizer."
+      "scope": "Qt-free document, storage, application and MyPaint adapter; locked Debug dependencies. AddressSanitizer and UndefinedBehaviorSanitizer. Historical v0.2.0-experimental.1 evidence; not rerun for the animation editing block."
     },
     "export_workflows": {
       "status": "passed",
-      "cases": 3,
+      "cases": 4,
       "ctest_entry": "export_workflows",
       "covers": [
         "immutable snapshot during concurrent edit",
@@ -153,10 +155,11 @@
         "rational frame rate manifest",
         "partial cancellation manifest",
         "successful job after cancellation",
-        "asynchronous recovery preserves original snapshot and newer unsaved edits"
+        "asynchronous recovery preserves original snapshot and newer unsaved edits",
+        "animation inspector, curve sampling, key navigation and saved pixel equivalence"
       ]
     },
-    "total_local_ctest_entries": 33,
+    "total_local_ctest_entries": 36,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -174,5 +177,11 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.1"
+  "version": "0.2.0-experimental.2",
+  "development_policy": {
+    "primary_platform": "macOS",
+    "verification_cadence": "End of coherent functionality blocks; iterate failures",
+    "release_artifacts": "source only",
+    "cross_platform_builds": "manual future compiled-release qualification"
+  }
 }

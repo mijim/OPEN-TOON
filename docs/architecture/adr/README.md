@@ -45,3 +45,5 @@ Accepted by user on 2026-09-20. All first-party UI, built-in assets, help, code 
 ## ADR-010 — Reuse proven open-source components
 
 Prefer maintained libraries for solved infrastructure through explicit adapters. Specific adoption remains conditional on workload benchmarks, pinned versions and redistribution checks. The [register](../../planning/LIBRARIES.md) separates intended choices from candidates and defines fallbacks. The original planning change installed no dependencies; current experimental adoption is recorded in `docs/implementation/DEPENDENCIES.md`.
+
+See [ADR-013](013-animation-editing.md) for setup/animate, pose curve and key-only retiming semantics.

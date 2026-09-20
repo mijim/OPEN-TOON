@@ -1,4 +1,5 @@
 #include "editor_controller.h"
+#include "opentoon/animation.h"
 #include "project_store.h"
 #include "scene_renderer.h"
 #include <QDateTime>
@@ -132,7 +133,8 @@ QVariantList EditorController::revisions() const {
 QVariantMap EditorController::transform() const {
     if (!layer_)
         return {};
-    auto t = evaluateTransform(document().layer(layer_), frame_);
+    auto t = animateMode_ ? evaluateTransform(document().layer(layer_), frame_)
+                          : document().layer(layer_).transform;
     return {{"x", t.x},           {"y", t.y},           {"rotation", t.rotation},
             {"scaleX", t.scaleX}, {"scaleY", t.scaleY}, {"opacity", t.opacity},
             {"pivotX", t.pivotX}, {"pivotY", t.pivotY}};
@@ -515,42 +517,14 @@ void EditorController::setTransform(QString field, double value) {
     if (!layer_)
         return;
     edit("Set " + field.toStdString(), [&](Document& d) {
-        auto& l = d.layer(layer_);
-        if (l.locked)
-            throw std::runtime_error("Unlock the layer before editing.");
-        auto set = [&](Transform& t) {
-            if (field == "x")
-                t.x = value;
-            else if (field == "y")
-                t.y = value;
-            else if (field == "rotation")
-                t.rotation = value;
-            else if (field == "scaleX")
-                t.scaleX = value;
-            else if (field == "scaleY")
-                t.scaleY = value;
-            else if (field == "opacity")
-                t.opacity = value;
-            else if (field == "pivotX")
-                t.pivotX = value;
-            else if (field == "pivotY")
-                t.pivotY = value;
-        };
-        if (l.keys.empty())
-            set(l.transform);
-        else {
-            auto valueAt = evaluateTransform(l, frame_);
-            set(valueAt);
-            auto it = std::find_if(l.keys.begin(), l.keys.end(), [&](auto k) { return k.frame == frame_; });
-            if (it == l.keys.end()) {
-                l.keys.push_back({frame_, valueAt, Interpolation::Linear});
-                std::sort(l.keys.begin(), l.keys.end(), [](auto a, auto b) { return a.frame < b.frame; });
-            } else
-                it->value = valueAt;
-        }
+        editTransform(d.layer(layer_), frame_, field.toStdString(), value,
+                      animateMode_ ? AnimationEditMode::Animate : AnimationEditMode::Setup, autoKey_);
     });
 }
 void EditorController::addKey(int interpolation) {
+    if (interpolation < 0 || interpolation > 2)
+        return;
+    setAnimateMode(true);
     if (!layer_)
         return;
     edit("Add transform key", [&](Document& d) {

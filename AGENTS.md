@@ -40,6 +40,9 @@
 
 ## Verification and publication
 
+- Current owner policy: implement coherent functionality blocks, then run meaningful macOS tests at the end and fix failures iteratively. Do not rebuild or test after every small edit.
+- Development releases currently publish source only. Linux/Windows builds and the full native CI matrix are manual qualification work for future compiled releases, not every push or source tag. Preserve portability in code without repeatedly building those targets.
+
 - Follow `docs/planning/EXECUTION.md`; choose meaningful invariant, recovery, image, input or artistic workflow checks for the change.
 - Use synthetic or redistributable fixtures with recorded provenance. Do not publish private third-party projects.
 - Keep credentials, personal paths, research caches and downloaded proprietary manuals out of commits. Do not stage unrelated local tour files.
