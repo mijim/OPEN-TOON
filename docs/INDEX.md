@@ -10,8 +10,8 @@
 | Appearance | Minimal black, white and gray; Geist-inspired language | User requirement |
 | Language | English across first-party UI, assets, code, help and documentation | User requirement; previous documentation translated |
 | Technology | C++20, Qt 6 and Qt Quick/QML | Accepted by user; risky integration paths need spikes |
-| Renderer | Isolated backend; evaluate Qt RHI/Skia paths | P00 decision |
-| Storage | Versioned open format, stable IDs, immutable resources and transactional save | Proposed design; crash-tested in P00/P01 |
+| Renderer | CPU QPainter reference adapter; Qt RHI/Skia comparison remains open | Experimental |
+| Storage | Experimental SQLite snapshot revisions; immutable external resources remain proposed | See ADR-011 and recovery tests |
 | Open-source reuse | Prefer proven libraries through tested adapters | User requirement; 28 library/tool entries evaluated in the roadmap |
 | Initial license | GPL-3.0-or-later for original contributions | Adopted |
 | Implementation | Experimental editor; partial catalog coverage | No complete phase or production release |

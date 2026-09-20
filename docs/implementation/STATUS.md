@@ -29,7 +29,7 @@ The editor runs locally on macOS and supports mouse drawing, sampled-pressure in
 - Synthetic two-second fixture: 48 PNG frames at 1920 × 1080; reopened document is semantically identical. Initial CPU export measured 3,077 ms on this Mac; it is not a large-scene or pen-latency benchmark.
 - Address/undefined-behavior sanitizers: 15/15 Qt-free core tests pass (26.86 seconds with the large crash fixture).
 - The physical tablet matrix is pending because the owner has no tablet currently. Tilt/eraser-end behavior is not implemented. Mouse input works independently.
-- CI definitions target Windows, Linux and macOS. A workflow definition alone is not evidence of a passing platform.
+- [CI run 35528441504](https://github.com/mijim/OPEN-TOON/actions/runs/35528441504) passes for source commit `982f88f`: Windows Server 2022, macOS 14 and Ubuntu 24.04 build and test with Qt 6.8.3, plus Linux core sanitizers. Native mouse/synthetic-pen UI smoke runs on macOS. Windows process-termination recovery, other-platform GUI interaction, physical devices and installation remain unqualified.
 - Standalone bundle deployment with split Homebrew Qt failed plugin/framework resolution. The build-tree application runs. No signed/notarized installer or clean-machine compatibility is claimed.
 
 ## Engineering boundaries

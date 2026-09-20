@@ -1,6 +1,6 @@
 # Build and verify the experimental editor
 
-The application is C++20 with Qt 6.8 or newer. Documentation tools use Python 3.11+. The verified local environment is macOS 15.5 arm64, AppleClang 17 and Qt 6.11.2. Windows/Linux builds are CI targets, not yet a published support promise.
+The application is C++20 with Qt 6.8 or newer. Documentation tools use Python 3.11+. The verified local environment is macOS 15.5 arm64, AppleClang 17 and Qt 6.11.2. Qt 6.8.3 builds and automated tests also pass on Windows Server 2022, macOS 14 and Ubuntu 24.04 in [CI](https://github.com/mijim/OPEN-TOON/actions/runs/35528441504). This is build/test coverage, not full device or installer qualification.
 
 ## Locked core dependencies
 
