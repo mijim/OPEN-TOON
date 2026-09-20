@@ -24,7 +24,7 @@ Play at the scene frame rate with range, loop and performance status.
 
 **Initial acceptance:** The counter distinguishes complete playback from dropped frames.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -54,7 +54,7 @@ Export range, name, numeric padding, resolution and alpha.
 
 **Initial acceptance:** An inclusive range from 1 to 24 creates exactly 24 files.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 

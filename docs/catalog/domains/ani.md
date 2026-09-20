@@ -24,7 +24,7 @@ Animate translation, rotation, scale, skew and opacity with consistent units.
 
 **Initial acceptance:** Negative scale does not produce undefined interpolation values.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -54,7 +54,7 @@ Support continuous segments and controlled pose changes.
 
 **Initial acceptance:** A stepped segment holds its pose until the next keyframe.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -64,7 +64,7 @@ Create keys per property or property set without accidental keys.
 
 **Initial acceptance:** With autokey disabled, local edits are distinguished from animated edits.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -84,7 +84,7 @@ Control acceleration and deceleration through curves and presets.
 
 **Initial acceptance:** Easing does not move keyframe endpoints.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -144,6 +144,6 @@ Edit values and navigate keys directly from the inspector.
 
 **Initial acceptance:** The inspector indicates whether a value is keyed or interpolated.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Evidence:** `proposal`.

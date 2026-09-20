@@ -1,6 +1,6 @@
 # Documentation map
 
-**Updated: 2026-09-20.** The repository contains a functional specification and an execution roadmap. It does not contain an implemented animation application.
+**Updated: 2026-09-20.** The repository contains specifications, an execution roadmap and an experimental native editor. [Implementation status](implementation/STATUS.md) records the available subsets and open P00–P11 gates.
 
 ## Current decisions
 
@@ -14,14 +14,16 @@
 | Storage | Versioned open format, stable IDs, immutable resources and transactional save | Proposed design; crash-tested in P00/P01 |
 | Open-source reuse | Prefer proven libraries through tested adapters | User requirement; 28 library/tool entries evaluated in the roadmap |
 | Initial license | GPL-3.0-or-later for original contributions | Adopted |
-| Implementation | All 282 features remain `not_started` | Current fact |
+| Implementation | Experimental editor; partial catalog coverage | No complete phase or production release |
 | Development roadmap | 23 phases, 69 work packages, complete feature and node ownership mapping | Prepared; estimates subject to evidence |
 
 ## Reading routes
 
+**Use or build the application:** [build](implementation/BUILD.md) → [user guide](implementation/USER-GUIDE.md) → [status](implementation/STATUS.md) → [machine-readable evidence](implementation/status.json).
+
 **Planning:** [roadmap](planning/README.md) → [phase table](planning/PHASES.md) → [first backlog](planning/FIRST-STEPS.md) → [execution rules](planning/EXECUTION.md) → [estimates](planning/ESTIMATES.md).
 
-**Dependencies:** [open-source register](planning/LIBRARIES.md), including upstream sources, intended use, benchmark gates, licensing investigations and fallback choices. No runtime library has been installed by preparing these documents.
+**Dependencies:** [open-source register](planning/LIBRARIES.md), including upstream sources, intended use, benchmark gates, licensing investigations and fallback choices. Actual experimental dependency adoption is recorded in [implementation dependencies](implementation/DEPENDENCIES.md).
 
 **Product research:** [scope](research/01-scope-and-method.md) → [catalog](catalog/README.md) → [workflows](research/02-workflows.md) → [risks](research/03-risks-and-decisions.md). The research and canonical catalogs are available in English.
 

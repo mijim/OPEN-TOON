@@ -14,6 +14,10 @@ Proposed ADRs require evidence before becoming implementation commitments. Accep
 | ADR-009 | English product, code and documentation | Accepted by user | User changes language requirements |
 | ADR-010 | Reuse proven open-source components | Accepted direction | A candidate fails the documented workload or adoption checks |
 
+| ADR-011 | Bounded experimental CPU renderer and SQLite snapshot storage | Accepted for prototype | Production performance/storage gates |
+
+See [ADR-011](011-experimental-desktop-slice.md) for current implementation evidence and deviations.
+
 Existing IDs are retained; removed entries are not renumbered.
 
 ## ADR-001 — Platform
@@ -38,4 +42,4 @@ Accepted by user on 2026-09-20. All first-party UI, built-in assets, help, code 
 
 ## ADR-010 — Reuse proven open-source components
 
-Prefer maintained libraries for solved infrastructure through explicit adapters. Specific adoption remains conditional on workload benchmarks, pinned versions and redistribution checks. The [register](../../planning/LIBRARIES.md) separates intended choices from candidates and defines fallbacks. No runtime dependency is installed by this planning change.
+Prefer maintained libraries for solved infrastructure through explicit adapters. Specific adoption remains conditional on workload benchmarks, pinned versions and redistribution checks. The [register](../../planning/LIBRARIES.md) separates intended choices from candidates and defines fallbacks. The original planning change installed no dependencies; current experimental adoption is recorded in `docs/implementation/DEPENDENCIES.md`.

@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-09-20",
+  "release_stage": "experimental",
+  "target_phase": "P11",
+  "target_complete": false,
+  "completed_phases": [],
+  "feature_completion_policy": "Partial catalog entries identify working subsets, not fulfilled acceptance criteria. No feature is claimed verified in the full catalog.",
+  "phases": [
+    {
+      "id": "P00",
+      "status": "in_progress",
+      "available": "Qt-free core, CPU reference renderer, locked infrastructure dependencies, bounded OpenToonz source audit and save failure tests.",
+      "remaining": "Renderer comparison, successful reuse extraction/build audit, fill/deformation spikes, device matrix and production budgets."
+    },
+    {
+      "id": "P01",
+      "status": "in_progress",
+      "available": "Native English QML shell, CMake modules, commands, immutable snapshots, undo/redo and validation.",
+      "remaining": "Docking/workspace persistence, configurable shortcuts, full accessibility, scalable resource/cache protocols and cross-platform qualification."
+    },
+    {
+      "id": "P02",
+      "status": "in_progress",
+      "available": "Mouse pencil, exposures, onion skin, playback, save/reopen and 48-frame 1080p PNG export.",
+      "remaining": "Full phase feature acceptance and animator-led workflow checks; large-project behavior and all fixture gates."
+    },
+    {
+      "id": "P03",
+      "status": "in_progress",
+      "available": "Synchronized virtualized timeline/Xsheet, create/hold/clear exposures, insert/remove frames and navigate drawings.",
+      "remaining": "Range selection/clipboard, drag/retime operations, annotations/thumbnails and advanced paperless workflows."
+    },
+    {
+      "id": "P04",
+      "status": "in_progress",
+      "available": "Sampled vector strokes, approximate eraser, primitives, single-stroke selection, point editing/smoothing, stable palette IDs and shape recoloring.",
+      "remaining": "Region topology/fill, analytic erasing, Bezier/contour/width editors, presets/textures/guides, robust selection and vector optimization."
+    },
+    {
+      "id": "P05",
+      "status": "planned",
+      "available": "Single still-image import is available as a prerequisite only.",
+      "remaining": "Raster tile engine, MyPaint integration, textured brushes, raster selection/transforms, image resource storage and benchmarks."
+    },
+    {
+      "id": "P06",
+      "status": "in_progress",
+      "available": "Layer transform keys with linear/held/smooth interpolation and inherited transforms/opacity.",
+      "remaining": "Function editor, velocity/motion paths, full key editing, cameras and multiplane evaluation."
+    },
+    {
+      "id": "P07",
+      "status": "planned",
+      "available": "Exact rational frame-to-sample arithmetic has a domain test; no audio playback.",
+      "remaining": "Audio decode/timeline/waveform/sync, media policies, FFmpeg adapter and video output."
+    },
+    {
+      "id": "P08",
+      "status": "in_progress",
+      "available": "Parented layers, pivots, independent duplicates and linked drawing clones.",
+      "remaining": "Production cut-out tools, asset/template library, substitution workflow, pose preservation, lip sync and animator validation."
+    },
+    {
+      "id": "P09",
+      "status": "planned",
+      "available": "No deformation subsystem implemented.",
+      "remaining": "Curve/bone/mesh deformation, constraints, binding/weights, deterministic solvers and reference fixtures."
+    },
+    {
+      "id": "P10",
+      "status": "planned",
+      "available": "CPU layer painting is available; it is not a node compositor.",
+      "remaining": "Typed graph evaluation, node UI, masks/effects, ROI/cache scheduling, OCIO and alpha/color reference scenes."
+    },
+    {
+      "id": "P11",
+      "status": "planned",
+      "available": "Saved revisions, recovery UX, English guide, regression tests and source CI are initial prerequisites.",
+      "remaining": "All required journeys, compaction/migration, hardening, supported device/OS matrix, accessibility, notices/SBOM and signed/installable releases."
+    }
+  ],
+  "verification": {
+    "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
+    "core_and_render_tests": {
+      "status": "passed",
+      "count": 19,
+      "command": "ctest --test-dir build/locked --output-on-failure"
+    },
+    "native_input_workflow": {
+      "status": "passed",
+      "command": "open-toon --smoke-test",
+      "covers": [
+        "mouse stroke",
+        "synthetic tablet pressure",
+        "gesture cancellation",
+        "palette selection after undo",
+        "undo/redo",
+        "save/reopen",
+        "usable canvas layout",
+        "window screenshot"
+      ]
+    },
+    "png_fixture": {
+      "status": "passed",
+      "frames": 48,
+      "width": 1920,
+      "height": 1080,
+      "semantic_round_trip": true,
+      "elapsed_ms": 3077,
+      "timing_scope": "Initial local CPU export; not a performance guarantee or release benchmark"
+    },
+    "physical_tablet": {
+      "status": "pending",
+      "reason": "Owner currently has no tablet; mouse input is required and available."
+    },
+    "other_operating_systems": {
+      "status": "pending",
+      "reason": "CI definitions added; inspect actual run results before claiming support."
+    },
+    "standalone_package": {
+      "status": "failed",
+      "reason": "Split Homebrew Qt deployment failed plugin/framework resolution. Build-tree application works; no installer was published."
+    },
+    "sanitizers": {
+      "status": "passed",
+      "count": 15,
+      "command": "ctest --preset sanitize",
+      "scope": "Qt-free core, AddressSanitizer and UndefinedBehaviorSanitizer, local system dependencies"
+    }
+  },
+  "ownership": {
+    "document": "modules/document",
+    "commands": "modules/application",
+    "storage": "adapters/storage",
+    "render": "adapters/render",
+    "input_and_presentation": "adapters/qt",
+    "ui": "ui",
+    "desktop_and_cli": "apps/desktop",
+    "behavioral_tests": "tests"
+  }
+}

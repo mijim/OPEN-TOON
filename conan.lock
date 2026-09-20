@@ -1,0 +1,13 @@
+{
+    "version": "0.5",
+    "requires": [
+        "sqlite3/3.53.4#89fcf5cda598966acb7f3e185b19c58d%1785239491.603",
+        "nlohmann_json/3.12.0#2d634ab0ec8d9f56353e5ccef6d6612c%1744735883.94",
+        "catch2/3.15.0#dad1ca2786e3f2c80129053a4ddc094f%1779369722.174"
+    ],
+    "build_requires": [
+        "cmake/4.4.3#8b46ce9dbf1937af1c05f19579c1f105%1789658722.203"
+    ],
+    "python_requires": [],
+    "config_requires": []
+}

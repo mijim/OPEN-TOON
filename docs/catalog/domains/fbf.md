@@ -24,7 +24,7 @@ Create and navigate drawings with continuous tool and exposure state.
 
 **Initial acceptance:** Drawing on a new frame does not modify the previous drawing without explicit intent.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -44,7 +44,7 @@ Show neighboring drawings with configurable range, opacity and visual distinctio
 
 **Initial acceptance:** Onion skin is absent from the final render.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -94,7 +94,7 @@ Alternate poses and play a short segment without losing the selection.
 
 **Initial acceptance:** Leaving short playback restores the working frame.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 

@@ -1,6 +1,6 @@
 # Phase index
 
-> Generated from `roadmap.json`. All work is planned, not implemented.
+> Generated from `roadmap.json`. Phase status is separate from feature completion; see [implementation evidence](../implementation/STATUS.md).
 
 | Phase | Outcome / milestone | Depends on | Features | Engineer-weeks |
 |---|---|---|---:|---:|

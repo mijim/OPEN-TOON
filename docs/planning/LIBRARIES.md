@@ -1,14 +1,14 @@
 # Open-source dependency register
 
-> Generated from `libraries.json`. None of these dependencies is installed by this documentation change.
+> Generated from `libraries.json`. Actual experimental adoption is recorded below; see [build evidence](../implementation/DEPENDENCIES.md).
 
-The user approved C++20 + Qt 6/QML and the reuse of proven, efficient open-source libraries. `selected_for_plan` means intended adoption subject to pinned-version checks; `candidate_requires_spike` means no adoption decision yet. Upstream maturity does not prove performance in OPEN-TOON.
+The user approved C++20 + Qt 6/QML and the reuse of proven, efficient open-source libraries. `experimental_adopted` means used in the bounded prototype, with production gates still open. `selected_for_plan` means intended adoption subject to pinned-version checks; `candidate_requires_spike` means no adoption decision yet. Upstream maturity does not prove performance in OPEN-TOON.
 
 Record exact source revision, package checksum, build flags, enabled modules, license files, transitive dependencies and benchmark evidence when adopting a library. Each adapter must have one accountable owner. Model/brush/font/fixture licenses are separate from library licenses.
 
 ## LIB-QT — Qt 6 / Qt Quick
 
-**Phase:** P01. **Decision:** `selected_for_plan`.
+**Phase:** P01. **Decision:** `experimental_adopted`.
 
 Desktop UI, tablet events, accessibility and platform integration.
 
@@ -24,7 +24,7 @@ Desktop UI, tablet events, accessibility and platform integration.
 
 ## LIB-SQLITE — SQLite
 
-**Phase:** P01. **Decision:** `selected_for_plan`.
+**Phase:** P01. **Decision:** `experimental_adopted`.
 
 Metadata, revision transactions and local indices.
 
@@ -344,7 +344,7 @@ Optional local inference runtime for approved assistive tools.
 
 ## LIB-JSON — nlohmann/json
 
-**Phase:** P01. **Decision:** `selected_for_plan`.
+**Phase:** P01. **Decision:** `experimental_adopted`.
 
 Readable manifests, configuration and interchange metadata.
 
@@ -392,7 +392,7 @@ Portable project/library package transport.
 
 ## LIB-CATCH — Catch2
 
-**Phase:** P01. **Decision:** `selected_for_plan`.
+**Phase:** P01. **Decision:** `experimental_adopted`.
 
 Domain and adapter regression tests.
 
@@ -440,7 +440,7 @@ Developer CPU/GPU/lock/allocation profiling.
 
 ## LIB-BUILD — CMake / Ninja / Conan 2
 
-**Phase:** P01. **Decision:** `selected_for_plan`.
+**Phase:** P01. **Decision:** `experimental_adopted`.
 
 Reproducible native builds, dependency graph and lockfiles.
 

@@ -24,7 +24,7 @@ Create local scenes with an explicit name, location and configuration.
 
 **Initial acceptance:** Reopening a new scene preserves its dimensions and duration.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -34,7 +34,7 @@ Configure width, height, pixel aspect ratio and custom presets.
 
 **Initial acceptance:** A non-square-pixel preset produces the expected framing.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -44,7 +44,7 @@ Define frame rate and length; specify whether changing frame rate preserves fram
 
 **Initial acceptance:** Changing from 24 to 25 fps explains the timing effect and can be undone.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -54,7 +54,7 @@ Persist scene data and resources coherently; saving a copy preserves the origina
 
 **Initial acceptance:** The copy opens from another location without depending on the original directory.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -64,7 +64,7 @@ Schedule recovery points without blocking drawing or silently replacing a manual
 
 **Initial acceptance:** After a forced shutdown, the latest valid recovery point can be restored.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -74,7 +74,7 @@ Retain identifiable revisions and open a selected version.
 
 **Initial acceptance:** An earlier revision retains its drawings when a newer revision changes them.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -94,7 +94,7 @@ Detect missing files, invalid references and corrupt components with actionable 
 
 **Initial acceptance:** A missing texture appears in a report without crashing the editor.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 

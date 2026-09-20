@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "as_of": "2026-09-20",
-  "status": "proposed_execution_plan",
+  "status": "active_execution_plan",
   "product_language": "en",
-  "implementation_status": "not_started",
+  "implementation_status": "experimental_partial",
   "estimate_unit": "focused engineer-weeks; 5 working days per engineer-week",
   "phases": [
     {
       "id": "P00",
       "title": "Technical feasibility and reuse",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [],
       "effort_engineer_weeks": [
         8,
@@ -65,7 +65,7 @@
     {
       "id": "P01",
       "title": "Application foundation and English design system",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [
         "P00"
       ],
@@ -146,7 +146,7 @@
     {
       "id": "P02",
       "title": "First complete frame-by-frame film",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [
         "P01"
       ],
@@ -227,7 +227,7 @@
     {
       "id": "P03",
       "title": "Timeline, Xsheet and paperless workflow",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [
         "P02"
       ],
@@ -311,7 +311,7 @@
     {
       "id": "P04",
       "title": "Professional vector drawing and palette workflow",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [
         "P03"
       ],
@@ -478,7 +478,7 @@
     {
       "id": "P06",
       "title": "Keyframe animation and multiplane cameras",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [
         "P04"
       ],
@@ -628,7 +628,7 @@
     {
       "id": "P08",
       "title": "Cut-out rigs, reusable assets and lip sync",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [
         "P06",
         "P07"

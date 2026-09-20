@@ -24,7 +24,7 @@ Provide horizontal and vertical views of the same time model.
 
 **Initial acceptance:** An Xsheet edit appears immediately in the timeline.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -34,7 +34,7 @@ Create unique drawings and reference them from one or more frame intervals.
 
 **Initial acceptance:** Two cells referencing the same drawing reflect a shared edit.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -44,7 +44,7 @@ Lengthen or shorten holds without duplicating drawing data.
 
 **Initial acceptance:** Extending a hold by ten frames does not create ten drawings.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -54,7 +54,7 @@ Change duration by shifting ranges according to an explicit rule.
 
 **Initial acceptance:** Inserting two frames shifts markers and content according to the selected option.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -64,7 +64,7 @@ Remove a time reference while keeping the drawing available.
 
 **Initial acceptance:** The drawing can be exposed again from the library.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -94,7 +94,7 @@ Apply regular exposure steps while preserving drawing order.
 
 **Initial acceptance:** Four drawings on twos occupy eight frames.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -114,7 +114,7 @@ Jump to a distinct drawing, keyframe or range boundary.
 
 **Initial acceptance:** Within a hold, next drawing jumps to the next actual change.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 

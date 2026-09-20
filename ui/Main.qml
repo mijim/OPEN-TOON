@@ -1,0 +1,1373 @@
+import QtQuick
+import QtQuick.Controls.Basic
+import QtQuick.Layouts
+import QtQuick.Dialogs
+import OpenToon.Native
+import "components" as C
+
+ApplicationWindow {
+    id: root
+    width: 1440
+    height: 920
+    minimumWidth: 1080
+    minimumHeight: 720
+    visible: true
+    title: editor.sceneName + (editor.modified ? " •" : "") + " — OPEN-TOON"
+    color: "#0a0a0a"
+    font.family: "Helvetica Neue"
+    font.pixelSize: 12
+    palette.window: "#111111"
+    palette.windowText: "#ededed"
+    palette.base: "#191919"
+    palette.text: "#ededed"
+    palette.button: "#202020"
+    palette.buttonText: "#ededed"
+    palette.highlight: "#454545"
+    palette.highlightedText: "#ffffff"
+    palette.mid: "#393939"
+    property var backend: editor
+    property string pendingAction: ""
+    property bool allowClose: false
+    property bool textEditing: activeFocusItem instanceof TextInput || activeFocusItem instanceof TextEdit
+    property bool xsheet: false
+    property int timelineCell: 22
+    property int timelineRow: 34
+    property int colorEditId: 0
+    function requestAction(action) {
+        if (editor.modified) {
+            pendingAction = action;
+            discardDialog.open();
+        } else
+            performAction(action);
+    }
+    function performAction(action) {
+        if (action === "new")
+            editor.newScene();
+        else if (action === "demo")
+            editor.loadDemo();
+        else if (action === "open")
+            openDialog.open();
+        else if (action === "quit") {
+            allowClose = true;
+            root.close();
+        }
+    }
+    function save() {
+        if (editor.projectPath.length)
+            editor.saveProject();
+        else
+            saveDialog.open();
+    }
+    onClosing: function (close) {
+        if (editor.exporting) {
+            close.accepted = false;
+            editor.report("Cancel or finish the export before closing.");
+            return;
+        }
+        if (editor.modified && !allowClose) {
+            close.accepted = false;
+            requestAction("quit");
+        }
+    }
+
+    Shortcut {
+        sequences: [StandardKey.New]
+        onActivated: root.requestAction("new")
+    }
+    Shortcut {
+        sequences: [StandardKey.Open]
+        onActivated: root.requestAction("open")
+    }
+    Shortcut {
+        sequences: [StandardKey.Save]
+        onActivated: root.save()
+    }
+    Shortcut {
+        sequences: [StandardKey.SaveAs]
+        onActivated: saveDialog.open()
+    }
+    Shortcut {
+        sequences: [StandardKey.Undo]
+        enabled: !root.textEditing
+        onActivated: editor.undo()
+    }
+    Shortcut {
+        sequences: [StandardKey.Redo]
+        enabled: !root.textEditing
+        onActivated: editor.redo()
+    }
+    Shortcut {
+        sequence: "B"
+        enabled: !root.textEditing
+        onActivated: editor.tool = "Pencil"
+    }
+    Shortcut {
+        sequence: "E"
+        enabled: !root.textEditing
+        onActivated: editor.tool = "Eraser"
+    }
+    Shortcut {
+        sequence: "V"
+        enabled: !root.textEditing
+        onActivated: editor.tool = "Select"
+    }
+    Shortcut {
+        sequence: "Space"
+        enabled: !root.textEditing
+        onActivated: editor.togglePlayback()
+    }
+    Shortcut {
+        sequence: "Right"
+        enabled: !root.textEditing
+        onActivated: editor.frame++
+    }
+    Shortcut {
+        sequence: "Left"
+        enabled: !root.textEditing
+        onActivated: editor.frame--
+    }
+    Shortcut {
+        sequence: "F"
+        enabled: !root.textEditing
+        onActivated: canvas.fit()
+    }
+    Shortcut {
+        sequence: "Delete"
+        enabled: !root.textEditing
+        onActivated: canvas.deleteSelection()
+    }
+    Shortcut {
+        sequence: "O"
+        enabled: !root.textEditing
+        onActivated: editor.onionSkin = !editor.onionSkin
+    }
+
+    menuBar: MenuBar {
+        background: Rectangle {
+            color: "#0e0e0e"
+        }
+        Menu {
+            title: "Scene"
+            Action {
+                text: "New scene"
+                onTriggered: root.requestAction("new")
+            }
+            Action {
+                text: "Open project…"
+                onTriggered: root.requestAction("open")
+            }
+            Action {
+                text: "Save"
+                onTriggered: root.save()
+            }
+            Action {
+                text: "Save As…"
+                onTriggered: saveDialog.open()
+            }
+            MenuSeparator {}
+            Action {
+                text: "Import image…"
+                onTriggered: imageDialog.open()
+            }
+            Action {
+                text: "Export PNG sequence…"
+                enabled: !editor.exporting
+                onTriggered: exportDialog.open()
+            }
+            Action {
+                text: "Scene settings…"
+                onTriggered: settingsDialog.open()
+            }
+            MenuSeparator {}
+            Action {
+                text: "Open bouncing ball example"
+                onTriggered: root.requestAction("demo")
+            }
+            Action {
+                text: "Save recovery snapshot"
+                onTriggered: editor.autosave()
+            }
+            Action {
+                text: "Quit"
+                onTriggered: root.requestAction("quit")
+            }
+        }
+        Menu {
+            title: "Edit"
+            Action {
+                text: "Undo"
+                enabled: editor.canUndo
+                onTriggered: editor.undo()
+            }
+            Action {
+                text: "Redo"
+                enabled: editor.canRedo
+                onTriggered: editor.redo()
+            }
+            MenuSeparator {}
+            Action {
+                text: "New drawing on twos"
+                onTriggered: editor.newDrawing(false)
+            }
+            Action {
+                text: "Duplicate drawing"
+                onTriggered: editor.newDrawing(true)
+            }
+            Action {
+                text: "Hold for two frames"
+                onTriggered: editor.holdDrawing(2)
+            }
+            Action {
+                text: "Hold for four frames"
+                onTriggered: editor.holdDrawing(4)
+            }
+            Action {
+                text: "Clear current exposure"
+                onTriggered: editor.clearExposure()
+            }
+            Action {
+                text: "Insert two frames"
+                onTriggered: editor.insertFrames(2)
+            }
+            Action {
+                text: "Remove two frames"
+                onTriggered: editor.removeFrames(2)
+            }
+        }
+        Menu {
+            title: "View"
+            Action {
+                text: "Fit canvas"
+                onTriggered: canvas.fit()
+            }
+            Action {
+                text: "Mirror canvas"
+                checkable: true
+                checked: canvas.mirrored
+                onTriggered: canvas.mirrored = !canvas.mirrored
+            }
+            Action {
+                text: "Rotate view 15°"
+                onTriggered: canvas.rotationAngle += 15
+            }
+            Action {
+                text: "Onion skin"
+                checkable: true
+                checked: editor.onionSkin
+                onTriggered: editor.onionSkin = !editor.onionSkin
+            }
+            Action {
+                text: "Revision history"
+                onTriggered: historyDialog.open()
+            }
+        }
+        Menu {
+            title: "Help"
+            Action {
+                text: "Keyboard and mouse controls"
+                onTriggered: helpDialog.open()
+            }
+            Action {
+                text: "Implementation status"
+                onTriggered: Qt.openUrlExternally("https://github.com/mijim/OPEN-TOON/blob/main/docs/implementation/STATUS.md")
+            }
+        }
+    }
+
+    ColumnLayout {
+        anchors.fill: parent
+        spacing: 0
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 58
+            color: "#0a0a0a"
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: 20
+                anchors.rightMargin: 18
+                spacing: 14
+                Text {
+                    text: "◩"
+                    color: "white"
+                    font.pixelSize: 25
+                }
+                Text {
+                    text: "OPEN-TOON"
+                    color: "#fafafa"
+                    font.pixelSize: 14
+                    font.letterSpacing: 1.3
+                    font.bold: true
+                }
+                Rectangle {
+                    width: 1
+                    height: 20
+                    color: "#303030"
+                }
+                Text {
+                    text: editor.sceneName
+                    color: "#b5b5b5"
+                    elide: Text.ElideRight
+                    Layout.preferredWidth: 220
+                    Layout.maximumWidth: 350
+                }
+                Rectangle {
+                    Layout.preferredWidth: stateLabel.implicitWidth + 16
+                    height: 22
+                    radius: 4
+                    color: "#191919"
+                    border.color: "#333333"
+                    Text {
+                        id: stateLabel
+                        anchors.centerIn: parent
+                        text: editor.modified ? "Unsaved changes" : "Saved"
+                        color: "#999999"
+                        font.pixelSize: 10
+                    }
+                }
+                Item {
+                    Layout.fillWidth: true
+                }
+                Text {
+                    text: "EXPERIMENTAL 0.1"
+                    color: "#737373"
+                    font.pixelSize: 10
+                    font.letterSpacing: 0.8
+                }
+                C.ToolButton {
+                    text: "Save"
+                    hint: "Save project · Cmd/Ctrl+S"
+                    onClicked: root.save()
+                }
+                C.ToolButton {
+                    text: editor.exporting ? "Exporting…" : "Export ↗"
+                    active: true
+                    enabled: !editor.exporting
+                    onClicked: exportDialog.open()
+                }
+            }
+        }
+        Rectangle {
+            Layout.fillWidth: true
+            height: 1
+            color: "#282828"
+        }
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 42
+            color: "#111111"
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: 16
+                anchors.rightMargin: 16
+                spacing: 10
+                Text {
+                    text: editor.tool
+                    color: "#e5e5e5"
+                    Layout.preferredWidth: 76
+                }
+                Text {
+                    text: "Size"
+                    color: "#858585"
+                    font.pixelSize: 11
+                }
+                Slider {
+                    from: 0.5
+                    to: 100
+                    value: editor.brushSize
+                    Layout.preferredWidth: 120
+                    onMoved: editor.brushSize = value
+                    Accessible.name: "Brush size"
+                }
+                Text {
+                    text: editor.brushSize.toFixed(1) + " px"
+                    color: "#aaaaaa"
+                    Layout.preferredWidth: 58
+                    font.family: "Menlo"
+                    font.pixelSize: 10
+                }
+                C.ToolButton {
+                    text: "Fill shape"
+                    active: editor.filled
+                    onClicked: editor.filled = !editor.filled
+                    hint: "Fill new rectangles and ellipses"
+                }
+                ComboBox {
+                    model: ["Underlay Art", "Color Art", "Line Art", "Overlay Art"]
+                    currentIndex: editor.artLayer
+                    implicitHeight: 28
+                    implicitWidth: 120
+                    onActivated: editor.artLayer = currentIndex
+                    Accessible.name: "Active art layer"
+                }
+                Item {
+                    Layout.fillWidth: true
+                }
+                C.ToolButton {
+                    text: "Onion"
+                    active: editor.onionSkin
+                    hint: "Previous and next distinct drawing · O"
+                    onClicked: editor.onionSkin = !editor.onionSkin
+                }
+                C.ToolButton {
+                    text: "−"
+                    onClicked: canvas.zoom /= 1.2
+                    hint: "Zoom out"
+                }
+                Text {
+                    text: Math.round(canvas.zoom * 100) + "%"
+                    color: "#999999"
+                    font.pixelSize: 11
+                }
+                C.ToolButton {
+                    text: "+"
+                    onClicked: canvas.zoom *= 1.2
+                    hint: "Zoom in"
+                }
+                C.ToolButton {
+                    text: "Fit"
+                    onClicked: canvas.fit()
+                    hint: "Fit canvas · F"
+                }
+            }
+        }
+        Rectangle {
+            Layout.fillWidth: true
+            height: 1
+            color: "#282828"
+        }
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.minimumHeight: 280
+            Layout.preferredHeight: 580
+            spacing: 0
+            Rectangle {
+                Layout.preferredWidth: 48
+                Layout.fillHeight: true
+                color: "#111111"
+                Column {
+                    anchors.top: parent.top
+                    anchors.topMargin: 12
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 8
+                    Repeater {
+                        model: [
+                            {
+                                name: "Select",
+                                icon: "↖",
+                                key: "V"
+                            },
+                            {
+                                name: "Pencil",
+                                icon: "╱",
+                                key: "B"
+                            },
+                            {
+                                name: "Eraser",
+                                icon: "▱",
+                                key: "E"
+                            },
+                            {
+                                name: "Rectangle",
+                                icon: "□",
+                                key: ""
+                            },
+                            {
+                                name: "Ellipse",
+                                icon: "○",
+                                key: ""
+                            },
+                            {
+                                name: "Recolor",
+                                icon: "◒",
+                                key: ""
+                            },
+                            {
+                                name: "Edit points",
+                                icon: "⌘",
+                                key: ""
+                            }
+                        ]
+                        C.ToolButton {
+                            required property var modelData
+                            width: 34
+                            height: 34
+                            text: modelData.icon
+                            font.pixelSize: 22
+                            active: editor.tool === modelData.name
+                            hint: modelData.name + (modelData.key ? " · " + modelData.key : "")
+                            onClicked: editor.tool = modelData.name
+                        }
+                    }
+                }
+            }
+            Rectangle {
+                width: 1
+                Layout.fillHeight: true
+                color: "#282828"
+            }
+            Item {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                DrawingCanvas {
+                    id: canvas
+                    objectName: "drawingCanvas"
+                    anchors.fill: parent
+                    editor: root.backend
+                }
+                Text {
+                    anchors.left: parent.left
+                    anchors.top: parent.top
+                    anchors.margins: 16
+                    text: "CAMERA"
+                    color: "#777777"
+                    font.pixelSize: 10
+                    font.letterSpacing: 1.4
+                }
+                Text {
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    anchors.margins: 14
+                    text: editor.sceneWidth + " × " + editor.sceneHeight + "   ·   " + editor.fps.toFixed(2) + " fps"
+                    color: "#777777"
+                    font.family: "Menlo"
+                    font.pixelSize: 10
+                }
+            }
+            Rectangle {
+                width: 1
+                Layout.fillHeight: true
+                color: "#282828"
+            }
+            Rectangle {
+                Layout.preferredWidth: 250
+                Layout.fillHeight: true
+                color: "#101010"
+                ScrollView {
+                    anchors.fill: parent
+                    clip: true
+                    contentWidth: availableWidth
+                    ColumnLayout {
+                        width: 248
+                        spacing: 16
+                        Text {
+                            Layout.leftMargin: 16
+                            Layout.topMargin: 18
+                            text: "PROPERTIES"
+                            color: "#888888"
+                            font.pixelSize: 10
+                            font.letterSpacing: 1.4
+                        }
+                        Label {
+                            Layout.leftMargin: 16
+                            text: "Transform"
+                            font.pixelSize: 13
+                            font.bold: true
+                        }
+                        GridLayout {
+                            Layout.leftMargin: 16
+                            Layout.rightMargin: 16
+                            Layout.fillWidth: true
+                            columns: 2
+                            columnSpacing: 8
+                            rowSpacing: 8
+                            Repeater {
+                                model: [
+                                    {
+                                        key: "x",
+                                        name: "Position X"
+                                    },
+                                    {
+                                        key: "y",
+                                        name: "Position Y"
+                                    },
+                                    {
+                                        key: "rotation",
+                                        name: "Rotation °"
+                                    },
+                                    {
+                                        key: "opacity",
+                                        name: "Opacity 0–1"
+                                    },
+                                    {
+                                        key: "scaleX",
+                                        name: "Scale X"
+                                    },
+                                    {
+                                        key: "scaleY",
+                                        name: "Scale Y"
+                                    },
+                                    {
+                                        key: "pivotX",
+                                        name: "Pivot X"
+                                    },
+                                    {
+                                        key: "pivotY",
+                                        name: "Pivot Y"
+                                    }
+                                ]
+                                ColumnLayout {
+                                    required property var modelData
+                                    Layout.fillWidth: true
+                                    spacing: 4
+                                    Text {
+                                        text: modelData.name
+                                        color: "#888888"
+                                        font.pixelSize: 10
+                                    }
+                                    TextField {
+                                        Layout.fillWidth: true
+                                        Layout.preferredWidth: 96
+                                        implicitHeight: 28
+                                        font.family: "Menlo"
+                                        font.pixelSize: 11
+                                        text: {
+                                            const f = editor.frame;
+                                            return Number(editor.transform[modelData.key] === undefined ? 0 : editor.transform[modelData.key]).toFixed(2);
+                                        }
+                                        selectByMouse: true
+                                        validator: DoubleValidator {
+                                            locale: "C"
+                                        }
+                                        onEditingFinished: if (acceptableInput)
+                                            editor.setTransform(modelData.key, Number(text))
+                                        Accessible.name: modelData.name
+                                    }
+                                }
+                            }
+                        }
+                        RowLayout {
+                            Layout.leftMargin: 12
+                            C.ToolButton {
+                                text: "◇ Add key"
+                                onClicked: editor.addKey(interpolation.currentIndex)
+                            }
+                            ComboBox {
+                                id: interpolation
+                                model: ["Linear", "Hold", "Smooth"]
+                                implicitWidth: 98
+                                implicitHeight: 28
+                                Accessible.name: "Key interpolation"
+                            }
+                        }
+                        ComboBox {
+                            Layout.leftMargin: 16
+                            Layout.rightMargin: 16
+                            Layout.fillWidth: true
+                            implicitHeight: 30
+                            model: [
+                                {
+                                    id: 0,
+                                    name: "No parent"
+                                }
+                            ].concat(editor.layers.filter(function (l) {
+                                return l.id !== editor.selectedLayer;
+                            }))
+                            currentIndex: {
+                                const selected = editor.layers.find(function (l) {
+                                    return l.id === editor.selectedLayer;
+                                });
+                                return model.findIndex(function (l) {
+                                    return l.id === (selected ? selected.parent : 0);
+                                });
+                            }
+                            textRole: "name"
+                            valueRole: "id"
+                            onActivated: editor.setParent(currentValue)
+                            Accessible.name: "Parent layer"
+                        }
+                        Rectangle {
+                            Layout.fillWidth: true
+                            height: 1
+                            color: "#282828"
+                        }
+                        RowLayout {
+                            Layout.leftMargin: 16
+                            Layout.rightMargin: 12
+                            Layout.fillWidth: true
+                            Label {
+                                text: "Palette"
+                                font.pixelSize: 13
+                                font.bold: true
+                            }
+                            Item {
+                                Layout.fillWidth: true
+                            }
+                            C.ToolButton {
+                                text: "+"
+                                hint: "Add color"
+                                onClicked: {
+                                    root.colorEditId = 0;
+                                    colorDialog.open();
+                                }
+                            }
+                        }
+                        Flow {
+                            Layout.leftMargin: 16
+                            Layout.rightMargin: 16
+                            Layout.fillWidth: true
+                            spacing: 8
+                            Repeater {
+                                model: editor.palette
+                                Rectangle {
+                                    required property var modelData
+                                    width: 34
+                                    height: 34
+                                    radius: 5
+                                    color: modelData.color
+                                    border.width: editor.selectedSwatch === modelData.id ? 3 : 1
+                                    border.color: editor.selectedSwatch === modelData.id ? "#b0b0b0" : "#444444"
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: editor.selectedSwatch = modelData.id
+                                        onDoubleClicked: {
+                                            root.colorEditId = modelData.id;
+                                            colorDialog.selectedColor = modelData.color;
+                                            colorDialog.open();
+                                        }
+                                    }
+                                    Accessible.name: modelData.name
+                                }
+                            }
+                        }
+                        Text {
+                            Layout.leftMargin: 16
+                            Layout.rightMargin: 16
+                            Layout.fillWidth: true
+                            text: "Double-click a swatch to recolor every linked stroke."
+                            wrapMode: Text.WordWrap
+                            color: "#777777"
+                            font.pixelSize: 11
+                        }
+                        Rectangle {
+                            Layout.fillWidth: true
+                            height: 1
+                            color: "#282828"
+                        }
+                        ColumnLayout {
+                            Layout.leftMargin: 12
+                            Layout.rightMargin: 12
+                            Layout.fillWidth: true
+                            spacing: 6
+                            C.ToolButton {
+                                text: "+ New drawing"
+                                Layout.fillWidth: true
+                                onClicked: editor.newDrawing(false)
+                                hint: "Create a distinct drawing exposed on twos"
+                            }
+                            C.ToolButton {
+                                text: "Duplicate drawing"
+                                Layout.fillWidth: true
+                                onClicked: editor.newDrawing(true)
+                            }
+                            C.ToolButton {
+                                text: "Smooth selected stroke"
+                                Layout.fillWidth: true
+                                onClicked: canvas.smoothSelection()
+                            }
+                            C.ToolButton {
+                                text: "Hold for 4 frames"
+                                Layout.fillWidth: true
+                                onClicked: editor.holdDrawing(4)
+                            }
+                        }
+                        Item {
+                            Layout.preferredHeight: 12
+                        }
+                    }
+                }
+            }
+        }
+        Rectangle {
+            Layout.fillWidth: true
+            height: 1
+            color: "#323232"
+        }
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 42
+            color: "#111111"
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: 14
+                anchors.rightMargin: 14
+                spacing: 8
+                C.ToolButton {
+                    text: "Timeline"
+                    active: !root.xsheet
+                    onClicked: root.xsheet = false
+                }
+                C.ToolButton {
+                    text: "Xsheet"
+                    active: root.xsheet
+                    onClicked: root.xsheet = true
+                }
+                Item {
+                    Layout.fillWidth: true
+                }
+                C.ToolButton {
+                    text: "|‹"
+                    hint: "First frame"
+                    onClicked: editor.frame = 0
+                }
+                C.ToolButton {
+                    text: "‹"
+                    hint: "Previous drawing"
+                    onClicked: editor.nextDrawing(-1)
+                }
+                C.ToolButton {
+                    text: editor.playing ? "Ⅱ" : "▶"
+                    active: editor.playing
+                    hint: "Play / pause · Space"
+                    onClicked: editor.togglePlayback()
+                }
+                C.ToolButton {
+                    text: "›"
+                    hint: "Next drawing"
+                    onClicked: editor.nextDrawing(1)
+                }
+                Text {
+                    text: String(editor.frame + 1).padStart(4, "0")
+                    color: "#eeeeee"
+                    font.family: "Menlo"
+                    font.pixelSize: 13
+                    Layout.preferredWidth: 45
+                }
+                Text {
+                    text: "/ " + editor.duration
+                    color: "#757575"
+                    font.family: "Menlo"
+                    font.pixelSize: 11
+                }
+                Item {
+                    Layout.fillWidth: true
+                }
+                C.ToolButton {
+                    text: "+ 2 frames"
+                    onClicked: editor.insertFrames(2)
+                }
+                C.ToolButton {
+                    text: "Settings"
+                    onClicked: settingsDialog.open()
+                }
+            }
+        }
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 186
+            Layout.minimumHeight: 186
+            Layout.maximumHeight: 186
+            Layout.fillHeight: false
+            spacing: 0
+            Rectangle {
+                Layout.preferredWidth: 250
+                Layout.fillHeight: true
+                color: "#101010"
+                ColumnLayout {
+                    anchors.fill: parent
+                    spacing: 0
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 30
+                        Layout.leftMargin: 12
+                        Layout.rightMargin: 6
+                        Text {
+                            text: "LAYERS"
+                            color: "#797979"
+                            font.pixelSize: 10
+                            font.letterSpacing: 1
+                        }
+                        Item {
+                            Layout.fillWidth: true
+                        }
+                        C.ToolButton {
+                            text: "+"
+                            hint: "Add layer"
+                            onClicked: editor.addLayer()
+                        }
+                        C.ToolButton {
+                            text: "↑"
+                            hint: "Move layer up"
+                            onClicked: editor.moveLayer(1)
+                        }
+                        C.ToolButton {
+                            text: "↓"
+                            hint: "Move layer down"
+                            onClicked: editor.moveLayer(-1)
+                        }
+                        C.ToolButton {
+                            text: "⋯"
+                            hint: "Layer actions"
+                            onClicked: layerMenu.open()
+                        }
+                        Menu {
+                            id: layerMenu
+                            Action {
+                                text: "Duplicate layer"
+                                onTriggered: editor.duplicateLayer(false)
+                            }
+                            Action {
+                                text: "Clone linked drawings"
+                                onTriggered: editor.duplicateLayer(true)
+                            }
+                            Action {
+                                text: "Remove layer"
+                                onTriggered: editor.removeLayer()
+                            }
+                        }
+                    }
+                    ListView {
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        clip: true
+                        model: editor.layers
+                        delegate: Rectangle {
+                            required property var modelData
+                            width: ListView.view.width
+                            height: root.timelineRow
+                            color: editor.selectedLayer === modelData.id ? "#292929" : "transparent"
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: editor.selectedLayer = modelData.id
+                            }
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.leftMargin: 4
+                                anchors.rightMargin: 6
+                                spacing: 2
+                                C.ToolButton {
+                                    text: modelData.visible ? "◉" : "○"
+                                    implicitWidth: 24
+                                    hint: "Toggle visibility"
+                                    onClicked: editor.toggleLayer(modelData.id, "visible")
+                                }
+                                C.ToolButton {
+                                    text: modelData.locked ? "L" : "·"
+                                    implicitWidth: 24
+                                    hint: "Toggle lock"
+                                    onClicked: editor.toggleLayer(modelData.id, "locked")
+                                }
+                                TextField {
+                                    text: modelData.name
+                                    Layout.fillWidth: true
+                                    background: null
+                                    selectByMouse: true
+                                    font.pixelSize: 11
+                                    onEditingFinished: editor.renameLayer(modelData.id, text)
+                                    onActiveFocusChanged: if (activeFocus)
+                                        editor.selectedLayer = modelData.id
+                                    Accessible.name: "Layer name"
+                                }
+                                C.ToolButton {
+                                    text: "S"
+                                    active: modelData.solo
+                                    implicitWidth: 24
+                                    hint: "Solo layer"
+                                    onClicked: editor.toggleLayer(modelData.id, "solo")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Rectangle {
+                width: 1
+                Layout.fillHeight: true
+                color: "#333333"
+            }
+            Flickable {
+                id: timelineScroll
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                clip: true
+                contentWidth: root.xsheet ? Math.max(width, editor.layers.length * 100 + 48) : Math.max(width, editor.duration * root.timelineCell)
+                contentHeight: root.xsheet ? editor.duration * root.timelineRow + 30 : Math.max(height, editor.layers.length * root.timelineRow + 30)
+                boundsBehavior: Flickable.StopAtBounds
+                ScrollBar.horizontal: ScrollBar {}
+                ScrollBar.vertical: ScrollBar {}
+                onContentXChanged: timeline.requestPaint()
+                onContentYChanged: timeline.requestPaint()
+                Canvas {
+                    id: timeline
+                    x: timelineScroll.contentX
+                    y: timelineScroll.contentY
+                    width: timelineScroll.width
+                    height: timelineScroll.height
+                    onWidthChanged: requestPaint()
+                    onHeightChanged: requestPaint()
+                    onPaint: {
+                        const ctx = getContext("2d");
+                        ctx.reset();
+                        ctx.fillStyle = "#141414";
+                        ctx.fillRect(0, 0, width, height);
+                        const data = editor.layers;
+                        const ox = timelineScroll.contentX;
+                        const oy = timelineScroll.contentY;
+                        ctx.font = "10px Menlo";
+                        ctx.textBaseline = "middle";
+                        if (!root.xsheet) {
+                            const first = Math.max(0, Math.floor(ox / root.timelineCell));
+                            const last = Math.min(editor.duration, Math.ceil((ox + width) / root.timelineCell));
+                            for (let f = first; f < last; f++) {
+                                const x = f * root.timelineCell - ox;
+                                ctx.strokeStyle = "#222222";
+                                ctx.beginPath();
+                                ctx.moveTo(x, 0);
+                                ctx.lineTo(x, height);
+                                ctx.stroke();
+                                if (f % 5 === 0 || f === 0) {
+                                    ctx.fillStyle = "#888888";
+                                    ctx.fillText(String(f + 1), x + 4, 14 - oy);
+                                }
+                            }
+                            for (let r = 0; r < data.length; r++) {
+                                const y = 30 + r * root.timelineRow - oy;
+                                if (y + root.timelineRow < 0 || y > height)
+                                    continue;
+                                ctx.strokeStyle = "#262626";
+                                ctx.beginPath();
+                                ctx.moveTo(0, y + root.timelineRow);
+                                ctx.lineTo(width, y + root.timelineRow);
+                                ctx.stroke();
+                                const spans = data[r].spans;
+                                for (let n = 0; n < spans.length; n++) {
+                                    const e = spans[n];
+                                    const x = e.start * root.timelineCell - ox;
+                                    const w = (e.end - e.start) * root.timelineCell;
+                                    if (x + w < 0 || x > width)
+                                        continue;
+                                    ctx.fillStyle = data[r].id === editor.selectedLayer ? "#777777" : "#414141";
+                                    ctx.fillRect(x + 1, y + 7, w - 2, 20);
+                                    ctx.fillStyle = "#e2e2e2";
+                                    ctx.beginPath();
+                                    ctx.arc(x + 8, y + 17, 2.5, 0, Math.PI * 2);
+                                    ctx.fill();
+                                }
+                                ctx.fillStyle = "#ffffff";
+                                for (let k = 0; k < data[r].keys.length; k++) {
+                                    const x = data[r].keys[k] * root.timelineCell - ox + 10;
+                                    ctx.fillText("◇", x, y + 17);
+                                }
+                            }
+                            const px = editor.frame * root.timelineCell - ox;
+                            ctx.fillStyle = "#ededed";
+                            ctx.fillRect(px, 0, 2, height);
+                            ctx.fillRect(px, 0, root.timelineCell, 3);
+                        } else {
+                            const first = Math.max(0, Math.floor((oy - 30) / root.timelineRow));
+                            const last = Math.min(editor.duration, Math.ceil((oy + height) / root.timelineRow));
+                            for (let f = first; f < last; f++) {
+                                const y = 30 + f * root.timelineRow - oy;
+                                ctx.fillStyle = f === editor.frame ? "#343434" : "#141414";
+                                ctx.fillRect(0, y, width, root.timelineRow);
+                                ctx.fillStyle = "#999999";
+                                ctx.fillText(String(f + 1), 6, y + 17);
+                                for (let r = 0; r < data.length; r++) {
+                                    const x = 48 + r * 100 - ox;
+                                    ctx.strokeStyle = "#333333";
+                                    ctx.strokeRect(x, y, 100, root.timelineRow);
+                                    for (let n = 0; n < data[r].spans.length; n++) {
+                                        const e = data[r].spans[n];
+                                        if (f >= e.start && f < e.end) {
+                                            ctx.fillStyle = "#cccccc";
+                                            ctx.fillText(f === e.start ? String(e.drawing) : "│", x + 40, y + 17);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            ctx.fillStyle = "#222222";
+                            ctx.fillRect(0, -oy, width, 30);
+                            ctx.fillStyle = "#aaaaaa";
+                            for (let r = 0; r < data.length; r++)
+                                ctx.fillText(data[r].name.substring(0, 12), 54 + r * 100 - ox, 15 - oy);
+                        }
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onPressed: function (mouse) {
+                            let row;
+                            if (root.xsheet) {
+                                editor.frame = Math.floor((mouse.y + timelineScroll.contentY - 30) / root.timelineRow);
+                                row = Math.floor((mouse.x + timelineScroll.contentX - 48) / 100);
+                            } else {
+                                editor.frame = Math.floor((mouse.x + timelineScroll.contentX) / root.timelineCell);
+                                row = Math.floor((mouse.y + timelineScroll.contentY - 30) / root.timelineRow);
+                            }
+                            if (row >= 0 && row < editor.layers.length)
+                                editor.selectedLayer = editor.layers[row].id;
+                        }
+                        onPositionChanged: function (mouse) {
+                            if (pressed)
+                                editor.frame = root.xsheet ? Math.floor((mouse.y + timelineScroll.contentY - 30) / root.timelineRow) : Math.floor((mouse.x + timelineScroll.contentX) / root.timelineCell);
+                        }
+                        onDoubleClicked: editor.newDrawing(false)
+                    }
+                }
+                Connections {
+                    target: editor
+                    function onChanged() {
+                        timeline.requestPaint();
+                    }
+                    function onFrameChanged() {
+                        timeline.requestPaint();
+                    }
+                    function onSelectionChanged() {
+                        timeline.requestPaint();
+                    }
+                }
+                Connections {
+                    target: root
+                    function onXsheetChanged() {
+                        timelineScroll.contentX = 0;
+                        timelineScroll.contentY = 0;
+                        timeline.requestPaint();
+                    }
+                }
+            }
+        }
+        Rectangle {
+            Layout.fillWidth: true
+            height: 1
+            color: "#333333"
+        }
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 28
+            color: "#0b0b0b"
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: 14
+                anchors.rightMargin: 10
+                Text {
+                    text: editor.status
+                    color: "#999999"
+                    font.pixelSize: 10
+                    elide: Text.ElideMiddle
+                    Layout.fillWidth: true
+                }
+                ProgressBar {
+                    visible: editor.exporting
+                    value: editor.exportProgress
+                    Layout.preferredWidth: 150
+                }
+                C.ToolButton {
+                    visible: editor.exporting
+                    text: "Cancel export"
+                    implicitHeight: 24
+                    onClicked: editor.cancelExport()
+                }
+                Text {
+                    text: "LOCAL / OFFLINE"
+                    color: "#606060"
+                    font.pixelSize: 9
+                    font.letterSpacing: 1
+                }
+            }
+        }
+    }
+
+    FileDialog {
+        id: openDialog
+        title: "Open OPEN-TOON project"
+        nameFilters: ["OPEN-TOON projects (*.otoon)"]
+        onAccepted: editor.openProject(selectedFile)
+    }
+    FileDialog {
+        id: saveDialog
+        title: "Save OPEN-TOON project"
+        fileMode: FileDialog.SaveFile
+        defaultSuffix: "otoon"
+        nameFilters: ["OPEN-TOON projects (*.otoon)"]
+        onAccepted: editor.saveProject(selectedFile)
+    }
+    FileDialog {
+        id: imageDialog
+        title: "Import image"
+        nameFilters: ["Images (*.png *.jpg *.jpeg *.bmp *.webp)"]
+        onAccepted: editor.importImage(selectedFile)
+    }
+    FolderDialog {
+        id: exportDialog
+        title: "Choose a folder for a new PNG sequence export"
+        onAccepted: editor.exportFrames(selectedFolder)
+    }
+    ColorDialog {
+        id: colorDialog
+        title: root.colorEditId ? "Edit linked palette color" : "Add palette color"
+        options: ColorDialog.ShowAlphaChannel
+        onAccepted: {
+            if (root.colorEditId)
+                editor.setSwatchColor(root.colorEditId, selectedColor);
+            else
+                editor.addSwatch(selectedColor);
+        }
+    }
+    Dialog {
+        id: discardDialog
+        title: "Unsaved changes"
+        anchors.centerIn: parent
+        modal: true
+        width: 400
+        standardButtons: Dialog.Discard | Dialog.Cancel
+        Label {
+            width: parent.width
+            text: "This scene has unsaved changes. Discard them and continue? Use Save first if you want to keep them."
+            wrapMode: Text.WordWrap
+        }
+        onDiscarded: root.performAction(root.pendingAction)
+    }
+    Dialog {
+        id: settingsDialog
+        title: "Scene settings"
+        anchors.centerIn: parent
+        modal: true
+        width: 420
+        standardButtons: Dialog.Ok | Dialog.Cancel
+        onOpened: {
+            sceneName.text = editor.sceneName;
+            sceneW.text = editor.sceneWidth;
+            sceneH.text = editor.sceneHeight;
+            sceneDuration.text = editor.duration;
+            rateN.text = editor.fpsNumerator;
+            rateD.text = editor.fpsDenominator;
+        }
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 10
+            Label {
+                text: "Scene name"
+            }
+            TextField {
+                id: sceneName
+                Layout.fillWidth: true
+            }
+            RowLayout {
+                TextField {
+                    id: sceneW
+                    placeholderText: "Width"
+                    Layout.fillWidth: true
+                    validator: IntValidator {
+                        bottom: 1
+                        top: 8192
+                    }
+                }
+                Label {
+                    text: "×"
+                }
+                TextField {
+                    id: sceneH
+                    placeholderText: "Height"
+                    Layout.fillWidth: true
+                    validator: IntValidator {
+                        bottom: 1
+                        top: 8192
+                    }
+                }
+            }
+            Label {
+                text: "Duration in frames (use Remove Frames to shorten)"
+                font.pixelSize: 10
+            }
+            TextField {
+                id: sceneDuration
+                Layout.fillWidth: true
+                validator: IntValidator {
+                    bottom: 1
+                    top: 1000000
+                }
+            }
+            Label {
+                text: "Frame rate: numerator / denominator"
+                font.pixelSize: 10
+            }
+            RowLayout {
+                TextField {
+                    id: rateN
+                    Layout.fillWidth: true
+                    validator: IntValidator {
+                        bottom: 1
+                        top: 240000
+                    }
+                }
+                Label {
+                    text: "/"
+                }
+                TextField {
+                    id: rateD
+                    Layout.fillWidth: true
+                    validator: IntValidator {
+                        bottom: 1
+                        top: 10000
+                    }
+                }
+            }
+            Label {
+                text: "Changing the rate preserves frame count and changes duration in seconds. The operation can be undone."
+                Layout.fillWidth: true
+                wrapMode: Text.WordWrap
+                color: "#999999"
+                font.pixelSize: 11
+            }
+        }
+        onAccepted: editor.setScene(sceneName.text, Number(sceneW.text), Number(sceneH.text), Number(sceneDuration.text), Number(rateN.text), Number(rateD.text))
+    }
+    Dialog {
+        id: historyDialog
+        title: "Saved revisions"
+        anchors.centerIn: parent
+        width: 480
+        height: 360
+        modal: true
+        standardButtons: Dialog.Close
+        ListView {
+            anchors.fill: parent
+            clip: true
+            model: editor.revisions
+            delegate: ItemDelegate {
+                required property var modelData
+                width: ListView.view.width
+                text: "#" + modelData.id + "  " + modelData.created + "  " + modelData.label
+                onClicked: {
+                    editor.restoreRevision(modelData.id);
+                    historyDialog.close();
+                }
+            }
+            Label {
+                anchors.centerIn: parent
+                visible: parent.count === 0
+                text: "Save the project to begin its revision history."
+                color: "#999999"
+            }
+        }
+    }
+    Dialog {
+        id: helpDialog
+        title: "Drawing controls"
+        anchors.centerIn: parent
+        width: 490
+        modal: true
+        standardButtons: Dialog.Close
+        Label {
+            width: parent.width
+            wrapMode: Text.WordWrap
+            text: "B — Pencil\nE — Eraser\nV — Select and move a stroke\nO — Onion skin\nF — Fit canvas\nSpace — Play / pause\nLeft / Right — Previous / next frame\nCmd/Ctrl+Z — Undo\n\nDraw with the left mouse button. Pan with the middle button or trackpad scroll. Ctrl+scroll zooms. Double-click a timeline cell to create a new drawing.\n\nTablets use pressure when available; physical tablet validation is pending. This is an experimental build, not the P11 release."
+        }
+    }
+    Dialog {
+        id: recoveryDialog
+        title: "Recover previous work?"
+        anchors.centerIn: parent
+        modal: true
+        width: 420
+        standardButtons: Dialog.Yes | Dialog.No
+        Label {
+            width: parent.width
+            wrapMode: Text.WordWrap
+            text: "A recovery snapshot from an earlier session is available. Open it as an unsaved scene?"
+        }
+        onAccepted: editor.recover()
+    }
+    Component.onCompleted: if (editor.recoveryPath.length)
+        recoveryDialog.open()
+}

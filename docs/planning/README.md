@@ -1,6 +1,6 @@
 # Long-term development roadmap
 
-**Status: execution plan, not an implemented application.** This plan covers all **282 catalog capabilities**, assigns specification ownership for **193 node/family entries**, and organizes delivery into **23 phases with 69 work packages**. The accepted direction is **C++20 + Qt 6 / Qt Quick**, with an offline modular core and mature open-source components behind explicit adapters.
+**Status: active execution plan. An experimental editor exists; no phase is complete.** See [implementation status](../implementation/STATUS.md). This plan covers all **282 catalog capabilities**, assigns specification ownership for **193 node/family entries**, and organizes delivery into **23 phases with 69 work packages**. The accepted direction is **C++20 + Qt 6 / Qt Quick**, with an offline modular core and mature open-source components behind explicit adapters.
 
 **English is the product language.** UI, menus, tools, messages, accessibility labels, built-in assets, help, code identifiers and public documentation must be English. This roadmap and the previous research, Markdown documents and canonical catalogs are written in English. User-created names, dialogue, drawings and filenames remain multilingual. See [the language policy](../design/02-language-policy.md).
 

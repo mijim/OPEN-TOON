@@ -24,7 +24,7 @@ Reference colors using stable identifiers separate from RGBA values.
 
 **Initial acceptance:** Changing a swatch recolors all its references and no distinct swatch.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -34,7 +34,7 @@ Manage solid swatches, names, opacity and duplicates.
 
 **Initial acceptance:** Two swatches with equal RGB values can retain different identities.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -54,7 +54,7 @@ Recolor outlines and fills independently.
 
 **Initial acceptance:** Painting only lines preserves interior colors.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 

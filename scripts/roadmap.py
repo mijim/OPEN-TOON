@@ -19,7 +19,7 @@ def documents():
     catalog = json.loads((ROOT / 'docs/catalog/features.json').read_text())['features']
     features = {f['id']: f for f in catalog}
     files = {}
-    index = ['# Phase index', '', '> Generated from `roadmap.json`. All work is planned, not implemented.', '',
+    index = ['# Phase index', '', '> Generated from `roadmap.json`. Phase status is separate from feature completion; see [implementation evidence](../implementation/STATUS.md).', '',
              '| Phase | Outcome / milestone | Depends on | Features | Engineer-weeks |', '|---|---|---|---:|---:|']
     for p in plan['phases']:
         low, high = p['effort_engineer_weeks']
@@ -51,8 +51,8 @@ def documents():
     totals = [sum(p['effort_engineer_weeks'][i] for p in plan['phases']) for i in (0, 1)]
     index += ['', f"Total planning envelope: **{totals[0]}–{totals[1]} focused engineer-weeks** including optional branches. See [estimation assumptions](ESTIMATES.md); this is not a calendar commitment.", '']
     files[PLAN / 'PHASES.md'] = '\n'.join(index)
-    lines = ['# Open-source dependency register', '', '> Generated from `libraries.json`. None of these dependencies is installed by this documentation change.', '',
-             'The user approved C++20 + Qt 6/QML and the reuse of proven, efficient open-source libraries. `selected_for_plan` means intended adoption subject to pinned-version checks; `candidate_requires_spike` means no adoption decision yet. Upstream maturity does not prove performance in OPEN-TOON.', '',
+    lines = ['# Open-source dependency register', '', '> Generated from `libraries.json`. Actual experimental adoption is recorded below; see [build evidence](../implementation/DEPENDENCIES.md).', '',
+             'The user approved C++20 + Qt 6/QML and the reuse of proven, efficient open-source libraries. `experimental_adopted` means used in the bounded prototype, with production gates still open. `selected_for_plan` means intended adoption subject to pinned-version checks; `candidate_requires_spike` means no adoption decision yet. Upstream maturity does not prove performance in OPEN-TOON.', '',
              'Record exact source revision, package checksum, build flags, enabled modules, license files, transitive dependencies and benchmark evidence when adopting a library. Each adapter must have one accountable owner. Model/brush/font/fixture licenses are separate from library licenses.', '']
     for lib in libraries:
         lines += [f"## {lib['id']} — {lib['name']}", '', f"**Phase:** {lib['adoption_phase']}. **Decision:** `{lib['status']}`.", '',
@@ -101,7 +101,7 @@ def validate():
         visited.add(pid)
     for p in phases:
         visit(p['id'], [])
-        if p['status'] != 'planned' or not p['outcome'] or not p['acceptance'] or not p['deliverables']:
+        if p['status'] not in {'planned', 'in_progress', 'complete'} or not p['outcome'] or not p['acceptance'] or not p['deliverables']:
             errors.append(f"Incomplete planning fields: {p['id']}")
         lo, hi = p['effort_engineer_weeks']
         if not 0 < lo <= hi:
@@ -120,7 +120,7 @@ def validate():
     for lib in libraries:
         if lib['adoption_phase'] not in phase_map or not lib['upstream_url'].startswith('https://'):
             errors.append(f"Invalid library entry: {lib['id']}")
-        if lib['status'] not in {'selected_for_plan', 'candidate_requires_spike'}:
+        if lib['status'] not in {'selected_for_plan', 'candidate_requires_spike', 'experimental_adopted'}:
             errors.append(f"Invalid library decision: {lib['id']}")
     nodes = json.loads((ROOT / 'docs/catalog/node-reference.json').read_text())['entries']
     node_plan = read('node-assignments.json')['assignments']

@@ -2,7 +2,7 @@
 
 ## Current context
 
-- The user requested exhaustive analysis, then a long-term phased development plan. The plan is now in `docs/planning/`; application implementation has not begun. Do not implement the full application merely because a catalog or roadmap exists.
+- The user explicitly authorized implementation through P11. An experimental native editor now exists. Read `docs/implementation/STATUS.md` and `status.json` for working behavior, evidence and remaining gates. Continue toward P11 without calling this prototype a completed phase or production release. Mouse input is required; the owner has no physical tablet available yet.
 - The user accepted C++20 + Qt 6/QML as the technical direction and explicitly requested proven, efficient open-source library reuse. Candidate libraries still require the documented adoption evidence.
 - **English is mandatory** for all first-party UI, menus, tooltips, messages, accessibility labels, built-in assets, help, code identifiers/comments and public documentation. User content remains multilingual. See `docs/design/02-language-policy.md` and `NFR-027`.
 - All project documentation and canonical catalog prose are now English. Preserve that language in future work; the owner may continue the conversation in Spanish.

@@ -34,7 +34,7 @@ Build parent-child chains with separate drawings and pegs.
 
 **Initial acceptance:** Reparenting with preserve-world enabled does not move the character.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -44,7 +44,7 @@ Edit the rotation center with an explicit scope distinction.
 
 **Initial acceptance:** Moving the temporary pivot does not change the rig's saved pivot.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 

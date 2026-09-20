@@ -34,7 +34,7 @@ Change ordering and labels while retaining stable identifiers.
 
 **Initial acceptance:** Renaming a layer does not break linked nodes or curves.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -44,7 +44,7 @@ Separate editing visibility, locking and temporary isolation.
 
 **Initial acceptance:** Leaving solo mode restores the original state of other layers.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -64,7 +64,7 @@ Distinguish a deep copy from an instance sharing drawings or functions.
 
 **Initial acceptance:** Editing shared clone content updates its instances; editing a deep copy does not.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -94,7 +94,7 @@ Store four ordered art sublayers per drawing.
 
 **Initial acceptance:** Painting Color Art leaves the Line Art strokes intact.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 

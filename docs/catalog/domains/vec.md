@@ -24,7 +24,7 @@ Represent strokes as curves with editable width and configurable caps.
 
 **Initial acceptance:** Changing width does not move the centerline.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -44,7 +44,7 @@ Apply pressure and variable profiles along a stroke.
 
 **Initial acceptance:** Fine stroke ends are preserved when zooming in.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -94,7 +94,7 @@ Trim geometry crossed by an eraser with size and pressure control.
 
 **Initial acceptance:** Partially erasing a line leaves two valid segments.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -104,7 +104,7 @@ Select strokes or regions, add to or subtract from the selection, and transform 
 
 **Initial acceptance:** A partial selection does not move strokes outside the selected area.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -124,7 +124,7 @@ Edit a stroke's center path while preserving brush appearance where possible.
 
 **Initial acceptance:** Moving a control point does not change the fill color.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -154,7 +154,7 @@ Reduce contour irregularities with adjustable strength.
 
 **Initial acceptance:** The operation preserves protected corners within the defined tolerance.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -164,7 +164,7 @@ Draw lines, rectangles and ellipses with constraints and optional fills.
 
 **Initial acceptance:** Holding the constraint produces a geometric circle.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 

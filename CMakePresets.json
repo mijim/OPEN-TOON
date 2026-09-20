@@ -1,0 +1,10 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {"name":"desktop","generator":"Ninja","binaryDir":"${sourceDir}/build/desktop","cacheVariables":{"CMAKE_BUILD_TYPE":"RelWithDebInfo"}},
+    {"name":"core","generator":"Ninja","binaryDir":"${sourceDir}/build/core","cacheVariables":{"CMAKE_BUILD_TYPE":"Debug","OPENTOON_DESKTOP":"OFF"}},
+    {"name":"sanitize","inherits":"core","binaryDir":"${sourceDir}/build/sanitize","cacheVariables":{"OPENTOON_SANITIZERS":"ON"}}
+  ],
+  "buildPresets":[{"name":"desktop","configurePreset":"desktop"},{"name":"core","configurePreset":"core"},{"name":"sanitize","configurePreset":"sanitize"}],
+  "testPresets":[{"name":"desktop","configurePreset":"desktop","output":{"outputOnFailure":true}},{"name":"core","configurePreset":"core","output":{"outputOnFailure":true}},{"name":"sanitize","configurePreset":"sanitize","output":{"outputOnFailure":true}}]
+}

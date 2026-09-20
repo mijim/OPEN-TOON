@@ -2,7 +2,9 @@
 
 An independent open-source desktop animation project combining vector and bitmap drawing, frame-by-frame and cut-out animation, rigging, compositing and production tools.
 
-**Current stage: research and development planning. There is no executable animation application yet.** The roadmap covers 282 capabilities in 26 domains; none is marked implemented.
+**Current stage: experimental native editor. P11 is not complete.** A C++20/Qt Quick application now supports mouse drawing, vector editing, layers, exposures, transform keys, SQLite project revisions and PNG export. The roadmap still covers 282 capabilities in 26 domains; working subsets are marked partial, with no phase claimed complete.
+
+Start with the [build instructions](docs/implementation/BUILD.md), [user guide](docs/implementation/USER-GUIDE.md) and [implementation status](docs/implementation/STATUS.md).
 
 The product will use a clean black, white and gray interface. **The entire first-party product is in English by requirement:** UI, messages, built-in assets, help, code and public documentation. The previous research, Markdown documents and canonical catalogs have also been translated into English. User-created content remains multilingual.
 
@@ -22,7 +24,7 @@ The product will use a clean black, white and gray interface. **The entire first
 
 **C++20 + Qt 6 / Qt Quick (QML)** for Windows, macOS and Linux, with a UI-independent domain, local storage, a shared headless evaluator and explicit integration adapters. Mature open-source components will provide infrastructure such as storage, brushes, image/media IO, color management and numerical routines. Graphics and other high-risk candidates must pass measured spikes before adoption.
 
-The first usable milestone is a complete two-second animation: draw, expose, play, save, reopen and export 48 PNG frames. Reliable 2D workflows precede advanced controllers, morphing, 3D, game exports and optional studio/AI extensions. The roadmap provides effort ranges and assumptions, not promised release dates.
+The experimental first-film workflow can draw, expose, play, save, reopen and export a two-second sequence of 48 PNG frames. Production acceptance and platform qualification remain open. Reliable 2D workflows precede advanced controllers, morphing, 3D, game exports and optional studio/AI extensions. The roadmap provides effort ranges and assumptions, not promised release dates.
 
 ## For contributors and AI agents
 
@@ -39,7 +41,7 @@ python3 scripts/roadmap.py render
 python3 scripts/validate_docs.py
 ```
 
-Documentation tools require only Python 3.11+ and its standard library. No future application dependencies need to be installed to inspect this plan.
+Documentation tools require only Python 3.11+ and its standard library. No application dependencies need to be installed to inspect the plan.
 
 ## License
 

@@ -1,35 +1,35 @@
 {
   "schema_version": 1,
   "as_of": "2026-09-20",
-  "note": "Research-backed shortlist, not an installed dependency lockfile. Recheck maintenance, security and exact distribution licenses when adopted.",
+  "note": "Experimental adoption is recorded separately from production acceptance; see docs/implementation/DEPENDENCIES.md.",
   "libraries": [
     {
       "id": "LIB-QT",
       "name": "Qt 6 / Qt Quick",
       "adoption_phase": "P01",
-      "status": "selected_for_plan",
+      "status": "experimental_adopted",
       "upstream_url": "https://doc.qt.io/qt-6/",
       "license_notes": "LGPL/GPL/commercial depending on module and build",
       "purpose": "Desktop UI, tablet events, accessibility and platform integration.",
       "integration_boundary": "QML visual layer only; no Qt types in domain APIs. QRhi usage is isolated and pinned to tested Qt versions.",
       "evaluation": "SP-01/02/07: real tablets, focus/DPI, graphics integration and clean installations.",
       "fallback": "Use one supported Qt rendering route; reconsider QML docking independently if its candidate fails.",
-      "version": null,
-      "installed": false
+      "version": "6.11.2 (local SDK; CI targets 6.8.3)",
+      "installed": true
     },
     {
       "id": "LIB-SQLITE",
       "name": "SQLite",
       "adoption_phase": "P01",
-      "status": "selected_for_plan",
+      "status": "experimental_adopted",
       "upstream_url": "https://sqlite.org/atomiccommit.html",
       "license_notes": "Public domain; review bundled extensions separately",
       "purpose": "Metadata, revision transactions and local indices.",
       "integration_boundary": "An adapter implements the project repository; immutable external blobs need their own publication/recovery protocol.",
       "evaluation": "SP-03: terminate at every commit boundary, fill disk and recover reachable blobs.",
       "fallback": "Keep the repository port; revise the blob protocol before changing database technology.",
-      "version": null,
-      "installed": false
+      "version": "3.53.4 (Conan lock)",
+      "installed": true
     },
     {
       "id": "LIB-SKIA",
@@ -301,15 +301,15 @@
       "id": "LIB-JSON",
       "name": "nlohmann/json",
       "adoption_phase": "P01",
-      "status": "selected_for_plan",
+      "status": "experimental_adopted",
       "upstream_url": "https://github.com/nlohmann/json",
       "license_notes": "MIT",
       "purpose": "Readable manifests, configuration and interchange metadata.",
       "integration_boundary": "Bound input depth/size; do not put JSON serialization in tablet sample or render hot paths.",
       "evaluation": "Schema migration, malformed input and metadata size.",
       "fallback": "Keep hot-path snapshots strongly typed.",
-      "version": null,
-      "installed": false
+      "version": "3.12.0",
+      "installed": true
     },
     {
       "id": "LIB-ZSTD",
@@ -343,15 +343,15 @@
       "id": "LIB-CATCH",
       "name": "Catch2",
       "adoption_phase": "P01",
-      "status": "selected_for_plan",
+      "status": "experimental_adopted",
       "upstream_url": "https://github.com/CatchOrg/Catch2",
       "license_notes": "BSL-1.0",
       "purpose": "Domain and adapter regression tests.",
       "integration_boundary": "Test behavior/invariants rather than mirroring implementation; UI and artistic review need separate evidence.",
       "evaluation": "Run deterministic fixtures and fault injection in CI.",
       "fallback": "Do not introduce a second C++ unit-test framework without a clear need.",
-      "version": null,
-      "installed": false
+      "version": "3.15.0 (Conan lock)",
+      "installed": true
     },
     {
       "id": "LIB-BENCH",
@@ -385,15 +385,15 @@
       "id": "LIB-BUILD",
       "name": "CMake / Ninja / Conan 2",
       "adoption_phase": "P01",
-      "status": "selected_for_plan",
+      "status": "experimental_adopted",
       "upstream_url": "https://docs.conan.io/2/",
       "license_notes": "Audit tools and every resolved package; package recipe is not upstream ownership",
       "purpose": "Reproducible native builds, dependency graph and lockfiles.",
       "integration_boundary": "Pin exact packages/revisions and flags after spikes; never track moving latest for releases.",
       "evaluation": "Clean builds and dependency restoration on every supported OS.",
       "fallback": "Document a reproducible source-build recipe for dependencies missing a reliable package.",
-      "version": null,
-      "installed": false
+      "version": "CMake 4.4.3, Ninja 1.13.2, Conan 2.20.1 (local)",
+      "installed": true
     }
   ]
 }

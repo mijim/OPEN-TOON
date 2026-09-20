@@ -74,7 +74,7 @@ Navigate the canvas without changing geometry or keyframes.
 
 **Initial acceptance:** Rotating the view by 90 degrees does not change the exported render.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -84,7 +84,7 @@ Mirror the displayed drawing for inspection without reflecting stored data.
 
 **Initial acceptance:** Saving with a mirrored view does not reverse the exported image.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -104,7 +104,7 @@ Show editable attributes, animation state and units for the current selection.
 
 **Initial acceptance:** Multi-object editing displays mixed values correctly.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
@@ -114,6 +114,6 @@ Use pressure and sensitivity settings, with visible fallback when the device lac
 
 **Initial acceptance:** The same gesture varies stroke width according to the selected pressure curve.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.

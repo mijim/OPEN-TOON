@@ -24,7 +24,7 @@ Import still images or sequences with explicit alpha, ordering and exposure.
 
 **Initial acceptance:** A sequence with gaps reports how they are resolved.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 
