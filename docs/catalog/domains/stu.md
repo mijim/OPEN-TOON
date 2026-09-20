@@ -1,99 +1,99 @@
-# STU — Producción de estudio y colaboración
+# STU — Studio production and collaboration
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Asignar escena → obtener derechos → editar → versionar → entregar.
+**Workflow:** Assign scene → acquire rights → edit → version → deliver.
 
-**Módulo:** `studio`.
+**Module:** `studio`.
 
-**Entidades:** Production, Job, SceneCheckout, AssetLock, RenderQueue.
+**Entities:** Production, Job, SceneCheckout, AssetLock, RenderQueue.
 
-**Relaciones:** PRJ, LIB, OUT.
+**Relationships:** PRJ, LIB, OUT.
 
-**Riesgo principal:** Conflictos multiusuario y red; no equivale a coedición CRDT.
+**Main risk:** Multi-user and network conflicts; this is not CRDT co-editing.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## STU-001 — Producciones y trabajos
+## STU-001 — Productions and jobs
 
-Organizar escenas en estructura de producción y asignaciones.
+Organize scenes within production structures and assignments.
 
-**Aceptación inicial:** Una escena tiene identidad independiente de su ruta en disco.
+**Initial acceptance:** A scene has an identity independent of its disk path.
 
-**Alcance:** `studio_extension` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `studio_extension` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## STU-002 — Acceso a escenas compartidas
+## STU-002 — Shared scene access
 
-Abrir y guardar escenas en almacenamiento compartido mediante un servicio definido.
+Open and save scenes on shared storage through a defined service.
 
-**Aceptación inicial:** Un usuario sin permisos recibe un rechazo sin cambios parciales.
+**Initial acceptance:** A user without permission is rejected without partial changes.
 
-**Alcance:** `studio_extension` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `studio_extension` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## STU-003 — Bloqueos de escena
+## STU-003 — Scene locks
 
-Coordinar derechos de escritura y liberación de bloqueos.
+Coordinate write rights and lock release.
 
-**Aceptación inicial:** Dos clientes no sobrescriben la misma revisión silenciosamente.
+**Initial acceptance:** Two clients do not silently overwrite the same revision.
 
-**Alcance:** `studio_extension` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `studio_extension` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## STU-004 — Bloqueos de dibujos
+## STU-004 — Drawing locks
 
-Permitir trabajo de pintura sobre dibujos autorizados mientras otros roles trabajan en escena.
+Allow painting on authorized drawings while other roles work on the scene.
 
-**Aceptación inicial:** Un bloqueo de dibujo no impide editar un recurso distinto autorizado.
+**Initial acceptance:** A drawing lock does not prevent editing a different authorized resource.
 
-**Alcance:** `studio_extension` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `studio_extension` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## STU-005 — Versiones y merge de entregas
+## STU-005 — Delivery versions and merging
 
-Gestionar revisiones y detectar divergencias al reintegrar una escena.
+Manage revisions and detect divergence when reintegrating a scene.
 
-**Aceptación inicial:** Una entrega antigua no sustituye una nueva sin resolver el conflicto.
+**Initial acceptance:** An older delivery does not replace a newer one without conflict resolution.
 
-**Alcance:** `studio_extension` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `studio_extension` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## STU-006 — Checkout remoto
+## STU-006 — Remote checkout
 
-Empaquetar escenas para trabajo desconectado y reintegrar cambios.
+Package scenes for offline work and reintegrate changes.
 
-**Aceptación inicial:** Un checkout conserva una revisión base que permite detectar conflictos.
+**Initial acceptance:** A checkout retains a base revision for conflict detection.
 
-**Alcance:** `studio_extension` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `studio_extension` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## STU-007 — Colas de render y vectorización
+## STU-007 — Render and vectorization queues
 
-Distribuir trabajos con estado, reintento y seguimiento.
+Distribute jobs with status, retry and monitoring.
 
-**Aceptación inicial:** Un worker que desaparece deja un trabajo recuperable.
+**Initial acceptance:** A disappearing worker leaves a recoverable job.
 
-**Alcance:** `studio_extension` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `studio_extension` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## STU-008 — Roles Paint y Scan
+## STU-008 — Paint and Scan roles
 
-Ofrecer espacios limitados por tarea para pintura y escaneo de producción.
+Provide task-limited workspaces for production painting and scanning.
 
-**Aceptación inicial:** El espacio de pintura no expone comandos que alteren el timing protegido.
+**Initial acceptance:** The painting workspace does not expose commands that change protected timing.
 
-**Alcance:** `studio_extension` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `studio_extension` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

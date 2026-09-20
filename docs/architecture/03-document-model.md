@@ -1,91 +1,90 @@
-# Modelo de documento y formato abierto
+# Document model and open format
 
-Propuesta, no formato ya implementado. Diseñar antes de dibujar pantallas evita que timeline, Xsheet y nodos acaben guardando tres escenas distintas.
+This is a proposal, not an implemented format. Designing the model before drawing screens prevents the timeline, Xsheet and node editor from storing three different scenes.
 
-## Entidades e invariantes
+## Entities and invariants
 
-| Entidad | Datos mínimos | Invariante |
+| Entity | Minimum data | Invariant |
 |---|---|---|
-| Project | ID, nombre, escenas, bibliotecas, configuración | Las rutas no son identidades |
-| Scene | ID, settings, capas, grafo, pistas y referencias | Una revisión describe un estado coherente |
-| SceneSettings | Resolución, pixel aspect, FPS racional, rango, color | Valores positivos y límites conocidos |
-| DrawingAsset | ID, versión, vector/raster, subcapas | Puede existir aunque no esté expuesto |
-| ArtLayer | Tipo semántico y contenido | Orden Underlay → Colour → Line → Overlay |
-| ExposureSpan | Inicio, fin exclusivo, DrawingId o vacío | Sin solapamientos ambiguos en una pista |
-| AnimatableProperty | Valor base, tipo y curva opcional | Distingue reposo, valor local y evaluación |
-| Keyframe | Tiempo, valor, interpolación y tangentes | Un valor por tiempo/propiedad tras resolver colisión |
-| Palette/Swatch | IDs, valores o recursos, nombre | Mismo RGBA no implica misma identidad |
-| Rig | Nodos, jerarquía, reposo y controles | Jerarquía acíclica y bind consistente |
-| CompositorGraph | Nodos, puertos y conexiones | Tipos válidos, evaluación sin ciclos ilegales |
-| AudioClip | Asset, inicio de escena, in/out, ganancia | Referencia al audio sin destrucción por recorte |
-| AssetRef | Hash, tipo, metadata y procedencia | El hash identifica contenido inmutable |
-| Revision | ID, parent, manifiesto y timestamp | No publica referencias a blobs inexistentes |
+| Project | ID, name, scenes, libraries, configuration | Paths are not identities |
+| Scene | ID, settings, layers, graph, tracks, references | A revision represents a coherent state |
+| SceneSettings | Resolution, pixel aspect, rational FPS, range, color | Positive values and known bounds |
+| DrawingAsset | ID, version, vector/raster content, sublayers | Can exist without being exposed |
+| ArtLayer | Semantic type and content | Underlay → Color → Line → Overlay order |
+| ExposureSpan | Start, exclusive end, DrawingId or empty | No ambiguous track overlaps |
+| AnimatableProperty | Base value, type, optional curve | Distinguishes rest, local and evaluated values |
+| Keyframe | Time, value, interpolation, tangents | One value per time/property after collision resolution |
+| Palette/Swatch | IDs, values or resources, name | Equal RGBA does not mean equal identity |
+| Rig | Nodes, hierarchy, rest state, controls | Acyclic hierarchy and consistent binding |
+| CompositorGraph | Nodes, ports, connections | Valid types and no illegal evaluation cycles |
+| AudioClip | Asset, scene start, in/out, gain | Trimming references audio without destroying it |
+| AssetRef | Hash, type, metadata, provenance | Hash identifies immutable content |
+| Revision | ID, parent, manifest, timestamp | Never publishes references to missing blobs |
 
-Un dibujo compartido por varias exposiciones es un recurso único. Quitar una celda no elimina ese recurso. Duplicar crea otro ID; clonar mantiene una relación explícita. La identidad de un color no cambia al modificar su valor, por lo que se puede recolorear toda una producción sin búsqueda por RGB.
+A drawing shared by several exposures is one resource. Removing a cell does not delete it. Duplication creates another ID; cloning retains an explicit relationship. Color identity remains stable when its value changes, allowing production-wide recoloring without RGB searches.
 
-## Tiempo
+## Time
 
-Internamente usar frame cero como origen e intervalos semiabiertos `[start, end)`. La UI puede mostrar frame uno por defecto, con conversión en un único lugar. Guardar FPS como racional reducido: por ejemplo `24000/1001`, no como `23.976` aproximado. Audio usa índices de muestra y conversión racional explícita; interpolación subframe no se redondea prematuramente.
+Use zero-based frames internally and half-open intervals `[start, end)`. The UI may display frame one by default, with conversion in one place. Store FPS as a reduced rational such as `24000/1001`, not the approximation `23.976`. Audio uses sample indices and explicit rational conversion; do not round subframe interpolation prematurely.
 
-Ejemplo: cuatro dibujos a doses ocupan `[0,2)`, `[2,4)`, `[4,6)`, `[6,8)`. Se muestran como frames 1–8, y exportar el rango produce ocho imágenes. Cambiar FPS debe ofrecer conservar conteo de frames o conservar duración, con reglas de remuestreo. Una transacción cambia todas las pistas afectadas y sus marcadores según la operación.
+Four drawings on twos occupy `[0,2)`, `[2,4)`, `[4,6)`, `[6,8)`. They display as frames 1–8 and export to eight images. A frame-rate change offers preservation of frame count or duration with specified resampling rules. One transaction updates all affected tracks and markers according to the operation.
 
-La reproducción usa un reloj monotónico; durante playback con sonido se sincroniza con el reloj de audio. Saltar frames para mantener fluidez es una política de preview visible, nunca una razón para omitir frames en render final.
+Playback uses a monotonic clock and synchronizes to the audio clock when sound is active. Dropping frames for responsiveness is a visible preview policy, never a reason to omit final-render frames.
 
-## Geometría, raster y color
+## Geometry, raster and color
 
-Vector: curvas y contornos conservan geometría editable, perfiles de grosor, estilos e identidad de regiones. La tessellación GPU es una caché derivada. Definir winding/fill rules, tolerancias en unidades de documento y comportamiento de auto-intersecciones. Skia u otra biblioteca no debe convertirse en el único esquema serializado de los dibujos.
+**Vector:** curves and contours retain editable geometry, width profiles, styles and region identities. GPU tessellation is a derived cache. Specify winding/fill rules, document-unit tolerances and self-intersection behavior. Skia or another library must not become the sole serialized drawing schema.
 
-Raster: tiles dispersos por capa/dibujo con alfa explícito y precisión registrada. Cambiar un tile crea una versión; áreas vacías no necesitan mapas enormes. Las texturas de pinceles tienen procedencia y licencia independientes del preset.
+**Raster:** sparse tiles per layer/drawing with explicit alpha and recorded precision. Changing a tile creates a version; empty areas need no huge maps. Brush textures have provenance and licenses independent of their presets.
 
-Composición: perfil por escena con espacio lineal de trabajo y formato flotante cuando corresponda; transformación de visualización separada. Declarar alfa premultiplicado o no premultiplicado por frontera y convertir conscientemente. No aplicar dos veces gamma ni tratar RGB oculto bajo alfa cero como color opaco. Un modo artístico que opere en espacio no lineal debe declararlo, no esconderlo.
+**Compositing:** scene profile with a linear working space and floating-point format where appropriate; display transformation is separate. Declare premultiplied or straight alpha at each boundary and convert deliberately. Do not apply gamma twice or treat hidden RGB beneath zero alpha as opaque color. An artistic mode operating in nonlinear space must declare that behavior.
 
-## Contenedor propuesto
-
+## Proposed container
 
 ```text
 shot.otoon/
   manifest.json       # formatVersion, projectId, sceneId, headRevision
-  document.sqlite     # índices, revisiones, escenas y metadatos transaccionales
-  blobs/sha256/...    # dibujos, tiles, audio y fuentes inmutables
-  previews/...        # opcional, regenerable
+  document.sqlite     # indices, revisions, scenes and transactional metadata
+  blobs/sha256/...    # immutable drawings, tiles, audio and source resources
+  previews/...        # optional and regenerable
 ```
 
-La exportación de intercambio legible produce JSON versionado y recursos; sirve para diagnóstico y herramientas externas. No mantener JSON y SQLite como dos fuentes canónicas editables simultáneamente. El manifiesto indica versión y localización; el estado canónico se publica en una revisión consistente de la base y los blobs.
+Readable interchange export produces versioned JSON and resources for diagnostics and external tools. Do not maintain JSON and SQLite as two simultaneously editable canonical sources. The manifest provides version and location; canonical state is published as a coherent database/blob revision.
 
-Un paquete de transporte se crea desde un snapshot cerrado, con inventario y hashes. No editar directamente un ZIP abierto ni meter un SQLite con WAL activo en el paquete. Utilizar backup/checkpoint y cierre controlado antes del empaquetado.
+Transport packages are created from closed snapshots with inventories and hashes. Do not edit an open ZIP directly or package SQLite with an active WAL. Use backup/checkpoint and controlled closure before packaging.
 
-## Protocolo de guardado
+## Save protocol
 
-1. Capturar la revisión a guardar sin bloquear durante todo el trabajo de disco.
-2. Escribir blobs nuevos a archivos temporales, verificar hashes, hacer flush necesario y renombrarlos dentro del mismo volumen.
-3. Confirmar la transacción de metadata/revisión que apunta a esos blobs ya durables.
-4. Publicar el manifiesto mediante reemplazo atómico compatible con la plataforma; sincronizar directorio cuando corresponda.
-5. Mantener la revisión anterior recuperable y limpiar temporales huérfanos en una pasada segura posterior.
+1. Capture the revision to save without blocking throughout disk IO.
+2. Write new blobs to temporary files, verify hashes, perform required flushes and rename within the same volume.
+3. Commit metadata/revision transactions referencing those already durable blobs.
+4. Publish the manifest through a platform-compatible atomic replacement; synchronize the directory where required.
+5. Keep the previous revision recoverable and remove orphaned temporary files in a later safe pass.
 
-La [atomicidad de SQLite](https://sqlite.org/atomiccommit.html) no hace transaccionales por sí sola los archivos externos. El formato debe admitir detectar si el manifiesto quedó atrasado respecto a la DB y resolverlo a una revisión íntegra. Nunca borrar blobs antiguos en el mismo paso que publica una revisión nueva. La recolección de basura toma como raíces todas las revisiones retenidas, exports fijados y recovery journals.
+[SQLite atomicity](https://sqlite.org/atomiccommit.html) does not itself make external files transactional. The format must detect a manifest lagging behind the database and resolve it to an intact revision. Never delete old blobs in the same step that publishes a new revision. Garbage collection uses all retained revisions, pinned exports and recovery journals as roots.
 
-Pruebas obligatorias: interrupción en cada frontera, disco lleno, permiso denegado, recurso ausente, guardado mientras se sigue editando y doble apertura de la misma escena. Una configuración de sincronización de SQLite que sacrifica durabilidad requiere una decisión explícita y no se presenta como recuperación garantizada.
+Required checks: interruption at every boundary, disk full, denied permissions, missing resources, continued editing during save and opening the same scene twice. SQLite synchronization settings that sacrifice durability require an explicit decision and cannot be described as guaranteed recovery.
 
-## Evolución y migración
+## Evolution and migration
 
-- `formatVersion` evoluciona independientemente de la versión de aplicación.
-- Migración determinista sobre una copia o nueva revisión; el original queda preservado.
-- Los bloques de extensiones desconocidas se conservan y se marcan, con límites de tamaño y tipos.
-- Un lector antiguo que no entiende semántica esencial abre solo lectura o rechaza; no guarda perdiendo datos silenciosamente.
-- Validar límites antes de reservar memoria, dimensiones, número de elementos, rutas de ZIP, referencias y ciclos.
-- Colección de fixtures de cada versión publicada y pruebas de ida/vuelta semántica.
+- `formatVersion` evolves independently of the application version.
+- Migrations are deterministic and operate on a copy or new revision, preserving the original.
+- Unknown extension blocks are retained and flagged, with type and size limits.
+- An older reader lacking essential semantics opens read-only or rejects the file; it does not silently save with data loss.
+- Validate dimensions, counts, archive paths, references and cycles before allocating memory.
+- Retain fixtures for every published version and test semantic round trips.
 
-## Formatos de intercambio
+## Interchange formats
 
-| Perfil | Objetivo propio | Pérdida o límite que debe declararse |
+| Profile | Intended purpose | Losses or limits to declare |
 |---|---|---|
-| PNG y secuencias | Entrega base de imágenes con alfa | Sin rigs, capas ni curvas |
-| WAV/PCM | Audio de referencia y mezcla | Sin representación del documento de animación |
-| SVG | Subconjunto vectorial interoperable | Filtros, fuentes y estilos complejos pueden requerir conversión |
-| PSD | Capas de layout y pintura | Modos, máscaras, smart objects y efectos no siempre trasladables |
-| EXR | Composición float y pases | Convenciones de canales, premultiplicación y color obligatorias |
-| Vídeo | Preview y entrega | Disponibilidad de codecs y alfa depende del perfil/build |
-| OTIO | Cortes, tracks, timing y referencias | No equivale a escena gráfica ni contiene el rig |
-| FBX/Alembic/USD | Investigación de interoperabilidad profesional | Evaluar lector, licencia, animación, materiales y ejes por separado |
+| PNG and sequences | Basic image delivery with alpha | No rigs, layers or curves |
+| WAV/PCM | Reference audio and mixes | No animation-document representation |
+| SVG | Interoperable vector subset | Filters, fonts and complex styles may need conversion |
+| PSD | Layout and paint layers | Modes, masks, smart objects and effects may not transfer |
+| EXR | Float compositing and passes | Channel, premultiplication and color conventions required |
+| Video | Preview and delivery | Codec and alpha availability depend on profile/build |
+| OTIO | Cuts, tracks, timing and references | Not a graphics scene or rig container |
+| FBX/Alembic/USD | Professional interoperability research | Evaluate reader, license, animation, materials and axes separately |
 
-Cada adapter retorna un informe con elementos conservados, horneados, omitidos y errores. Una importación aceptada mantiene el original como asset o referencia de procedencia según política. No usar `.svg` o `.json` como promesa de que todo el comportamiento de otra aplicación cabe en ese formato.
+Each adapter returns a report of preserved, baked, omitted and failed elements. Accepted imports retain the original as an asset or provenance reference according to policy. A `.svg` or `.json` extension is not a promise that all another application's behavior fits in the format.

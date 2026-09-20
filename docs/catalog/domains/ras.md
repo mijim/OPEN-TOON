@@ -1,89 +1,89 @@
-# RAS — Dibujo bitmap, texturas y pinceles
+# RAS — Bitmap drawing, textures and brushes
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Dibujar bitmap → editar → gestionar resolución → intercambiar pinceles.
+**Workflow:** Draw bitmap → edit → manage resolution → exchange brushes.
 
-**Módulo:** `drawing-raster`.
+**Module:** `drawing-raster`.
 
-**Entidades:** RasterTile, BrushPreset, TextureAsset, RasterSelection.
+**Entities:** RasterTile, BrushPreset, TextureAsset, RasterSelection.
 
-**Relaciones:** LYR, UI.
+**Relationships:** LYR, UI.
 
-**Riesgo principal:** Consumo de memoria y coherencia entre textura y transformación.
+**Main risk:** Memory usage and consistency between texture and transform.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## RAS-001 — Capas bitmap
+## RAS-001 — Bitmap layers
 
-Pintar imágenes por píxeles con resolución definida y transparencia.
+Paint pixel images with a defined resolution and transparency.
 
-**Aceptación inicial:** Una capa vacía exporta alfa cero.
+**Initial acceptance:** An empty layer exports with zero alpha.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## RAS-002 — Pincel bitmap texturado
+## RAS-002 — Textured bitmap brush
 
-Soportar punta, espaciado, opacidad y dinámica en trazos raster.
+Support brush tip, spacing, opacity and dynamics for raster strokes.
 
-**Aceptación inicial:** Un trazo largo mantiene densidad estable al variar velocidad.
+**Initial acceptance:** A long stroke maintains stable density as drawing speed changes.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## RAS-003 — Goma bitmap
+## RAS-003 — Bitmap eraser
 
-Eliminar o reducir alfa con borde y opacidad configurables.
+Remove or reduce alpha with configurable edge softness and opacity.
 
-**Aceptación inicial:** Borrar no introduce píxeles negros opacos en el borde.
+**Initial acceptance:** Erasing does not introduce opaque black pixels at the edge.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## RAS-004 — Resolución de textura
+## RAS-004 — Texture resolution
 
-Modificar resolución y calidad de imágenes explicando la pérdida por remuestreo.
+Change image resolution and quality while explaining resampling loss.
 
-**Aceptación inicial:** Escalar hacia abajo conserva dimensiones físicas acordadas.
+**Initial acceptance:** Downsampling preserves the agreed physical dimensions.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## RAS-005 — Selección raster
+## RAS-005 — Raster selection
 
-Transformar píxeles seleccionados conservando máscara y canal alfa.
+Transform selected pixels while preserving the mask and alpha channel.
 
-**Aceptación inicial:** Rotar la selección no rellena el exterior con un color sólido.
+**Initial acceptance:** Rotating the selection does not fill the surrounding area with a solid color.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## RAS-006 — Pinceles ABR
+## RAS-006 — ABR brushes
 
-Importar el subconjunto soportado de pinceles Photoshop y emitir un informe de parámetros ignorados.
+Import a supported subset of Photoshop brushes and report ignored parameters.
 
-**Aceptación inicial:** Un ABR no compatible se rechaza con diagnóstico sin crear un preset roto.
+**Initial acceptance:** An unsupported ABR file is rejected with diagnostics without creating a broken preset.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## RAS-007 — Pincel vectorial con textura bitmap
+## RAS-007 — Vector brush with bitmap texture
 
-Mantener separadas geometría vectorial y textura raster dependiente de resolución.
+Keep vector geometry separate from resolution-dependent raster texture.
 
-**Aceptación inicial:** El editor advierte cuando la ampliación excede resolución de textura.
+**Initial acceptance:** The editor warns when magnification exceeds the texture resolution.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

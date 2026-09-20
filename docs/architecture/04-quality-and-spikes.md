@@ -1,52 +1,54 @@
-# Calidad y pruebas de viabilidad
+# Quality and feasibility experiments
 
-Los [26 requisitos no funcionales](../catalog/nonfunctional.json) son objetivos propuestos, **no resultados medidos**. Una aplicación de animación se valida con dibujos, tiempo, persistencia y dispositivos, no solamente con tests de componentes UI.
+The [27 nonfunctional requirements](../catalog/nonfunctional.json) are proposed objectives, **not measured results**. Animation software is validated through drawings, timing, persistence and devices, not only UI component tests.
 
-## Fixtures de carga propuestos
+## Proposed load fixtures
 
-| Escena | Contenido sintético | Finalidad |
+| Scene | Synthetic content | Purpose |
 |---|---|---|
-| B0 | 1 capa, 1 dibujo, trazos de tableta grabados, 1080p | Latencia y fidelidad de entrada |
-| B1 | 100 capas, 1.000 frames, 200 dibujos únicos, 100.000 segmentos vectoriales totales, 1 pista WAV de 48 kHz, máscaras básicas | Presupuesto inicial de UI, caché y playback |
-| B2 | 300 capas, 10.000 frames, 1.000 dibujos, curvas y rigs reutilizados | Virtualización e invalidación |
-| B3 | 4K, raster disperso, texturas, blur, máscaras y transparencias | Memoria, tiles y calidad |
-| B4 | Rig con curvas/envelope, 60 controles, sustituciones y poses | Deformación y controles |
-| B5 | HDR, cartas de color, alfa, EXR y múltiples salidas | Coherencia del compositor |
-| B6 | Proyectos corruptos, recursos ausentes, versiones viejas | Recuperación y parsers |
+| B0 | One layer/drawing, recorded tablet strokes, 1080p | Input latency and fidelity |
+| B1 | 100 layers, 1,000 frames, 200 unique drawings, 100,000 total vector segments, one 48 kHz WAV track, basic masks | Initial UI, cache and playback budgets |
+| B2 | 300 layers, 10,000 frames, 1,000 drawings, curves and reused rigs | Virtualization and invalidation |
+| B3 | 4K sparse raster, textures, blur, masks and transparency | Memory, tiles and quality |
+| B4 | Curve/envelope rig, 60 controls, substitutions and poses | Deformation and controllers |
+| B5 | HDR, color charts, alpha, EXR and multiple outputs | Compositor consistency |
+| B6 | Corrupt projects, missing resources and old versions | Recovery and parsers |
 
-Los fixtures deberán generarse con semilla fija, guardar hashes y declarar si el conteo es de segmentos totales o visibles. El hardware de referencia se registrará antes de ejecutar pruebas: CPU, GPU, RAM/VRAM, sistema, driver, tableta, refresh, DPI, resolución y build release. Una máquina con 16 GiB es una referencia de presupuesto, no un requisito mínimo ya validado.
+Generate fixtures with fixed seeds, record hashes and distinguish total from visible segment counts. Before testing, record CPU, GPU, RAM/VRAM, OS, driver, tablet, refresh rate, DPI, resolution and release build. A 16 GiB machine is a budget reference, not an already-validated minimum requirement. Early phases exercise the explicitly supported subset of each fixture.
 
-## Puertas técnicas
+## Technical gates
 
-| ID | Incertidumbre | Experimento acotado | Evidencia para decidir |
+| ID | Uncertainty | Bounded experiment | Decision evidence |
 |---|---|---|---|
-| SP-00 | Núcleo propio frente a OpenToonz | Auditar guardado, exposición, vector/raster, Plastic y compositor en un checkout identificado; probar build y una modificación de UI | Mapa de acoplamientos, licencias y coste de reutilización frente a desarrollo propio |
-| SP-01 | Entrada Qt y respuesta del lápiz | Capturar presión/inclinación y dibujar B0 en cada SO con tabletas reales; probar HiDPI, pérdida de foco y cancelación | Trace interno, vídeo para latencia física y lista de drivers; cambiar de adapter si falla |
-| SP-02 | Renderer y Qt Quick | Comparar CPU+upload y GPU RHI; evaluar Skia en el límite vectorial; tiles, alfa, filtros y superficies | Frame times, memoria, tiempos de build y equivalencia visual; una única ruta principal elegida |
-| SP-03 | Guardado robusto | Prototipo mínimo de SQLite+blobs con fallos inyectados entre cada paso | Recuperación sin referencias rotas y coste del guardado concurrente |
-| SP-04 | Topología vectorial y pintura | Autointersecciones, líneas variables, regiones adyacentes, cierre de huecos y goma | Suite de dibujos patológicos y criterios de error; elegir algoritmo/librería |
-| SP-05 | Modelo temporal y audio | Mezclar FPS enteros/racionales, clips y cambios de tasa durante 10 minutos | Cero errores de conteo y deriva dentro del objetivo |
-| SP-06 | Deformación | Prototipo de curva/envelope y malla sobre B4 con textura cuadriculada | Calidad de juntas, continuidad, rendimiento y límites explícitos |
-| SP-07 | Distribución libre | Construir paquete mínimo con módulos Qt, fuentes y codecs previstos | Dependencias y licencias exactas, instalación en sistema limpio y carga de plugins |
+| SP-00 | Owned core versus OpenToonz reuse/fork | Audit saving, exposures, vector/raster, Plastic and compositor in an identified checkout; build and change a UI element | Coupling/license map and reuse versus development cost |
+| SP-01 | Qt input and pen response | Capture pressure/tilt and draw B0 on each OS with real tablets; test HiDPI, focus loss and cancellation | Internal traces, physical-latency video and driver matrix; change adapter if needed |
+| SP-02 | Renderer and Qt Quick | Compare CPU/upload with GPU RHI; evaluate Skia at the vector boundary, tiles, alpha, filters and surfaces | Frame times, memory, build cost, visual equivalence; select one primary path |
+| SP-03 | Robust saving | Minimal SQLite/blob prototype with injected failures between every step | Recovery without broken references and concurrent-save cost |
+| SP-04 | Vector topology and painting | Self-intersections, variable width, adjacent regions, gap closing and erasing | Pathological drawing suite and error criteria; choose algorithm/library |
+| SP-05 | Time model and audio | Mix integer/rational FPS, clips and rate changes over ten minutes | Exact frame counts and drift within the target |
+| SP-06 | Deformation | Curve/envelope and mesh prototype on B4 with checker texture | Joint quality, continuity, performance and explicit limits |
+| SP-07 | Free-software distribution | Build a minimal package with intended Qt modules, fonts and codecs | Exact dependencies/licenses, clean-system installation and plugin loading |
 
-No hace falta resolver partículas o IA antes del primer producto útil. Sí hace falta conocer si la pila elegida puede dibujar, guardar y reproducir con garantías. Si un spike falla, actualizar el ADR y el plan; no esconderlo detrás de un objetivo de diseño.
+Particles and AI need not be solved before the first useful product. Drawing, saving and playback viability must be established. Failed spikes update the ADR and roadmap; do not hide them behind visual-design goals.
 
-## Tipos de pruebas
+## Types of verification
 
-**Dominio:** aritmética temporal, intervalos, identidades, curvas, transformaciones, comandos inversos y orden del grafo. Pruebas generativas para secuencias de edición; comparan invariantes, no una copia del algoritmo de implementación.
+**Domain:** time arithmetic, intervals, identities, curves, transforms, inverse commands and graph order. Generative edit sequences compare invariants rather than duplicating the implementation algorithm.
 
-**Persistencia:** guardar/abrir, migraciones, backups, disco lleno, rutas Unicode, interrupciones y acceso concurrente. El criterio es igualdad semántica y recursos recuperables, no byte a byte de una DB con timestamps.
+**Persistence:** save/open, migrations, backups, disk full, Unicode paths, interruptions and concurrent access. Require semantic equality and recoverable resources, not byte equality of databases containing timestamps.
 
-**Imagen:** render CPU determinista cuando sea posible y comparación perceptual/numérica de GPU con tolerancias por operador. Comparar alfa por separado; incluir bordes, imágenes fuera de frame, HDR y combinaciones de paleta/deformación/máscara. Investigar cambios de golden antes de aceptarlos.
+**Images:** deterministic CPU rendering where possible and perceptual/numerical GPU comparisons with per-operator tolerances. Compare alpha separately; include edges, out-of-frame content, HDR and palette/deformation/mask combinations. Investigate golden changes before accepting them.
 
-**UI:** navegación de teclado, selección, operaciones de rango, textos largos, escalado, estados vacíos y recuperación de foco. El trazado sintético sirve para regresiones de geometría; no sustituye la prueba física de tableta.
+**UI:** keyboard navigation, selections, range operations, long text, scaling, empty states and focus recovery. Synthetic strokes catch geometry regressions but do not replace physical tablet testing. All first-party surfaces follow the [English policy](../design/02-language-policy.md).
 
-**Rendimiento:** warm/cold cache separados, p50/p95/p99, regresiones sobre la misma máquina y build, CPU/GPU/IO diferenciados. Medir guardar mientras se dibuja y evitar promedios que oculten pausas largas.
+**Performance:** separate cold/warm caches; record p50/p95/p99 and compare the same machine/build. Separate CPU/GPU/IO. Measure saving while drawing and avoid averages that hide long pauses.
 
-**Flujo artístico:** completar [WF-01 a WF-12](../research/02-workflows.md) con una persona animadora, registrando bloqueos, pérdidas y pasos confusos. La paridad no se obtiene por contar menús.
+**Artist workflows:** complete [WF-01 through WF-12](../research/02-workflows.md) with an animator, recording blockers, losses and confusing steps. Menu counts do not prove production readiness.
 
-## Definition of Done futura
+## Definition of Done
 
-Una capacidad pasa de `not_started` a implementada cuando realiza su operación sobre el modelo real, persiste, se deshace cuando aplica, explica errores y tiene aceptación observable. Pasa a verificada cuando además supera las plataformas/perfiles declarados y documenta límites. Funciones parcialmente soportadas se marcan `partial`, con el subconjunto exacto.
+A capability moves from `not_started` to implemented when it performs its operation on the real model, persists, supports undo where applicable, explains errors and meets observable acceptance. It becomes verified after passing declared platforms/profiles and documenting limits. Partial support remains `partial` with its exact subset.
 
-Para una release: builds limpios, avisos de terceros, formato versionado, escenas de referencia, prueba de actualización/recuperación, paquete instalable y guía de limitaciones. Los objetivos de render 4K/8K, número de capas y codecs se anunciarán solo después de medirlos.
+A release requires clean builds, third-party notices, a versioned format, reference scenes, upgrade/recovery checks, installable packages and a limitations guide. Advertise resolution, layer counts and codecs only after measuring them.
+
+The [roadmap](../planning/README.md) assigns phases and release gates to this strategy. All budgets remain proposed until measured on recorded hardware.

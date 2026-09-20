@@ -1,129 +1,129 @@
-# LYR — Capas, dibujos y subcapas artísticas
+# LYR — Layers, drawings and art sublayers
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Crear capa → crear dibujo → exponerlo → reutilizar o duplicar.
+**Workflow:** Create layer → create drawing → expose → reuse or duplicate.
 
-**Módulo:** `document`.
+**Module:** `document`.
 
-**Entidades:** Layer, Drawing, DrawingId, ArtLayer, ExposureTrack.
+**Entities:** Layer, Drawing, DrawingId, ArtLayer, ExposureTrack.
 
-**Relaciones:** PRJ.
+**Relationships:** PRJ.
 
-**Riesgo principal:** Confundir exposición, dibujo compartido y copia independiente.
+**Main risk:** Confusing exposures, shared drawings and independent copies.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## LYR-001 — Capas tipadas
+## LYR-001 — Typed layers
 
-Crear capas de dibujo, sonido y transformación con atributos específicos.
+Create drawing, sound and transform layers with type-specific attributes.
 
-**Aceptación inicial:** El inspector impide asignar muestras de audio a una capa vectorial.
+**Initial acceptance:** The inspector prevents assigning audio samples to a vector layer.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## LYR-002 — Reordenar y renombrar
+## LYR-002 — Reorder and rename layers
 
-Cambiar orden y etiquetas manteniendo identificadores estables.
+Change ordering and labels while retaining stable identifiers.
 
-**Aceptación inicial:** Renombrar una capa no rompe nodos ni curvas vinculadas.
+**Initial acceptance:** Renaming a layer does not break linked nodes or curves.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## LYR-003 — Visibilidad, bloqueo y solo
+## LYR-003 — Visibility, lock and solo
 
-Separar visibilidad de edición, bloqueo y aislamiento temporal.
+Separate editing visibility, locking and temporary isolation.
 
-**Aceptación inicial:** Solo se revierte sin perder el estado original de las demás capas.
+**Initial acceptance:** Leaving solo mode restores the original state of other layers.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## LYR-004 — Grupos de capas
+## LYR-004 — Layer groups
 
-Agrupar y desagrupar conservando las relaciones que afectan al resultado.
+Group and ungroup layers while preserving relationships that affect the result.
 
-**Aceptación inicial:** Desagrupar no altera la posición global de los dibujos.
+**Initial acceptance:** Ungrouping does not change the drawings' world positions.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## LYR-005 — Duplicar o clonar
+## LYR-005 — Duplicate or clone
 
-Distinguir copia profunda de instancia que comparte dibujos o funciones.
+Distinguish a deep copy from an instance sharing drawings or functions.
 
-**Aceptación inicial:** Editar un clon actualiza sus instancias; editar una copia no.
+**Initial acceptance:** Editing shared clone content updates its instances; editing a deep copy does not.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## LYR-006 — Sincronización de exposiciones
+## LYR-006 — Exposure synchronization
 
-Permitir pistas vinculadas que compartan la secuencia de dibujos.
+Allow linked tracks to share a drawing sequence.
 
-**Aceptación inicial:** Cambiar una exposición sincronizada actualiza las pistas asociadas.
+**Initial acceptance:** Changing a synchronized exposure updates the associated tracks.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## LYR-007 — Gestión de elementos
+## LYR-007 — Element management
 
-Identificar dibujos usados y no expuestos; renumerar sin perder referencias.
+Identify used and unexposed drawings; renumber without losing references.
 
-**Aceptación inicial:** Un dibujo no expuesto no se elimina al vaciar una celda.
+**Initial acceptance:** Clearing a cell does not delete its now-unexposed drawing.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## LYR-008 — Line, Colour, Overlay y Underlay
+## LYR-008 — Line, Color, Overlay and Underlay Art
 
-Guardar cuatro subcapas artísticas por dibujo con orden definido.
+Store four ordered art sublayers per drawing.
 
-**Aceptación inicial:** Pintar Colour Art mantiene intacta la línea de Line Art.
+**Initial acceptance:** Painting Color Art leaves the Line Art strokes intact.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## LYR-009 — Gestor de art layers
+## LYR-009 — Art layer manager
 
-Mover, intercambiar, duplicar y consolidar subcapas en rangos de dibujos.
+Move, swap, duplicate and consolidate art sublayers across drawing ranges.
 
-**Aceptación inicial:** Un intercambio sobre diez dibujos se deshace como una operación.
+**Initial acceptance:** Swapping art layers across ten drawings is undone as one operation.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## LYR-010 — Anotaciones de hoja
+## LYR-010 — Sheet annotations
 
-Añadir texto o dibujos de anotación independientes del render final.
+Add text or drawing annotations independently of the final render.
 
-**Aceptación inicial:** La anotación se ve en la hoja y no aparece en la secuencia exportada.
+**Initial acceptance:** Annotations appear in the sheet but not in the exported sequence.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## LYR-011 — Edición múltiple de propiedades
+## LYR-011 — Multi-layer property editing
 
-Aplicar atributos comunes a una selección de capas compatible.
+Apply shared attributes to a compatible selection of layers.
 
-**Aceptación inicial:** La operación informa de capas incompatibles y conserva el resto.
+**Initial acceptance:** The operation reports incompatible layers and preserves the remaining data.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

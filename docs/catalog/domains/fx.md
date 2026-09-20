@@ -1,219 +1,219 @@
-# FX — Efectos, composición avanzada y sombreado
+# FX — Effects, advanced compositing and shading
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Añadir efecto → delimitar → animar parámetros → comprobar salida.
+**Workflow:** Add effect → define bounds → animate parameters → verify output.
 
-**Módulo:** `effects`.
+**Module:** `effects`.
 
-**Entidades:** EffectDefinition, AnimatedParameter, Matte, SurfaceMap.
+**Entities:** EffectDefinition, AnimatedParameter, Matte, SurfaceMap.
 
-**Relaciones:** NOD, COL.
+**Relationships:** NOD, COL.
 
-**Riesgo principal:** Precisión de color, alfa, bordes de tile y coste acumulado.
+**Main risk:** Color precision, alpha, tile edges and cumulative cost.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## FX-001 — Modos de mezcla
+## FX-001 — Blend modes
 
-Combinar imágenes con ecuaciones de mezcla y alfa documentadas.
+Combine images using documented blending and alpha equations.
 
-**Aceptación inicial:** Una batería de patches coincide con las ecuaciones seleccionadas.
+**Initial acceptance:** A patch test suite matches the selected equations.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FX-002 — Transparencia animada
+## FX-002 — Animated transparency
 
-Controlar alfa independientemente de RGB.
+Control alpha independently of RGB.
 
-**Aceptación inicial:** Bajar opacidad a cero produce alfa cero sin halo al recomponer.
+**Initial acceptance:** Reducing opacity to zero produces zero alpha without a halo when recomposited.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FX-003 — Blur gaussiano y box
+## FX-003 — Gaussian and box blur
 
-Filtrar por radio con extensión de borde explícita.
+Filter by radius with explicit edge extension.
 
-**Aceptación inicial:** Un blur por tiles no deja costuras.
+**Initial acceptance:** Tiled blur leaves no seams.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FX-004 — Blur direccional, radial y zoom
+## FX-004 — Directional, radial and zoom blur
 
-Aplicar desenfoques con centro, dirección y longitud animables.
+Apply blur with animatable center, direction and length.
 
-**Aceptación inicial:** Mover el centro fuera del frame mantiene el comportamiento definido.
+**Initial acceptance:** Moving the center outside the frame preserves defined behavior.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FX-005 — Bokeh y blur variable
+## FX-005 — Bokeh and variable blur
 
-Controlar desenfoque mediante forma y mapas espaciales.
+Control blur using shapes and spatial maps.
 
-**Aceptación inicial:** Las zonas con radio cero conservan la entrada.
+**Initial acceptance:** Areas with zero radius preserve the input.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FX-006 — Glow y bloom
+## FX-006 — Glow and bloom
 
-Generar halo luminoso preservando HDR cuando esté habilitado.
+Generate light halos while preserving HDR when enabled.
 
-**Aceptación inicial:** Una fuente HDR no se recorta antes del filtro en modo float.
+**Initial acceptance:** An HDR source is not clipped before filtering in float mode.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FX-007 — Sombras, tonos y highlights
+## FX-007 — Shadows, tones and highlights
 
-Crear sombreado 2D por silueta y matte.
+Create 2D shading from silhouettes and mattes.
 
-**Aceptación inicial:** La sombra puede desplazarse sin mover el dibujo fuente.
+**Initial acceptance:** A shadow can move independently of the source drawing.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FX-008 — Curvas y niveles de color
+## FX-008 — Color curves and levels
 
-Modificar canales mediante curvas y rangos animables.
+Adjust channels through animatable curves and ranges.
 
-**Aceptación inicial:** Una curva identidad devuelve la entrada dentro de tolerancia.
+**Initial acceptance:** An identity curve returns the input within tolerance.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
 ## FX-009 — Color override
 
-Sustituir muestras y texturas por identidad en ramas concretas.
+Replace swatches and textures by identity on selected branches.
 
-**Aceptación inicial:** El mismo dibujo puede renderizarse con dos variantes simultáneas.
+**Initial acceptance:** The same drawing can render with two variants simultaneously.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FX-010 — Fades de paleta
+## FX-010 — Palette fades
 
-Interpolar colores de una paleta o muestra en el tiempo.
+Interpolate palette or swatch colors over time.
 
-**Aceptación inicial:** El fade no cambia la identidad de la muestra.
+**Initial acceptance:** The fade does not change swatch identity.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FX-011 — Transformación de textura
+## FX-011 — Texture transforms
 
-Animar coordenadas de relleno sin mover geometría.
+Animate fill coordinates without moving geometry.
 
-**Aceptación inicial:** Una textura se desplaza dentro de un contorno inmóvil.
+**Initial acceptance:** A texture moves inside a stationary contour.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FX-012 — Texturas por secuencia
+## FX-012 — Sequence textures
 
-Sustituir una textura por frames de una secuencia externa.
+Replace a texture with frames from an external sequence.
 
-**Aceptación inicial:** La selección temporal de textura respeta FPS y rango definidos.
+**Initial acceptance:** Texture sampling respects the defined frame rate and range.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FX-013 — Matte animado
+## FX-013 — Animated matte
 
-Editar contornos animables con suavizado interior y exterior.
+Edit animatable contours with inner and outer feathering.
 
-**Aceptación inicial:** La máscara mantiene continuidad al interpolar controles compatibles.
+**Initial acceptance:** The mask remains continuous when interpolating compatible controls.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FX-014 — Canales y keying
+## FX-014 — Channels and keying
 
-Seleccionar, intercambiar y extraer mattes desde canales de imagen.
+Select, swap and extract mattes from image channels.
 
-**Aceptación inicial:** El canal seleccionado coincide con los valores originales del test.
+**Initial acceptance:** The selected channel matches the original test values.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FX-015 — Generadores
+## FX-015 — Generators
 
-Crear color plano, gradientes, rejillas y ruido como fuentes de imagen.
+Create solid color, gradients, grids and noise as image sources.
 
-**Aceptación inicial:** Un generador con semilla fija es reproducible.
+**Initial acceptance:** A generator with a fixed seed is reproducible.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FX-016 — Distorsión y turbulencia
+## FX-016 — Distortion and turbulence
 
-Deformar coordenadas de muestreo con mapas y parámetros.
+Deform sampling coordinates using maps and parameters.
 
-**Aceptación inicial:** Una distorsión identidad produce la entrada original.
+**Initial acceptance:** Identity distortion produces the original input.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FX-017 — Nitidez y antiflicker
+## FX-017 — Sharpening and antiflicker
 
-Ofrecer filtros de detalle y estabilización visual con rango acotado.
+Provide detail and visual-stability filters within bounded ranges.
 
-**Aceptación inicial:** El filtro desactivado no modifica los píxeles.
+**Initial acceptance:** A disabled filter does not modify pixels.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FX-018 — Light shading y normales
+## FX-018 — Light shading and normals
 
-Iluminar arte mediante normales o volúmenes auxiliares.
+Light artwork using normals or auxiliary volumes.
 
-**Aceptación inicial:** Mover una luz cambia el sombreado sin modificar el dibujo fuente.
+**Initial acceptance:** Moving a light changes shading without modifying the source drawing.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FX-019 — Surface shading y sombras proyectadas
+## FX-019 — Surface shading and cast shadows
 
-Definir superficies y elevación para sombras y oclusión.
+Define surfaces and elevation for shadows and occlusion.
 
-**Aceptación inicial:** Dos superficies de distinta altura producen la relación de sombra prevista.
+**Initial acceptance:** Surfaces at different heights produce the expected shadow relationship.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
 ## FX-020 — OpenFX
 
-Alojar un subconjunto declarado del estándar con plugins compatibles.
+Host a declared subset of the standard with compatible plugins.
 
-**Aceptación inicial:** Un plugin incompatible se rechaza y queda identificado en el proyecto.
+**Initial acceptance:** An incompatible plugin is rejected and remains identified in the project.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

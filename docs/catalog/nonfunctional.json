@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "as_of": "2026-09-20",
-  "note": "Objetivos propuestos; ninguno se presenta como rendimiento medido de OPEN-TOON. B1 se define en quality-and-spikes.",
+  "note": "Proposed objectives, not measured OPEN-TOON performance. B1 is defined in the quality and spikes document.",
   "requirements": [
     {
       "id": "NFR-001",
-      "category": "Integridad",
-      "requirement": "Interrumpir guardado en cada frontera del protocolo deja una revisión íntegra anterior o nueva.",
-      "verification": "Fault injection y reapertura; cero referencias publicadas a blobs ausentes.",
+      "category": "Integrity",
+      "requirement": "Interrupting save at any protocol boundary leaves either the previous or the new revision intact.",
+      "verification": "Fault injection and reopening; no published references to missing blobs.",
       "domains": [
         "PRJ"
       ],
@@ -15,9 +15,9 @@
     },
     {
       "id": "NFR-002",
-      "category": "Recuperación",
-      "requirement": "El autoguardado propuesto tiene intervalo por defecto de 60 segundos configurable.",
-      "verification": "Cierre forzado durante edición y recuperación del último snapshot confirmado; medir pérdida real.",
+      "category": "Recovery",
+      "requirement": "Proposed autosave defaults to a configurable 60-second interval.",
+      "verification": "Force shutdown during editing and recover the last committed snapshot; measure actual work loss.",
       "domains": [
         "PRJ"
       ],
@@ -26,8 +26,8 @@
     {
       "id": "NFR-003",
       "category": "Undo",
-      "requirement": "Cada gesto de dibujo es una transacción reversible; rangos y cambios de paleta también.",
-      "verification": "Secuencias aleatorias ejecutar/deshacer/rehacer recuperan igualdad semántica.",
+      "requirement": "Every drawing gesture is a reversible transaction, as are range edits and palette changes.",
+      "verification": "Random execute/undo/redo sequences restore semantic equality.",
       "domains": [
         "PRJ",
         "LYR",
@@ -37,9 +37,9 @@
     },
     {
       "id": "NFR-004",
-      "category": "Lápiz",
-      "requirement": "Objetivo de p95 menor o igual a 8 ms desde recepción de muestra hasta trabajo CPU del trazo listo.",
-      "verification": "Trace de 10000 muestras en hardware de referencia; excluir refresco de pantalla y reportarlo aparte.",
+      "category": "Pen input",
+      "requirement": "Target p95 at or below 8 ms from sample receipt until CPU stroke processing is ready.",
+      "verification": "Trace 10,000 samples on reference hardware; exclude display refresh and report it separately.",
       "domains": [
         "UI",
         "VEC",
@@ -49,9 +49,9 @@
     },
     {
       "id": "NFR-005",
-      "category": "Latencia física",
-      "requirement": "Objetivo orientativo p95 menor o igual a 50 ms de lápiz a píxel en escena simple.",
-      "verification": "Medición con cámara de alta velocidad en dispositivos reales; no sustituir por timings internos.",
+      "category": "Physical latency",
+      "requirement": "Indicative target p95 at or below 50 ms from pen to pixel in a simple scene.",
+      "verification": "High-speed camera measurement on real devices; internal timings are not a substitute.",
       "domains": [
         "UI",
         "VEC",
@@ -61,9 +61,9 @@
     },
     {
       "id": "NFR-006",
-      "category": "Interactividad",
-      "requirement": "Objetivo p95 menor o igual a 16.7 ms de frame UI al navegar la escena B1.",
-      "verification": "Medir en build release a 1920x1080, DPR 1 y 2, con GPU/driver documentados.",
+      "category": "Interactivity",
+      "requirement": "Target p95 UI frame time at or below 16.7 ms when navigating B1.",
+      "verification": "Measure release builds at 1920×1080, DPR 1 and 2, with documented GPU and driver.",
       "domains": [
         "UI",
         "OUT"
@@ -73,8 +73,8 @@
     {
       "id": "NFR-007",
       "category": "Playback",
-      "requirement": "Mantener 24 fps en B1 tras preparar caché sin deriva acumulada de audio superior a un frame en 10 minutos.",
-      "verification": "Medir frame times y diferencia entre muestra y playhead; reportar frames omitidos.",
+      "requirement": "Maintain 24 fps in B1 after cache preparation, with accumulated audio drift no greater than one frame over ten minutes.",
+      "verification": "Measure frame times and sample/playhead offset; report dropped frames.",
       "domains": [
         "AUD",
         "OUT",
@@ -84,9 +84,9 @@
     },
     {
       "id": "NFR-008",
-      "category": "Escalabilidad temporal",
-      "requirement": "Una escena de 10000 frames no crea un objeto de UI por celda ni bitmap completo por frame.",
-      "verification": "Inspección de asignaciones y benchmark de navegación con virtualización.",
+      "category": "Timeline scalability",
+      "requirement": "A 10,000-frame scene creates neither one UI object per cell nor a full bitmap per frame.",
+      "verification": "Inspect allocations and benchmark navigation with virtualization.",
       "domains": [
         "TIM",
         "LYR"
@@ -95,9 +95,9 @@
     },
     {
       "id": "NFR-009",
-      "category": "Memoria",
-      "requirement": "Presupuesto inicial de caché de 2 GiB configurable; objetivo RSS menor a 4 GiB en B1 con 16 GiB de RAM.",
-      "verification": "Benchmark con repetición de abrir, cerrar y editar; registrar CPU RAM y VRAM por separado.",
+      "category": "Memory",
+      "requirement": "Initial configurable cache budget of 2 GiB; target RSS below 4 GiB for B1 on a 16 GiB machine.",
+      "verification": "Benchmark repeated open, close and edit operations; record CPU RAM and VRAM separately.",
       "domains": [
         "OUT",
         "PRJ"
@@ -106,9 +106,9 @@
     },
     {
       "id": "NFR-010",
-      "category": "Cancelación",
-      "requirement": "Operaciones largas reciben cancelación y devuelven control visible en menos de 500 ms cuando el backend lo permita.",
-      "verification": "Cancelar imports, render y empaquetado; procesos no cooperativos requieren terminación controlada.",
+      "category": "Cancellation",
+      "requirement": "Long operations accept cancellation and return visible control within 500 ms when the backend permits.",
+      "verification": "Cancel imports, renders and packaging; uncooperative processes require controlled termination.",
       "domains": [
         "OUT",
         "IMP"
@@ -118,8 +118,8 @@
     {
       "id": "NFR-011",
       "category": "Color",
-      "requirement": "La ruta CPU de referencia y GPU coinciden dentro de tolerancias acordadas por operador y precisión.",
-      "verification": "Fixtures de alfa, gradientes, mezcla, ICC/OCIO y HDR; no usar una tolerancia global que oculte fallos.",
+      "requirement": "Reference CPU and GPU paths agree within operator- and precision-specific tolerances.",
+      "verification": "Use alpha, gradient, blend, ICC/OCIO and HDR fixtures; no global tolerance that hides failures.",
       "domains": [
         "COL",
         "FX"
@@ -128,9 +128,9 @@
     },
     {
       "id": "NFR-012",
-      "category": "Determinismo",
-      "requirement": "Misma revisión, assets, semillas y perfil generan igual semántica; igualdad exacta en kernels deterministas CPU.",
-      "verification": "Hashes en CPU y tolerancias explícitas en GPU; registrar versiones de backend.",
+      "category": "Determinism",
+      "requirement": "Identical revision, assets, seeds and profile produce equal semantics; deterministic CPU kernels produce exact equality.",
+      "verification": "Use CPU hashes and explicit GPU tolerances; record backend versions.",
       "domains": [
         "PAR",
         "OUT"
@@ -139,9 +139,9 @@
     },
     {
       "id": "NFR-013",
-      "category": "Portabilidad",
-      "requirement": "Builds y smoke tests en Windows, macOS y Linux antes de anunciar soporte de plataforma.",
-      "verification": "Matriz reproducible con sistemas, GPU, drivers y dispositivos de entrada probados.",
+      "category": "Portability",
+      "requirement": "Build and smoke-test Windows, macOS and Linux before advertising platform support.",
+      "verification": "Reproducible matrix of tested operating systems, GPUs, drivers and input devices.",
       "domains": [
         "UI",
         "PRJ"
@@ -150,9 +150,9 @@
     },
     {
       "id": "NFR-014",
-      "category": "Accesibilidad",
-      "requirement": "Texto normal con contraste mínimo 4.5:1 y controles críticos operables por teclado.",
-      "verification": "Auditar tokens, foco, nombres accesibles y alternativas a acciones exclusivamente gestuales.",
+      "category": "Accessibility",
+      "requirement": "Normal text has at least 4.5:1 contrast, and critical controls support keyboard operation.",
+      "verification": "Audit tokens, focus, accessible names and alternatives to gesture-only actions.",
       "domains": [
         "UI"
       ],
@@ -160,9 +160,9 @@
     },
     {
       "id": "NFR-015",
-      "category": "Monocromo",
-      "requirement": "No depender del color para selección, errores, claves o estados.",
-      "verification": "Revisión de toda la UI en escala de grises y con símbolos/texto visibles.",
+      "category": "Monochrome",
+      "requirement": "Do not rely on color alone for selections, errors, keyframes or states.",
+      "verification": "Review the entire UI in grayscale with visible symbols and text.",
       "domains": [
         "UI",
         "TIM"
@@ -172,8 +172,8 @@
     {
       "id": "NFR-016",
       "category": "Offline",
-      "requirement": "Crear, editar, guardar y exportar imágenes no requiere cuenta ni conexión.",
-      "verification": "Ejecutar flujo WF-01 con red deshabilitada.",
+      "requirement": "Creating, editing, saving and exporting images requires neither an account nor a connection.",
+      "verification": "Run WF-01 with networking disabled.",
       "domains": [
         "PRJ",
         "OUT"
@@ -182,9 +182,9 @@
     },
     {
       "id": "NFR-017",
-      "category": "Migraciones",
-      "requirement": "Cada versión publicada de formato conserva un fixture de apertura y migración.",
-      "verification": "Migrar sobre copia y comparar semántica/render; mantener original intacto.",
+      "category": "Migrations",
+      "requirement": "Retain opening and migration fixtures for every published format version.",
+      "verification": "Migrate a copy and compare semantics/rendering; preserve the original.",
       "domains": [
         "PRJ"
       ],
@@ -192,9 +192,9 @@
     },
     {
       "id": "NFR-018",
-      "category": "Entradas no confiables",
-      "requirement": "Rechazar archivos con rutas de escape, tamaños abusivos, ciclos o contenido corrupto.",
-      "verification": "Fuzzing de parsers y fixtures corruptos sin ejecución de scripts ni escritura fuera de destino.",
+      "category": "Untrusted input",
+      "requirement": "Reject path traversal, excessive sizes, cycles and corrupt content.",
+      "verification": "Fuzz parsers and use corrupt fixtures without script execution or writes outside the destination.",
       "domains": [
         "IMP",
         "PRJ"
@@ -203,9 +203,9 @@
     },
     {
       "id": "NFR-019",
-      "category": "Licencias",
-      "requirement": "Inventario de dependencias y recursos para cada binario distribuido.",
-      "verification": "SBOM, versiones, hashes y avisos del build concreto; excluir dependencias no redistribuibles.",
+      "category": "Licenses",
+      "requirement": "Maintain a dependency and asset inventory for every distributed binary.",
+      "verification": "Record SBOM, versions, hashes and notices for the actual build; exclude non-redistributable dependencies.",
       "domains": [
         "PRJ"
       ],
@@ -213,9 +213,9 @@
     },
     {
       "id": "NFR-020",
-      "category": "Pruebas de producto",
-      "requirement": "Toda capacidad implementada tiene prueba observable o escenario de usuario y límites publicados.",
-      "verification": "No marcar implementada por presencia de controles sin comportamiento real.",
+      "category": "Product verification",
+      "requirement": "Every implemented capability has an observable test or user scenario and published limits.",
+      "verification": "Do not mark a capability implemented merely because nonfunctional controls exist.",
       "domains": [
         "PRJ"
       ],
@@ -223,9 +223,9 @@
     },
     {
       "id": "NFR-021",
-      "category": "Formato abierto",
-      "requirement": "Documentar tipos, unidades, versión, algoritmos necesarios y migraciones para leer el formato.",
-      "verification": "Una herramienta independiente puede enumerar recursos y tiempos sin iniciar la UI.",
+      "category": "Open format",
+      "requirement": "Document types, units, versions, required algorithms and migrations needed to read the format.",
+      "verification": "An independent tool can enumerate resources and timing without launching the UI.",
       "domains": [
         "PRJ"
       ],
@@ -233,9 +233,9 @@
     },
     {
       "id": "NFR-022",
-      "category": "Diagnósticos",
-      "requirement": "Errores de importación/render incluyen acción, recurso e información recuperable.",
-      "verification": "Un recurso perdido genera informe exportable sin secretos ni contenidos por defecto.",
+      "category": "Diagnostics",
+      "requirement": "Import/render errors include the operation, resource and recoverable information.",
+      "verification": "A missing resource produces an exportable report without secrets or content by default.",
       "domains": [
         "IMP",
         "OUT"
@@ -244,9 +244,9 @@
     },
     {
       "id": "NFR-023",
-      "category": "Estructura",
-      "requirement": "El dominio compila y se prueba sin Qt, codecs, red ni ventanas.",
-      "verification": "Target CMake específico en CI y restricciones de dependencia entre targets.",
+      "category": "Structure",
+      "requirement": "The domain builds and is tested without Qt, codecs, networking or windows.",
+      "verification": "A dedicated CMake target in CI enforces dependency boundaries between targets.",
       "domains": [
         "PRJ"
       ],
@@ -254,9 +254,9 @@
     },
     {
       "id": "NFR-024",
-      "category": "Documentación",
-      "requirement": "IDs, fuentes, dependencias y vistas generadas permanecen consistentes.",
-      "verification": "Ejecutar scripts/validate_docs.py en cada cambio de catálogo.",
+      "category": "Documentation",
+      "requirement": "IDs, sources, dependencies and generated views remain consistent.",
+      "verification": "Run scripts/validate_docs.py for every catalog change.",
       "domains": [
         "PRJ"
       ],
@@ -264,9 +264,9 @@
     },
     {
       "id": "NFR-025",
-      "category": "No pérdida en conversión",
-      "requirement": "Cada adapter explica campos convertidos, omitidos y horneados.",
-      "verification": "Round-trip de fixtures soportados y reporte para funciones incompatibles.",
+      "category": "Conversion transparency",
+      "requirement": "Every adapter explains converted, omitted and baked fields.",
+      "verification": "Round-trip supported fixtures and report incompatible features.",
       "domains": [
         "IMP",
         "OUT"
@@ -275,12 +275,25 @@
     },
     {
       "id": "NFR-026",
-      "category": "Revisiones concurrentes",
-      "requirement": "Aplicar una operación calculada sobre una revisión obsoleta no sobrescribe cambios recientes.",
-      "verification": "Simular edición durante import/guardado; rechazar o rebasar explícitamente el resultado.",
+      "category": "Concurrent revisions",
+      "requirement": "Applying an operation computed from a stale revision does not overwrite newer changes.",
+      "verification": "Simulate editing during import/save; explicitly reject or rebase the result.",
       "domains": [
         "PRJ",
         "STU"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-027",
+      "category": "English product language",
+      "requirement": "All first-party UI, menus, tooltips, errors, accessibility labels, bundled presets, templates, help, public documentation and code identifiers use English. User-authored content supports Unicode without forced translation.",
+      "verification": "Review the string inventory, built-in assets and documentation; test English UI on non-English OS locales and round-trip Unicode filenames, layers and text.",
+      "domains": [
+        "UI",
+        "PRJ",
+        "AUT",
+        "LIB"
       ],
       "status": "proposed_not_measured"
     }

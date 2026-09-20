@@ -1,40 +1,46 @@
-# Mapa del análisis
+# Documentation map
 
-## Decisiones principales
+**Updated: 2026-09-20.** The repository contains a functional specification and an execution roadmap. It does not contain an implemented animation application.
 
-| Tema | Resultado | Estado |
+## Current decisions
+
+| Topic | Direction | Status |
 |---|---|---|
-| Producto propio | Editor profesional 2D, local y de escritorio | Recomendación |
-| Estética | Blanco, negro y grises; lenguaje visual Geist | Solicitado |
-| Tecnología | C++20, Qt 6 y Qt Quick/QML | Recomendación condicionada a pruebas |
-| Motor | Modelo propio; backend de render aislado, candidatos Qt RHI/Skia | Decisión pendiente de medición |
-| Persistencia | Formato abierto versionado, recursos por hash, guardado transaccional | Diseño propuesto |
-| Licencia inicial | GPL-3.0-or-later para el repositorio | Adoptada para esta publicación |
-| Implementación | Sin aplicación; catálogo íntegramente `not_started` | Hecho |
-| Próxima etapa | Plan detallado por dependencias y entregables verificables | Pendiente de revisión del análisis |
+| Product | Professional offline desktop 2D editor | Planned |
+| Appearance | Minimal black, white and gray; Geist-inspired language | User requirement |
+| Language | English across first-party UI, assets, code, help and documentation | User requirement; previous documentation translated |
+| Technology | C++20, Qt 6 and Qt Quick/QML | Accepted by user; risky integration paths need spikes |
+| Renderer | Isolated backend; evaluate Qt RHI/Skia paths | P00 decision |
+| Storage | Versioned open format, stable IDs, immutable resources and transactional save | Proposed design; crash-tested in P00/P01 |
+| Open-source reuse | Prefer proven libraries through tested adapters | User requirement; 28 library/tool entries evaluated in the roadmap |
+| Initial license | GPL-3.0-or-later for original contributions | Adopted |
+| Implementation | All 282 features remain `not_started` | Current fact |
+| Development roadmap | 23 phases, 69 work packages, complete feature and node ownership mapping | Prepared; estimates subject to evidence |
 
-## Rutas de lectura
+## Reading routes
 
-**Producto:** [alcance](research/01-scope-and-method.md) → [catálogo](catalog/README.md) → [flujos de trabajo](research/02-workflows.md) → [riesgos](research/03-risks-and-decisions.md).
+**Planning:** [roadmap](planning/README.md) → [phase table](planning/PHASES.md) → [first backlog](planning/FIRST-STEPS.md) → [execution rules](planning/EXECUTION.md) → [estimates](planning/ESTIMATES.md).
 
-**Ingeniería:** [tecnologías](architecture/01-technology-selection.md) → [arquitectura](architecture/02-system-design.md) → [modelo de datos](architecture/03-document-model.md) → [calidad y spikes](architecture/04-quality-and-spikes.md) → [ADRs](architecture/adr/README.md).
+**Dependencies:** [open-source register](planning/LIBRARIES.md), including upstream sources, intended use, benchmark gates, licensing investigations and fallback choices. No runtime library has been installed by preparing these documents.
 
-**Diseño:** [sistema visual y comportamiento](design/01-design-system.md), con tokens, distribución, densidad, estados, atajos y accesibilidad.
+**Product research:** [scope](research/01-scope-and-method.md) → [catalog](catalog/README.md) → [workflows](research/02-workflows.md) → [risks](research/03-risks-and-decisions.md). The research and canonical catalogs are available in English.
 
-**Planificación:** [entrada al plan](planning/README.md). Las clasificaciones `core`, `pro`, `advanced`, `optional` y `legacy` describen complejidad/uso; **no son ediciones de pago ni fases comprometidas**.
+**Engineering:** [technology selection](architecture/01-technology-selection.md) → [system architecture](architecture/02-system-design.md) → [document model](architecture/03-document-model.md) → [quality and spikes](architecture/04-quality-and-spikes.md) → [ADRs](architecture/adr/README.md).
 
-**Auditoría:** [inventario de nodos](catalog/node-reference.json).
+**Design:** [visual system](design/01-design-system.md) and [English language policy](design/02-language-policy.md).
 
-## Cómo recuperar contexto con IA
+## Retrieve context for AI-assisted work
 
-| Necesidad | Leer |
+| Need | Query or document |
 |---|---|
-| Una capacidad | `python3 scripts/catalog.py show RIG-005` |
-| Un área | `python3 scripts/catalog.py domain DEF` y ficha del dominio |
-| Encontrar un término | `python3 scripts/catalog.py search "deformación"` |
-| Semántica del documento | `architecture/03-document-model.md` |
-| Crear un ticket | Requisito + aceptación + dependencias del dominio |
-| Revisar cobertura | Catálogo + evidencia funcional futura, nunca solo conteos |
-| Nueva biblioteca | Comparativa + ADR + licencia y perfil de distribución |
+| Where a feature completes | `python3 scripts/roadmap.py feature DEF-005` |
+| Phase outcome, dependencies and gates | `python3 scripts/roadmap.py phase P13` |
+| Exact feature behavior | `python3 scripts/catalog.py show DEF-005` |
+| Domain context | `python3 scripts/catalog.py domain DEF` |
+| Dependency decision | `python3 scripts/roadmap.py library LIB-LIBIGL` |
+| Operator specification owner | `planning/node-assignments.json` |
+| Create an implementation issue | Feature criteria + phase + contract + `planning/FIRST-STEPS.md` template |
+| Quality and language requirements | `catalog/nonfunctional.json` — 27 proposed requirements |
+| Validate documentary consistency | `python3 scripts/validate_docs.py` |
 
-Cada ficha de capacidad tiene una descripción observable y un criterio de aceptación inicial. El diseño detallado de algoritmos, todas las propiedades de cada operador y los casos límite adicionales se desarrollarán antes de implementar esa capacidad. Este análisis busca cobertura de familias y operaciones, no reproduce los manuales ni presume conocer el funcionamiento interno de un producto propietario.
+`core`, `pro`, `advanced`, `optional` and `legacy` describe capability complexity/use; they are not paid editions or implementation states. Primary completion assignments and node specification ownership are distinct. An audit must use working scenes and evidence, not menu or inventory counts.

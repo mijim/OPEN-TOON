@@ -3,7 +3,7 @@
   "domains": [
     {
       "id": "PRJ",
-      "title": "Proyectos, escenas y persistencia",
+      "title": "Projects, scenes and persistence",
       "owner_module": "project",
       "depends_on": [],
       "entities": [
@@ -13,12 +13,12 @@
         "AssetRef",
         "Revision"
       ],
-      "workflow": "Crear escena → configurar → guardar → recuperar → empaquetar.",
-      "risk": "Pérdida de datos y referencias rotas."
+      "workflow": "Create scene → configure → save → recover → package.",
+      "risk": "Data loss and broken references."
     },
     {
       "id": "UI",
-      "title": "Espacio de trabajo, navegación y preferencias",
+      "title": "Workspace, navigation and preferences",
       "owner_module": "workspace",
       "depends_on": [
         "PRJ"
@@ -29,12 +29,12 @@
         "ShortcutMap",
         "ToolPreset"
       ],
-      "workflow": "Elegir espacio → dibujar o animar → personalizar paneles y atajos.",
-      "risk": "Densidad profesional frente a legibilidad; estados de herramienta ambiguos."
+      "workflow": "Choose workspace → draw or animate → customize panels and shortcuts.",
+      "risk": "Professional density versus readability; ambiguous tool states."
     },
     {
       "id": "LYR",
-      "title": "Capas, dibujos y subcapas artísticas",
+      "title": "Layers, drawings and art sublayers",
       "owner_module": "document",
       "depends_on": [
         "PRJ"
@@ -46,12 +46,12 @@
         "ArtLayer",
         "ExposureTrack"
       ],
-      "workflow": "Crear capa → crear dibujo → exponerlo → reutilizar o duplicar.",
-      "risk": "Confundir exposición, dibujo compartido y copia independiente."
+      "workflow": "Create layer → create drawing → expose → reuse or duplicate.",
+      "risk": "Confusing exposures, shared drawings and independent copies."
     },
     {
       "id": "VEC",
-      "title": "Dibujo vectorial y edición geométrica",
+      "title": "Vector drawing and geometry editing",
       "owner_module": "drawing-vector",
       "depends_on": [
         "LYR",
@@ -64,12 +64,12 @@
         "FillRegion",
         "Selection"
       ],
-      "workflow": "Boceto → selección → limpieza → edición del contorno → dibujo final.",
-      "risk": "Topología, precisión y calidad del trazo son trabajo de motor."
+      "workflow": "Sketch → select → clean up → edit contours → finish drawing.",
+      "risk": "Topology, precision and stroke quality require engine work."
     },
     {
       "id": "RAS",
-      "title": "Dibujo bitmap, texturas y pinceles",
+      "title": "Bitmap drawing, textures and brushes",
       "owner_module": "drawing-raster",
       "depends_on": [
         "LYR",
@@ -81,12 +81,12 @@
         "TextureAsset",
         "RasterSelection"
       ],
-      "workflow": "Dibujar bitmap → editar → gestionar resolución → intercambiar pinceles.",
-      "risk": "Consumo de memoria y coherencia entre textura y transformación."
+      "workflow": "Draw bitmap → edit → manage resolution → exchange brushes.",
+      "risk": "Memory usage and consistency between texture and transform."
     },
     {
       "id": "COL",
-      "title": "Pintura, paletas y gestión de color",
+      "title": "Painting, palettes and color management",
       "owner_module": "colour",
       "depends_on": [
         "LYR",
@@ -100,12 +100,12 @@
         "TextureFill",
         "ColourConfig"
       ],
-      "workflow": "Definir paleta → rellenar → corregir → generar variaciones → comprobar color.",
-      "risk": "Confundir identidad de color con valores RGB y perder consistencia de producción."
+      "workflow": "Define palette → fill → correct → create variants → verify color.",
+      "risk": "Confusing color identity with RGB values and losing production consistency."
     },
     {
       "id": "TIM",
-      "title": "Timeline, Xsheet y exposición",
+      "title": "Timeline, Xsheet and exposure",
       "owner_module": "timeline",
       "depends_on": [
         "LYR"
@@ -117,12 +117,12 @@
         "Marker",
         "Annotation"
       ],
-      "workflow": "Exponer → ajustar timing → reproducir → revisar hoja.",
-      "risk": "Un desfase de un frame afecta a sonido, dibujo y render."
+      "workflow": "Expose → adjust timing → play → review sheet.",
+      "risk": "A one-frame offset affects sound, drawing and rendering."
     },
     {
       "id": "FBF",
-      "title": "Animación tradicional y paperless",
+      "title": "Traditional and paperless animation",
       "owner_module": "animation-drawing",
       "depends_on": [
         "TIM",
@@ -135,12 +135,12 @@
         "DrawingMark",
         "DrawingDesk"
       ],
-      "workflow": "Rough → tie-down → cleanup → pintura → revisión.",
-      "risk": "Las ayudas visuales nunca deben convertirse accidentalmente en arte exportado."
+      "workflow": "Rough → tie-down → cleanup → paint → review.",
+      "risk": "Visual aids must never accidentally become exported artwork."
     },
     {
       "id": "ANI",
-      "title": "Transformaciones, curvas y animación por claves",
+      "title": "Transforms, curves and keyframe animation",
       "owner_module": "animation-curves",
       "depends_on": [
         "TIM",
@@ -153,12 +153,12 @@
         "Transform",
         "Expression"
       ],
-      "workflow": "Colocar claves → interpolar → ajustar curvas → reutilizar movimiento.",
-      "risk": "Orden de matrices, pivotes y evaluación de curvas."
+      "workflow": "Place keys → interpolate → adjust curves → reuse motion.",
+      "risk": "Matrix order, pivots and curve evaluation."
     },
     {
       "id": "RIG",
-      "title": "Rigging, jerarquías e inversa cinemática",
+      "title": "Rigging, hierarchies and inverse kinematics",
       "owner_module": "rigging",
       "depends_on": [
         "ANI",
@@ -171,12 +171,12 @@
         "Constraint",
         "DrawingSubstitution"
       ],
-      "workflow": "Despiece → pivotes → jerarquía → controles → poses.",
-      "risk": "Ciclos de dependencia y saltos de pose al modificar jerarquías."
+      "workflow": "Break down → set pivots → build hierarchy → add controls → pose.",
+      "risk": "Dependency cycles and pose jumps when changing hierarchies."
     },
     {
       "id": "DEF",
-      "title": "Deformadores y mallas",
+      "title": "Deformers and meshes",
       "owner_module": "deformation",
       "depends_on": [
         "RIG"
@@ -188,12 +188,12 @@
         "Mesh",
         "WeightMap"
       ],
-      "workflow": "Preparar reposo → definir influencias → animar → evaluar → hornear.",
-      "risk": "Calidad de deformación, auto-intersecciones y texturas complejas."
+      "workflow": "Prepare rest pose → define influences → animate → evaluate → bake.",
+      "risk": "Deformation quality, self-intersections and complex textures."
     },
     {
       "id": "CTL",
-      "title": "Controladores avanzados de personajes",
+      "title": "Advanced character controllers",
       "owner_module": "controllers",
       "depends_on": [
         "DEF",
@@ -205,12 +205,12 @@
         "ControlBinding",
         "ControllerWidget"
       ],
-      "workflow": "Capturar poses → definir controles → interpolar → empaquetar.",
-      "risk": "Una interpolación de poses no inventa dibujos ni resuelve topología incompatible."
+      "workflow": "Capture poses → define controls → interpolate → package.",
+      "risk": "Pose interpolation does not invent drawings or resolve incompatible topology."
     },
     {
       "id": "MOR",
-      "title": "Morphing vectorial",
+      "title": "Vector morphing",
       "owner_module": "morphing",
       "depends_on": [
         "VEC",
@@ -221,12 +221,12 @@
         "CorrespondenceHint",
         "MorphKey"
       ],
-      "workflow": "Elegir extremos → establecer correspondencias → interpolar → corregir.",
-      "risk": "Topologías incompatibles, huecos y trazos degenerados."
+      "workflow": "Choose endpoints → establish correspondences → interpolate → correct.",
+      "risk": "Incompatible topologies, holes and degenerate strokes."
     },
     {
       "id": "CAM",
-      "title": "Cámara, staging y espacio 2.5D",
+      "title": "Camera, staging and 2.5D space",
       "owner_module": "camera",
       "depends_on": [
         "ANI"
@@ -237,12 +237,12 @@
         "StagePlane",
         "SafeArea"
       ],
-      "workflow": "Colocar planos → encuadrar → animar cámara → comprobar composición.",
-      "risk": "Proyección y profundidad deben coincidir entre vistas."
+      "workflow": "Position planes → frame shot → animate camera → check composition.",
+      "risk": "Projection and depth must agree across views."
     },
     {
       "id": "NOD",
-      "title": "Grafo de composición",
+      "title": "Compositing graph",
       "owner_module": "compositor-graph",
       "depends_on": [
         "LYR",
@@ -255,12 +255,12 @@
         "NodeGroup",
         "AttributeBinding"
       ],
-      "workflow": "Conectar entradas → agrupar → parametrizar → previsualizar → renderizar.",
-      "risk": "Ciclos, invalidación incorrecta y diferencia entre orden de capas y topología."
+      "workflow": "Connect inputs → group → configure parameters → preview → render.",
+      "risk": "Cycles, incorrect invalidation and confusion between layer order and topology."
     },
     {
       "id": "FX",
-      "title": "Efectos, composición avanzada y sombreado",
+      "title": "Effects, advanced compositing and shading",
       "owner_module": "effects",
       "depends_on": [
         "NOD",
@@ -272,12 +272,12 @@
         "Matte",
         "SurfaceMap"
       ],
-      "workflow": "Añadir efecto → delimitar → animar parámetros → comprobar salida.",
-      "risk": "Precisión de color, alfa, bordes de tile y coste acumulado."
+      "workflow": "Add effect → define bounds → animate parameters → verify output.",
+      "risk": "Color precision, alpha, tile edges and cumulative cost."
     },
     {
       "id": "PAR",
-      "title": "Partículas",
+      "title": "Particles",
       "owner_module": "particles",
       "depends_on": [
         "NOD",
@@ -290,12 +290,12 @@
         "Force",
         "SimulationCache"
       ],
-      "workflow": "Emitir → aplicar fuerzas → representar → hornear.",
-      "risk": "La simulación debe ser reproducible y permitir scrubbing."
+      "workflow": "Emit → apply forces → display → bake.",
+      "risk": "Simulation must be reproducible and support scrubbing."
     },
     {
       "id": "AUD",
-      "title": "Sonido y sincronización labial",
+      "title": "Sound and lip sync",
       "owner_module": "audio",
       "depends_on": [
         "TIM",
@@ -308,12 +308,12 @@
         "PhonemeTrack",
         "VisemeMap"
       ],
-      "workflow": "Importar sonido → ajustar → escuchar → detectar y corregir bocas.",
-      "risk": "Deriva audiovisual, cortes de audio y detección imperfecta."
+      "workflow": "Import sound → adjust → listen → detect and correct mouths.",
+      "risk": "Audiovisual drift, audio dropouts and imperfect detection."
     },
     {
       "id": "IMP",
-      "title": "Importación, escaneo e intercambio",
+      "title": "Import, scanning and interchange",
       "owner_module": "interchange",
       "depends_on": [
         "PRJ",
@@ -325,12 +325,12 @@
         "ConversionReport",
         "ExternalAsset"
       ],
-      "workflow": "Importar → verificar conversiones → enlazar recursos → corregir pérdidas.",
-      "risk": "La extensión de archivo no implica fidelidad de todas sus funciones."
+      "workflow": "Import → verify conversions → link resources → correct losses.",
+      "risk": "A filename extension does not imply fidelity for every format feature."
     },
     {
       "id": "THR",
-      "title": "Integración 3D",
+      "title": "3D integration",
       "owner_module": "integration-3d",
       "depends_on": [
         "CAM",
@@ -343,12 +343,12 @@
         "AnimationClip",
         "ExternalRenderJob"
       ],
-      "workflow": "Importar modelo → ajustar unidades → posar → componer con 2D.",
-      "risk": "Compatibilidad de formatos, ejes y coste del render externo."
+      "workflow": "Import model → adjust units → pose → composite with 2D.",
+      "risk": "Format compatibility, axes and external rendering cost."
     },
     {
       "id": "OUT",
-      "title": "Preview, render y exportación",
+      "title": "Preview, rendering and export",
       "owner_module": "render",
       "depends_on": [
         "NOD",
@@ -361,12 +361,12 @@
         "FrameBuffer",
         "OutputSpec"
       ],
-      "workflow": "Previsualizar → fijar rango y calidad → renderizar → verificar.",
-      "risk": "Diferencias de preview y salida, fallos de encoder y agotamiento de memoria."
+      "workflow": "Preview → set range and quality → render → verify.",
+      "risk": "Preview/output differences, encoder failures and memory exhaustion."
     },
     {
       "id": "LIB",
-      "title": "Bibliotecas, símbolos y reutilización",
+      "title": "Libraries, symbols and reuse",
       "owner_module": "asset-library",
       "depends_on": [
         "PRJ",
@@ -378,12 +378,12 @@
         "Symbol",
         "AssetVersion"
       ],
-      "workflow": "Crear asset → catalogar → reutilizar → actualizar.",
-      "risk": "Assets que parecen independientes pero comparten datos."
+      "workflow": "Create asset → catalog → reuse → update.",
+      "risk": "Assets that appear independent but share data."
     },
     {
       "id": "GAM",
-      "title": "Salida para videojuegos",
+      "title": "Game output",
       "owner_module": "game-export",
       "depends_on": [
         "DEF",
@@ -396,12 +396,12 @@
         "Anchor",
         "CollisionShape"
       ],
-      "workflow": "Preparar rig compatible → hornear → exportar → validar runtime.",
-      "risk": "No todos los nodos y deformadores tienen representación en motores de juego."
+      "workflow": "Prepare compatible rig → bake → export → validate runtime.",
+      "risk": "Not every node or deformer has a representation in game engines."
     },
     {
       "id": "AUT",
-      "title": "Scripting y automatización",
+      "title": "Scripting and automation",
       "owner_module": "scripting",
       "depends_on": [
         "PRJ",
@@ -414,12 +414,12 @@
         "ScriptContext",
         "BatchJob"
       ],
-      "workflow": "Automatizar edición → ejecutar comandos → procesar lotes → integrar pipeline.",
-      "risk": "Código externo ejecutable y cambios no reversibles."
+      "workflow": "Automate edits → execute commands → batch process → integrate pipeline.",
+      "risk": "Executable external code and irreversible changes."
     },
     {
       "id": "STU",
-      "title": "Producción de estudio y colaboración",
+      "title": "Studio production and collaboration",
       "owner_module": "studio",
       "depends_on": [
         "PRJ",
@@ -433,12 +433,12 @@
         "AssetLock",
         "RenderQueue"
       ],
-      "workflow": "Asignar escena → obtener derechos → editar → versionar → entregar.",
-      "risk": "Conflictos multiusuario y red; no equivale a coedición CRDT."
+      "workflow": "Assign scene → acquire rights → edit → version → deliver.",
+      "risk": "Multi-user and network conflicts; this is not CRDT co-editing."
     },
     {
       "id": "AIX",
-      "title": "Asistencia de IA opcional",
+      "title": "Optional AI assistance",
       "owner_module": "ai-adapters",
       "depends_on": [
         "RAS",
@@ -450,8 +450,8 @@
         "Mask",
         "GeneratedVariant"
       ],
-      "workflow": "Seleccionar → configurar proveedor → generar → comparar → aceptar.",
-      "risk": "Dependencia de servicios, licencias de modelos y pérdida de control creativo."
+      "workflow": "Select → configure provider → generate → compare → accept.",
+      "risk": "Service dependencies, model licenses and loss of creative control."
     }
   ]
 }

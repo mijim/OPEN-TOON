@@ -1,159 +1,159 @@
-# RIG — Rigging, jerarquías e inversa cinemática
+# RIG — Rigging, hierarchies and inverse kinematics
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Despiece → pivotes → jerarquía → controles → poses.
+**Workflow:** Break down → set pivots → build hierarchy → add controls → pose.
 
-**Módulo:** `rigging`.
+**Module:** `rigging`.
 
-**Entidades:** Rig, Joint, PegHierarchy, Constraint, DrawingSubstitution.
+**Entities:** Rig, Joint, PegHierarchy, Constraint, DrawingSubstitution.
 
-**Relaciones:** ANI, VEC.
+**Relationships:** ANI, VEC.
 
-**Riesgo principal:** Ciclos de dependencia y saltos de pose al modificar jerarquías.
+**Main risk:** Dependency cycles and pose jumps when changing hierarchies.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## RIG-001 — Despiece de personaje
+## RIG-001 — Character breakdown
 
-Separar partes del modelo preservando registro y paletas.
+Separate model parts while preserving registration and palettes.
 
-**Aceptación inicial:** Las piezas reconstruyen visualmente el personaje original en reposo.
+**Initial acceptance:** The pieces visually reconstruct the original character at rest.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## RIG-002 — Jerarquías de transformación
+## RIG-002 — Transform hierarchies
 
-Construir cadenas padre-hijo con dibujo y pegs separados.
+Build parent-child chains with separate drawings and pegs.
 
-**Aceptación inicial:** Reparentar con conservar mundo no desplaza el personaje.
+**Initial acceptance:** Reparenting with preserve-world enabled does not move the character.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## RIG-003 — Pivotes permanentes y temporales
+## RIG-003 — Permanent and temporary pivots
 
-Editar centro de rotación con distinción de alcance.
+Edit the rotation center with an explicit scope distinction.
 
-**Aceptación inicial:** Mover el pivote temporal no modifica el pivote guardado del rig.
+**Initial acceptance:** Moving the temporary pivot does not change the rig's saved pivot.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## RIG-004 — Orden Z y ajustes de profundidad
+## RIG-004 — Z order and depth adjustment
 
-Organizar superposición de piezas con control fino.
+Control part overlap with fine depth adjustments.
 
-**Aceptación inicial:** El brazo puede pasar delante y detrás del torso con resultado estable.
+**Initial acceptance:** An arm can move in front of and behind the torso with stable results.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## RIG-005 — Articulaciones y Auto Patch
+## RIG-005 — Joints and Auto Patch
 
-Resolver juntas y ocultación de líneas entre piezas superpuestas.
+Resolve joints and hide lines between overlapping parts.
 
-**Aceptación inicial:** La junta de prueba no muestra una costura al flexionar el brazo.
+**Initial acceptance:** The test joint shows no seam when the arm bends.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## RIG-006 — Sustitución de dibujos
+## RIG-006 — Drawing substitutions
 
-Cambiar bocas, manos o vistas de una pieza manteniendo la animación.
+Swap mouths, hands or views of a part while retaining animation.
 
-**Aceptación inicial:** Cambiar una boca no altera la transformación de cabeza.
+**Initial acceptance:** Changing a mouth does not alter the head transform.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## RIG-007 — Sustitución múltiple
+## RIG-007 — Multiple substitutions
 
-Cambiar variantes coordinadas en varios elementos del personaje.
+Switch coordinated variants across several character elements.
 
-**Aceptación inicial:** Cambiar vista sustituye las piezas asignadas en una única transacción.
+**Initial acceptance:** Changing a view replaces the assigned parts in one transaction.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## RIG-008 — Navegación de jerarquía
+## RIG-008 — Hierarchy navigation
 
-Seleccionar padre, hijo o cadena sin buscar manualmente cada nodo.
+Select a parent, child or chain without manually finding every node.
 
-**Aceptación inicial:** La navegación respeta el grupo y no cruza a otro personaje.
+**Initial acceptance:** Navigation respects the group and does not cross into another character.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## RIG-009 — Inversa cinemática
+## RIG-009 — Inverse kinematics
 
-Resolver articulaciones desde un objetivo con límites configurables.
+Solve joints from a target with configurable limits.
 
-**Aceptación inicial:** Arrastrar una mano mantiene longitudes cuando el modo exige rigidez.
+**Initial acceptance:** Dragging a hand preserves bone lengths when the selected mode requires rigidity.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## RIG-010 — Nails y restricciones IK
+## RIG-010 — Nails and IK constraints
 
-Fijar puntos durante manipulación de otras partes.
+Pin points while manipulating other parts.
 
-**Aceptación inicial:** Un pie fijado permanece en posición mientras se desplaza el torso.
+**Initial acceptance:** A pinned foot stays in position while the torso moves.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## RIG-011 — Claves de restricciones
+## RIG-011 — Constraint keyframes
 
-Animar el estado de restricciones y transiciones de control.
+Animate constraint states and control transitions.
 
-**Aceptación inicial:** Activar una fijación en un frame no cambia frames anteriores.
+**Initial acceptance:** Enabling a pin on one frame does not change earlier frames.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## RIG-012 — Copiar poses
+## RIG-012 — Copy poses
 
-Guardar y transferir poses con mapeo estable de piezas.
+Save and transfer poses using stable part mappings.
 
-**Aceptación inicial:** Aplicar una pose no sobrescribe propiedades fuera de su conjunto.
+**Initial acceptance:** Applying a pose does not overwrite properties outside its set.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
 ## RIG-013 — Breakdown Assistant
 
-Mezclar valores entre poses vecinas por porcentaje y selección de atributos.
+Blend neighboring poses by percentage and selected attributes.
 
-**Aceptación inicial:** Los extremos cero y cien reproducen las poses de referencia.
+**Initial acceptance:** Zero and one hundred percent reproduce the reference poses.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## RIG-014 — Guías y convenciones de rig
+## RIG-014 — Rig guides and conventions
 
-Identificar piezas de control, guías y nombres sin incluirlas en render.
+Identify controls, guides and names without including them in the render.
 
-**Aceptación inicial:** Una guía visible en setup queda excluida de salida final.
+**Initial acceptance:** A guide visible during setup is excluded from final output.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

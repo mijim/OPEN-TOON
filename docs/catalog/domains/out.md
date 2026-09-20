@@ -1,149 +1,149 @@
-# OUT — Preview, render y exportación
+# OUT — Preview, rendering and export
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Previsualizar → fijar rango y calidad → renderizar → verificar.
+**Workflow:** Preview → set range and quality → render → verify.
 
-**Módulo:** `render`.
+**Module:** `render`.
 
-**Entidades:** RenderJob, RenderProfile, FrameBuffer, OutputSpec.
+**Entities:** RenderJob, RenderProfile, FrameBuffer, OutputSpec.
 
-**Relaciones:** NOD, CAM, AUD.
+**Relationships:** NOD, CAM, AUD.
 
-**Riesgo principal:** Diferencias de preview y salida, fallos de encoder y agotamiento de memoria.
+**Main risk:** Preview/output differences, encoder failures and memory exhaustion.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## OUT-001 — Playback interactivo
+## OUT-001 — Interactive playback
 
-Reproducir a FPS de escena con rango, bucle y estado de rendimiento.
+Play at the scene frame rate with range, loop and performance status.
 
-**Aceptación inicial:** El contador distingue reproducción completa de frames omitidos.
+**Initial acceptance:** The counter distinguishes complete playback from dropped frames.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## OUT-002 — Preview con calidad controlada
+## OUT-002 — Quality-controlled preview
 
-Separar preview rápido y evaluación final mostrando simplificaciones activas.
+Separate fast preview from final evaluation and show active simplifications.
 
-**Aceptación inicial:** El usuario puede identificar que un efecto está omitido en preview.
+**Initial acceptance:** Users can identify effects omitted from preview.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## OUT-003 — Timeout de preview
+## OUT-003 — Preview timeout
 
-Limitar trabajo interactivo y señalar resultados incompletos recuperables.
+Limit interactive work and flag recoverable incomplete results.
 
-**Aceptación inicial:** Una escena pesada sigue aceptando cancelar o completar el frame.
+**Initial acceptance:** A heavy scene still accepts cancellation or completion of the frame.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## OUT-004 — Secuencias de imágenes
+## OUT-004 — Image sequences
 
-Exportar rango, nombre, relleno numérico, resolución y alfa.
+Export range, name, numeric padding, resolution and alpha.
 
-**Aceptación inicial:** Un rango inclusivo 1 a 24 genera exactamente 24 archivos.
+**Initial acceptance:** An inclusive range from 1 to 24 creates exactly 24 files.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## OUT-005 — Vídeo con audio
+## OUT-005 — Video with audio
 
-Renderizar y codificar usando perfiles de códec disponibles por plataforma.
+Render and encode using platform-available codec profiles.
 
-**Aceptación inicial:** Vídeo y mezcla de audio empiezan en el mismo instante.
+**Initial acceptance:** Video and the audio mix begin at the same instant.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## OUT-006 — Múltiples salidas
+## OUT-006 — Multiple outputs
 
-Configurar varias salidas con resolución y formato independientes.
+Configure outputs with independent resolutions and formats.
 
-**Aceptación inicial:** Una escena produce dos salidas sin cambiar parámetros de cámara globales.
+**Initial acceptance:** One scene produces two outputs without changing global camera parameters.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## OUT-007 — Batch render
+## OUT-007 — Batch rendering
 
-Ejecutar trabajos fuera de la UI con logs, código de salida y posibilidad de reintento.
+Run jobs outside the UI with logs, exit codes and retry support.
 
-**Aceptación inicial:** Reintentar un frame fallido no vuelve a escribir frames válidos sin necesidad.
+**Initial acceptance:** Retrying a failed frame does not unnecessarily rewrite valid frames.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## OUT-008 — Crop y escala de salida
+## OUT-008 — Output crop and scale
 
-Recortar y redimensionar en nodos de salida con filtro definido.
+Crop and resize in output nodes using a defined filter.
 
-**Aceptación inicial:** El crop conserva el origen y dimensiones indicadas.
+**Initial acceptance:** Cropping preserves the specified origin and dimensions.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## OUT-009 — Layout PSD y capas
+## OUT-009 — PSD layout and layers
 
-Exportar layouts conservando las capas que admita el perfil.
+Export layouts while preserving layers supported by the profile.
 
-**Aceptación inicial:** El PSD de prueba reabierto conserva registro y transparencia.
+**Initial acceptance:** Reopening the test PSD preserves registration and transparency.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## OUT-010 — Intercambio con After Effects
+## OUT-010 — After Effects interchange
 
-Documentar una exportación con datos y render por capas según perfil.
+Document profile-based export of data and per-layer renders.
 
-**Aceptación inicial:** El destinatario recibe un informe de efectos horneados.
+**Initial acceptance:** The recipient receives a report of baked effects.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## OUT-011 — GIF y salida ligera
+## OUT-011 — GIF and lightweight output
 
-Generar animaciones de preview con paleta, loop y limitaciones explícitas.
+Generate preview animations with explicit palette, loop and format limits.
 
-**Aceptación inicial:** La duración del GIF coincide dentro de la granularidad de su formato.
+**Initial acceptance:** GIF duration matches within the format's timing granularity.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## OUT-012 — Player de secuencias
+## OUT-012 — Sequence player
 
-Reproducir resultados renderizados con su audio sin abrir el editor completo.
+Play rendered results with audio without opening the full editor.
 
-**Aceptación inicial:** Una secuencia con frame faltante se señala claramente.
+**Initial acceptance:** Missing sequence frames are clearly flagged.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## OUT-013 — Precisión y color de salida
+## OUT-013 — Output precision and color
 
-Elegir profundidad de bits, alfa y espacio de color por salida.
+Choose bit depth, alpha and color space per output.
 
-**Aceptación inicial:** Un EXR float conserva valores superiores a uno en el perfil HDR.
+**Initial acceptance:** A float EXR preserves values above one in the HDR profile.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

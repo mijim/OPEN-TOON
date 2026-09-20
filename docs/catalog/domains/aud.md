@@ -1,119 +1,119 @@
-# AUD — Sonido y sincronización labial
+# AUD — Sound and lip sync
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Importar sonido → ajustar → escuchar → detectar y corregir bocas.
+**Workflow:** Import sound → adjust → listen → detect and correct mouths.
 
-**Módulo:** `audio`.
+**Module:** `audio`.
 
-**Entidades:** AudioAsset, AudioClip, AudioTrack, PhonemeTrack, VisemeMap.
+**Entities:** AudioAsset, AudioClip, AudioTrack, PhonemeTrack, VisemeMap.
 
-**Relaciones:** TIM, RIG.
+**Relationships:** TIM, RIG.
 
-**Riesgo principal:** Deriva audiovisual, cortes de audio y detección imperfecta.
+**Main risk:** Audiovisual drift, audio dropouts and imperfect detection.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## AUD-001 — Importar sonido
+## AUD-001 — Import sound
 
-Decodificar formatos admitidos y conservar muestra original y metadatos.
+Decode supported formats while preserving the original sample and metadata.
 
-**Aceptación inicial:** Un archivo incompatible genera error sin pista vacía residual.
+**Initial acceptance:** An incompatible file reports an error without leaving an empty track.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## AUD-002 — Forma de onda
+## AUD-002 — Waveform
 
-Representar amplitud a diferentes niveles de zoom temporal.
+Display amplitude at different timeline zoom levels.
 
-**Aceptación inicial:** El pico de referencia se alinea con su muestra de audio.
+**Initial acceptance:** The reference peak aligns with its audio sample.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## AUD-003 — Recorte y colocación
+## AUD-003 — Trim and place clips
 
-Mover inicio, ajustar entrada/salida y repetir clips de forma no destructiva.
+Move clip start, adjust in/out points and repeat clips nondestructively.
 
-**Aceptación inicial:** Recortar y deshacer recupera el audio completo.
+**Initial acceptance:** Trimming and undoing restores the complete audio.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## AUD-004 — Mezcla por pistas
+## AUD-004 — Track mixing
 
-Controlar volumen y escuchar varias pistas sincronizadas.
+Control volume and play multiple synchronized tracks.
 
-**Aceptación inicial:** Dos pistas alineadas se mezclan sin desplazamiento temporal.
+**Initial acceptance:** Aligned tracks mix without a time offset.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
 ## AUD-005 — Scrubbing
 
-Escuchar fragmentos al recorrer frames, incluyendo modo de barrido continuo.
+Play audio fragments while traversing frames, including continuous scrubbing.
 
-**Aceptación inicial:** Arrastrar al frame marcado reproduce el fragmento esperado.
+**Initial acceptance:** Dragging to the marked frame plays the expected fragment.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## AUD-006 — Detección de lip-sync
+## AUD-006 — Lip-sync detection
 
-Obtener candidatos de fonemas o visemas desde audio con resultados editables.
+Derive candidate phonemes or visemes from audio with editable results.
 
-**Aceptación inicial:** La detección no sobrescribe correcciones manuales sin elección explícita.
+**Initial acceptance:** Detection does not overwrite manual corrections without explicit selection.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## AUD-007 — Mapeo a bocas
+## AUD-007 — Mouth mapping
 
-Asociar etiquetas detectadas a dibujos del personaje.
+Associate detected labels with character drawings.
 
-**Aceptación inicial:** Una etiqueta sin dibujo asignado queda señalada.
+**Initial acceptance:** Labels without an assigned drawing are flagged.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## AUD-008 — Corrección manual de lip-sync
+## AUD-008 — Manual lip-sync correction
 
-Editar bocas y duración independientemente del detector.
+Edit mouth drawings and duration independently of the detector.
 
-**Aceptación inicial:** Una corrección manual se conserva al guardar y reabrir.
+**Initial acceptance:** Manual corrections survive saving and reopening.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## AUD-009 — Biblioteca de audio
+## AUD-009 — Audio library
 
-Localizar, preescuchar y reutilizar audio de escena sin duplicarlo innecesariamente.
+Find, preview and reuse scene audio without unnecessary duplication.
 
-**Aceptación inicial:** Renombrar una entrada de biblioteca no mueve el archivo fuente.
+**Initial acceptance:** Renaming a library entry does not move the source file.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## AUD-010 — Exportar mezcla
+## AUD-010 — Export mix
 
-Exportar audio por rango y sincronizarlo con el render.
+Export audio by range and synchronize it with rendering.
 
-**Aceptación inicial:** La duración exportada coincide con el rango racional de escena.
+**Initial acceptance:** Exported duration matches the rational scene range.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

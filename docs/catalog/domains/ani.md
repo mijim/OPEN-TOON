@@ -1,149 +1,149 @@
-# ANI — Transformaciones, curvas y animación por claves
+# ANI — Transforms, curves and keyframe animation
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Colocar claves → interpolar → ajustar curvas → reutilizar movimiento.
+**Workflow:** Place keys → interpolate → adjust curves → reuse motion.
 
-**Módulo:** `animation-curves`.
+**Module:** `animation-curves`.
 
-**Entidades:** AnimatableProperty, Keyframe, Curve, Transform, Expression.
+**Entities:** AnimatableProperty, Keyframe, Curve, Transform, Expression.
 
-**Relaciones:** TIM, LYR.
+**Relationships:** TIM, LYR.
 
-**Riesgo principal:** Orden de matrices, pivotes y evaluación de curvas.
+**Main risk:** Matrix order, pivots and curve evaluation.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## ANI-001 — Transformaciones de capa
+## ANI-001 — Layer transforms
 
-Animar traslación, rotación, escala, sesgo y opacidad con unidades coherentes.
+Animate translation, rotation, scale, skew and opacity with consistent units.
 
-**Aceptación inicial:** Una escala negativa no produce valores indefinidos en la interpolación.
+**Initial acceptance:** Negative scale does not produce undefined interpolation values.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## ANI-002 — Modo setup y animate
+## ANI-002 — Setup and animate modes
 
-Separar cambios de reposo de inserción o modificación de claves.
+Separate rest-state changes from keyframe insertion or editing.
 
-**Aceptación inicial:** Mover un objeto en modo setup no añade claves.
+**Initial acceptance:** Moving an object in setup mode does not add keyframes.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
 ## ANI-003 — Pegs
 
-Usar nodos de transformación independientes del contenido gráfico.
+Use transform nodes independent of graphic content.
 
-**Aceptación inicial:** Mover el peg transforma todos sus hijos sin alterar sus dibujos.
+**Initial acceptance:** Moving a peg transforms all its children without changing their drawings.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## ANI-004 — Claves interpoladas y sostenidas
+## ANI-004 — Interpolated and held keys
 
-Soportar segmentos continuos y saltos de pose controlados.
+Support continuous segments and controlled pose changes.
 
-**Aceptación inicial:** Un segmento stepped mantiene la pose hasta el siguiente keyframe.
+**Initial acceptance:** A stepped segment holds its pose until the next keyframe.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## ANI-005 — Autokey y edición de claves
+## ANI-005 — Autokey and key editing
 
-Crear claves por propiedad o conjunto sin claves accidentales.
+Create keys per property or property set without accidental keys.
 
-**Aceptación inicial:** Con autokey apagado se distingue edición local de edición animada.
+**Initial acceptance:** With autokey disabled, local edits are distinguished from animated edits.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## ANI-006 — Editor de funciones
+## ANI-006 — Function editor
 
-Editar curvas con tangentes, rangos, valores y unidades visibles.
+Edit curves with visible tangents, ranges, values and units.
 
-**Aceptación inicial:** Una tangente modificada produce el mismo valor en preview y exportación.
+**Initial acceptance:** An edited tangent produces the same value in preview and export.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## ANI-007 — Ease y velocidad
+## ANI-007 — Easing and velocity
 
-Controlar aceleración y desaceleración por curvas y presets.
+Control acceleration and deceleration through curves and presets.
 
-**Aceptación inicial:** Un ease no mueve las posiciones finales de las claves.
+**Initial acceptance:** Easing does not move keyframe endpoints.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## ANI-008 — Trayectorias y velocidad espacial
+## ANI-008 — Motion paths and spatial velocity
 
-Distinguir forma del recorrido y avance temporal por él.
+Separate the path shape from temporal progress along it.
 
-**Aceptación inicial:** Cambiar velocidad mantiene la geometría de la trayectoria.
+**Initial acceptance:** Changing speed preserves the path geometry.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## ANI-009 — Edición de varias claves
+## ANI-009 — Multi-key editing
 
-Desplazar, escalar y copiar bloques de claves entre pistas compatibles.
+Move, scale and copy key blocks between compatible tracks.
 
-**Aceptación inicial:** Escalar un bloque conserva el orden o explica colisiones temporales.
+**Initial acceptance:** Scaling a block preserves order or explains timing collisions.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## ANI-010 — Copiar movimiento
+## ANI-010 — Copy motion
 
-Transferir animación entre objetos con reglas sobre pivotes y unidades.
+Transfer animation between objects with explicit pivot and unit rules.
 
-**Aceptación inicial:** Copiar movimiento no duplica el dibujo subyacente.
+**Initial acceptance:** Copying motion does not duplicate the underlying drawing.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## ANI-011 — Expresiones
+## ANI-011 — Expressions
 
-Evaluar relaciones entre atributos con detección de ciclos y errores visibles.
+Evaluate attribute relationships with cycle detection and visible errors.
 
-**Aceptación inicial:** Una dependencia circular no bloquea la aplicación.
+**Initial acceptance:** A circular dependency does not block the application.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## ANI-012 — Captura de movimiento manual
+## ANI-012 — Manual motion capture
 
-Registrar una trayectoria gestual como datos temporales editables.
+Record a gesture path as editable time-based data.
 
-**Aceptación inicial:** La trayectoria capturada puede simplificarse y deshacerse.
+**Initial acceptance:** The captured path can be simplified and the operation undone.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## ANI-013 — Editor numérico animable
+## ANI-013 — Animatable numeric editor
 
-Editar valores y navegar claves directamente desde el inspector.
+Edit values and navigate keys directly from the inspector.
 
-**Aceptación inicial:** El inspector muestra si el valor pertenece a una clave o es interpolado.
+**Initial acceptance:** The inspector indicates whether a value is keyed or interpolated.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

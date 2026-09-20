@@ -1,89 +1,89 @@
-# CAM — Cámara, staging y espacio 2.5D
+# CAM — Camera, staging and 2.5D space
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Colocar planos → encuadrar → animar cámara → comprobar composición.
+**Workflow:** Position planes → frame shot → animate camera → check composition.
 
-**Módulo:** `camera`.
+**Module:** `camera`.
 
-**Entidades:** Camera, Projection, StagePlane, SafeArea.
+**Entities:** Camera, Projection, StagePlane, SafeArea.
 
-**Relaciones:** ANI.
+**Relationships:** ANI.
 
-**Riesgo principal:** Proyección y profundidad deben coincidir entre vistas.
+**Main risk:** Projection and depth must agree across views.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## CAM-001 — Cámaras y cámara activa
+## CAM-001 — Cameras and active camera
 
-Crear cámaras y seleccionar explícitamente la que produce la salida.
+Create cameras and explicitly select the output camera.
 
-**Aceptación inicial:** Cambiar cámara activa cambia preview y exportación de forma concordante.
+**Initial acceptance:** Changing the active camera changes preview and export consistently.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## CAM-002 — Transformación de cámara
+## CAM-002 — Camera transforms
 
-Animar posición, rotación y encuadre con pegs y curvas.
+Animate position, rotation and framing through pegs and curves.
 
-**Aceptación inicial:** Un movimiento de cámara no modifica coordenadas locales de dibujos.
+**Initial acceptance:** Camera motion does not change local drawing coordinates.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## CAM-003 — Multiplano
+## CAM-003 — Multiplane
 
-Distribuir capas en profundidad para generar paralaje.
+Distribute layers in depth to produce parallax.
 
-**Aceptación inicial:** Un travelling produce desplazamientos diferentes según profundidad.
+**Initial acceptance:** A tracking shot creates different displacement according to depth.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## CAM-004 — Vistas superior, lateral y perspectiva
+## CAM-004 — Top, side and perspective views
 
-Inspeccionar posiciones espaciales y relaciones de cámara.
+Inspect spatial positions and camera relationships.
 
-**Aceptación inicial:** Una selección corresponde al mismo objeto en las distintas vistas.
+**Initial acceptance:** Selection identifies the same object across views.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## CAM-005 — Proyección ortográfica
+## CAM-005 — Orthographic projection
 
-Ofrecer salida sin perspectiva para flujos 2D y videojuegos.
+Provide perspective-free output for 2D and game workflows.
 
-**Aceptación inicial:** Objetos iguales a distinta profundidad mantienen tamaño aparente.
+**Initial acceptance:** Equal objects at different depths retain the same apparent size.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## CAM-006 — Guías de encuadre
+## CAM-006 — Framing guides
 
-Usar guías de alineación y zonas de referencia como ayudas no exportables.
+Provide alignment guides and reference zones that are not exported.
 
-**Aceptación inicial:** Las guías no aparecen en la imagen renderizada.
+**Initial acceptance:** Guides are absent from the rendered image.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## CAM-007 — Transformación y opacidad de staging
+## CAM-007 — Staging transforms and opacity
 
-Posicionar fondos y referencias con bloqueo y transparencia temporal.
+Position backgrounds and references with locking and temporary transparency.
 
-**Aceptación inicial:** Cambiar opacidad de trabajo se distingue de opacidad renderizable.
+**Initial acceptance:** Working opacity is distinguished from renderable opacity.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

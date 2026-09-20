@@ -7,6 +7,7 @@ import re
 import sys
 from urllib.parse import unquote
 from catalog import ROOT, read, documents
+from roadmap import validate as validate_roadmap, documents as roadmap_documents
 
 errors = []
 features = read('features.json')['features']
@@ -63,7 +64,8 @@ def visit(key, active):
 
 for domain in graph:
     visit(domain, [])
-for path, text in documents().items():
+errors.extend(validate_roadmap())
+for path, text in {**documents(), **roadmap_documents()}.items():
     if not path.exists() or path.read_text(encoding='utf-8') != text:
         errors.append(f'Stale generated view: {path.relative_to(ROOT)}')
 for path in [ROOT / 'README.md', ROOT / 'AGENTS.md', ROOT / 'CONTRIBUTING.md', *(ROOT / 'docs').rglob('*.md')]:

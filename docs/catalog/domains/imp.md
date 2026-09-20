@@ -1,119 +1,119 @@
-# IMP — Importación, escaneo e intercambio
+# IMP — Import, scanning and interchange
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Importar → verificar conversiones → enlazar recursos → corregir pérdidas.
+**Workflow:** Import → verify conversions → link resources → correct losses.
 
-**Módulo:** `interchange`.
+**Module:** `interchange`.
 
-**Entidades:** ImportJob, FormatAdapter, ConversionReport, ExternalAsset.
+**Entities:** ImportJob, FormatAdapter, ConversionReport, ExternalAsset.
 
-**Relaciones:** PRJ, LYR.
+**Relationships:** PRJ, LYR.
 
-**Riesgo principal:** La extensión de archivo no implica fidelidad de todas sus funciones.
+**Main risk:** A filename extension does not imply fidelity for every format feature.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## IMP-001 — Imágenes y secuencias
+## IMP-001 — Images and sequences
 
-Importar imágenes sueltas o secuencias con alfa, orden y exposición explícitos.
+Import still images or sequences with explicit alpha, ordering and exposure.
 
-**Aceptación inicial:** Una secuencia con huecos informa cómo los resuelve.
+**Initial acceptance:** A sequence with gaps reports how they are resolved.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## IMP-002 — PSD por capas
+## IMP-002 — Layered PSD
 
-Leer jerarquía, opacidad y modos soportados, informando de pérdidas.
+Read hierarchy, opacity and supported modes while reporting losses.
 
-**Aceptación inicial:** Un modo no soportado se informa antes de aceptar la conversión.
+**Initial acceptance:** Unsupported modes are reported before accepting conversion.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## IMP-003 — Layout PSD
+## IMP-003 — PSD layout
 
-Reutilizar composición y posiciones de un layout con escala conocida.
+Reuse layout composition and positions at a known scale.
 
-**Aceptación inicial:** Las capas conservan registro relativo tras importar.
+**Initial acceptance:** Layers retain their relative registration after import.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## IMP-004 — Vectores externos
+## IMP-004 — External vectors
 
-Convertir formatos vectoriales compatibles preservando curvas, rellenos y transformaciones soportadas.
+Convert compatible vector formats while preserving supported curves, fills and transforms.
 
-**Aceptación inicial:** El informe enumera filtros o fuentes no trasladables.
+**Initial acceptance:** The report lists filters or fonts that cannot be transferred.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## IMP-005 — Vídeo de referencia
+## IMP-005 — Reference video
 
-Importar vídeo para referencia o extracción de frames con reloj explícito.
+Import video for reference or frame extraction with an explicit clock.
 
-**Aceptación inicial:** Un clip de tasa variable se normaliza sin deriva oculta.
+**Initial acceptance:** A variable-rate clip is normalized without hidden drift.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## IMP-006 — Vincular imagen externa
+## IMP-006 — Link external image
 
-Conservar enlace y permitir actualizar contenido desde disco.
+Retain a link and allow content updates from disk.
 
-**Aceptación inicial:** Una actualización no borra la transformación de la capa.
+**Initial acceptance:** Updating content does not erase the layer transform.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## IMP-007 — Escaneo
+## IMP-007 — Scanning
 
-Adquirir dibujos con resolución, registro y orden de numeración.
+Acquire drawings with resolution, registration and numbering order.
 
-**Aceptación inicial:** Reescanear una hoja puede sustituir su dibujo sin cambiar exposiciones.
+**Initial acceptance:** Rescanning a sheet can replace its drawing without changing exposures.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## IMP-008 — Vectorización
+## IMP-008 — Vectorization
 
-Convertir escaneos a trazos o regiones con parámetros repetibles.
+Convert scans to strokes or regions using repeatable parameters.
 
-**Aceptación inicial:** El mismo preset y entrada producen igual salida.
+**Initial acceptance:** The same preset and input produce the same output.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## IMP-009 — FLA y SWF heredados
+## IMP-009 — Legacy FLA and SWF
 
-Documentar conversión asistida y límites de formatos antiguos.
+Document assisted conversion and limits of older formats.
 
-**Aceptación inicial:** Una función no convertible queda en un informe, no desaparece sin aviso.
+**Initial acceptance:** Unconvertible features appear in a report instead of disappearing silently.
 
-**Alcance:** `legacy_candidate` · **Nivel:** `legacy` · **Estado:** `not_started`.
+**Scope:** `legacy_candidate` · **Level:** `legacy` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## IMP-010 — Intercambio editorial
+## IMP-010 — Editorial interchange
 
-Recibir layouts o animatics como escenas con timing y recursos.
+Receive layouts or animatics as scenes with timing and resources.
 
-**Aceptación inicial:** La duración del plano importado coincide con el animatic de referencia.
+**Initial acceptance:** Imported shot duration matches the reference animatic.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

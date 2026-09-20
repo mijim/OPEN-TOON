@@ -1,99 +1,99 @@
-# CTL — Controladores avanzados de personajes
+# CTL — Advanced character controllers
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Capturar poses → definir controles → interpolar → empaquetar.
+**Workflow:** Capture poses → define controls → interpolate → package.
 
-**Módulo:** `controllers`.
+**Module:** `controllers`.
 
-**Entidades:** Controller, PoseSample, ControlBinding, ControllerWidget.
+**Entities:** Controller, PoseSample, ControlBinding, ControllerWidget.
 
-**Relaciones:** DEF, ANI.
+**Relationships:** DEF, ANI.
 
-**Riesgo principal:** Una interpolación de poses no inventa dibujos ni resuelve topología incompatible.
+**Main risk:** Pose interpolation does not invent drawings or resolve incompatible topology.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## CTL-001 — Controles en cámara
+## CTL-001 — Camera-view controls
 
-Mostrar widgets vinculados a atributos del rig con selección y límites.
+Show selectable widgets bound to rig attributes with limits.
 
-**Aceptación inicial:** Arrastrar un widget cambia solo sus atributos enlazados.
+**Initial acceptance:** Dragging a widget changes only its linked attributes.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## CTL-002 — Slider de poses
+## CTL-002 — Pose slider
 
-Generar un control unidimensional a partir de poses compatibles.
+Generate a one-dimensional control from compatible poses.
 
-**Aceptación inicial:** En cada muestra el controlador reproduce exactamente la pose capturada.
+**Initial acceptance:** At each sample position, the controller reproduces the captured pose exactly.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## CTL-003 — Rejilla de poses
+## CTL-003 — Pose grid
 
-Crear un control bidimensional sobre muestras de pose organizadas.
+Create a two-dimensional control over organized pose samples.
 
-**Aceptación inicial:** Los puntos de la rejilla reproducen sus muestras y las celdas interpolan.
+**Initial acceptance:** Grid points reproduce their samples and cells interpolate between them.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## CTL-004 — Asistente de funciones
+## CTL-004 — Function wizard
 
-Enlazar controles a atributos, activación y visibilidad sin escribir cada script.
+Connect controls to attributes, activation and visibility without writing every script.
 
-**Aceptación inicial:** Un interruptor puede mostrar un conjunto de controles sin alterar el render.
+**Initial acceptance:** A switch can show a control set without altering the render.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## CTL-005 — Panel de personaje
+## CTL-005 — Character dashboard
 
-Agrupar controles identificables para manipulación de un personaje.
+Group identifiable controls for character manipulation.
 
-**Aceptación inicial:** Duplicar el personaje crea bindings independientes.
+**Initial acceptance:** Duplicating the character creates independent bindings.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## CTL-006 — Controlador por script
+## CTL-006 — Scripted controller
 
-Exponer eventos y atributos para controles personalizados con validación.
+Expose events and attributes for validated custom controls.
 
-**Aceptación inicial:** Un error de script se informa sin corromper la escena.
+**Initial acceptance:** Script errors are reported without corrupting the scene.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## CTL-007 — Deformador sobre deformador
+## CTL-007 — Deformer on deformer
 
-Componer controles que actúan sobre otra estructura de deformación.
+Compose controls acting on another deformation structure.
 
-**Aceptación inicial:** La evaluación respeta el orden declarado y rechaza ciclos.
+**Initial acceptance:** Evaluation respects the declared order and rejects cycles.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## CTL-008 — Controladores transportables
+## CTL-008 — Portable controllers
 
-Incluir dependencias y bindings al guardar una plantilla de rig.
+Include dependencies and bindings when saving a rig template.
 
-**Aceptación inicial:** Importar la plantilla en otra escena conserva controles operativos.
+**Initial acceptance:** Importing the template into another scene preserves working controls.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

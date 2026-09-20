@@ -87,7 +87,7 @@
         },
         {
           "id": "P01-W3",
-          "description": "Create monochrome QML tokens, keyboard commands, focus rules, dock layout persistence and accessible English strings; migrate earlier Spanish research with stable IDs and reviewed terminology.",
+          "description": "Create monochrome QML tokens, keyboard commands, focus rules, dock layout persistence and accessible English strings; audit the English glossary against command IDs, built-in assets and documentation.",
           "status": "planned"
         }
       ],
@@ -124,7 +124,7 @@
         "NFR-027"
       ],
       "risks": [
-        "Premature framework design; docking Qt Quick maturity; English migration volume."
+        "Premature framework design; docking Qt Quick maturity; inconsistent terminology across product surfaces."
       ],
       "milestone": "Foundation",
       "feature_ids": [
@@ -204,7 +204,6 @@
       ],
       "milestone": "v0.1 — usable vertical slice",
       "feature_ids": [
-        "LYR-001",
         "LYR-002",
         "LYR-003",
         "VEC-001",
@@ -684,6 +683,7 @@
       ],
       "milestone": "v0.5 — cut-out animation",
       "feature_ids": [
+        "LYR-001",
         "RIG-001",
         "RIG-002",
         "RIG-003",
@@ -1837,7 +1837,7 @@
     },
     {
       "feature_id": "LYR-001",
-      "completion_phase": "P02",
+      "completion_phase": "P08",
       "status": "planned",
       "disposition": "planned_delivery"
     },
@@ -3407,5 +3407,6 @@
       "status": "planned",
       "disposition": "conditional_extension"
     }
-  ]
+  ],
+  "documentation_language": "en"
 }

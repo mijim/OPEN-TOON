@@ -24,42 +24,42 @@ def documents() -> dict[Path, str]:
     domains = read('domains.json')['domains']
     nodes = read('node-reference.json')['entries']
     files = {}
-    index = ['# Catálogo funcional', '',
-             f'{len(features)} capacidades originales propuestas en {len(domains)} dominios. Estado de aplicación: **sin implementar**.', '',
-             'Fuente canónica: [features.json](features.json). Los criterios de aceptación son objetivos de OPEN-TOON. Las dependencias entre dominios indican relaciones, no que deba completarse un dominio entero antes de comenzar otro.', '',
-             'Niveles: `core` fundamentos; `pro` flujo profesional; `advanced` alta complejidad; `optional` optativo; `legacy` compatibilidad histórica. No son fases de ejecución.', '',
-             '| Dominio | Capacidades | Módulo |', '|---|---:|---|']
+    index = ['# Functional catalog', '',
+             f'{len(features)} original proposed capabilities across {len(domains)} domains. Application status: **not implemented**.', '',
+             'Canonical source: [features.json](features.json). Acceptance criteria are OPEN-TOON objectives. Domain dependencies express relationships, not a requirement to finish an entire domain before starting another.', '',
+             'Levels: `core` foundations; `pro` professional workflow; `advanced` high complexity; `optional` optional extension; `legacy` historical compatibility. These are not execution phases.', '',
+             '| Domain | Capabilities | Module |', '|---|---:|---|']
     for d in domains:
         selected = [f for f in features if f['domain'] == d['id']]
         filename = f"{d['id'].lower()}.md"
         index.append(f"| [{d['id']} — {d['title']}](domains/{filename}) | {len(selected)} | `{d['owner_module']}` |")
-        lines = [f"# {d['id']} — {d['title']}", '', '[Volver al catálogo](../README.md)', '',
-                 '> Vista generada desde `features.json` y `domains.json`; no editar a mano.', '',
-                 f"**Flujo:** {d['workflow']}", '', f"**Módulo:** `{d['owner_module']}`.", '',
-                 f"**Entidades:** {', '.join(d['entities'])}.", '',
-                 f"**Relaciones:** {', '.join(d['depends_on']) or 'Ninguna'}.", '',
-                 f"**Riesgo principal:** {d['risk']}", '',
-                 '## Contrato común', '',
-                 'Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.', '']
+        lines = [f"# {d['id']} — {d['title']}", '', '[Back to catalog](../README.md)', '',
+                 '> Generated from `features.json` and `domains.json`; do not edit manually.', '',
+                 f"**Workflow:** {d['workflow']}", '', f"**Module:** `{d['owner_module']}`.", '',
+                 f"**Entities:** {', '.join(d['entities'])}.", '',
+                 f"**Relationships:** {', '.join(d['depends_on']) or 'None'}.", '',
+                 f"**Main risk:** {d['risk']}", '',
+                 '## Shared contract', '',
+                 'Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.', '']
         for f in selected:
             lines += [f"## {f['id']} — {f['title']}", '', f['requirement'], '',
-                      f"**Aceptación inicial:** {f['acceptance_criteria'][0]}", '',
-                      f"**Alcance:** `{f['scope']}` · **Nivel:** `{f['capability_level']}` · **Estado:** `{f['implementation_status']}`.", '',
-                      f"**Evidencia:** `{f['evidence']}`.", '']
+                      f"**Initial acceptance:** {f['acceptance_criteria'][0]}", '',
+                      f"**Scope:** `{f['scope']}` · **Level:** `{f['capability_level']}` · **Status:** `{f['implementation_status']}`.", '',
+                      f"**Evidence:** `{f['evidence']}`.", '']
         files[CATALOG / 'domains' / filename] = '\n'.join(lines)
-    index += ['', '## Catálogos complementarios', '',
-              '- [Esquema JSON de las capacidades](features.schema.json).',
-              '- [Requisitos no funcionales](nonfunctional.json).',
-              '- [Inventario de nodos por categoría](nodes.md).',
-              '- [Flujos integrados para aceptación](../research/02-workflows.md).', '',
-              'No sumar funciones, páginas y nodos: contienen solapamientos y niveles de granularidad distintos.', '']
+    index += ['', '## Related catalogs', '',
+              '- [Capability JSON schema](features.schema.json).',
+              '- [Nonfunctional requirements](nonfunctional.json).',
+              '- [Node inventory by category](nodes.md).',
+              '- [Integrated acceptance workflows](../research/02-workflows.md).', '',
+              'Do not add capability, page and node counts: they overlap and have different levels of detail.', '']
     files[CATALOG / 'README.md'] = '\n'.join(index)
-    lines = ['# Inventario de nodos', '',
-             f'{len(nodes)} entradas de operadores y familias propuestas. No se presentan como ese número de efectos distintos. Todas están pendientes de especificación y parámetros de OPEN-TOON.', '',
-             'Antes de implementar cada operador: definir puertos, tipos, parámetros/unidades, valores por defecto, animabilidad, espacio de color, alfa, bounds/halo de tiles, ROI, invalidación, determinismo, errores, perfiles soportados y una escena de referencia.', '',
-             'El núcleo mínimo de composición y las principales familias ya están descritos en NOD, FX, PAR, DEF, CTL y THR. Este inventario evita perder los operadores menos frecuentes durante el plan largo.', '']
+    lines = ['# Node inventory', '',
+             f'{len(nodes)} proposed operator and family entries. This is not a count of distinct effects. All await OPEN-TOON specifications and parameters.', '',
+             'Before implementing an operator, define ports, types, parameter units/defaults, animability, color space, alpha, tile bounds/halo, ROI, invalidation, determinism, errors, supported profiles and a reference scene.', '',
+             'The minimal compositor and main families are described in NOD, FX, PAR, DEF, CTL and THR. This inventory keeps less frequent operators visible throughout the long-term plan.', '']
     for cat in sorted({n['category'] for n in nodes}):
-        lines += [f'## {cat}', '', '| ID estable | Nodo |', '|---|---|']
+        lines += [f'## {cat}', '', '| Stable ID | Node |', '|---|---|']
         lines += [f"| `{n['id']}` | {n['name']} |" for n in nodes if n['category'] == cat]
         lines += ['']
     files[CATALOG / 'nodes.md'] = '\n'.join(lines)

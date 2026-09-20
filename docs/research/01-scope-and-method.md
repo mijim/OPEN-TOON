@@ -1,42 +1,40 @@
-# Alcance y metodología
+# Scope and methodology
 
-## Qué vamos a construir
+## What we will build
 
-OPEN-TOON pretende cubrir dibujo vectorial y bitmap, pintura, exposición, animación tradicional, rigging cut-out, deformación, curvas, cámara, composición, sonido, integración 3D, bibliotecas y exportación. El catálogo incluye además flujos de estudio, videojuegos y asistencia opcional.
+OPEN-TOON aims to cover vector and bitmap drawing, painting, exposure, traditional animation, cut-out rigging, deformation, curves, cameras, compositing, sound, 3D integration, libraries and export. The catalog also includes studio workflows, game delivery and optional assistance.
 
-## Límites de producto
+## Product boundaries
 
-| Área | Tratamiento |
+| Area | Treatment |
 |---|---|
-| Gestión de producción | Extensión de estudio separada, con versiones y bloqueos |
-| Herramientas auxiliares | Flujos especializados integrados como espacios o utilidades independientes |
-| SDK de videojuegos | Perfil futuro de exportación, sin dependencia propietaria |
-| Asistencia generativa | Capacidades opcionales mediante proveedores intercambiables; no dependencia del núcleo |
+| Production management | Separate studio extension with revisions and locks |
+| Auxiliary tools | Specialized workflows integrated as workspaces or standalone utilities |
+| Game SDK | Future export profile without a proprietary dependency |
+| Generative assistance | Optional capabilities through interchangeable providers; not a core dependency |
 
-## Referencia temporal
+## Time baseline
 
-El análisis se mantiene versionado junto al repositorio y debe revisarse cuando cambien las decisiones de producto o arquitectura.
+The analysis is versioned with the repository and must be reviewed when product or architecture decisions change.
 
-## Proceso de investigación
+## Research process
 
-1. Fijar el alcance del producto con el usuario.
-2. Clasificar las familias en **26 dominios** y redactar **282 capacidades** de OPEN-TOON, con comportamiento y aceptación inicial.
-3. Registrar por separado el inventario de nodos. Algunas entradas son familias, no operadores, y no se suman a las capacidades como si fueran requisitos únicos.
-4. Contrastar alternativas tecnológicas con documentación primaria de los proyectos abiertos utilizados.
-5. Proponer arquitectura, modelo de datos, lenguaje visual, escenarios y puertas de calidad que sirvan al futuro plan.
+1. Agree on product scope with the owner.
+2. Classify families into **26 domains** and define **282 OPEN-TOON capabilities** with initial behavior and acceptance criteria.
+3. Record the node inventory separately. Some entries are families rather than operators; they are not added to the capability count as unique requirements.
+4. Compare technology alternatives using primary documentation from the relevant open-source projects.
+5. Propose architecture, document model, visual language, workflows and quality gates for the [development plan](../planning/README.md).
 
-Las descripciones son especificaciones propias de OPEN-TOON.
+The descriptions are OPEN-TOON's own specifications.
 
-## Niveles de evidencia
+## Evidence levels
 
-| Etiqueta | Significado | No significa |
+| Label | Meaning | Does not mean |
 |---|---|---|
-| `proposal` | Capacidad propuesta para OPEN-TOON | Implementación o validación funcional |
-| `analysis_draft` | Requisito propio propuesto y preparado para revisión | Diseño final de algoritmo |
-| `not_started` | Sin implementación de aplicación | Que exista un botón funcional |
+| `proposal` | Proposed OPEN-TOON capability | Implementation or functional verification |
+| `analysis_draft` | Proposed requirement prepared for review | Final algorithm design |
+| `not_started` | No application implementation | A working control exists |
 
+## Deliberate distinctions
 
-## Diferencias deliberadas
-
-
-El nombre OPEN-TOON es provisional y conviene distinguirlo claramente de [OpenToonz](https://opentoonz.github.io/e/), un proyecto existente que también se ha considerado técnicamente.
+OPEN-TOON is a provisional name and should remain clearly distinguishable from [OpenToonz](https://opentoonz.github.io/e/), an existing project also considered in the technical evaluation.

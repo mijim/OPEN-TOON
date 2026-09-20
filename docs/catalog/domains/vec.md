@@ -1,289 +1,289 @@
-# VEC — Dibujo vectorial y edición geométrica
+# VEC — Vector drawing and geometry editing
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Boceto → selección → limpieza → edición del contorno → dibujo final.
+**Workflow:** Sketch → select → clean up → edit contours → finish drawing.
 
-**Módulo:** `drawing-vector`.
+**Module:** `drawing-vector`.
 
-**Entidades:** VectorStroke, BezierPath, WidthProfile, FillRegion, Selection.
+**Entities:** VectorStroke, BezierPath, WidthProfile, FillRegion, Selection.
 
-**Relaciones:** LYR, UI.
+**Relationships:** LYR, UI.
 
-**Riesgo principal:** Topología, precisión y calidad del trazo son trabajo de motor.
+**Main risk:** Topology, precision and stroke quality require engine work.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## VEC-001 — Lápiz de línea central
+## VEC-001 — Centerline pencil
 
-Representar trazos como curvas con grosor editable y extremos configurables.
+Represent strokes as curves with editable width and configurable caps.
 
-**Aceptación inicial:** Cambiar grosor no desplaza la línea central.
+**Initial acceptance:** Changing width does not move the centerline.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-002 — Pincel vectorial
+## VEC-002 — Vector brush
 
-Crear siluetas rellenadas editables desde gestos de dibujo.
+Create editable filled silhouettes from drawing gestures.
 
-**Aceptación inicial:** Un trazo cerrado sigue siendo editable por puntos.
+**Initial acceptance:** A closed stroke remains editable through control points.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-003 — Grosor variable
+## VEC-003 — Variable width
 
-Aplicar presión y perfiles variables a lo largo del trazo.
+Apply pressure and variable profiles along a stroke.
 
-**Aceptación inicial:** Los extremos finos se conservan al ampliar la vista.
+**Initial acceptance:** Fine stroke ends are preserved when zooming in.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-004 — Textura de lápiz
+## VEC-004 — Pencil texture
 
-Asociar textura y parámetros de repetición a una línea central.
+Attach a texture and repetition parameters to a centerline.
 
-**Aceptación inicial:** Cambiar la longitud mantiene continuidad de textura definida.
+**Initial acceptance:** Changing stroke length preserves the defined texture continuity.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-005 — Presets de pincel
+## VEC-005 — Brush presets
 
-Guardar tamaño, punta, suavizado y textura como un preset reutilizable.
+Save size, tip, smoothing and texture as a reusable preset.
 
-**Aceptación inicial:** Exportar e importar el preset conserva el aspecto de una muestra.
+**Initial acceptance:** Exporting and importing the preset preserves a sample stroke's appearance.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-006 — Presets de lápiz
+## VEC-006 — Pencil presets
 
-Guardar perfiles y configuración de líneas con identidad propia.
+Save line profiles and settings as distinct presets.
 
-**Aceptación inicial:** Cambiar de preset no modifica trazos ya existentes.
+**Initial acceptance:** Switching presets does not modify existing strokes.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-007 — Estabilizador
+## VEC-007 — Stroke stabilizer
 
-Suavizar ruido del lápiz mediante parámetros de retardo y estabilización.
+Smooth pen noise through configurable lag and stabilization.
 
-**Aceptación inicial:** El final del trazo alcanza el punto levantado sin segmento espurio.
+**Initial acceptance:** The stroke reaches its pen-up endpoint without an unintended segment.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-008 — Goma vectorial
+## VEC-008 — Vector eraser
 
-Recortar geometría atravesada por una goma con tamaño y presión.
+Trim geometry crossed by an eraser with size and pressure control.
 
-**Aceptación inicial:** Borrar parcialmente una línea deja dos segmentos válidos.
+**Initial acceptance:** Partially erasing a line leaves two valid segments.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-009 — Selector y lazo
+## VEC-009 — Selection and lasso
 
-Seleccionar trazos o regiones, sumar y restar selección y transformarla.
+Select strokes or regions, add to or subtract from the selection, and transform it.
 
-**Aceptación inicial:** Una selección parcial no mueve trazos externos al área elegida.
+**Initial acceptance:** A partial selection does not move strokes outside the selected area.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-010 — Editor de contornos
+## VEC-010 — Contour editor
 
-Añadir, eliminar y mover puntos y tangentes de curvas.
+Add, delete and move curve points and tangents.
 
-**Aceptación inicial:** Eliminar un punto mantiene una curva válida y deshacer la restaura.
+**Initial acceptance:** Deleting a point leaves a valid curve, and undo restores it.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-011 — Editor de línea central
+## VEC-011 — Centerline editor
 
-Editar la trayectoria central preservando el aspecto del pincel cuando sea posible.
+Edit a stroke's center path while preserving brush appearance where possible.
 
-**Aceptación inicial:** Mover un control no cambia el color de relleno.
+**Initial acceptance:** Moving a control point does not change the fill color.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-012 — Editor de grosor
+## VEC-012 — Width editor
 
-Modificar el perfil del lápiz sin redibujar la trayectoria.
+Modify a pencil profile without redrawing its path.
 
-**Aceptación inicial:** Un ajuste localizado de grosor no afecta al resto del trazo.
+**Initial acceptance:** A localized width adjustment does not affect the rest of the stroke.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-013 — Retoque de lápiz
+## VEC-013 — Pencil retouching
 
-Pintar ajustes de grosor u opacidad con aumento, reducción, sustitución y suavizado.
+Paint width or opacity adjustments using increase, decrease, replace and smooth modes.
 
-**Aceptación inicial:** Suavizar opacidad no cambia posiciones de los puntos.
+**Initial acceptance:** Smoothing opacity does not move control points.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-014 — Suavizado posterior
+## VEC-014 — Post-stroke smoothing
 
-Reducir irregularidades de contornos con intensidad controlable.
+Reduce contour irregularities with adjustable strength.
 
-**Aceptación inicial:** El ajuste conserva esquinas protegidas dentro de la tolerancia definida.
+**Initial acceptance:** The operation preserves protected corners within the defined tolerance.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-015 — Líneas y primitivas
+## VEC-015 — Lines and primitives
 
-Dibujar líneas, rectángulos y elipses con restricciones y relleno opcional.
+Draw lines, rectangles and ellipses with constraints and optional fills.
 
-**Aceptación inicial:** Mantener la restricción produce un círculo geométrico.
+**Initial acceptance:** Holding the constraint produces a geometric circle.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-016 — Polyline y Bézier
+## VEC-016 — Polylines and Bézier curves
 
-Construir curvas precisas por puntos y manejadores.
+Construct precise curves using points and handles.
 
-**Aceptación inicial:** Cerrar un camino crea una región pintable sin hueco residual.
+**Initial acceptance:** Closing a path creates a paintable region without a residual gap.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-017 — Cortador
+## VEC-017 — Cutter
 
-Separar una región mediante lazo y conservarla como selección editable.
+Separate a region with a lasso and retain it as an editable selection.
 
-**Aceptación inicial:** Mover el recorte no arrastra el dibujo exterior.
+**Initial acceptance:** Moving the cutout does not drag the surrounding drawing.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-018 — Deformación de perspectiva
+## VEC-018 — Perspective deformation
 
-Deformar una selección con controles de perspectiva.
+Deform a selection using perspective controls.
 
-**Aceptación inicial:** Deshacer restituye exactamente los puntos anteriores.
+**Initial acceptance:** Undo restores the previous points exactly.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-019 — Envelope de dibujo
+## VEC-019 — Drawing envelope
 
-Editar una envolvente que deforma geometría seleccionada.
+Edit an envelope that deforms selected geometry.
 
-**Aceptación inicial:** La envolvente opera solo sobre la selección capturada.
+**Initial acceptance:** The envelope affects only the captured selection.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-020 — Trazos invisibles
+## VEC-020 — Invisible strokes
 
-Definir fronteras de relleno que no generan línea visible.
+Define fill boundaries that produce no visible line.
 
-**Aceptación inicial:** La frontera contiene la pintura y no aparece al exportar.
+**Initial acceptance:** The boundary contains the paint and is absent from exports.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-021 — Conversión de trazos
+## VEC-021 — Stroke conversion
 
-Convertir tipos de línea según restricciones explícitas y conservar una copia recuperable.
+Convert line types under explicit constraints and retain a recoverable copy.
 
-**Aceptación inicial:** La conversión informa de textura u opacidad no preservada.
+**Initial acceptance:** The conversion reports any texture or opacity that is not preserved.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-022 — Optimización vectorial
+## VEC-022 — Vector optimization
 
-Simplificar geometría y combinar elementos compatibles con tolerancia configurada.
+Simplify geometry and combine compatible elements within a configured tolerance.
 
-**Aceptación inicial:** La simplificación respeta una tolerancia de error visual publicada.
+**Initial acceptance:** Simplification respects a published visual-error tolerance.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-023 — Sellos
+## VEC-023 — Drawing stamps
 
-Estampar dibujos reutilizables con posición, escala y rotación.
+Stamp reusable drawings with position, scale and rotation.
 
-**Aceptación inicial:** Cada sello conserva la transformación con que se insertó.
+**Initial acceptance:** Each stamp retains its insertion transform.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-024 — Texto
+## VEC-024 — Text
 
-Crear texto editable y convertirlo a geometría cuando se necesite portabilidad.
+Create editable text and convert it to geometry when portability is needed.
 
-**Aceptación inicial:** El texto convertido mantiene su aspecto sin la fuente instalada.
+**Initial acceptance:** Converted text retains its appearance without the font installed.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-025 — Guías y rejilla
+## VEC-025 — Guides and grid
 
-Mostrar cuadrícula y referencias con ajuste opcional.
+Show a grid and reference guides with optional snapping.
 
-**Aceptación inicial:** Desactivar ajuste permite colocar puntos entre líneas de rejilla.
+**Initial acceptance:** Disabling snapping permits points between grid lines.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-026 — Guías de perspectiva
+## VEC-026 — Perspective guides
 
-Asistir dibujo con puntos de fuga, isometría y perspectivas curvas.
+Assist drawing using vanishing points, isometric and curved perspectives.
 
-**Aceptación inicial:** Mover una guía cambia la asistencia y no los dibujos terminados.
+**Initial acceptance:** Moving a guide changes assistance without modifying finished drawings.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## VEC-027 — Reposicionar todos los dibujos
+## VEC-027 — Reposition all drawings
 
-Aplicar una transformación geométrica a un conjunto de dibujos del elemento.
+Apply a geometric transform to a set of drawings belonging to an element.
 
-**Aceptación inicial:** La acción desplaza dibujos usados y no expuestos según selección explícita.
+**Initial acceptance:** The action moves exposed and unexposed drawings according to the explicit selection.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

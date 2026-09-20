@@ -1,87 +1,89 @@
-# Diseño visual y experiencia de edición
+# Visual design and editing experience
 
-## Dirección
+## Direction
 
-Blanco, negro y grises, tipografía sobria, líneas finas, superficies planas y controles precisos. Tomar como referencia el lenguaje de [Geist](https://vercel.com/geist/stack), su [jerarquía de color](https://vercel.com/geist/colors) y su [tipografía](https://vercel.com/geist/typography). Construir componentes propios para un editor de animación; no trasladar literalmente el layout de un dashboard ni asumir que la documentación pública concede licencia sobre todos los recursos de marca.
+Black, white and gray; restrained typography, thin lines, flat surfaces and precise controls. Use [Geist's visual language](https://vercel.com/geist/stack), [color hierarchy](https://vercel.com/geist/colors) and [typography](https://vercel.com/geist/typography) as references. Build original animation-editor components; do not copy a dashboard layout literally or assume public documentation grants rights to every brand asset.
 
-La estética afecta a la interfaz. **El arte del usuario conserva todo su color**, y las paletas muestran colores reales. El lienzo admite fondo blanco, gris neutro o transparencia. Las ayudas del animador pueden usar colores configurables, pero por defecto emplean patrones, opacidad y símbolos legibles en monocromo.
+The aesthetic applies to the interface. **User artwork retains its full color**, and palettes display actual colors. The canvas supports white, neutral gray or transparent backgrounds. Animation aids may use configurable colors, but default to patterns, opacity and symbols readable in monochrome.
 
-## Tokens propuestos
+All first-party text follows the [English language policy](02-language-policy.md). This applies to tools, errors, accessibility labels, presets and documentation, independently of the language of the artwork or dialogue.
 
-Valores propios de OPEN-TOON, inspirados en la referencia; no se presentan como tokens oficiales de Vercel.
+## Proposed tokens
 
-| Token | Claro | Oscuro | Uso |
+These are OPEN-TOON values inspired by the reference, not official Vercel tokens.
+
+| Token | Light | Dark | Usage |
 |---|---|---|---|
-| `surface.base` | `#FFFFFF` | `#0A0A0A` | Ventana |
-| `surface.panel` | `#FAFAFA` | `#111111` | Paneles y barra |
+| `surface.base` | `#FFFFFF` | `#0A0A0A` | Window |
+| `surface.panel` | `#FAFAFA` | `#111111` | Panels and bars |
 | `surface.hover` | `#F0F0F0` | `#222222` | Hover |
-| `surface.selected` | `#E8E8E8` | `#303030` | Selección acompañada de indicador |
-| `text.primary` | `#171717` | `#EDEDED` | Texto principal |
-| `text.secondary` | `#666666` | `#A3A3A3` | Texto secundario |
-| `border.subtle` | `#E5E5E5` | `#2A2A2A` | Separadores decorativos |
-| `border.control` | `#767676` | `#777777` | Límite de controles cuando sea necesario distinguirlos |
-| `focus.ring` | `#171717` | `#FFFFFF` | Anillo doble con separación del fondo |
-| `action.primary.bg` | `#171717` | `#EDEDED` | Acción principal |
-| `action.primary.fg` | `#FFFFFF` | `#0A0A0A` | Texto de acción principal |
+| `surface.selected` | `#E8E8E8` | `#303030` | Selection with an additional indicator |
+| `text.primary` | `#171717` | `#EDEDED` | Primary text |
+| `text.secondary` | `#666666` | `#A3A3A3` | Secondary text |
+| `border.subtle` | `#E5E5E5` | `#2A2A2A` | Decorative separators |
+| `border.control` | `#767676` | `#777777` | Essential control boundaries |
+| `focus.ring` | `#171717` | `#FFFFFF` | Double ring separated from the background |
+| `action.primary.bg` | `#171717` | `#EDEDED` | Primary action background |
+| `action.primary.fg` | `#FFFFFF` | `#0A0A0A` | Primary action text |
 
-Los separadores decorativos no son suficientes para comunicar foco o límites esenciales. Los estados deshabilitados no se reutilizan como texto secundario legible. Errores usan icono, explicación y acción de recuperación; no se distinguen solo por rojo.
+Decorative separators are insufficient to communicate focus or essential boundaries. Disabled styling is not reused for readable secondary text. Errors include an icon, explanation and recovery action; red alone never identifies them.
 
-Tipografía propuesta: Geist Sans para UI y Geist Mono para timecode, frames y valores alineados. La [fuente Geist está bajo SIL OFL 1.1](https://github.com/vercel/geist-font/blob/main/OFL.txt); cuando se incluya se conservará su licencia. Se admite fallback del sistema sin red. Tamaños: 12 px para metadata secundaria, 13–14 px para controles y 16–20 px para encabezados, con escalado de UI. No usar títulos gigantes en el área de trabajo.
+Proposed typography: Geist Sans for UI and Geist Mono for timecode, frames and aligned values. [Geist uses SIL OFL 1.1](https://github.com/vercel/geist-font/blob/main/OFL.txt); retain the license when bundling it. Allow an offline system-font fallback. Sizes: 12 px for secondary metadata, 13–14 px for controls and 16–20 px for headings, with UI scaling. Avoid oversized headings in the workspace.
 
-Espaciado base 4 px; escala 4/8/12/16/24. Radio 4–6 px en controles, sin tarjetas enormes ni sombras decorativas. Filas de 28–32 px en modo compacto y 36–40 px en modo cómodo. Objetivos interactivos de al menos 24×24 píxeles lógicos cuando corresponda, ampliables para lápiz/táctil. Los iconos pueden ser menores dentro de esa zona.
+Base spacing is 4 px, with a 4/8/12/16/24 scale. Control corner radii are 4–6 px, without oversized cards or decorative shadows. Rows are 28–32 px in compact mode and 36–40 px in comfortable mode. Interactive targets are at least 24×24 logical pixels where appropriate, expandable for pen/touch; icons may be smaller inside them.
 
-## Distribución
+## Layout
 
 ```text
-┌ Proyecto / escena ── espacio de trabajo ── guardado ── búsqueda ── exportar ┐
-├ Herramienta activa / tamaño / modo / controles contextuales ───────────────┤
-│       │                                              │                  │
-│ Tools │          Cámara / Drawing viewport            │ Inspector        │
-│       │          lienzo como área dominante           │ Tool properties  │
-│       │                                              │ Color / Library  │
-├───────┴──────────────────────────────────────────────┴──────────────────┤
-│ Timeline / Xsheet / Nodes        transporte · frame · rango · FPS       │
-│ pistas, exposiciones o grafo; altura ajustable                           │
-├ información útil: selección, coordenadas, zoom, calidad de preview ──────┤
+┌ Project / scene ── workspace ── save status ── command search ── export ┐
+├ Active tool / size / mode / contextual controls ───────────────────────┤
+│       │                                            │                  │
+│ Tools │          Camera / Drawing viewport         │ Inspector        │
+│       │          canvas occupies the main area     │ Tool properties  │
+│       │                                            │ Color / Library  │
+├───────┴────────────────────────────────────────────┴──────────────────┤
+│ Timeline / Xsheet / Nodes       transport · frame · range · FPS       │
+│ tracks, exposures or graph; adjustable height                         │
+├ Useful status: selection, coordinates, zoom, preview quality ─────────┤
 ```
 
-Ancho inicial de herramientas 48 px; inspector entre 260 y 340 px; zona temporal aproximadamente un cuarto de altura, modificable. Son puntos de partida, no restricciones rígidas. El viewport recibe el espacio restante. No mostrar todas las herramientas de rigging, dibujo y composición simultáneamente.
+Start with a 48 px tool strip, a 260–340 px inspector and a timeline area around one quarter of the height. These are initial values, not rigid constraints. The viewport receives the remaining area. Do not display every rigging, drawing and compositing tool simultaneously.
 
-| Espacio | Centro | Inferior | Inspector |
+| Workspace | Center | Bottom | Inspector |
 |---|---|---|---|
-| Dibujo | Drawing/Camera | Timeline corta o Xsheet | Pincel, paleta, onion skin |
-| Animación | Camera | Timeline y curvas | Transformación, exposición y sustituciones |
-| Rig | Camera con controles | Jerarquía/nodos | Pivotes, reposo e influencias |
-| Composición | Preview de cámara | Grafo de nodos | Parámetros, máscaras y salida |
-| Revisión | Imagen amplia | Transporte y notas | Calidad, comparación y exportación |
+| Drawing | Drawing/Camera | Short timeline or Xsheet | Brush, palette, onion skin |
+| Animation | Camera | Timeline and curves | Transform, exposure, substitutions |
+| Rigging | Camera with controls | Hierarchy/nodes | Pivots, rest pose, influences |
+| Compositing | Camera preview | Node graph | Parameters, masks, output |
+| Review | Large image | Transport and notes | Quality, comparison, export |
 
-Mínimo orientativo de evaluación: 1280×800 con paneles colapsables; trabajo recomendado a 1920×1080 o superior. A 200 % de escala deben seguir disponibles acciones esenciales mediante menús y colapso. Multi-monitor guarda geometría relativa y recupera ventanas fuera de pantalla. Tableta de dibujo externa no implica prometer una versión iPad/Android.
+Initial evaluation minimum: 1280×800 with collapsible panels; recommended workspace 1920×1080 or higher. Essential actions remain accessible through menus and panel collapse at 200% scale. Multi-monitor layouts store relative geometry and recover off-screen windows. Supporting external drawing tablets does not imply an iPad/Android application.
 
-## Comportamiento de componentes
+## Component behavior
 
-| Componente | Contrato de interacción |
+| Component | Interaction contract |
 |---|---|
-| Botón de herramienta | Seleccionado visible por fondo y marca; tooltip con nombre y atajo |
-| Campo numérico | Unidad explícita, entrada directa, arrastre opcional, reset y estado animado |
-| Propiedad animada | Distingue valor base, clave actual e interpolado mediante símbolo/forma y texto |
-| Timeline | Separación clara entre celda vacía, hold, nuevo dibujo, clave continua y clave sostenida |
-| Xsheet | Numeración, selección rectangular, edición por teclado y encabezados fijos |
-| Nodo | Nombre, tipo, puertos distinguibles por forma/etiqueta y estados de error |
-| Barra de guardado | Modificado, guardando, guardado, recuperación disponible y error, sin estados ambiguos |
-| Progreso | Operación, avance si es medible, cancelar y resultado; no barra ficticia |
-| Diálogo de importación | Vista previa, opciones pertinentes e informe de pérdidas |
-| Búsqueda de comandos | Nombres, sinónimos y atajos; no requiere servicio remoto |
+| Tool button | Selection shown by background and mark; tooltip includes name and shortcut |
+| Numeric field | Explicit unit, direct entry, optional dragging, reset, animated state |
+| Animated property | Distinguish base value, current key and interpolation through shape/symbol and text |
+| Timeline | Clearly distinguish empty cells, holds, new drawings, continuous and held keys |
+| Xsheet | Numbering, rectangular selection, keyboard editing and fixed headers |
+| Node | Name, type, ports distinguished by shape/label and error states |
+| Save status | Distinct modified, saving, saved, recovery-available and error states |
+| Progress | Operation, measurable progress when available, cancellation and result; no fictional progress bar |
+| Import dialog | Preview, relevant options and conversion-loss report |
+| Command search | Names, synonyms and shortcuts; no remote service required |
 
-Un click modifica selección; doble click entra en edición cuando sea convencional. Gestos de arrastre siempre tienen alternativa mediante campo, menú o teclado. Los scrubs numéricos muestran el valor antes de confirmar y permiten cancelar. No usar hover como único acceso a una función esencial.
+A click changes selection; a double-click enters editing where conventional. Drag gestures always have a field, menu or keyboard alternative. Numeric scrubbing previews values and supports cancellation. Hover is never the sole route to an essential function.
 
-## Accesibilidad y localización
+## Accessibility and localization architecture
 
-Usar los criterios de [WCAG 2.2](https://www.w3.org/TR/WCAG22/) como guía verificable para contraste, foco y acciones por puntero, sin afirmar una certificación de app nativa. Objetivo: 4,5:1 para texto normal, foco distinguible y nombres/roles en la capa accesible de Qt. La geometría artística no puede reducirse por completo a controles estándar, pero sus operaciones y propiedades deben tener alternativas accesibles.
+Use [WCAG 2.2](https://www.w3.org/TR/WCAG22/) as a verifiable guide for contrast, focus and pointer actions without claiming native-app certification. Target 4.5:1 normal-text contrast, distinct focus and names/roles through Qt accessibility. Artistic geometry cannot be fully reduced to standard controls, but its operations and properties need accessible alternatives.
 
-Atajos contextuales con conflictos detectados, soporte de teclado español, IME y redistribución de teclas. Strings traducibles; no concatenar mensajes que impidan pluralización. Los números y unidades se muestran según locale cuando proceda, mientras que el formato de archivo usa una representación estable e independiente del idioma.
+Contextual shortcuts detect conflicts and support Spanish keyboards, IMEs and remapping. First-party strings are English and localization-ready; do not concatenate messages in ways that prevent future pluralization. Display numbers/units according to an explicit locale policy where appropriate, while files use stable language-independent representations. Non-English OS settings do not silently change the initial English product language.
 
-## Validación visual futura
+## Future visual validation
 
-Escenas de UI: proyecto vacío, dibujo cargado, 300 capas, nombres largos, multi-selección, error de recurso, render parcial, modo oscuro y 200 % de escala. Comprobar densidad, ausencia de clipping, legibilidad de texto y separación de canvas/UI. Las transiciones de UI serán cortas y reducibles; nunca añadir easing visual al playhead que cambie el tiempo percibido.
+UI scenes include an empty project, loaded drawing, 300 layers, long names, multi-selection, missing resource, partial render, dark mode and 200% scaling. Check density, clipping, legibility and canvas/UI separation. UI transitions are brief and reducible; never add visual easing to the playhead that changes perceived timing.
 
-La captura de producto para la futura landing deberá proceder de la aplicación real. Este documento define la dirección visual; no es una maqueta funcional ni una promesa de interfaz terminada.
+Future product screenshots must come from the actual application. This document defines visual direction; it is not a functional mockup or a completed-interface claim.

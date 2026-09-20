@@ -1,79 +1,79 @@
-# AUT — Scripting y automatización
+# AUT — Scripting and automation
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Automatizar edición → ejecutar comandos → procesar lotes → integrar pipeline.
+**Workflow:** Automate edits → execute commands → batch process → integrate pipeline.
 
-**Módulo:** `scripting`.
+**Module:** `scripting`.
 
-**Entidades:** CommandAPI, Script, ScriptContext, BatchJob.
+**Entities:** CommandAPI, Script, ScriptContext, BatchJob.
 
-**Relaciones:** PRJ, NOD, OUT.
+**Relationships:** PRJ, NOD, OUT.
 
-**Riesgo principal:** Código externo ejecutable y cambios no reversibles.
+**Main risk:** Executable external code and irreversible changes.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## AUT-001 — Editor y ejecución de scripts
+## AUT-001 — Script editing and execution
 
-Crear y ejecutar scripts con salida, errores y contexto de escena explícitos.
+Create and execute scripts with explicit output, errors and scene context.
 
-**Aceptación inicial:** Un error indica script y posición y preserva el último estado válido.
+**Initial acceptance:** An error identifies the script and location while preserving the last valid state.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## AUT-002 — Acciones de script en UI
+## AUT-002 — Script actions in the UI
 
-Asignar scripts a botones y acciones identificables.
+Assign scripts to identifiable buttons and actions.
 
-**Aceptación inicial:** Una acción inexistente se muestra deshabilitada con causa.
+**Initial acceptance:** A missing action is disabled with an explanation.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## AUT-003 — API de escena y nodos
+## AUT-003 — Scene and node API
 
-Exponer consultas y comandos sobre capas, atributos, dibujos y conexiones.
+Expose queries and commands for layers, attributes, drawings and connections.
 
-**Aceptación inicial:** Una modificación por API actualiza las mismas vistas que la UI.
+**Initial acceptance:** An API modification updates the same views as a UI operation.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## AUT-004 — Integración Python
+## AUT-004 — Python integration
 
-Facilitar automatización externa con una API versionada y contratos de error.
+Support external automation through a versioned API and error contracts.
 
-**Aceptación inicial:** Un proceso externo puede abrir una copia, consultar y renderizar sin UI.
+**Initial acceptance:** An external process can open a copy, query it and render without a UI.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## AUT-005 — Sandbox y contexto de ejecución
+## AUT-005 — Sandbox and execution context
 
-Separar pruebas de scripts y políticas de ejecución del documento.
+Separate script testing and execution policies from the document.
 
-**Aceptación inicial:** Abrir una escena ajena no ejecuta scripts por sí solo.
+**Initial acceptance:** Opening someone else's scene does not execute scripts automatically.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## AUT-006 — Herramientas de conversión CLI
+## AUT-006 — CLI conversion tools
 
-Exponer validación, conversión y render como comandos con resultados estructurados.
+Expose validation, conversion and rendering as commands with structured results.
 
-**Aceptación inicial:** Un archivo inválido devuelve código no cero y diagnóstico legible.
+**Initial acceptance:** An invalid file returns a nonzero exit code and readable diagnostics.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

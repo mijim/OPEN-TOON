@@ -1,89 +1,89 @@
-# LIB — Bibliotecas, símbolos y reutilización
+# LIB — Libraries, symbols and reuse
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Crear asset → catalogar → reutilizar → actualizar.
+**Workflow:** Create asset → catalog → reuse → update.
 
-**Módulo:** `asset-library`.
+**Module:** `asset-library`.
 
-**Entidades:** AssetLibrary, Template, Symbol, AssetVersion.
+**Entities:** AssetLibrary, Template, Symbol, AssetVersion.
 
-**Relaciones:** PRJ, RIG.
+**Relationships:** PRJ, RIG.
 
-**Riesgo principal:** Assets que parecen independientes pero comparten datos.
+**Main risk:** Assets that appear independent but share data.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## LIB-001 — Bibliotecas locales
+## LIB-001 — Local libraries
 
-Organizar assets por carpetas con búsqueda, previews y refresco.
+Organize assets in folders with search, previews and refresh.
 
-**Aceptación inicial:** Mover el catálogo no pierde las referencias empaquetadas.
+**Initial acceptance:** Moving the catalog does not lose packaged references.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## LIB-002 — Plantillas de escenas y rigs
+## LIB-002 — Scene and rig templates
 
-Guardar selecciones con dibujos, paletas, nodos y animación requerida.
+Save selections with required drawings, palettes, nodes and animation.
 
-**Aceptación inicial:** Una plantilla se importa correctamente en una escena vacía.
+**Initial acceptance:** A template imports correctly into an empty scene.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## LIB-003 — Símbolos reutilizables
+## LIB-003 — Reusable symbols
 
-Encapsular elementos con su propio contenido y transformación.
+Encapsulate elements with their own content and transforms.
 
-**Aceptación inicial:** Editar un símbolo actualiza sus instancias según el modo de enlace.
+**Initial acceptance:** Editing a symbol updates its instances according to the linking mode.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## LIB-004 — Importar plantillas
+## LIB-004 — Import templates
 
-Aplicar reglas de copia, enlaces y conflictos al reutilizar assets.
+Apply copy, linking and conflict rules when reusing assets.
 
-**Aceptación inicial:** Dos imports pueden ser independientes si se elige duplicación.
+**Initial acceptance:** Two imports can be independent when duplication is selected.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
 ## LIB-005 — Paste special
 
-Seleccionar si se importan animación, dibujos, paletas o estructura.
+Choose whether to import animation, drawings, palettes or structure.
 
-**Aceptación inicial:** Pegar únicamente claves no sobrescribe el rig receptor.
+**Initial acceptance:** Pasting only keys does not overwrite the receiving rig.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## LIB-006 — Miniaturas de biblioteca
+## LIB-006 — Library thumbnails
 
-Generar previews actualizables sin bloquear edición.
+Generate refreshable previews without blocking editing.
 
-**Aceptación inicial:** Un asset modificado invalida su miniatura.
+**Initial acceptance:** Modifying an asset invalidates its thumbnail.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## LIB-007 — Edición de plantillas
+## LIB-007 — Template editing
 
-Editar un recurso de biblioteca distinguiendo original e instancia.
+Edit a library resource while distinguishing its source from instances.
 
-**Aceptación inicial:** Guardar cambios indica qué recurso se modifica.
+**Initial acceptance:** Saving changes identifies which resource is modified.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

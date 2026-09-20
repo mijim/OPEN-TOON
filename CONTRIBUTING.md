@@ -1,12 +1,17 @@
-# Contribuir
+# Contributing
 
-El proyecto está en investigación. Las contribuciones útiles ahora son correcciones de requisitos, fuentes primarias, fixtures redistribuibles y pruebas de viabilidad propuestas. No hay un SDK de plugins ni una API estable.
+OPEN-TOON is in the specification and development-planning stage. Useful contributions currently include requirement corrections, reusable-library evaluations, redistributable fixtures and bounded technical experiments. There is no stable application SDK or plugin API yet.
 
-Antes de cambiar el alcance, leer [AGENTS.md](AGENTS.md). Describir el problema, el ID de capacidad, el comportamiento esperado, la evidencia y las limitaciones. Mantener identificadores existentes y regenerar el catálogo Markdown tras editar sus datos.
+Read [AGENTS.md](AGENTS.md), the [roadmap](docs/planning/README.md) and the relevant phase before changing scope. Describe the problem, feature IDs, expected behavior, evidence and limitations. Keep existing IDs and regenerate Markdown views after editing canonical records.
 
 ```sh
 python3 scripts/catalog.py render
+python3 scripts/roadmap.py render
 python3 scripts/validate_docs.py
 ```
 
-Las aportaciones originales se ofrecen bajo GPL-3.0-or-later. Identificar la procedencia y licencia de cualquier recurso externo; no copiar manuales, assets comerciales ni escenas de clientes. Para código futuro: APIs pequeñas, cambios verificables y pruebas de comportamiento proporcionales al cambio.
+Use English for new code, comments, documentation, UI strings and built-in assets. Preserve multilingual user content. The previous research has been translated; future revisions must retain stable IDs and technical meaning.
+
+Original contributions are offered under GPL-3.0-or-later. Identify the provenance and license of external resources; do not copy proprietary manuals, commercial assets or client scenes. New dependencies require pinned-version, license, maintenance and workload evidence. Future code should use small APIs, observable changes and meaningful behavior tests proportional to the risk.
+
+A planning assignment does not mark a feature implemented. Update implementation status only with working document behavior and the evidence required by the [Definition of Done](docs/planning/EXECUTION.md).

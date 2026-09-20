@@ -1,47 +1,48 @@
-# Riesgos, diferencias y decisiones abiertas
+# Risks, differences and open decisions
 
-## Riesgos que determinan el esfuerzo
+## Risks that determine effort
 
-| ID | Riesgo | Consecuencia | Respuesta y condición para cerrarlo |
+| ID | Risk | Consequence | Response and closure condition |
 |---|---|---|---|
-| R-01 | Alcance de suite profesional | Muchos subsistemas y especialidades; contar funciones no estima duración | Plan por flujos completos, equipo/capacidad declarados y rangos revisables |
-| R-02 | Trazo y relleno vectorial insuficientes | Una UI bonita no resulta útil al dibujar | SP-01/SP-04 y evaluación con animadores |
-| R-03 | Qt RHI o integración Skia compleja | Acoplamiento a versión y diferencias de GPU | Adapter aislado, SP-02 y matriz de builds |
-| R-04 | Guardado de DB y assets inconsistente | Pérdida de trabajo | Protocolo de commits, fallos inyectados y revisiones inmutables |
-| R-05 | Deformación avanzada | Artefactos y algoritmos caros | Validar curva/envelope antes de weighted/shape-aware |
-| R-06 | Color y alfa incoherentes | Preview y render no coinciden | Pipeline explícito y fixtures de composición |
-| R-07 | Compatibilidad de formatos sobreprometida | Importación destructiva y frustración | Perfiles por formato con informes de pérdida |
-| R-08 | Licencias de dependencias | Binarios difíciles de redistribuir | Revisar cada módulo/build y preservar avisos |
-| R-09 | Nombre parecido a OpenToonz | Confusión de identidad y expectativas | Nombre provisional y revisión antes de una release |
-| R-10 | Plugin o script inestable | Fallos, acceso indebido o datos corruptos | Sin autoejecución, límites, adapter y aislamiento según tipo |
-| R-11 | Colaboración prematura | Desviar trabajo de la herramienta local | Versiones y paquetes primero; servicio de estudio separado |
-| R-12 | IA dependiente de proveedor | Costes y ausencia de funcionamiento offline | Funciones optativas; editor completo sin servicio de IA |
-| R-13 | Catálogo funcional incompleto | Operadores/variantes no considerados | Revisión humana por área y actualización del catálogo |
-| R-14 | Conteos interpretados como avance | Falsa sensación de producto terminado | Estado `not_started` y distinción entre capacidad y nodo |
+| R-01 | Professional-suite scope | Many subsystems and specialties; feature counts do not estimate duration | Plan complete workflows with explicit staffing/capacity and revisable ranges |
+| R-02 | Inadequate vector strokes and fills | Attractive UI remains unusable for drawing | SP-01/SP-04 and animator evaluation |
+| R-03 | Complex Qt RHI or Skia integration | Version coupling and GPU differences | Isolated adapter, SP-02 and build matrix |
+| R-04 | Inconsistent database and asset saves | Lost work | Commit protocol, fault injection and immutable revisions |
+| R-05 | Advanced deformation | Artifacts and expensive algorithms | Validate curve/envelope before weighted/shape-aware deformation |
+| R-06 | Inconsistent color and alpha | Preview and render disagree | Explicit pipeline and compositing fixtures |
+| R-07 | Overpromised format compatibility | Destructive import and frustration | Format profiles with loss reports |
+| R-08 | Dependency licenses | Difficult binary redistribution | Review each module/build and preserve notices |
+| R-09 | Name resembles OpenToonz | Confused identity and expectations | Provisional name and review before release |
+| R-10 | Unstable plugin or script | Crashes, improper access or corrupt data | No automatic execution; limits, adapters and appropriate isolation |
+| R-11 | Premature collaboration features | Work diverted from the local tool | Revisions and packages first; separate studio service |
+| R-12 | Provider-dependent AI | Costs and loss of offline operation | Optional features; complete editor without an AI service |
+| R-13 | Incomplete capability catalog | Missing operators or variants | Human review by domain and catalog updates |
+| R-14 | Counts interpreted as progress | False impression of a finished product | Preserve `not_started` and distinguish capabilities from nodes |
 
-## Decisiones resueltas o propuestas
+## Resolved or proposed decisions
 
-| ID | Decisión | Estado |
+| ID | Decision | Status |
 |---|---|---|
-| D-02 | Interfaz minimalista blanco/negro, cercana a Vercel | Confirmado por el usuario |
-| D-03 | GitHub público en `mijim` | Confirmado por el usuario |
-| D-04 | Investigar antes del plan y construir después | Confirmado por el usuario |
-| D-05 | Escritorio local; sin cuenta obligatoria | Recomendación |
-| D-06 | C++20/Qt Quick | Recomendación condicionada a SP-00/01/02 |
-| D-08 | GPL-3.0-or-later para aportaciones originales | Licencia inicial aplicada |
-| D-09 | Backend gráfico exacto, dependencias y versiones | Abierto hasta los spikes |
+| D-02 | Minimal black/white interface close to Vercel's visual language | Confirmed by user |
+| D-03 | Public GitHub repository under `mijim` | Confirmed by user |
+| D-04 | Research before planning; implementation afterward | Confirmed by user; plan now prepared |
+| D-05 | Local desktop editor without a mandatory account | Recommended direction |
+| D-06 | C++20 / Qt Quick | Accepted direction; integration evidence still required |
+| D-08 | GPL-3.0-or-later for original contributions | Initial license applied |
+| D-09 | Exact graphics backend, dependencies and versions | Open until the spikes |
+| D-10 | English product, code and documentation | Confirmed by user |
+| D-11 | Reuse proven, efficient open-source libraries | Confirmed direction; individual adoption gates apply |
 
-## Información que mejorará el futuro plan
+## Information that improves estimates
 
-No impide completar el análisis. Antes de estimar calendario: personas disponibles, experiencia C++/Qt/gráficos, presupuesto, sistemas/tabletas reales, prioridad de animación tradicional frente a cut-out y primer flujo de producción que debe completarse. Si no se aportan estos datos, el plan deberá explicitar sus supuestos y estimar por tamaños/riesgo, no dar fechas ficticias.
+Available people, C++/Qt/graphics experience, budget, real operating systems/tablets, traditional-versus-cut-out priorities and the first required production workflow will improve the schedule. These do not prevent completing the analysis or plan. Until supplied, [estimates](../planning/ESTIMATES.md) use explicit assumptions and risk ranges rather than fictional dates.
 
-El análisis propone un núcleo propio pero aún no audita código de OpenToonz. Tampoco tiene mediciones de latencia, render o compatibilidad de dispositivos. Estas son incertidumbres técnicas concretas, registradas en los spikes, no razones para volver a investigar indefinidamente antes de producir una primera herramienta útil.
+The analysis proposes an owned core but has not yet audited OpenToonz code. It also contains no measured tablet latency, rendering performance or device compatibility. These are specific uncertainties recorded in the spikes, not a reason to keep researching indefinitely before producing a useful tool.
 
-## Detalle que debe cerrarse por capacidad
+## Details to resolve per capability
 
-Antes de implementar cada capacidad se especificarán parámetros, valores por defecto, límites, unidades, formatos soportados, transacciones, casos de cancelación y pruebas.
+Before implementation, specify parameters, defaults, limits, units, supported formats, transactions, cancellation cases and tests.
 
+## Maintaining the research
 
-## Mantenimiento de la investigación
-
-Los cambios de alcance deben conservar los IDs existentes, actualizar las fuentes canónicas y regenerar las vistas Markdown.
+Scope changes preserve existing IDs, update canonical records and regenerate Markdown views. Translation preserves behavior and acceptance criteria rather than merely translating labels.

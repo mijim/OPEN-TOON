@@ -1,79 +1,79 @@
-# MOR — Morphing vectorial
+# MOR — Vector morphing
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Elegir extremos → establecer correspondencias → interpolar → corregir.
+**Workflow:** Choose endpoints → establish correspondences → interpolate → correct.
 
-**Módulo:** `morphing`.
+**Module:** `morphing`.
 
-**Entidades:** MorphSequence, CorrespondenceHint, MorphKey.
+**Entities:** MorphSequence, CorrespondenceHint, MorphKey.
 
-**Relaciones:** VEC, TIM.
+**Relationships:** VEC, TIM.
 
-**Riesgo principal:** Topologías incompatibles, huecos y trazos degenerados.
+**Main risk:** Incompatible topologies, holes and degenerate strokes.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## MOR-001 — Interpolación de dibujos
+## MOR-001 — Drawing interpolation
 
-Generar intercalados entre dibujos vectoriales compatibles.
+Generate in-betweens between compatible vector drawings.
 
-**Aceptación inicial:** El primer y último frame son idénticos a los extremos.
+**Initial acceptance:** The first and last frames are identical to the endpoint drawings.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## MOR-002 — Reglas de compatibilidad
+## MOR-002 — Compatibility rules
 
-Diagnosticar incompatibilidades de regiones y colores antes de interpolar.
+Diagnose region and color incompatibilities before interpolation.
 
-**Aceptación inicial:** Una entrada bitmap se rechaza en el modo vectorial.
+**Initial acceptance:** Bitmap input is rejected in vector mode.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## MOR-003 — Hints de correspondencia
+## MOR-003 — Correspondence hints
 
-Permitir guiar qué puntos, contornos o líneas se corresponden.
+Let artists guide matching points, contours or lines.
 
-**Aceptación inicial:** Añadir una correspondencia modifica el segmento esperado.
+**Initial acceptance:** Adding a correspondence changes the intended segment.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## MOR-004 — Claves de morphing intermedias
+## MOR-004 — Intermediate morph keys
 
-Convertir un resultado intermedio en dibujo clave para añadir detalles.
+Turn an intermediate result into a key drawing for additional detail.
 
-**Aceptación inicial:** La nueva clave divide el morph y sigue siendo editable.
+**Initial acceptance:** The new key splits the morph and remains editable.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## MOR-005 — Timing y easing del morph
+## MOR-005 — Morph timing and easing
 
-Separar progreso temporal del emparejamiento geométrico.
+Separate temporal progress from geometric correspondence.
 
-**Aceptación inicial:** Ajustar ease conserva dibujos extremos y duración.
+**Initial acceptance:** Adjusting easing preserves endpoint drawings and duration.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## MOR-006 — Huecos y transparencia
+## MOR-006 — Holes and transparency
 
-Resolver regiones interiores y alfa con reglas visibles.
+Resolve interior regions and alpha under visible rules.
 
-**Aceptación inicial:** Un anillo conserva el hueco en toda la secuencia válida.
+**Initial acceptance:** A ring retains its hole throughout a valid sequence.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

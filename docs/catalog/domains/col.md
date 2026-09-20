@@ -1,169 +1,169 @@
-# COL — Pintura, paletas y gestión de color
+# COL — Painting, palettes and color management
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Definir paleta → rellenar → corregir → generar variaciones → comprobar color.
+**Workflow:** Define palette → fill → correct → create variants → verify color.
 
-**Módulo:** `colour`.
+**Module:** `colour`.
 
-**Entidades:** Palette, SwatchId, Gradient, TextureFill, ColourConfig.
+**Entities:** Palette, SwatchId, Gradient, TextureFill, ColourConfig.
 
-**Relaciones:** LYR, VEC, RAS.
+**Relationships:** LYR, VEC, RAS.
 
-**Riesgo principal:** Confundir identidad de color con valores RGB y perder consistencia de producción.
+**Main risk:** Confusing color identity with RGB values and losing production consistency.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## COL-001 — Paletas y colores identificados
+## COL-001 — Palettes and identified colors
 
-Referenciar colores por identificador estable separado de su valor RGBA.
+Reference colors using stable identifiers separate from RGBA values.
 
-**Aceptación inicial:** Cambiar una muestra recolorea todas sus referencias y ninguna muestra distinta.
+**Initial acceptance:** Changing a swatch recolors all its references and no distinct swatch.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## COL-002 — Crear y editar muestras
+## COL-002 — Create and edit swatches
 
-Gestionar muestras sólidas, nombres, opacidad y duplicados.
+Manage solid swatches, names, opacity and duplicates.
 
-**Aceptación inicial:** Dos muestras con igual RGB pueden conservar identidades diferentes.
+**Initial acceptance:** Two swatches with equal RGB values can retain different identities.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## COL-003 — Relleno por regiones
+## COL-003 — Region fill
 
-Pintar regiones cerradas con tolerancia definida.
+Paint closed regions using a defined tolerance.
 
-**Aceptación inicial:** Una región vecina separada por una línea no recibe pintura.
+**Initial acceptance:** An adjacent region separated by a line is not painted.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## COL-004 — Pintar líneas y áreas
+## COL-004 — Paint lines and areas
 
-Permitir recolorear contornos y rellenos de manera independiente.
+Recolor outlines and fills independently.
 
-**Aceptación inicial:** Pintar solo líneas preserva colores interiores.
+**Initial acceptance:** Painting only lines preserves interior colors.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## COL-005 — Cierre de huecos
+## COL-005 — Gap closing
 
-Resolver discontinuidades pequeñas para facilitar el relleno sin unir áreas arbitrarias.
+Resolve small discontinuities to support filling without joining arbitrary areas.
 
-**Aceptación inicial:** Un hueco por encima de la tolerancia sigue abierto.
+**Initial acceptance:** A gap larger than the tolerance remains open.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## COL-006 — Pintura múltiple
+## COL-006 — Multi-drawing painting
 
-Aplicar operaciones de pintado a selección de dibujos o rango temporal.
+Apply paint operations to selected drawings or a time range.
 
-**Aceptación inicial:** El resumen indica qué dibujos únicos se alteraron.
+**Initial acceptance:** The summary identifies which unique drawings changed.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## COL-007 — Gradientes y texturas
+## COL-007 — Gradients and textures
 
-Usar rellenos graduales y texturas con transformación independiente.
+Use gradient and texture fills with independent transforms.
 
-**Aceptación inicial:** Rotar textura no cambia la forma que la recorta.
+**Initial acceptance:** Rotating a texture does not change its clipping shape.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## COL-008 — Modelo de color
+## COL-008 — Color model
 
-Comparar y muestrear una referencia de color asociada al proyecto.
+Compare and sample a project-associated color reference.
 
-**Aceptación inicial:** Cambiar de modelo no altera automáticamente el dibujo.
+**Initial acceptance:** Changing the reference model does not automatically modify the drawing.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## COL-009 — Listas de paletas
+## COL-009 — Palette lists
 
-Resolver paletas de escena, elemento y producción con orden explícito.
+Resolve scene, element and production palettes in an explicit order.
 
-**Aceptación inicial:** Un conflicto de identidad se resuelve de forma reproducible.
+**Initial acceptance:** Identity conflicts are resolved reproducibly.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## COL-010 — Clones y variantes de paleta
+## COL-010 — Palette clones and variants
 
-Compartir identidades entre variaciones cromáticas sin recolorear a mano.
+Share identities between color variations without manual repainting.
 
-**Aceptación inicial:** Una variante nocturna afecta solo a la instancia configurada.
+**Initial acceptance:** A night variant affects only the configured instance.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## COL-011 — Importar y exportar paletas
+## COL-011 — Import and export palettes
 
-Transferir paletas con recursos de textura y reglas de conflicto.
+Transfer palettes with texture resources and conflict rules.
 
-**Aceptación inicial:** La importación repetida no duplica silenciosamente identidades.
+**Initial acceptance:** Repeated import does not silently duplicate identities.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## COL-012 — Recuperar colores
+## COL-012 — Recover colors
 
-Restaurar o reasignar colores cuyos recursos no estén disponibles.
+Restore or reassign colors whose resources are unavailable.
 
-**Aceptación inicial:** Abrir sin una paleta muestra el problema sin reemplazar los IDs originales.
+**Initial acceptance:** Opening without a palette reports the problem without replacing original IDs.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## COL-013 — Optimizar paletas
+## COL-013 — Palette optimization
 
-Detectar muestras redundantes o sin uso respetando revisiones existentes.
+Detect redundant or unused swatches while respecting existing revisions.
 
-**Aceptación inicial:** Una muestra usada en una versión histórica no se elimina por defecto.
+**Initial acceptance:** A swatch used in a historical version is not deleted by default.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## COL-014 — Espacios de color
+## COL-014 — Color spaces
 
-Distinguir interpretación de entrada, composición, visualización y salida.
+Distinguish input interpretation, compositing, display and output.
 
-**Aceptación inicial:** Una carta de referencia completa el recorrido con error medido.
+**Initial acceptance:** A reference chart completes the pipeline with measured error.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## COL-015 — Configuraciones de estudio
+## COL-015 — Studio color configurations
 
-Permitir una configuración de color compartida y validada.
+Support a shared, validated color configuration.
 
-**Aceptación inicial:** Una configuración que falta produce aviso y no una conversión silenciosa.
+**Initial acceptance:** A missing configuration produces a warning rather than a silent conversion.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

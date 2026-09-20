@@ -1,89 +1,89 @@
-# GAM — Salida para videojuegos
+# GAM — Game output
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Preparar rig compatible → hornear → exportar → validar runtime.
+**Workflow:** Prepare compatible rig → bake → export → validate runtime.
 
-**Módulo:** `game-export`.
+**Module:** `game-export`.
 
-**Entidades:** SpriteAtlas, RuntimeSkeleton, Anchor, CollisionShape.
+**Entities:** SpriteAtlas, RuntimeSkeleton, Anchor, CollisionShape.
 
-**Relaciones:** DEF, OUT, LIB.
+**Relationships:** DEF, OUT, LIB.
 
-**Riesgo principal:** No todos los nodos y deformadores tienen representación en motores de juego.
+**Main risk:** Not every node or deformer has a representation in game engines.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
 ## GAM-001 — Sprite sheets
 
-Empaquetar frames con metadatos de pivote, tamaño y temporización.
+Pack frames with pivot, size and timing metadata.
 
-**Aceptación inicial:** Reconstruir la animación desde atlas conserva registro y timing.
+**Initial acceptance:** Reconstructing animation from the atlas preserves registration and timing.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## GAM-002 — Esqueleto y animación de runtime
+## GAM-002 — Runtime skeleton and animation
 
-Exportar un perfil de rig compatible con un runtime objetivo.
+Export a rig profile compatible with a target runtime.
 
-**Aceptación inicial:** Un clip exportado coincide en las poses de referencia definidas.
+**Initial acceptance:** An exported clip matches the defined reference poses.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## GAM-003 — Horneado de efectos
+## GAM-003 — Effect baking
 
-Convertir partes no soportadas en imágenes o grupos precompuestos.
+Convert unsupported parts into images or precomposed groups.
 
-**Aceptación inicial:** El informe identifica los elementos que dejan de ser editables en runtime.
+**Initial acceptance:** The report identifies elements that cease to be editable at runtime.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## GAM-004 — Anclas para accesorios
+## GAM-004 — Accessory anchors
 
-Exportar puntos de montaje y transformaciones animadas.
+Export attachment points and animated transforms.
 
-**Aceptación inicial:** Un accesorio se mantiene unido a la mano en el ejemplo de runtime.
+**Initial acceptance:** An accessory stays attached to the hand in the runtime example.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## GAM-005 — Colisiones y metadatos
+## GAM-005 — Collisions and metadata
 
-Asociar regiones de colisión y datos de juego a la exportación.
+Attach collision regions and game data to exports.
 
-**Aceptación inicial:** Las colisiones respetan escala y origen del asset.
+**Initial acceptance:** Collisions respect the asset's scale and origin.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## GAM-006 — Variaciones de paleta en runtime
+## GAM-006 — Runtime palette variants
 
-Representar variantes compatibles o generar atlas por variante.
+Represent compatible variants or generate an atlas per variant.
 
-**Aceptación inicial:** La variante seleccionada no cambia el timing de animación.
+**Initial acceptance:** Selecting a variant does not change animation timing.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## GAM-007 — Salida HTML heredada
+## GAM-007 — Legacy HTML output
 
-Registrar exportación EaselJS como compatibilidad histórica de referencia.
+Record EaselJS export as a historical compatibility option.
 
-**Aceptación inicial:** El análisis distingue este formato del formato nativo OPEN-TOON.
+**Initial acceptance:** The specification distinguishes this format from the native OPEN-TOON format.
 
-**Alcance:** `legacy_candidate` · **Nivel:** `legacy` · **Estado:** `not_started`.
+**Scope:** `legacy_candidate` · **Level:** `legacy` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

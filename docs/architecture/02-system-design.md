@@ -1,129 +1,129 @@
-# Arquitectura de sistema y clean code
+# System architecture and clean code
 
-Estado: propuesta para el futuro plan, sin implementación. Una aplicación modular en un repositorio es suficiente. No se necesitan microservicios para dibujar, guardar y renderizar localmente.
+Status: planned architecture, not an implementation. A modular application in one repository is sufficient. Drawing, saving and local rendering do not require microservices.
 
-## Límites y dependencias
+## Boundaries and dependencies
 
 ```mermaid
 flowchart TD
-  QML[Qt Quick: paneles y controles] --> UI[View models y adaptador de entrada]
-  CLI[CLI y API de automatización] --> APP[Casos de uso y comandos]
+  QML[Qt Quick panels and controls] --> UI[View models and input adapter]
+  CLI[CLI and automation API] --> APP[Use cases and commands]
   UI --> APP
-  APP --> DOM[Documento y dominio C++ puro]
-  APP --> PORTS[Puertos de almacenamiento, render y medios]
-  ADAPTERS[SQLite, archivos, codecs, Qt, GPU] -. implementan .-> PORTS
-  DOM --> SNAP[Snapshot de escena evaluable]
-  SNAP --> EVAL[Evaluación de tiempo, rig y compositor]
-  EVAL --> BACKEND[Backend CPU o GPU]
-  BACKEND --> VIEW[Superficie de preview o salida]
+  APP --> DOM[Document and pure C++ domain]
+  APP --> PORTS[Storage, render and media ports]
+  ADAPTERS[SQLite, files, codecs, Qt, GPU] -. implement .-> PORTS
+  DOM --> SNAP[Evaluable scene snapshot]
+  SNAP --> EVAL[Time, rig and compositor evaluation]
+  EVAL --> BACKEND[CPU or GPU backend]
+  BACKEND --> VIEW[Preview surface or output]
 ```
 
-Las flechas indican dependencias conceptuales; adapters se conectan en el punto de composición de la aplicación. El dominio no conoce vistas, rutas de instalación ni librerías de codecs. Los casos de uso coordinan transacciones y validan permisos del documento. Los adapters convierten tipos externos a contratos propios.
+Arrows represent conceptual dependencies; adapters are connected at the application's composition root. The domain knows nothing about views, installation paths or codec libraries. Use cases coordinate transactions and validate document permissions. Adapters convert external types into owned contracts.
 
-## Estructura prevista
+## Planned structure
 
 ```text
 apps/
-  desktop/                 # arranque Qt, composición y recursos
-  render-cli/              # validación, render y conversión sin ventanas
+  desktop/                 # Qt startup, composition and resources
+  render-cli/              # headless validation, rendering and conversion
 modules/
-  document/                # IDs, dibujos, capas, referencias y esquema
-  timeline/                # intervalos, exposición, marcadores y tiempo
-  geometry/                # curvas, perfiles, regiones y operaciones
-  raster/                  # tiles, pinceles, selección y daños
-  colour/                  # paletas y contratos de conversión
-  animation/               # curvas y evaluación de propiedades
-  rigging/                 # jerarquías, restricciones y poses
-  deformation/             # bind, influencias y algoritmos
-  compositor/              # grafo tipado, scheduling y operadores
-  audio/                   # clips, mezcla y reloj
-  assets/                  # biblioteca y dependencias
-  application/             # comandos, consultas y sesiones
+  document/                # IDs, drawings, layers, references and schema
+  timeline/                # intervals, exposures, markers and time
+  geometry/                # curves, profiles, regions and operations
+  raster/                  # tiles, brushes, selection and dirty regions
+  colour/                  # palettes and conversion contracts
+  animation/               # curves and property evaluation
+  rigging/                 # hierarchies, constraints and poses
+  deformation/             # binding, influences and algorithms
+  compositor/              # typed graph, scheduling and operators
+  audio/                   # clips, mixing and clock
+  assets/                  # library and dependencies
+  application/             # commands, queries and sessions
 adapters/
-  qt-ui/                   # view models y modelos de listas/tablas
-  qt-input/                # tableta, gestos, captura y coordenadas
-  render-rhi/              # frontera QRhi versionada
-  render-cpu/              # referencia y diagnóstico
-  storage/                 # SQLite, blobs y migraciones
-  media/                   # codecs y procesos de render externos
-  colour-ocio/             # configuración y transformación OCIO
-  scripting/               # API externa y host aislado futuro
+  qt-ui/                   # view models and list/table models
+  qt-input/                # tablet, gestures, capture and coordinates
+  render-rhi/              # versioned QRhi boundary
+  render-cpu/              # reference and diagnostics
+  storage/                 # SQLite, blobs and migrations
+  media/                   # codecs and external render processes
+  colour-ocio/             # OCIO configuration and transforms
+  scripting/               # external API and future isolated host
 ui/
-  tokens/                  # diseño visual portable
-  components/              # botones, campos, paneles y menús
-  workspaces/              # layouts de dibujo, animación y composición
+  tokens/                  # portable visual design
+  components/              # buttons, fields, panels and menus
+  workspaces/              # drawing, animation and compositing layouts
 tests/
   domain/ integration/ visual/ fixtures/ performance/
 docs/
   research/ catalog/ architecture/ design/ planning/
 ```
 
-No crear todos los directorios vacíos ahora. Se introducen cuando tengan una responsabilidad real. Cada módulo tendrá API pública pequeña, implementación privada y pruebas propias; CMake impedirá dependencias inversas. Las interfaces se justifican por un límite tecnológico o por más de una implementación real, no por convertir cada clase en una jerarquía.
+Do not create every directory empty now. Introduce modules when they have a real responsibility. Each has a small public API, private implementation and appropriate tests; CMake prevents reverse dependencies. Interfaces are justified by a technology boundary or multiple real implementations, not by turning every class into an inheritance hierarchy. The layer families in the [execution rules](../planning/EXECUTION.md) describe these same boundaries, not a second competing directory tree.
 
-## Tres tipos de estado
+## Three kinds of state
 
-| Estado | Ejemplos | Dueño y persistencia |
+| State | Examples | Ownership and persistence |
 |---|---|---|
-| Documento | Dibujos, exposiciones, paletas, claves, conexiones | Núcleo, versionado y guardado |
-| Sesión | Selección, frame actual, herramienta, operaciones provisionales | Sesión de edición, normalmente separado |
-| Preferencias/layout | Atajos, densidad, tema, paneles | Perfil del usuario, fuera de la escena compartida |
+| Document | Drawings, exposures, palettes, keys, connections | Core; versioned and saved |
+| Session | Selection, current frame, tool, provisional operations | Editing session; normally separate |
+| Preferences/layout | Shortcuts, density, theme, panels | User profile outside the shared scene |
 
-Las cachés son datos derivados y descartables. Una caché jamás es la única copia de un dibujo. El renderer consume snapshots inmutables y no altera el documento al calcular una imagen.
+Caches are derived, disposable data. A cache is never the only copy of a drawing. The renderer consumes immutable snapshots and does not mutate the document while evaluating an image.
 
-## Comandos y transacciones
+## Commands and transactions
 
-Ejemplo: `PaintRegion(drawingId, artLayerId, regionId, swatchId, expectedRevision)` valida referencias, calcula el cambio, confirma una transacción, publica un `DocumentDelta` y permite deshacer. Un comando no guarda punteros crudos a objetos de UI. Su entrada es serializable para scripting futuro, pero no hace falta implementar event sourcing completo.
+For example, `PaintRegion(drawingId, artLayerId, regionId, swatchId, expectedRevision)` validates references, computes a change, commits a transaction, publishes a `DocumentDelta` and supports undo. Commands do not retain raw pointers to UI objects. Inputs are serializable for future scripting, without requiring a complete event-sourcing system.
 
-El trazo tiene `begin/update/end/cancel`. Las muestras provisionales alimentan el feedback inmediato; al terminar se confirma un único gesto. Deshacer un trazo restaura su geometría o tiles y no añade miles de pasos. En operaciones largas, el cálculo trabaja sobre una revisión; antes de aplicar se comprueba que siga siendo válida. Cancelar descarta el resultado provisional.
+Strokes have `begin/update/end/cancel`. Provisional samples provide immediate feedback; completion commits one gesture. Undo restores its geometry or tiles rather than adding thousands of steps. Long operations compute against a revision and verify its validity before applying results. Cancellation discards provisional output.
 
-Undo puede usar deltas inversos y recursos inmutables por hash. Una operación destructiva de raster conserva solo tiles modificados, no una copia completa de todo el proyecto. Las revisiones persistentes y la pila de undo son mecanismos distintos; su retención se especifica por separado.
+Undo can use inverse deltas and immutable resources addressed by hash. Destructive raster operations retain changed tiles rather than copying the entire project. Persistent revisions and the undo stack are distinct mechanisms with separately specified retention.
 
-## Pipeline de entrada y dibujo
+## Input and drawing pipeline
 
-1. Recibir eventos con posición, presión, inclinación, tipo de puntero y timestamp disponibles.
-2. Convertir coordenadas de pantalla/HiDPI/vista a espacio de dibujo mediante una transformación explícita.
-3. Resamplear y estabilizar en un pipeline medible, respetando el final del gesto y la cancelación.
-4. Actualizar un overlay de baja latencia sin reconstruir todos los paneles ni persistir cada muestra.
-5. Ajustar geometría o rasterizar tiles, confirmar el comando e invalidar regiones afectadas.
+1. Receive available position, pressure, tilt, pointer type and timestamp events.
+2. Convert screen/HiDPI/view coordinates into drawing space with an explicit transform.
+3. Resample and stabilize through a measurable pipeline, respecting gesture completion and cancellation.
+4. Update a low-latency overlay without rebuilding every panel or persisting each sample.
+5. Fit geometry or rasterize tiles, commit the command and invalidate affected regions.
 
-La presión constante del ratón se trata como un perfil definido. No asumir que todos los dispositivos aportan inclinación o goma. Evitar procesar dos veces un evento de tableta y su evento sintético de ratón. La vista rotada o reflejada afecta a la conversión de coordenadas, no al significado del documento.
+Constant mouse pressure uses a defined profile. Do not assume every device supports tilt or an eraser. Avoid processing both a tablet event and its synthetic mouse event. Rotated or mirrored views affect coordinate conversion, not document semantics.
 
-## Evaluación y render
+## Evaluation and rendering
 
-`Scene + revision + rationalTime + renderProfile → evaluated scene → graph → frame`. Primero se resuelven exposiciones y curvas, después transformaciones/rig/deformación, finalmente composición y salida. Esta es una separación lógica: se puede fusionar trabajo por rendimiento sin cambiar el contrato.
+`Scene + revision + rationalTime + renderProfile → evaluated scene → graph → frame`. Resolve exposures and curves, then transforms/rig/deformation, then compositing and output. This logical separation permits fused computation for performance without changing the contract.
 
-El grafo tiene puertos tipados y validación de ciclos. Las dependencias de transformación y las de imagen no se confunden. Un operador declara entradas, parámetros, región necesaria, extensión del resultado, política de color/alfa, caché y comportamiento cuando falta un recurso. Un blur solicita halos de tiles; una partícula con estado exige evaluación temporal o caché reproducible. No se presume que todos los nodos sean funciones puras de un único frame.
+The graph has typed ports and cycle validation. Transform dependencies are distinct from image dependencies. Operators declare inputs, parameters, required regions, output bounds, color/alpha policy, cache behavior and missing-resource handling. Blur requests tile halos; stateful particles require temporal evaluation or reproducible caches. Not every node is a pure function of one frame.
 
-Clave de caché propuesta: versión del operador + hashes de entradas + parámetros evaluados + tiempo cuando aplique + perfil de render/color + semilla. Cambiar una paleta invalida consumidores de sus IDs; cambiar un dato de layout de UI no invalida nada gráfico. La caché tiene presupuesto y desalojo LRU o equivalente medido.
+Proposed cache key: operator version + input hashes + evaluated parameters + time where relevant + render/color profile + seed. A palette change invalidates consumers of its IDs; UI layout changes invalidate no graphics. Caches have budgets and a measured LRU or equivalent eviction policy.
 
-Preview y salida final comparten evaluación semántica. El preview puede reducir resolución, muestras o complejidad, pero debe mostrar cuándo está incompleto. Un nodo desconocido no se ignora silenciosamente en exportación final: se bloquea la salida o se exige una política de fallback explícita.
+Preview and final output share semantic evaluation. Preview may reduce resolution, samples or complexity, but must indicate incomplete results. Final export cannot silently ignore an unknown node: block output or require an explicit fallback policy.
 
-## Hilos y procesos
+## Threads and processes
 
-| Contexto | Trabajo | Restricción |
+| Context | Work | Constraint |
 |---|---|---|
-| UI | Entrada, selección, comandos cortos y accesibilidad | Sin decodificación ni render final bloqueante |
-| Render | Evaluación visible y envío GPU | Sin mutaciones directas del documento |
-| Workers | Importación, thumbnails, geometría y guardado de blobs | Cancelables, con revisión y presupuesto |
-| Audio | Mezcla y reloj | Sin asignaciones no acotadas ni locks largos en callback |
-| Procesos externos | Encoder, plugins no confiables o renderizadores | IPC versionado, límites y recuperación de fallos |
+| UI | Input, selection, short commands, accessibility | No blocking decoding or final rendering |
+| Render | Visible evaluation and GPU submission | No direct document mutation |
+| Workers | Import, thumbnails, geometry, blob saving | Cancellable, revision-aware and budgeted |
+| Audio | Mixing and clock | No unbounded allocation or long callback locks |
+| External processes | Encoder, untrusted plugins or renderers | Versioned IPC, limits and failure recovery |
 
-La distribución real se mide; no crear un hilo por nodo. Las reglas de sincronización de [QQuickRhiItem](https://doc.qt.io/qt-6/qquickrhiitem.html) exigen separar estado UI y renderer. Usar snapshots/deltas y colas, con puntos claros de publicación.
+Measure the actual allocation of work; do not create a thread per node. [QQuickRhiItem synchronization](https://doc.qt.io/qt-6/qquickrhiitem.html) requires separating UI and renderer state. Use snapshots/deltas and queues with explicit publication points.
 
-## Ampliar una capacidad
+## Extending capabilities
 
-Una nueva herramienta declara metadatos, comandos, inspector y overlays; una nueva operación gráfica declara contrato de nodo y kernel; un formato nuevo implementa un adapter y un informe de conversión. Ninguno necesita editar un `AppManager` que controle todo. Los plugins externos y su ABI estable se posponen hasta que exista al menos un conjunto interno de operaciones que haya demostrado el diseño.
+A new tool declares metadata, commands, inspector and overlays; a graphics operation declares a node contract and kernel; a format implements an adapter and conversion report. None requires editing an all-controlling `AppManager`. Defer external plugins and stable ABI until an internal operation set has demonstrated the design.
 
-Al cargar un proyecto se preservan bloques desconocidos para evitar perder información. Plugins y scripts no se ejecutan automáticamente por abrir un archivo. La coedición futura debe respetar revisiones y conflictos de recursos; no añadir un CRDT genérico a geometría, píxeles y audio suponiendo que resolverá su semántica.
+Preserve unknown blocks when loading projects to avoid losing information. Opening a file never automatically executes plugins or scripts. Future co-editing must respect revisions and resource conflicts; adding a generic CRDT to geometry, pixels and audio does not resolve their semantics.
 
-## Reglas de código
+## Code rules
 
-- Ownership explícito, RAII y contenedores con invariantes; minimizar `shared_ptr` y prohíbir ciclos de ownership.
-- Tipos distintos para IDs, frames, segundos, píxeles y espacios de coordenadas. No intercambiar `int` o `double` sin unidad en APIs públicas.
-- Errores de dominio como resultados tipados; excepciones y fallos externos se traducen en límites. No depender de `std::expected` si se mantiene C++20 sin biblioteca auxiliar.
-- Sin singletons mutables de documento, registries globales de herramientas ni llamadas al disco desde entidades.
-- QML muestra estado y dispara acciones; no implementa interpolación, serialización o algoritmos de pincel.
-- Formato y lint automatizados; revisiones centradas en comportamiento, claridad y contratos.
-- Registrar diagnósticos estructurados sin rutas personales ni contenido artístico por defecto. Métricas de rendimiento locales; cualquier telemetría futura será optativa.
+- Explicit ownership, RAII and containers with invariants; minimize `shared_ptr` and prohibit ownership cycles.
+- Distinct types for IDs, frames, seconds, pixels and coordinate spaces. Do not interchange unitless `int` or `double` values in public APIs.
+- Typed domain error results; translate exceptions and external failures at boundaries. Do not rely on `std::expected` under C++20 without a supporting library.
+- No mutable document singletons, global tool registries or entity-level disk access.
+- QML displays state and dispatches actions; it does not implement interpolation, serialization or brush algorithms.
+- Automated formatting/linting; reviews focus on behavior, clarity and contracts.
+- Structured diagnostics exclude personal paths and artwork by default. Performance metrics stay local; any future telemetry is optional.
 
-La escalabilidad buscada es poder añadir herramientas y escenas grandes con límites claros; no multiplicar frameworks, capas de abstracción o servicios por anticipación.
+Scalability means adding tools and handling large scenes through clear boundaries, not preemptively multiplying frameworks, abstractions or services.

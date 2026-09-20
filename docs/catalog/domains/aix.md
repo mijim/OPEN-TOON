@@ -1,79 +1,79 @@
-# AIX — Asistencia de IA opcional
+# AIX — Optional AI assistance
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Seleccionar → configurar proveedor → generar → comparar → aceptar.
+**Workflow:** Select → configure provider → generate → compare → accept.
 
-**Módulo:** `ai-adapters`.
+**Module:** `ai-adapters`.
 
-**Entidades:** Provider, InferenceJob, Mask, GeneratedVariant.
+**Entities:** Provider, InferenceJob, Mask, GeneratedVariant.
 
-**Relaciones:** RAS, PRJ.
+**Relationships:** RAS, PRJ.
 
-**Riesgo principal:** Dependencia de servicios, licencias de modelos y pérdida de control creativo.
+**Main risk:** Service dependencies, model licenses and loss of creative control.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## AIX-001 — Habilitación opcional
+## AIX-001 — Optional enablement
 
-Aislar funciones de IA para que todo el editor principal funcione sin ellas.
+Isolate AI features so the entire core editor works without them.
 
-**Aceptación inicial:** Deshabilitar IA no bloquea abrir, dibujar o exportar proyectos.
+**Initial acceptance:** Disabling AI does not prevent opening, drawing or exporting projects.
 
-**Alcance:** `optional_extension` · **Nivel:** `optional` · **Estado:** `not_started`.
+**Scope:** `optional_extension` · **Level:** `optional` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## AIX-002 — Máscaras de IA
+## AIX-002 — AI masks
 
-Crear, modificar y borrar máscaras con expansión controlada.
+Create, modify and delete masks with controlled expansion.
 
-**Aceptación inicial:** La operación afecta solo a la máscara y al padding elegido.
+**Initial acceptance:** The operation affects only the mask and selected padding.
 
-**Alcance:** `optional_extension` · **Nivel:** `optional` · **Estado:** `not_started`.
+**Scope:** `optional_extension` · **Level:** `optional` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## AIX-003 — Borrado asistido
+## AIX-003 — Assisted erasing
 
-Generar una propuesta para eliminar contenido enmascarado sin destruir el original.
+Propose removal of masked content without destroying the original.
 
-**Aceptación inicial:** Rechazar una variante restaura exactamente la imagen de entrada.
+**Initial acceptance:** Rejecting a variant restores the input image exactly.
 
-**Alcance:** `optional_extension` · **Nivel:** `optional` · **Estado:** `not_started`.
+**Scope:** `optional_extension` · **Level:** `optional` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## AIX-004 — Expansión de imagen
+## AIX-004 — Image expansion
 
-Generar contenido más allá de los límites manteniendo el original identificable.
+Generate content beyond image boundaries while keeping the original identifiable.
 
-**Aceptación inicial:** La imagen original mantiene su registro tras ampliar el lienzo.
+**Initial acceptance:** The original image retains registration after canvas expansion.
 
-**Alcance:** `optional_extension` · **Nivel:** `optional` · **Estado:** `not_started`.
+**Scope:** `optional_extension` · **Level:** `optional` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## AIX-005 — Aumento de resolución
+## AIX-005 — Resolution enhancement
 
-Proponer imágenes o texturas de mayor resolución como variantes.
+Propose higher-resolution images or textures as variants.
 
-**Aceptación inicial:** El resultado informa del factor y conserva una copia de la entrada.
+**Initial acceptance:** The result reports the scale factor and retains a copy of the input.
 
-**Alcance:** `optional_extension` · **Nivel:** `optional` · **Estado:** `not_started`.
+**Scope:** `optional_extension` · **Level:** `optional` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## AIX-006 — Relleno generativo
+## AIX-006 — Generative fill
 
-Generar contenido en una región guiado por texto con aceptación manual.
+Generate text-guided content within a region with manual acceptance.
 
-**Aceptación inicial:** La generación no sustituye el recurso hasta aceptarse.
+**Initial acceptance:** Generation does not replace the resource until accepted.
 
-**Alcance:** `optional_extension` · **Nivel:** `optional` · **Estado:** `not_started`.
+**Scope:** `optional_extension` · **Level:** `optional` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

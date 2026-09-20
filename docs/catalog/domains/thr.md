@@ -1,109 +1,109 @@
-# THR — Integración 3D
+# THR — 3D integration
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Importar modelo → ajustar unidades → posar → componer con 2D.
+**Workflow:** Import model → adjust units → pose → composite with 2D.
 
-**Módulo:** `integration-3d`.
+**Module:** `integration-3d`.
 
-**Entidades:** ModelAsset, ModelSubnode, Skeleton, AnimationClip, ExternalRenderJob.
+**Entities:** ModelAsset, ModelSubnode, Skeleton, AnimationClip, ExternalRenderJob.
 
-**Relaciones:** CAM, NOD.
+**Relationships:** CAM, NOD.
 
-**Riesgo principal:** Compatibilidad de formatos, ejes y coste del render externo.
+**Main risk:** Format compatibility, axes and external rendering cost.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## THR-001 — Importar modelos 3D
+## THR-001 — Import 3D models
 
-Leer formatos admitidos con materiales y jerarquías dentro de un perfil documentado.
+Read supported formats with materials and hierarchies under a documented profile.
 
-**Aceptación inicial:** Un modelo de referencia conserva las proporciones y orientación.
+**Initial acceptance:** A reference model retains proportions and orientation.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## THR-002 — Unidades y escala
+## THR-002 — Units and scale
 
-Interpretar unidades del archivo y convertirlas al espacio de la escena.
+Interpret file units and convert them to scene space.
 
-**Aceptación inicial:** Un objeto de un metro mantiene relación diez a uno con uno de diez centímetros.
+**Initial acceptance:** A one-meter object retains a ten-to-one relationship with a ten-centimeter object.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## THR-003 — Clips de animación 3D
+## THR-003 — 3D animation clips
 
-Seleccionar y retimar animaciones incluidas en el asset.
+Select and retime animations included in an asset.
 
-**Aceptación inicial:** Un clip repetido no salta en sus límites cuando es cíclico.
+**Initial acceptance:** A cyclic repeated clip has no jump at its boundaries.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## THR-004 — Subnodos
+## THR-004 — Subnodes
 
-Seleccionar y animar componentes internos del modelo.
+Select and animate internal model components.
 
-**Aceptación inicial:** Mover una pieza no desplaza una pieza hermana sin vínculo.
+**Initial acceptance:** Moving one part does not move an unlinked sibling.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## THR-005 — Armatures y skinning
+## THR-005 — Armatures and skinning
 
-Animar esqueletos y deformación del modelo bajo límites soportados.
+Animate model skeletons and deformation within supported limits.
 
-**Aceptación inicial:** El rig de prueba conserva la pose de bind al importar.
+**Initial acceptance:** The test rig retains its bind pose on import.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## THR-006 — Overrides de subnodos
+## THR-006 — Subnode overrides
 
-Hornear transformaciones y clips importados en claves editables.
+Bake imported transforms and clips into editable keys.
 
-**Aceptación inicial:** El bake reproduce las posiciones muestreadas del clip original.
+**Initial acceptance:** Baking reproduces sampled positions from the original clip.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## THR-007 — Composición 2D y 3D
+## THR-007 — 2D and 3D compositing
 
-Combinar planos dibujados y modelos con profundidad, transparencia y cámara coherentes.
+Combine drawn planes and models with consistent depth, transparency and cameras.
 
-**Aceptación inicial:** Un objeto atraviesa planos con el orden esperado.
+**Initial acceptance:** An object crosses planes in the expected order.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## THR-008 — Render externo
+## THR-008 — External rendering
 
-Orquestar renderizadores externos con cancelación, errores y recursos explícitos.
+Orchestrate external renderers with explicit resources, cancellation and errors.
 
-**Aceptación inicial:** Un fallo del proceso de render no cierra el editor.
+**Initial acceptance:** A render process failure does not close the editor.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## THR-009 — Normalización de profundidad
+## THR-009 — Depth normalization
 
-Tratar bordes de Z y aplanado de resultados 3D.
+Handle depth boundaries and flattening of 3D results.
 
-**Aceptación inicial:** La composición de borde no produce halos por profundidad inválida.
+**Initial acceptance:** Edge compositing produces no halos from invalid depth.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

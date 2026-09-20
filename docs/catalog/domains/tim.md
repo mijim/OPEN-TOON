@@ -1,159 +1,159 @@
-# TIM — Timeline, Xsheet y exposición
+# TIM — Timeline, Xsheet and exposure
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Exponer → ajustar timing → reproducir → revisar hoja.
+**Workflow:** Expose → adjust timing → play → review sheet.
 
-**Módulo:** `timeline`.
+**Module:** `timeline`.
 
-**Entidades:** FrameIndex, RationalRate, ExposureSpan, Marker, Annotation.
+**Entities:** FrameIndex, RationalRate, ExposureSpan, Marker, Annotation.
 
-**Relaciones:** LYR.
+**Relationships:** LYR.
 
-**Riesgo principal:** Un desfase de un frame afecta a sonido, dibujo y render.
+**Main risk:** A one-frame offset affects sound, drawing and rendering.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## TIM-001 — Timeline y Xsheet sincronizadas
+## TIM-001 — Synchronized timeline and Xsheet
 
-Ofrecer dos vistas del mismo modelo temporal, horizontal y vertical.
+Provide horizontal and vertical views of the same time model.
 
-**Aceptación inicial:** Una edición en Xsheet aparece de inmediato en Timeline.
+**Initial acceptance:** An Xsheet edit appears immediately in the timeline.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## TIM-002 — Crear dibujos y exposiciones
+## TIM-002 — Create drawings and exposures
 
-Crear dibujos únicos y referenciarlos desde uno o más intervalos de fotogramas.
+Create unique drawings and reference them from one or more frame intervals.
 
-**Aceptación inicial:** Dos celdas del mismo dibujo reflejan una edición compartida.
+**Initial acceptance:** Two cells referencing the same drawing reflect a shared edit.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## TIM-003 — Mantener y extender exposición
+## TIM-003 — Hold and extend exposures
 
-Alargar o acortar holds sin duplicar los datos del dibujo.
+Lengthen or shorten holds without duplicating drawing data.
 
-**Aceptación inicial:** Extender un hold diez frames no crea diez dibujos.
+**Initial acceptance:** Extending a hold by ten frames does not create ten drawings.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## TIM-004 — Insertar y quitar frames
+## TIM-004 — Insert and remove frames
 
-Modificar duración desplazando rangos según una regla explícita.
+Change duration by shifting ranges according to an explicit rule.
 
-**Aceptación inicial:** Insertar dos frames desplaza marcadores y contenido según la opción elegida.
+**Initial acceptance:** Inserting two frames shifts markers and content according to the selected option.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## TIM-005 — Vaciar exposición
+## TIM-005 — Clear exposure
 
-Quitar una referencia temporal conservando el dibujo disponible.
+Remove a time reference while keeping the drawing available.
 
-**Aceptación inicial:** El dibujo se puede volver a exponer desde la biblioteca.
+**Initial acceptance:** The drawing can be exposed again from the library.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## TIM-006 — Copiar y pegar rangos
+## TIM-006 — Copy and paste ranges
 
-Distinguir pegado de exposición, dibujos, keyframes y combinaciones.
+Distinguish pasting exposures, drawings, keyframes and combinations.
 
-**Aceptación inicial:** Pegar exposición no añade keyframes de transformación.
+**Initial acceptance:** Pasting exposures does not add transform keyframes.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## TIM-007 — Repeticiones y ciclos
+## TIM-007 — Repeats and cycles
 
-Repetir secuencias con dibujos compartidos y límite temporal explícito.
+Repeat sequences with shared drawings and an explicit time limit.
 
-**Aceptación inicial:** Corregir el dibujo original corrige sus repeticiones vinculadas.
+**Initial acceptance:** Correcting the original drawing corrects its linked repetitions.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## TIM-008 — Timing a doses y treses
+## TIM-008 — Timing on twos and threes
 
-Aplicar pasos de exposición regulares con conservación del orden.
+Apply regular exposure steps while preserving drawing order.
 
-**Aceptación inicial:** Una secuencia de cuatro dibujos a doses ocupa ocho frames.
+**Initial acceptance:** Four drawings on twos occupy eight frames.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## TIM-009 — Arrastrar, estirar y sobrescribir
+## TIM-009 — Drag, stretch and overwrite
 
-Mover bloques con opciones de inserción y sobrescritura controladas.
+Move blocks with controlled insertion and overwrite options.
 
-**Aceptación inicial:** El editor muestra qué rango será sustituido antes de soltar.
+**Initial acceptance:** The editor previews the range to be replaced before dropping.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## TIM-010 — Navegación entre dibujos
+## TIM-010 — Navigate between drawings
 
-Saltar a dibujo distinto, keyframe o límite del rango.
+Jump to a distinct drawing, keyframe or range boundary.
 
-**Aceptación inicial:** En un hold, siguiente dibujo salta al siguiente cambio real.
+**Initial acceptance:** Within a hold, next drawing jumps to the next actual change.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## TIM-011 — Marcadores de escena
+## TIM-011 — Scene markers
 
-Crear marcadores y rangos nombrados con duración y notas.
+Create named markers and ranges with duration and notes.
 
-**Aceptación inicial:** Un marcador bloqueado no se desplaza al arrastrar la regla.
+**Initial acceptance:** A locked marker does not move when dragging the ruler.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## TIM-012 — Marcas de fotograma
+## TIM-012 — Frame marks
 
-Clasificar claves, breakdowns e intercalados con símbolos legibles.
+Classify keys, breakdowns and in-betweens using readable symbols.
 
-**Aceptación inicial:** Los símbolos siguen siendo distinguibles en monocromo.
+**Initial acceptance:** Symbols remain distinguishable in monochrome.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## TIM-013 — Miniaturas de exposición
+## TIM-013 — Exposure thumbnails
 
-Mostrar previews de dibujos con caché y actualización selectiva.
+Show cached drawing previews with selective updates.
 
-**Aceptación inicial:** Cambiar un dibujo invalida solo sus miniaturas asociadas.
+**Initial acceptance:** Changing a drawing invalidates only its associated thumbnails.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## TIM-014 — Imprimir Xsheet
+## TIM-014 — Print Xsheet
 
-Exportar o imprimir hoja con columnas, tiempos, numeración y anotaciones.
+Export or print sheets with columns, timing, numbering and annotations.
 
-**Aceptación inicial:** Una hoja de varios folios repite cabeceras y no omite frames.
+**Initial acceptance:** A multi-page sheet repeats headers and omits no frames.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

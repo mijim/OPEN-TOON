@@ -1,119 +1,119 @@
-# UI — Espacio de trabajo, navegación y preferencias
+# UI — Workspace, navigation and preferences
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Elegir espacio → dibujar o animar → personalizar paneles y atajos.
+**Workflow:** Choose workspace → draw or animate → customize panels and shortcuts.
 
-**Módulo:** `workspace`.
+**Module:** `workspace`.
 
-**Entidades:** Workspace, PanelLayout, ShortcutMap, ToolPreset.
+**Entities:** Workspace, PanelLayout, ShortcutMap, ToolPreset.
 
-**Relaciones:** PRJ.
+**Relationships:** PRJ.
 
-**Riesgo principal:** Densidad profesional frente a legibilidad; estados de herramienta ambiguos.
+**Main risk:** Professional density versus readability; ambiguous tool states.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## UI-001 — Paneles acoplables
+## UI-001 — Dockable panels
 
-Mover, dividir, agrupar y restablecer paneles sin perder el documento.
+Move, split, group and reset panels without losing the document.
 
-**Aceptación inicial:** Restaurar un layout deja todas las vistas accesibles.
+**Initial acceptance:** Restoring a layout leaves every view accessible.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## UI-002 — Espacios guardados
+## UI-002 — Saved workspaces
 
-Guardar y alternar configuraciones orientadas a dibujo, animación, rig y composición.
+Save and switch layouts for drawing, animation, rigging and compositing.
 
-**Aceptación inicial:** Cambiar espacio conserva selección y fotograma.
+**Initial acceptance:** Switching workspaces preserves the selection and current frame.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## UI-003 — Barras personalizables
+## UI-003 — Customizable toolbars
 
-Mostrar herramientas relevantes y permitir ordenar acciones frecuentes.
+Show relevant tools and allow frequently used actions to be reordered.
 
-**Aceptación inicial:** Un botón personalizado sigue funcionando al reiniciar.
+**Initial acceptance:** A custom button continues to work after restarting.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## UI-004 — Atajos configurables
+## UI-004 — Configurable shortcuts
 
-Asignar atajos por contexto con detección de conflictos y búsqueda de comandos.
+Assign contextual shortcuts with conflict detection and command search.
 
-**Aceptación inicial:** Un atajo en un campo de texto no dispara una acción destructiva.
+**Initial acceptance:** A shortcut inside a text field does not trigger a destructive action.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## UI-005 — Preferencias persistentes
+## UI-005 — Persistent preferences
 
-Separar preferencias personales, ajustes del documento y valores temporales.
+Separate personal preferences, document settings and temporary values.
 
-**Aceptación inicial:** Cambiar tamaño de interfaz no modifica el archivo del proyecto.
+**Initial acceptance:** Changing UI scale does not modify the project file.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## UI-006 — Zoom, pan y rotación de vista
+## UI-006 — View zoom, pan and rotation
 
-Navegar el lienzo sin alterar la geometría ni los keyframes.
+Navigate the canvas without changing geometry or keyframes.
 
-**Aceptación inicial:** Rotar la vista 90 grados no cambia el render exportado.
+**Initial acceptance:** Rotating the view by 90 degrees does not change the exported render.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## UI-007 — Espejo de vista
+## UI-007 — Mirror view
 
-Invertir la visualización para inspección del dibujo sin reflejar los datos.
+Mirror the displayed drawing for inspection without reflecting stored data.
 
-**Aceptación inicial:** Guardar con vista reflejada no invierte la imagen exportada.
+**Initial acceptance:** Saving with a mirrored view does not reverse the exported image.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## UI-008 — Vistas de cámara y dibujo
+## UI-008 — Camera and drawing views
 
-Distinguir edición de dibujo aislado y resultado compuesto de la escena.
+Distinguish isolated drawing editing from the composited scene result.
 
-**Aceptación inicial:** El dibujo seleccionado se puede editar sin incluir efectos en sus datos.
+**Initial acceptance:** The selected drawing can be edited without baking effects into its data.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## UI-009 — Inspector contextual
+## UI-009 — Contextual inspector
 
-Mostrar atributos editables, su animación y sus unidades para la selección activa.
+Show editable attributes, animation state and units for the current selection.
 
-**Aceptación inicial:** La edición de varios objetos muestra valores mixtos correctamente.
+**Initial acceptance:** Multi-object editing displays mixed values correctly.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## UI-010 — Entrada con tableta
+## UI-010 — Tablet input
 
-Usar presión y ajustes de sensibilidad; degradar de forma visible si el dispositivo no los soporta.
+Use pressure and sensitivity settings, with visible fallback when the device lacks support.
 
-**Aceptación inicial:** Un mismo gesto varía el grosor según la curva de presión elegida.
+**Initial acceptance:** The same gesture varies stroke width according to the selected pressure curve.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

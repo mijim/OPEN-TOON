@@ -1,119 +1,119 @@
-# PRJ — Proyectos, escenas y persistencia
+# PRJ — Projects, scenes and persistence
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Crear escena → configurar → guardar → recuperar → empaquetar.
+**Workflow:** Create scene → configure → save → recover → package.
 
-**Módulo:** `project`.
+**Module:** `project`.
 
-**Entidades:** Project, Scene, SceneSettings, AssetRef, Revision.
+**Entities:** Project, Scene, SceneSettings, AssetRef, Revision.
 
-**Relaciones:** Ninguna.
+**Relationships:** None.
 
-**Riesgo principal:** Pérdida de datos y referencias rotas.
+**Main risk:** Data loss and broken references.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## PRJ-001 — Crear y abrir escenas
+## PRJ-001 — Create and open scenes
 
-Crear escenas locales con nombre, ruta y configuración explícita.
+Create local scenes with an explicit name, location and configuration.
 
-**Aceptación inicial:** Reabrir una escena nueva conserva dimensiones y duración.
+**Initial acceptance:** Reopening a new scene preserves its dimensions and duration.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## PRJ-002 — Resolución y aspect ratio
+## PRJ-002 — Resolution and aspect ratio
 
-Configurar anchura, altura, proporción de píxel y presets personalizados.
+Configure width, height, pixel aspect ratio and custom presets.
 
-**Aceptación inicial:** Un preset no cuadrado reproduce el encuadre esperado.
+**Initial acceptance:** A non-square-pixel preset produces the expected framing.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## PRJ-003 — FPS y duración
+## PRJ-003 — Frame rate and duration
 
-Definir tasa de fotogramas y longitud; decidir si cambiar FPS conserva frames o tiempo.
+Define frame rate and length; specify whether changing frame rate preserves frame count or elapsed time.
 
-**Aceptación inicial:** Cambiar de 24 a 25 fps informa del efecto temporal y permite deshacer.
+**Initial acceptance:** Changing from 24 to 25 fps explains the timing effect and can be undone.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## PRJ-004 — Guardar y guardar copia
+## PRJ-004 — Save and save a copy
 
-Persistir recursos y escena con una operación coherente; guardar copia conserva el original.
+Persist scene data and resources coherently; saving a copy preserves the original.
 
-**Aceptación inicial:** La copia se abre desde otra ruta sin depender del directorio original.
+**Initial acceptance:** The copy opens from another location without depending on the original directory.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## PRJ-005 — Autoguardado
+## PRJ-005 — Autosave
 
-Programar recuperación sin bloquear dibujo ni sustituir silenciosamente un guardado manual.
+Schedule recovery points without blocking drawing or silently replacing a manual save.
 
-**Aceptación inicial:** Un cierre forzado permite recuperar el último punto de recuperación válido.
+**Initial acceptance:** After a forced shutdown, the latest valid recovery point can be restored.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## PRJ-006 — Versiones de escena
+## PRJ-006 — Scene versions
 
-Conservar revisiones identificables y abrir una versión elegida.
+Retain identifiable revisions and open a selected version.
 
-**Aceptación inicial:** Una revisión anterior mantiene sus dibujos aunque la nueva cambie.
+**Initial acceptance:** An earlier revision retains its drawings when a newer revision changes them.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## PRJ-007 — Formato compacto
+## PRJ-007 — Compact project format
 
-Ofrecer empaquetado y desempaquetado de escena con recursos incluidos.
+Package and unpack scenes with their resources included.
 
-**Aceptación inicial:** Ambas representaciones producen la misma imagen al reabrirse.
+**Initial acceptance:** Both representations render the same image after reopening.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## PRJ-008 — Integridad de proyecto
+## PRJ-008 — Project integrity
 
-Detectar archivos ausentes, referencias inválidas y componentes corruptos con diagnóstico accionable.
+Detect missing files, invalid references and corrupt components with actionable diagnostics.
 
-**Aceptación inicial:** Una textura perdida aparece en un informe y no provoca cierre del editor.
+**Initial acceptance:** A missing texture appears in a report without crashing the editor.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## PRJ-009 — Optimización de backups
+## PRJ-009 — Backup optimization
 
-Listar tamaño y uso de copias antes de limpiar recursos redundantes.
+List backup size and usage before removing redundant resources.
 
-**Aceptación inicial:** No eliminar un recurso que siga referenciado por otra revisión.
+**Initial acceptance:** Resources still referenced by another revision are not deleted.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## PRJ-010 — Recientes y bienvenida
+## PRJ-010 — Recent scenes and welcome screen
 
-Mostrar escenas recientes y acciones de crear, abrir y localizar un archivo movido.
+Show recent scenes and actions to create, open or locate a moved file.
 
-**Aceptación inicial:** Un reciente inexistente puede retirarse sin borrar otros archivos.
+**Initial acceptance:** A missing recent entry can be removed without deleting other files.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

@@ -1,169 +1,169 @@
-# DEF — Deformadores y mallas
+# DEF — Deformers and meshes
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Preparar reposo → definir influencias → animar → evaluar → hornear.
+**Workflow:** Prepare rest pose → define influences → animate → evaluate → bake.
 
-**Módulo:** `deformation`.
+**Module:** `deformation`.
 
-**Entidades:** DeformationChain, RestPose, Influence, Mesh, WeightMap.
+**Entities:** DeformationChain, RestPose, Influence, Mesh, WeightMap.
 
-**Relaciones:** RIG.
+**Relationships:** RIG.
 
-**Riesgo principal:** Calidad de deformación, auto-intersecciones y texturas complejas.
+**Main risk:** Deformation quality, self-intersections and complex textures.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## DEF-001 — Deformación por huesos
+## DEF-001 — Bone deformation
 
-Articular un dibujo mediante una cadena con juntas e influencias.
+Articulate a drawing through a chain of joints and influences.
 
-**Aceptación inicial:** Una extremidad se flexiona manteniendo conexión entre segmentos.
+**Initial acceptance:** A limb bends while maintaining connections between segments.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
 ## DEF-002 — Game bones
 
-Representar esqueletos orientados a exportación de runtime con límites documentados.
+Represent runtime-oriented skeletons with documented export limits.
 
-**Aceptación inicial:** La exportación conserva jerarquía y transformaciones de reposo.
+**Initial acceptance:** Export preserves hierarchy and rest transforms.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## DEF-003 — Curvas de deformación
+## DEF-003 — Curve deformation
 
-Controlar la forma mediante segmentos curvos y tangentes.
+Control shape through curve segments and tangents.
 
-**Aceptación inicial:** Mover una tangente produce una transición continua.
+**Initial acceptance:** Moving a tangent produces a continuous transition.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## DEF-004 — Envelope
+## DEF-004 — Envelope deformation
 
-Deformar la silueta mediante una envolvente cerrada.
+Deform a silhouette through a closed envelope.
 
-**Aceptación inicial:** Cerrar la envolvente no introduce una discontinuidad en su unión.
+**Initial acceptance:** Closing the envelope introduces no discontinuity at its seam.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## DEF-005 — Free Form
+## DEF-005 — Free-form deformation
 
-Deformar regiones interiores mediante malla y controles internos.
+Deform interior regions with a mesh and internal controls.
 
-**Aceptación inicial:** Una textura cuadriculada sigue la deformación del interior.
+**Initial acceptance:** A checker texture follows the interior deformation.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## DEF-006 — Shape-aware
+## DEF-006 — Shape-aware deformation
 
-Adaptar pesos a la forma usando controles de punto, hueso y jaula.
+Adapt weights to the shape using point, bone and cage controls.
 
-**Aceptación inicial:** Mover un control localizado reduce influencia fuera de su región.
+**Initial acceptance:** Moving a localized control reduces influence outside its region.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## DEF-007 — Weighted deform
+## DEF-007 — Weighted deformation
 
-Combinar influencias de curvas, puntos y pegs en un campo de deformación.
+Combine curve, point and peg influences in a deformation field.
 
-**Aceptación inicial:** Dos fuentes solapadas se mezclan sin salto brusco en la frontera.
+**Initial acceptance:** Overlapping sources blend without an abrupt boundary jump.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## DEF-008 — Edición de pose de reposo
+## DEF-008 — Rest-pose editing
 
-Separar bind/rest pose del estado animado y actualizarlo de forma explícita.
+Separate bind/rest pose from animated state and update it explicitly.
 
-**Aceptación inicial:** Restablecer lleva a la pose de reposo sin borrar las claves.
+**Initial acceptance:** Resetting returns to the rest pose without deleting keys.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## DEF-009 — Regiones de influencia
+## DEF-009 — Influence regions
 
-Configurar áreas elípticas o de forma y radios de transición.
+Configure elliptical or shape-based regions and falloff radii.
 
-**Aceptación inicial:** Reducir un radio limita el área deformada sin cambiar el control.
+**Initial acceptance:** Reducing a radius limits the deformed area without moving the control.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## DEF-010 — Rigs con múltiples poses
+## DEF-010 — Multiple-pose rigs
 
-Asignar cadenas de deformación a sustituciones compatibles.
+Assign deformation chains to compatible substitutions.
 
-**Aceptación inicial:** Cambiar dibujo activa la cadena correcta sin referencias huérfanas.
+**Initial acceptance:** Changing drawings activates the correct chain without orphaned references.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
 ## DEF-011 — Kinematic output
 
-Adjuntar otros elementos al resultado de un deformador.
+Attach other elements to the evaluated result of a deformer.
 
-**Aceptación inicial:** Un accesorio sigue el extremo del brazo deformado.
+**Initial acceptance:** An accessory follows the end of a deformed arm.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
 ## DEF-012 — Point kinematic output
 
-Muestrear posiciones de una curva deformada para controlar otros objetos.
+Sample positions on a deformed curve to control other objects.
 
-**Aceptación inicial:** El objeto adjunto sigue el punto elegido durante toda la animación.
+**Initial acceptance:** The attached object follows the chosen point throughout the animation.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## DEF-013 — Conversión a dibujos
+## DEF-013 — Convert deformation to drawings
 
-Hornear deformaciones evaluadas como dibujos editables.
+Bake evaluated deformation into editable drawings.
 
-**Aceptación inicial:** El dibujo horneado reproduce la pose y no depende del rig original.
+**Initial acceptance:** The baked drawing reproduces the pose independently of the original rig.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## DEF-014 — Generación de envolventes
+## DEF-014 — Envelope generation
 
-Derivar controles iniciales de la geometría del dibujo con limpieza posterior.
+Derive initial controls from drawing geometry with subsequent cleanup.
 
-**Aceptación inicial:** La envolvente propuesta puede editarse antes de confirmarla.
+**Initial acceptance:** The proposed envelope can be edited before confirmation.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## DEF-015 — Visibilidad y calidad de deformación
+## DEF-015 — Deformation visibility and quality
 
-Activar controles y niveles de preview sin alterar resultado final.
+Toggle controls and preview quality without changing the final result.
 
-**Aceptación inicial:** Ocultar controles no desactiva el deformador.
+**Initial acceptance:** Hiding controls does not disable the deformer.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

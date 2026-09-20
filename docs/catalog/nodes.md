@@ -1,14 +1,14 @@
-# Inventario de nodos
+# Node inventory
 
-193 entradas de operadores y familias propuestas. No se presentan como ese número de efectos distintos. Todas están pendientes de especificación y parámetros de OPEN-TOON.
+193 proposed operator and family entries. This is not a count of distinct effects. All await OPEN-TOON specifications and parameters.
 
-Antes de implementar cada operador: definir puertos, tipos, parámetros/unidades, valores por defecto, animabilidad, espacio de color, alfa, bounds/halo de tiles, ROI, invalidación, determinismo, errores, perfiles soportados y una escena de referencia.
+Before implementing an operator, define ports, types, parameter units/defaults, animability, color space, alpha, tile bounds/halo, ROI, invalidation, determinism, errors, supported profiles and a reference scene.
 
-El núcleo mínimo de composición y las principales familias ya están descritos en NOD, FX, PAR, DEF, CTL y THR. Este inventario evita perder los operadores menos frecuentes durante el plan largo.
+The minimal compositor and main families are described in NOD, FX, PAR, DEF, CTL and THR. This inventory keeps less frequent operators visible throughout the long-term plan.
 
 ## 3d
 
-| ID estable | Nodo |
+| Stable ID | Node |
 |---|---|
 | `NODE-450dce4d56` | 3D |
 | `NODE-e0088fd808` | 3D Kinematic Output |
@@ -22,7 +22,7 @@ El núcleo mínimo de composición y las principales familias ya están descrito
 
 ## combine
 
-| ID estable | Nodo |
+| Stable ID | Node |
 |---|---|
 | `NODE-303ad8d494` | Combine |
 | `NODE-f06f7a2f68` | Blending |
@@ -37,7 +37,7 @@ El núcleo mínimo de composición y las principales familias ya están descrito
 
 ## constraint
 
-| ID estable | Nodo |
+| Stable ID | Node |
 |---|---|
 | `NODE-f3a568dc7a` | Constraint |
 | `NODE-6eff2bf33f` | Constraint Switch |
@@ -51,14 +51,14 @@ El núcleo mínimo de composición y las principales familias ya están descrito
 
 ## controller
 
-| ID estable | Nodo |
+| Stable ID | Node |
 |---|---|
 | `NODE-968d914aee` | Controller |
 | `NODE-aae033e5e0` | OGL-Controller |
 
 ## deformation
 
-| ID estable | Nodo |
+| Stable ID | Node |
 |---|---|
 | `NODE-1701509f0b` | Deformation |
 | `NODE-e451ae614f` | Articulation |
@@ -91,7 +91,7 @@ El núcleo mínimo de composición y las principales familias ya están descrito
 
 ## filter
 
-| ID estable | Nodo |
+| Stable ID | Node |
 |---|---|
 | `NODE-34cc3c5ef1` | Filter |
 | `NODE-a94126b0bc` | Anti-Flicker |
@@ -147,14 +147,14 @@ El núcleo mínimo de composición y las principales familias ya están descrito
 
 ## general
 
-| ID estable | Nodo |
+| Stable ID | Node |
 |---|---|
 | `NODE-5f0dde20ab` | Layer Properties |
 | `NODE-a06b79d317` | Nodes / Layers |
 
 ## generator
 
-| ID estable | Nodo |
+| Stable ID | Node |
 |---|---|
 | `NODE-9b7bf3ee52` | Generator |
 | `NODE-62d4df6fb1` | Animated Matte Generator |
@@ -169,7 +169,7 @@ El núcleo mínimo de composición y las principales familias ya están descrito
 
 ## group
 
-| ID estable | Nodo |
+| Stable ID | Node |
 |---|---|
 | `NODE-509ac67271` | Group |
 | `NODE-2c01d639e3` | Group |
@@ -178,7 +178,7 @@ El núcleo mínimo de composición y las principales familias ya están descrito
 
 ## miscellaneous
 
-| ID estable | Nodo |
+| Stable ID | Node |
 |---|---|
 | `NODE-c04d252ac9` | Miscellaneous |
 | `NODE-5279f7012c` | External |
@@ -193,7 +193,7 @@ El núcleo mínimo de composición y las principales familias ya están descrito
 
 ## move
 
-| ID estable | Nodo |
+| Stable ID | Node |
 |---|---|
 | `NODE-c3ba0f4da2` | Move |
 | `NODE-35c19f293b` | Apply Image Transformation |
@@ -208,7 +208,7 @@ El núcleo mínimo de composición y las principales familias ya están descrito
 
 ## output
 
-| ID estable | Nodo |
+| Stable ID | Node |
 |---|---|
 | `NODE-fa7e646fa7` | Output |
 | `NODE-fefc1d44a6` | Crop |
@@ -219,7 +219,7 @@ El núcleo mínimo de composición y las principales familias ya están descrito
 
 ## particle-effects
 
-| ID estable | Nodo |
+| Stable ID | Node |
 |---|---|
 | `NODE-566a6f74a9` | Particle |
 | `NODE-bdfad01957` | 3D Region |
@@ -248,7 +248,7 @@ El núcleo mínimo de composición y las principales familias ya están descrito
 
 ## plugins
 
-| ID estable | Nodo |
+| Stable ID | Node |
 |---|---|
 | `NODE-494ccf4929` | Brightness Contrast |
 | `NODE-e29b493a5e` | Plugins |
@@ -256,13 +256,13 @@ El núcleo mínimo de composición y las principales familias ya están descrito
 
 ## presets
 
-| ID estable | Nodo |
+| Stable ID | Node |
 |---|---|
 | `NODE-8b6f458a81` | Selection Preset |
 
 ## shading
 
-| ID estable | Nodo |
+| Stable ID | Node |
 |---|---|
 | `NODE-6e4f3b2399` | Shading |
 | `NODE-95ad409179` | Ambient Occlusion |

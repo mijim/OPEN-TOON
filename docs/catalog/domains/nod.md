@@ -1,119 +1,119 @@
-# NOD — Grafo de composición
+# NOD — Compositing graph
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Conectar entradas → agrupar → parametrizar → previsualizar → renderizar.
+**Workflow:** Connect inputs → group → configure parameters → preview → render.
 
-**Módulo:** `compositor-graph`.
+**Module:** `compositor-graph`.
 
-**Entidades:** Node, Port, Edge, NodeGroup, AttributeBinding.
+**Entities:** Node, Port, Edge, NodeGroup, AttributeBinding.
 
-**Relaciones:** LYR, ANI.
+**Relationships:** LYR, ANI.
 
-**Riesgo principal:** Ciclos, invalidación incorrecta y diferencia entre orden de capas y topología.
+**Main risk:** Cycles, incorrect invalidation and confusion between layer order and topology.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## NOD-001 — Vista de nodos
+## NOD-001 — Node view
 
-Crear, mover, conectar, buscar y eliminar nodos con navegación del grafo.
+Create, move, connect, search and delete nodes while navigating the graph.
 
-**Aceptación inicial:** Eliminar un nodo reconecta solo según la opción elegida.
+**Initial acceptance:** Deleting a node reconnects only according to the chosen option.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## NOD-002 — Puertos tipados
+## NOD-002 — Typed ports
 
-Distinguir imagen, transformación, matte y otros flujos de datos.
+Distinguish image, transform, matte and other data flows.
 
-**Aceptación inicial:** Una conexión incompatible se rechaza antes de evaluar.
+**Initial acceptance:** Incompatible connections are rejected before evaluation.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## NOD-003 — Biblioteca de nodos
+## NOD-003 — Node library
 
-Organizar operadores por categoría y búsqueda con descripción.
+Organize operators by category with search and descriptions.
 
-**Aceptación inicial:** La búsqueda encuentra un operador por su nombre y categoría.
+**Initial acceptance:** Search finds an operator by name and category.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## NOD-004 — Grupos y puertos publicados
+## NOD-004 — Groups and published ports
 
-Encapsular subgrafos con entradas y salidas reutilizables.
+Encapsulate subgraphs with reusable inputs and outputs.
 
-**Aceptación inicial:** Agrupar mantiene la imagen resultante del grafo.
+**Initial acceptance:** Grouping preserves the graph's resulting image.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## NOD-005 — Composición por capas
+## NOD-005 — Layer compositing
 
-Combinar entradas manteniendo orden, alfa y profundidad según el modo.
+Combine inputs while preserving order, alpha and depth according to the mode.
 
-**Aceptación inicial:** Una capa semitransparente produce el alfa esperado sobre fondo transparente.
+**Initial acceptance:** A semitransparent layer produces the expected alpha over a transparent background.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## NOD-006 — Máscaras y cutters
+## NOD-006 — Masks and cutters
 
-Recortar por matte con inversión y tratamiento de alfa definidos.
+Clip by matte with defined inversion and alpha handling.
 
-**Aceptación inicial:** Una máscara parcial no se interpreta como binaria salvo modo explícito.
+**Initial acceptance:** A partial mask is not treated as binary unless explicitly configured.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
 ## NOD-007 — Switches
 
-Seleccionar imágenes o transformaciones según atributos animados.
+Select images or transforms using animated attributes.
 
-**Aceptación inicial:** Cambiar selector no evalúa ramas innecesarias salvo dependencia compartida.
+**Initial acceptance:** Changing the selector avoids evaluating unnecessary branches unless dependencies are shared.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## NOD-008 — Display y Write
+## NOD-008 — Display and Write
 
-Separar salida de preview y salidas finales exportables.
+Separate preview output from exportable final outputs.
 
-**Aceptación inicial:** Un Display alternativo no cambia el Write configurado.
+**Initial acceptance:** An alternate Display does not change the configured Write output.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## NOD-009 — Bypass y cache
+## NOD-009 — Bypass and cache
 
-Anular temporalmente operadores y reutilizar resultados válidos.
+Temporarily bypass operators and reuse valid results.
 
-**Aceptación inicial:** Editar una dependencia invalida todas las salidas afectadas.
+**Initial acceptance:** Editing a dependency invalidates all affected outputs.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## NOD-010 — Notas y organización
+## NOD-010 — Notes and organization
 
-Añadir notas y organización espacial sin influencia en la imagen.
+Add notes and spatial organization without changing the image.
 
-**Aceptación inicial:** Mover notas no invalida el render.
+**Initial acceptance:** Moving notes does not invalidate the render.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

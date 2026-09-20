@@ -1,89 +1,89 @@
-# PAR — Partículas
+# PAR — Particles
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Emitir → aplicar fuerzas → representar → hornear.
+**Workflow:** Emit → apply forces → display → bake.
 
-**Módulo:** `particles`.
+**Module:** `particles`.
 
-**Entidades:** ParticleSystem, Emitter, ParticleState, Force, SimulationCache.
+**Entities:** ParticleSystem, Emitter, ParticleState, Force, SimulationCache.
 
-**Relaciones:** NOD, ANI.
+**Relationships:** NOD, ANI.
 
-**Riesgo principal:** La simulación debe ser reproducible y permitir scrubbing.
+**Main risk:** Simulation must be reproducible and support scrubbing.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## PAR-001 — Emisores de sprites
+## PAR-001 — Sprite emitters
 
-Emitir imágenes con tasa, vida y semilla controladas.
+Emit images with controlled rate, lifetime and seed.
 
-**Aceptación inicial:** La misma semilla produce la misma secuencia.
+**Initial acceptance:** The same seed produces the same sequence.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## PAR-002 — Regiones de emisión
+## PAR-002 — Emission regions
 
-Definir emisión por regiones planas o espaciales.
+Define emission within planar or spatial regions.
 
-**Aceptación inicial:** Las partículas nacen únicamente dentro de la región elegida.
+**Initial acceptance:** Particles spawn only within the chosen region.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## PAR-003 — Velocidad y variación
+## PAR-003 — Velocity and variation
 
-Asignar velocidad, tamaño, orientación y dispersión por parámetros.
+Assign velocity, size, orientation and dispersion through parameters.
 
-**Aceptación inicial:** Con variación cero todas las partículas comparten el valor inicial.
+**Initial acceptance:** With zero variation, all particles share the initial value.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## PAR-004 — Fuerzas y movimiento
+## PAR-004 — Forces and motion
 
-Aplicar gravedad, viento, fricción, vórtices y atracción o repulsión.
+Apply gravity, wind, friction, vortices, attraction and repulsion.
 
-**Aceptación inicial:** Con todas las fuerzas a cero se conserva la velocidad inicial.
+**Initial acceptance:** With all forces at zero, initial velocity is preserved.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## PAR-005 — Colisiones y vida
+## PAR-005 — Collisions and lifetime
 
-Gestionar rebote, muerte y regiones sumidero.
+Handle bounce, death and sink regions.
 
-**Aceptación inicial:** Una partícula expirada deja de contribuir al render.
+**Initial acceptance:** An expired particle no longer contributes to the render.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## PAR-006 — Bake y composición
+## PAR-006 — Baking and compositing
 
-Cachear simulaciones y mezclar sistemas con otras capas.
+Cache simulations and combine systems with other layers.
 
-**Aceptación inicial:** Saltar a un frame horneado reproduce el resultado secuencial.
+**Initial acceptance:** Jumping to a baked frame reproduces the sequential result.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## PAR-007 — Plantillas de partículas
+## PAR-007 — Particle templates
 
-Guardar sistemas reutilizables con sus assets y parámetros.
+Save reusable systems with their assets and parameters.
 
-**Aceptación inicial:** Importar una plantilla conserva semilla y aspecto.
+**Initial acceptance:** Importing a template preserves seed and appearance.
 
-**Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

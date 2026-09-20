@@ -1,36 +1,37 @@
-# Flujos de trabajo y aceptación integrada
+# Workflows and integrated acceptance
 
-Estos escenarios atraviesan módulos y evitan construir funciones aisladas que no sirvan para terminar un plano. Son especificaciones propias para futuras pruebas; no se han ejecutado.
+These cross-module scenarios prevent isolated features that cannot finish a shot. They are proposed future tests and have not been executed.
 
-| ID | Persona y trabajo | Recorrido | Resultado verificable |
+| ID | Role and task | Workflow | Verifiable result |
 |---|---|---|---|
-| WF-01 | Animador tradicional: pelota de 2 segundos | Crear 1080p/24 fps → dibujar poses → exponer a doses → onion skin → guardar → exportar PNG | 48 imágenes; dibujos compartidos correctos; sin ayudas en exportación; reabrir conserva el trabajo |
-| WF-02 | Cleanup: corregir una línea | Abrir rough → subcapa Line Art → lápiz variable → editar contorno → goma → deshacer | Se conserva el rough y el grosor; el historial revierte el gesto completo |
-| WF-03 | Colorista: variante nocturna | Paleta por IDs → Colour Art → relleno → clon de paleta → override en una rama | La variante cambia la instancia elegida; otra mantiene el esquema original |
-| WF-04 | Animador cut-out: saludo | Rig de torso/brazo/mano → pivotes/pegs → claves → sustituir mano → ajustar ease | Sin saltos de pivote o de registro; curva y preview coinciden |
-| WF-05 | Rigger: brazo deformable | Dibujo de brazo → rest pose → curva/envelope → influencias → accesorio con kinematic output | Flexión sin costura relevante en fixture; accesorio sigue el extremo; reset recupera reposo |
-| WF-06 | Rigger avanzado: giro de cabeza | Preparar poses compatibles → rejilla de controlador → interpolar → guardar plantilla | Cada muestra recupera su pose; controlador importado funciona sin enlaces a la escena original |
-| WF-07 | Animador de diálogo | Importar WAV → onda → scrubbing → detección → mapear bocas → corregir → exportar | Correcciones conservadas; audio y boca alineados dentro de un frame; informe de etiquetas sin mapa |
-| WF-08 | Compositor: plano con paralaje | Fondo/medio/personaje → cámara → máscaras → blur/sombra → Write de imagen y vídeo | Orden y alfa coherentes; calidad incompleta de preview visible; salida completa por perfil |
-| WF-09 | Generalista 2D/3D | Importar modelo autorizado → unidades → clip → override → componer con dibujos | Misma escala y timing en preview y resultado; límites de materiales expresados |
-| WF-11 | Estudio distribuido | Obtener escena/revisión → bloquear recurso → trabajar offline → subir entrega divergente | El conflicto se detecta; ninguna revisión se sobrescribe sin resolución explícita |
-| WF-12 | Artista recuperando un fallo | Editar → autoguardar → interrupción durante save → reabrir → localizar textura ausente | Se recupera una revisión coherente; se conservan referencias y se puede relocalizar el recurso |
+| WF-01 | Traditional animator: two-second bouncing ball | Create 1080p/24fps → draw poses → expose on twos → onion skin → save → export PNG | 48 images; correct shared drawings; no visual aids in exports; reopening preserves work |
+| WF-02 | Cleanup artist: correct a line | Open rough → Line Art → variable pencil → edit contour → erase → undo | Rough and width preserved; history reverses the complete gesture |
+| WF-03 | Colorist: night variant | ID-based palette → Color Art → fill → palette clone → branch override | Only the selected instance changes; another retains the original scheme |
+| WF-04 | Cut-out animator: waving gesture | Torso/arm/hand rig → pivots/pegs → keys → hand substitution → easing | No pivot or registration jumps; curves and preview agree |
+| WF-05 | Rigger: deformable arm | Arm drawing → rest pose → curve/envelope → influences → kinematic accessory | No significant fixture seam; accessory follows the endpoint; reset restores rest pose |
+| WF-06 | Advanced rigger: head turn | Compatible poses → controller grid → interpolation → save template | Each sample recovers its pose; imported controller works without links to the original scene |
+| WF-07 | Dialogue animator | Import WAV → waveform → scrub → detect → map mouths → correct → export | Corrections retained; mouth/audio alignment within one frame; report unmapped labels |
+| WF-08 | Compositor: parallax shot | Background/midground/character → camera → masks → blur/shadow → image/video Write | Consistent order/alpha; incomplete preview quality visible; complete profile-based output |
+| WF-09 | 2D/3D generalist | Import authorized model → units → clip → override → composite with drawings | Matching scale/timing in preview/output; material limits stated |
+| WF-10 | Game animator: runtime delivery | Compatible rig → bake unsupported effects → export atlas/skeleton → play in open reference runtime | Registration, timing, pivots and reference poses match; unsupported elements reported |
+| WF-11 | Distributed studio | Acquire scene/revision → lock resource → work offline → submit divergent revision | Conflict detected; no revision overwritten without explicit resolution |
+| WF-12 | Artist recovering from failure | Edit → autosave → interrupt save → reopen → locate missing texture | Coherent revision recovered; references retained and resource can be relinked |
 
-## Casos límite transversales
+## Cross-cutting edge cases
 
-| Situación | Resultado requerido |
+| Situation | Required result |
 |---|---|
-| Un dibujo expuesto 200 veces | Cambiarlo actualiza sus exposiciones; duplicarlo rompe el vínculo intencionadamente |
-| Dos muestras con igual RGB | Su identidad permanece diferenciada |
-| Peg con escala negativa | Transformaciones y pivotes siguen reglas explícitas y finitas |
-| Capa bloqueada durante un drag | Cancelar o completar de forma definida, sin modificación parcial |
-| Frame vacío entre holds | Se distingue de repetir el dibujo anterior |
-| Cambio de FPS racional | Audio, marcadores y claves siguen la política seleccionada |
-| Plugin de efecto ausente | Se conserva su bloque; el render final no lo omite silenciosamente |
-| Escena enorme | Cancelar preview y reducir calidad sigue siendo posible |
-| Guardar mientras continúa el dibujo | Se identifica qué revisión se guardó; el documento puede seguir marcado modificado |
-| Archivo ajeno con scripts | Abrir no ejecuta código automáticamente |
-| Cambio de espacio de color | Preview y salida comunican la conversión aplicada |
-| Import con pérdidas | Se informa del subconjunto soportado y se conserva el original según política |
+| One drawing exposed 200 times | Editing updates all exposures; duplication deliberately breaks sharing |
+| Two swatches with equal RGB | Their identities remain distinct |
+| Peg with negative scale | Transforms and pivots follow explicit finite rules |
+| Layer locked during a drag | Defined cancellation or completion without partial mutation |
+| Empty frame between holds | Distinct from repeating the previous drawing |
+| Rational frame-rate change | Audio, markers and keys follow the chosen policy |
+| Missing effect plugin | Preserve its block; final rendering does not silently omit it |
+| Huge scene | Preview cancellation and lower quality remain available |
+| Save while drawing continues | Identify the saved revision; the document may remain modified |
+| External file containing scripts | Opening does not execute code automatically |
+| Color-space change | Preview and output communicate the applied conversion |
+| Lossy import | Report the supported subset and preserve the original according to policy |
 
-Cada escenario tendrá fixtures propios, criterios cuantitativos donde proceda y grabación de un recorrido real. Durante el plan se asociarán a IDs de capacidades concretos y se descompondrán en entregas verticales completas.
+Each scenario requires owned fixtures, quantitative criteria where appropriate and a recorded real workflow. The roadmap maps these to capability groups and complete vertical deliveries. WF-10 supplies an OPEN-TOON-specific acceptance scenario for the planned game-export/runtime phase.

@@ -1,139 +1,139 @@
-# FBF — Animación tradicional y paperless
+# FBF — Traditional and paperless animation
 
-[Volver al catálogo](../README.md)
+[Back to catalog](../README.md)
 
-> Vista generada desde `features.json` y `domains.json`; no editar a mano.
+> Generated from `features.json` and `domains.json`; do not edit manually.
 
-**Flujo:** Rough → tie-down → cleanup → pintura → revisión.
+**Workflow:** Rough → tie-down → cleanup → paint → review.
 
-**Módulo:** `animation-drawing`.
+**Module:** `animation-drawing`.
 
-**Entidades:** OnionSettings, TraceOffset, DrawingMark, DrawingDesk.
+**Entities:** OnionSettings, TraceOffset, DrawingMark, DrawingDesk.
 
-**Relaciones:** TIM, VEC, COL.
+**Relationships:** TIM, VEC, COL.
 
-**Riesgo principal:** Las ayudas visuales nunca deben convertirse accidentalmente en arte exportado.
+**Main risk:** Visual aids must never accidentally become exported artwork.
 
-## Contrato común
+## Shared contract
 
-Las mutaciones deben respetar transacciones, undo/redo y persistencia. Las vistas de ayuda no se exportan. Errores, cancelación y datos no soportados deben conservar el último estado válido. Estas son condiciones de OPEN-TOON que se concretarán por operación al implementar.
+Mutations must respect transactions, undo/redo and persistence. Visual aids are not exported. Errors, cancellation and unsupported data must preserve the last valid state. These OPEN-TOON conditions will be specified per operation during implementation.
 
-## FBF-001 — Dibujo frame a frame
+## FBF-001 — Frame-by-frame drawing
 
-Crear y recorrer dibujos con continuidad de herramientas y exposición.
+Create and navigate drawings with continuous tool and exposure state.
 
-**Aceptación inicial:** Dibujar en un nuevo frame no modifica el anterior sin intención explícita.
+**Initial acceptance:** Drawing on a new frame does not modify the previous drawing without explicit intent.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FBF-002 — Rough, tie-down y cleanup
+## FBF-002 — Rough, tie-down and cleanup
 
-Organizar fases de dibujo mediante capas, marcas y visibilidad.
+Organize drawing stages through layers, marks and visibility.
 
-**Aceptación inicial:** Ocultar rough deja un cleanup completo sin referencias perdidas.
+**Initial acceptance:** Hiding rough layers leaves a complete cleanup without missing references.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FBF-003 — Onion skin anterior y posterior
+## FBF-003 — Previous and next onion skin
 
-Mostrar dibujos vecinos con rango, opacidad y diferenciación configurable.
+Show neighboring drawings with configurable range, opacity and visual distinction.
 
-**Aceptación inicial:** El onion skin no aparece en el render final.
+**Initial acceptance:** Onion skin is absent from the final render.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FBF-004 — Onion skin avanzado
+## FBF-004 — Advanced onion skin
 
-Seleccionar dibujos concretos, separar frames de dibujos únicos y comparar capas.
+Select specific drawings, distinguish frames from unique drawings and compare layers.
 
-**Aceptación inicial:** Un hold no se cuenta varias veces al operar por dibujos únicos.
+**Initial acceptance:** A hold is not counted repeatedly when operating on unique drawings.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FBF-005 — Onion skin entre capas
+## FBF-005 — Onion skin across layers
 
-Comparar referencias de otras capas con reglas de visibilidad.
+Compare references from other layers using visibility rules.
 
-**Aceptación inicial:** Bloquear una capa no impide usarla como referencia.
+**Initial acceptance:** Locking a layer does not prevent using it as a reference.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
 ## FBF-006 — Shift and trace
 
-Mover y rotar temporalmente dibujos de referencia para calcar.
+Temporarily move and rotate reference drawings for tracing.
 
-**Aceptación inicial:** Restablecer la referencia no cambia los datos fuente.
+**Initial acceptance:** Resetting the reference does not change source data.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FBF-007 — Mesa de dibujos
+## FBF-007 — Drawing desk
 
-Organizar dibujos de referencia fuera de su exposición temporal.
+Arrange reference drawings independently of their timeline exposure.
 
-**Aceptación inicial:** Retirar una referencia de la mesa no elimina su dibujo.
+**Initial acceptance:** Removing a desk reference does not delete its drawing.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FBF-008 — Flip y reproducción corta
+## FBF-008 — Flip and short playback
 
-Alternar poses y reproducir un segmento corto sin perder selección.
+Alternate poses and play a short segment without losing the selection.
 
-**Aceptación inicial:** Salir de mini playback recupera el frame de trabajo.
+**Initial acceptance:** Leaving short playback restores the working frame.
 
-**Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FBF-009 — Marcas de dibujo
+## FBF-009 — Drawing marks
 
-Marcar dibujos como claves, breakdowns u otras categorías personalizadas.
+Mark drawings as keys, breakdowns or custom categories.
 
-**Aceptación inicial:** Una marca de dibujo se refleja en todas sus exposiciones.
+**Initial acceptance:** A drawing mark appears on all its exposures.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FBF-010 — Generar Colour Art desde línea
+## FBF-010 — Generate Color Art from lines
 
-Construir fronteras de pintura derivadas de Line Art con tolerancias.
+Build paint boundaries from Line Art using defined tolerances.
 
-**Aceptación inicial:** Regenerar mantiene posibilidad de conservar correcciones manuales.
+**Initial acceptance:** Regeneration offers a way to preserve manual corrections.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FBF-011 — Generar matte
+## FBF-011 — Generate matte
 
-Producir siluetas de referencia a partir de dibujos.
+Produce reference silhouettes from drawings.
 
-**Aceptación inicial:** La silueta conserva huecos según la opción configurada.
+**Initial acceptance:** The silhouette preserves holes according to the configured option.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.
 
-## FBF-012 — Registro y cruces
+## FBF-012 — Registration and alignment crosses
 
-Usar marcas de alineación que facilitan el registro entre dibujos.
+Use alignment marks to register drawings.
 
-**Aceptación inicial:** Las cruces de ayuda no se renderizan como arte final.
+**Initial acceptance:** Reference crosses are not rendered as final artwork.
 
-**Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidencia:** `proposal`.
+**Evidence:** `proposal`.

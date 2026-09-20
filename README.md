@@ -1,43 +1,48 @@
 # OPEN-TOON
 
-El objetivo es reunir dibujo vectorial y bitmap, animación tradicional y cut-out, rigging, composición y herramientas de producción en una aplicación de escritorio con una interfaz limpia en blanco, negro y grises.
+An independent open-source desktop animation project combining vector and bitmap drawing, frame-by-frame and cut-out animation, rigging, compositing and production tools.
 
-## Consultar el análisis
+**Current stage: research and development planning. There is no executable animation application yet.** The roadmap covers 282 capabilities in 26 domains; none is marked implemented.
 
-1. [Índice y resumen de decisiones](docs/INDEX.md).
-2. [Alcance, metodología y límites](docs/research/01-scope-and-method.md).
-3. [Catálogo funcional: 282 capacidades en 26 dominios](docs/catalog/README.md).
-4. [Comparativa tecnológica y recomendación](docs/architecture/01-technology-selection.md).
-5. [Arquitectura y estructura del código](docs/architecture/02-system-design.md).
-6. [Modelo de datos y formato de proyecto](docs/architecture/03-document-model.md).
-7. [Diseño visual y experiencia de edición](docs/design/01-design-system.md).
-8. [Calidad, rendimiento y pruebas de viabilidad](docs/architecture/04-quality-and-spikes.md).
-9. [Riesgos y decisiones abiertas](docs/research/03-risks-and-decisions.md).
-10. [Entrada al futuro plan de implementación](docs/planning/README.md).
+The product will use a clean black, white and gray interface. **The entire first-party product is in English by requirement:** UI, messages, built-in assets, help, code and public documentation. The previous research, Markdown documents and canonical catalogs have also been translated into English. User-created content remains multilingual.
 
-## Para agentes de IA
+## Start here
 
-Leer [AGENTS.md](AGENTS.md), después [docs/INDEX.md](docs/INDEX.md). El catálogo canónico es [features.json](docs/catalog/features.json); las fichas Markdown son vistas generadas. Los IDs de funciones permiten recuperar contexto por módulo sin cargar todo el análisis.
+1. [Documentation map](docs/INDEX.md).
+2. [Long-term development roadmap](docs/planning/README.md).
+3. [23 phases with dependencies and acceptance criteria](docs/planning/PHASES.md).
+4. [Open-source libraries and adoption decisions](docs/planning/LIBRARIES.md).
+5. [Effort and staffing assumptions](docs/planning/ESTIMATES.md).
+6. [First implementation backlog](docs/planning/FIRST-STEPS.md).
+7. [Functional catalog](docs/catalog/README.md).
+8. [Architecture](docs/architecture/02-system-design.md) and [document format](docs/architecture/03-document-model.md).
+9. [Visual design](docs/design/01-design-system.md) and [English language policy](docs/design/02-language-policy.md).
+
+## Technical direction
+
+**C++20 + Qt 6 / Qt Quick (QML)** for Windows, macOS and Linux, with a UI-independent domain, local storage, a shared headless evaluator and explicit integration adapters. Mature open-source components will provide infrastructure such as storage, brushes, image/media IO, color management and numerical routines. Graphics and other high-risk candidates must pass measured spikes before adoption.
+
+The first usable milestone is a complete two-second animation: draw, expose, play, save, reopen and export 48 PNG frames. Reliable 2D workflows precede advanced controllers, morphing, 3D, game exports and optional studio/AI extensions. The roadmap provides effort ranges and assumptions, not promised release dates.
+
+## For contributors and AI agents
+
+Read [AGENTS.md](AGENTS.md) and the relevant phase before making changes. Canonical JSON records have stable IDs; generated views must not be edited manually. Planning completion is separate from implementation status.
 
 ```sh
 python3 scripts/catalog.py stats
 python3 scripts/catalog.py show DEF-005
-python3 scripts/catalog.py search "paleta"
-python3 scripts/catalog.py domain RIG
+python3 scripts/roadmap.py phase P09
+python3 scripts/roadmap.py feature DEF-005
+python3 scripts/roadmap.py library LIB-MYPAINT
 python3 scripts/catalog.py render
+python3 scripts/roadmap.py render
 python3 scripts/validate_docs.py
 ```
 
-Las herramientas documentales usan únicamente la biblioteca estándar de Python 3.11 o posterior. No se necesitan dependencias de la futura aplicación para consultar el análisis.
+Documentation tools require only Python 3.11+ and its standard library. No future application dependencies need to be installed to inspect this plan.
 
-## Dirección técnica propuesta
+## License
 
-Escritorio para Windows, macOS y Linux; **C++20 + Qt 6 / Qt Quick (QML)**, núcleo de dominio independiente de la interfaz, motor gráfico intercambiable, almacenamiento local y render sin interfaz. La elección de backend gráfico requiere pruebas antes de considerarse definitiva. La apariencia inspirada en Geist no obliga a usar una tecnología web.
+Original contributions are licensed under **GPL-3.0-or-later**; see [LICENSE](LICENSE). Third-party libraries and assets retain their respective licenses, which must be checked for the exact distributed build. Artwork created by users does not acquire the application's license merely through using it.
 
-El plan largo de implementación se elaborará después de revisar este análisis, respetando la secuencia solicitada. No hay fechas ni promesas de paridad publicadas.
-
-## Licencia
-
-Las aportaciones originales se distribuyen bajo GPL-3.0-or-later; véase [LICENSE](LICENSE). Las obras creadas por los usuarios no adquieren la licencia de la aplicación por el mero hecho de utilizarla.
-
-Nombre de trabajo: OPEN-TOON. Antes de una distribución pública de binarios se revisará su posible confusión con otros proyectos de animación.
+OPEN-TOON is the working project name. Distribution, support and compatibility claims will reflect demonstrated implementation evidence.

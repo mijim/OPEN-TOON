@@ -1,38 +1,47 @@
-# Instrucciones para trabajar en OPEN-TOON
+# Working on OPEN-TOON
 
-## Contexto vigente
+## Current context
 
-- Se solicitó primero investigación detallada y clasificada; después se elaborará un plan largo por etapas. No iniciar una implementación completa solo porque exista este catálogo.
-- La interfaz debe ser minimalista, en blanco, negro y grises, muy próxima en lenguaje visual a Vercel/Geist, con identidad propia.
-- El repositorio debe ser público en la cuenta GitHub `mijim`.
+- The user requested exhaustive analysis, then a long-term phased development plan. The plan is now in `docs/planning/`; application implementation has not begun. Do not implement the full application merely because a catalog or roadmap exists.
+- The user accepted C++20 + Qt 6/QML as the technical direction and explicitly requested proven, efficient open-source library reuse. Candidate libraries still require the documented adoption evidence.
+- **English is mandatory** for all first-party UI, menus, tooltips, messages, accessibility labels, built-in assets, help, code identifiers/comments and public documentation. User content remains multilingual. See `docs/design/02-language-policy.md` and `NFR-027`.
+- All project documentation and canonical catalog prose are now English. Preserve that language in future work; the owner may continue the conversation in Spanish.
+- The interface is minimalist black, white and gray, with a Geist-inspired visual language and its own identity.
+- The repository is public at `mijim/OPEN-TOON`. Preserve concurrent user edits and do not restore intentionally removed research references.
 
-## Lectura y fuentes
+## Read only the relevant context
 
-1. Leer `docs/INDEX.md` y el documento pertinente al módulo.
-2. Consultar `docs/catalog/features.json` por ID o dominio usando `scripts/catalog.py`.
+1. Start with `docs/INDEX.md` and `docs/planning/README.md`.
+2. Query a feature assignment with `python3 scripts/roadmap.py feature DEF-005`, then its phase and catalog requirement.
+3. Use `python3 scripts/catalog.py show DEF-005` or `domain DEF` to retrieve behavior and acceptance.
+4. Review the owning architecture contract and the library register before adding dependencies.
+5. Node inventory entries may describe families. Their specification owner must expand operators and parameters before implementation; never count entries as implemented effects.
 
-## Mantener la documentación
+## Maintain the planning records
 
-- `features.json`, `domains.json`, `node-reference.json` y `nonfunctional.json` son fuentes canónicas; no renumerar IDs existentes.
-- Regenerar las fichas con `python3 scripts/catalog.py render` y validar con `python3 scripts/validate_docs.py`.
-- Una nueva capacidad necesita alcance, comportamiento observable, aceptación y módulo propietario.
-- Cambios de tecnología, serialización, semántica temporal, color o plugins necesitan actualizar el ADR correspondiente.
-- Documentar implementación real por separado. Nunca marcar una capacidad terminada por crear un botón, un mockup o un test que no ejercita su comportamiento.
+- Canonical catalog files: `features.json`, `domains.json`, `node-reference.json`, `nonfunctional.json` under `docs/catalog/`. Preserve stable IDs.
+- Canonical planning files: `roadmap.json`, `libraries.json`, `node-assignments.json` under `docs/planning/`.
+- Regenerate with `python3 scripts/catalog.py render` and `python3 scripts/roadmap.py render`; validate with `python3 scripts/validate_docs.py`.
+- Each feature has exactly one primary completion phase. Earlier subsets stay partial; optional deferrals remain unimplemented with an explicit decision.
+- Each new capability needs scope, observable behavior, acceptance and an owning module. Update phase coverage and estimates when scope changes.
+- Technology, serialization, time, color and extension-contract changes need an ADR update.
+- A button, mockup or implementation-mirroring test does not complete a capability. Record real behavior and verification evidence separately from the plan.
 
-## Arquitectura prevista
+## Architecture
 
-- Núcleo C++20 sin dependencias de QML, widgets, filesystem, red ni SDKs propietarios.
-- UI → aplicación → dominio; adapters implementan los puertos del dominio/aplicación.
-- Toda mutación del documento pasa por comandos transaccionales y undo/redo. Vista, selección y hover tienen estado propio.
-- Un único modelo de tiempo para timeline, Xsheet, audio, curvas y render. Tasas racionales, límites definidos, IDs estables.
-- No tratar un nodo gráfico de Qt como un nodo del documento ni el scene graph de UI como el compositor de animación.
-- No introducir servicios remotos obligatorios, microservicios, una reescritura en otra tecnología o un segundo motor sin una decisión documentada.
-- Preferir módulos pequeños por capacidad con API explícita, RAII, ownership visible y validación en límites. Evitar abstracciones sin consumidor real.
+- Keep the C++20 domain independent of QML/widgets, filesystem, network and proprietary SDKs. UI calls application use cases; adapters implement ports.
+- Route all document mutations through transactional commands with undo/redo. View state, selection and hover have separate ownership.
+- Use one rational time model across exposures, curves, audio and render. Define interval boundaries and coordinate spaces explicitly.
+- Keep Qt's UI scene graph separate from the animation document and compositor graph.
+- Use immutable evaluation snapshots and revision-aware cache/job publication. Prevent stale jobs from overwriting newer edits.
+- Prefer small capability modules, explicit APIs, RAII, visible ownership and validation at boundaries. Avoid speculative abstractions or empty frameworks.
+- Do not add mandatory remote services, microservices, a second equivalent engine or a technology rewrite without a recorded need and decision.
+- Adopt libraries through narrow adapters with pinned revisions, workload benchmarks, license inventory and a documented fallback. Upstream maturity alone does not establish our performance.
 
-## Verificación y publicación
+## Verification and publication
 
-- Probar invariantes, persistencia, undo, conversión de formatos, imágenes de referencia y escenarios de animador según el cambio.
-- No descargar ni subir proyectos privados de terceros como fixtures. Usar escenas sintéticas o recursos redistribuibles con procedencia.
-- No incluir credenciales, rutas personales, cachés de investigación ni manuales descargados en commits.
-- GPL-3.0-or-later para aportaciones originales; revisar por dependencia módulos, plugins y binarios realmente distribuidos.
-- Ramas de trabajo nuevas con prefijo `codex/`, salvo instrucción expresa del usuario.
+- Follow `docs/planning/EXECUTION.md`; choose meaningful invariant, recovery, image, input or artistic workflow checks for the change.
+- Use synthetic or redistributable fixtures with recorded provenance. Do not publish private third-party projects.
+- Keep credentials, personal paths, research caches and downloaded proprietary manuals out of commits. Do not stage unrelated local tour files.
+- Original contributions are GPL-3.0-or-later. Check actual Qt/FFmpeg/plugin/model modules and shipped assets individually.
+- New work branches use `codex/` unless the user explicitly requests another name.
