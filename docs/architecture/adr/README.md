@@ -51,3 +51,5 @@ See [ADR-013](013-animation-editing.md) for setup/animate, pose curve and key-on
 See [ADR-014](014-drawing-selection.md) for rectangular vector/raster selection, compositing and brush opacity.
 
 See [ADR-015](015-direct-editing-workspace.md) for direct transform handles, integrated timing and selection-owned Properties; it supersedes the earlier dialog interaction.
+
+See [ADR-016](016-visual-animation-and-bezier.md) for visual pose gestures, channel Bézier easing, format 3 migration and screen-space picking.

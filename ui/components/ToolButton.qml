@@ -1,14 +1,14 @@
 import QtQuick
 import QtQuick.Controls.Basic
 
-Button {
+CompactButton {
     id: control
     property bool active: false
     property string hint: ""
-    implicitHeight: 30
-    implicitWidth: Math.max(30, contentItem.implicitWidth + 18)
-    padding: 7
-    font.pixelSize: 12
+    implicitHeight: 26
+    implicitWidth: Math.max(26, contentItem.implicitWidth + 14)
+    padding: 4
+    font.pixelSize: 11
     hoverEnabled: true
     contentItem: Text {
         text: control.text

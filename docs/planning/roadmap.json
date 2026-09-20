@@ -324,7 +324,7 @@
         {
           "id": "P04-W1",
           "description": "Add region-aware fills, gap closing, invisible strokes, contour/centerline editing, width profiles, cutter, smoothing and curve primitives.",
-          "status": "planned"
+          "status": "in_progress"
         },
         {
           "id": "P04-W2",
@@ -334,7 +334,7 @@
         {
           "id": "P04-W3",
           "description": "Add four art layers, color models, palette variants, palette repair and multi-drawing operations; explicitly define drawing sharing semantics.",
-          "status": "planned"
+          "status": "in_progress"
         }
       ],
       "acceptance": [
@@ -491,12 +491,12 @@
         {
           "id": "P06-W1",
           "description": "Implement setup/animate modes, pegs, pivots, transform channels, stepped/continuous keys, autokey and batched key editing.",
-          "status": "planned"
+          "status": "in_progress"
         },
         {
           "id": "P06-W2",
           "description": "Build curve/ease and motion-path editors with explicit interpolation, velocity and extrapolation semantics.",
-          "status": "planned"
+          "status": "in_progress"
         },
         {
           "id": "P06-W3",

@@ -76,10 +76,15 @@ struct Transform {
     auto operator<=>(const Transform&) const = default;
 };
 enum class Interpolation { Linear, Step, Smooth };
+struct BezierEase {
+    double x1 = 1.0 / 3, y1 = 1.0 / 3, x2 = 2.0 / 3, y2 = 2.0 / 3;
+    auto operator<=>(const BezierEase&) const = default;
+};
 struct Keyframe {
     Frame frame = 0;
     Transform value;
     Interpolation interpolation = Interpolation::Linear;
+    std::map<std::string, BezierEase> easing;
     auto operator<=>(const Keyframe&) const = default;
 };
 struct Layer {
@@ -98,7 +103,7 @@ struct Marker {
     auto operator<=>(const Marker&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 2;
+    static constexpr int formatVersion = 3;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;

@@ -1,5 +1,17 @@
 # Experimental releases
 
+## 0.2.0-experimental.5 — visual animation and precise picking
+
+- Animate (A): move, scale and rotate layer poses on the canvas, with initial anchors, live previews and one undo per gesture.
+- Integrated Bezier handles, channel easing/overshoot presets, double-click graph keys and a visible canvas trajectory.
+- Constant eight-screen-pixel vector picking margin; distinct tool cursors and contextual move/resize/rotate/point feedback.
+- Live point-edit previews, usable thin-line handles and a scrollable tool strip.
+- Compact shared controls, a single curve toolbar, optional Values fields and a working draggable panel divider.
+- Format 3 curve persistence, original backups for schema 1/2 upgrades and current-format compaction.
+- macOS: 48 CTest entries plus native mouse pose, point and Bezier workflows. Source only.
+
+Drawing morphing, contour Bezier geometry, independent channel key times, separate spatial velocity and cameras remain open. Older editors cannot open format 3; use the migration backup with them. See ADR-016.
+
 ## 0.2.0-experimental.4 — direct editing workspace
 
 - Removed separate selection, timing and curve dialogs.

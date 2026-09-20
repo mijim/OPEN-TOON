@@ -12,31 +12,31 @@ Flow {
         height: 28
         verticalAlignment: Text.AlignVCenter
     }
-    ComboBox {
+    CompactComboBox {
         id: content
         model: ["Exposures", "Independent drawings", "Keys only", "Exposures + keys"]
         implicitWidth: 145
         implicitHeight: 28
         Accessible.name: "Timing edit content"
     }
-    Button {
+    CompactButton {
         text: "Copy"
         implicitHeight: 28
         onClicked: root.controller.copyTimelineRange()
     }
-    Button {
+    CompactButton {
         text: "Paste"
         implicitHeight: 28
         enabled: root.controller.hasClipboard
         onClicked: root.controller.pasteTimelineRange(content.currentIndex, false)
     }
-    Button {
+    CompactButton {
         text: "Insert"
         implicitHeight: 28
         enabled: root.controller.hasClipboard
         onClicked: root.controller.pasteTimelineRange(content.currentIndex, true)
     }
-    ComboBox {
+    CompactComboBox {
         id: step
         implicitWidth: 95
         implicitHeight: 28
@@ -44,7 +44,7 @@ Flow {
         onActivated: root.controller.timeSelectedDrawings(currentIndex + 1)
         Accessible.name: "Drawing timing"
     }
-    SpinBox {
+    CompactSpinBox {
         id: repeats
         from: 1
         to: 1000
@@ -54,12 +54,12 @@ Flow {
         implicitHeight: 28
         Accessible.name: "Repeat count"
     }
-    Button {
+    CompactButton {
         text: "Repeat"
         implicitHeight: 28
         onClicked: root.controller.repeatTimelineRange(repeats.value)
     }
-    Button {
+    CompactButton {
         text: "Clear"
         implicitHeight: 28
         onClicked: root.controller.clearTimelineRange(content.currentIndex >= 2)

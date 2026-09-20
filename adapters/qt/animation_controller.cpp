@@ -28,6 +28,10 @@ QVariantList EditorController::animationKeys() const {
         return result;
     for (const auto& key : document().layer(layer_).keys) {
         auto item = poseMap(key.value);
+        QVariantMap easing;
+        for (const auto& [channel, e] : key.easing)
+            easing.insert(QString::fromStdString(channel), QVariantList{e.x1, e.y1, e.x2, e.y2});
+        item.insert("easing", easing);
         item.insert("frame", key.frame);
         item.insert("interpolation", int(key.interpolation));
         result.push_back(item);
@@ -46,7 +50,9 @@ QString EditorController::keyState() const {
         return "Held endpoint";
     auto right = std::upper_bound(keys.begin(), keys.end(), frame_,
                                   [](Frame f, const Keyframe& k) { return f < k.frame; });
-    return (right - 1)->interpolation == Interpolation::Step ? "Held pose" : "Interpolated pose";
+    return (right - 1)->interpolation == Interpolation::Step && (right - 1)->easing.empty()
+               ? "Held pose"
+               : "Interpolated pose";
 }
 QVariantList EditorController::curveSamples(QString channel, int samples) const {
     QVariantList result;
@@ -112,4 +118,31 @@ void EditorController::retimeSelectedKeys(int destination, int length) {
         rangeEnd_ = std::min(destination + length, duration());
         emit rangeChanged();
     }
+}
+
+bool EditorController::commitPose(const Transform& pose) {
+    if (!layer_)
+        return false;
+    return edit("Animate layer pose", [&](Document& d) { recordPose(d.layer(layer_), frame_, pose); });
+}
+bool EditorController::setCurveHandles(int frame, QString channel, double x1, double y1, double x2,
+                                       double y2) {
+    if (!layer_)
+        return false;
+    return edit("Edit Bezier handles", [&](Document& d) {
+        setKeyEase(d.layer(layer_), frame, channel.toStdString(), {x1, y1, x2, y2});
+    });
+}
+bool EditorController::addCurveKey(int frame, QString channel, double value) {
+    if (!layer_ || frame < 0 || frame >= duration())
+        return false;
+    bool result = edit("Add visual curve key", [&](Document& d) {
+        auto& layer = d.layer(layer_);
+        auto pose = evaluateTransform(layer, frame);
+        setTransformValue(pose, channel.toStdString(), value);
+        recordPose(layer, frame, pose);
+    });
+    if (result)
+        setFrame(frame);
+    return result;
 }

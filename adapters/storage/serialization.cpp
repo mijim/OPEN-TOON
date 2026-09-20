@@ -98,10 +98,15 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
                   {"keys", Json::array()}};
         for (auto e : l.exposures)
             x["exposures"].push_back({e.start, e.end, e.drawing});
-        for (auto k : l.keys)
+        for (const auto& k : l.keys) {
+            Json ease = Json::object();
+            for (const auto& [channel, e] : k.easing)
+                ease[channel] = {e.x1, e.y1, e.x2, e.y2};
             x["keys"].push_back({{"frame", k.frame},
                                  {"value", transform(k.value)},
-                                 {"interpolation", static_cast<int>(k.interpolation)}});
+                                 {"interpolation", static_cast<int>(k.interpolation)},
+                                 {"easing", ease}});
+        }
         j["layers"].push_back(std::move(x));
     }
     for (const auto& m : d.markers)
@@ -225,9 +230,22 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
         limit(x.at("keys"), 1000000);
         for (const auto& e : x.at("exposures"))
             l.exposures.push_back({e.at(0), e.at(1), e.at(2)});
-        for (const auto& k : x.at("keys"))
-            l.keys.push_back({k.at("frame"), readTransform(k.at("value")),
-                              static_cast<Interpolation>(k.at("interpolation").get<int>())});
+        for (const auto& k : x.at("keys")) {
+            Keyframe key{k.at("frame"), readTransform(k.at("value")),
+                         static_cast<Interpolation>(k.at("interpolation").get<int>())};
+            if (k.contains("easing")) {
+                const auto& ease = k.at("easing");
+                if (!ease.is_object() || ease.size() > 8)
+                    throw std::runtime_error("Invalid channel easing map.");
+                for (auto it = ease.begin(); it != ease.end(); ++it) {
+                    const auto& e = it.value();
+                    if (!e.is_array() || e.size() != 4)
+                        throw std::runtime_error("Invalid Bezier handles.");
+                    key.easing[it.key()] = {e.at(0), e.at(1), e.at(2), e.at(3)};
+                }
+            }
+            l.keys.push_back(std::move(key));
+        }
         d.layers.push_back(std::move(l));
     }
     for (const auto& m : j.at("markers"))

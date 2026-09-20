@@ -101,6 +101,23 @@ TEST_CASE("Recovery saves an immutable snapshot without clearing newer unsaved e
     REQUIRE(opentoon::ProjectStore::load(std::filesystem::path(path.toStdString())).document == saved);
     QFile::remove(path);
 }
+
+TEST_CASE("Visual curve commands preserve poses and undo atomically") {
+    EditorController editor;
+    editor.newScene();
+    auto before = editor.document();
+    REQUIRE(editor.addCurveKey(20, "x", 100));
+    REQUIRE(editor.setCurveHandles(0, "x", .25, 0, .65, 1.8));
+    auto eased = editor.document();
+    editor.setFrame(0);
+    editor.addKey();
+    REQUIRE(editor.document() == eased);
+    REQUIRE_FALSE(editor.setCurveHandles(0, "x", .8, 0, .2, 1));
+    REQUIRE(editor.document() == eased);
+    editor.undo();
+    editor.undo();
+    REQUIRE(editor.document() == before);
+}
 int main(int argc, char** argv) {
     QGuiApplication application(argc, argv);
     QCoreApplication::setApplicationName("OPEN-TOON-export-tests");

@@ -25,7 +25,7 @@ def documents() -> dict[Path, str]:
     nodes = read('node-reference.json')['entries']
     files = {}
     index = ['# Functional catalog', '',
-             f'{len(features)} original proposed capabilities across {len(domains)} domains. Application status: **not implemented**.', '',
+             f'{len(features)} original proposed capabilities across {len(domains)} domains. Application status: **experimental, with partial working subsets; no phase is complete**.', '',
              'Canonical source: [features.json](features.json). Acceptance criteria are OPEN-TOON objectives. Domain dependencies express relationships, not a requirement to finish an entire domain before starting another.', '',
              'Levels: `core` foundations; `pro` professional workflow; `advanced` high complexity; `optional` optional extension; `legacy` historical compatibility. These are not execution phases.', '',
              '| Domain | Capabilities | Module |', '|---|---:|---|']

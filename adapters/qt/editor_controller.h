@@ -157,6 +157,9 @@ class EditorController final : public QObject {
     Q_INVOKABLE void setSwatchColor(int, QColor);
     Q_INVOKABLE void setScene(QString, int, int, int, int, int);
     Q_INVOKABLE void setTransform(QString, double);
+    bool commitPose(const opentoon::Transform&);
+    Q_INVOKABLE bool setCurveHandles(int frame, QString channel, double x1, double y1, double x2, double y2);
+    Q_INVOKABLE bool addCurveKey(int frame, QString channel, double value);
     Q_INVOKABLE void addKey(int interpolation = 0);
     Q_INVOKABLE void deleteKey();
     Q_INVOKABLE void togglePlayback();

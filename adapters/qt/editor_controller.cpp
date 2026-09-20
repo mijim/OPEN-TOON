@@ -167,10 +167,13 @@ void EditorController::setSelectedSwatch(int value) {
         }
 }
 void EditorController::setTool(QString value) {
-    if (QStringList{"Pencil", "Eraser", "Select", "Marquee", "Rectangle", "Ellipse", "Recolor", "Edit points",
-                    "Raster ink", "Raster soft", "Raster dry", "Raster smudge", "Raster eraser"}
+    if (QStringList{"Animate", "Pencil", "Eraser", "Select", "Marquee", "Rectangle", "Ellipse", "Recolor",
+                    "Edit points", "Raster ink", "Raster soft", "Raster dry", "Raster smudge",
+                    "Raster eraser"}
             .contains(value)) {
         tool_ = std::move(value);
+        if (tool_ == "Animate")
+            setAnimateMode(true);
         emit toolChanged();
     }
 }
@@ -532,7 +535,8 @@ void EditorController::addKey(int interpolation) {
         if (l.locked)
             throw std::runtime_error("Unlock the layer before editing.");
         auto value = evaluateTransform(l, frame_);
-        std::erase_if(l.keys, [&](auto k) { return k.frame == frame_; });
+        if (std::any_of(l.keys.begin(), l.keys.end(), [&](const auto& k) { return k.frame == frame_; }))
+            return;
         l.keys.push_back({frame_, value, static_cast<Interpolation>(interpolation)});
         std::sort(l.keys.begin(), l.keys.end(), [](auto a, auto b) { return a.frame < b.frame; });
     });

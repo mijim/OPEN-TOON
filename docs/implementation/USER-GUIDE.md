@@ -43,7 +43,7 @@ Each manual save appends a complete revision. Scene history can restore a saved 
 
 Every 60 seconds, a modified document is saved to a recovery file. On a later launch, recovery can open that snapshot as an unsaved scene. Save it under a chosen name. Autosave runs from an immutable snapshot in a worker, so newer edits stay unsaved until the next save. Manual saves remain synchronous. Recovery from operating-system power loss and multiple simultaneous application instances has not been qualified.
 
-Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and total decoded media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening a version 1 project remains supported. Its first save creates a `.pre-v2.bak` copy before upgrading. The old editor requires that backup to reopen the original format.
+Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and total decoded media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening version 1/2 projects remains supported. Format 3 adds channel Bézier easing; the first save of an older schema creates a `.pre-v3.bak` copy before upgrading. The old editor requires that backup to reopen the original format.
 
 **Scene → Compact project history** retains the chosen number of newest saved revisions and removes unreachable media, after creating a full `.pre-compact.bak` backup. Save pending edits first. This is an explicit operation and is not part of autosave.
 
@@ -78,7 +78,7 @@ an entire drag or numeric edit.
 
 Keys currently contain complete poses: a value edit affects only that field, while
 moving a key or changing Linear/Hold/Smooth interpolation affects all eight channels.
-Smooth has fixed easing slopes; editable tangents and independent channel keys remain
+Smooth has fixed default easing slopes; custom channel Bézier handles are available. Independent channel keys remain
 planned. Frames shown in the interface start at 1.
 
 Select a range and layers in the timeline. Drag its right edge (bottom edge in the
@@ -118,3 +118,46 @@ eraser strength. The eraser does not depend on the selected palette color's alph
 Rotated rectangles become editable polygons; rotated ellipses use a 128-point polygon
 approximation. Nonuniform scaling applies an average stroke-width scale. These tools
 are experimental and do not yet provide analytic curve-preserving transforms.
+
+
+## Animate visually (A)
+
+1. Draw your artwork. Expose it across the desired frames using the timeline's hold
+   controls; pose keys do not extend drawing exposures automatically.
+2. Select the layer and choose **Animate** (A), or **Pose on canvas** in Curves.
+3. Move to the desired frame and drag the box to move, its handles to scale, or its
+   top circle to rotate. Shift constrains proportions or snaps angles; Escape cancels.
+4. Release to record one pose key. A first later-frame edit adds an unchanged frame-1
+   anchor. The Animate tool always records keys; the inspector's Auto key setting
+   continues to govern numeric edits. Select (V) edits drawing geometry instead.
+5. Open **Curves**, select a channel and its starting key, and drag the round handles
+   to shape the outgoing transition. **Overshoot** gives an editable starting point.
+   Double-click the graph to add a key; use a middle key to make a bounce when the
+   start and end have the same value. Numeric controls remain available for precision.
+
+The dashed canvas trajectory follows the current drawing's center. Spatial control
+points and a separate velocity curve are not implemented. Transform interpolation
+moves the layer; it does not morph one vector drawing into another. Morphing remains P14.
+
+## Picking and cursor feedback
+
+Thin vector strokes have an eight-screen-pixel selection margin at any zoom. Hollow
+shapes select by their outlines; filled shapes also select through their interiors.
+Picking targets the active layer and respects art-layer paint order. The cursor shows
+the active tool, becomes a hand over movable artwork, changes direction on resize
+handles and shows rotation or point-edit feedback where applicable. Locked layers
+and playback show unavailable feedback. Edit points previews the changed stroke
+while dragging. Opposing middle handles hide on very thin boxes to keep moving usable.
+
+
+## Compact workspace and panel sizing
+
+Drag the thin horizontal separator with the central grip above the Timeline/Xsheet/Curves
+tabs upward to enlarge the lower panel, or downward to return space to the canvas.
+Double-click the grip to restore the default height. The panel follows the window size
+and retains a usable canvas minimum.
+
+Curves keeps its actions in a single compact toolbar. **Values** reveals the optional
+frame/value/base-interpolation fields; hiding them gives that space back to the graph.
+Hover the question mark for editing gestures. Buttons, dropdowns, number fields and
+checkboxes use the same compact styling throughout the workspace.

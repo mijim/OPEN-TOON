@@ -58,7 +58,7 @@ TEST_CASE("Saving a stale revision cannot overwrite another writer") {
 }
 TEST_CASE("Unknown versions and excessive nesting do not enter the document model") {
     auto text = serializeDocument(makeDocument());
-    auto position = text.find("\"version\":2");
+    auto position = text.find("\"version\":3");
     REQUIRE(position != std::string::npos);
     text.replace(position, 11, "\"version\":9");
     REQUIRE_THROWS(deserializeDocument(text));
@@ -170,7 +170,7 @@ TEST_CASE("Version one projects migrate with an independently readable original 
     REQUIRE(ProjectStore::load(p.file).document == changed);
     REQUIRE(ProjectStore::load(p.file, original.revision).document == original.document);
     auto backup = p.file;
-    backup += ".pre-v2.bak";
+    backup += ".pre-v3.bak";
     REQUIRE(ProjectStore::load(backup).document == original.document);
     {
         FixtureDatabase db(backup);
@@ -233,4 +233,31 @@ TEST_CASE("Compaction collects only resources no retained revision needs") {
     FixtureDatabase db(p.file);
     REQUIRE(db.count("SELECT count(*) FROM resources") == 1);
     REQUIRE(ProjectStore::load(result.backup, first).document.drawings.begin()->second.image->rgba[0] == 0);
+}
+
+TEST_CASE("Schema two upgrades preserve an original backup and protect Bezier metadata") {
+    TemporaryProject p;
+    auto d = makeDocument();
+    auto rev = ProjectStore::save(p.file, d);
+    {
+        FixtureDatabase db(p.file);
+        db.execute("PRAGMA user_version=2");
+    }
+    Transform target;
+    target.x = 100;
+    d.layers.front().keys = {{0, {}, Interpolation::Linear}, {20, target, Interpolation::Linear}};
+    d.layers.front().keys.front().easing["x"] = {.25, 0, .65, 1.8};
+    (void)ProjectStore::save(p.file, d, "Bezier upgrade", rev);
+    REQUIRE(ProjectStore::load(p.file).document == d);
+    auto backup = p.file;
+    backup += ".pre-v3.bak";
+    REQUIRE(ProjectStore::load(backup).document == makeDocument());
+    {
+        FixtureDatabase db(backup);
+        REQUIRE(db.count("PRAGMA user_version") == 2);
+    }
+    {
+        FixtureDatabase db(p.file);
+        REQUIRE(db.count("PRAGMA user_version") == 3);
+    }
 }

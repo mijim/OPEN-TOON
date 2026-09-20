@@ -1,4 +1,5 @@
 #include "opentoon/document.h"
+#include "opentoon/animation.h"
 #include <cmath>
 #include <limits>
 #include <set>
@@ -192,6 +193,8 @@ void Document::validate() const {
             validateTransform(k.value);
             require(static_cast<int>(k.interpolation) >= 0 && static_cast<int>(k.interpolation) <= 2,
                     "Unknown interpolation.");
+            for (const auto& [channel, ease] : k.easing)
+                validateEase(channel, ease);
             previous = k.frame;
         }
     }
@@ -230,21 +233,24 @@ Transform evaluateTransform(const Layer& layer, Frame frame) {
     if (right == layer.keys.begin())
         return right->value;
     auto left = right - 1;
-    if (right == layer.keys.end() || left->interpolation == Interpolation::Step)
+    if (right == layer.keys.end())
         return left->value;
-    double t = static_cast<double>(frame - left->frame) / (right->frame - left->frame);
-    if (left->interpolation == Interpolation::Smooth)
-        t = t * t * (3 - 2 * t);
+    const double time = static_cast<double>(frame - left->frame) / (right->frame - left->frame);
     Transform result;
-    auto mix = [t](double a, double b) { return a + (b - a) * t; };
-    result.x = mix(left->value.x, right->value.x);
-    result.y = mix(left->value.y, right->value.y);
-    result.rotation = mix(left->value.rotation, right->value.rotation);
-    result.scaleX = mix(left->value.scaleX, right->value.scaleX);
-    result.scaleY = mix(left->value.scaleY, right->value.scaleY);
-    result.opacity = mix(left->value.opacity, right->value.opacity);
-    result.pivotX = mix(left->value.pivotX, right->value.pivotX);
-    result.pivotY = mix(left->value.pivotY, right->value.pivotY);
+    for (const auto* channel : {"x", "y", "rotation", "scaleX", "scaleY", "opacity", "pivotX", "pivotY"}) {
+        double t = time;
+        if (auto ease = left->easing.find(channel); ease != left->easing.end())
+            t = evaluateEase(ease->second, time);
+        else if (left->interpolation == Interpolation::Step)
+            t = 0;
+        else if (left->interpolation == Interpolation::Smooth)
+            t = time * time * (3 - 2 * time);
+        double a = transformValue(left->value, channel), b = transformValue(right->value, channel);
+        double value = a + (b - a) * t;
+        if (std::string_view(channel) == "opacity")
+            value = std::clamp(value, 0.0, 1.0);
+        setTransformValue(result, channel, value);
+    }
     return result;
 }
 void insertFrames(Document& d, Frame at, Frame count) {

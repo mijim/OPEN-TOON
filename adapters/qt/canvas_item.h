@@ -46,6 +46,9 @@ class CanvasItem : public QQuickPaintedItem {
     void viewChanged();
 
   protected:
+    void hoverMoveEvent(QHoverEvent*) override;
+    void hoverEnterEvent(QHoverEvent*) override;
+    void hoverLeaveEvent(QHoverEvent*) override;
     void mousePressEvent(QMouseEvent*) override;
     void mouseMoveEvent(QMouseEvent*) override;
     void mouseReleaseEvent(QMouseEvent*) override;
@@ -55,6 +58,15 @@ class CanvasItem : public QQuickPaintedItem {
     bool eventFilter(QObject*, QEvent*) override;
 
   private:
+    QPointF hoverPosition_;
+    void updateCursor(QPointF);
+    opentoon::Id hitVector(QPointF) const;
+    void selectAnimationBounds();
+    bool handleVisible(int) const;
+    void previewPose(QTransform);
+    std::optional<opentoon::Document> posePreview_;
+    opentoon::Transform sourcePose_, previewPose_;
+    opentoon::Drawing pointDrawingPreview_;
     opentoon::PixelRect region_;
     std::vector<opentoon::Id> regionStrokes_;
     opentoon::Drawing transformSource_, transformPreview_;

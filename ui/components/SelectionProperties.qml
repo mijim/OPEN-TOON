@@ -76,19 +76,19 @@ ColumnLayout {
             label: "Selected stroke width"
             onCommitted: value => root.drawingCanvas.setObjectProperty("strokeWidth", value)
         }
-        CheckBox {
+        CompactCheckBox {
             text: "Filled"
             checked: root.objectData.filled || false
             onToggled: root.drawingCanvas.setObjectProperty("filled", checked ? 1 : 0)
         }
-        ComboBox {
+        CompactComboBox {
             Layout.fillWidth: true
             model: ["Underlay Art", "Color Art", "Line Art", "Overlay Art"]
             currentIndex: root.objectData.artLayer || 0
             onActivated: root.drawingCanvas.setObjectProperty("artLayer", currentIndex)
             Accessible.name: "Selected object art layer"
         }
-        ComboBox {
+        CompactComboBox {
             Layout.fillWidth: true
             model: root.controller.palette
             textRole: "name"

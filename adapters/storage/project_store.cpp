@@ -68,7 +68,7 @@ int verifyProject(Database& db) {
     if (sqlite3_step(version.value) != SQLITE_ROW)
         throw std::runtime_error("Cannot read database schema version.");
     auto number = sqlite3_column_int(version.value, 0);
-    if (number < 1 || number > 2)
+    if (number < 1 || number > Document::formatVersion)
         throw std::runtime_error("Unsupported project schema. Open it with a compatible OPEN-TOON version.");
     return number;
 }
@@ -118,17 +118,17 @@ std::int64_t ProjectStore::save(const std::filesystem::path& path, const Documen
     Database db(path, true);
     if (existing) {
         const auto version = verifyProject(db);
-        if (version == 1) {
+        if (version < Document::formatVersion) {
             auto backup = path;
-            backup += ".pre-v2.bak";
+            backup += ".pre-v3.bak";
             for (int suffix = 1; std::filesystem::exists(backup); ++suffix) {
                 backup = path;
-                backup += ".pre-v2-" + std::to_string(suffix) + ".bak";
+                backup += ".pre-v3-" + std::to_string(suffix) + ".bak";
             }
             backupDatabase(db, backup);
         }
     } else {
-        db.execute("PRAGMA application_id=1330925390; PRAGMA user_version=2;");
+        db.execute("PRAGMA application_id=1330925390; PRAGMA user_version=3;");
     }
     db.execute("PRAGMA journal_mode=DELETE; PRAGMA synchronous=FULL; PRAGMA foreign_keys=ON;");
     db.execute("CREATE TABLE IF NOT EXISTS revisions (id INTEGER PRIMARY KEY, created TEXT NOT NULL DEFAULT "
@@ -150,7 +150,7 @@ std::int64_t ProjectStore::save(const std::filesystem::path& path, const Documen
                    "CREATE TABLE IF NOT EXISTS revision_resources(revision INTEGER NOT NULL REFERENCES "
                    "revisions(id) ON DELETE CASCADE,hash TEXT NOT NULL REFERENCES resources(hash),PRIMARY "
                    "KEY(revision,hash));"
-                   "PRAGMA user_version=2;");
+                   "PRAGMA user_version=3;");
         std::set<std::string> references;
         auto data = serializeDocument(document, [&](std::span<const std::uint8_t> bytes) {
             auto hash = resourceHash(bytes);
@@ -240,7 +240,7 @@ ProjectStore::CompactionResult ProjectStore::compact(const std::filesystem::path
         throw std::invalid_argument("Invalid compaction request.");
     auto before = std::filesystem::file_size(path);
     Database db(path, false);
-    if (verifyProject(db) != 2)
+    if (verifyProject(db) != Document::formatVersion)
         throw std::runtime_error("Save this project in the current format before compacting.");
     if (head(db) != expected)
         throw std::runtime_error("Project changed on disk; reopen before compacting.");

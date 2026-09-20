@@ -36,6 +36,53 @@ void setTransformValue(Transform& t, std::string_view channel, double value) {
         throw std::invalid_argument("Transform values must be finite.");
     t.*member(channel) = value;
 }
+void validateEase(std::string_view channel, const BezierEase& e) {
+    (void)member(channel);
+    if (!std::isfinite(e.x1) || !std::isfinite(e.y1) || !std::isfinite(e.x2) || !std::isfinite(e.y2) ||
+        e.x1 < 0 || e.x2 > 1 || e.x1 > e.x2 || std::abs(e.y1) > 4 || std::abs(e.y2) > 4)
+        throw std::invalid_argument("Bezier handles must have ordered time in 0–1 and values in -4–4.");
+}
+double evaluateEase(const BezierEase& e, double time) {
+    auto cubic = [](double t, double a, double b) {
+        double u = 1 - t;
+        return 3 * u * u * t * a + 3 * u * t * t * b + t * t * t;
+    };
+    if (time <= 0 || time >= 1)
+        return std::clamp(time, 0.0, 1.0);
+    double low = 0, high = 1;
+    for (int i = 0; i < 40; ++i) {
+        double mid = (low + high) / 2;
+        if (cubic(mid, e.x1, e.x2) < time)
+            low = mid;
+        else
+            high = mid;
+    }
+    return cubic((low + high) / 2, e.y1, e.y2);
+}
+void recordPose(Layer& layer, Frame frame, const Transform& pose) {
+    editable(layer);
+    if (frame < 0 || frame >= 1000000)
+        throw std::invalid_argument("Invalid pose frame.");
+    if (layer.keys.empty() && frame > 0)
+        layer.keys.push_back({0, layer.transform, Interpolation::Linear});
+    auto it =
+        std::find_if(layer.keys.begin(), layer.keys.end(), [=](const auto& k) { return k.frame == frame; });
+    if (it != layer.keys.end())
+        it->value = pose;
+    else
+        layer.keys.push_back({frame, pose, Interpolation::Linear});
+    std::sort(layer.keys.begin(), layer.keys.end(),
+              [](const auto& a, const auto& b) { return a.frame < b.frame; });
+}
+void setKeyEase(Layer& layer, Frame frame, std::string_view channel, const BezierEase& ease) {
+    editable(layer);
+    validateEase(channel, ease);
+    auto it =
+        std::find_if(layer.keys.begin(), layer.keys.end(), [=](const auto& k) { return k.frame == frame; });
+    if (it == layer.keys.end() || std::next(it) == layer.keys.end())
+        throw std::runtime_error("Select a key with a following key to edit its outgoing curve.");
+    it->easing[std::string(channel)] = ease;
+}
 void editTransform(Layer& layer, Frame frame, std::string_view channel, double value, AnimationEditMode mode,
                    bool autokey) {
     editable(layer);
@@ -71,6 +118,8 @@ void editKey(Layer& layer, Frame source, Frame destination, std::string_view cha
         throw std::runtime_error("Another key already occupies the destination frame.");
     setTransformValue(key->value, channel, value);
     key->frame = destination;
+    if (key->interpolation != interpolation)
+        key->easing.clear();
     key->interpolation = interpolation;
     std::sort(layer.keys.begin(), layer.keys.end(),
               [](const auto& a, const auto& b) { return a.frame < b.frame; });

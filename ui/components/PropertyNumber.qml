@@ -1,12 +1,12 @@
 import QtQuick
 import QtQuick.Controls.Basic
 
-TextField {
+CompactTextField {
     id: root
     required property real number
     required property string label
     signal committed(real value)
-    implicitHeight: 30
+    implicitHeight: 26
     selectByMouse: true
     font.family: "Menlo"
     font.pixelSize: 11

@@ -768,7 +768,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/status.json; docs/architecture/adr/014-drawing-selection.md; bounded rectangular subset only, catalog acceptance not closed"
+      "implementation_evidence": "docs/implementation/status.json; docs/architecture/adr/016-visual-animation-and-bezier.md; bounded visual-editing subset only, catalog acceptance not closed"
     },
     {
       "id": "VEC-010",
@@ -809,7 +809,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/status.json; experimental subset only, catalog acceptance not closed"
+      "implementation_evidence": "docs/implementation/status.json; docs/architecture/adr/016-visual-animation-and-bezier.md; bounded visual-editing subset only, catalog acceptance not closed"
     },
     {
       "id": "VEC-012",
@@ -2147,7 +2147,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/status.json; experimental subset only, catalog acceptance not closed"
+      "implementation_evidence": "docs/implementation/status.json; docs/architecture/adr/016-visual-animation-and-bezier.md; bounded visual-editing subset only, catalog acceptance not closed"
     },
     {
       "id": "ANI-002",
@@ -2168,7 +2168,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/status.json; docs/architecture/adr/013-animation-editing.md; experimental subset only, catalog acceptance not closed"
+      "implementation_evidence": "docs/implementation/status.json; docs/architecture/adr/016-visual-animation-and-bezier.md; bounded visual-editing subset only, catalog acceptance not closed"
     },
     {
       "id": "ANI-003",
@@ -2230,7 +2230,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/status.json; experimental subset only, catalog acceptance not closed"
+      "implementation_evidence": "docs/implementation/status.json; docs/architecture/adr/016-visual-animation-and-bezier.md; bounded visual-editing subset only, catalog acceptance not closed"
     },
     {
       "id": "ANI-006",
@@ -2251,7 +2251,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/status.json; docs/architecture/adr/013-animation-editing.md; experimental subset only, catalog acceptance not closed"
+      "implementation_evidence": "docs/implementation/status.json; docs/architecture/adr/016-visual-animation-and-bezier.md; bounded visual-editing subset only, catalog acceptance not closed"
     },
     {
       "id": "ANI-007",
@@ -2272,7 +2272,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/status.json; experimental subset only, catalog acceptance not closed"
+      "implementation_evidence": "docs/implementation/status.json; docs/architecture/adr/016-visual-animation-and-bezier.md; bounded visual-editing subset only, catalog acceptance not closed"
     },
     {
       "id": "ANI-008",

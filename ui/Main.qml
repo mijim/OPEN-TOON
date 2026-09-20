@@ -25,15 +25,22 @@ ApplicationWindow {
     palette.highlight: "#454545"
     palette.highlightedText: "#ffffff"
     palette.mid: "#393939"
+    Shortcut {
+        sequence: "A"
+        enabled: !root.textEditing
+        onActivated: editor.tool = "Animate"
+    }
     property bool showCurves: false
     property bool showTimingTools: false
     property string inspectorMode: "none"
-    property real bottomHeight: 230
+    property real bottomHeight: 280
+    readonly property real maximumBottomHeight: Math.max(140, workspace.height - appHeader.height - canvasToolbar.height - bottomSplitter.height - bottomTabs.height - statusBar.height - (timingTools.visible ? timingTools.height : 0) - canvasWorkspace.Layout.minimumHeight - 2)
+    readonly property real effectiveBottomHeight: Math.max(140, Math.min(bottomHeight, maximumBottomHeight))
     Connections {
         target: canvas
         function onRegionChanged() {
             if (canvas.hasRegion)
-                root.inspectorMode = "object";
+                root.inspectorMode = editor.tool === "Animate" ? "layer" : "object";
         }
     }
     property var backend: editor
@@ -98,7 +105,7 @@ ApplicationWindow {
         anchors.centerIn: parent
         standardButtons: Dialog.Ok | Dialog.Cancel
         onAccepted: editor.setSceneMarker(markerName.text)
-        TextField {
+        C.CompactTextField {
             id: markerName
             placeholderText: "Marker label (empty removes marker)"
             width: 330
@@ -352,11 +359,15 @@ ApplicationWindow {
     }
 
     ColumnLayout {
+        id: workspace
         anchors.fill: parent
         spacing: 0
         Rectangle {
+            id: appHeader
             Layout.fillWidth: true
-            Layout.preferredHeight: 58
+            Layout.preferredHeight: 44
+            Layout.minimumHeight: 44
+            Layout.maximumHeight: 44
             color: "#0a0a0a"
             RowLayout {
                 anchors.fill: parent
@@ -429,8 +440,11 @@ ApplicationWindow {
             color: "#282828"
         }
         Rectangle {
+            id: canvasToolbar
             Layout.fillWidth: true
-            Layout.preferredHeight: 42
+            Layout.preferredHeight: 34
+            Layout.minimumHeight: 34
+            Layout.maximumHeight: 34
             color: "#111111"
             RowLayout {
                 anchors.fill: parent
@@ -442,7 +456,7 @@ ApplicationWindow {
                     color: "#e5e5e5"
                     Layout.preferredWidth: 76
                 }
-                ComboBox {
+                C.CompactComboBox {
                     visible: editor.tool.startsWith("Raster ")
                     model: ["Raster ink", "Raster soft", "Raster dry", "Raster smudge", "Raster eraser"]
                     currentIndex: Math.max(0, model.indexOf(editor.tool))
@@ -452,13 +466,13 @@ ApplicationWindow {
                     Accessible.name: "Raster brush preset"
                 }
                 Text {
-                    visible: editor.tool !== "Marquee" && editor.tool !== "Select"
+                    visible: editor.tool !== "Marquee" && editor.tool !== "Select" && editor.tool !== "Animate"
                     text: "Size"
                     color: "#858585"
                     font.pixelSize: 11
                 }
                 Slider {
-                    visible: editor.tool !== "Marquee" && editor.tool !== "Select"
+                    visible: editor.tool !== "Marquee" && editor.tool !== "Select" && editor.tool !== "Animate"
                     from: 0.5
                     to: 100
                     value: editor.brushSize
@@ -467,7 +481,7 @@ ApplicationWindow {
                     Accessible.name: "Brush size"
                 }
                 Text {
-                    visible: editor.tool !== "Marquee" && editor.tool !== "Select"
+                    visible: editor.tool !== "Marquee" && editor.tool !== "Select" && editor.tool !== "Animate"
                     text: editor.brushSize.toFixed(1) + " px"
                     color: "#aaaaaa"
                     Layout.preferredWidth: 58
@@ -493,7 +507,12 @@ ApplicationWindow {
                         Layout.preferredWidth: 32
                     }
                 }
-                ComboBox {
+                Label {
+                    visible: editor.tool === "Animate"
+                    text: canvas.hasRegion ? "Animate layer · Drag to pose · Handles scale / rotate · Each gesture records a key" : "Animate layer · No artwork at this frame — extend the drawing exposure in the timeline"
+                    color: "#bbbbbb"
+                }
+                C.CompactComboBox {
                     visible: editor.tool === "Marquee"
                     model: ["Vectors", "Raster pixels", "Vectors + raster"]
                     currentIndex: canvas.selectionMedia
@@ -528,13 +547,13 @@ ApplicationWindow {
                 }
                 C.ToolButton {
                     text: "Fill shape"
-                    visible: !editor.tool.startsWith("Raster ") && editor.tool !== "Marquee" && editor.tool !== "Select"
+                    visible: !editor.tool.startsWith("Raster ") && editor.tool !== "Marquee" && editor.tool !== "Select" && editor.tool !== "Animate"
                     active: editor.filled
                     onClicked: editor.filled = !editor.filled
                     hint: "Fill new rectangles and ellipses"
                 }
-                ComboBox {
-                    visible: !editor.tool.startsWith("Raster ") && editor.tool !== "Marquee" && editor.tool !== "Select"
+                C.CompactComboBox {
+                    visible: !editor.tool.startsWith("Raster ") && editor.tool !== "Marquee" && editor.tool !== "Select" && editor.tool !== "Animate"
                     model: ["Underlay Art", "Color Art", "Line Art", "Overlay Art"]
                     currentIndex: editor.artLayer
                     implicitHeight: 28
@@ -579,77 +598,89 @@ ApplicationWindow {
             color: "#282828"
         }
         RowLayout {
+            id: canvasWorkspace
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.minimumHeight: 280
+            Layout.minimumHeight: 160
             Layout.preferredHeight: 580
             spacing: 0
             Rectangle {
                 Layout.preferredWidth: 48
                 Layout.fillHeight: true
                 color: "#111111"
-                Column {
-                    anchors.top: parent.top
-                    anchors.topMargin: 12
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 8
-                    Repeater {
-                        model: [
-                            {
-                                name: "Select",
-                                icon: "↖",
-                                key: "V"
-                            },
-                            {
-                                name: "Marquee",
-                                icon: "▧",
-                                key: "M"
-                            },
-                            {
-                                name: "Pencil",
-                                icon: "╱",
-                                key: "B"
-                            },
-                            {
-                                name: "Raster ink",
-                                icon: "◉",
-                                key: ""
-                            },
-                            {
-                                name: "Eraser",
-                                icon: "▱",
-                                key: "E"
-                            },
-                            {
-                                name: "Rectangle",
-                                icon: "□",
-                                key: ""
-                            },
-                            {
-                                name: "Ellipse",
-                                icon: "○",
-                                key: ""
-                            },
-                            {
-                                name: "Recolor",
-                                icon: "◒",
-                                key: ""
-                            },
-                            {
-                                name: "Edit points",
-                                icon: "⌘",
-                                key: ""
+                Flickable {
+                    anchors.fill: parent
+                    clip: true
+                    contentHeight: toolColumn.height + 24
+                    boundsBehavior: Flickable.StopAtBounds
+                    Column {
+                        id: toolColumn
+                        y: 12
+                        x: (parent.width - width) / 2
+                        spacing: 4
+                        Repeater {
+                            model: [
+                                {
+                                    name: "Select",
+                                    icon: "↖",
+                                    key: "V"
+                                },
+                                {
+                                    name: "Animate",
+                                    icon: "◇",
+                                    key: "A"
+                                },
+                                {
+                                    name: "Marquee",
+                                    icon: "▧",
+                                    key: "M"
+                                },
+                                {
+                                    name: "Pencil",
+                                    icon: "╱",
+                                    key: "B"
+                                },
+                                {
+                                    name: "Raster ink",
+                                    icon: "◉",
+                                    key: ""
+                                },
+                                {
+                                    name: "Eraser",
+                                    icon: "▱",
+                                    key: "E"
+                                },
+                                {
+                                    name: "Rectangle",
+                                    icon: "□",
+                                    key: ""
+                                },
+                                {
+                                    name: "Ellipse",
+                                    icon: "○",
+                                    key: ""
+                                },
+                                {
+                                    name: "Recolor",
+                                    icon: "◒",
+                                    key: ""
+                                },
+                                {
+                                    name: "Edit points",
+                                    icon: "⌘",
+                                    key: ""
+                                }
+                            ]
+                            C.ToolButton {
+                                required property var modelData
+                                width: 34
+                                height: 28
+                                text: modelData.icon
+                                font.pixelSize: 18
+                                active: editor.tool === modelData.name
+                                hint: modelData.name + (modelData.key ? " · " + modelData.key : "")
+                                onClicked: editor.tool = modelData.name
                             }
-                        ]
-                        C.ToolButton {
-                            required property var modelData
-                            width: 34
-                            height: 34
-                            text: modelData.icon
-                            font.pixelSize: 22
-                            active: editor.tool === modelData.name
-                            hint: modelData.name + (modelData.key ? " · " + modelData.key : "")
-                            onClicked: editor.tool = modelData.name
                         }
                     }
                 }
@@ -739,17 +770,18 @@ ApplicationWindow {
                             }
                             RowLayout {
                                 Layout.leftMargin: 16
-                                ComboBox {
+                                C.CompactComboBox {
                                     model: ["Setup", "Animate"]
+                                    enabled: editor.tool !== "Animate"
                                     currentIndex: editor.animateMode ? 1 : 0
                                     onActivated: editor.animateMode = currentIndex === 1
                                     Accessible.name: "Animation edit mode"
                                     implicitWidth: 105
                                 }
-                                CheckBox {
-                                    text: "Auto key"
-                                    checked: editor.autoKey
-                                    enabled: editor.animateMode
+                                C.CompactCheckBox {
+                                    text: editor.tool === "Animate" ? "Gesture keys" : "Auto key"
+                                    checked: editor.tool === "Animate" || editor.autoKey
+                                    enabled: editor.tool !== "Animate" && editor.animateMode
                                     onToggled: editor.autoKey = checked
                                 }
                             }
@@ -850,7 +882,7 @@ ApplicationWindow {
                                     text: "◇ Add key"
                                     onClicked: editor.addKey(interpolation.currentIndex)
                                 }
-                                ComboBox {
+                                C.CompactComboBox {
                                     id: interpolation
                                     model: ["Linear", "Hold", "Smooth"]
                                     implicitWidth: 98
@@ -858,7 +890,7 @@ ApplicationWindow {
                                     Accessible.name: "Key interpolation"
                                 }
                             }
-                            ComboBox {
+                            C.CompactComboBox {
                                 Layout.leftMargin: 16
                                 Layout.rightMargin: 16
                                 Layout.fillWidth: true
@@ -988,27 +1020,46 @@ ApplicationWindow {
             }
         }
         Rectangle {
+            id: bottomSplitter
+            objectName: "workspaceSplitter"
             Layout.fillWidth: true
-            implicitHeight: 7
-            color: "#252525"
+            Layout.preferredHeight: 8
+            Layout.minimumHeight: 8
+            Layout.maximumHeight: 8
+            color: resizeHandle.containsMouse || resizeHandle.pressed ? "#303030" : "#171717"
+            Rectangle {
+                anchors.centerIn: parent
+                width: 40
+                height: 2
+                radius: 1
+                color: "#666666"
+            }
             MouseArea {
+                id: resizeHandle
                 anchors.fill: parent
+                hoverEnabled: true
+                preventStealing: true
                 cursorShape: Qt.SplitVCursor
                 property real startY
                 property real startHeight
                 onPressed: mouse => {
-                    startY = mapToItem(root, mouse.x, mouse.y).y;
-                    startHeight = root.bottomHeight;
+                    startY = mapToGlobal(mouse.x, mouse.y).y;
+                    startHeight = root.effectiveBottomHeight;
                 }
                 onPositionChanged: mouse => {
                     if (pressed)
-                        root.bottomHeight = Math.max(180, Math.min(root.height - 490, startHeight + startY - mapToItem(root, mouse.x, mouse.y).y));
+                        root.bottomHeight = Math.max(140, Math.min(root.maximumBottomHeight, startHeight + startY - mapToGlobal(mouse.x, mouse.y).y));
                 }
+                onDoubleClicked: root.bottomHeight = 280
+                Accessible.name: "Resize timeline and curves vertically"
             }
         }
         Rectangle {
+            id: bottomTabs
             Layout.fillWidth: true
-            Layout.preferredHeight: 42
+            Layout.preferredHeight: 34
+            Layout.minimumHeight: 34
+            Layout.maximumHeight: 34
             color: "#111111"
             RowLayout {
                 anchors.fill: parent
@@ -1093,6 +1144,7 @@ ApplicationWindow {
             }
         }
         C.TimingTools {
+            id: timingTools
             visible: root.showTimingTools && !root.showCurves
             controller: editor
             Layout.fillWidth: true
@@ -1102,17 +1154,19 @@ ApplicationWindow {
         }
         C.CurveEditor {
             id: curveEditor
+            Layout.minimumHeight: root.effectiveBottomHeight
+            Layout.maximumHeight: root.effectiveBottomHeight
             visible: root.showCurves
             controller: editor
             Layout.fillWidth: true
-            Layout.preferredHeight: root.bottomHeight
+            Layout.preferredHeight: root.effectiveBottomHeight
         }
         RowLayout {
             Layout.fillWidth: true
             visible: !root.showCurves
-            Layout.preferredHeight: root.bottomHeight
-            Layout.minimumHeight: root.bottomHeight
-            Layout.maximumHeight: root.bottomHeight
+            Layout.preferredHeight: root.effectiveBottomHeight
+            Layout.minimumHeight: root.effectiveBottomHeight
+            Layout.maximumHeight: root.effectiveBottomHeight
             Layout.fillHeight: false
             spacing: 0
             Rectangle {
@@ -1207,7 +1261,7 @@ ApplicationWindow {
                                     hint: "Toggle lock"
                                     onClicked: editor.toggleLayer(modelData.id, "locked")
                                 }
-                                TextField {
+                                C.CompactTextField {
                                     text: modelData.name
                                     Layout.fillWidth: true
                                     background: null
@@ -1371,6 +1425,13 @@ ApplicationWindow {
                     }
                     MouseArea {
                         id: timelineInput
+                        hoverEnabled: true
+                        property bool overRangeEnd: {
+                            const row = rowAt(Qt.point(mouseX, mouseY));
+                            const edge = root.xsheet ? 30 + editor.rangeEnd * root.timelineRow - timelineScroll.contentY : editor.rangeEnd * root.timelineCell - timelineScroll.contentX;
+                            return row >= 0 && row < editor.layers.length && editor.selectedLayers.indexOf(editor.layers[row].id) >= 0 && Math.abs((root.xsheet ? mouseY : mouseX) - edge) <= 5;
+                        }
+                        cursorShape: resizing || overRangeEnd ? (root.xsheet ? Qt.SizeVerCursor : Qt.SizeHorCursor) : pressed && moving ? Qt.ClosedHandCursor : Qt.CrossCursor
                         preventStealing: true
                         anchors.fill: parent
                         property int anchorFrame: 0
@@ -1476,8 +1537,11 @@ ApplicationWindow {
             color: "#333333"
         }
         Rectangle {
+            id: statusBar
             Layout.fillWidth: true
-            Layout.preferredHeight: 28
+            Layout.preferredHeight: 22
+            Layout.minimumHeight: 22
+            Layout.maximumHeight: 22
             color: "#0b0b0b"
             RowLayout {
                 anchors.fill: parent
@@ -1582,12 +1646,12 @@ ApplicationWindow {
             Label {
                 text: "Scene name"
             }
-            TextField {
+            C.CompactTextField {
                 id: sceneName
                 Layout.fillWidth: true
             }
             RowLayout {
-                TextField {
+                C.CompactTextField {
                     id: sceneW
                     placeholderText: "Width"
                     Layout.fillWidth: true
@@ -1599,7 +1663,7 @@ ApplicationWindow {
                 Label {
                     text: "×"
                 }
-                TextField {
+                C.CompactTextField {
                     id: sceneH
                     placeholderText: "Height"
                     Layout.fillWidth: true
@@ -1613,7 +1677,7 @@ ApplicationWindow {
                 text: "Duration in frames (use Remove Frames to shorten)"
                 font.pixelSize: 10
             }
-            TextField {
+            C.CompactTextField {
                 id: sceneDuration
                 Layout.fillWidth: true
                 validator: IntValidator {
@@ -1626,7 +1690,7 @@ ApplicationWindow {
                 font.pixelSize: 10
             }
             RowLayout {
-                TextField {
+                C.CompactTextField {
                     id: rateN
                     Layout.fillWidth: true
                     validator: IntValidator {
@@ -1637,7 +1701,7 @@ ApplicationWindow {
                 Label {
                     text: "/"
                 }
-                TextField {
+                C.CompactTextField {
                     id: rateD
                     Layout.fillWidth: true
                     validator: IntValidator {
@@ -1673,7 +1737,7 @@ ApplicationWindow {
             Label {
                 text: "Revisions to retain"
             }
-            SpinBox {
+            C.CompactSpinBox {
                 id: retainedRevisions
                 from: 1
                 to: 1000
@@ -1723,7 +1787,7 @@ ApplicationWindow {
         Label {
             width: parent.width
             wrapMode: Text.WordWrap
-            text: "B — Pencil\nE — Eraser\nV — Select and move a stroke\nM — Rectangular vector/raster selection\nO — Onion skin\nF — Fit canvas\nSpace — Play / pause\nLeft / Right — Previous / next frame\nCmd/Ctrl+Z — Undo\n\nDraw with the left mouse button. Pan with the middle button or trackpad scroll. Ctrl+scroll zooms. Double-click a timeline cell to create a new drawing.\n\nTablets use pressure when available; physical tablet validation is pending. This is an experimental build, not the P11 release."
+            text: "B — Pencil\nE — Eraser\nV — Select and move a stroke\nA — Animate layer poses on canvas\nM — Rectangular vector/raster selection\nO — Onion skin\nF — Fit canvas\nSpace — Play / pause\nLeft / Right — Previous / next frame\nCmd/Ctrl+Z — Undo\n\nDraw with the left mouse button. Pan with the middle button or trackpad scroll. Ctrl+scroll zooms. Double-click a timeline cell to create a new drawing.\n\nTablets use pressure when available; physical tablet validation is pending. This is an experimental build, not the P11 release."
         }
     }
     Dialog {

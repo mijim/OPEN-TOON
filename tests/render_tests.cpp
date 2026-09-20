@@ -1,6 +1,9 @@
+#include "opentoon/animation.h"
 #include "scene_renderer.h"
 #include "serialization.h"
+#include "vector_hit.h"
 #include <catch2/catch_test_macros.hpp>
+#include <cmath>
 using namespace opentoon;
 TEST_CASE("Saved and reopened scenes produce the same forty-eight rendered frames") {
     auto original = makeBouncingBall();
@@ -67,4 +70,40 @@ TEST_CASE("Opaque raster tiles have no internal seams at fractional viewport sca
             for (int x = 1; x < size.width() - 1; ++x)
                 REQUIRE(image.pixelColor(x, y) == QColor(Qt::black));
     }
+}
+
+TEST_CASE("Thin vector picking has a screen-space margin at any zoom and respects art order") {
+    Drawing drawing;
+    drawing.strokes.push_back({1, 1, .5, Shape::Stroke, false, 0, {{0, 0, 1}, {100, 0, 1}}});
+    for (double zoom : {.1, .4, 1.0, 5.0, 10.0}) {
+        QTransform view;
+        view.translate(100, 100);
+        view.rotate(30);
+        view.scale(zoom, zoom * 2);
+        auto center = view.map(QPointF(50, 0));
+        auto normal = QPointF(-.5, std::sqrt(3.0) / 2);
+        REQUIRE(hitVectorOnScreen(drawing, view, center + normal * 7) == 1);
+        REQUIRE_FALSE(hitVectorOnScreen(drawing, view, center + normal * (12 + zoom)));
+    }
+    drawing.strokes.push_back({2, 1, .5, Shape::Stroke, false, 2, {{0, 0, 1}, {100, 0, 1}}});
+    drawing.strokes.push_back({3, 1, .5, Shape::Stroke, false, 1, {{0, 0, 1}, {100, 0, 1}}});
+    REQUIRE(hitVectorOnScreen(drawing, {}, QPointF(50, 6)) == 2);
+    drawing.strokes = {{4, 1, 1, Shape::Ellipse, false, 0, {{0, 0, 1}, {100, 100, 1}}}};
+    REQUIRE_FALSE(hitVectorOnScreen(drawing, {}, QPointF(50, 50)));
+    REQUIRE(hitVectorOnScreen(drawing, {}, QPointF(50, -7)) == 4);
+    drawing.strokes.front().filled = true;
+    REQUIRE(hitVectorOnScreen(drawing, {}, QPointF(50, 50)) == 4);
+}
+TEST_CASE("Bezier motion uses identical preview and reopened rendering") {
+    auto d = makeBouncingBall();
+    auto& layer = d.layers.back();
+    layer.keys.clear();
+    Transform target;
+    target.x = 200;
+    recordPose(layer, 24, target);
+    setKeyEase(layer, 0, "x", {.25, 0, .65, 1.8});
+    const auto reopened = deserializeDocument(serializeDocument(d));
+    for (int f = 0; f <= 24; ++f)
+        REQUIRE(SceneRenderer::render(d, f, QSize(240, 135)) ==
+                SceneRenderer::render(reopened, f, QSize(240, 135)));
 }

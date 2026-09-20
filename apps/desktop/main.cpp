@@ -3,6 +3,7 @@
 #include "project_store.h"
 #include "scene_renderer.h"
 #include "serialization.h"
+#include "visual_editing_smoke.h"
 #include <QDir>
 #include <QElapsedTimer>
 #include <QFile>
@@ -398,7 +399,25 @@ int main(int argc, char** argv) {
                             }
                             QTimer::singleShot(100, &app, [&, window] {
                                 auto shot = window->grabWindow();
-                                app.exit(!shot.isNull() && shot.save("build/selection-ui-smoke.png") ? 0 : 1);
+                                try {
+                                    if (shot.isNull() || !shot.save("build/selection-ui-smoke.png"))
+                                        throw std::runtime_error("Selection screenshot failed.");
+                                    auto* canvas = window->findChild<CanvasItem*>("drawingCanvas");
+                                    visualEditingSmoke(editor, *canvas, *window);
+                                    QTimer::singleShot(150, &app, [&, window] {
+                                        auto image = window->grabWindow();
+                                        std::cout << "Visual animation smoke passed: thin picking, cursor "
+                                                     "feedback, move/scale/rotate, cancel, undo, save/reopen "
+                                                     "and Bezier handle drag.\n";
+                                        app.exit(!image.isNull() &&
+                                                         image.save("build/visual-animation-smoke.png")
+                                                     ? 0
+                                                     : 1);
+                                    });
+                                } catch (const std::exception& e) {
+                                    std::cerr << e.what() << '\n';
+                                    app.exit(1);
+                                }
                             });
                         });
                     });

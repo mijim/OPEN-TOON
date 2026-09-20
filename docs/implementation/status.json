@@ -16,7 +16,7 @@
     {
       "id": "P01",
       "status": "in_progress",
-      "available": "Native English QML shell, CMake modules, commands, immutable snapshots, undo/redo and validation. Integrated resizable timing/curve workspace and selection-owned object/layer Properties.",
+      "available": "Native English QML shell, CMake modules, commands, immutable snapshots, undo/redo and validation. Integrated resizable timing/curve workspace and selection-owned object/layer Properties. Shared compact controls, optional curve numeric fields and a draggable workspace divider with dynamic bounds.",
       "remaining": "Docking/workspace persistence, configurable shortcuts, full accessibility, scalable resource/cache protocols and cross-platform qualification."
     },
     {
@@ -34,7 +34,7 @@
     {
       "id": "P04",
       "status": "in_progress",
-      "available": "Sampled vector strokes, approximate eraser, primitives, single-stroke selection, point editing/smoothing, stable palette IDs and shape recoloring. Rectangular whole-stroke multi-selection, move/duplicate/delete, flips and quarter turns preserve editable geometry, swatch and art-layer IDs. On-canvas scale/rotation handles with live previews and explicit selected-vector properties.",
+      "available": "Sampled vector strokes, approximate eraser, primitives, single-stroke selection, point editing/smoothing, stable palette IDs and shape recoloring. Rectangular whole-stroke multi-selection, move/duplicate/delete, flips and quarter turns preserve editable geometry, swatch and art-layer IDs. On-canvas scale/rotation handles with live previews and explicit selected-vector properties. Thin vectors have a constant screen-space hit margin respecting art order; point dragging previews the complete stroke, with contextual tool/handle cursors.",
       "remaining": "Region topology/fill, analytic erasing, Bezier/contour/width editors, presets/textures/guides, lasso/partial/additive selection and vector optimization."
     },
     {
@@ -46,8 +46,8 @@
     {
       "id": "P06",
       "status": "in_progress",
-      "available": "Layer transform keys with linear/held/smooth interpolation, inherited transforms/opacity, explicit Setup/Animate and Auto key, key navigation/state, editable pose-channel graph and key-only multi-layer retiming with collision rejection. Curves stay in the main workspace; timeline/Xsheet range-end dragging stretches timing.",
-      "remaining": "Independent channel keys, editable tangents, velocity/motion paths, complete batched editing, cameras and multiplane evaluation."
+      "available": "Layer transform keys with linear/held/smooth interpolation, inherited transforms/opacity, explicit Setup/Animate and Auto key, key navigation/state, editable pose-channel graph and key-only multi-layer retiming with collision rejection. Curves stay in the main workspace; timeline/Xsheet range-end dragging stretches timing. Animate (A) records layer poses directly with move/scale/rotation handles and an initial anchor. Per-channel normalized Bezier handles, overshoot presets, graph key creation and a read-only canvas trajectory share evaluation with export.",
+      "remaining": "Independent channel keys, linked/free analytic tangents, separate spatial paths and velocity, complete batched editing, cameras and multiplane evaluation."
     },
     {
       "id": "P07",
@@ -76,7 +76,7 @@
     {
       "id": "P11",
       "status": "planned",
-      "available": "Saved revisions, recovery UX, English guide, regression tests and source CI are initial prerequisites. Format 1 migration backups, checked format 2 resources, explicit backed-up compaction and asynchronous recovery snapshots.",
+      "available": "Saved revisions, recovery UX, English guide, regression tests and source CI are initial prerequisites. Format 1/2 migration backups, format 3 curve metadata and checked compressed media resources, explicit backed-up compaction and asynchronous recovery snapshots.",
       "remaining": "All required journeys, remaining hardening, supported device/OS matrix, accessibility, complete notices/SBOM and signed/installable releases."
     }
   ],
@@ -84,7 +84,7 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 32,
+      "count": 47,
       "command": "ctest --test-dir build/locked --output-on-failure"
     },
     "native_input_workflow": {
@@ -105,7 +105,7 @@
         "timeline range clipboard",
         "native timeline range selection",
         "native Alt-drag with grab offset and undo",
-        "curve dialog layout",
+        "integrated curve panel layout",
         "native curve key drag and undo",
         "native mixed-media marquee and move",
         "region drag cancellation and undo/redo",
@@ -114,7 +114,15 @@
         "selection-preserving Properties edits",
         "timeline end-handle retiming and undo",
         "integrated curve panel layout",
-        "selected vector inspector and visible Retina transform handles"
+        "selected vector inspector and visible Retina transform handles",
+        "six-screen-pixel thin-line picking and hover feedback",
+        "point-handle margin, live preview atomicity and undo",
+        "visual pose move/scale/rotate, cancellation, anchored keys and undo",
+        "visual pose pixel-equivalent save/reopen",
+        "native Bezier handle drag and undo",
+        "compact curve graph height budget",
+        "native workspace splitter expansion and shrinking",
+        "minimum-window layout with optional numeric fields"
       ],
       "limits": "One startup attempt failed to inject the initial stroke with another development instance running; rerun after closing that disposable instance passed. Real-device qualification remains pending."
     },
@@ -156,7 +164,7 @@
     },
     "export_workflows": {
       "status": "passed",
-      "cases": 5,
+      "cases": 6,
       "ctest_entry": "export_workflows",
       "covers": [
         "immutable snapshot during concurrent edit",
@@ -166,10 +174,11 @@
         "successful job after cancellation",
         "asynchronous recovery preserves original snapshot and newer unsaved edits",
         "animation inspector, curve sampling, key navigation and saved pixel equivalence",
-        "drawing selection locks, media filters and empty-drawing protection"
+        "drawing selection locks, media filters and empty-drawing protection",
+        "visual pose/curve commands preserve existing easing and reject invalid handles atomically"
       ]
     },
-    "total_local_ctest_entries": 43,
+    "total_local_ctest_entries": 48,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -184,6 +193,13 @@
     "brush_opacity": {
       "status": "passed",
       "scope": "Coverage at zero/partial/full opacity; eraser works with transparent selected swatch."
+    },
+    "visual_animation": {
+      "status": "passed",
+      "platform": "macOS",
+      "scope": "Bezier endpoint/overshoot/channel isolation/opacity and retiming; invalid handle rejection; schema 1/2 backup migration; thin-stroke picking at 0.1–10x with rotated nonuniform transforms; native pose and curve gestures.",
+      "screenshot": "docs/implementation/visual-animation.png",
+      "limitations": "Synthetic mouse/tablet input; physical tablets, Linux/Windows qualification and production-scale performance pending."
     }
   },
   "ownership": {
@@ -197,7 +213,7 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.4",
+  "version": "0.2.0-experimental.5",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",

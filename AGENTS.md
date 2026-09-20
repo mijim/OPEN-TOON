@@ -17,6 +17,8 @@
 4. Review the owning architecture contract and the library register before adding dependencies.
 5. Node inventory entries may describe families. Their specification owner must expand operators and parameters before implementation; never count entries as implemented effects.
 
+- Every update to the official `README.md` must include a playful detail that truthfully reflects current project coverage. Keep partial phases and unsupported functionality explicit.
+
 ## Maintain the planning records
 
 - Canonical catalog files: `features.json`, `domains.json`, `node-reference.json`, `nonfunctional.json` under `docs/catalog/`. Preserve stable IDs.
@@ -29,6 +31,7 @@
 
 ## Interaction requirements
 
+- Keep controls compact and visually minimal throughout the interface. Curves should devote most panel height to the graph; numeric controls are secondary. The timeline/curve panel must resize by dragging its visible workspace separator.
 - Editing and transforms must be direct: canvas bounding boxes with drag handles and live previews. Do not put selection transforms or timing tools in separate dialogs.
 - Timing and curves stay in the main workspace. Properties describes the explicitly selected canvas object/region or layer, with a clear empty state; it must not silently edit a different target.
 

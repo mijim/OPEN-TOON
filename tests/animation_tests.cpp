@@ -85,3 +85,58 @@ TEST_CASE("Curve edits retain other channel values and round trip held and smoot
     l.locked = true;
     REQUIRE_THROWS(editKey(l, 24, 25, "x", 50, Interpolation::Linear));
 }
+
+TEST_CASE("Visual poses anchor the start and preserve artwork, easing and undo") {
+    Session session;
+    const auto id = session.document().layers.front().id;
+    const auto before = session.document();
+    Transform pose;
+    pose.x = 180;
+    pose.rotation = 25;
+    pose.scaleX = 1.5;
+    session.apply("Pose", [&](Document& d) { recordPose(d.layer(id), 24, pose); });
+    const auto& layer = session.document().layer(id);
+    REQUIRE(layer.keys.size() == 2);
+    REQUIRE(evaluateTransform(layer, 0) == before.layer(id).transform);
+    REQUIRE(evaluateTransform(layer, 12).x == Catch::Approx(90));
+    REQUIRE(session.document().drawings == before.drawings);
+    session.undo();
+    REQUIRE(session.document() == before);
+    auto locked = before.layer(id);
+    locked.locked = true;
+    REQUIRE_THROWS(recordPose(locked, 24, pose));
+}
+TEST_CASE("Per-channel Bezier curves overshoot deterministically and survive saving and retiming") {
+    auto d = makeDocument();
+    auto& layer = d.layers.front();
+    Transform target;
+    target.x = 100;
+    target.y = 200;
+    target.opacity = .5;
+    recordPose(layer, 20, target);
+    const BezierEase ease{.25, 0, .65, 1.8};
+    setKeyEase(layer, 0, "x", ease);
+    REQUIRE(evaluateTransform(layer, 15).x > 100);
+    REQUIRE(evaluateTransform(layer, 10).y == Catch::Approx(100));
+    REQUIRE(evaluateTransform(layer, 0).x == 0);
+    REQUIRE(evaluateTransform(layer, 20).x == 100);
+    setKeyEase(layer, 0, "opacity", {.1, -4, .9, 4});
+    for (int f = 0; f <= 20; ++f) {
+        auto opacity = evaluateTransform(layer, f).opacity;
+        REQUIRE(opacity >= 0);
+        REQUIRE(opacity <= 1);
+    }
+    auto reopened = deserializeDocument(serializeDocument(d));
+    REQUIRE(reopened == d);
+    auto original = layer;
+    retimeKeys(d, {layer.id}, 0, 21, 0, 41);
+    for (int f = 0; f <= 20; ++f)
+        REQUIRE(evaluateTransform(d.layers.front(), f * 2) == evaluateTransform(original, f));
+    recordPose(d.layers.front(), 0, {});
+    REQUIRE(d.layers.front().keys.front().easing.at("x") == ease);
+    REQUIRE_THROWS(setKeyEase(d.layers.front(), 0, "x", {.8, 0, .2, 1}));
+    REQUIRE_THROWS(setKeyEase(d.layers.front(), 0, "unknown", ease));
+    REQUIRE_THROWS(setKeyEase(d.layers.front(), 40, "x", ease));
+    d.layers.front().keys.front().easing["x"].y1 = 5;
+    REQUIRE_THROWS(d.validate());
+}

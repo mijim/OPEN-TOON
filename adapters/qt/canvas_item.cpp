@@ -1,6 +1,8 @@
 #include "canvas_item.h"
 #include "editor_controller.h"
+#include "opentoon/animation.h"
 #include "scene_renderer.h"
+#include "vector_hit.h"
 #include <QCursor>
 #include <QMouseEvent>
 #include <QPainter>
@@ -36,6 +38,8 @@ void CanvasItem::setEditor(EditorController* editor) {
             cancelGesture();
             clearRegion();
             selectedStroke_ = 0;
+            selectAnimationBounds();
+            updateCursor(hoverPosition_);
             update();
         });
         connect(editor, &EditorController::frameChanged, this, [this] {
@@ -45,6 +49,8 @@ void CanvasItem::setEditor(EditorController* editor) {
             selectedStroke_ = 0;
             clearRegion();
             selectedStroke_ = 0;
+            selectAnimationBounds();
+            updateCursor(hoverPosition_);
             update();
         });
         connect(editor, &EditorController::toolChanged, this, [this] {
@@ -53,6 +59,8 @@ void CanvasItem::setEditor(EditorController* editor) {
             cancelGesture();
             clearRegion();
             selectedStroke_ = 0;
+            selectAnimationBounds();
+            updateCursor(hoverPosition_);
             update();
         });
         connect(editor, &EditorController::selectionChanged, this, [this] {
@@ -62,6 +70,8 @@ void CanvasItem::setEditor(EditorController* editor) {
             selectedStroke_ = 0;
             clearRegion();
             selectedStroke_ = 0;
+            selectAnimationBounds();
+            updateCursor(hoverPosition_);
             update();
         });
     }
@@ -71,16 +81,19 @@ void CanvasItem::setEditor(EditorController* editor) {
 void CanvasItem::setZoom(double value) {
     zoom_ = std::clamp(value, 0.1, 10.0);
     emit viewChanged();
+    updateCursor(hoverPosition_);
     update();
 }
 void CanvasItem::setMirrored(bool value) {
     mirrored_ = value;
     emit viewChanged();
+    updateCursor(hoverPosition_);
     update();
 }
 void CanvasItem::setRotationAngle(double value) {
     angle_ = value;
     emit viewChanged();
+    updateCursor(hoverPosition_);
     update();
 }
 void CanvasItem::fit() {
@@ -88,6 +101,7 @@ void CanvasItem::fit() {
     angle_ = 0;
     pan_ = {};
     emit viewChanged();
+    updateCursor(hoverPosition_);
     update();
 }
 QTransform CanvasItem::viewTransform() const {
@@ -125,24 +139,31 @@ void CanvasItem::paint(QPainter* p) {
     if (!editor_)
         return;
     p->setRenderHint(QPainter::Antialiasing);
+    const auto& displayDocument = posePreview_ ? *posePreview_ : editor_->document();
     auto view = viewTransform();
     p->save();
     p->setWorldTransform(view, true);
     p->fillRect(QRectF(-1, -1, editor_->sceneWidth() + 2, editor_->sceneHeight() + 2), QColor("#454545"));
     SceneRenderer::paint(
-        *p, editor_->document(), editor_->frame(),
+        *p, displayDocument, editor_->frame(),
         {true, editor_->onionSkin(), 1, 0,
-         (rasterBrush_ || (transforming_ && previewValid_)) ? Id(editor_->selectedLayer()) : 0,
-         rasterBrush_ ? &rasterPreview_ : (transforming_ && previewValid_ ? &transformPreview_ : nullptr)});
+         (rasterBrush_ || (drawing_ && selectedPoint_ >= 0 && editor_->tool() == "Edit points") ||
+          (transforming_ && previewValid_ && !posePreview_))
+             ? Id(editor_->selectedLayer())
+             : 0,
+         rasterBrush_ ? &rasterPreview_
+         : (drawing_ && selectedPoint_ >= 0 && editor_->tool() == "Edit points")
+             ? &pointDrawingPreview_
+             : (transforming_ && previewValid_ && !posePreview_ ? &transformPreview_ : nullptr)});
     if (editor_->selectedLayer()) {
         p->save();
-        p->setWorldTransform(
-            SceneRenderer::worldTransform(
-                editor_->document(), editor_->document().layer(editor_->selectedLayer()), editor_->frame()),
-            true);
+        p->setWorldTransform(SceneRenderer::worldTransform(displayDocument,
+                                                           displayDocument.layer(editor_->selectedLayer()),
+                                                           editor_->frame()),
+                             true);
         if (!rasterBrush_ && drawing_ && !samples_.empty() && editor_->tool() != "Eraser" &&
             editor_->tool() != "Select" && editor_->tool() != "Marquee" && editor_->tool() != "Recolor" &&
-            editor_->tool() != "Edit points") {
+            editor_->tool() != "Edit points" && editor_->tool() != "Animate") {
             Stroke stroke{0,
                           Id(editor_->selectedSwatch()),
                           editor_->brushSize(),
@@ -167,7 +188,30 @@ void CanvasItem::paint(QPainter* p) {
             p->setBrush(QColor(255, 255, 255, 15));
             p->drawRect(rect);
         }
-        if (hasRegion() && (editor_->tool() == "Select" || editor_->tool() == "Marquee")) {
+        if (editor_->tool() == "Animate" && hasRegion()) {
+            p->save();
+            p->setWorldTransform(itemTransform);
+            const auto& layer = displayDocument.layer(editor_->selectedLayer());
+            const QPointF center(region_.x + region_.width / 2.0, region_.y + region_.height / 2.0);
+            auto position = [&](Frame f) {
+                return (SceneRenderer::worldTransform(displayDocument, layer, f) * view).map(center);
+            };
+            if (!layer.keys.empty()) {
+                QPolygonF path;
+                const auto start = layer.keys.front().frame, end = layer.keys.back().frame;
+                for (Frame f = start; f < end; f += std::max(1, (end - start) / 240))
+                    path << position(f);
+                path << position(end);
+                p->setPen(QPen(QColor("#999999"), 1, Qt::DashLine));
+                p->drawPolyline(path);
+                p->setBrush(QColor("#111111"));
+                for (const auto& key : layer.keys)
+                    p->drawEllipse(position(key.frame), 3, 3);
+            }
+            p->restore();
+        }
+        if (hasRegion() &&
+            (editor_->tool() == "Select" || editor_->tool() == "Marquee" || editor_->tool() == "Animate")) {
             p->save();
             p->setWorldTransform(itemTransform);
             QPen pen(previewValid_ || !transforming_ ? QColor("#777777") : QColor(Qt::red));
@@ -181,7 +225,8 @@ void CanvasItem::paint(QPainter* p) {
             p->drawLine(handlePosition(1), handlePosition(8));
             p->setBrush(QColor("#111111"));
             for (int i = 0; i < 8; ++i)
-                p->drawRect(QRectF(handlePosition(i) - QPointF(4, 4), QSizeF(8, 8)));
+                if (handleVisible(i))
+                    p->drawRect(QRectF(handlePosition(i) - QPointF(4, 4), QSizeF(8, 8)));
             p->drawEllipse(handlePosition(8), 5, 5);
             p->restore();
         }
@@ -196,7 +241,11 @@ void CanvasItem::paint(QPainter* p) {
                         for (std::size_t i = 0; i < stroke.points.size(); ++i) {
                             auto point =
                                 drawing_ && int(i) == selectedPoint_ ? pointPreview_ : stroke.points[i];
-                            p->drawRect(QRectF(point.x - 3, point.y - 3, 6, 6));
+                            const auto screenPoint = selectionWorld().map(QPointF(point.x, point.y));
+                            p->save();
+                            p->setWorldTransform(itemTransform);
+                            p->drawRect(QRectF(screenPoint - QPointF(3, 3), QSizeF(6, 6)));
+                            p->restore();
                         }
                     }
         }
@@ -214,10 +263,10 @@ void CanvasItem::begin(QPointF position, double pressure) {
     }
     try {
         auto point = localPoint(position, pressure);
-        if (editor_->tool() == "Marquee" || editor_->tool() == "Select") {
+        if (editor_->tool() == "Marquee" || editor_->tool() == "Select" || editor_->tool() == "Animate") {
             if (hasRegion()) {
                 for (int handle = 8; handle >= 0; --handle)
-                    if (QLineF(position, handlePosition(handle)).length() <= 10) {
+                    if (handleVisible(handle) && QLineF(position, handlePosition(handle)).length() <= 10) {
                         samples_ = {point};
                         drawing_ = true;
                         startTransform(handle);
@@ -233,10 +282,12 @@ void CanvasItem::begin(QPointF position, double pressure) {
                     return;
                 }
             }
+            if (editor_->tool() == "Animate")
+                return;
             clearRegion();
             if (editor_->tool() == "Select") {
                 if (auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame()))
-                    selectStroke(hitStroke(*d, point, 8).value_or(0));
+                    selectStroke(hitVectorOnScreen(*d, selectionWorld(), position).value_or(0));
                 if (hasRegion()) {
                     samples_ = {point};
                     drawing_ = true;
@@ -276,9 +327,17 @@ void CanvasItem::begin(QPointF position, double pressure) {
         selectionDelta_ = {};
         last_ = position;
         if (editor_->tool() == "Select" || editor_->tool() == "Recolor" || editor_->tool() == "Edit points") {
+            const auto previousStroke = selectedStroke_;
             selectedStroke_ = 0;
-            if (auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame()))
-                selectedStroke_ = hitStroke(*d, point, 8).value_or(0);
+            if (auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame())) {
+                selectedStroke_ = hitVectorOnScreen(*d, selectionWorld(), position).value_or(0);
+                if (editor_->tool() == "Edit points")
+                    for (const auto& stroke : d->strokes)
+                        if (stroke.id == previousStroke)
+                            for (auto p : stroke.points)
+                                if (QLineF(position, selectionWorld().map(QPointF(p.x, p.y))).length() <= 10)
+                                    selectedStroke_ = previousStroke;
+            }
             if (editor_->tool() == "Recolor" && selectedStroke_) {
                 drawing_ = false;
                 editor_->recolorStroke(selectedStroke_);
@@ -290,9 +349,12 @@ void CanvasItem::begin(QPointF position, double pressure) {
             if (const auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame()))
                 for (const auto& s : d->strokes)
                     if (s.id == selectedStroke_) {
-                        double closest = 24;
+                        pointDrawingPreview_ = *d;
+                        double closest = 10;
                         for (std::size_t i = 0; i < s.points.size(); ++i) {
-                            double distance = std::hypot(point.x - s.points[i].x, point.y - s.points[i].y);
+                            double distance =
+                                QLineF(position, selectionWorld().map(QPointF(s.points[i].x, s.points[i].y)))
+                                    .length();
                             if (distance < closest) {
                                 closest = distance;
                                 selectedPoint_ = int(i);
@@ -376,9 +438,12 @@ void CanvasItem::move(QPointF position, double pressure) {
                 samples_.push_back(point);
             else
                 samples_.back() = point;
-        } else if (editor_->tool() == "Edit points")
+        } else if (editor_->tool() == "Edit points") {
             pointPreview_ = point;
-        else if (editor_->tool() == "Select")
+            for (auto& stroke : pointDrawingPreview_.strokes)
+                if (stroke.id == selectedStroke_ && selectedPoint_ >= 0)
+                    stroke.points[selectedPoint_] = point;
+        } else if (editor_->tool() == "Select")
             selectionDelta_ = {point.x - samples_.front().x, point.y - samples_.front().y};
         else if (editor_->tool() == "Ellipse" || editor_->tool() == "Rectangle") {
             if (samples_.size() == 1)
@@ -431,19 +496,25 @@ void CanvasItem::end() {
         rasterBrush_.reset();
         editor_->commitRaster(std::move(raster));
     } else if (editor_->tool() == "Edit points") {
-        if (selectedStroke_ && selectedPoint_ >= 0)
+        if (selectedStroke_ && selectedPoint_ >= 0) {
+            QScopedValueRollback<bool> guard(committing_, true);
             editor_->movePoint(selectedStroke_, selectedPoint_, pointPreview_);
+        }
     } else if (editor_->tool() == "Eraser")
         editor_->eraseGesture(std::move(points));
     else if (editor_->tool() == "Select") {
         if (selectedStroke_)
             editor_->translateStroke(selectedStroke_, selectionDelta_.x(), selectionDelta_.y());
-    } else if (editor_->tool() != "Recolor" && editor_->tool() != "Edit points")
+    } else if (editor_->tool() != "Recolor" && editor_->tool() != "Edit points" &&
+               editor_->tool() != "Animate")
         editor_->commitStroke(std::move(points));
     selectionDelta_ = {};
     update();
 }
 void CanvasItem::cancelGesture() {
+    posePreview_.reset();
+    pointDrawingPreview_ = {};
+    selectedPoint_ = -1;
     transforming_ = false;
     previewValid_ = false;
     pendingTransform_ = {};
@@ -456,6 +527,7 @@ void CanvasItem::cancelGesture() {
     panning_ = false;
     samples_.clear();
     selectionDelta_ = {};
+    updateCursor(hoverPosition_);
     update();
 }
 void CanvasItem::mousePressEvent(QMouseEvent* e) {
@@ -472,17 +544,20 @@ void CanvasItem::mousePressEvent(QMouseEvent* e) {
         tiltX_ = tiltY_ = 0;
         begin(e->position(), 1);
     }
+    updateCursor(e->position());
     e->accept();
 }
 void CanvasItem::mouseMoveEvent(QMouseEvent* e) {
     shift_ = e->modifiers() & Qt::ShiftModifier;
     if (!tablet_)
         move(e->position(), 1);
+    updateCursor(e->position());
     e->accept();
 }
 void CanvasItem::mouseReleaseEvent(QMouseEvent* e) {
     if (!tablet_)
         end();
+    updateCursor(e->position());
     e->accept();
 }
 void CanvasItem::mouseUngrabEvent() {
@@ -618,8 +693,8 @@ void CanvasItem::transformRegion(int action, int dx, int dy) {
 QTransform CanvasItem::selectionWorld() const {
     if (!editor_ || !editor_->selectedLayer())
         return viewTransform();
-    return SceneRenderer::worldTransform(
-               editor_->document(), editor_->document().layer(editor_->selectedLayer()), editor_->frame()) *
+    const auto& doc = posePreview_ ? *posePreview_ : editor_->document();
+    return SceneRenderer::worldTransform(doc, doc.layer(editor_->selectedLayer()), editor_->frame()) *
            viewTransform();
 }
 QPointF CanvasItem::handlePosition(int handle) const {
@@ -628,7 +703,8 @@ QPointF CanvasItem::handlePosition(int handle) const {
                               r.topRight(),    QPointF(r.right(), r.center().y()),
                               r.bottomRight(), QPointF(r.center().x(), r.bottom()),
                               r.bottomLeft(),  QPointF(r.left(), r.center().y())};
-    auto world = pendingTransform_ * selectionWorld();
+    auto world =
+        (editor_ && editor_->tool() == "Animate" ? QTransform{} : pendingTransform_) * selectionWorld();
     if (handle == 8) {
         auto top = world.map(points[1]), center = world.map(r.center());
         auto delta = top - center;
@@ -667,6 +743,8 @@ void CanvasItem::startTransform(int handle) {
     if (!editor_ || !hasRegion())
         return;
     if (auto* drawing = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame())) {
+        sourcePose_ =
+            evaluateTransform(editor_->document().layer(editor_->selectedLayer()), editor_->frame());
         transformSource_ = *drawing;
         transformPreview_ = *drawing;
         transformHandle_ = handle;
@@ -676,6 +754,10 @@ void CanvasItem::startTransform(int handle) {
     }
 }
 void CanvasItem::previewTransform(QTransform matrix) {
+    if (editor_->tool() == "Animate") {
+        previewPose(matrix);
+        return;
+    }
     pendingTransform_ = matrix;
     try {
         transformPreview_ = transformSource_;
@@ -692,6 +774,17 @@ void CanvasItem::previewTransform(QTransform matrix) {
     update();
 }
 void CanvasItem::commitTransform() {
+    if (editor_->tool() == "Animate") {
+        bool commit = posePreview_ && previewValid_ && previewPose_ != sourcePose_;
+        auto pose = previewPose_;
+        cancelGesture();
+        if (commit) {
+            QScopedValueRollback<bool> guard(committing_, true);
+            editor_->commitPose(pose);
+        }
+        selectAnimationBounds();
+        return;
+    }
     auto matrix = pendingTransform_;
     auto original = region_;
     auto id = selectedStroke_;
@@ -719,7 +812,7 @@ void CanvasItem::commitTransform() {
 }
 QVariantMap CanvasItem::objectProperties() const {
     QVariantMap result{{"kind", "none"}};
-    if (!hasRegion() || !editor_)
+    if (!hasRegion() || !editor_ || editor_->tool() == "Animate")
         return result;
     auto bounds = pendingTransform_.mapRect(QRectF(region_.x, region_.y, region_.width, region_.height));
     result = {{"kind", selectedStroke_                             ? "vector"
@@ -776,4 +869,13 @@ void CanvasItem::setObjectProperty(QString name, double value) {
     startTransform(-1);
     previewTransform(matrix);
     commitTransform();
+}
+
+bool CanvasItem::handleVisible(int handle) const {
+    // Opposing middle handles must not cover the move target of a thin line.
+    if (handle == 1 || handle == 5)
+        return QLineF(handlePosition(1), handlePosition(5)).length() >= 24;
+    if (handle == 3 || handle == 7)
+        return QLineF(handlePosition(3), handlePosition(7)).length() >= 24;
+    return true;
 }
