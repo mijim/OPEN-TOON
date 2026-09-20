@@ -58,6 +58,7 @@ class EditorController final : public QObject {
     explicit EditorController(QObject* parent = nullptr);
     ~EditorController() override;
     const opentoon::Document& document() const { return session_.document(); }
+    std::uint64_t sceneGeneration() const { return sceneGeneration_; }
     bool animateMode() const { return animateMode_; }
     bool autoKey() const { return autoKey_; }
     void setAnimateMode(bool);
@@ -173,6 +174,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE void setScene(QString, int, int, int, int, int);
     Q_INVOKABLE void setTransform(QString, double);
     bool commitPose(const opentoon::Transform&);
+    bool setPoseKeyPosition(int frame, double x, double y);
     Q_INVOKABLE bool movePoseKey(int source, int destination);
     Q_INVOKABLE bool setPoseCurveHandles(int frame, double x1, double y1, double x2, double y2);
     Q_INVOKABLE bool setCurveHandles(int frame, QString channel, double x1, double y1, double x2, double y2);

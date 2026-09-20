@@ -12,6 +12,7 @@ class CanvasItem : public QQuickPaintedItem {
     Q_PROPERTY(int selectionMedia READ selectionMedia WRITE setSelectionMedia NOTIFY regionChanged)
     Q_PROPERTY(QString regionInfo READ regionInfo NOTIFY regionChanged)
     Q_PROPERTY(EditorController* editor READ editor WRITE setEditor NOTIFY editorChanged)
+    Q_PROPERTY(bool motionPathEditing READ motionPathEditing WRITE setMotionPathEditing NOTIFY viewChanged)
     Q_PROPERTY(double zoom READ zoom WRITE setZoom NOTIFY viewChanged)
     Q_PROPERTY(bool mirrored READ mirrored WRITE setMirrored NOTIFY viewChanged)
     Q_PROPERTY(double rotationAngle READ rotationAngle WRITE setRotationAngle NOTIFY viewChanged)
@@ -28,6 +29,9 @@ class CanvasItem : public QQuickPaintedItem {
     explicit CanvasItem(QQuickItem* parent = nullptr);
     EditorController* editor() const { return editor_; }
     void setEditor(EditorController*);
+    bool motionPathEditing() const { return motionPathEditing_; }
+    void setMotionPathEditing(bool);
+    Q_INVOKABLE QPointF motionPathPosition(int frame) const;
     double zoom() const { return zoom_; }
     void setZoom(double);
     bool mirrored() const { return mirrored_; }
@@ -59,6 +63,24 @@ class CanvasItem : public QQuickPaintedItem {
     bool eventFilter(QObject*, QEvent*) override;
 
   private:
+    struct MotionSample {
+        opentoon::Frame frame;
+        QPointF position;
+    };
+    bool motionPathEditing_ = false, motionReferenceValid_ = false;
+    int motionKey_ = -1;
+    QPointF motionReference_, motionPress_;
+    opentoon::Id motionReferenceLayer_ = 0;
+    std::uint64_t motionReferenceScene_ = 0;
+    QTransform motionParentInverse_;
+    void resetMotionReference();
+    std::vector<MotionSample> motionSamples(const opentoon::Document&, QPointF reference) const;
+    int motionPathKeyAt(QPointF) const;
+    int motionPathFrameAt(QPointF) const;
+    void beginMotionPath(QPointF);
+    void previewMotionPath(QPointF);
+    void commitMotionPath();
+    void paintMotionPath(QPainter*, const opentoon::Document&, const QTransform& itemTransform);
     QPointF hoverPosition_;
     void updateCursor(QPointF);
     opentoon::Id hitVector(QPointF) const;

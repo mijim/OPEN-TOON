@@ -135,8 +135,9 @@ are experimental and do not yet provide analytic curve-preserving transforms.
    Double-click the graph to add a key; use a middle key to make a bounce when the
    start and end have the same value. Numeric controls remain available for precision.
 
-The dashed canvas trajectory follows the current drawing's center. Spatial control
-points and a separate velocity curve are not implemented. Transform interpolation
+The dashed canvas trajectory follows a drawing reference point. **Path** enables
+direct key-position editing; independent spatial Bezier handles and a separate
+velocity curve remain pending. Transform interpolation
 moves the layer; it does not morph one vector drawing into another. Morphing remains P14.
 
 ## Picking and cursor feedback
@@ -233,3 +234,32 @@ Text fields keep their usual editing behavior. Changing layers clears key select
 Undo restores document data and drops selected frames that no longer contain keys.
 The in-memory motion clipboard can be reused after opening a different scene. These
 operations use full-pose keys; independent channel timing remains pending.
+
+## Edit motion positions on the canvas
+
+Choose **Animate (A)**, expose a drawing and create pose keys. Enable **Path** in the
+canvas toolbar to edit the evaluated trajectory directly. The transform box is hidden
+in this mode so its handles do not compete with path markers.
+
+- Click a round marker to go to that key's frame; the active marker shows its frame number.
+- Drag a marker to move that pose's X/Y. Picking works within eleven screen pixels.
+  Shift constrains movement to the dominant screen direction. Escape cancels; release
+  creates one undo step. Rotation, scale, pivot, opacity, timing and easing are retained.
+- Click near the path to scrub to a sampled frame. Double-click near it to add the
+  evaluated pose at that integer frame. Existing keys are preserved. A new key starts
+  with linear outgoing interpolation and can change the interpolation on either side.
+- Turn **Path** off to return to the usual pose move/scale/rotation box.
+
+The path tracks a fixed local reference: the drawing's bounds center when entering
+Path. It includes animated parent transforms. The reference stays fixed when changing
+frames; selecting another layer or re-entering Path captures a new center. Use key
+navigation in Timeline/Curves when multiple markers overlap at the same position.
+
+The gesture follows the cursor even through mirrored/rotated views and negative or
+nonuniform parent scales. A zero-scale parent rejects movement; a zero-scale child
+can still be repositioned. Changing the view, resizing, changing frames or changing
+the document cancels an active preview. Locked layers cannot be edited.
+
+This edits pose positions, not an independent spatial spline. Curves still controls
+X/Y easing; separate path geometry and velocity, spatial Bezier handles and multi-key
+path movement remain pending. Dense trajectories are sampled at integer frames.

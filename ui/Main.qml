@@ -527,9 +527,18 @@ ApplicationWindow {
                     text: "Drag points · Double-click a segment to add · Delete removes the selected point"
                     color: "#bbbbbb"
                 }
+                C.ToolButton {
+                    objectName: "motionPathModeButton"
+                    text: "Path"
+                    visible: editor.tool === "Animate"
+                    active: canvas.motionPathEditing
+                    enabled: canvas.motionPathEditing || (canvas.hasRegion && editor.animationKeys.length > 0)
+                    hint: "Drag pose keys on the canvas path. Shift constrains direction. Double-click to add a sampled pose; inserting a pose can change the timing curves between keys."
+                    onClicked: canvas.motionPathEditing = !canvas.motionPathEditing
+                }
                 Label {
                     visible: editor.tool === "Animate"
-                    text: canvas.hasRegion ? "Animate layer · Drag to pose · Handles scale / rotate · Each gesture records a key" : "Animate layer · No artwork at this frame — extend the drawing exposure in the timeline"
+                    text: canvas.motionPathEditing ? "Path · Drag keys · Double-click to add · Shift constrains · Escape cancels" : canvas.hasRegion ? "Animate layer · Drag to pose · Handles scale / rotate · Each gesture records a key" : "Animate layer · No artwork at this frame — extend the drawing exposure in the timeline"
                     color: "#bbbbbb"
                 }
                 C.CompactComboBox {

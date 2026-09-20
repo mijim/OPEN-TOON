@@ -19,6 +19,12 @@ CanvasItem::CanvasItem(QQuickItem* parent) : QQuickPaintedItem(parent) {
     setAntialiasing(true);
     setFlag(ItemIsFocusScope);
     setActiveFocusOnTab(true);
+    auto cancelPathOnResize = [this] {
+        if (motionKey_ >= 0)
+            cancelGesture();
+    };
+    connect(this, &QQuickItem::widthChanged, this, cancelPathOnResize);
+    connect(this, &QQuickItem::heightChanged, this, cancelPathOnResize);
     connect(this, &QQuickItem::windowChanged, this, [this](QQuickWindow* window) {
         if (filteredWindow_)
             filteredWindow_->removeEventFilter(this);
@@ -56,6 +62,8 @@ void CanvasItem::setEditor(EditorController* editor) {
         connect(editor, &EditorController::toolChanged, this, [this] {
             if (committing_)
                 return;
+            if (editor_->tool() != "Animate")
+                setMotionPathEditing(false);
             cancelGesture();
             clearRegion();
             selectedStroke_ = 0;
@@ -71,6 +79,8 @@ void CanvasItem::setEditor(EditorController* editor) {
             clearRegion();
             selectedStroke_ = 0;
             selectAnimationBounds();
+            if (motionPathEditing_)
+                resetMotionReference();
             updateCursor(hoverPosition_);
             update();
         });
@@ -79,24 +89,32 @@ void CanvasItem::setEditor(EditorController* editor) {
     update();
 }
 void CanvasItem::setZoom(double value) {
+    if (motionKey_ >= 0)
+        cancelGesture();
     zoom_ = std::clamp(value, 0.1, 10.0);
     emit viewChanged();
     updateCursor(hoverPosition_);
     update();
 }
 void CanvasItem::setMirrored(bool value) {
+    if (motionKey_ >= 0)
+        cancelGesture();
     mirrored_ = value;
     emit viewChanged();
     updateCursor(hoverPosition_);
     update();
 }
 void CanvasItem::setRotationAngle(double value) {
+    if (motionKey_ >= 0)
+        cancelGesture();
     angle_ = value;
     emit viewChanged();
     updateCursor(hoverPosition_);
     update();
 }
 void CanvasItem::fit() {
+    if (motionKey_ >= 0)
+        cancelGesture();
     zoom_ = 1;
     angle_ = 0;
     pan_ = {};
@@ -188,29 +206,9 @@ void CanvasItem::paint(QPainter* p) {
             p->setBrush(QColor(255, 255, 255, 15));
             p->drawRect(rect);
         }
-        if (editor_->tool() == "Animate" && hasRegion()) {
-            p->save();
-            p->setWorldTransform(itemTransform);
-            const auto& layer = displayDocument.layer(editor_->selectedLayer());
-            const QPointF center(region_.x + region_.width / 2.0, region_.y + region_.height / 2.0);
-            auto position = [&](Frame f) {
-                return (SceneRenderer::worldTransform(displayDocument, layer, f) * view).map(center);
-            };
-            if (!layer.keys.empty()) {
-                QPolygonF path;
-                const auto start = layer.keys.front().frame, end = layer.keys.back().frame;
-                for (Frame f = start; f < end; f += std::max(1, (end - start) / 240))
-                    path << position(f);
-                path << position(end);
-                p->setPen(QPen(QColor("#999999"), 1, Qt::DashLine));
-                p->drawPolyline(path);
-                p->setBrush(QColor("#111111"));
-                for (const auto& key : layer.keys)
-                    p->drawEllipse(position(key.frame), 3, 3);
-            }
-            p->restore();
-        }
-        if (hasRegion() &&
+        if (editor_->tool() == "Animate" && (hasRegion() || (motionPathEditing_ && motionReferenceValid_)))
+            paintMotionPath(p, displayDocument, itemTransform);
+        if (hasRegion() && !motionPathEditing_ &&
             (editor_->tool() == "Select" || editor_->tool() == "Marquee" || editor_->tool() == "Animate")) {
             p->save();
             p->setWorldTransform(itemTransform);
@@ -265,6 +263,10 @@ void CanvasItem::begin(QPointF position, double pressure) {
         return;
     }
     try {
+        if (editor_->tool() == "Animate" && motionPathEditing_) {
+            beginMotionPath(position);
+            return;
+        }
         auto point = localPoint(position, pressure);
         if (editor_->tool() == "Marquee" || editor_->tool() == "Select" || editor_->tool() == "Animate") {
             if (hasRegion()) {
@@ -381,6 +383,10 @@ void CanvasItem::move(QPointF position, double pressure) {
     if (!drawing_ || !editor_)
         return;
     try {
+        if (motionKey_ >= 0) {
+            previewMotionPath(position);
+            return;
+        }
         auto point = localPoint(position, pressure);
         if (transforming_) {
             QTransform matrix;
@@ -472,6 +478,10 @@ void CanvasItem::end() {
     if (!drawing_ || !editor_)
         return;
     drawing_ = false;
+    if (motionKey_ >= 0) {
+        commitMotionPath();
+        return;
+    }
     auto points = std::move(samples_);
     samples_.clear();
     if (transforming_) {
@@ -516,6 +526,7 @@ void CanvasItem::end() {
     update();
 }
 void CanvasItem::cancelGesture() {
+    motionKey_ = -1;
     posePreview_.reset();
     pointDrawingPreview_ = {};
     selectedPoint_ = -1;
@@ -541,6 +552,8 @@ void CanvasItem::mousePressEvent(QMouseEvent* e) {
         return;
     }
     if (e->button() == Qt::MiddleButton) {
+        if (motionKey_ >= 0)
+            cancelGesture();
         panning_ = true;
         last_ = e->position();
         panStart_ = pan_;
@@ -570,6 +583,8 @@ void CanvasItem::mouseUngrabEvent() {
         cancelGesture();
 }
 void CanvasItem::wheelEvent(QWheelEvent* e) {
+    if (motionKey_ >= 0)
+        cancelGesture();
     if (e->modifiers() & Qt::ControlModifier)
         setZoom(zoom_ * std::pow(1.0015, e->angleDelta().y()));
     else {
@@ -898,6 +913,20 @@ bool CanvasItem::handleVisible(int handle) const {
 }
 
 void CanvasItem::mouseDoubleClickEvent(QMouseEvent* e) {
+    if (editor_ && editor_->tool() == "Animate" && motionPathEditing_ && !editor_->playing() &&
+        editor_->selectedLayer()) {
+        cancelGesture();
+        const int frame = motionPathFrameAt(e->position());
+        if (frame >= 0) {
+            editor_->setFrame(frame);
+            editor_->addKey();
+            editor_->clearPoseSelection();
+            editor_->selectPoseKey(frame);
+        } else
+            editor_->report("Double-click near the motion path to add a pose at a sampled frame.");
+        e->accept();
+        return;
+    }
     if (!editor_ || editor_->tool() != "Edit points" || editor_->playing() || !editor_->selectedLayer()) {
         QQuickPaintedItem::mouseDoubleClickEvent(e);
         return;

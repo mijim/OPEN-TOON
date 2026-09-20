@@ -4,6 +4,7 @@
 #include "serialization.h"
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <limits>
 using namespace opentoon;
 TEST_CASE("Setup never creates keys and animate requires explicit autokey") {
     Session session;
@@ -275,4 +276,53 @@ TEST_CASE("Duplicate and delete selected pose keys preserve originals and reject
     REQUIRE_THROWS(retimeKeyBlock(layer, {0}, 12, 12));
     REQUIRE_THROWS(pasteKeyBlock(layer, copyKeyBlock(layer, {0, 4}), 12));
     REQUIRE(layer == before);
+}
+
+TEST_CASE("Motion-path position edits preserve every non-position field and reject invalid commands") {
+    Session session;
+    const auto id = session.document().layers.front().id;
+    session.apply("Path fixture", [&](Document& d) {
+        auto& layer = d.layer(id);
+        Transform pose;
+        pose.x = 80;
+        pose.y = 40;
+        pose.rotation = 37;
+        pose.scaleX = -2;
+        pose.scaleY = .6;
+        pose.opacity = .4;
+        pose.pivotX = 20;
+        pose.pivotY = 30;
+        recordPose(layer, 12, pose);
+        recordPose(layer, 24, pose);
+        setKeyEase(layer, 12, "x", {.2, 0, .8, 1.4});
+        setKeyEase(layer, 12, "rotation", {.3, 0, .7, 1});
+    });
+    const auto before = session.document();
+    session.apply("Move point", [&](Document& d) { setKeyPosition(d.layer(id), 12, 125, -15); });
+    auto expected = before.layer(id).keys[1];
+    expected.value.x = 125;
+    expected.value.y = -15;
+    REQUIRE(session.document().layer(id).keys[1] == expected);
+    REQUIRE(session.document().layer(id).keys.front() == before.layer(id).keys.front());
+    REQUIRE(session.document().layer(id).keys.back() == before.layer(id).keys.back());
+    REQUIRE(session.document().drawings == before.drawings);
+    REQUIRE(session.document().layer(id).exposures == before.layer(id).exposures);
+    auto layer = session.document().layer(id);
+    const auto unchanged = layer;
+    REQUIRE_THROWS(setKeyPosition(layer, 12, 200, std::numeric_limits<double>::quiet_NaN()));
+    REQUIRE(layer == unchanged);
+    REQUIRE_THROWS(setKeyPosition(layer, 12, 10000001, 0));
+    REQUIRE(layer == unchanged);
+    REQUIRE_THROWS(setKeyPosition(layer, 10, 0, 0));
+    REQUIRE(layer == unchanged);
+    layer.locked = true;
+    auto locked = layer;
+    REQUIRE_THROWS(setKeyPosition(layer, 12, 0, 0));
+    REQUIRE(layer == locked);
+    auto reopened = deserializeDocument(serializeDocument(session.document()));
+    for (int f = 0; f < 48; ++f)
+        REQUIRE(evaluateTransform(reopened.layer(id), f) ==
+                evaluateTransform(session.document().layer(id), f));
+    session.undo();
+    REQUIRE(session.document() == before);
 }

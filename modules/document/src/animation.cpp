@@ -131,6 +131,17 @@ void movePoseKey(Layer& layer, Frame source, Frame destination) {
         throw std::runtime_error("The selected pose key no longer exists.");
     editKey(layer, source, destination, "x", key->value.x, key->interpolation);
 }
+void setKeyPosition(Layer& layer, Frame frame, double x, double y) {
+    editable(layer);
+    if (!std::isfinite(x) || !std::isfinite(y) || std::abs(x) > 10000000 || std::abs(y) > 10000000)
+        throw std::invalid_argument("Key positions must be finite and within the supported scene range.");
+    auto key = std::find_if(layer.keys.begin(), layer.keys.end(),
+                            [=](const auto& item) { return item.frame == frame; });
+    if (key == layer.keys.end())
+        throw std::runtime_error("Select an existing pose key to move its position.");
+    key->value.x = x;
+    key->value.y = y;
+}
 void setPoseEase(Layer& layer, Frame frame, const BezierEase& ease) {
     // Validate all inputs before changing any of the channels.
     validateEase("x", ease);

@@ -164,3 +164,9 @@ bool EditorController::setPoseCurveHandles(int frame, double x1, double y1, doub
     return edit("Ease complete pose",
                 [&](Document& d) { setPoseEase(d.layer(layer_), frame, {x1, y1, x2, y2}); });
 }
+
+bool EditorController::setPoseKeyPosition(int frame, double x, double y) {
+    if (!layer_)
+        return false;
+    return edit("Move motion-path key", [&](Document& d) { setKeyPosition(d.layer(layer_), frame, x, y); });
+}

@@ -1,5 +1,17 @@
 # Experimental releases
 
+## 0.2.0-experimental.8 — canvas motion positions
+
+- Animate → Path: click/drag pose markers on the canvas; double-click the trajectory to add a sampled pose.
+- Fixed local drawing reference; parent-aware movement through rotated, negative and nonuniform transforms.
+- Screen-space picking, frame label, Shift direction constraint and transactional preview/undo.
+- Changes only X/Y; retains timing, other transform channels, easing, artwork and parent animation.
+- View changes cancel active path drags; singular parents and locked layers reject edits.
+- macOS: 55 CTest entries; native trajectory, hierarchy, reference-stability and persistence checks passed. Source only; format 3 unchanged.
+
+This is a partial ANI-008/P06 implementation. Spatial spline tangents and separate
+velocity remain pending. Adding a pose can change interpolation between keys. See ADR-019.
+
 ## 0.2.0-experimental.7 — direct pose-key blocks
 
 - Shared selection across Curves, Timeline and Xsheet, with span/toggle/box gestures.

@@ -277,3 +277,32 @@ TEST_CASE("Pose-key selection edits only animation and reconciles after history 
     REQUIRE(editor.selectedPoseFrames().empty());
     REQUIRE(editor.hasPoseClipboard());
 }
+
+TEST_CASE("Motion-path position commands preserve easing and pixels through undo and persistence") {
+    EditorController editor;
+    editor.loadDemo();
+    const auto id = editor.selectedLayer();
+    editor.addCurveKey(12, "x", 50);
+    editor.addCurveKey(24, "x", 100);
+    editor.setCurveHandles(12, "x", .2, 0, .8, 1.4);
+    const auto before = editor.document();
+    REQUIRE(editor.setPoseKeyPosition(12, 140, 30));
+    REQUIRE(editor.document().drawings == before.drawings);
+    auto key = std::find_if(editor.document().layer(id).keys.begin(), editor.document().layer(id).keys.end(),
+                            [](const auto& key) { return key.frame == 12; });
+    REQUIRE(key->easing.at("x").y2 == 1.4);
+    QTemporaryDir tmp;
+    auto file = QUrl::fromLocalFile(tmp.path() + "/path.otoon");
+    auto pixels = opentoon::SceneRenderer::render(editor.document(), 18);
+    REQUIRE(editor.saveProject(file));
+    editor.undo();
+    REQUIRE(editor.document() == before);
+    REQUIRE(editor.openProject(file));
+    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 18) == pixels);
+    editor.toggleLayer(id, "locked");
+    const auto locked = editor.document();
+    REQUIRE_FALSE(editor.setPoseKeyPosition(12, 0, 0));
+    REQUIRE(editor.document() == locked);
+    REQUIRE_FALSE(editor.setPoseKeyPosition(999, 0, 0));
+    REQUIRE(editor.document() == locked);
+}

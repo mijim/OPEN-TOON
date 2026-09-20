@@ -8,6 +8,7 @@ void setTransformValue(Transform&, std::string_view channel, double value);
 // A visual pose gesture records one full pose; the first later-frame edit anchors frame zero.
 void recordPose(Layer&, Frame, const Transform&);
 void movePoseKey(Layer&, Frame source, Frame destination);
+void setKeyPosition(Layer&, Frame, double x, double y);
 void setPoseEase(Layer&, Frame, const BezierEase&);
 void setKeyEase(Layer&, Frame, std::string_view channel, const BezierEase&);
 void validateEase(std::string_view channel, const BezierEase&);

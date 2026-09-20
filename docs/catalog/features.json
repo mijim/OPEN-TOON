@@ -2283,7 +2283,7 @@
         "Changing speed preserves the path geometry."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "animation-curves",
@@ -2292,7 +2292,8 @@
         "LYR"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/status.json; docs/architecture/adr/019-canvas-motion-path-editing.md; canvas pose-position edits on an evaluated trajectory only; independent spatial geometry and velocity remain unimplemented"
     },
     {
       "id": "ANI-009",

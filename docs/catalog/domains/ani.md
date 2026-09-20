@@ -94,7 +94,7 @@ Separate the path shape from temporal progress along it.
 
 **Initial acceptance:** Changing speed preserves the path geometry.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 

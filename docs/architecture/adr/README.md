@@ -57,3 +57,5 @@ See [ADR-016](016-visual-animation-and-bezier.md) for visual pose gestures, chan
 See [ADR-017](017-combined-motion-and-point-editing.md) for the default combined motion overview, complete-pose edits, sampled point insertion/deletion and Clear semantics.
 
 See [ADR-018](018-pose-key-block-editing.md) for shared pose-key selection, block timing and local-unit motion transfer.
+
+See [ADR-019](019-canvas-motion-path-editing.md) for canvas trajectory key editing, parent-space mapping and its interpolation limits.

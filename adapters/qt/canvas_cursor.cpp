@@ -92,6 +92,15 @@ void CanvasItem::updateCursor(QPointF point) {
         return;
     }
     const auto tool = editor_->tool();
+    if (tool == "Animate" && motionPathEditing_) {
+        if (motionKey_ >= 0)
+            setCursor(Qt::ClosedHandCursor);
+        else if (motionPathKeyAt(point) >= 0)
+            setCursor(Qt::OpenHandCursor);
+        else
+            setCursor(motionPathFrameAt(point) >= 0 ? Qt::PointingHandCursor : Qt::CrossCursor);
+        return;
+    }
     if (tool == "Select" || tool == "Marquee" || tool == "Animate") {
         if (hasRegion()) {
             for (int h = 8; h >= 0; --h) {
