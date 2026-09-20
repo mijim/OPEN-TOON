@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mijim/OPEN-TOON/blob/main/docs/catalog/features.schema.json",
+  "title": "OPEN-TOON functional catalog",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "as_of",
+    "baseline",
+    "features"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date"
+    },
+    "baseline": {
+      "type": "string"
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/feature"
+      }
+    }
+  },
+  "$defs": {
+    "feature": {
+      "type": "object",
+      "required": [
+        "id",
+        "domain",
+        "title",
+        "requirement",
+        "acceptance_criteria",
+        "source_ids",
+        "reference_url",
+        "reference_product",
+        "evidence",
+        "implementation_status",
+        "scope",
+        "capability_level",
+        "owner_module",
+        "depends_on_domains",
+        "specification_status",
+        "notes"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requirement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reference_product": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner_module": {
+          "type": "string",
+          "minLength": 1
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z]{2,3}-[0-9]{3}$"
+        },
+        "domain": {
+          "type": "string",
+          "pattern": "^[A-Z]{2,3}$"
+        },
+        "reference_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "acceptance_criteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "depends_on_domains": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z]{2,3}$"
+          }
+        },
+        "evidence": {
+          "enum": [
+            "documentation_linked",
+            "hands_on_verified",
+            "proposal"
+          ]
+        },
+        "implementation_status": {
+          "enum": [
+            "not_started",
+            "in_progress",
+            "partial",
+            "implemented",
+            "verified"
+          ]
+        },
+        "scope": {
+          "enum": [
+            "base",
+            "studio_extension",
+            "optional_extension",
+            "legacy_candidate"
+          ]
+        },
+        "capability_level": {
+          "enum": [
+            "core",
+            "pro",
+            "advanced",
+            "optional",
+            "legacy"
+          ]
+        },
+        "specification_status": {
+          "enum": [
+            "analysis_draft",
+            "ready_for_implementation",
+            "implemented_spec"
+          ]
+        }
+      }
+    }
+  }
+}

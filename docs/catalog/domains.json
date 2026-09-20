@@ -1,0 +1,457 @@
+{
+  "schema_version": 1,
+  "domains": [
+    {
+      "id": "PRJ",
+      "title": "Proyectos, escenas y persistencia",
+      "owner_module": "project",
+      "depends_on": [],
+      "entities": [
+        "Project",
+        "Scene",
+        "SceneSettings",
+        "AssetRef",
+        "Revision"
+      ],
+      "workflow": "Crear escena → configurar → guardar → recuperar → empaquetar.",
+      "risk": "Pérdida de datos y referencias rotas."
+    },
+    {
+      "id": "UI",
+      "title": "Espacio de trabajo, navegación y preferencias",
+      "owner_module": "workspace",
+      "depends_on": [
+        "PRJ"
+      ],
+      "entities": [
+        "Workspace",
+        "PanelLayout",
+        "ShortcutMap",
+        "ToolPreset"
+      ],
+      "workflow": "Elegir espacio → dibujar o animar → personalizar paneles y atajos.",
+      "risk": "Densidad profesional frente a legibilidad; estados de herramienta ambiguos."
+    },
+    {
+      "id": "LYR",
+      "title": "Capas, dibujos y subcapas artísticas",
+      "owner_module": "document",
+      "depends_on": [
+        "PRJ"
+      ],
+      "entities": [
+        "Layer",
+        "Drawing",
+        "DrawingId",
+        "ArtLayer",
+        "ExposureTrack"
+      ],
+      "workflow": "Crear capa → crear dibujo → exponerlo → reutilizar o duplicar.",
+      "risk": "Confundir exposición, dibujo compartido y copia independiente."
+    },
+    {
+      "id": "VEC",
+      "title": "Dibujo vectorial y edición geométrica",
+      "owner_module": "drawing-vector",
+      "depends_on": [
+        "LYR",
+        "UI"
+      ],
+      "entities": [
+        "VectorStroke",
+        "BezierPath",
+        "WidthProfile",
+        "FillRegion",
+        "Selection"
+      ],
+      "workflow": "Boceto → selección → limpieza → edición del contorno → dibujo final.",
+      "risk": "Topología, precisión y calidad del trazo son trabajo de motor."
+    },
+    {
+      "id": "RAS",
+      "title": "Dibujo bitmap, texturas y pinceles",
+      "owner_module": "drawing-raster",
+      "depends_on": [
+        "LYR",
+        "UI"
+      ],
+      "entities": [
+        "RasterTile",
+        "BrushPreset",
+        "TextureAsset",
+        "RasterSelection"
+      ],
+      "workflow": "Dibujar bitmap → editar → gestionar resolución → intercambiar pinceles.",
+      "risk": "Consumo de memoria y coherencia entre textura y transformación."
+    },
+    {
+      "id": "COL",
+      "title": "Pintura, paletas y gestión de color",
+      "owner_module": "colour",
+      "depends_on": [
+        "LYR",
+        "VEC",
+        "RAS"
+      ],
+      "entities": [
+        "Palette",
+        "SwatchId",
+        "Gradient",
+        "TextureFill",
+        "ColourConfig"
+      ],
+      "workflow": "Definir paleta → rellenar → corregir → generar variaciones → comprobar color.",
+      "risk": "Confundir identidad de color con valores RGB y perder consistencia de producción."
+    },
+    {
+      "id": "TIM",
+      "title": "Timeline, Xsheet y exposición",
+      "owner_module": "timeline",
+      "depends_on": [
+        "LYR"
+      ],
+      "entities": [
+        "FrameIndex",
+        "RationalRate",
+        "ExposureSpan",
+        "Marker",
+        "Annotation"
+      ],
+      "workflow": "Exponer → ajustar timing → reproducir → revisar hoja.",
+      "risk": "Un desfase de un frame afecta a sonido, dibujo y render."
+    },
+    {
+      "id": "FBF",
+      "title": "Animación tradicional y paperless",
+      "owner_module": "animation-drawing",
+      "depends_on": [
+        "TIM",
+        "VEC",
+        "COL"
+      ],
+      "entities": [
+        "OnionSettings",
+        "TraceOffset",
+        "DrawingMark",
+        "DrawingDesk"
+      ],
+      "workflow": "Rough → tie-down → cleanup → pintura → revisión.",
+      "risk": "Las ayudas visuales nunca deben convertirse accidentalmente en arte exportado."
+    },
+    {
+      "id": "ANI",
+      "title": "Transformaciones, curvas y animación por claves",
+      "owner_module": "animation-curves",
+      "depends_on": [
+        "TIM",
+        "LYR"
+      ],
+      "entities": [
+        "AnimatableProperty",
+        "Keyframe",
+        "Curve",
+        "Transform",
+        "Expression"
+      ],
+      "workflow": "Colocar claves → interpolar → ajustar curvas → reutilizar movimiento.",
+      "risk": "Orden de matrices, pivotes y evaluación de curvas."
+    },
+    {
+      "id": "RIG",
+      "title": "Rigging, jerarquías e inversa cinemática",
+      "owner_module": "rigging",
+      "depends_on": [
+        "ANI",
+        "VEC"
+      ],
+      "entities": [
+        "Rig",
+        "Joint",
+        "PegHierarchy",
+        "Constraint",
+        "DrawingSubstitution"
+      ],
+      "workflow": "Despiece → pivotes → jerarquía → controles → poses.",
+      "risk": "Ciclos de dependencia y saltos de pose al modificar jerarquías."
+    },
+    {
+      "id": "DEF",
+      "title": "Deformadores y mallas",
+      "owner_module": "deformation",
+      "depends_on": [
+        "RIG"
+      ],
+      "entities": [
+        "DeformationChain",
+        "RestPose",
+        "Influence",
+        "Mesh",
+        "WeightMap"
+      ],
+      "workflow": "Preparar reposo → definir influencias → animar → evaluar → hornear.",
+      "risk": "Calidad de deformación, auto-intersecciones y texturas complejas."
+    },
+    {
+      "id": "CTL",
+      "title": "Controladores avanzados de personajes",
+      "owner_module": "controllers",
+      "depends_on": [
+        "DEF",
+        "ANI"
+      ],
+      "entities": [
+        "Controller",
+        "PoseSample",
+        "ControlBinding",
+        "ControllerWidget"
+      ],
+      "workflow": "Capturar poses → definir controles → interpolar → empaquetar.",
+      "risk": "Una interpolación de poses no inventa dibujos ni resuelve topología incompatible."
+    },
+    {
+      "id": "MOR",
+      "title": "Morphing vectorial",
+      "owner_module": "morphing",
+      "depends_on": [
+        "VEC",
+        "TIM"
+      ],
+      "entities": [
+        "MorphSequence",
+        "CorrespondenceHint",
+        "MorphKey"
+      ],
+      "workflow": "Elegir extremos → establecer correspondencias → interpolar → corregir.",
+      "risk": "Topologías incompatibles, huecos y trazos degenerados."
+    },
+    {
+      "id": "CAM",
+      "title": "Cámara, staging y espacio 2.5D",
+      "owner_module": "camera",
+      "depends_on": [
+        "ANI"
+      ],
+      "entities": [
+        "Camera",
+        "Projection",
+        "StagePlane",
+        "SafeArea"
+      ],
+      "workflow": "Colocar planos → encuadrar → animar cámara → comprobar composición.",
+      "risk": "Proyección y profundidad deben coincidir entre vistas."
+    },
+    {
+      "id": "NOD",
+      "title": "Grafo de composición",
+      "owner_module": "compositor-graph",
+      "depends_on": [
+        "LYR",
+        "ANI"
+      ],
+      "entities": [
+        "Node",
+        "Port",
+        "Edge",
+        "NodeGroup",
+        "AttributeBinding"
+      ],
+      "workflow": "Conectar entradas → agrupar → parametrizar → previsualizar → renderizar.",
+      "risk": "Ciclos, invalidación incorrecta y diferencia entre orden de capas y topología."
+    },
+    {
+      "id": "FX",
+      "title": "Efectos, composición avanzada y sombreado",
+      "owner_module": "effects",
+      "depends_on": [
+        "NOD",
+        "COL"
+      ],
+      "entities": [
+        "EffectDefinition",
+        "AnimatedParameter",
+        "Matte",
+        "SurfaceMap"
+      ],
+      "workflow": "Añadir efecto → delimitar → animar parámetros → comprobar salida.",
+      "risk": "Precisión de color, alfa, bordes de tile y coste acumulado."
+    },
+    {
+      "id": "PAR",
+      "title": "Partículas",
+      "owner_module": "particles",
+      "depends_on": [
+        "NOD",
+        "ANI"
+      ],
+      "entities": [
+        "ParticleSystem",
+        "Emitter",
+        "ParticleState",
+        "Force",
+        "SimulationCache"
+      ],
+      "workflow": "Emitir → aplicar fuerzas → representar → hornear.",
+      "risk": "La simulación debe ser reproducible y permitir scrubbing."
+    },
+    {
+      "id": "AUD",
+      "title": "Sonido y sincronización labial",
+      "owner_module": "audio",
+      "depends_on": [
+        "TIM",
+        "RIG"
+      ],
+      "entities": [
+        "AudioAsset",
+        "AudioClip",
+        "AudioTrack",
+        "PhonemeTrack",
+        "VisemeMap"
+      ],
+      "workflow": "Importar sonido → ajustar → escuchar → detectar y corregir bocas.",
+      "risk": "Deriva audiovisual, cortes de audio y detección imperfecta."
+    },
+    {
+      "id": "IMP",
+      "title": "Importación, escaneo e intercambio",
+      "owner_module": "interchange",
+      "depends_on": [
+        "PRJ",
+        "LYR"
+      ],
+      "entities": [
+        "ImportJob",
+        "FormatAdapter",
+        "ConversionReport",
+        "ExternalAsset"
+      ],
+      "workflow": "Importar → verificar conversiones → enlazar recursos → corregir pérdidas.",
+      "risk": "La extensión de archivo no implica fidelidad de todas sus funciones."
+    },
+    {
+      "id": "THR",
+      "title": "Integración 3D",
+      "owner_module": "integration-3d",
+      "depends_on": [
+        "CAM",
+        "NOD"
+      ],
+      "entities": [
+        "ModelAsset",
+        "ModelSubnode",
+        "Skeleton",
+        "AnimationClip",
+        "ExternalRenderJob"
+      ],
+      "workflow": "Importar modelo → ajustar unidades → posar → componer con 2D.",
+      "risk": "Compatibilidad de formatos, ejes y coste del render externo."
+    },
+    {
+      "id": "OUT",
+      "title": "Preview, render y exportación",
+      "owner_module": "render",
+      "depends_on": [
+        "NOD",
+        "CAM",
+        "AUD"
+      ],
+      "entities": [
+        "RenderJob",
+        "RenderProfile",
+        "FrameBuffer",
+        "OutputSpec"
+      ],
+      "workflow": "Previsualizar → fijar rango y calidad → renderizar → verificar.",
+      "risk": "Diferencias de preview y salida, fallos de encoder y agotamiento de memoria."
+    },
+    {
+      "id": "LIB",
+      "title": "Bibliotecas, símbolos y reutilización",
+      "owner_module": "asset-library",
+      "depends_on": [
+        "PRJ",
+        "RIG"
+      ],
+      "entities": [
+        "AssetLibrary",
+        "Template",
+        "Symbol",
+        "AssetVersion"
+      ],
+      "workflow": "Crear asset → catalogar → reutilizar → actualizar.",
+      "risk": "Assets que parecen independientes pero comparten datos."
+    },
+    {
+      "id": "GAM",
+      "title": "Salida para videojuegos",
+      "owner_module": "game-export",
+      "depends_on": [
+        "DEF",
+        "OUT",
+        "LIB"
+      ],
+      "entities": [
+        "SpriteAtlas",
+        "RuntimeSkeleton",
+        "Anchor",
+        "CollisionShape"
+      ],
+      "workflow": "Preparar rig compatible → hornear → exportar → validar runtime.",
+      "risk": "No todos los nodos y deformadores tienen representación en motores de juego."
+    },
+    {
+      "id": "AUT",
+      "title": "Scripting y automatización",
+      "owner_module": "scripting",
+      "depends_on": [
+        "PRJ",
+        "NOD",
+        "OUT"
+      ],
+      "entities": [
+        "CommandAPI",
+        "Script",
+        "ScriptContext",
+        "BatchJob"
+      ],
+      "workflow": "Automatizar edición → ejecutar comandos → procesar lotes → integrar pipeline.",
+      "risk": "Código externo ejecutable y cambios no reversibles."
+    },
+    {
+      "id": "STU",
+      "title": "Producción de estudio y colaboración",
+      "owner_module": "studio",
+      "depends_on": [
+        "PRJ",
+        "LIB",
+        "OUT"
+      ],
+      "entities": [
+        "Production",
+        "Job",
+        "SceneCheckout",
+        "AssetLock",
+        "RenderQueue"
+      ],
+      "workflow": "Asignar escena → obtener derechos → editar → versionar → entregar.",
+      "risk": "Conflictos multiusuario y red; no equivale a coedición CRDT."
+    },
+    {
+      "id": "AIX",
+      "title": "Asistencia de IA opcional",
+      "owner_module": "ai-adapters",
+      "depends_on": [
+        "RAS",
+        "PRJ"
+      ],
+      "entities": [
+        "Provider",
+        "InferenceJob",
+        "Mask",
+        "GeneratedVariant"
+      ],
+      "workflow": "Seleccionar → configurar proveedor → generar → comparar → aceptar.",
+      "risk": "Dependencia de servicios, licencias de modelos y pérdida de control creativo."
+    }
+  ]
+}

@@ -1,0 +1,288 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-09-20",
+  "note": "Objetivos propuestos; ninguno se presenta como rendimiento medido de OPEN-TOON o Harmony. B1 se define en quality-and-spikes.",
+  "requirements": [
+    {
+      "id": "NFR-001",
+      "category": "Integridad",
+      "requirement": "Interrumpir guardado en cada frontera del protocolo deja una revisión íntegra anterior o nueva.",
+      "verification": "Fault injection y reapertura; cero referencias publicadas a blobs ausentes.",
+      "domains": [
+        "PRJ"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-002",
+      "category": "Recuperación",
+      "requirement": "El autoguardado propuesto tiene intervalo por defecto de 60 segundos configurable.",
+      "verification": "Cierre forzado durante edición y recuperación del último snapshot confirmado; medir pérdida real.",
+      "domains": [
+        "PRJ"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-003",
+      "category": "Undo",
+      "requirement": "Cada gesto de dibujo es una transacción reversible; rangos y cambios de paleta también.",
+      "verification": "Secuencias aleatorias ejecutar/deshacer/rehacer recuperan igualdad semántica.",
+      "domains": [
+        "PRJ",
+        "LYR",
+        "VEC"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-004",
+      "category": "Lápiz",
+      "requirement": "Objetivo de p95 menor o igual a 8 ms desde recepción de muestra hasta trabajo CPU del trazo listo.",
+      "verification": "Trace de 10000 muestras en hardware de referencia; excluir refresco de pantalla y reportarlo aparte.",
+      "domains": [
+        "UI",
+        "VEC",
+        "RAS"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-005",
+      "category": "Latencia física",
+      "requirement": "Objetivo orientativo p95 menor o igual a 50 ms de lápiz a píxel en escena simple.",
+      "verification": "Medición con cámara de alta velocidad en dispositivos reales; no sustituir por timings internos.",
+      "domains": [
+        "UI",
+        "VEC",
+        "RAS"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-006",
+      "category": "Interactividad",
+      "requirement": "Objetivo p95 menor o igual a 16.7 ms de frame UI al navegar la escena B1.",
+      "verification": "Medir en build release a 1920x1080, DPR 1 y 2, con GPU/driver documentados.",
+      "domains": [
+        "UI",
+        "OUT"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-007",
+      "category": "Playback",
+      "requirement": "Mantener 24 fps en B1 tras preparar caché sin deriva acumulada de audio superior a un frame en 10 minutos.",
+      "verification": "Medir frame times y diferencia entre muestra y playhead; reportar frames omitidos.",
+      "domains": [
+        "AUD",
+        "OUT",
+        "TIM"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-008",
+      "category": "Escalabilidad temporal",
+      "requirement": "Una escena de 10000 frames no crea un objeto de UI por celda ni bitmap completo por frame.",
+      "verification": "Inspección de asignaciones y benchmark de navegación con virtualización.",
+      "domains": [
+        "TIM",
+        "LYR"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-009",
+      "category": "Memoria",
+      "requirement": "Presupuesto inicial de caché de 2 GiB configurable; objetivo RSS menor a 4 GiB en B1 con 16 GiB de RAM.",
+      "verification": "Benchmark con repetición de abrir, cerrar y editar; registrar CPU RAM y VRAM por separado.",
+      "domains": [
+        "OUT",
+        "PRJ"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-010",
+      "category": "Cancelación",
+      "requirement": "Operaciones largas reciben cancelación y devuelven control visible en menos de 500 ms cuando el backend lo permita.",
+      "verification": "Cancelar imports, render y empaquetado; procesos no cooperativos requieren terminación controlada.",
+      "domains": [
+        "OUT",
+        "IMP"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-011",
+      "category": "Color",
+      "requirement": "La ruta CPU de referencia y GPU coinciden dentro de tolerancias acordadas por operador y precisión.",
+      "verification": "Fixtures de alfa, gradientes, mezcla, ICC/OCIO y HDR; no usar una tolerancia global que oculte fallos.",
+      "domains": [
+        "COL",
+        "FX"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-012",
+      "category": "Determinismo",
+      "requirement": "Misma revisión, assets, semillas y perfil generan igual semántica; igualdad exacta en kernels deterministas CPU.",
+      "verification": "Hashes en CPU y tolerancias explícitas en GPU; registrar versiones de backend.",
+      "domains": [
+        "PAR",
+        "OUT"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-013",
+      "category": "Portabilidad",
+      "requirement": "Builds y smoke tests en Windows, macOS y Linux antes de anunciar soporte de plataforma.",
+      "verification": "Matriz reproducible con sistemas, GPU, drivers y dispositivos de entrada probados.",
+      "domains": [
+        "UI",
+        "PRJ"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-014",
+      "category": "Accesibilidad",
+      "requirement": "Texto normal con contraste mínimo 4.5:1 y controles críticos operables por teclado.",
+      "verification": "Auditar tokens, foco, nombres accesibles y alternativas a acciones exclusivamente gestuales.",
+      "domains": [
+        "UI"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-015",
+      "category": "Monocromo",
+      "requirement": "No depender del color para selección, errores, claves o estados.",
+      "verification": "Revisión de toda la UI en escala de grises y con símbolos/texto visibles.",
+      "domains": [
+        "UI",
+        "TIM"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-016",
+      "category": "Offline",
+      "requirement": "Crear, editar, guardar y exportar imágenes no requiere cuenta ni conexión.",
+      "verification": "Ejecutar flujo WF-01 con red deshabilitada.",
+      "domains": [
+        "PRJ",
+        "OUT"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-017",
+      "category": "Migraciones",
+      "requirement": "Cada versión publicada de formato conserva un fixture de apertura y migración.",
+      "verification": "Migrar sobre copia y comparar semántica/render; mantener original intacto.",
+      "domains": [
+        "PRJ"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-018",
+      "category": "Entradas no confiables",
+      "requirement": "Rechazar archivos con rutas de escape, tamaños abusivos, ciclos o contenido corrupto.",
+      "verification": "Fuzzing de parsers y fixtures corruptos sin ejecución de scripts ni escritura fuera de destino.",
+      "domains": [
+        "IMP",
+        "PRJ"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-019",
+      "category": "Licencias",
+      "requirement": "Inventario de dependencias y recursos para cada binario distribuido.",
+      "verification": "SBOM, versiones, hashes y avisos del build concreto; excluir dependencias no redistribuibles.",
+      "domains": [
+        "PRJ"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-020",
+      "category": "Pruebas de producto",
+      "requirement": "Toda capacidad implementada tiene prueba observable o escenario de usuario y límites publicados.",
+      "verification": "No marcar implementada por presencia de controles sin comportamiento real.",
+      "domains": [
+        "PRJ"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-021",
+      "category": "Formato abierto",
+      "requirement": "Documentar tipos, unidades, versión, algoritmos necesarios y migraciones para leer el formato.",
+      "verification": "Una herramienta independiente puede enumerar recursos y tiempos sin iniciar la UI.",
+      "domains": [
+        "PRJ"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-022",
+      "category": "Diagnósticos",
+      "requirement": "Errores de importación/render incluyen acción, recurso e información recuperable.",
+      "verification": "Un recurso perdido genera informe exportable sin secretos ni contenidos por defecto.",
+      "domains": [
+        "IMP",
+        "OUT"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-023",
+      "category": "Estructura",
+      "requirement": "El dominio compila y se prueba sin Qt, codecs, red ni ventanas.",
+      "verification": "Target CMake específico en CI y restricciones de dependencia entre targets.",
+      "domains": [
+        "PRJ"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-024",
+      "category": "Documentación",
+      "requirement": "IDs, fuentes, dependencias y vistas generadas permanecen consistentes.",
+      "verification": "Ejecutar scripts/validate_docs.py en cada cambio de catálogo.",
+      "domains": [
+        "PRJ"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-025",
+      "category": "No pérdida en conversión",
+      "requirement": "Cada adapter explica campos convertidos, omitidos y horneados.",
+      "verification": "Round-trip de fixtures soportados y reporte para funciones incompatibles.",
+      "domains": [
+        "IMP",
+        "OUT"
+      ],
+      "status": "proposed_not_measured"
+    },
+    {
+      "id": "NFR-026",
+      "category": "Revisiones concurrentes",
+      "requirement": "Aplicar una operación calculada sobre una revisión obsoleta no sobrescribe cambios recientes.",
+      "verification": "Simular edición durante import/guardado; rechazar o rebasar explícitamente el resultado.",
+      "domains": [
+        "PRJ",
+        "STU"
+      ],
+      "status": "proposed_not_measured"
+    }
+  ]
+}
