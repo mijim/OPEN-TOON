@@ -11,6 +11,8 @@
         "catch2/3.15.0#dad1ca2786e3f2c80129053a4ddc094f%1779369722.174"
     ],
     "build_requires": [
+        "strawberryperl/5.32.1.1#8d114504d172cfea8ea1662d09b6333e%1751971032.423",
+        "nasm/2.16.01#31e26f2ee3c4346ecd347911bd126904%1745483323.489",
         "cmake/4.4.3#8b46ce9dbf1937af1c05f19579c1f105%1789658722.203"
     ],
     "python_requires": [],

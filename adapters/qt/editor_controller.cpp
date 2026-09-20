@@ -148,6 +148,10 @@ void EditorController::setSelectedLayer(int value) {
     try {
         (void)document().layer(value);
         layer_ = value;
+        rangeLayers_ = {layer_};
+        rangeStart_ = frame_;
+        rangeEnd_ = frame_ + 1;
+        emit rangeChanged();
         emit selectionChanged();
         emit changed();
     } catch (...) {

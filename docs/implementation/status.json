@@ -102,7 +102,9 @@
         "raster mouse painting",
         "raster pixel equivalence after reopen",
         "cancelled raster gesture",
-        "timeline range clipboard"
+        "timeline range clipboard",
+        "native timeline range selection",
+        "native Alt-drag with grab offset and undo"
       ]
     },
     "png_fixture": {
@@ -171,5 +173,6 @@
     "desktop_and_cli": "apps/desktop",
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
-  }
+  },
+  "version": "0.2.0-experimental.1"
 }

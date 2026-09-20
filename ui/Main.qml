@@ -394,7 +394,7 @@ ApplicationWindow {
                     Layout.fillWidth: true
                 }
                 Text {
-                    text: "EXPERIMENTAL 0.1"
+                    text: Qt.application.version
                     color: "#737373"
                     font.pixelSize: 10
                     font.letterSpacing: 0.8
@@ -1069,6 +1069,7 @@ ApplicationWindow {
                 onContentYChanged: timeline.requestPaint()
                 Canvas {
                     id: timeline
+                    objectName: "timelineCanvas"
                     x: timelineScroll.contentX
                     y: timelineScroll.contentY
                     width: timelineScroll.width
@@ -1182,6 +1183,7 @@ ApplicationWindow {
                     }
                     MouseArea {
                         id: timelineInput
+                        preventStealing: true
                         anchors.fill: parent
                         property int anchorFrame: 0
                         property int anchorRow: -1
@@ -1197,9 +1199,9 @@ ApplicationWindow {
                             timeline.forceActiveFocus();
                             anchorFrame = frameAt(mouse);
                             anchorRow = rowAt(mouse);
-                            moving = (mouse.modifiers & Qt.AltModifier) && anchorRow >= 0;
+                            moving = (mouse.modifiers & Qt.AltModifier) && anchorRow >= 0 && anchorRow < editor.layers.length && anchorFrame >= editor.rangeStart && anchorFrame < editor.rangeEnd && editor.selectedLayers.indexOf(editor.layers[anchorRow].id) >= 0;
                             if (moving)
-                                previewFrame = anchorFrame;
+                                previewFrame = editor.rangeStart;
                             else if (anchorRow >= 0 && anchorRow < editor.layers.length)
                                 editor.selectTimelineRange(anchorFrame, anchorFrame, anchorRow, anchorRow);
                             else
@@ -1209,7 +1211,7 @@ ApplicationWindow {
                             if (!pressed)
                                 return;
                             if (moving) {
-                                previewFrame = Math.max(0, Math.min(editor.duration - 1, frameAt(mouse)));
+                                previewFrame = Math.max(0, Math.min(editor.duration - 1, editor.rangeStart + frameAt(mouse) - anchorFrame));
                                 editor.report("Move preview: replace frames " + (previewFrame + 1) + "–" + (previewFrame + editor.rangeEnd - editor.rangeStart) + ". Release to overwrite; Escape cancels.");
                                 timeline.requestPaint();
                             } else if (anchorRow >= 0)

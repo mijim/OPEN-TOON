@@ -30,7 +30,8 @@ void EditorController::selectTimelineRange(int firstFrame, int lastFrame, int fi
     if (document().layers.empty())
         return;
     rangeStart_ = std::clamp(std::min(firstFrame, lastFrame), 0, duration() - 1);
-    rangeEnd_ = std::clamp(std::max(firstFrame, lastFrame) + 1, rangeStart_ + 1, duration());
+    rangeEnd_ = int(std::clamp(std::int64_t(std::max(firstFrame, lastFrame)) + 1,
+                               std::int64_t(rangeStart_ + 1), std::int64_t(duration())));
     firstRow = std::clamp(firstRow, 0, int(document().layers.size()) - 1);
     lastRow = std::clamp(lastRow, 0, int(document().layers.size()) - 1);
     rangeLayers_.clear();
@@ -94,12 +95,18 @@ void EditorController::timeSelectedDrawings(int step) {
     });
 }
 void EditorController::moveTimelineRange(int destination, bool insert) {
-    edit("Move selected range", [&](Document& d) {
-        const auto ids = validRangeLayers();
-        const auto clip = copyRange(d, ids, rangeStart_, std::min(rangeEnd_, duration()));
-        clearRange(d, ids, rangeStart_, std::min(rangeEnd_, duration()), true);
-        pasteRange(d, ids, destination, clip, PasteContent::All, insert);
-    });
+    const auto length = std::min(rangeEnd_, duration()) - rangeStart_;
+    if (edit("Move selected range", [&](Document& d) {
+            const auto ids = validRangeLayers();
+            const auto clip = copyRange(d, ids, rangeStart_, std::min(rangeEnd_, duration()));
+            clearRange(d, ids, rangeStart_, std::min(rangeEnd_, duration()), true);
+            pasteRange(d, ids, destination, clip, PasteContent::All, insert);
+        })) {
+        rangeStart_ = destination;
+        rangeEnd_ = destination + length;
+        setFrame(destination);
+        emit rangeChanged();
+    }
 }
 void EditorController::setSceneMarker(QString name) {
     edit("Set scene marker", [&](Document& d) { setMarker(d, frame_, name.toStdString()); });

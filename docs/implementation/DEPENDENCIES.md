@@ -30,3 +30,5 @@ presets are original code. The fallback is to retain raster tiles and disable un
 brush authoring rather than changing stored pixels. Current evidence is the replay and UI
 workflow corpus; production brush latency remains an open gate. miniaudio is resolved in
 Conan for the upcoming media adapter but is not currently linked or used.
+
+The lock also includes Windows-only NASM and Strawberry Perl build requirements used by OpenSSL. They are build tools, not linked application libraries.

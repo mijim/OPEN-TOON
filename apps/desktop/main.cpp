@@ -25,9 +25,14 @@
 int main(int argc, char** argv) {
     QGuiApplication app(argc, argv);
     QCoreApplication::setApplicationName("OPEN-TOON");
+    QCoreApplication::setApplicationVersion(OPENTOON_VERSION);
     QCoreApplication::setOrganizationName("OPEN-TOON");
     QQuickStyle::setStyle("Basic");
     const auto args = app.arguments();
+    if (args.contains("--version")) {
+        std::cout << OPENTOON_VERSION << '\n';
+        return 0;
+    }
     if (args.contains("--smoke-test")) {
         QStandardPaths::setTestModeEnabled(true);
         QCoreApplication::setApplicationName("OPEN-TOON-smoke");
@@ -95,9 +100,10 @@ int main(int argc, char** argv) {
                     editor.newScene();
                     auto start = canvas->mapToScene(QPointF(canvas->width() / 2 - 80, canvas->height() / 2));
                     auto send = [&](QEvent::Type type, QPointF point, Qt::MouseButton button,
-                                    Qt::MouseButtons buttons) {
+                                    Qt::MouseButtons buttons,
+                                    Qt::KeyboardModifiers modifiers = Qt::NoModifier) {
                         QMouseEvent event(type, point, window->mapToGlobal(point.toPoint()), button, buttons,
-                                          Qt::NoModifier);
+                                          modifiers);
                         QCoreApplication::sendEvent(window, &event);
                     };
                     send(QEvent::MouseButtonPress, start, Qt::LeftButton, Qt::LeftButton);
@@ -189,6 +195,33 @@ int main(int argc, char** argv) {
                     editor.pasteTimelineRange(0, false);
                     if (!editor.document().drawingAt(editor.selectedLayer(), 6))
                         throw std::runtime_error("Timeline range paste failed.");
+                    QCoreApplication::processEvents();
+                    auto* timeline = window->findChild<QQuickItem*>("timelineCanvas");
+                    if (!timeline)
+                        throw std::runtime_error("Timeline canvas is missing.");
+                    auto cell = window->property("timelineCell").toDouble();
+                    auto timelinePoint = [&](int frame) {
+                        return timeline->mapToScene(QPointF((frame + 0.5) * cell, 42));
+                    };
+                    send(QEvent::MouseButtonPress, timelinePoint(0), Qt::LeftButton, Qt::LeftButton);
+                    send(QEvent::MouseMove, timelinePoint(3), Qt::NoButton, Qt::LeftButton);
+                    send(QEvent::MouseButtonRelease, timelinePoint(3), Qt::LeftButton, Qt::NoButton);
+                    if (editor.rangeStart() != 0 || editor.rangeEnd() != 4)
+                        throw std::runtime_error("Native timeline drag did not select the expected frames.");
+                    const auto beforeMove = editor.document();
+                    send(QEvent::MouseButtonPress, timelinePoint(1), Qt::LeftButton, Qt::LeftButton,
+                         Qt::AltModifier);
+                    send(QEvent::MouseMove, timelinePoint(11), Qt::NoButton, Qt::LeftButton, Qt::AltModifier);
+                    send(QEvent::MouseButtonRelease, timelinePoint(11), Qt::LeftButton, Qt::NoButton,
+                         Qt::AltModifier);
+                    if (editor.rangeStart() != 10 || editor.document().drawingAt(editor.selectedLayer(), 0) ||
+                        !editor.document().drawingAt(editor.selectedLayer(), 10))
+                        throw std::runtime_error(
+                            "Native Alt-drag did not move the selected range with its grab offset.");
+                    editor.undo();
+                    if (editor.document() != beforeMove)
+                        throw std::runtime_error("Range move undo did not restore exposures.");
+                    editor.setFrame(0);
                     editor.setTool("Raster ink");
                     QTimer::singleShot(250, &app, [&, window] {
                         auto image = window->grabWindow();

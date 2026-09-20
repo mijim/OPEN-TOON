@@ -97,4 +97,4 @@ Every node/family entry has a **specification owner phase**, distinct from featu
 
 Conditional AI and legacy entries require model/parser/license/quality evidence. If they cannot be delivered, record a deferred decision with the precise missing prerequisite and retain their unimplemented state. They are not quietly deleted or counted as done.
 
-The next authorized development step would be **P00**, beginning with the issues in [FIRST-STEPS.md](FIRST-STEPS.md). This planning change does not begin application implementation.
+Implementation is authorized through **P11**. Continue closing the outstanding gates in the [implementation status](../implementation/STATUS.md), using the issues in [FIRST-STEPS.md](FIRST-STEPS.md). Working subsets do not close a phase automatically.
