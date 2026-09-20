@@ -124,6 +124,19 @@ void editKey(Layer& layer, Frame source, Frame destination, std::string_view cha
     std::sort(layer.keys.begin(), layer.keys.end(),
               [](const auto& a, const auto& b) { return a.frame < b.frame; });
 }
+void movePoseKey(Layer& layer, Frame source, Frame destination) {
+    auto key =
+        std::find_if(layer.keys.begin(), layer.keys.end(), [=](const auto& k) { return k.frame == source; });
+    if (key == layer.keys.end())
+        throw std::runtime_error("The selected pose key no longer exists.");
+    editKey(layer, source, destination, "x", key->value.x, key->interpolation);
+}
+void setPoseEase(Layer& layer, Frame frame, const BezierEase& ease) {
+    // Validate all inputs before changing any of the channels.
+    validateEase("x", ease);
+    for (const auto* channel : {"x", "y", "rotation", "scaleX", "scaleY", "opacity", "pivotX", "pivotY"})
+        setKeyEase(layer, frame, channel, ease);
+}
 void retimeKeys(Document& d, const std::vector<Id>& ids, Frame start, Frame end, Frame destination,
                 Frame length) {
     if (start < 0 || end <= start || end > d.duration || destination < 0 || length < 1 ||

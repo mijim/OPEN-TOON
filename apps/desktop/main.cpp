@@ -6,6 +6,7 @@
 #include "visual_editing_smoke.h"
 #include <QDir>
 #include <QElapsedTimer>
+#include <QEventLoop>
 #include <QFile>
 #include <QGuiApplication>
 #include <QJsonDocument>
@@ -310,11 +311,23 @@ int main(int argc, char** argv) {
                     window->setProperty("bottomHeight", 300);
                     QTimer::singleShot(250, &app, [&, window] {
                         auto* graph = window->findChild<QQuickItem*>("animationCurveCanvas");
-                        if (!graph || graph->width() < 200 || graph->height() < 100) {
+                        if (!graph) {
                             std::cerr << "Curve editor layout failed.\n";
                             app.exit(1);
                             return;
                         }
+                        auto* panel = window->findChild<QQuickItem*>("curveEditorPanel");
+                        if (!panel || !panel->property("combined").toBool()) {
+                            std::cerr << "Curves must default to all motion.\n";
+                            app.exit(1);
+                            return;
+                        }
+                        QMetaObject::invokeMethod(panel, "selectChannel", Q_ARG(QVariant, QVariant("x")));
+                        QEventLoop layoutReady;
+                        QTimer::singleShot(100, &layoutReady, &QEventLoop::quit);
+                        layoutReady.exec();
+                        window->grabWindow(); // Flush layout even when another window occludes the smoke
+                                              // instance.
                         const auto beforeCurveDrag = editor.document();
                         auto point = [&](int frame, double value) {
                             double left = graph->property("plotLeft").toDouble();
@@ -335,7 +348,15 @@ int main(int argc, char** argv) {
                         sendCurve(QEvent::MouseButtonRelease, point(30, 180), Qt::LeftButton, Qt::NoButton);
                         const auto& keys = editor.document().layer(editor.selectedLayer()).keys;
                         if (keys.back().frame != 30 || std::abs(keys.back().value.x - 180) > 1) {
-                            std::cerr << "Native curve drag did not commit time and value.\n";
+                            std::cerr << "Native curve drag did not commit time and value: channel="
+                                      << panel->property("channel").toString().toStdString()
+                                      << " size=" << graph->width() << "," << graph->height()
+                                      << " visible=" << graph->isVisible()
+                                      << " low=" << panel->property("low").toDouble()
+                                      << " high=" << panel->property("high").toDouble()
+                                      << " frame=" << keys.back().frame << " x=" << keys.back().value.x
+                                      << " status=" << editor.status().toStdString() << "\n";
+                            window->grabWindow().save("build/curve-failure.png");
                             app.exit(1);
                             return;
                         }

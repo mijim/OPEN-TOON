@@ -140,3 +140,28 @@ TEST_CASE("Per-channel Bezier curves overshoot deterministically and survive sav
     d.layers.front().keys.front().easing["x"].y1 = 5;
     REQUIRE_THROWS(d.validate());
 }
+
+TEST_CASE("Combined pose timing and easing preserve artwork and edit every channel atomically") {
+    Session session;
+    auto id = session.document().layers.front().id;
+    Transform pose;
+    pose.x = 90;
+    pose.y = -40;
+    pose.rotation = 70;
+    pose.scaleX = 2;
+    pose.opacity = .3;
+    session.apply("Pose", [&](Document& d) { recordPose(d.layer(id), 20, pose); });
+    session.apply("Ease all", [&](Document& d) { setPoseEase(d.layer(id), 0, {.25, 0, .65, 1.8}); });
+    auto before = session.document();
+    REQUIRE(before.layer(id).keys.front().easing.size() == 8);
+    session.apply("Retime pose", [&](Document& d) { movePoseKey(d.layer(id), 20, 30); });
+    REQUIRE(session.document().layer(id).keys.back().value == pose);
+    REQUIRE(session.document().layer(id).keys.front().easing == before.layer(id).keys.front().easing);
+    REQUIRE(session.document().drawings == before.drawings);
+    REQUIRE_THROWS(session.apply("Collision", [&](Document& d) { movePoseKey(d.layer(id), 30, 0); }));
+    session.undo();
+    REQUIRE(session.document() == before);
+    REQUIRE_THROWS(
+        session.apply("Invalid ease", [&](Document& d) { setPoseEase(d.layer(id), 0, {.9, 0, .1, 1}); }));
+    REQUIRE(session.document() == before);
+}

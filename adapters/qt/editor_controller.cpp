@@ -460,10 +460,11 @@ void EditorController::holdDrawing(int count) {
 void EditorController::clearExposure() {
     if (!layer_)
         return;
-    edit("Clear exposure", [&](Document& d) {
+    edit("Clear frame and key", [&](Document& d) {
         if (d.layer(layer_).locked)
             throw std::runtime_error("Unlock the layer before editing.");
         expose(d.layer(layer_), frame_, frame_ + 1, 0);
+        std::erase_if(d.layer(layer_).keys, [&](const auto& key) { return key.frame == frame_; });
     });
 }
 void EditorController::insertFrames(int n) {

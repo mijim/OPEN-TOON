@@ -53,3 +53,5 @@ See [ADR-014](014-drawing-selection.md) for rectangular vector/raster selection,
 See [ADR-015](015-direct-editing-workspace.md) for direct transform handles, integrated timing and selection-owned Properties; it supersedes the earlier dialog interaction.
 
 See [ADR-016](016-visual-animation-and-bezier.md) for visual pose gestures, channel Bézier easing, format 3 migration and screen-space picking.
+
+See [ADR-017](017-combined-motion-and-point-editing.md) for the default combined motion overview, complete-pose edits, sampled point insertion/deletion and Clear semantics.

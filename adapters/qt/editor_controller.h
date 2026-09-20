@@ -73,7 +73,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE void selectTimelineRange(int firstFrame, int lastFrame, int firstRow, int lastRow);
     Q_INVOKABLE void copyTimelineRange();
     Q_INVOKABLE void pasteTimelineRange(int content = 0, bool insert = false);
-    Q_INVOKABLE void clearTimelineRange(bool keys = false);
+    Q_INVOKABLE void clearTimelineRange(bool keys = true);
     Q_INVOKABLE void repeatTimelineRange(int repeats);
     Q_INVOKABLE void retimeTimelineRange(int frames);
     Q_INVOKABLE void timeSelectedDrawings(int step);
@@ -130,6 +130,8 @@ class EditorController final : public QObject {
     void eraseGesture(std::vector<opentoon::Point>);
     void translateStroke(opentoon::Id, double, double);
     void recolorStroke(opentoon::Id);
+    bool insertPoint(opentoon::Id, int segment, double fraction);
+    bool deletePoint(opentoon::Id, int point);
     void movePoint(opentoon::Id, int, opentoon::Point);
     void smoothStroke(opentoon::Id);
     void deleteStroke(opentoon::Id);
@@ -158,6 +160,8 @@ class EditorController final : public QObject {
     Q_INVOKABLE void setScene(QString, int, int, int, int, int);
     Q_INVOKABLE void setTransform(QString, double);
     bool commitPose(const opentoon::Transform&);
+    Q_INVOKABLE bool movePoseKey(int source, int destination);
+    Q_INVOKABLE bool setPoseCurveHandles(int frame, double x1, double y1, double x2, double y2);
     Q_INVOKABLE bool setCurveHandles(int frame, QString channel, double x1, double y1, double x2, double y2);
     Q_INVOKABLE bool addCurveKey(int frame, QString channel, double value);
     Q_INVOKABLE void addKey(int interpolation = 0);

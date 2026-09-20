@@ -17,7 +17,7 @@ Flow {
         model: ["Exposures", "Independent drawings", "Keys only", "Exposures + keys"]
         implicitWidth: 145
         implicitHeight: 28
-        Accessible.name: "Timing edit content"
+        Accessible.name: "Paste content. Clear always removes exposures and keys."
     }
     CompactButton {
         text: "Copy"
@@ -61,8 +61,10 @@ Flow {
     }
     CompactButton {
         text: "Clear"
+        objectName: "clearTimelineButton"
+        Accessible.name: "Clear exposures and animation keys in the selected range"
         implicitHeight: 28
-        onClicked: root.controller.clearTimelineRange(content.currentIndex >= 2)
+        onClicked: root.controller.clearTimelineRange()
     }
     Label {
         text: "Drag the range end to stretch · Alt-drag to move"

@@ -31,6 +31,7 @@
 
 ## Interaction requirements
 
+- Curves defaults to All motion for the selected layer. Its legend edits a highlighted curve in place; Link easing defaults to all pose channels for handle drags. Individual channels are optional precision views. Clear removes both exposures and animation keys in the selected range, with atomic undo.
 - Keep controls compact and visually minimal throughout the interface. Curves should devote most panel height to the graph; numeric controls are secondary. The timeline/curve panel must resize by dragging its visible workspace separator.
 - Editing and transforms must be direct: canvas bounding boxes with drag handles and live previews. Do not put selection transforms or timing tools in separate dialogs.
 - Timing and curves stay in the main workspace. Properties describes the explicitly selected canvas object/region or layer, with a clear empty state; it must not silently edit a different target.

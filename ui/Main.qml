@@ -48,6 +48,7 @@ ApplicationWindow {
     property bool allowClose: false
     property bool textEditing: activeFocusItem instanceof TextInput || activeFocusItem instanceof TextEdit
     property bool xsheet: false
+    property bool keyEditing: editor.tool === "Animate"
     property int timelineCell: 22
     property int timelineRow: 34
     property int colorEditId: 0
@@ -187,7 +188,7 @@ ApplicationWindow {
         onActivated: canvas.fit()
     }
     Shortcut {
-        sequence: "Delete"
+        sequences: ["Delete", "Backspace"]
         enabled: !root.textEditing
         onActivated: canvas.deleteSelection()
     }
@@ -306,7 +307,7 @@ ApplicationWindow {
                 onTriggered: editor.holdDrawing(4)
             }
             Action {
-                text: "Clear current exposure"
+                text: "Clear current frame and key"
                 onTriggered: editor.clearExposure()
             }
             Action {
@@ -506,6 +507,11 @@ ApplicationWindow {
                         text: Math.round(editor.brushOpacity * 100) + "%"
                         Layout.preferredWidth: 32
                     }
+                }
+                Label {
+                    visible: editor.tool === "Edit points"
+                    text: "Drag points · Double-click a segment to add · Delete removes the selected point"
+                    color: "#bbbbbb"
                 }
                 Label {
                     visible: editor.tool === "Animate"
@@ -1093,6 +1099,39 @@ ApplicationWindow {
                     visible: !root.showCurves
                     onClicked: root.showTimingTools = !root.showTimingTools
                 }
+                C.ToolButton {
+                    text: "Keys"
+                    visible: !root.showCurves
+                    active: root.keyEditing
+                    hint: "Key mode: drag diamonds to move poses; double-click an empty cell to add a key. Turn off to select exposure ranges."
+                    onClicked: root.keyEditing = !root.keyEditing
+                }
+                C.ToolButton {
+                    text: "+ Key"
+                    visible: !root.showCurves
+                    hint: "Add pose key at the current frame"
+                    onClicked: editor.addKey()
+                }
+                C.ToolButton {
+                    text: "−"
+                    visible: !root.showCurves && !root.xsheet
+                    hint: "Narrow timeline frames"
+                    enabled: root.timelineCell > 12
+                    onClicked: {
+                        root.timelineCell = Math.max(12, root.timelineCell - 10);
+                        timeline.requestPaint();
+                    }
+                }
+                C.ToolButton {
+                    text: "+"
+                    visible: !root.showCurves && !root.xsheet
+                    hint: "Widen timeline frames for easier key placement"
+                    enabled: root.timelineCell < 72
+                    onClicked: {
+                        root.timelineCell = Math.min(72, root.timelineCell + 10);
+                        timeline.requestPaint();
+                    }
+                }
                 Item {
                     Layout.fillWidth: true
                 }
@@ -1313,6 +1352,21 @@ ApplicationWindow {
                     height: timelineScroll.height
                     onWidthChanged: requestPaint()
                     onHeightChanged: requestPaint()
+                    function keyPosition(frame, row) {
+                        return root.xsheet ? Qt.point(48 + row * 100 + 80 - timelineScroll.contentX, 30 + (frame + .5) * root.timelineRow - timelineScroll.contentY) : Qt.point((frame + .5) * root.timelineCell - timelineScroll.contentX, 30 + (row + .5) * root.timelineRow - timelineScroll.contentY);
+                    }
+                    function diamond(ctx, p, filled) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y - 6);
+                        ctx.lineTo(p.x + 6, p.y);
+                        ctx.lineTo(p.x, p.y + 6);
+                        ctx.lineTo(p.x - 6, p.y);
+                        ctx.closePath();
+                        if (filled)
+                            ctx.fill();
+                        else
+                            ctx.stroke();
+                    }
                     onPaint: {
                         const ctx = getContext("2d");
                         ctx.reset();
@@ -1378,11 +1432,6 @@ ApplicationWindow {
                                     ctx.arc(x + 8, y + 17, 2.5, 0, Math.PI * 2);
                                     ctx.fill();
                                 }
-                                ctx.fillStyle = "#ffffff";
-                                for (let k = 0; k < data[r].keys.length; k++) {
-                                    const x = data[r].keys[k] * root.timelineCell - ox + 10;
-                                    ctx.fillText("◇", x, y + 17);
-                                }
                             }
                             for (let m = 0; m < editor.markers.length; ++m) {
                                 const marker = editor.markers[m];
@@ -1422,6 +1471,16 @@ ApplicationWindow {
                             for (let r = 0; r < data.length; r++)
                                 ctx.fillText(data[r].name.substring(0, 12), 54 + r * 100 - ox, 15 - oy);
                         }
+                        ctx.fillStyle = "#eeeeee";
+                        ctx.strokeStyle = "#ffffff";
+                        for (let r = 0; r < data.length; ++r)
+                            for (const frame of data[r].keys) {
+                                const p = keyPosition(frame, r);
+                                if (p.x >= 0 && p.x <= width && p.y >= 0 && p.y <= height)
+                                    diamond(ctx, p, true);
+                            }
+                        if (timelineInput.keySource >= 0)
+                            diamond(ctx, keyPosition(timelineInput.previewFrame, timelineInput.anchorRow), false);
                     }
                     MouseArea {
                         id: timelineInput
@@ -1429,11 +1488,35 @@ ApplicationWindow {
                         property bool overRangeEnd: {
                             const row = rowAt(Qt.point(mouseX, mouseY));
                             const edge = root.xsheet ? 30 + editor.rangeEnd * root.timelineRow - timelineScroll.contentY : editor.rangeEnd * root.timelineCell - timelineScroll.contentX;
-                            return row >= 0 && row < editor.layers.length && editor.selectedLayers.indexOf(editor.layers[row].id) >= 0 && Math.abs((root.xsheet ? mouseY : mouseX) - edge) <= 5;
+                            return !root.keyEditing && row >= 0 && row < editor.layers.length && editor.selectedLayers.indexOf(editor.layers[row].id) >= 0 && Math.abs((root.xsheet ? mouseY : mouseX) - edge) <= 5;
                         }
-                        cursorShape: resizing || overRangeEnd ? (root.xsheet ? Qt.SizeVerCursor : Qt.SizeHorCursor) : pressed && moving ? Qt.ClosedHandCursor : Qt.CrossCursor
+                        cursorShape: keySource >= 0 ? Qt.ClosedHandCursor : resizing || overRangeEnd ? (root.xsheet ? Qt.SizeVerCursor : Qt.SizeHorCursor) : keyAt(Qt.point(mouseX, mouseY)) >= 0 ? Qt.OpenHandCursor : pressed && moving ? Qt.ClosedHandCursor : Qt.CrossCursor
                         preventStealing: true
                         anchors.fill: parent
+                        property int keySource: -1
+                        property bool canceled: false
+                        function keyAt(mouse) {
+                            const row = rowAt(mouse);
+                            if (row < 0 || row >= editor.layers.length)
+                                return -1;
+                            let nearest = -1, distance = 12;
+                            for (const frame of editor.layers[row].keys) {
+                                const p = timeline.keyPosition(frame, row), d = Math.hypot(p.x - mouse.x, p.y - mouse.y);
+                                if (d < distance) {
+                                    nearest = frame;
+                                    distance = d;
+                                }
+                            }
+                            return nearest;
+                        }
+                        function cancel() {
+                            canceled = true;
+                            keySource = -1;
+                            resizing = false;
+                            moving = false;
+                            previewFrame = -1;
+                            timeline.requestPaint();
+                        }
                         property int anchorFrame: 0
                         property int anchorRow: -1
                         property bool moving: false
@@ -1448,15 +1531,32 @@ ApplicationWindow {
                         }
                         onPressed: function (mouse) {
                             timeline.forceActiveFocus();
+                            canceled = false;
                             anchorFrame = frameAt(mouse);
                             anchorRow = rowAt(mouse);
                             const edge = root.xsheet ? 30 + editor.rangeEnd * root.timelineRow - timelineScroll.contentY : editor.rangeEnd * root.timelineCell - timelineScroll.contentX;
                             const coordinate = root.xsheet ? mouse.y : mouse.x;
-                            resizing = anchorRow >= 0 && anchorRow < editor.layers.length && editor.selectedLayers.indexOf(editor.layers[anchorRow].id) >= 0 && Math.abs(coordinate - edge) <= 5;
+                            resizing = !root.keyEditing && anchorRow >= 0 && anchorRow < editor.layers.length && editor.selectedLayers.indexOf(editor.layers[anchorRow].id) >= 0 && Math.abs(coordinate - edge) <= 5;
                             previewEnd = editor.rangeEnd;
                             moving = !resizing && (mouse.modifiers & Qt.AltModifier) && anchorRow >= 0 && anchorRow < editor.layers.length && anchorFrame >= editor.rangeStart && anchorFrame < editor.rangeEnd && editor.selectedLayers.indexOf(editor.layers[anchorRow].id) >= 0;
                             if (resizing) {
                                 timeline.requestPaint();
+                                return;
+                            }
+                            const key = keyAt(mouse);
+                            if (!moving && key >= 0) {
+                                editor.selectedLayer = editor.layers[anchorRow].id;
+                                editor.frame = key;
+                                canceled = false;
+                                keySource = key;
+                                previewFrame = key;
+                                timeline.requestPaint();
+                                return;
+                            }
+                            if (root.keyEditing && !moving && anchorRow >= 0 && anchorRow < editor.layers.length) {
+                                editor.selectedLayer = editor.layers[anchorRow].id;
+                                editor.frame = anchorFrame;
+                                canceled = false;
                                 return;
                             }
                             if (moving)
@@ -1467,8 +1567,17 @@ ApplicationWindow {
                                 editor.frame = anchorFrame;
                         }
                         onPositionChanged: function (mouse) {
-                            if (!pressed)
+                            if (!pressed || canceled)
                                 return;
+                            if (keySource >= 0) {
+                                previewFrame = Math.max(0, Math.min(editor.duration - 1, keySource + frameAt(mouse) - anchorFrame));
+                                timeline.requestPaint();
+                                return;
+                            }
+                            if (root.keyEditing && !moving) {
+                                editor.frame = frameAt(mouse);
+                                return;
+                            }
                             if (resizing) {
                                 previewEnd = Math.max(editor.rangeStart + 1, frameAt(mouse) + 1);
                                 timeline.requestPaint();
@@ -1482,6 +1591,15 @@ ApplicationWindow {
                                 editor.frame = frameAt(mouse);
                         }
                         onReleased: {
+                            if (canceled)
+                                return;
+                            if (keySource >= 0) {
+                                const source = keySource, destination = previewFrame;
+                                cancel();
+                                if (source !== destination)
+                                    editor.movePoseKey(source, destination);
+                                return;
+                            }
                             if (resizing)
                                 editor.retimeTimelineRange(previewEnd - editor.rangeStart);
                             resizing = false;
@@ -1491,24 +1609,30 @@ ApplicationWindow {
                             previewFrame = -1;
                             timeline.requestPaint();
                         }
-                        onCanceled: {
-                            resizing = false;
-                            moving = false;
-                            previewFrame = -1;
-                            timeline.requestPaint();
+                        onCanceled: cancel()
+                        onDoubleClicked: mouse => {
+                            if (root.keyEditing) {
+                                const row = rowAt(mouse), frame = frameAt(mouse);
+                                cancel();
+                                if (row >= 0 && row < editor.layers.length && frame >= 0 && frame < editor.duration) {
+                                    editor.selectedLayer = editor.layers[row].id;
+                                    editor.frame = frame;
+                                    editor.addKey();
+                                }
+                            } else
+                                editor.newDrawing(false);
                         }
-                        onDoubleClicked: editor.newDrawing(false)
+                        Accessible.name: "Timeline. Drag diamonds to retime poses. Enable Keys to add keys by double-clicking. Alt-drag moves an exposure range."
                     }
                     Keys.onEscapePressed: {
-                        timelineInput.resizing = false;
-                        timelineInput.moving = false;
-                        timelineInput.previewFrame = -1;
-                        requestPaint();
+                        timelineInput.cancel();
                     }
                 }
                 Connections {
                     target: editor
                     function onChanged() {
+                        if (timelineInput.keySource >= 0)
+                            timelineInput.cancel();
                         timeline.requestPaint();
                     }
                     function onFrameChanged() {

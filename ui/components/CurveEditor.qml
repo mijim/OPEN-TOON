@@ -9,7 +9,28 @@ Item {
     required property var controller
     property var keys: controller.animationKeys
     property var samples: []
-    property string channel: channels.currentValue || "x"
+    property string channel: channels.currentValue || "all"
+    readonly property bool combined: channel === "all"
+    function selectChannel(value) {
+        for (let i = 0; i < channels.model.length; ++i)
+            if (channels.model[i].key === value) {
+                channels.currentIndex = i;
+                return;
+            }
+    }
+    property int timeZoom: 1
+    property int timeStart: 0
+    readonly property int timeSpan: Math.max(1, Math.ceil((controller.duration - 1) / timeZoom))
+    readonly property int firstFrame: Math.max(0, Math.min(timeStart, controller.duration - 1 - timeSpan))
+    readonly property int lastFrame: firstFrame + timeSpan
+    function zoomTime(factor) {
+        timeZoom = Math.max(1, Math.min(64, timeZoom * factor));
+        timeStart = Math.max(0, controller.frame - Math.floor(timeSpan / 2));
+    }
+    onFirstFrameChanged: if (graph)
+        graph.requestPaint()
+    onLastFrameChanged: if (graph)
+        graph.requestPaint()
     property real low: -1
     property real high: 1
     property bool showNumbers: false
@@ -23,8 +44,12 @@ Item {
         return selected.easing[channel] || (selected.interpolation === 2 ? [1 / 3, 0, 2 / 3, 1] : [1 / 3, 1 / 3, 2 / 3, 2 / 3]);
     }
     function preset(values) {
-        if (selected && segmentEnd)
-            controller.setCurveHandles(selected.frame, channel, values[0], values[1], values[2], values[3]);
+        if (selected && segmentEnd) {
+            if (combined)
+                controller.setPoseCurveHandles(selected.frame, values[0], values[1], values[2], values[3]);
+            else
+                controller.setCurveHandles(selected.frame, channel, values[0], values[1], values[2], values[3]);
+        }
     }
     function tangent(index) {
         if (!selected || !segmentEnd || Math.abs(segmentEnd[channel] - selected[channel]) < 1e-9)
@@ -55,6 +80,12 @@ Item {
     function refresh() {
         if (!controller || !graph)
             return;
+        if (channel === "all") {
+            selectCurrent();
+            if (overview)
+                overview.refresh();
+            return;
+        }
         samples = controller.curveSamples(channel);
         let lo = Infinity, hi = -Infinity;
         for (const p of samples) {
@@ -82,7 +113,7 @@ Item {
     }
     function selectCurrent() {
         selected = keys.find(k => k.frame === controller.frame) || null;
-        if (selected) {
+        if (selected && !combined) {
             keyFrame.value = selected.frame + 1;
             keyValue.text = Number(selected[channel]).toFixed(3);
             keyValue.valueEdited = false;
@@ -92,7 +123,7 @@ Item {
     onVisibleChanged: if (visible)
         refresh()
     Component.onCompleted: refresh()
-    onChannelChanged: refresh()
+    onChannelChanged: Qt.callLater(refresh)
     Connections {
         target: root.controller
         function onChanged() {
@@ -119,7 +150,12 @@ Item {
                 id: channels
                 textRole: "name"
                 valueRole: "key"
+                objectName: "curveChannelSelector"
                 model: [
+                    {
+                        name: "All motion",
+                        key: "all"
+                    },
                     {
                         name: "Position X · px",
                         key: "x"
@@ -174,8 +210,29 @@ Item {
             }
             C.ToolButton {
                 text: "Fit"
-                hint: "Fit curve values"
-                onClicked: root.refresh()
+                hint: "Fit full duration and curve values"
+                onClicked: {
+                    root.timeZoom = 1;
+                    root.timeStart = 0;
+                    root.refresh();
+                }
+            }
+            C.ToolButton {
+                text: "−"
+                hint: "Zoom out in time"
+                enabled: root.timeZoom > 1
+                onClicked: root.zoomTime(.5)
+            }
+            Label {
+                text: root.timeZoom + "×"
+                color: "#888888"
+                font.pixelSize: 10
+            }
+            C.ToolButton {
+                text: "+"
+                hint: "Zoom in around current frame"
+                enabled: root.timeZoom < 64
+                onClicked: root.zoomTime(2)
             }
             Rectangle {
                 Layout.preferredWidth: 1
@@ -184,19 +241,19 @@ Item {
             }
             C.ToolButton {
                 text: "Linear"
-                hint: "Linear outgoing channel curve"
+                hint: root.combined ? "Linear transition for all pose channels" : "Linear outgoing channel curve"
                 enabled: root.segmentEnd !== null
                 onClicked: root.preset([1 / 3, 1 / 3, 2 / 3, 2 / 3])
             }
             C.ToolButton {
                 text: "Ease"
-                hint: "Ease in / out"
+                hint: root.combined ? "Ease all pose channels together" : "Ease in / out"
                 enabled: root.segmentEnd !== null
                 onClicked: root.preset([1 / 3, 0, 2 / 3, 1])
             }
             C.ToolButton {
                 text: "Overshoot"
-                hint: "Editable overshoot"
+                hint: root.combined ? "Overshoot for all pose channels" : "Editable overshoot"
                 enabled: root.segmentEnd !== null
                 onClicked: root.preset([.25, 0, .65, 1.8])
             }
@@ -208,18 +265,19 @@ Item {
                 elide: Text.ElideRight
             }
             C.ToolButton {
-                text: "+"
+                text: "+ Key"
                 hint: "Add pose key at current frame"
                 onClicked: root.controller.addKey()
             }
             C.ToolButton {
-                text: "−"
+                text: "− Key"
                 hint: "Delete current pose key"
                 enabled: root.selected !== null
                 onClicked: root.controller.deleteKey()
             }
             C.ToolButton {
                 text: "Values"
+                enabled: !root.combined
                 hint: "Show precise numeric key controls"
                 active: root.showNumbers
                 onClicked: root.showNumbers = !root.showNumbers
@@ -229,8 +287,19 @@ Item {
                 hint: "Drag square keys or round handles. Double-click to add a key. Escape cancels. Add a middle key to create a bounce between equal values."
             }
         }
+        MotionOverview {
+            id: overview
+            controller: root.controller
+            firstFrame: root.firstFrame
+            lastFrame: root.lastFrame
+            visible: root.combined
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            evaluateEase: root.previewEase
+        }
         Canvas {
             id: graph
+            visible: !root.combined
             objectName: "animationCurveCanvas"
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -239,13 +308,26 @@ Item {
             property real plotTop: 12
             property real plotBottom: height - 22
             function px(frame) {
-                return plotLeft + frame / Math.max(1, root.controller.duration - 1) * (plotRight - plotLeft);
+                return plotLeft + (frame - root.firstFrame) / Math.max(1, root.lastFrame - root.firstFrame) * (plotRight - plotLeft);
             }
             function py(value) {
                 return plotBottom - (value - root.low) / (root.high - root.low) * (plotBottom - plotTop);
             }
             function frameAt(x) {
-                return Math.round(Math.max(0, Math.min(1, (x - plotLeft) / (plotRight - plotLeft))) * Math.max(0, root.controller.duration - 1));
+                return Math.min(root.controller.duration - 1, root.firstFrame + Math.round(Math.max(0, Math.min(1, (x - plotLeft) / (plotRight - plotLeft))) * (root.lastFrame - root.firstFrame)));
+            }
+            function keyAt(x, y) {
+                let nearest = null, distance = 14;
+                for (const k of root.keys) {
+                    if (k.frame < root.firstFrame || k.frame > root.lastFrame)
+                        continue;
+                    const d = Math.hypot(px(k.frame) - x, py(k[root.channel]) - y);
+                    if (d < distance) {
+                        nearest = k;
+                        distance = d;
+                    }
+                }
+                return nearest;
             }
             function valueAt(y) {
                 return root.low + (plotBottom - y) / (plotBottom - plotTop) * (root.high - root.low);
@@ -266,9 +348,13 @@ Item {
                     ctx.stroke();
                     ctx.fillStyle = "#aaaaaa";
                     ctx.fillText((root.high - (root.high - root.low) * i / ticks).toFixed(2), 4, y + 4);
-                    let f = Math.round((root.controller.duration - 1) * i / ticks), x = px(f);
+                    let f = Math.round(root.firstFrame + (root.lastFrame - root.firstFrame) * i / ticks), x = px(f);
                     ctx.fillText(String(f + 1), x - 5, height - 8);
                 }
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(plotLeft - 7, plotTop - 7, plotRight - plotLeft + 14, plotBottom - plotTop + 14);
+                ctx.clip();
                 ctx.strokeStyle = "#dddddd";
                 ctx.lineWidth = 1.5;
                 ctx.beginPath();
@@ -296,7 +382,7 @@ Item {
                 for (const k of root.keys) {
                     let x = px(k.frame), y = py(k[root.channel]);
                     ctx.fillStyle = k.frame === root.controller.frame ? "#ffffff" : "#888888";
-                    ctx.fillRect(x - 4, y - 4, 8, 8);
+                    ctx.fillRect(x - 5, y - 5, 10, 10);
                 }
                 if (root.selected && root.segmentEnd) {
                     ctx.strokeStyle = "#888888";
@@ -317,14 +403,15 @@ Item {
                 }
                 if (pointer.dragKey) {
                     ctx.strokeStyle = "#ffffff";
-                    ctx.strokeRect(px(pointer.targetFrame) - 6, py(pointer.targetValue) - 6, 12, 12);
+                    ctx.strokeRect(px(pointer.targetFrame) - 7, py(pointer.targetValue) - 7, 14, 14);
                 }
+                ctx.restore();
             }
             MouseArea {
                 id: pointer
                 anchors.fill: parent
                 hoverEnabled: true
-                cursorShape: pressed ? Qt.ClosedHandCursor : root.tangentAt(mouseX, mouseY) >= 0 || root.keys.some(k => Math.hypot(graph.px(k.frame) - mouseX, graph.py(k[root.channel]) - mouseY) < 10) ? Qt.OpenHandCursor : Qt.CrossCursor
+                cursorShape: pressed ? Qt.ClosedHandCursor : root.tangentAt(mouseX, mouseY) >= 0 || graph.keyAt(mouseX, mouseY) ? Qt.OpenHandCursor : Qt.CrossCursor
                 property int dragHandle: -1
                 property int handleFrame: -1
                 property var draft: []
@@ -344,7 +431,7 @@ Item {
                     }
                     moved = false;
                     origin = Qt.point(mouse.x, mouse.y);
-                    dragKey = root.keys.find(k => Math.abs(graph.px(k.frame) - mouse.x) < 9 && Math.abs(graph.py(k[root.channel]) - mouse.y) < 9) || null;
+                    dragKey = graph.keyAt(mouse.x, mouse.y);
                     if (dragKey) {
                         targetFrame = dragKey.frame;
                         targetValue = dragKey[root.channel];
@@ -358,7 +445,7 @@ Item {
                     if (dragHandle >= 0) {
                         const a = root.selected, b = root.segmentEnd, i = dragHandle * 2;
                         let h = draft.slice();
-                        let frame = (mouse.x - graph.plotLeft) / (graph.plotRight - graph.plotLeft) * (root.controller.duration - 1);
+                        let frame = root.firstFrame + (mouse.x - graph.plotLeft) / (graph.plotRight - graph.plotLeft) * (root.lastFrame - root.firstFrame);
                         h[i] = Math.max(dragHandle === 0 ? 0 : h[0], Math.min(dragHandle === 0 ? h[2] : 1, (frame - a.frame) / (b.frame - a.frame)));
                         h[i + 1] = Math.max(-4, Math.min(4, (graph.valueAt(mouse.y) - a[root.channel]) / (b[root.channel] - a[root.channel])));
                         draft = h;
@@ -369,15 +456,15 @@ Item {
                         if (Math.abs(mouse.x - origin.x) + Math.abs(mouse.y - origin.y) > 3)
                             moved = true;
                         if (moved) {
-                            targetFrame = graph.frameAt(mouse.x);
-                            targetValue = graph.valueAt(mouse.y);
+                            targetFrame = Math.max(0, Math.min(root.controller.duration - 1, dragKey.frame + Math.round((mouse.x - origin.x) / (graph.plotRight - graph.plotLeft) * (root.lastFrame - root.firstFrame))));
+                            targetValue = dragKey[root.channel] + (origin.y - mouse.y) / (graph.plotBottom - graph.plotTop) * (root.high - root.low);
                         }
                     } else
                         root.controller.frame = graph.frameAt(mouse.x);
                     graph.requestPaint();
                 }
                 onDoubleClicked: mouse => {
-                    if (!root.keys.some(k => Math.hypot(graph.px(k.frame) - mouse.x, graph.py(k[root.channel]) - mouse.y) < 10) && root.tangentAt(mouse.x, mouse.y) < 0)
+                    if (!graph.keyAt(mouse.x, mouse.y) && root.tangentAt(mouse.x, mouse.y) < 0)
                         root.controller.addCurveKey(graph.frameAt(mouse.x), root.channel, graph.valueAt(mouse.y));
                 }
                 onReleased: {
@@ -410,8 +497,25 @@ Item {
                 Accessible.name: "Animation curve. Use the numeric controls to edit keys without dragging."
             }
         }
+        ScrollBar {
+            id: timeScroll
+            objectName: "curveTimeScroll"
+            visible: root.timeZoom > 1
+            orientation: Qt.Horizontal
+            Layout.fillWidth: true
+            Layout.preferredHeight: 12
+            size: Math.min(1, root.timeSpan / Math.max(1, root.controller.duration - 1))
+            Binding {
+                target: timeScroll
+                property: "position"
+                value: root.firstFrame / Math.max(1, root.controller.duration - 1)
+                when: !timeScroll.pressed
+            }
+            onPositionChanged: if (pressed)
+                root.timeStart = Math.round(position * (root.controller.duration - 1))
+        }
         RowLayout {
-            visible: root.showNumbers
+            visible: root.showNumbers && !root.combined
             Label {
                 text: "Key frame"
             }

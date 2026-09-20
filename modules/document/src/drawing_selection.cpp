@@ -4,6 +4,28 @@
 #include <set>
 #include <stdexcept>
 namespace opentoon {
+void insertStrokePoint(Stroke& stroke, std::size_t segment, double fraction) {
+    if (stroke.shape != Shape::Stroke && stroke.shape != Shape::Polygon)
+        throw std::invalid_argument("Point insertion supports pencil strokes and polygons.");
+    const auto count = stroke.points.size();
+    const auto segments = stroke.shape == Shape::Polygon ? count : count > 0 ? count - 1 : 0;
+    if (segment >= segments || !std::isfinite(fraction) || fraction <= 0 || fraction >= 1 || count >= 100000)
+        throw std::invalid_argument("Choose a point inside an editable segment.");
+    auto a = stroke.points[segment], b = stroke.points[(segment + 1) % count];
+    Point p{a.x + (b.x - a.x) * fraction, a.y + (b.y - a.y) * fraction,
+            a.pressure + (b.pressure - a.pressure) * fraction};
+    stroke.points.insert(stroke.points.begin() + segment + 1, p);
+}
+void removeStrokePoint(Stroke& stroke, std::size_t point) {
+    if (stroke.shape != Shape::Stroke && stroke.shape != Shape::Polygon)
+        throw std::invalid_argument("Point deletion supports pencil strokes and polygons.");
+    const std::size_t minimum = stroke.shape == Shape::Polygon ? 3 : 1;
+    if (point >= stroke.points.size() || stroke.points.size() <= minimum)
+        throw std::invalid_argument(
+            "This stroke cannot lose another point. Use Select to delete the object.");
+    stroke.points.erase(stroke.points.begin() + point);
+}
+
 namespace {
 void validate(PixelRect r) {
     if (r.width < 1 || r.height < 1 || r.width > 20000000 || r.height > 20000000 ||

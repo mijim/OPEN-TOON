@@ -28,13 +28,13 @@
     {
       "id": "P03",
       "status": "in_progress",
-      "available": "Synchronized virtualized timeline/Xsheet, create/hold/clear exposures, insert/remove frames and navigate drawings. Multi-layer range clipboard, independent drawing paste, key paste, cycles, ones/twos/threes, overwrite retiming, Alt-drag moves, markers and bounded Xsheet PDF export.",
+      "available": "Synchronized virtualized timeline/Xsheet, create/hold/clear exposures, insert/remove frames and navigate drawings. Multi-layer range clipboard, independent drawing paste, key paste, cycles, ones/twos/threes, overwrite retiming, Alt-drag moves, markers and bounded Xsheet PDF export. Clear removes selected exposures and pose keys together. Timeline/Xsheet diamonds can be dragged directly; Keys mode adds poses by double-click, with adjustable timeline cell width.",
       "remaining": "Frame annotations/thumbnails, advanced onion/tracing controls, paperless workflows and artist acceptance."
     },
     {
       "id": "P04",
       "status": "in_progress",
-      "available": "Sampled vector strokes, approximate eraser, primitives, single-stroke selection, point editing/smoothing, stable palette IDs and shape recoloring. Rectangular whole-stroke multi-selection, move/duplicate/delete, flips and quarter turns preserve editable geometry, swatch and art-layer IDs. On-canvas scale/rotation handles with live previews and explicit selected-vector properties. Thin vectors have a constant screen-space hit margin respecting art order; point dragging previews the complete stroke, with contextual tool/handle cursors.",
+      "available": "Sampled vector strokes, approximate eraser, primitives, single-stroke selection, point editing/smoothing, stable palette IDs and shape recoloring. Rectangular whole-stroke multi-selection, move/duplicate/delete, flips and quarter turns preserve editable geometry, swatch and art-layer IDs. On-canvas scale/rotation handles with live previews and explicit selected-vector properties. Thin vectors have a constant screen-space hit margin respecting art order; point dragging previews the complete stroke, with contextual tool/handle cursors. Pencil/polygon points can be inserted on segments by double-click and deleted individually while preserving identity, pressure interpolation and minimum geometry.",
       "remaining": "Region topology/fill, analytic erasing, Bezier/contour/width editors, presets/textures/guides, lasso/partial/additive selection and vector optimization."
     },
     {
@@ -46,7 +46,7 @@
     {
       "id": "P06",
       "status": "in_progress",
-      "available": "Layer transform keys with linear/held/smooth interpolation, inherited transforms/opacity, explicit Setup/Animate and Auto key, key navigation/state, editable pose-channel graph and key-only multi-layer retiming with collision rejection. Curves stay in the main workspace; timeline/Xsheet range-end dragging stretches timing. Animate (A) records layer poses directly with move/scale/rotation handles and an initial anchor. Per-channel normalized Bezier handles, overshoot presets, graph key creation and a read-only canvas trajectory share evaluation with export.",
+      "available": "Layer transform keys with linear/held/smooth interpolation, inherited transforms/opacity, explicit Setup/Animate and Auto key, key navigation/state, editable pose-channel graph and key-only multi-layer retiming with collision rejection. Curves stay in the main workspace; timeline/Xsheet range-end dragging stretches timing. Animate (A) records layer poses directly with move/scale/rotation handles and an initial anchor. Per-channel normalized Bezier handles, overshoot presets, graph key creation and a read-only canvas trajectory share evaluation with export. All motion defaults to normalized combined channels with in-place channel selection, square-key editing, linked/unlinked easing handles, a full-pose retiming lane and time zoom/panning.",
       "remaining": "Independent channel keys, linked/free analytic tangents, separate spatial paths and velocity, complete batched editing, cameras and multiplane evaluation."
     },
     {
@@ -84,7 +84,7 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 47,
+      "count": 49,
       "command": "ctest --test-dir build/locked --output-on-failure"
     },
     "native_input_workflow": {
@@ -122,9 +122,17 @@
         "native Bezier handle drag and undo",
         "compact curve graph height budget",
         "native workspace splitter expansion and shrinking",
-        "minimum-window layout with optional numeric fields"
+        "minimum-window layout with optional numeric fields",
+        "native pencil point insertion/deletion and undo",
+        "All motion default and channel population",
+        "combined pose diamond retiming and undo",
+        "combined linked/unlinked Bezier handle editing and transactional preview",
+        "combined square-key time/value drag and double-click insertion",
+        "time zoom separates nearby keys",
+        "Timeline/Xsheet pose-key dragging, Timeline key creation and undo",
+        "actual Clear button clears exposures and keys with one undo"
       ],
-      "limits": "One startup attempt failed to inject the initial stroke with another development instance running; rerun after closing that disposable instance passed. Real-device qualification remains pending."
+      "limits": "Synthetic mouse/tablet events on macOS; no physical tablet available. Window-layout flush required for occluded native smoke instances."
     },
     "png_fixture": {
       "status": "passed",
@@ -150,7 +158,7 @@
         "windows-2022": "32 CTest entries passed with Qt 6.8.3; POSIX process termination test excluded",
         "sanitizers": "27 Qt-free core and MyPaint cases passed with AddressSanitizer and UndefinedBehaviorSanitizer"
       },
-      "limits": "Build/test evidence only; Windows crash-termination test is not implemented, GUI interaction outside macOS, physical tablets and clean-machine installation remain unqualified. Historical evidence; experimental.2 is macOS-validated only under the source-release policy."
+      "limits": "Build/test evidence only; Windows crash-termination test is not implemented, GUI interaction outside macOS, physical tablets and clean-machine installation remain unqualified. Historical evidence; experimental.6 is macOS-validated only under the source-release policy."
     },
     "standalone_package": {
       "status": "failed",
@@ -164,7 +172,7 @@
     },
     "export_workflows": {
       "status": "passed",
-      "cases": 6,
+      "cases": 7,
       "ctest_entry": "export_workflows",
       "covers": [
         "immutable snapshot during concurrent edit",
@@ -175,10 +183,11 @@
         "asynchronous recovery preserves original snapshot and newer unsaved edits",
         "animation inspector, curve sampling, key navigation and saved pixel equivalence",
         "drawing selection locks, media filters and empty-drawing protection",
-        "visual pose/curve commands preserve existing easing and reject invalid handles atomically"
+        "visual pose/curve commands preserve existing easing and reject invalid handles atomically",
+        "default Clear removes selected exposures and keys atomically, preserves outside keys and rejects locked layers"
       ]
     },
-    "total_local_ctest_entries": 48,
+    "total_local_ctest_entries": 50,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -187,8 +196,8 @@
     "drawing_selection": {
       "status": "passed",
       "platform": "macOS",
-      "core_cases": 6,
-      "scope": "Overlapping tile-boundary moves, shared untouched tiles, sparse transparency, source-over compositing, flips and four quarter turns, vector identity and art/palette preservation, undo and atomic rejection. Free affine transforms, transparent raster resampling and explicit vector-ID membership."
+      "core_cases": 7,
+      "scope": "Overlapping tile-boundary moves, shared untouched tiles, sparse transparency, source-over compositing, flips and four quarter turns, vector identity and art/palette preservation, undo and atomic rejection. Free affine transforms, transparent raster resampling and explicit vector-ID membership. Point insertion interpolates pressure and preserves metadata; deletion enforces minimum geometry and rejects analytic primitives."
     },
     "brush_opacity": {
       "status": "passed",
@@ -197,7 +206,7 @@
     "visual_animation": {
       "status": "passed",
       "platform": "macOS",
-      "scope": "Bezier endpoint/overshoot/channel isolation/opacity and retiming; invalid handle rejection; schema 1/2 backup migration; thin-stroke picking at 0.1–10x with rotated nonuniform transforms; native pose and curve gestures.",
+      "scope": "Bezier endpoint/overshoot/channel isolation/opacity and retiming; invalid handle rejection; schema 1/2 backup migration; thin-stroke picking at 0.1\u201310x with rotated nonuniform transforms; native pose and curve gestures. Full-pose retiming preserves values/easing, linked easing validates all channels, collisions reject atomically.",
       "screenshot": "docs/implementation/visual-animation.png",
       "limitations": "Synthetic mouse/tablet input; physical tablets, Linux/Windows qualification and production-scale performance pending."
     }
@@ -213,7 +222,7 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.5",
+  "version": "0.2.0-experimental.6",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",

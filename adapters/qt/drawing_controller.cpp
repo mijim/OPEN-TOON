@@ -53,3 +53,30 @@ bool EditorController::setStrokeProperty(Id id, QString name, double value) {
             }
     });
 }
+
+bool EditorController::insertPoint(opentoon::Id id, int segment, double fraction) {
+    if (!layer_ || segment < 0)
+        return false;
+    return edit("Insert vector point", [&](opentoon::Document& d) {
+        auto& drawing = d.editableDrawing(layer_, frame_);
+        for (auto& stroke : drawing.strokes)
+            if (stroke.id == id) {
+                opentoon::insertStrokePoint(stroke, segment, fraction);
+                return;
+            }
+        throw std::runtime_error("The selected stroke no longer exists.");
+    });
+}
+bool EditorController::deletePoint(opentoon::Id id, int point) {
+    if (!layer_ || point < 0)
+        return false;
+    return edit("Delete vector point", [&](opentoon::Document& d) {
+        auto& drawing = d.editableDrawing(layer_, frame_);
+        for (auto& stroke : drawing.strokes)
+            if (stroke.id == id) {
+                opentoon::removeStrokePoint(stroke, point);
+                return;
+            }
+        throw std::runtime_error("The selected stroke no longer exists.");
+    });
+}

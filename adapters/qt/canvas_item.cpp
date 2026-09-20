@@ -244,7 +244,10 @@ void CanvasItem::paint(QPainter* p) {
                             const auto screenPoint = selectionWorld().map(QPointF(point.x, point.y));
                             p->save();
                             p->setWorldTransform(itemTransform);
-                            p->drawRect(QRectF(screenPoint - QPointF(3, 3), QSizeF(6, 6)));
+                            double radius = int(i) == selectedPoint_ ? 4 : 3;
+                            p->setBrush(int(i) == selectedPoint_ ? Qt::black : Qt::white);
+                            p->drawRect(QRectF(screenPoint - QPointF(radius, radius),
+                                               QSizeF(radius * 2, radius * 2)));
                             p->restore();
                         }
                     }
@@ -499,6 +502,7 @@ void CanvasItem::end() {
         if (selectedStroke_ && selectedPoint_ >= 0) {
             QScopedValueRollback<bool> guard(committing_, true);
             editor_->movePoint(selectedStroke_, selectedPoint_, pointPreview_);
+            selectStroke(selectedStroke_);
         }
     } else if (editor_->tool() == "Eraser")
         editor_->eraseGesture(std::move(points));
@@ -561,7 +565,9 @@ void CanvasItem::mouseReleaseEvent(QMouseEvent* e) {
     e->accept();
 }
 void CanvasItem::mouseUngrabEvent() {
-    cancelGesture();
+    // Normal release also drops the grab; keep the completed point selection.
+    if (drawing_ || panning_ || transforming_)
+        cancelGesture();
 }
 void CanvasItem::wheelEvent(QWheelEvent* e) {
     if (e->modifiers() & Qt::ControlModifier)
@@ -622,6 +628,17 @@ void CanvasItem::smoothSelection() {
         editor_->smoothStroke(selectedStroke_);
 }
 void CanvasItem::deleteSelection() {
+    if (editor_ && editor_->tool() == "Edit points") {
+        if (selectedStroke_ && selectedPoint_ >= 0) {
+            QScopedValueRollback<bool> guard(committing_, true);
+            if (editor_->deletePoint(selectedStroke_, selectedPoint_)) {
+                selectedPoint_ = -1;
+                selectStroke(selectedStroke_);
+            }
+        } else
+            editor_->report("Select a control point to delete it.");
+        return;
+    }
     if (editor_ && editor_->tool() == "Marquee" && hasRegion()) {
         transformRegion(int(SelectionAction::Delete));
     } else if (editor_ && selectedStroke_) {
@@ -878,4 +895,49 @@ bool CanvasItem::handleVisible(int handle) const {
     if (handle == 3 || handle == 7)
         return QLineF(handlePosition(3), handlePosition(7)).length() >= 24;
     return true;
+}
+
+void CanvasItem::mouseDoubleClickEvent(QMouseEvent* e) {
+    if (!editor_ || editor_->tool() != "Edit points" || editor_->playing() || !editor_->selectedLayer()) {
+        QQuickPaintedItem::mouseDoubleClickEvent(e);
+        return;
+    }
+    cancelGesture();
+    const auto* drawing = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame());
+    if (!drawing)
+        return;
+    Id id = hitVector(e->position());
+    double closest = 8, fraction = 0;
+    int segment = -1;
+    for (const auto& stroke : drawing->strokes)
+        if (stroke.id == id && (stroke.shape == Shape::Stroke || stroke.shape == Shape::Polygon)) {
+            const auto count = stroke.points.size();
+            const auto segments = stroke.shape == Shape::Polygon ? count : count ? count - 1 : 0;
+            for (std::size_t i = 0; i < segments; ++i) {
+                auto a = selectionWorld().map(QPointF(stroke.points[i].x, stroke.points[i].y));
+                auto b = selectionWorld().map(
+                    QPointF(stroke.points[(i + 1) % count].x, stroke.points[(i + 1) % count].y));
+                auto v = b - a, delta = e->position() - a;
+                const double length = v.x() * v.x() + v.y() * v.y();
+                if (length < 1e-12)
+                    continue;
+                double t = std::clamp(QPointF::dotProduct(delta, v) / length, 0.0, 1.0);
+                double distance = QLineF(e->position(), a + v * t).length();
+                if (t > 1e-6 && t < 1 - 1e-6 && distance < closest) {
+                    closest = distance;
+                    fraction = t;
+                    segment = int(i);
+                }
+            }
+        }
+    if (segment >= 0) {
+        QScopedValueRollback<bool> guard(committing_, true);
+        if (editor_->insertPoint(id, segment, fraction)) {
+            selectStroke(id);
+            selectedPoint_ = segment + 1;
+            update();
+        }
+    } else
+        editor_->report("Double-click inside a pencil or polygon segment to insert a point.");
+    e->accept();
 }

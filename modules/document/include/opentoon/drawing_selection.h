@@ -1,6 +1,8 @@
 #pragma once
 #include "opentoon/document.h"
 namespace opentoon {
+void insertStrokePoint(Stroke&, std::size_t segment, double fraction);
+void removeStrokePoint(Stroke&, std::size_t point);
 struct PixelRect {
     int x = 0, y = 0, width = 0, height = 0;
     auto operator<=>(const PixelRect&) const = default;

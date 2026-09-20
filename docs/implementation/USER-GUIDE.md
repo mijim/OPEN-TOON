@@ -161,3 +161,43 @@ Curves keeps its actions in a single compact toolbar. **Values** reveals the opt
 frame/value/base-interpolation fields; hiding them gives that space back to the graph.
 Hover the question mark for editing gestures. Buttons, dropdowns, number fields and
 checkboxes use the same compact styling throughout the workspace.
+
+
+## All motion, point editing and Clear
+
+Curves starts on **All motion**. It shows every changing local transform channel of
+the selected layer, normalized to its own fitted display range. Click a name in the
+legend to highlight and edit that curve while keeping the others visible.
+
+- Drag a **square** to change its channel value and key time. Keys still store complete
+  poses: moving a key in time moves its other channels too; their values stay unchanged.
+- Select a starting key, then drag the **round handles** to shape its outgoing easing
+  or overshoot. **Link easing** starts enabled and applies the handle's transition to
+  all pose channels. Turn it off to adjust only the highlighted channel.
+- Drag a **diamond** in the bottom Keys lane to change pose timing without changing values.
+- Double-click in the plot to add a key at that time/value. Double-click in the Keys
+  lane to record the evaluated pose instead. **+ Key** records at the current frame.
+- Use **+ / −** to zoom time around the current frame, the lower scrollbar to pan,
+  and **Fit** to restore the entire timeline and fit values. Drag the workspace divider
+  upward for a taller graph. Escape cancels a drag; Undo reverses one committed gesture.
+
+Linear, Ease and Overshoot presets affect all channels in All motion. Link easing
+controls manual handle drags only. The dropdown's individual channel views show
+original units with optional numeric **Values** controls. Equal start/end values
+need a middle key to make a bounce. Use Animate (A) for direct canvas posing.
+
+Timeline and Xsheet also support dragging pose diamonds. Enable **Keys** to add keys
+with a double-click in an empty cell; turn it off for exposure-range selection and
+new drawings. **+ Key** is always available. Timeline's **+ / −** buttons widen or
+narrow the frame cells. Moving onto an occupied key or editing a locked layer rejects
+the gesture without losing either pose.
+
+With **Edit points**, double-click a pencil or polygon segment to insert a control
+point, drag it to reshape the stroke, and use Delete/Backspace to remove the selected
+point. The last pencil point and the final three polygon points are protected. Use
+Select to delete the entire object. Rectangle/ellipse point counts are fixed.
+
+**Clear** removes both exposures and animation keys within the selected range and
+layers, regardless of the paste-content dropdown. The frame menu action clears one
+cell and its key. Outside keys, rest transforms and drawing resources are preserved;
+Undo restores the cleared exposures and keys together.

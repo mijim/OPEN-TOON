@@ -49,6 +49,7 @@ class CanvasItem : public QQuickPaintedItem {
     void hoverMoveEvent(QHoverEvent*) override;
     void hoverEnterEvent(QHoverEvent*) override;
     void hoverLeaveEvent(QHoverEvent*) override;
+    void mouseDoubleClickEvent(QMouseEvent*) override;
     void mousePressEvent(QMouseEvent*) override;
     void mouseMoveEvent(QMouseEvent*) override;
     void mouseReleaseEvent(QMouseEvent*) override;

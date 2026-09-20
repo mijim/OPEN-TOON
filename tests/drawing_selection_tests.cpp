@@ -1,6 +1,7 @@
 #include "opentoon/drawing_selection.h"
 #include "opentoon/session.h"
 #include "serialization.h"
+#include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 using namespace opentoon;
 namespace {
@@ -154,4 +155,33 @@ TEST_CASE("Affine vector edits freeze object membership and keep rotated primiti
     REQUIRE(d.strokes.front().id == 1);
     REQUIRE(d.strokes.front().swatch == 5);
     REQUIRE(d.strokes.back() == unrelated);
+}
+
+TEST_CASE("Sampled point insertion preserves pressure and point deletion preserves shape identity") {
+    Stroke s{10, 7, 4, Shape::Stroke, false, 2, {{0, 0, .2}, {100, 40, .8}}};
+    const auto original = s;
+    insertStrokePoint(s, 0, .25);
+    REQUIRE(s.points.size() == 3);
+    REQUIRE(s.points[1].x == 25);
+    REQUIRE(s.points[1].y == 10);
+    REQUIRE(s.points[1].pressure == Catch::Approx(.35));
+    REQUIRE(s.id == 10);
+    REQUIRE(s.swatch == 7);
+    REQUIRE(s.artLayer == 2);
+    removeStrokePoint(s, 1);
+    REQUIRE(s == original);
+    removeStrokePoint(s, 0);
+    REQUIRE_THROWS(removeStrokePoint(s, 0));
+    s = original;
+    s.shape = Shape::Rectangle;
+    REQUIRE_THROWS(insertStrokePoint(s, 0, .5));
+    REQUIRE_THROWS(removeStrokePoint(s, 0));
+    s = original;
+    s.shape = Shape::Polygon;
+    s.points.push_back({50, 80, .5});
+    insertStrokePoint(s, 2, .5);
+    REQUIRE(s.points.back().x == 25);
+    REQUIRE(s.points.back().y == 40);
+    removeStrokePoint(s, 3);
+    REQUIRE_THROWS(removeStrokePoint(s, 0));
 }

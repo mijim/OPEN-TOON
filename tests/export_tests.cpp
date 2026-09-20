@@ -118,6 +118,35 @@ TEST_CASE("Visual curve commands preserve poses and undo atomically") {
     editor.undo();
     REQUIRE(editor.document() == before);
 }
+
+TEST_CASE("Clear removes range exposures and keys together and undo restores both") {
+    EditorController editor;
+    editor.newScene();
+    editor.holdDrawing(40);
+    REQUIRE(editor.addCurveKey(10, "x", 100));
+    REQUIRE(editor.addCurveKey(20, "y", 60));
+    REQUIRE(editor.setPoseCurveHandles(0, .3, 0, .7, 1));
+    auto original = editor.document();
+    editor.selectTimelineRange(0, 10, 0, 0);
+    editor.clearTimelineRange();
+    const auto& layer = editor.document().layer(editor.selectedLayer());
+    REQUIRE(layer.keys.size() == 1);
+    REQUIRE(layer.keys.front().frame == 20);
+    REQUIRE_FALSE(editor.document().drawingAt(layer.id, 0));
+    REQUIRE(editor.document().drawingAt(layer.id, 11));
+    editor.undo();
+    REQUIRE(editor.document() == original);
+    editor.setFrame(10);
+    editor.clearExposure();
+    REQUIRE(editor.document().layer(editor.selectedLayer()).keys.size() == 2);
+    REQUIRE_FALSE(editor.document().drawingAt(editor.selectedLayer(), 10));
+    editor.undo();
+    REQUIRE(editor.document() == original);
+    editor.toggleLayer(editor.selectedLayer(), "locked");
+    auto locked = editor.document();
+    editor.clearTimelineRange();
+    REQUIRE(editor.document() == locked);
+}
 int main(int argc, char** argv) {
     QGuiApplication application(argc, argv);
     QCoreApplication::setApplicationName("OPEN-TOON-export-tests");

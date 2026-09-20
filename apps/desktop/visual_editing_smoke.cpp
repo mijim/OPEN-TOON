@@ -56,6 +56,22 @@ void visualEditingSmoke(EditorController& editor, CanvasItem& canvas, QQuickWind
     require(editor.document().drawings != beforePoint.drawings, "Point handle drag did not edit the stroke.");
     editor.undo();
     require(editor.document() == beforePoint, "Point undo changed unrelated data.");
+    const auto beforeInsert = editor.document();
+    const auto pointCount = beforeInsert.drawingAt(editor.selectedLayer(), 0)->strokes.front().points.size();
+    send(QEvent::MouseButtonPress, center, Qt::LeftButton, Qt::LeftButton);
+    send(QEvent::MouseButtonDblClick, center, Qt::LeftButton, Qt::LeftButton);
+    send(QEvent::MouseButtonRelease, center, Qt::LeftButton, Qt::NoButton);
+    require(editor.document().drawingAt(editor.selectedLayer(), 0)->strokes.front().points.size() ==
+                pointCount + 1,
+            "Native double-click did not insert a vector point.");
+    canvas.deleteSelection();
+    require(editor.document() == beforeInsert, "Deleting the inserted point changed the remaining stroke.");
+    editor.undo();
+    require(editor.document().drawingAt(editor.selectedLayer(), 0)->strokes.front().points.size() ==
+                pointCount + 1,
+            "Point deletion undo failed.");
+    editor.undo();
+    require(editor.document() == beforeInsert, "Point insertion undo failed.");
     const auto drawing = editor.document().drawings;
     editor.setFrame(12);
     editor.setTool("Animate");
@@ -130,10 +146,11 @@ void visualEditingSmoke(EditorController& editor, CanvasItem& canvas, QQuickWind
             "Native Bezier handle drag failed.");
     editor.undo();
     require(editor.document() == beforeHandle, "Bezier handle undo changed other data.");
-    auto settle = [] {
+    auto settle = [&] {
         QEventLoop loop;
         QTimer::singleShot(80, &loop, &QEventLoop::quit);
         loop.exec();
+        window.grabWindow();
     };
     settle();
     require(graph->height() >= panel->height() - 65, "Curve toolbar consumes too much graph height.");
@@ -166,5 +183,161 @@ void visualEditingSmoke(EditorController& editor, CanvasItem& canvas, QQuickWind
     panel->setProperty("showNumbers", false);
     window.resize(1440, 920);
     window.setProperty("bottomHeight", 280);
+    settle();
+    QMetaObject::invokeMethod(panel, "selectChannel", Q_ARG(QVariant, QVariant("all")));
+    settle();
+    require(panel->property("combined").toBool(), "All motion did not become active.");
+    auto* combined = window.findChild<QQuickItem*>("combinedMotionCanvas");
+    auto* overview = window.findChild<QQuickItem*>("motionOverview");
+    require(combined && overview && combined->height() > 150, "Combined motion graph has no usable area.");
+    require(overview->property("curveCount").toInt() >= 2, "Combined motion omitted animated X or Y.");
+    auto keyPosition = [&](int frame) {
+        double left = combined->property("plotLeft").toDouble(),
+               right = combined->property("plotRight").toDouble();
+        return combined->mapToScene(QPointF(left + frame / double(editor.duration() - 1) * (right - left),
+                                            combined->property("keyY").toDouble()));
+    };
+    const auto beforeRetime = editor.document();
+    sendGraph(QEvent::MouseButtonPress, keyPosition(12), Qt::LeftButton, Qt::LeftButton);
+    sendGraph(QEvent::MouseMove, keyPosition(18), Qt::NoButton, Qt::LeftButton);
+    sendGraph(QEvent::MouseButtonRelease, keyPosition(18), Qt::LeftButton, Qt::NoButton);
+    require(editor.document().layer(editor.selectedLayer()).keys.back().frame == 18,
+            "Combined pose diamond did not retime.");
+    require(editor.document().layer(editor.selectedLayer()).keys.back().value ==
+                beforeRetime.layer(editor.selectedLayer()).keys.back().value,
+            "Combined retiming modified the pose values.");
+    editor.undo();
+    require(editor.document() == beforeRetime, "Combined retiming undo failed.");
+    editor.setFrame(0);
+    settle();
+    auto tangentPosition = [&] {
+        QVariant value;
+        require(QMetaObject::invokeMethod(overview, "tangent", Q_RETURN_ARG(QVariant, value),
+                                          Q_ARG(QVariant, QVariant(0))),
+                "Cannot locate overview handle.");
+        require(value.canConvert<QPointF>(), "Overview has no editable outgoing handle.");
+        return combined->mapToScene(value.toPointF());
+    };
+    const auto beforeLinked = editor.document();
+    auto linkedFrom = tangentPosition(), linkedTo = linkedFrom + QPointF(5, -15);
+    sendGraph(QEvent::MouseButtonPress, linkedFrom, Qt::LeftButton, Qt::LeftButton);
+    sendGraph(QEvent::MouseMove, linkedTo, Qt::NoButton, Qt::LeftButton);
+    require(editor.document() == beforeLinked, "Linked easing preview changed the document before release.");
+    sendGraph(QEvent::MouseButtonRelease, linkedTo, Qt::LeftButton, Qt::NoButton);
+    const auto linked = editor.document().layer(editor.selectedLayer()).keys.front().easing;
+    require(linked.size() == 8 && linked.at("x") == linked.at("y") &&
+                linked.at("x") != beforeLinked.layer(editor.selectedLayer()).keys.front().easing.at("x"),
+            "All motion did not ease the complete pose through a handle drag.");
+    require(panel->property("combined").toBool(), "Editing a handle left All motion.");
+    editor.undo();
+    require(editor.document() == beforeLinked, "Linked easing undo was not atomic.");
+    overview->setProperty("linkEasing", false);
+    settle();
+    linkedFrom = tangentPosition();
+    linkedTo = linkedFrom + QPointF(5, -15);
+    sendGraph(QEvent::MouseButtonPress, linkedFrom, Qt::LeftButton, Qt::LeftButton);
+    sendGraph(QEvent::MouseMove, linkedTo, Qt::NoButton, Qt::LeftButton);
+    sendGraph(QEvent::MouseButtonRelease, linkedTo, Qt::LeftButton, Qt::NoButton);
+    auto unlinked = editor.document().layer(editor.selectedLayer()).keys.front().easing;
+    require(unlinked.size() == 1 &&
+                unlinked.at("x") != beforeLinked.layer(editor.selectedLayer()).keys.front().easing.at("x"),
+            "Unlinked handle editing did not isolate the selected channel.");
+    editor.undo();
+    require(editor.document() == beforeLinked, "Unlinked easing undo failed.");
+    overview->setProperty("linkEasing", true);
+    settle();
+    auto motionPoint = [&](int frame, double value) {
+        QVariant result;
+        require(QMetaObject::invokeMethod(combined, "pointFor", Q_RETURN_ARG(QVariant, result),
+                                          Q_ARG(QVariant, QVariant(frame)), Q_ARG(QVariant, QVariant(value))),
+                "Cannot map overview curve coordinates.");
+        return combined->mapToScene(result.toPointF());
+    };
+    const auto beforeValue = editor.document();
+    const auto oldPose = beforeValue.layer(editor.selectedLayer()).keys.back().value;
+    auto valueFrom = motionPoint(12, oldPose.x), valueTo = motionPoint(16, oldPose.x + 8);
+    sendGraph(QEvent::MouseButtonPress, valueFrom, Qt::LeftButton, Qt::LeftButton);
+    sendGraph(QEvent::MouseMove, valueTo, Qt::NoButton, Qt::LeftButton);
+    sendGraph(QEvent::MouseButtonRelease, valueTo, Qt::LeftButton, Qt::NoButton);
+    const auto valueKey = editor.document().layer(editor.selectedLayer()).keys.back();
+    require(valueKey.frame == 16 && std::abs(valueKey.value.x - oldPose.x - 8) < 1 &&
+                valueKey.value.y == oldPose.y,
+            "All motion square drag did not edit time and channel value.");
+    editor.undo();
+    require(editor.document() == beforeValue, "All motion square drag undo failed.");
+    auto addPoint = motionPoint(18, oldPose.x * .6);
+    sendGraph(QEvent::MouseButtonPress, addPoint, Qt::LeftButton, Qt::LeftButton);
+    sendGraph(QEvent::MouseButtonDblClick, addPoint, Qt::LeftButton, Qt::LeftButton);
+    sendGraph(QEvent::MouseButtonRelease, addPoint, Qt::LeftButton, Qt::NoButton);
+    require(editor.document().layer(editor.selectedLayer()).keys.size() == 3 &&
+                editor.document().layer(editor.selectedLayer()).keys.back().frame == 18,
+            "All motion double-click did not add a curve key.");
+    editor.undo();
+    require(editor.document() == beforeValue, "Visual key insertion undo failed.");
+    editor.setFrame(12);
+    const auto unzoomedX = motionPoint(12, oldPose.x).x() - motionPoint(0, 0).x();
+    QMetaObject::invokeMethod(panel, "zoomTime", Q_ARG(QVariant, QVariant(2)));
+    settle();
+    require(motionPoint(12, oldPose.x).x() - motionPoint(0, 0).x() > unzoomedX * 1.8,
+            "Time zoom did not spread nearby keys.");
+    panel->setProperty("timeZoom", 1);
+    panel->setProperty("timeStart", 0);
+    window.setProperty("showCurves", false);
+    window.setProperty("keyEditing", true);
+    settle();
+    auto* timeline = window.findChild<QQuickItem*>("timelineCanvas");
+    require(timeline, "Timeline is missing.");
+    auto timelineKey = [&](int frame) {
+        QVariant result;
+        require(QMetaObject::invokeMethod(timeline, "keyPosition", Q_RETURN_ARG(QVariant, result),
+                                          Q_ARG(QVariant, QVariant(frame)), Q_ARG(QVariant, QVariant(0))),
+                "Cannot map timeline key.");
+        return timeline->mapToScene(result.toPointF());
+    };
+    for (bool xsheet : {false, true}) {
+        window.setProperty("xsheet", xsheet);
+        settle();
+        // Xsheet's frame 12 is below the viewport: use frame zero to test the same gesture.
+        const int source = xsheet ? 0 : 12, destinationFrame = xsheet ? 2 : 18;
+        const auto beforeTimeline = editor.document();
+        auto start = timelineKey(source), end = timelineKey(destinationFrame);
+        sendGraph(QEvent::MouseButtonPress, start, Qt::LeftButton, Qt::LeftButton);
+        sendGraph(QEvent::MouseMove, end, Qt::NoButton, Qt::LeftButton);
+        require(editor.document() == beforeTimeline, "Timeline key preview modified the document.");
+        sendGraph(QEvent::MouseButtonRelease, end, Qt::LeftButton, Qt::NoButton);
+        const auto& timelineKeys = editor.document().layer(editor.selectedLayer()).keys;
+        require(std::any_of(timelineKeys.begin(), timelineKeys.end(),
+                            [&](const auto& k) { return k.frame == destinationFrame; }),
+                "Timeline/Xsheet diamond drag did not move the pose.");
+        editor.undo();
+        require(editor.document() == beforeTimeline, "Timeline key drag undo failed.");
+    }
+    window.setProperty("xsheet", false);
+    settle();
+    auto newTimelineKey = timelineKey(20);
+    sendGraph(QEvent::MouseButtonPress, newTimelineKey, Qt::LeftButton, Qt::LeftButton);
+    sendGraph(QEvent::MouseButtonDblClick, newTimelineKey, Qt::LeftButton, Qt::LeftButton);
+    sendGraph(QEvent::MouseButtonRelease, newTimelineKey, Qt::LeftButton, Qt::NoButton);
+    require(editor.document().layer(editor.selectedLayer()).keys.size() == 3 &&
+                editor.document().layer(editor.selectedLayer()).keys.back().frame == 20,
+            "Timeline Keys mode double-click did not add a pose.");
+    editor.undo();
+    window.setProperty("showTimingTools", true);
+    editor.selectTimelineRange(0, 12, 0, 0);
+    settle();
+    auto* clear = window.findChild<QQuickItem*>("clearTimelineButton");
+    require(clear, "Clear button is missing.");
+    auto clearPoint = clear->mapToScene(QPointF(clear->width() / 2, clear->height() / 2));
+    auto beforeClear = editor.document();
+    sendGraph(QEvent::MouseButtonPress, clearPoint, Qt::LeftButton, Qt::LeftButton);
+    sendGraph(QEvent::MouseButtonRelease, clearPoint, Qt::LeftButton, Qt::NoButton);
+    require(editor.document().layer(editor.selectedLayer()).keys.empty(),
+            "Clear button left animation keys behind.");
+    require(!editor.document().drawingAt(editor.selectedLayer(), 0),
+            "Clear button left the selected exposure behind.");
+    editor.undo();
+    require(editor.document() == beforeClear, "Clear undo failed to restore animation and drawing exposure.");
+    window.setProperty("showCurves", true);
+    editor.setFrame(0);
     settle();
 }

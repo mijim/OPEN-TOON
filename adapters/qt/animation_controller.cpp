@@ -146,3 +146,21 @@ bool EditorController::addCurveKey(int frame, QString channel, double value) {
         setFrame(frame);
     return result;
 }
+
+bool EditorController::movePoseKey(int source, int destination) {
+    if (!layer_)
+        return false;
+    bool result = edit("Retime complete pose", [&](Document& d) {
+        opentoon::movePoseKey(d.layer(layer_), source, destination);
+        d.duration = std::max(d.duration, destination + 1);
+    });
+    if (result)
+        setFrame(destination);
+    return result;
+}
+bool EditorController::setPoseCurveHandles(int frame, double x1, double y1, double x2, double y2) {
+    if (!layer_)
+        return false;
+    return edit("Ease complete pose",
+                [&](Document& d) { setPoseEase(d.layer(layer_), frame, {x1, y1, x2, y2}); });
+}

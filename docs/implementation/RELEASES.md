@@ -1,5 +1,18 @@
 # Experimental releases
 
+## 0.2.0-experimental.6 — editable combined motion
+
+- All motion is the default: highlight a channel and edit square keys or round handles in place.
+- Linked easing shapes all channels together; switch it off for individual handle edits.
+- Full-pose diamonds drag in All motion, Timeline and Xsheet; Keys mode supports double-click insertion.
+- Time zoom/panning, wider timeline cells, larger hit areas and explicit add/remove controls.
+- Clear removes selected exposures and animation keys together, with one undo.
+- Double-click pencil/polygon segments to insert points; Delete/Backspace removes a selected point.
+- macOS: 50 CTest entries; native combined-curve, key drag/add, point and Clear workflows passed. Source only; format remains 3.
+
+P04/P06 and P11 remain partial. Independent channel timing, analytic contour geometry,
+spatial velocity, cameras and drawing morphing remain open. See ADR-017.
+
 ## 0.2.0-experimental.5 — visual animation and precise picking
 
 - Animate (A): move, scale and rotate layer poses on the canvas, with initial anchors, live previews and one undo per gesture.
