@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "bcee5640-6156-494b-8e41-312dc56e340a",
+  "title": "Add Libraries",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T16:46:41.120Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "docs/planning/libraries.json",
+      "kind": "created",
+      "area": "tests",
+      "added": 399,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "addbf296-17e2-4bac-bf8c-87b588068716"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "addbf296-17e2-4bac-bf8c-87b588068716",
+      "title": "Introduce Libraries",
+      "explanation": "This part of libraries.json adds 399 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the main implementation change.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 1,
+      "endLine": 399,
+      "area": "tests",
+      "added": 399,
+      "removed": 0
+    }
+  ]
+}

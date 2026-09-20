@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "id": "288ed8b0-d163-4828-93b8-83a7167d5208",
+  "title": "Improve tests flow",
+  "summary": "2 files changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T17:09:58.348Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "docs/planning/roadmap.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 4,
+      "removed": 3
+    },
+    {
+      "path": "scripts/roadmap.py",
+      "kind": "modified",
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "db2ba76e-2776-4068-809b-797b757dbc97",
+        "6c951011-14f3-4813-bf5a-979efcd5b502",
+        "1a7b30a4-d364-41b8-849b-a4db3c72c317",
+        "d7ad91f1-34ea-4c04-a7fb-d7d7c7e4b97d"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "db2ba76e-2776-4068-809b-797b757dbc97",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 90,
+      "endLine": 90,
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "id": "6c951011-14f3-4813-bf5a-979efcd5b502",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 127,
+      "endLine": 127,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "1a7b30a4-d364-41b8-849b-a4db3c72c317",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 1 line and adds 2. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 3410,
+      "endLine": 3411,
+      "area": "tests",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "d7ad91f1-34ea-4c04-a7fb-d7d7c7e4b97d",
+      "title": "Reshape `documents`",
+      "explanation": "The `documents` section replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "scripts/roadmap.py",
+      "startLine": 40,
+      "endLine": 40,
+      "area": "tests",
+      "symbol": "documents",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}
