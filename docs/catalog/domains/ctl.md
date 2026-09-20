@@ -26,7 +26,7 @@ Mostrar widgets vinculados a atributos del rig con selección y límites.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-25b190db56](https://docs.toonboom.com/help/harmony-25/premium/master-controller/about-master-controller.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## CTL-002 — Slider de poses
 
@@ -36,7 +36,7 @@ Generar un control unidimensional a partir de poses compatibles.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-f3f4f3f583](https://docs.toonboom.com/help/harmony-25/premium/master-controller/about-slider-wizard.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## CTL-003 — Rejilla de poses
 
@@ -46,7 +46,7 @@ Crear un control bidimensional sobre muestras de pose organizadas.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-c40cb9f32b](https://docs.toonboom.com/help/harmony-25/premium/master-controller/about-grid-wizard.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## CTL-004 — Asistente de funciones
 
@@ -56,7 +56,7 @@ Enlazar controles a atributos, activación y visibilidad sin escribir cada scrip
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-4d847c3493](https://docs.toonboom.com/help/harmony-25/premium/master-controller/about-function-wizard.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## CTL-005 — Panel de personaje
 
@@ -66,7 +66,7 @@ Agrupar controles identificables para manipulación de un personaje.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-a9027b8149](https://docs.toonboom.com/help/harmony-25/premium/master-controller/function-wizard-create-character-dashboard.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## CTL-006 — Controlador por script
 
@@ -76,7 +76,7 @@ Exponer eventos y atributos para controles personalizados con validación.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-8f84bf9cad](https://docs.toonboom.com/help/harmony-25/premium/master-controller/script-master-controller.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## CTL-007 — Deformador sobre deformador
 
@@ -86,7 +86,7 @@ Componer controles que actúan sobre otra estructura de deformación.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-b74f4903b0](https://docs.toonboom.com/help/harmony-25/premium/master-controller/about-deformer-on-deformer.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## CTL-008 — Controladores transportables
 
@@ -96,4 +96,4 @@ Incluir dependencias y bindings al guardar una plantilla de rig.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-e69bbb249a](https://docs.toonboom.com/help/harmony-25/premium/master-controller/create-template-master-controller.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

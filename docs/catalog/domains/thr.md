@@ -26,7 +26,7 @@ Leer formatos admitidos con materiales y jerarquías dentro de un perfil documen
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-760bffb608](https://docs.toonboom.com/help/harmony-25/premium/3d-integration/about-3d-integration.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## THR-002 — Unidades y escala
 
@@ -36,7 +36,7 @@ Interpretar unidades del archivo y convertirlas al espacio de la escena.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-3c91b9aef0](https://docs.toonboom.com/help/harmony-25/premium/release-notes/harmony/harmony-25-1-release-notes.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## THR-003 — Clips de animación 3D
 
@@ -46,7 +46,7 @@ Seleccionar y retimar animaciones incluidas en el asset.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-bec9b28ee7](https://docs.toonboom.com/help/harmony-25/premium/3d-integration/about-animated-3d-models.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## THR-004 — Subnodos
 
@@ -56,7 +56,7 @@ Seleccionar y animar componentes internos del modelo.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-44140221d7](https://docs.toonboom.com/help/harmony-25/premium/3d-integration/about-3d-graph-view.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## THR-005 — Armatures y skinning
 
@@ -66,7 +66,7 @@ Animar esqueletos y deformación del modelo bajo límites soportados.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-2b8924fc2d](https://docs.toonboom.com/help/harmony-25/premium/3d-integration/bone-skinning.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## THR-006 — Overrides de subnodos
 
@@ -76,7 +76,7 @@ Hornear transformaciones y clips importados en claves editables.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-e0be0dd368](https://docs.toonboom.com/help/harmony-25/premium/3d-integration/bake-subnode-override.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## THR-007 — Composición 2D y 3D
 
@@ -86,7 +86,7 @@ Combinar planos dibujados y modelos con profundidad, transparencia y cámara coh
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-6936ae1d91](https://docs.toonboom.com/help/harmony-25/premium/3d-integration/about-3d-model-harmony.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## THR-008 — Render externo
 
@@ -96,7 +96,7 @@ Orquestar renderizadores externos con cancelación, errores y recursos explícit
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-13bbeb4faa](https://docs.toonboom.com/help/harmony-25/premium/reference/node/3d/render-maya-blender-batch-node.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## THR-009 — Normalización de profundidad
 
@@ -106,4 +106,4 @@ Tratar bordes de Z y aplanado de resultados 3D.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-b02bff22a8](https://docs.toonboom.com/help/harmony-25/premium/reference/node/3d/z-buffer-smoothing-node.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

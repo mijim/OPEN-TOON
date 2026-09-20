@@ -26,7 +26,7 @@ Combinar imágenes con ecuaciones de mezcla y alfa documentadas.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-f06f7a2f68](https://docs.toonboom.com/help/harmony-25/premium/reference/node/combine/blending-node.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FX-002 — Transparencia animada
 
@@ -36,7 +36,7 @@ Controlar alfa independientemente de RGB.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-b69e81e91d](https://docs.toonboom.com/help/harmony-25/premium/reference/node/filter/transparency-node.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FX-003 — Blur gaussiano y box
 
@@ -46,7 +46,7 @@ Filtrar por radio con extensión de borde explícita.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-674d718b26](https://docs.toonboom.com/help/harmony-25/premium/reference/node/filter/blur-gaussian-node.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FX-004 — Blur direccional, radial y zoom
 
@@ -56,7 +56,7 @@ Aplicar desenfoques con centro, dirección y longitud animables.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-83b0cb533a](https://docs.toonboom.com/help/harmony-25/premium/reference/node/filter/blur-radial-zoom-node.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FX-005 — Bokeh y blur variable
 
@@ -66,7 +66,7 @@ Controlar desenfoque mediante forma y mapas espaciales.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-e2dd78046b](https://docs.toonboom.com/help/harmony-25/premium/reference/node/filter/bokeh-blur-node.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FX-006 — Glow y bloom
 
@@ -76,7 +76,7 @@ Generar halo luminoso preservando HDR cuando esté habilitado.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-54340ff712](https://docs.toonboom.com/help/harmony-25/premium/reference/node/filter/bloom-node.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FX-007 — Sombras, tonos y highlights
 
@@ -86,7 +86,7 @@ Crear sombreado 2D por silueta y matte.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-92aba889fe](https://docs.toonboom.com/help/harmony-25/premium/reference/node/filter/shadow-node.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FX-008 — Curvas y niveles de color
 
@@ -96,7 +96,7 @@ Modificar canales mediante curvas y rangos animables.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-2abc9c921f](https://docs.toonboom.com/help/harmony-25/premium/effects/adjust-colour-curve.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FX-009 — Color override
 
@@ -106,7 +106,7 @@ Sustituir muestras y texturas por identidad en ramas concretas.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-8c75ad0708](https://docs.toonboom.com/help/harmony-25/premium/effects/about-colour-override.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FX-010 — Fades de paleta
 
@@ -116,7 +116,7 @@ Interpolar colores de una paleta o muestra en el tiempo.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-c4f81a63a2](https://docs.toonboom.com/help/harmony-25/premium/effects/about-colour-fade.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FX-011 — Transformación de textura
 
@@ -126,7 +126,7 @@ Animar coordenadas de relleno sin mover geometría.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-cc348d1a1d](https://docs.toonboom.com/help/harmony-25/premium/effects/modify-texture-fills-transformation.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FX-012 — Texturas por secuencia
 
@@ -136,7 +136,7 @@ Sustituir una textura por frames de una secuencia externa.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-c84b74df9e](https://docs.toonboom.com/help/harmony-25/premium/effects/override-colour-bitmap-image-sequence.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FX-013 — Matte animado
 
@@ -146,7 +146,7 @@ Editar contornos animables con suavizado interior y exterior.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-e329520013](https://docs.toonboom.com/help/harmony-25/premium/effects/animated-matte-generator/about-animated-matte-generator.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FX-014 — Canales y keying
 
@@ -156,7 +156,7 @@ Seleccionar, intercambiar y extraer mattes desde canales de imagen.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-0a2a946319](https://docs.toonboom.com/help/harmony-25/premium/reference/node/filter/channel-selector-node.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FX-015 — Generadores
 
@@ -166,7 +166,7 @@ Crear color plano, gradientes, rejillas y ruido como fuentes de imagen.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-9b7bf3ee52](https://docs.toonboom.com/help/harmony-25/premium/reference/node/generator/generator-node.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FX-016 — Distorsión y turbulencia
 
@@ -176,7 +176,7 @@ Deformar coordenadas de muestreo con mapas y parámetros.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-1a92cef5c5](https://docs.toonboom.com/help/harmony-25/premium/reference/node/deformation/turbulence-node.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FX-017 — Nitidez y antiflicker
 
@@ -186,7 +186,7 @@ Ofrecer filtros de detalle y estabilización visual con rango acotado.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-24b0a7913c](https://docs.toonboom.com/help/harmony-25/premium/effects/unsharp-mask.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FX-018 — Light shading y normales
 
@@ -196,7 +196,7 @@ Iluminar arte mediante normales o volúmenes auxiliares.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-8693901f0a](https://docs.toonboom.com/help/harmony-25/premium/effects/about-light-shading.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FX-019 — Surface shading y sombras proyectadas
 
@@ -206,7 +206,7 @@ Definir superficies y elevación para sombras y oclusión.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-a9272ca17c](https://docs.toonboom.com/help/harmony-25/premium/effects/cast-shadow/about-surface-shading.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FX-020 — OpenFX
 
@@ -216,4 +216,4 @@ Alojar un subconjunto declarado del estándar con plugins compatibles.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-dbd6ebac99](https://docs.toonboom.com/help/harmony-25/premium/effects/about-openfx.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

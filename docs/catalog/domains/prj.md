@@ -26,7 +26,7 @@ Crear escenas locales con nombre, ruta y configuración explícita.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-3bafbe2bec](https://docs.toonboom.com/help/harmony-25/premium/project-creation/create-scene.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## PRJ-002 — Resolución y aspect ratio
 
@@ -36,7 +36,7 @@ Configurar anchura, altura, proporción de píxel y presets personalizados.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-da6b6cf1b2](https://docs.toonboom.com/help/harmony-25/premium/project-creation/create-custom-resolution.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## PRJ-003 — FPS y duración
 
@@ -46,7 +46,7 @@ Definir tasa de fotogramas y longitud; decidir si cambiar FPS conserva frames o 
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-8dacf5486c](https://docs.toonboom.com/help/harmony-25/premium/project-creation/about-scene-setting.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## PRJ-004 — Guardar y guardar copia
 
@@ -56,7 +56,7 @@ Persistir recursos y escena con una operación coherente; guardar copia conserva
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-fc0d10d142](https://docs.toonboom.com/help/harmony-25/premium/project-creation/save-scene-new-copy.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## PRJ-005 — Autoguardado
 
@@ -66,7 +66,7 @@ Programar recuperación sin bloquear dibujo ni sustituir silenciosamente un guar
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-6927a4c994](https://docs.toonboom.com/help/harmony-25/premium/project-creation/auto-save-scene.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## PRJ-006 — Versiones de escena
 
@@ -76,7 +76,7 @@ Conservar revisiones identificables y abrir una versión elegida.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-3f5fbd4b66](https://docs.toonboom.com/help/harmony-25/premium/project-creation/save-scene-new-version.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## PRJ-007 — Formato compacto
 
@@ -86,7 +86,7 @@ Ofrecer empaquetado y desempaquetado de escena con recursos incluidos.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-1ce1dd2d1e](https://docs.toonboom.com/help/harmony-25/premium/project-creation/compact-file-structure.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## PRJ-008 — Integridad de proyecto
 
@@ -96,7 +96,7 @@ Detectar archivos ausentes, referencias inválidas y componentes corruptos con d
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-4b1d0004a4](https://docs.toonboom.com/help/harmony-25/premium/project-creation/verify-project-integrity.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## PRJ-009 — Optimización de backups
 
@@ -106,7 +106,7 @@ Listar tamaño y uso de copias antes de limpiar recursos redundantes.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-3c91b9aef0](https://docs.toonboom.com/help/harmony-25/premium/release-notes/harmony/harmony-25-1-release-notes.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## PRJ-010 — Recientes y bienvenida
 
@@ -116,4 +116,4 @@ Mostrar escenas recientes y acciones de crear, abrir y localizar un archivo movi
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-ba4fd0aa8d](https://docs.toonboom.com/help/harmony-25/premium/project-creation/about-welcome-screen.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

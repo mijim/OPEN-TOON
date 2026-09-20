@@ -11,7 +11,6 @@ from catalog import ROOT, read, documents
 errors = []
 features = read('features.json')['features']
 domains = read('domains.json')['domains']
-references = json.loads((ROOT / 'docs/research/reference-index.json').read_text())['entries']
 nodes = read('node-reference.json')['entries']
 nfr = read('nonfunctional.json')['requirements']
 
@@ -25,11 +24,9 @@ def unique(items, kind):
 
 feature_ids = unique(features, 'feature')
 domain_ids = unique(domains, 'domain')
-reference_ids = unique(references, 'reference')
 unique(nodes, 'node')
 unique(nfr, 'nonfunctional')
-reference_map = {r['id']: r for r in references}
-required = {'id', 'domain', 'title', 'requirement', 'acceptance_criteria', 'source_ids', 'reference_url', 'evidence', 'implementation_status', 'scope', 'capability_level', 'owner_module', 'depends_on_domains', 'specification_status'}
+required = {'id', 'domain', 'title', 'requirement', 'acceptance_criteria', 'evidence', 'implementation_status', 'scope', 'capability_level', 'owner_module', 'depends_on_domains', 'specification_status'}
 for f in features:
     if not required <= f.keys():
         errors.append(f"Missing fields in {f['id']}")
@@ -47,17 +44,6 @@ for f in features:
         errors.append(f"Invalid level: {f['id']}")
     if set(f['depends_on_domains']) - domain_ids:
         errors.append(f"Unknown dependency: {f['id']}")
-    for source in f['source_ids']:
-        if source not in reference_ids:
-            errors.append(f"Unknown source: {f['id']}: {source}")
-        elif reference_map[source]['url'] != f['reference_url']:
-            errors.append(f"URL mismatch: {f['id']}: {source}")
-for node in nodes:
-    if node['reference_id'] not in reference_ids:
-        errors.append(f"Unknown node source: {node['id']}")
-for ref in references:
-    if set(ref['feature_ids']) - feature_ids:
-        errors.append(f"Invalid reverse references: {ref['id']}")
 
 graph = {d['id']: d['depends_on'] for d in domains}
 visited = set()
@@ -90,4 +76,4 @@ for path in [ROOT / 'README.md', ROOT / 'AGENTS.md', ROOT / 'CONTRIBUTING.md', *
 if errors:
     print('\n'.join(errors), file=sys.stderr)
     raise SystemExit(1)
-print(f'OK: {len(features)} features, {len(domains)} domains, {len(nodes)} node references, {len(references)} indexed pages, {len(nfr)} quality requirements; generated views and local links valid.')
+print(f'OK: {len(features)} features, {len(domains)} domains, {len(nodes)} node entries, {len(nfr)} quality requirements; generated views and local links valid.')

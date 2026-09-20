@@ -26,7 +26,7 @@ Crear capas de dibujo, sonido y transformación con atributos específicos.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-941df44055](https://docs.toonboom.com/help/harmony-25/premium/layers/layer-column-type.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## LYR-002 — Reordenar y renombrar
 
@@ -36,7 +36,7 @@ Cambiar orden y etiquetas manteniendo identificadores estables.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-ceff40db57](https://docs.toonboom.com/help/harmony-25/premium/layers/reorder-layer-column.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## LYR-003 — Visibilidad, bloqueo y solo
 
@@ -46,7 +46,7 @@ Separar visibilidad de edición, bloqueo y aislamiento temporal.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-7291b58452](https://docs.toonboom.com/help/harmony-25/premium/layers/enable-disable-solo-mode.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## LYR-004 — Grupos de capas
 
@@ -56,7 +56,7 @@ Agrupar y desagrupar conservando las relaciones que afectan al resultado.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-06d100d8bb](https://docs.toonboom.com/help/harmony-25/premium/layers/about-group-timeline.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## LYR-005 — Duplicar o clonar
 
@@ -66,7 +66,7 @@ Distinguir copia profunda de instancia que comparte dibujos o funciones.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-0b3992eaf8](https://docs.toonboom.com/help/harmony-25/premium/layers/about-clone-duplicate-layer.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## LYR-006 — Sincronización de exposiciones
 
@@ -76,7 +76,7 @@ Permitir pistas vinculadas que compartan la secuencia de dibujos.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-e3df7474cd](https://docs.toonboom.com/help/harmony-25/premium/layers/about-sync-layer.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## LYR-007 — Gestión de elementos
 
@@ -86,7 +86,7 @@ Identificar dibujos usados y no expuestos; renumerar sin perder referencias.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-fd47fa27eb](https://docs.toonboom.com/help/harmony-25/premium/layers/use-element-manager.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## LYR-008 — Line, Colour, Overlay y Underlay
 
@@ -96,7 +96,7 @@ Guardar cuatro subcapas artísticas por dibujo con orden definido.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-890432ee4e](https://docs.toonboom.com/help/harmony-25/premium/paperless-animation/about-art-layer.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## LYR-009 — Gestor de art layers
 
@@ -106,7 +106,7 @@ Mover, intercambiar, duplicar y consolidar subcapas en rangos de dibujos.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-0717ca32d7](https://docs.toonboom.com/help/harmony-25/premium/paperless-animation/art-layer-manager.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## LYR-010 — Anotaciones de hoja
 
@@ -116,7 +116,7 @@ Añadir texto o dibujos de anotación independientes del render final.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-099d14c6f9](https://docs.toonboom.com/help/harmony-25/premium/layers/about-annotation-column.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## LYR-011 — Edición múltiple de propiedades
 
@@ -126,4 +126,4 @@ Aplicar atributos comunes a una selección de capas compatible.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-d55a19b732](https://docs.toonboom.com/help/harmony-25/premium/layers/set-property-many-layer.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

@@ -13,7 +13,6 @@ Estos escenarios atraviesan módulos y evitan construir funciones aisladas que n
 | WF-07 | Animador de diálogo | Importar WAV → onda → scrubbing → detección → mapear bocas → corregir → exportar | Correcciones conservadas; audio y boca alineados dentro de un frame; informe de etiquetas sin mapa |
 | WF-08 | Compositor: plano con paralaje | Fondo/medio/personaje → cámara → máscaras → blur/sombra → Write de imagen y vídeo | Orden y alfa coherentes; calidad incompleta de preview visible; salida completa por perfil |
 | WF-09 | Generalista 2D/3D | Importar modelo autorizado → unidades → clip → override → componer con dibujos | Misma escala y timing en preview y resultado; límites de materiales expresados |
-| WF-10 | Artista de juegos | Ciclo → anclas → hornear efectos → atlas y metadata → reconstruir en visor de referencia | Registro estable de pivotes, duraciones y anclas; sin dependencia del SDK de Harmony |
 | WF-11 | Estudio distribuido | Obtener escena/revisión → bloquear recurso → trabajar offline → subir entrega divergente | El conflicto se detecta; ninguna revisión se sobrescribe sin resolución explícita |
 | WF-12 | Artista recuperando un fallo | Editar → autoguardar → interrupción durante save → reabrir → localizar textura ausente | Se recupera una revisión coherente; se conservan referencias y se puede relocalizar el recurso |
 

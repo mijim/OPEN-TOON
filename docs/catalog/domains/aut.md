@@ -26,7 +26,7 @@ Crear y ejecutar scripts con salida, errores y contexto de escena explícitos.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-cb193b7df9](https://docs.toonboom.com/help/harmony-25/premium/scripting/about-scripting.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## AUT-002 — Acciones de script en UI
 
@@ -36,7 +36,7 @@ Asignar scripts a botones y acciones identificables.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-4676463c4a](https://docs.toonboom.com/help/harmony-25/premium/scripting/link-script-button.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## AUT-003 — API de escena y nodos
 
@@ -46,7 +46,7 @@ Exponer consultas y comandos sobre capas, atributos, dibujos y conexiones.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-362b8b5ece](https://docs.toonboom.com/help/harmony-25/premium/scripting/show-node-attributes.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## AUT-004 — Integración Python
 
@@ -56,7 +56,7 @@ Facilitar automatización externa con una API versionada y contratos de error.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-e7577ec800](https://docs.toonboom.com/help/harmony-25/premium/release-notes/harmony/harmony-25-release-notes.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## AUT-005 — Sandbox y contexto de ejecución
 
@@ -66,7 +66,7 @@ Separar pruebas de scripts y políticas de ejecución del documento.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-699184a3ab](https://docs.toonboom.com/help/harmony-25/premium/scripting/use-sandbox.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## AUT-006 — Herramientas de conversión CLI
 
@@ -76,4 +76,4 @@ Exponer validación, conversión y render como comandos con resultados estructur
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-aa2ed4e9df](https://docs.toonboom.com/help/harmony-25/premium/utilities/introduction-utilities.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

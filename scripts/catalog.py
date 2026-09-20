@@ -26,8 +26,8 @@ def documents() -> dict[Path, str]:
     files = {}
     index = ['# Catálogo funcional', '',
              f'{len(features)} capacidades originales propuestas en {len(domains)} dominios. Estado de aplicación: **sin implementar**.', '',
-             'Fuente canónica: [features.json](features.json). Los criterios de aceptación son objetivos de OPEN-TOON; los enlaces documentan la familia de referencia. Las dependencias entre dominios indican relaciones, no que deba completarse un dominio entero antes de comenzar otro.', '',
-             'Niveles: `core` fundamentos; `pro` flujo profesional; `advanced` alta complejidad; `optional` optativo; `legacy` compatibilidad histórica. No son fases ni ediciones comerciales.', '',
+             'Fuente canónica: [features.json](features.json). Los criterios de aceptación son objetivos de OPEN-TOON. Las dependencias entre dominios indican relaciones, no que deba completarse un dominio entero antes de comenzar otro.', '',
+             'Niveles: `core` fundamentos; `pro` flujo profesional; `advanced` alta complejidad; `optional` optativo; `legacy` compatibilidad histórica. No son fases de ejecución.', '',
              '| Dominio | Capacidades | Módulo |', '|---|---:|---|']
     for d in domains:
         selected = [f for f in features if f['domain'] == d['id']]
@@ -45,23 +45,22 @@ def documents() -> dict[Path, str]:
             lines += [f"## {f['id']} — {f['title']}", '', f['requirement'], '',
                       f"**Aceptación inicial:** {f['acceptance_criteria'][0]}", '',
                       f"**Alcance:** `{f['scope']}` · **Nivel:** `{f['capability_level']}` · **Estado:** `{f['implementation_status']}`.", '',
-                      f"**Referencia:** [{f['source_ids'][0]}]({f['reference_url']}) · `{f['evidence']}`.", '']
+                      f"**Evidencia:** `{f['evidence']}`.", '']
         files[CATALOG / 'domains' / filename] = '\n'.join(lines)
     index += ['', '## Catálogos complementarios', '',
               '- [Esquema JSON de las capacidades](features.schema.json).',
               '- [Requisitos no funcionales](nonfunctional.json).',
-              '- [Referencias de nodos por categoría](nodes.md).',
-              '- [Inventario completo de navegación oficial](../research/reference-index.json).',
+              '- [Inventario de nodos por categoría](nodes.md).',
               '- [Flujos integrados para aceptación](../research/02-workflows.md).', '',
               'No sumar funciones, páginas y nodos: contienen solapamientos y niveles de granularidad distintos.', '']
     files[CATALOG / 'README.md'] = '\n'.join(index)
-    lines = ['# Referencias de nodos de Harmony Premium 25', '',
-             f'{len(nodes)} entradas del apartado de referencia de nodos. Incluyen operadores y páginas de familia; no se presentan como ese número de efectos distintos. Todas están pendientes de especificación de equivalencia y parámetros de OPEN-TOON.', '',
+    lines = ['# Inventario de nodos', '',
+             f'{len(nodes)} entradas de operadores y familias propuestas. No se presentan como ese número de efectos distintos. Todas están pendientes de especificación y parámetros de OPEN-TOON.', '',
              'Antes de implementar cada operador: definir puertos, tipos, parámetros/unidades, valores por defecto, animabilidad, espacio de color, alfa, bounds/halo de tiles, ROI, invalidación, determinismo, errores, perfiles soportados y una escena de referencia.', '',
              'El núcleo mínimo de composición y las principales familias ya están descritos en NOD, FX, PAR, DEF, CTL y THR. Este inventario evita perder los operadores menos frecuentes durante el plan largo.', '']
     for cat in sorted({n['category'] for n in nodes}):
-        lines += [f'## {cat}', '', '| ID estable | Referencia |', '|---|---|']
-        lines += [f"| `{n['id']}` | [{n['name']}]({n['reference_url']}) |" for n in nodes if n['category'] == cat]
+        lines += [f'## {cat}', '', '| ID estable | Nodo |', '|---|---|']
+        lines += [f"| `{n['id']}` | {n['name']} |" for n in nodes if n['category'] == cat]
         lines += ['']
     files[CATALOG / 'nodes.md'] = '\n'.join(lines)
     return files

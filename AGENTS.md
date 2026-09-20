@@ -2,7 +2,6 @@
 
 ## Contexto vigente
 
-- El usuario eligió **Harmony Premium como base**. Storyboard Pro es un producto separado, fuera del alcance base.
 - Se solicitó primero investigación detallada y clasificada; después se elaborará un plan largo por etapas. No iniciar una implementación completa solo porque exista este catálogo.
 - La interfaz debe ser minimalista, en blanco, negro y grises, muy próxima en lenguaje visual a Vercel/Geist, con identidad propia.
 - El repositorio debe ser público en la cuenta GitHub `mijim`.
@@ -11,15 +10,12 @@
 
 1. Leer `docs/INDEX.md` y el documento pertinente al módulo.
 2. Consultar `docs/catalog/features.json` por ID o dominio usando `scripts/catalog.py`.
-3. Consultar la fuente concreta antes de implementar. `documentation_linked` no significa prueba manual de Harmony, equivalencia exacta ni función implementada.
-4. `docs/research/reference-index.json` es un índice de navegación, no 1.844 requisitos validados. `retrieval-log.json` registra descargas HTTP, no pruebas funcionales.
-5. Los requisitos y criterios de aceptación de OPEN-TOON son propuestas propias. No atribuir a Harmony decisiones internas de arquitectura, rendimiento o formato.
 
 ## Mantener la documentación
 
 - `features.json`, `domains.json`, `node-reference.json` y `nonfunctional.json` son fuentes canónicas; no renumerar IDs existentes.
 - Regenerar las fichas con `python3 scripts/catalog.py render` y validar con `python3 scripts/validate_docs.py`.
-- Una nueva capacidad necesita alcance, fuente o etiqueta de propuesta, comportamiento observable, aceptación y módulo propietario.
+- Una nueva capacidad necesita alcance, comportamiento observable, aceptación y módulo propietario.
 - Cambios de tecnología, serialización, semántica temporal, color o plugins necesitan actualizar el ADR correspondiente.
 - Documentar implementación real por separado. Nunca marcar una capacidad terminada por crear un botón, un mockup o un test que no ejercita su comportamiento.
 

@@ -1,9 +1,5 @@
 # OPEN-TOON
 
-An independent open-source 2D animation application in the research and specification stage, using Toon Boom Harmony Premium as a functional reference.
-
-**Estado: análisis y especificación. Todavía no existe una aplicación ejecutable.** No se afirma compatibilidad con archivos de Harmony ni paridad de funciones. Proyecto independiente, sin afiliación con Toon Boom, Vercel u OpenToonz.
-
 El objetivo es reunir dibujo vectorial y bitmap, animación tradicional y cut-out, rigging, composición y herramientas de producción en una aplicación de escritorio con una interfaz limpia en blanco, negro y grises.
 
 ## Consultar el análisis
@@ -21,7 +17,7 @@ El objetivo es reunir dibujo vectorial y bitmap, animación tradicional y cut-ou
 
 ## Para agentes de IA
 
-Leer [AGENTS.md](AGENTS.md), después [docs/INDEX.md](docs/INDEX.md). El catálogo canónico es [features.json](docs/catalog/features.json); las fichas Markdown son vistas generadas. Los IDs de funciones y las fuentes permiten recuperar contexto por módulo sin cargar toda la investigación.
+Leer [AGENTS.md](AGENTS.md), después [docs/INDEX.md](docs/INDEX.md). El catálogo canónico es [features.json](docs/catalog/features.json); las fichas Markdown son vistas generadas. Los IDs de funciones permiten recuperar contexto por módulo sin cargar todo el análisis.
 
 ```sh
 python3 scripts/catalog.py stats
@@ -42,6 +38,6 @@ El plan largo de implementación se elaborará después de revisar este análisi
 
 ## Licencia
 
-Las aportaciones originales de este repositorio se distribuyen bajo **GPL-3.0-or-later**; véase [LICENSE](LICENSE). Los documentos y recursos externos enlazados conservan sus licencias. No se redistribuyen manuales, ilustraciones, código ni recursos de Toon Boom. Las obras creadas por los usuarios no adquieren la licencia de la aplicación por el mero hecho de utilizarla.
+Las aportaciones originales se distribuyen bajo GPL-3.0-or-later; véase [LICENSE](LICENSE). Las obras creadas por los usuarios no adquieren la licencia de la aplicación por el mero hecho de utilizarla.
 
 Nombre de trabajo: OPEN-TOON. Antes de una distribución pública de binarios se revisará su posible confusión con otros proyectos de animación.

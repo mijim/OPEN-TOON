@@ -41,7 +41,6 @@ Composición: perfil por escena con espacio lineal de trabajo y formato flotante
 
 ## Contenedor propuesto
 
-Dos representaciones: directorio de trabajo `.otoon/` y paquete de transporte `.otoonz` (nombres provisionales, pendientes de comprobar colisiones). **No son formatos de Toon Boom ni de OpenToonz.**
 
 ```text
 shot.otoon/
@@ -87,8 +86,6 @@ Pruebas obligatorias: interrupción en cada frontera, disco lleno, permiso deneg
 | EXR | Composición float y pases | Convenciones de canales, premultiplicación y color obligatorias |
 | Vídeo | Preview y entrega | Disponibilidad de codecs y alfa depende del perfil/build |
 | OTIO | Cortes, tracks, timing y referencias | No equivale a escena gráfica ni contiene el rig |
-| glTF/GLB | Candidato abierto para 3D propio | No asumir soporte equivalente a FBX/Alembic de Harmony |
 | FBX/Alembic/USD | Investigación de interoperabilidad profesional | Evaluar lector, licencia, animación, materiales y ejes por separado |
-| Harmony TVG/XStage/TBG | Sin compatibilidad comprometida | No afirmar round-trip sin especificación y fixtures legítimos |
 
 Cada adapter retorna un informe con elementos conservados, horneados, omitidos y errores. Una importación aceptada mantiene el original como asset o referencia de procedencia según política. No usar `.svg` o `.json` como promesa de que todo el comportamiento de otra aplicación cabe en ese formato.

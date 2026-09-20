@@ -2,9 +2,9 @@
 
 282 capacidades originales propuestas en 26 dominios. Estado de aplicación: **sin implementar**.
 
-Fuente canónica: [features.json](features.json). Los criterios de aceptación son objetivos de OPEN-TOON; los enlaces documentan la familia de referencia. Las dependencias entre dominios indican relaciones, no que deba completarse un dominio entero antes de comenzar otro.
+Fuente canónica: [features.json](features.json). Los criterios de aceptación son objetivos de OPEN-TOON. Las dependencias entre dominios indican relaciones, no que deba completarse un dominio entero antes de comenzar otro.
 
-Niveles: `core` fundamentos; `pro` flujo profesional; `advanced` alta complejidad; `optional` optativo; `legacy` compatibilidad histórica. No son fases ni ediciones comerciales.
+Niveles: `core` fundamentos; `pro` flujo profesional; `advanced` alta complejidad; `optional` optativo; `legacy` compatibilidad histórica. No son fases de ejecución.
 
 | Dominio | Capacidades | Módulo |
 |---|---:|---|
@@ -39,8 +39,7 @@ Niveles: `core` fundamentos; `pro` flujo profesional; `advanced` alta complejida
 
 - [Esquema JSON de las capacidades](features.schema.json).
 - [Requisitos no funcionales](nonfunctional.json).
-- [Referencias de nodos por categoría](nodes.md).
-- [Inventario completo de navegación oficial](../research/reference-index.json).
+- [Inventario de nodos por categoría](nodes.md).
 - [Flujos integrados para aceptación](../research/02-workflows.md).
 
 No sumar funciones, páginas y nodos: contienen solapamientos y niveles de granularidad distintos.

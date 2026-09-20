@@ -26,7 +26,7 @@ Articular un dibujo mediante una cadena con juntas e influencias.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-fcf5d0d775](https://docs.toonboom.com/help/harmony-25/premium/deformation/about-bone-deformation.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## DEF-002 — Game bones
 
@@ -36,7 +36,7 @@ Representar esqueletos orientados a exportación de runtime con límites documen
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-7635291ff4](https://docs.toonboom.com/help/harmony-25/premium/deformation/about-game-bone-deformation.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## DEF-003 — Curvas de deformación
 
@@ -46,7 +46,7 @@ Controlar la forma mediante segmentos curvos y tangentes.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-e3b108b9a6](https://docs.toonboom.com/help/harmony-25/premium/deformation/about-curve-deformation.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## DEF-004 — Envelope
 
@@ -56,7 +56,7 @@ Deformar la silueta mediante una envolvente cerrada.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-596e11364e](https://docs.toonboom.com/help/harmony-25/premium/deformation/about-envelope-deformation.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## DEF-005 — Free Form
 
@@ -66,7 +66,7 @@ Deformar regiones interiores mediante malla y controles internos.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-9668e32f4c](https://docs.toonboom.com/help/harmony-25/premium/deformation/about-free-form-deformation.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## DEF-006 — Shape-aware
 
@@ -76,7 +76,7 @@ Adaptar pesos a la forma usando controles de punto, hueso y jaula.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-416a9f3dfc](https://docs.toonboom.com/help/harmony-25/premium/deformation/about-shape-aware-deformations.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## DEF-007 — Weighted deform
 
@@ -86,7 +86,7 @@ Combinar influencias de curvas, puntos y pegs en un campo de deformación.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-8ce9fb2f71](https://docs.toonboom.com/help/harmony-25/premium/deformation/about-weighted-deformations.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## DEF-008 — Edición de pose de reposo
 
@@ -96,7 +96,7 @@ Separar bind/rest pose del estado animado y actualizarlo de forma explícita.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-a1b616481e](https://docs.toonboom.com/help/harmony-25/premium/deformation/about-rest-position-set.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## DEF-009 — Regiones de influencia
 
@@ -106,7 +106,7 @@ Configurar áreas elípticas o de forma y radios de transición.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-c61dfee929](https://docs.toonboom.com/help/harmony-25/premium/deformation/about-region-influence.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## DEF-010 — Rigs con múltiples poses
 
@@ -116,7 +116,7 @@ Asignar cadenas de deformación a sustituciones compatibles.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-7d550c852d](https://docs.toonboom.com/help/harmony-25/premium/deformation/about-multi-pose-deformation-rig.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## DEF-011 — Kinematic output
 
@@ -126,7 +126,7 @@ Adjuntar otros elementos al resultado de un deformador.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-d1ad41f1fd](https://docs.toonboom.com/help/harmony-25/premium/deformation/rig-kinematic-output.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## DEF-012 — Point kinematic output
 
@@ -136,7 +136,7 @@ Muestrear posiciones de una curva deformada para controlar otros objetos.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-34b6296f43](https://docs.toonboom.com/help/harmony-25/premium/deformation/about-point-kinematic-output.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## DEF-013 — Conversión a dibujos
 
@@ -146,7 +146,7 @@ Hornear deformaciones evaluadas como dibujos editables.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-d3e6e31be5](https://docs.toonboom.com/help/harmony-25/premium/deformation/convert_deformation-drawing.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## DEF-014 — Generación de envolventes
 
@@ -156,7 +156,7 @@ Derivar controles iniciales de la geometría del dibujo con limpieza posterior.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-0a399daa09](https://docs.toonboom.com/help/harmony-25/premium/deformation/generate-envelope-with-artwork.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## DEF-015 — Visibilidad y calidad de deformación
 
@@ -166,4 +166,4 @@ Activar controles y niveles de preview sin alterar resultado final.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-e818dd6f3e](https://docs.toonboom.com/help/harmony-25/premium/deformation/disable-deformation-preview.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

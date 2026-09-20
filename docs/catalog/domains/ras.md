@@ -26,7 +26,7 @@ Pintar imágenes por píxeles con resolución definida y transparencia.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-244ec6be5c](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-bitmap-layers.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## RAS-002 — Pincel bitmap texturado
 
@@ -36,7 +36,7 @@ Soportar punta, espaciado, opacidad y dinámica en trazos raster.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-d57641e891](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-brush-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## RAS-003 — Goma bitmap
 
@@ -46,7 +46,7 @@ Eliminar o reducir alfa con borde y opacidad configurables.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-fbeaac1886](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-eraser-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## RAS-004 — Resolución de textura
 
@@ -56,7 +56,7 @@ Modificar resolución y calidad de imágenes explicando la pérdida por remuestr
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-b18995cc34](https://docs.toonboom.com/help/harmony-25/premium/import/change-bitmap-image-quality.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## RAS-005 — Selección raster
 
@@ -66,7 +66,7 @@ Transformar píxeles seleccionados conservando máscara y canal alfa.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-0441f46367](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-select-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## RAS-006 — Pinceles ABR
 
@@ -76,7 +76,7 @@ Importar el subconjunto soportado de pinceles Photoshop y emitir un informe de p
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-e7577ec800](https://docs.toonboom.com/help/harmony-25/premium/release-notes/harmony/harmony-25-release-notes.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## RAS-007 — Pincel vectorial con textura bitmap
 
@@ -86,4 +86,4 @@ Mantener separadas geometría vectorial y textura raster dependiente de resoluci
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-d57641e891](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-brush-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

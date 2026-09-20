@@ -26,7 +26,7 @@ Organizar assets por carpetas con búsqueda, previews y refresco.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-7f5e541888](https://docs.toonboom.com/help/harmony-25/premium/library/about-library.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## LIB-002 — Plantillas de escenas y rigs
 
@@ -36,7 +36,7 @@ Guardar selecciones con dibujos, paletas, nodos y animación requerida.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-3645507487](https://docs.toonboom.com/help/harmony-25/premium/library/about-template.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## LIB-003 — Símbolos reutilizables
 
@@ -46,7 +46,7 @@ Encapsular elementos con su propio contenido y transformación.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-56deabc874](https://docs.toonboom.com/help/harmony-25/premium/library/about-symbol.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## LIB-004 — Importar plantillas
 
@@ -56,7 +56,7 @@ Aplicar reglas de copia, enlaces y conflictos al reutilizar assets.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-123c8fa445](https://docs.toonboom.com/help/harmony-25/premium/library/import-template.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## LIB-005 — Paste special
 
@@ -66,7 +66,7 @@ Seleccionar si se importan animación, dibujos, paletas o estructura.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-280fd80c47](https://docs.toonboom.com/help/harmony-25/premium/library/use-paste-special.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## LIB-006 — Miniaturas de biblioteca
 
@@ -76,7 +76,7 @@ Generar previews actualizables sin bloquear edición.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-60d82d3571](https://docs.toonboom.com/help/harmony-25/premium/library/generate-thumbnail.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## LIB-007 — Edición de plantillas
 
@@ -86,4 +86,4 @@ Editar un recurso de biblioteca distinguiendo original e instancia.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-abb240f9b7](https://docs.toonboom.com/help/harmony-25/premium/library/edit-template.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

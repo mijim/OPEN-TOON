@@ -26,7 +26,7 @@ Representar trazos como curvas con grosor editable y extremos configurables.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-616e4225a1](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-pencil-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-002 — Pincel vectorial
 
@@ -36,7 +36,7 @@ Crear siluetas rellenadas editables desde gestos de dibujo.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-d57641e891](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-brush-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-003 — Grosor variable
 
@@ -46,7 +46,7 @@ Aplicar presión y perfiles variables a lo largo del trazo.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-61b6ece53c](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-pencil-editor-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-004 — Textura de lápiz
 
@@ -56,7 +56,7 @@ Asociar textura y parámetros de repetición a una línea central.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-e34ac985dd](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-pencil-line-texture.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-005 — Presets de pincel
 
@@ -66,7 +66,7 @@ Guardar tamaño, punta, suavizado y textura como un preset reutilizable.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-a91371a694](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-brush-presets.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-006 — Presets de lápiz
 
@@ -76,7 +76,7 @@ Guardar perfiles y configuración de líneas con identidad propia.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-5f58963884](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-pencil-presets.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-007 — Estabilizador
 
@@ -86,7 +86,7 @@ Suavizar ruido del lápiz mediante parámetros de retardo y estabilización.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-01d0620968](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-stabilization.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-008 — Goma vectorial
 
@@ -96,7 +96,7 @@ Recortar geometría atravesada por una goma con tamaño y presión.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-fbeaac1886](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-eraser-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-009 — Selector y lazo
 
@@ -106,7 +106,7 @@ Seleccionar trazos o regiones, sumar y restar selección y transformarla.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-0441f46367](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-select-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-010 — Editor de contornos
 
@@ -116,7 +116,7 @@ Añadir, eliminar y mover puntos y tangentes de curvas.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-2f4c000b7c](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-contour-editor-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-011 — Editor de línea central
 
@@ -126,7 +126,7 @@ Editar la trayectoria central preservando el aspecto del pincel cuando sea posib
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-33351193bd](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-centerline-editor.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-012 — Editor de grosor
 
@@ -136,7 +136,7 @@ Modificar el perfil del lápiz sin redibujar la trayectoria.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-61b6ece53c](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-pencil-editor-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-013 — Retoque de lápiz
 
@@ -146,7 +146,7 @@ Pintar ajustes de grosor u opacidad con aumento, reducción, sustitución y suav
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-d8ff27b34b](https://docs.toonboom.com/help/harmony-25/premium/drawing/pencil-retouch-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-014 — Suavizado posterior
 
@@ -156,7 +156,7 @@ Reducir irregularidades de contornos con intensidad controlable.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-bc4b2e3785](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-smooth-editor-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-015 — Líneas y primitivas
 
@@ -166,7 +166,7 @@ Dibujar líneas, rectángulos y elipses con restricciones y relleno opcional.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-8b70ba5f4a](https://docs.toonboom.com/help/harmony-25/premium/drawing/draw-ellipse-rectangle-line-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-016 — Polyline y Bézier
 
@@ -176,7 +176,7 @@ Construir curvas precisas por puntos y manejadores.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-a22d6d719b](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-shape-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-017 — Cortador
 
@@ -186,7 +186,7 @@ Separar una región mediante lazo y conservarla como selección editable.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-a103fb42af](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-cutter-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-018 — Deformación de perspectiva
 
@@ -196,7 +196,7 @@ Deformar una selección con controles de perspectiva.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-c6c8383a10](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-perspective-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-019 — Envelope de dibujo
 
@@ -206,7 +206,7 @@ Editar una envolvente que deforma geometría seleccionada.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-c81dc674da](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-envelope-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-020 — Trazos invisibles
 
@@ -216,7 +216,7 @@ Definir fronteras de relleno que no generan línea visible.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-313cdd883b](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-stroke-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-021 — Conversión de trazos
 
@@ -226,7 +226,7 @@ Convertir tipos de línea según restricciones explícitas y conservar una copia
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-51372e7004](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-stroke-conversion.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-022 — Optimización vectorial
 
@@ -236,7 +236,7 @@ Simplificar geometría y combinar elementos compatibles con tolerancia configura
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-410c7b61f5](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-drawing-optimization.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-023 — Sellos
 
@@ -246,7 +246,7 @@ Estampar dibujos reutilizables con posición, escala y rotación.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-dca5f92aa5](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-stamp-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-024 — Texto
 
@@ -256,7 +256,7 @@ Crear texto editable y convertirlo a geometría cuando se necesite portabilidad.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-ebbe0d6b72](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-text-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-025 — Guías y rejilla
 
@@ -266,7 +266,7 @@ Mostrar cuadrícula y referencias con ajuste opcional.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-bf8814a6a5](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-grid.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-026 — Guías de perspectiva
 
@@ -276,7 +276,7 @@ Asistir dibujo con puntos de fuga, isometría y perspectivas curvas.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-b20079c397](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-drawing-guide.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## VEC-027 — Reposicionar todos los dibujos
 
@@ -286,4 +286,4 @@ Aplicar una transformación geométrica a un conjunto de dibujos del elemento.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-1e276f919c](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-reposition-all-drawing-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

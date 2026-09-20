@@ -26,7 +26,7 @@ Importar imágenes sueltas o secuencias con alfa, orden y exposición explícito
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-e055a18f60](https://docs.toonboom.com/help/harmony-25/premium/import/import-bitmap-image.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## IMP-002 — PSD por capas
 
@@ -36,7 +36,7 @@ Leer jerarquía, opacidad y modos soportados, informando de pérdidas.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-564fdb2e3a](https://docs.toonboom.com/help/harmony-25/premium/import/import-multi-layer-psd-file.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## IMP-003 — Layout PSD
 
@@ -46,7 +46,7 @@ Reutilizar composición y posiciones de un layout con escala conocida.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-79550a6433](https://docs.toonboom.com/help/harmony-25/premium/import/import-psd-layout.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## IMP-004 — Vectores externos
 
@@ -56,7 +56,7 @@ Convertir formatos vectoriales compatibles preservando curvas, rellenos y transf
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-f6a8928d43](https://docs.toonboom.com/help/harmony-25/premium/import/import-vector-files.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## IMP-005 — Vídeo de referencia
 
@@ -66,7 +66,7 @@ Importar vídeo para referencia o extracción de frames con reloj explícito.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-aa2bd5fb04](https://docs.toonboom.com/help/harmony-25/premium/import/import-quicktime-movie.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## IMP-006 — Vincular imagen externa
 
@@ -76,7 +76,7 @@ Conservar enlace y permitir actualizar contenido desde disco.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-e967e8b467](https://docs.toonboom.com/help/harmony-25/premium/import/link-layer-external-image.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## IMP-007 — Escaneo
 
@@ -86,7 +86,7 @@ Adquirir dibujos con resolución, registro y orden de numeración.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-59387f2abb](https://docs.toonboom.com/help/harmony-25/premium/import/about-scan.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## IMP-008 — Vectorización
 
@@ -96,7 +96,7 @@ Convertir escaneos a trazos o regiones con parámetros repetibles.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-3b47817346](https://docs.toonboom.com/help/harmony-25/premium/import/about-custom-vectorization-parameter.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## IMP-009 — FLA y SWF heredados
 
@@ -106,7 +106,7 @@ Documentar conversión asistida y límites de formatos antiguos.
 
 **Alcance:** `legacy_candidate` · **Nivel:** `legacy` · **Estado:** `not_started`.
 
-**Referencia:** [H25-44a46da8d7](https://docs.toonboom.com/help/harmony-25/premium/import/about-fla-file-import.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## IMP-010 — Intercambio editorial
 
@@ -116,4 +116,4 @@ Recibir layouts o animatics como escenas con timing y recursos.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-acfe671ce8](https://docs.toonboom.com/help/harmony-25/premium/about/about.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

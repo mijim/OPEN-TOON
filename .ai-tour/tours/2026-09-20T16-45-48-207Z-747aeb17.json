@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "id": "747aeb17-e8f9-4337-a1b0-595913ccb44a",
+  "title": "Update Roadmap",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T16:45:48.207Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "docs/planning/roadmap.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 1,
+      "removed": 2
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "49e9bcad-58bb-459b-86a7-8b9eebd7db4a",
+        "67dec89f-4269-4e9e-8cab-b7dfbad56482"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "49e9bcad-58bb-459b-86a7-8b9eebd7db4a",
+      "title": "Simplify Roadmap",
+      "explanation": "This part of roadmap.json removes 1 line. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 6,
+      "endLine": 6,
+      "area": "tests",
+      "added": 0,
+      "removed": 1
+    },
+    {
+      "id": "67dec89f-4269-4e9e-8cab-b7dfbad56482",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 942,
+      "endLine": 942,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

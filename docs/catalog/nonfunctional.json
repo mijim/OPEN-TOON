@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "as_of": "2026-09-20",
-  "note": "Objetivos propuestos; ninguno se presenta como rendimiento medido de OPEN-TOON o Harmony. B1 se define en quality-and-spikes.",
+  "note": "Objetivos propuestos; ninguno se presenta como rendimiento medido de OPEN-TOON. B1 se define en quality-and-spikes.",
   "requirements": [
     {
       "id": "NFR-001",

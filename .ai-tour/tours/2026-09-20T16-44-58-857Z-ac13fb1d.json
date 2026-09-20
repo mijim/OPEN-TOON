@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "ac13fb1d-b79a-4d93-ae0a-8d6a5d040d49",
+  "title": "Add Roadmap",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T16:44:58.857Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "docs/planning/roadmap.json",
+      "kind": "created",
+      "area": "tests",
+      "added": 3412,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "6abde99f-0499-4d20-8dbb-6ff24d6aaf60"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "6abde99f-0499-4d20-8dbb-6ff24d6aaf60",
+      "title": "Introduce Roadmap",
+      "explanation": "This part of roadmap.json adds 3412 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the main implementation change.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 1,
+      "endLine": 3412,
+      "area": "tests",
+      "added": 3412,
+      "removed": 0
+    }
+  ]
+}

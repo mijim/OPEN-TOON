@@ -26,7 +26,7 @@ Referenciar colores por identificador estable separado de su valor RGBA.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-6066b2d11c](https://docs.toonboom.com/help/harmony-25/premium/colour/about-palette.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## COL-002 — Crear y editar muestras
 
@@ -36,7 +36,7 @@ Gestionar muestras sólidas, nombres, opacidad y duplicados.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-e663fb19b1](https://docs.toonboom.com/help/harmony-25/premium/colour/about-colour-swatch.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## COL-003 — Relleno por regiones
 
@@ -46,7 +46,7 @@ Pintar regiones cerradas con tolerancia definida.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-8beb8028a8](https://docs.toonboom.com/help/harmony-25/premium/colour/about-paint.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## COL-004 — Pintar líneas y áreas
 
@@ -56,7 +56,7 @@ Permitir recolorear contornos y rellenos de manera independiente.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-8beb8028a8](https://docs.toonboom.com/help/harmony-25/premium/colour/about-paint.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## COL-005 — Cierre de huecos
 
@@ -66,7 +66,7 @@ Resolver discontinuidades pequeñas para facilitar el relleno sin unir áreas ar
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-8beb8028a8](https://docs.toonboom.com/help/harmony-25/premium/colour/about-paint.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## COL-006 — Pintura múltiple
 
@@ -76,7 +76,7 @@ Aplicar operaciones de pintado a selección de dibujos o rango temporal.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-8beb8028a8](https://docs.toonboom.com/help/harmony-25/premium/colour/about-paint.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## COL-007 — Gradientes y texturas
 
@@ -86,7 +86,7 @@ Usar rellenos graduales y texturas con transformación independiente.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-4e01cf508a](https://docs.toonboom.com/help/harmony-25/premium/colour/about-gradient-texture-tool.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## COL-008 — Modelo de color
 
@@ -96,7 +96,7 @@ Comparar y muestrear una referencia de color asociada al proyecto.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-c4369655fe](https://docs.toonboom.com/help/harmony-25/premium/colour/about-colour-model.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## COL-009 — Listas de paletas
 
@@ -106,7 +106,7 @@ Resolver paletas de escena, elemento y producción con orden explícito.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-282f8d387c](https://docs.toonboom.com/help/harmony-25/premium/colour/about-palette-list-levels.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## COL-010 — Clones y variantes de paleta
 
@@ -116,7 +116,7 @@ Compartir identidades entre variaciones cromáticas sin recolorear a mano.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-d23d2c621d](https://docs.toonboom.com/help/harmony-25/premium/colour/about-advanced-palette-management.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## COL-011 — Importar y exportar paletas
 
@@ -126,7 +126,7 @@ Transferir paletas con recursos de textura y reglas de conflicto.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-4c265a6d0e](https://docs.toonboom.com/help/harmony-25/premium/colour/about-export-palettes.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## COL-012 — Recuperar colores
 
@@ -136,7 +136,7 @@ Restaurar o reasignar colores cuyos recursos no estén disponibles.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-a815ad80e3](https://docs.toonboom.com/help/harmony-25/premium/colour/about-back-up-palettes.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## COL-013 — Optimizar paletas
 
@@ -146,7 +146,7 @@ Detectar muestras redundantes o sin uso respetando revisiones existentes.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-471f2a2830](https://docs.toonboom.com/help/harmony-25/premium/colour/about-optimizing-palettes.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## COL-014 — Espacios de color
 
@@ -156,7 +156,7 @@ Distinguir interpretación de entrada, composición, visualización y salida.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-e331c6c3ff](https://docs.toonboom.com/help/harmony-25/premium/colour/about-colour-space-management.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## COL-015 — Configuraciones de estudio
 
@@ -166,4 +166,4 @@ Permitir una configuración de color compartida y validada.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-b97f31e9f7](https://docs.toonboom.com/help/harmony-25/premium/colour/customize-colour-spaces.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

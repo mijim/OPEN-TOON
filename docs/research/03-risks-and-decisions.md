@@ -16,23 +16,20 @@
 | R-10 | Plugin o script inestable | Fallos, acceso indebido o datos corruptos | Sin autoejecución, límites, adapter y aislamiento según tipo |
 | R-11 | Colaboración prematura | Desviar trabajo de la herramienta local | Versiones y paquetes primero; servicio de estudio separado |
 | R-12 | IA dependiente de proveedor | Costes y ausencia de funcionamiento offline | Funciones optativas; editor completo sin servicio de IA |
-| R-13 | Corpus documental incompleto | Operadores/variantes no considerados | Índice de referencia, actualización de fuentes y revisión humana por área |
-| R-14 | Conteos interpretados como avance | Falsa sensación de producto terminado | Estado `not_started` y distinción entre capacidad, fuente y nodo |
+| R-13 | Catálogo funcional incompleto | Operadores/variantes no considerados | Revisión humana por área y actualización del catálogo |
+| R-14 | Conteos interpretados como avance | Falsa sensación de producto terminado | Estado `not_started` y distinción entre capacidad y nodo |
 
 ## Decisiones resueltas o propuestas
 
 | ID | Decisión | Estado |
 |---|---|---|
-| D-01 | Harmony Premium como referencia base | Confirmado por el usuario |
 | D-02 | Interfaz minimalista blanco/negro, cercana a Vercel | Confirmado por el usuario |
 | D-03 | GitHub público en `mijim` | Confirmado por el usuario |
 | D-04 | Investigar antes del plan y construir después | Confirmado por el usuario |
 | D-05 | Escritorio local; sin cuenta obligatoria | Recomendación |
 | D-06 | C++20/Qt Quick | Recomendación condicionada a SP-00/01/02 |
-| D-07 | Formato propio abierto; sin promesa de leer TVG/XStage/TBG | Recomendación |
 | D-08 | GPL-3.0-or-later para aportaciones originales | Licencia inicial aplicada |
 | D-09 | Backend gráfico exacto, dependencias y versiones | Abierto hasta los spikes |
-| D-10 | Storyboard Pro completo | Fuera de base; ampliación solo si se decide expresamente |
 
 ## Información que mejorará el futuro plan
 
@@ -42,10 +39,9 @@ El análisis propone un núcleo propio pero aún no audita código de OpenToonz.
 
 ## Detalle que debe cerrarse por capacidad
 
-El catálogo cubre familias y operaciones; antes de implementar cada una se especificarán sus parámetros, valores por defecto, límites, unidades, formatos soportados, transacciones, casos de cancelación y tests. Para los nodos hay [193 entradas de referencia](../catalog/nodes.md), con páginas tanto de familia como de operador. No se ha redactado un clon de cada diálogo ni se ha afirmado conocer algoritmos internos de Harmony.
+Antes de implementar cada capacidad se especificarán parámetros, valores por defecto, límites, unidades, formatos soportados, transacciones, casos de cancelación y pruebas.
 
-Un requisito propio puede ser más estricto que su referencia, como guardado tolerante a fallos, scripting sin autoejecución o informes de importación. Las fuentes acreditan el área funcional; esas políticas son decisiones propuestas de OPEN-TOON. En particular, la página oficial de batch render describe la cola de **Harmony Database**; el render local sin UI propuesto para OPEN-TOON no debe atribuirse a esa edición autónoma de Harmony.
 
 ## Mantenimiento de la investigación
 
-Al actualizar la referencia de Harmony: registrar versión/fecha, revisar notas nuevas, comparar URLs del índice, asociar cambios a IDs existentes, crear IDs nuevos solo para capacidades nuevas y señalar funciones retiradas sin borrar su historial. No incrementar artificialmente el número de requisitos dividiendo botones equivalentes. La cobertura se evalúa por flujos y precisión de especificación.
+Los cambios de alcance deben conservar los IDs existentes, actualizar las fuentes canónicas y regenerar las vistas Markdown.

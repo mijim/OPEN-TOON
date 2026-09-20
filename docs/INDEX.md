@@ -1,12 +1,9 @@
 # Mapa del análisis
 
-Fecha de corte: **20 de septiembre de 2026**. Referencia funcional: **Harmony Premium 25.x**, incluyendo las notas públicas de **25.2, build 24991, de 25 de marzo de 2026**. Es una referencia documental fijada; no una garantía de que no exista una publicación posterior o funciones no documentadas.
-
 ## Decisiones principales
 
 | Tema | Resultado | Estado |
 |---|---|---|
-| Producto de referencia | Harmony Premium; Storyboard Pro fuera de la base | Confirmado por el usuario |
 | Producto propio | Editor profesional 2D, local y de escritorio | Recomendación |
 | Estética | Blanco, negro y grises; lenguaje visual Geist | Solicitado |
 | Tecnología | C++20, Qt 6 y Qt Quick/QML | Recomendación condicionada a pruebas |
@@ -26,7 +23,7 @@ Fecha de corte: **20 de septiembre de 2026**. Referencia funcional: **Harmony Pr
 
 **Planificación:** [entrada al plan](planning/README.md). Las clasificaciones `core`, `pro`, `advanced`, `optional` y `legacy` describen complejidad/uso; **no son ediciones de pago ni fases comprometidas**.
 
-**Auditoría:** [matriz de cobertura](research/COVERAGE.md), [fuentes técnicas y de producto](research/SOURCES.md), [índice oficial](research/reference-index.json), [registro de recuperación](research/retrieval-log.json), [referencias de nodos](catalog/node-reference.json).
+**Auditoría:** [inventario de nodos](catalog/node-reference.json).
 
 ## Cómo recuperar contexto con IA
 
@@ -36,8 +33,8 @@ Fecha de corte: **20 de septiembre de 2026**. Referencia funcional: **Harmony Pr
 | Un área | `python3 scripts/catalog.py domain DEF` y ficha del dominio |
 | Encontrar un término | `python3 scripts/catalog.py search "deformación"` |
 | Semántica del documento | `architecture/03-document-model.md` |
-| Crear un ticket | Requisito + aceptación + fuentes + dependencias del dominio |
-| Revisar paridad | Índice de referencia + evidencia funcional futura, nunca solo conteos |
+| Crear un ticket | Requisito + aceptación + dependencias del dominio |
+| Revisar cobertura | Catálogo + evidencia funcional futura, nunca solo conteos |
 | Nueva biblioteca | Comparativa + ADR + licencia y perfil de distribución |
 
 Cada ficha de capacidad tiene una descripción observable y un criterio de aceptación inicial. El diseño detallado de algoritmos, todas las propiedades de cada operador y los casos límite adicionales se desarrollarán antes de implementar esa capacidad. Este análisis busca cobertura de familias y operaciones, no reproduce los manuales ni presume conocer el funcionamiento interno de un producto propietario.

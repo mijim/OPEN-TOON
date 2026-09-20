@@ -11,7 +11,6 @@ Los ADR propuestos deben revisarse con evidencia antes de convertirse en comprom
 | ADR-005 | Renderer detrás de contrato; Qt RHI/Skia por validar | Abierto | Se complete SP-02 |
 | ADR-006 | Offline y formato abierto; red/IA/estudio optativos | Propuesto | El usuario cambie prioridades de producto |
 | ADR-007 | GPL-3.0-or-later para el repositorio inicial | Adoptado | El propietario cambie licencia antes de integrar aportaciones que lo dificulten |
-| ADR-008 | No prometer compatibilidad nativa Harmony ni SDK propietario | Adoptado como límite de comunicación | Existan especificación, fixtures y pruebas legítimas |
 
 ## ADR-001 — Plataforma
 
@@ -27,4 +26,4 @@ No se declara elegido un renderer definitivo. QQuickRhiItem es candidato para pr
 
 ## ADR-007 — Licencia
 
-El repositorio adopta GPL-3.0-or-later para las contribuciones originales. Prioriza mantener abiertas las modificaciones redistribuidas y permite distribución de una alternativa libre. No cambia las licencias de dependencias, fuentes ni obras de usuarios. Los módulos Qt, FFmpeg y plugins se evaluarán por build concreto. Referencias en [fuentes](../../research/SOURCES.md).
+El repositorio adopta GPL-3.0-or-later para las contribuciones originales. Prioriza mantener abiertas las modificaciones redistribuidas y permite distribución de una alternativa libre. No cambia las licencias de dependencias, fuentes ni obras de usuarios. Los módulos Qt, FFmpeg y plugins se evaluarán por build concreto.

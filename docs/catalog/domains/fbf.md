@@ -26,7 +26,7 @@ Crear y recorrer dibujos con continuidad de herramientas y exposición.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-35cb7c7eb7](https://docs.toonboom.com/help/harmony-25/premium/paperless-animation/about-paperless-animation.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FBF-002 — Rough, tie-down y cleanup
 
@@ -36,7 +36,7 @@ Organizar fases de dibujo mediante capas, marcas y visibilidad.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-4171e1f348](https://docs.toonboom.com/help/harmony-25/premium/paperless-animation/clean-animation.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FBF-003 — Onion skin anterior y posterior
 
@@ -46,7 +46,7 @@ Mostrar dibujos vecinos con rango, opacidad y diferenciación configurable.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-1b726e005c](https://docs.toonboom.com/help/harmony-25/premium/paperless-animation/about-onion-skin.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FBF-004 — Onion skin avanzado
 
@@ -56,7 +56,7 @@ Seleccionar dibujos concretos, separar frames de dibujos únicos y comparar capa
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-788d9faecc](https://docs.toonboom.com/help/harmony-25/premium/paperless-animation/about-advanced-onion-skin.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FBF-005 — Onion skin entre capas
 
@@ -66,7 +66,7 @@ Comparar referencias de otras capas con reglas de visibilidad.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-e7cef9ee88](https://docs.toonboom.com/help/harmony-25/premium/paperless-animation/display-onion-skin-other-layer.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FBF-006 — Shift and trace
 
@@ -76,7 +76,7 @@ Mover y rotar temporalmente dibujos de referencia para calcar.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-6b716a0ca1](https://docs.toonboom.com/help/harmony-25/premium/paperless-animation/about-shift-trace.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FBF-007 — Mesa de dibujos
 
@@ -86,7 +86,7 @@ Organizar dibujos de referencia fuera de su exposición temporal.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-f9e8084820](https://docs.toonboom.com/help/harmony-25/premium/paperless-animation/about-drawing-desk.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FBF-008 — Flip y reproducción corta
 
@@ -96,7 +96,7 @@ Alternar poses y reproducir un segmento corto sin perder selección.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-638f2d31ee](https://docs.toonboom.com/help/harmony-25/premium/paperless-animation/use-mini-playback.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FBF-009 — Marcas de dibujo
 
@@ -106,7 +106,7 @@ Marcar dibujos como claves, breakdowns u otras categorías personalizadas.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-b8f3953dbe](https://docs.toonboom.com/help/harmony-25/premium/paperless-animation/about-mark-drawing.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FBF-010 — Generar Colour Art desde línea
 
@@ -116,7 +116,7 @@ Construir fronteras de pintura derivadas de Line Art con tolerancias.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-e846aeb2c3](https://docs.toonboom.com/help/harmony-25/premium/paperless-animation/create-colour-art-line-art.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FBF-011 — Generar matte
 
@@ -126,7 +126,7 @@ Producir siluetas de referencia a partir de dibujos.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-dfaa873304](https://docs.toonboom.com/help/harmony-25/premium/paperless-animation/generate-matte.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## FBF-012 — Registro y cruces
 
@@ -136,4 +136,4 @@ Usar marcas de alineación que facilitan el registro entre dibujos.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-2d2d07f3bf](https://docs.toonboom.com/help/harmony-25/premium/paperless-animation/add-cross-hairs.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

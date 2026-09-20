@@ -26,7 +26,7 @@ Separar partes del modelo preservando registro y paletas.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-480464d344](https://docs.toonboom.com/help/harmony-25/premium/rigging/about-character-breakdown.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## RIG-002 — Jerarquías de transformación
 
@@ -36,7 +36,7 @@ Construir cadenas padre-hijo con dibujo y pegs separados.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-73011c19db](https://docs.toonboom.com/help/harmony-25/premium/rigging/about-peg-hierarchy-rig.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## RIG-003 — Pivotes permanentes y temporales
 
@@ -46,7 +46,7 @@ Editar centro de rotación con distinción de alcance.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-b75e92972f](https://docs.toonboom.com/help/harmony-25/premium/rigging/about-permanent-pivot.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## RIG-004 — Orden Z y ajustes de profundidad
 
@@ -56,7 +56,7 @@ Organizar superposición de piezas con control fino.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-aa8d48e6cd](https://docs.toonboom.com/help/harmony-25/premium/rigging/about-z-nudge.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## RIG-005 — Articulaciones y Auto Patch
 
@@ -66,7 +66,7 @@ Resolver juntas y ocultación de líneas entre piezas superpuestas.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-b00876c4a0](https://docs.toonboom.com/help/harmony-25/premium/rigging/about-auto-patch-articulation.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## RIG-006 — Sustitución de dibujos
 
@@ -76,7 +76,7 @@ Cambiar bocas, manos o vistas de una pieza manteniendo la animación.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-cddb6e4045](https://docs.toonboom.com/help/harmony-25/premium/cut-out-animation/about-swap-drawing.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## RIG-007 — Sustitución múltiple
 
@@ -86,7 +86,7 @@ Cambiar variantes coordinadas en varios elementos del personaje.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-403006646c](https://docs.toonboom.com/help/harmony-25/premium/cut-out-animation/about-multiple-drawing-substitution.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## RIG-008 — Navegación de jerarquía
 
@@ -96,7 +96,7 @@ Seleccionar padre, hijo o cadena sin buscar manualmente cada nodo.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-6d2f951c5b](https://docs.toonboom.com/help/harmony-25/premium/cut-out-animation/about-hierarchy-navigation.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## RIG-009 — Inversa cinemática
 
@@ -106,7 +106,7 @@ Resolver articulaciones desde un objetivo con límites configurables.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-a45b9e8623](https://docs.toonboom.com/help/harmony-25/premium/cut-out-animation/about-inverse-kinematic.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## RIG-010 — Nails y restricciones IK
 
@@ -116,7 +116,7 @@ Fijar puntos durante manipulación de otras partes.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-d35d183feb](https://docs.toonboom.com/help/harmony-25/premium/cut-out-animation/about-nails.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## RIG-011 — Claves de restricciones
 
@@ -126,7 +126,7 @@ Animar el estado de restricciones y transiciones de control.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-4ccd94a688](https://docs.toonboom.com/help/harmony-25/premium/cut-out-animation/about-ik-keyframe.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## RIG-012 — Copiar poses
 
@@ -136,7 +136,7 @@ Guardar y transferir poses con mapeo estable de piezas.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-e878c1f28e](https://docs.toonboom.com/help/harmony-25/premium/rigging/about-pose-copier.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## RIG-013 — Breakdown Assistant
 
@@ -146,7 +146,7 @@ Mezclar valores entre poses vecinas por porcentaje y selección de atributos.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-1fd2e4cf2f](https://docs.toonboom.com/help/harmony-25/premium/cut-out-animation/breakdown-assistant.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## RIG-014 — Guías y convenciones de rig
 
@@ -156,4 +156,4 @@ Identificar piezas de control, guías y nombres sin incluirlas en render.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-76fc47e700](https://docs.toonboom.com/help/harmony-25/premium/rigging/about-guide-layer.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

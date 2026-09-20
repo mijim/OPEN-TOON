@@ -26,7 +26,7 @@ Crear cámaras y seleccionar explícitamente la que produce la salida.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-c7e69774d0](https://docs.toonboom.com/help/harmony-25/premium/camera/about-camera.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## CAM-002 — Transformación de cámara
 
@@ -36,7 +36,7 @@ Animar posición, rotación y encuadre con pegs y curvas.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-c7e69774d0](https://docs.toonboom.com/help/harmony-25/premium/camera/about-camera.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## CAM-003 — Multiplano
 
@@ -46,7 +46,7 @@ Distribuir capas en profundidad para generar paralaje.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-eceb3298a3](https://docs.toonboom.com/help/harmony-25/premium/staging/about-multiplane.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## CAM-004 — Vistas superior, lateral y perspectiva
 
@@ -56,7 +56,7 @@ Inspeccionar posiciones espaciales y relaciones de cámara.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-ce4ab163a0](https://docs.toonboom.com/help/harmony-25/premium/3d-integration/about-3d-object-different-view.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## CAM-005 — Proyección ortográfica
 
@@ -66,7 +66,7 @@ Ofrecer salida sin perspectiva para flujos 2D y videojuegos.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-69025b6c3f](https://docs.toonboom.com/help/harmony-25/premium/gaming/about-orthographic-camera.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## CAM-006 — Guías de encuadre
 
@@ -76,7 +76,7 @@ Usar guías de alineación y zonas de referencia como ayudas no exportables.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-8174da4d99](https://docs.toonboom.com/help/harmony-25/premium/staging/about-alignment-guides.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## CAM-007 — Transformación y opacidad de staging
 
@@ -86,4 +86,4 @@ Posicionar fondos y referencias con bloqueo y transparencia temporal.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-fdba21b1cf](https://docs.toonboom.com/help/harmony-25/premium/staging/about-opacity-transparency.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

@@ -4,7 +4,6 @@
 
 Construir una **aplicación de escritorio nativa con C++20, Qt 6 y Qt Quick/QML**, con bibliotecas de dominio independientes de Qt. Priorizar Windows, macOS y Linux; validar una plataforma primero, pero compilar y comprobar el resto desde que exista el primer núcleo utilizable. La distribución web no es un requisito del usuario y no debe limitar el motor.
 
-La recomendación es un juicio de ingeniería basado en requisitos y documentación, **no un benchmark realizado**. El motor gráfico definitivo queda condicionado a las pruebas SP-01 y SP-02. Los núcleos difíciles son el trazo, la topología de regiones pintables, la deformación, el compositor y el guardado; ningún framework los proporciona como un equivalente listo de Harmony.
 
 ## Criterios
 
@@ -59,7 +58,6 @@ No conviene ignorar alternativas libres existentes. [OpenToonz](https://opentoon
 | Build | CMake presets + Ninja; Conan 2 como candidato para dependencias | Versiones y hashes fijados; no combinar gestores sin motivo |
 | Pruebas | Tests C++ de dominio; Qt Test/Quick Test para UI; fixtures de imagen y proyectos | Elegir bibliotecas exactas en el primer scaffold |
 
-[Skia](https://skia.org/docs/user/api/) ayuda a dibujar geometría, pero no aporta un modelo de animación, un editor de curvas ni la semántica de rellenos de Harmony. [OpenColorIO](https://opencolorio.org/) se orienta al color en producción audiovisual. [OpenTimelineIO](https://opentimelineio.readthedocs.io/en/latest/) describe montaje y referencias a medios; no sustituye nuestro formato de escena.
 
 ## Decisión gráfica que no debe ocultarse
 

@@ -26,7 +26,7 @@ Generar intercalados entre dibujos vectoriales compatibles.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-14e6269bdd](https://docs.toonboom.com/help/harmony-25/premium/morphing/about-morphing.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## MOR-002 — Reglas de compatibilidad
 
@@ -36,7 +36,7 @@ Diagnosticar incompatibilidades de regiones y colores antes de interpolar.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-395adb942b](https://docs.toonboom.com/help/harmony-25/premium/morphing/about-morph-rule.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## MOR-003 — Hints de correspondencia
 
@@ -46,7 +46,7 @@ Permitir guiar qué puntos, contornos o líneas se corresponden.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-14e6269bdd](https://docs.toonboom.com/help/harmony-25/premium/morphing/about-morphing.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## MOR-004 — Claves de morphing intermedias
 
@@ -56,7 +56,7 @@ Convertir un resultado intermedio en dibujo clave para añadir detalles.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-c4bfa8aceb](https://docs.toonboom.com/help/harmony-25/premium/morphing/about-morph-key-drawing.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## MOR-005 — Timing y easing del morph
 
@@ -66,7 +66,7 @@ Separar progreso temporal del emparejamiento geométrico.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-14e6269bdd](https://docs.toonboom.com/help/harmony-25/premium/morphing/about-morphing.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## MOR-006 — Huecos y transparencia
 
@@ -76,4 +76,4 @@ Resolver regiones interiores y alfa con reglas visibles.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-f7595f1a57](https://docs.toonboom.com/help/harmony-25/premium/morphing/about-transparency-morph.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

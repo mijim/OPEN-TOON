@@ -26,7 +26,7 @@ Ofrecer dos vistas del mismo modelo temporal, horizontal y vertical.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-511b77c6a8](https://docs.toonboom.com/help/harmony-25/premium/layers/about-layer-column.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## TIM-002 — Crear dibujos y exposiciones
 
@@ -36,7 +36,7 @@ Crear dibujos únicos y referenciarlos desde uno o más intervalos de fotogramas
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-06ae4f88c1](https://docs.toonboom.com/help/harmony-25/premium/timing/about-creating-exposure.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## TIM-003 — Mantener y extender exposición
 
@@ -46,7 +46,7 @@ Alargar o acortar holds sin duplicar los datos del dibujo.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-a004f6f168](https://docs.toonboom.com/help/harmony-25/premium/timing/about-adjusting-exposure.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## TIM-004 — Insertar y quitar frames
 
@@ -56,7 +56,7 @@ Modificar duración desplazando rangos según una regla explícita.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-16442580e1](https://docs.toonboom.com/help/harmony-25/premium/timing/about-scene-length.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## TIM-005 — Vaciar exposición
 
@@ -66,7 +66,7 @@ Quitar una referencia temporal conservando el dibujo disponible.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-11f51e512d](https://docs.toonboom.com/help/harmony-25/premium/timing/about-exposure.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## TIM-006 — Copiar y pegar rangos
 
@@ -76,7 +76,7 @@ Distinguir pegado de exposición, dibujos, keyframes y combinaciones.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-00e4796695](https://docs.toonboom.com/help/harmony-25/premium/timing/about-tweaking-exposure-timeline.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## TIM-007 — Repeticiones y ciclos
 
@@ -86,7 +86,7 @@ Repetir secuencias con dibujos compartidos y límite temporal explícito.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-06ae4f88c1](https://docs.toonboom.com/help/harmony-25/premium/timing/about-creating-exposure.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## TIM-008 — Timing a doses y treses
 
@@ -96,7 +96,7 @@ Aplicar pasos de exposición regulares con conservación del orden.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-a004f6f168](https://docs.toonboom.com/help/harmony-25/premium/timing/about-adjusting-exposure.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## TIM-009 — Arrastrar, estirar y sobrescribir
 
@@ -106,7 +106,7 @@ Mover bloques con opciones de inserción y sobrescritura controladas.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-62b9c36095](https://docs.toonboom.com/help/harmony-25/premium/timing/overwrite-exposure-keyframe.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## TIM-010 — Navegación entre dibujos
 
@@ -116,7 +116,7 @@ Saltar a dibujo distinto, keyframe o límite del rango.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-f87f5edfa6](https://docs.toonboom.com/help/harmony-25/premium/timing/about-timing.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## TIM-011 — Marcadores de escena
 
@@ -126,7 +126,7 @@ Crear marcadores y rangos nombrados con duración y notas.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-f99a3e0bac](https://docs.toonboom.com/help/harmony-25/premium/timing/about-scene-marker.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## TIM-012 — Marcas de fotograma
 
@@ -136,7 +136,7 @@ Clasificar claves, breakdowns e intercalados con símbolos legibles.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-ef6cfd840b](https://docs.toonboom.com/help/harmony-25/premium/timing/about-frame-markers.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## TIM-013 — Miniaturas de exposición
 
@@ -146,7 +146,7 @@ Mostrar previews de dibujos con caché y actualización selectiva.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-3343e310ae](https://docs.toonboom.com/help/harmony-25/premium/paperless-animation/display-timeline-thumbnails.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## TIM-014 — Imprimir Xsheet
 
@@ -156,4 +156,4 @@ Exportar o imprimir hoja con columnas, tiempos, numeración y anotaciones.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-2c0f63c654](https://docs.toonboom.com/help/harmony-25/premium/timing/print-xsheet.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

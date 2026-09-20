@@ -26,7 +26,7 @@ Organizar escenas en estructura de producción y asignaciones.
 
 **Alcance:** `studio_extension` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-95ab978ba8](https://docs.toonboom.com/help/harmony-25/premium/project-creation/about-database-structure.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## STU-002 — Acceso a escenas compartidas
 
@@ -36,7 +36,7 @@ Abrir y guardar escenas en almacenamiento compartido mediante un servicio defini
 
 **Alcance:** `studio_extension` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-2e940bb71d](https://docs.toonboom.com/help/harmony-25/premium/project-creation/about-database.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## STU-003 — Bloqueos de escena
 
@@ -46,7 +46,7 @@ Coordinar derechos de escritura y liberación de bloqueos.
 
 **Alcance:** `studio_extension` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-dd30b0ab2c](https://docs.toonboom.com/help/harmony-25/premium/project-creation/about-global-lock.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## STU-004 — Bloqueos de dibujos
 
@@ -56,7 +56,7 @@ Permitir trabajo de pintura sobre dibujos autorizados mientras otros roles traba
 
 **Alcance:** `studio_extension` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-8cdb228d35](https://docs.toonboom.com/help/harmony-25/premium/project-creation/about-drawing-lock.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## STU-005 — Versiones y merge de entregas
 
@@ -66,7 +66,7 @@ Gestionar revisiones y detectar divergencias al reintegrar una escena.
 
 **Alcance:** `studio_extension` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-523ce57039](https://docs.toonboom.com/help/harmony-25/premium/project-creation/merge-scene-version-harmony-srever.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## STU-006 — Checkout remoto
 
@@ -76,7 +76,7 @@ Empaquetar escenas para trabajo desconectado y reintegrar cambios.
 
 **Alcance:** `studio_extension` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-acfe671ce8](https://docs.toonboom.com/help/harmony-25/premium/about/about.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## STU-007 — Colas de render y vectorización
 
@@ -86,7 +86,7 @@ Distribuir trabajos con estado, reintento y seguimiento.
 
 **Alcance:** `studio_extension` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-2e940bb71d](https://docs.toonboom.com/help/harmony-25/premium/project-creation/about-database.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## STU-008 — Roles Paint y Scan
 
@@ -96,4 +96,4 @@ Ofrecer espacios limitados por tarea para pintura y escaneo de producción.
 
 **Alcance:** `studio_extension` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-acfe671ce8](https://docs.toonboom.com/help/harmony-25/premium/about/about.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

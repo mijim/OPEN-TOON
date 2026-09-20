@@ -1,0 +1,3411 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-09-20",
+  "status": "proposed_execution_plan",
+  "product_language": "en",
+  "implementation_status": "not_started",
+  "estimate_unit": "focused engineer-weeks; 5 working days per engineer-week",
+  "phases": [
+    {
+      "id": "P00",
+      "title": "Technical feasibility and reuse",
+      "status": "planned",
+      "depends_on": [],
+      "effort_engineer_weeks": [
+        8,
+        16
+      ],
+      "outcome": "Choose a proven implementation path before committing to the graphics and storage stack.",
+      "work_packages": [
+        {
+          "id": "P00-W1",
+          "description": "Timebox SP-00: build and audit an identified OpenToonz revision; record reusable components and coupling, with no automatic whole-application fork.",
+          "status": "planned"
+        },
+        {
+          "id": "P00-W2",
+          "description": "Run SP-01/02/03/04/05: tablet traces, CPU/GPU rendering, crash-safe storage, vector region topology and rational audio time.",
+          "status": "planned"
+        },
+        {
+          "id": "P00-W3",
+          "description": "Run SP-06/07 at prototype scale: deformation feasibility and redistributable packages; benchmark the Qt Quick docking candidate.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Record hardware, dependency revisions, build flags, licenses and raw measurements.",
+        "Select one primary renderer and one fallback; prove a pressure-sensitive stroke on each target OS.",
+        "Interrupt every save boundary without publishing missing blobs; demonstrate a viable fill and curve deformation.",
+        "Accept or reject each spike with an ADR; an unresolved core blocker prevents P01 production contracts."
+      ],
+      "deliverables": [
+        "Technology ADRs and benchmark reports",
+        "B0/B4/B6 prototype fixtures",
+        "Dependency adoption shortlist"
+      ],
+      "fixtures": [
+        "B0",
+        "B4",
+        "B6"
+      ],
+      "quality_requirements": [
+        "NFR-001",
+        "NFR-004",
+        "NFR-005",
+        "NFR-019",
+        "NFR-023"
+      ],
+      "risks": [
+        "Renderer interoperability; tablet drivers; topology correctness."
+      ],
+      "milestone": "Technical baseline",
+      "feature_ids": []
+    },
+    {
+      "id": "P01",
+      "title": "Application foundation and English design system",
+      "status": "planned",
+      "depends_on": [
+        "P00"
+      ],
+      "effort_engineer_weeks": [
+        12,
+        22
+      ],
+      "outcome": "Open a real local document in a minimal English desktop shell with reversible edits and safe recovery.",
+      "work_packages": [
+        {
+          "id": "P01-W1",
+          "description": "Create CMake/Ninja targets, Conan lockfiles, module boundaries, CI builds and sanitizer profiles; build an English contributor guide.",
+          "status": "planned"
+        },
+        {
+          "id": "P01-W2",
+          "description": "Implement stable IDs, rational time, command transactions, immutable render snapshots, SQLite/blob storage, migrations and recovery.",
+          "status": "planned"
+        },
+        {
+          "id": "P01-W3",
+          "description": "Create monochrome QML tokens, keyboard commands, focus rules, dock layout persistence and accessible English strings; migrate earlier Spanish research with stable IDs and reviewed terminology.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Create/save/reopen a scene and undo/redo document configuration changes through the real command API.",
+        "Simulate disk-full and termination; recover the last committed revision with actionable English errors.",
+        "Build on Windows/macOS/Linux; run physical tablet smoke checks on available reference hardware and explicitly mark untested device profiles.",
+        "Inventory all visible strings, accessibility labels and first-party docs; English is the release language and non-Latin user text round-trips."
+      ],
+      "deliverables": [
+        "Modular desktop shell and headless test target",
+        "Versioned project format draft and recovery protocol",
+        "English glossary, UI tokens and dependency notices"
+      ],
+      "fixtures": [
+        "B0",
+        "B6"
+      ],
+      "quality_requirements": [
+        "NFR-001",
+        "NFR-002",
+        "NFR-003",
+        "NFR-013",
+        "NFR-014",
+        "NFR-015",
+        "NFR-016",
+        "NFR-017",
+        "NFR-018",
+        "NFR-019",
+        "NFR-021",
+        "NFR-022",
+        "NFR-023",
+        "NFR-024",
+        "NFR-027"
+      ],
+      "risks": [
+        "Premature framework design; docking Qt Quick maturity; English migration volume."
+      ],
+      "milestone": "Foundation",
+      "feature_ids": [
+        "PRJ-001",
+        "PRJ-002",
+        "PRJ-003",
+        "PRJ-004",
+        "PRJ-005",
+        "PRJ-008",
+        "PRJ-010",
+        "UI-001",
+        "UI-004",
+        "UI-005",
+        "UI-006",
+        "UI-009",
+        "UI-010"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "First complete frame-by-frame film",
+      "status": "planned",
+      "depends_on": [
+        "P01"
+      ],
+      "effort_engineer_weeks": [
+        16,
+        28
+      ],
+      "outcome": "An animator can draw a two-second bouncing ball, save it, reopen it and export 48 PNG frames.",
+      "work_packages": [
+        {
+          "id": "P02-W1",
+          "description": "Implement pencil strokes, pressure width, erasing, selection and stable palette references on vector drawings.",
+          "status": "planned"
+        },
+        {
+          "id": "P02-W2",
+          "description": "Connect drawing exposures, simple layers, onion skin and playback to the shared time model; use a minimal ordered compositor with alpha-over.",
+          "status": "planned"
+        },
+        {
+          "id": "P02-W3",
+          "description": "Add still-image import and cancellable PNG sequence export using the same scene evaluator as preview.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Complete WF-01 at 1080p/24fps without editing files outside the app; exactly 48 correctly numbered frames export.",
+        "Undo a complete stroke, exposure edit and layer reorder; save/reopen retains semantic equality.",
+        "Measure B0 tablet latency, pressure fidelity and display scaling on the declared device matrix.",
+        "Rerender the reopened scene and compare pixels within the documented backend tolerance; preview and export agree on framing."
+      ],
+      "deliverables": [
+        "v0.1 experimental desktop package",
+        "Redistributable bouncing-ball fixture",
+        "First user manual and recorded workflow"
+      ],
+      "fixtures": [
+        "B0",
+        "B6"
+      ],
+      "quality_requirements": [
+        "NFR-001",
+        "NFR-003",
+        "NFR-004",
+        "NFR-005",
+        "NFR-006",
+        "NFR-012",
+        "NFR-014",
+        "NFR-015",
+        "NFR-016",
+        "NFR-027"
+      ],
+      "risks": [
+        "Stable fill/erase topology and interactive latency."
+      ],
+      "milestone": "v0.1 — usable vertical slice",
+      "feature_ids": [
+        "LYR-001",
+        "LYR-002",
+        "LYR-003",
+        "VEC-001",
+        "VEC-003",
+        "VEC-008",
+        "VEC-009",
+        "COL-001",
+        "COL-002",
+        "TIM-002",
+        "TIM-003",
+        "TIM-004",
+        "TIM-005",
+        "TIM-010",
+        "FBF-001",
+        "FBF-003",
+        "IMP-001",
+        "OUT-001",
+        "OUT-004"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "Timeline, Xsheet and paperless workflow",
+      "status": "planned",
+      "depends_on": [
+        "P02"
+      ],
+      "effort_engineer_weeks": [
+        12,
+        20
+      ],
+      "outcome": "Animate longer scenes using consistent timeline and Xsheet exposure editing.",
+      "work_packages": [
+        {
+          "id": "P03-W1",
+          "description": "Implement interval-based holds, insert/delete, cycles, timing on twos/threes, stretch and multi-range copy; virtualize timeline and Xsheet views.",
+          "status": "planned"
+        },
+        {
+          "id": "P03-W2",
+          "description": "Add advanced onion skin, shift-and-trace, flip/desk views, thumbnails, drawing marks and registration tools.",
+          "status": "planned"
+        },
+        {
+          "id": "P03-W3",
+          "description": "Extend workspace, shortcut, layer grouping, clone/sync, annotations and element management without duplicating document state.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Perform equivalent edits in timeline and Xsheet and obtain identical exposure intervals after undo/reopen.",
+        "Edit a sparse 10,000-frame scene without allocating a UI item for every cell.",
+        "Complete WF-02 rough-to-cleanup using the supported vector subset; preserve registration.",
+        "Test keyboard-only editing, focused shortcuts and multi-selection across collapsed groups."
+      ],
+      "deliverables": [
+        "Shared exposure editor with two synchronized views",
+        "Paperless workflow guide",
+        "Large-timeline performance report"
+      ],
+      "fixtures": [
+        "B1",
+        "B2"
+      ],
+      "quality_requirements": [
+        "NFR-003",
+        "NFR-006",
+        "NFR-008",
+        "NFR-014",
+        "NFR-027"
+      ],
+      "risks": [
+        "Interval boundary errors; accidental drawing sharing versus duplication."
+      ],
+      "milestone": "v0.2 — paperless animation",
+      "feature_ids": [
+        "UI-002",
+        "UI-003",
+        "UI-007",
+        "UI-008",
+        "LYR-004",
+        "LYR-005",
+        "LYR-006",
+        "LYR-007",
+        "LYR-010",
+        "LYR-011",
+        "TIM-001",
+        "TIM-006",
+        "TIM-007",
+        "TIM-008",
+        "TIM-009",
+        "TIM-011",
+        "TIM-012",
+        "TIM-013",
+        "TIM-014",
+        "FBF-004",
+        "FBF-005",
+        "FBF-006",
+        "FBF-007",
+        "FBF-008",
+        "FBF-009",
+        "FBF-012"
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "Professional vector drawing and palette workflow",
+      "status": "planned",
+      "depends_on": [
+        "P03"
+      ],
+      "effort_engineer_weeks": [
+        20,
+        36
+      ],
+      "outcome": "Clean up and recolor production drawings using editable vector geometry and linked palettes.",
+      "work_packages": [
+        {
+          "id": "P04-W1",
+          "description": "Add region-aware fills, gap closing, invisible strokes, contour/centerline editing, width profiles, cutter, smoothing and curve primitives.",
+          "status": "planned"
+        },
+        {
+          "id": "P04-W2",
+          "description": "Implement vector brushes, gradient/texture fills, drawing deformation tools, guides, stamps and outline-safe text; retain editable text metadata where supported.",
+          "status": "planned"
+        },
+        {
+          "id": "P04-W3",
+          "description": "Add four art layers, color models, palette variants, palette repair and multi-drawing operations; explicitly define drawing sharing semantics.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Complete WF-02 and WF-03 with recoloring propagated by stable swatch IDs.",
+        "Exercise self-intersections, near-coincident curves and small gaps; undo never drops unrelated contours.",
+        "Transform or cut a selection without silently converting all vectors to raster.",
+        "Preserve all art-layer and palette relations across save, clone and import/export; record tolerances for curve flattening."
+      ],
+      "deliverables": [
+        "Vector editing and fill topology specification",
+        "Day/night palette fixture",
+        "Golden drawings for pathological geometry"
+      ],
+      "fixtures": [
+        "B0",
+        "B1"
+      ],
+      "quality_requirements": [
+        "NFR-003",
+        "NFR-004",
+        "NFR-005",
+        "NFR-011",
+        "NFR-012",
+        "NFR-025",
+        "NFR-027"
+      ],
+      "risks": [
+        "Polygon libraries do not solve editable curve topology automatically."
+      ],
+      "milestone": "Vector production toolkit",
+      "feature_ids": [
+        "LYR-008",
+        "LYR-009",
+        "VEC-002",
+        "VEC-005",
+        "VEC-006",
+        "VEC-007",
+        "VEC-010",
+        "VEC-011",
+        "VEC-012",
+        "VEC-013",
+        "VEC-014",
+        "VEC-015",
+        "VEC-016",
+        "VEC-017",
+        "VEC-018",
+        "VEC-019",
+        "VEC-020",
+        "VEC-021",
+        "VEC-022",
+        "VEC-023",
+        "VEC-024",
+        "VEC-025",
+        "VEC-026",
+        "VEC-027",
+        "COL-003",
+        "COL-004",
+        "COL-005",
+        "COL-006",
+        "COL-007",
+        "COL-008",
+        "COL-009",
+        "COL-010",
+        "COL-011",
+        "COL-012",
+        "COL-013",
+        "FBF-002",
+        "FBF-010",
+        "FBF-011"
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "Raster and textured brush engine",
+      "status": "planned",
+      "depends_on": [
+        "P04"
+      ],
+      "effort_engineer_weeks": [
+        14,
+        26
+      ],
+      "outcome": "Mix tiled bitmap artwork and vector drawings with responsive textured brushes.",
+      "work_packages": [
+        {
+          "id": "P05-W1",
+          "description": "Integrate libmypaint through a brush/tile adapter; benchmark color conversion, stroke sampling and undo tile diffs.",
+          "status": "planned"
+        },
+        {
+          "id": "P05-W2",
+          "description": "Implement bitmap layers, selection, resolution changes, texture-backed vector brushes/pencils and deterministic preset serialization.",
+          "status": "planned"
+        },
+        {
+          "id": "P05-W3",
+          "description": "Evaluate an ABR subset importer with explicit compatibility reporting; preserve original presets and reject unsupported variants safely.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Paint B3 at 4K with bounded tiles/caches and cancellable operations; report cold/warm memory separately.",
+        "Compare undo/reopen stroke output and pressure transitions using recorded input streams.",
+        "Import documented ABR fixtures or publish precise unsupported fields; do not claim general Photoshop brush compatibility.",
+        "Mix raster and vectors while keeping premultiplication and color transforms consistent."
+      ],
+      "deliverables": [
+        "Brush adapter and preset schema",
+        "Raster workflow sample",
+        "ABR support matrix and memory benchmark"
+      ],
+      "fixtures": [
+        "B0",
+        "B3"
+      ],
+      "quality_requirements": [
+        "NFR-003",
+        "NFR-004",
+        "NFR-005",
+        "NFR-009",
+        "NFR-011",
+        "NFR-018",
+        "NFR-025",
+        "NFR-027"
+      ],
+      "risks": [
+        "Brush engine surface format, ABR coverage and excessive tile snapshots."
+      ],
+      "milestone": "Mixed-media drawing",
+      "feature_ids": [
+        "VEC-004",
+        "RAS-001",
+        "RAS-002",
+        "RAS-003",
+        "RAS-004",
+        "RAS-005",
+        "RAS-006",
+        "RAS-007"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "Keyframe animation and multiplane cameras",
+      "status": "planned",
+      "depends_on": [
+        "P04"
+      ],
+      "effort_engineer_weeks": [
+        16,
+        28
+      ],
+      "outcome": "Animate transform hierarchies and camera moves with predictable timing and curves.",
+      "work_packages": [
+        {
+          "id": "P06-W1",
+          "description": "Implement setup/animate modes, pegs, pivots, transform channels, stepped/continuous keys, autokey and batched key editing.",
+          "status": "planned"
+        },
+        {
+          "id": "P06-W2",
+          "description": "Build curve/ease and motion-path editors with explicit interpolation, velocity and extrapolation semantics.",
+          "status": "planned"
+        },
+        {
+          "id": "P06-W3",
+          "description": "Add multiple cameras, animated orthographic framing, multiplane Z, staging views and reusable motion transfers; 3D views here show 2D planes, not imported meshes.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Animate a camera move and character hierarchy; reopening preserves all evaluated keyframe values.",
+        "Verify parent-child transforms and pivot edits with nonuniform scale and negative scale.",
+        "Scrub and export identical camera framing at integer and rational frame rates.",
+        "Copy and retime key ranges without changing unrelated channels; undo restores the complete edit."
+      ],
+      "deliverables": [
+        "Animation channel and interpolation contracts",
+        "Multiplane scene fixture",
+        "Curve editor and camera documentation"
+      ],
+      "fixtures": [
+        "B1",
+        "B2"
+      ],
+      "quality_requirements": [
+        "NFR-003",
+        "NFR-007",
+        "NFR-008",
+        "NFR-012",
+        "NFR-027"
+      ],
+      "risks": [
+        "Coordinate spaces, rotation interpolation and setup-versus-animation state."
+      ],
+      "milestone": "Keyframe animation",
+      "feature_ids": [
+        "ANI-001",
+        "ANI-002",
+        "ANI-003",
+        "ANI-004",
+        "ANI-005",
+        "ANI-006",
+        "ANI-007",
+        "ANI-008",
+        "ANI-009",
+        "ANI-010",
+        "ANI-012",
+        "ANI-013",
+        "CAM-001",
+        "CAM-002",
+        "CAM-003",
+        "CAM-004",
+        "CAM-005",
+        "CAM-006",
+        "CAM-007"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "Sound and practical media output",
+      "status": "planned",
+      "depends_on": [
+        "P03",
+        "P05"
+      ],
+      "effort_engineer_weeks": [
+        12,
+        22
+      ],
+      "outcome": "Edit dialogue against drawings and deliver synchronized image or movie output.",
+      "work_packages": [
+        {
+          "id": "P07-W1",
+          "description": "Use miniaudio for device playback/mixing and a restricted FFmpeg adapter for decoding/encoding; keep one authoritative rational timeline clock.",
+          "status": "planned"
+        },
+        {
+          "id": "P07-W2",
+          "description": "Add waveforms, trim/offset, gain, scrub, audio library, preview quality and render-range controls.",
+          "status": "planned"
+        },
+        {
+          "id": "P07-W3",
+          "description": "Add video import, video/audio export, GIF and standalone playback; distinguish input decoding support from redistributable output codec profiles.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Play and export a ten-minute rational-rate scene with audiovisual drift within NFR-007.",
+        "Cancel render and device changes cleanly; no partial output is reported as complete.",
+        "Check waveform, trim and gain against a known waveform and exact sample boundaries.",
+        "Install the minimal licensed media build on clean target systems and list available codecs at runtime."
+      ],
+      "deliverables": [
+        "Audio/media adapters and clock contract",
+        "Ten-minute sync fixture",
+        "Codec support and export guide"
+      ],
+      "fixtures": [
+        "B1",
+        "B6"
+      ],
+      "quality_requirements": [
+        "NFR-007",
+        "NFR-009",
+        "NFR-010",
+        "NFR-018",
+        "NFR-019",
+        "NFR-025",
+        "NFR-027"
+      ],
+      "risks": [
+        "Real-time thread allocations, device loss and build-dependent codec licensing."
+      ],
+      "milestone": "v0.3 — drawing with sound",
+      "feature_ids": [
+        "AUD-001",
+        "AUD-002",
+        "AUD-003",
+        "AUD-004",
+        "AUD-005",
+        "AUD-009",
+        "AUD-010",
+        "IMP-005",
+        "OUT-002",
+        "OUT-005",
+        "OUT-011",
+        "OUT-012"
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "Cut-out rigs, reusable assets and lip sync",
+      "status": "planned",
+      "depends_on": [
+        "P06",
+        "P07"
+      ],
+      "effort_engineer_weeks": [
+        16,
+        30
+      ],
+      "outcome": "Build a reusable character, animate its rigid parts and map dialogue to mouth drawings.",
+      "work_packages": [
+        {
+          "id": "P08-W1",
+          "description": "Implement breakdown, hierarchy editing, pivots, Z ordering, substitutions, pose copying and patching seams.",
+          "status": "planned"
+        },
+        {
+          "id": "P08-W2",
+          "description": "Create versioned local libraries, templates, symbols, previews and paste modes; instantiate assets without accidental shared edits.",
+          "status": "planned"
+        },
+        {
+          "id": "P08-W3",
+          "description": "Add manual lip-sync editing and mouth mapping; evaluate Rhubarb as an optional subprocess, retaining editable generated timing.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Complete WF-04 with a reusable waving character and independently editable instances.",
+        "Complete WF-07 using both manual keys and imported mouth timings; Spanish and English recordings are separate evaluation fixtures.",
+        "Reimport a rig template without ID collisions or lost palette dependencies.",
+        "Document detector limitations: Rhubarb speech mode is English-oriented; language-independent mode needs its own quality results."
+      ],
+      "deliverables": [
+        "Cut-out rig and asset schemas",
+        "Character and dialogue examples",
+        "Optional lip-sync adapter report"
+      ],
+      "fixtures": [
+        "B1",
+        "B4"
+      ],
+      "quality_requirements": [
+        "NFR-003",
+        "NFR-007",
+        "NFR-017",
+        "NFR-018",
+        "NFR-025",
+        "NFR-027"
+      ],
+      "risks": [
+        "Symbol ownership and mouth-drawing mapping; detector quality varies by language."
+      ],
+      "milestone": "v0.5 — cut-out animation",
+      "feature_ids": [
+        "RIG-001",
+        "RIG-002",
+        "RIG-003",
+        "RIG-004",
+        "RIG-005",
+        "RIG-006",
+        "RIG-007",
+        "RIG-008",
+        "RIG-012",
+        "AUD-006",
+        "AUD-007",
+        "AUD-008",
+        "LIB-001",
+        "LIB-002",
+        "LIB-003",
+        "LIB-004",
+        "LIB-005",
+        "LIB-006",
+        "LIB-007"
+      ]
+    },
+    {
+      "id": "P09",
+      "title": "Core deformation",
+      "status": "planned",
+      "depends_on": [
+        "P08"
+      ],
+      "effort_engineer_weeks": [
+        20,
+        36
+      ],
+      "outcome": "Animate curved limbs and flexible drawings with stable rest poses and attachments.",
+      "work_packages": [
+        {
+          "id": "P09-W1",
+          "description": "Implement bone, curve and envelope evaluation over an explicit rest-space mesh with consistent texture coordinates.",
+          "status": "planned"
+        },
+        {
+          "id": "P09-W2",
+          "description": "Add influence editing, multiple poses, generated envelopes and deformation quality/visibility controls.",
+          "status": "planned"
+        },
+        {
+          "id": "P09-W3",
+          "description": "Implement kinematic attachments and bake-to-drawings with provenance and bounded approximation error.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Complete WF-05 and compare rest, posed and baked drawings within declared tolerances.",
+        "Test joints, folds and extreme poses on B4 with a checker texture; reject invalid weights predictably.",
+        "Animation remains reproducible after reopen and template reuse.",
+        "Profile interactive edits separately from final render; expose quality settings without changing saved intent."
+      ],
+      "deliverables": [
+        "Deformation evaluation contract",
+        "Rig fixtures and bake accuracy report",
+        "Artist-facing core deformation manual"
+      ],
+      "fixtures": [
+        "B4"
+      ],
+      "quality_requirements": [
+        "NFR-003",
+        "NFR-009",
+        "NFR-012",
+        "NFR-027"
+      ],
+      "risks": [
+        "Self-intersections, mesh quality and numerical conditioning."
+      ],
+      "milestone": "v0.6 — deformable characters",
+      "feature_ids": [
+        "DEF-001",
+        "DEF-003",
+        "DEF-004",
+        "DEF-008",
+        "DEF-009",
+        "DEF-010",
+        "DEF-011",
+        "DEF-012",
+        "DEF-013",
+        "DEF-014",
+        "DEF-015"
+      ]
+    },
+    {
+      "id": "P10",
+      "title": "Node compositor and managed color",
+      "status": "planned",
+      "depends_on": [
+        "P06",
+        "P07",
+        "P09"
+      ],
+      "effort_engineer_weeks": [
+        20,
+        38
+      ],
+      "outcome": "Compose scenes with editable node graphs, masks, effects and consistent color-managed output.",
+      "work_packages": [
+        {
+          "id": "P10-W1",
+          "description": "Promote the early ordered compositor to a typed acyclic graph with groups, switches, viewer/output nodes and dirty propagation; migrate old projects.",
+          "status": "planned"
+        },
+        {
+          "id": "P10-W2",
+          "description": "Build the node editor as a view over the document graph; implement basic blending, opacity, blur, glow, shadows, color correction and mattes.",
+          "status": "planned"
+        },
+        {
+          "id": "P10-W3",
+          "description": "Integrate OpenColorIO and HDR-capable image IO, define working/display/output transforms and add multi-output/headless rendering.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Complete the supported 2D subset of WF-08 with masks, camera movement and multiple outputs.",
+        "Validate cycles, incompatible ports and missing assets before render with English node-specific diagnostics.",
+        "Use B5 charts to verify alpha, linear-light composition and display/export transforms.",
+        "Change one upstream parameter and show correct selective invalidation; render the same revision through UI and CLI."
+      ],
+      "deliverables": [
+        "Typed compositor and node operator contract",
+        "Color pipeline specification",
+        "2D compositing fixture and output comparisons"
+      ],
+      "fixtures": [
+        "B1",
+        "B3",
+        "B5"
+      ],
+      "quality_requirements": [
+        "NFR-009",
+        "NFR-010",
+        "NFR-011",
+        "NFR-012",
+        "NFR-018",
+        "NFR-025",
+        "NFR-027"
+      ],
+      "risks": [
+        "Graph migration, color-space errors and GPU/CPU consistency."
+      ],
+      "milestone": "v0.8 — compositing",
+      "feature_ids": [
+        "COL-014",
+        "COL-015",
+        "NOD-001",
+        "NOD-002",
+        "NOD-003",
+        "NOD-004",
+        "NOD-005",
+        "NOD-006",
+        "NOD-007",
+        "NOD-008",
+        "NOD-009",
+        "NOD-010",
+        "FX-001",
+        "FX-002",
+        "FX-003",
+        "FX-006",
+        "FX-007",
+        "FX-008",
+        "FX-009",
+        "FX-013",
+        "OUT-003",
+        "OUT-006",
+        "OUT-007",
+        "OUT-008",
+        "OUT-013"
+      ]
+    },
+    {
+      "id": "P11",
+      "title": "Reliable 1.0 release",
+      "status": "planned",
+      "depends_on": [
+        "P10"
+      ],
+      "effort_engineer_weeks": [
+        16,
+        28
+      ],
+      "outcome": "Ship a dependable offline 2D product with a clearly bounded feature set.",
+      "work_packages": [
+        {
+          "id": "P11-W1",
+          "description": "Run complete drawing, cut-out, audio and 2D compositing journeys with animators; prioritize data-loss and workflow blockers over new tools.",
+          "status": "planned"
+        },
+        {
+          "id": "P11-W2",
+          "description": "Complete project compaction, revision/history, optimization and recovery UX; finalize format migration and supported OS/device profiles.",
+          "status": "planned"
+        },
+        {
+          "id": "P11-W3",
+          "description": "Produce installable packages, dependency notices/SBOM, English help, accessibility review and reproducible release evidence; test installation and upgrades.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Complete WF-01 through WF-05, WF-07, the supported 2D part of WF-08 and WF-12 on the published matrix.",
+        "No known data-loss defect or critical release blocker remains; all relevant NFR budgets are measured or explicitly narrowed before release.",
+        "Open all earlier release fixtures or issue a recoverable migration diagnostic; backup before destructive migration.",
+        "Publish an accurate support matrix: advanced controllers/morph/3D/studio/AI are later releases, not implied by the 1.0 label."
+      ],
+      "deliverables": [
+        "v1.0 installers and source release",
+        "Migration, recovery and accessibility reports",
+        "English user/contributor docs and measured support matrix"
+      ],
+      "fixtures": [
+        "B0",
+        "B1",
+        "B2",
+        "B3",
+        "B4",
+        "B5",
+        "B6"
+      ],
+      "quality_requirements": [
+        "NFR-001",
+        "NFR-002",
+        "NFR-003",
+        "NFR-004",
+        "NFR-005",
+        "NFR-006",
+        "NFR-007",
+        "NFR-008",
+        "NFR-009",
+        "NFR-010",
+        "NFR-011",
+        "NFR-012",
+        "NFR-013",
+        "NFR-014",
+        "NFR-015",
+        "NFR-016",
+        "NFR-017",
+        "NFR-018",
+        "NFR-019",
+        "NFR-020",
+        "NFR-021",
+        "NFR-022",
+        "NFR-023",
+        "NFR-024",
+        "NFR-025",
+        "NFR-026",
+        "NFR-027"
+      ],
+      "risks": [
+        "Polish and compatibility debt; premature claims of feature completeness."
+      ],
+      "milestone": "v1.0 — reliable local 2D",
+      "feature_ids": [
+        "PRJ-006",
+        "PRJ-007",
+        "PRJ-009"
+      ]
+    },
+    {
+      "id": "P12",
+      "title": "Automation and extension foundations",
+      "status": "planned",
+      "depends_on": [
+        "P11"
+      ],
+      "effort_engineer_weeks": [
+        12,
+        24
+      ],
+      "outcome": "Automate editing and rendering through a documented, versioned command API.",
+      "work_packages": [
+        {
+          "id": "P12-W1",
+          "description": "Expose stable document queries and transactions through a C++ application API and pybind11 Python bindings.",
+          "status": "planned"
+        },
+        {
+          "id": "P12-W2",
+          "description": "Build script editor, custom actions, explicit trusted-script permissions and a separate process for restricted automation; Python bindings themselves are not a sandbox.",
+          "status": "planned"
+        },
+        {
+          "id": "P12-W3",
+          "description": "Add CLI batch jobs, deterministic expression evaluation, cancellation, version negotiation and plugin manifests.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "A script generates and renders a scene using the same validated commands and undo rules as the UI.",
+        "Reject unsupported API versions with a migration hint; never execute scripts embedded in a project automatically.",
+        "A terminated worker leaves no partial document transaction or completed-looking output.",
+        "Document which scripts are trusted and which restrictions are enforced by OS process boundaries, not a misleading restricted Python namespace."
+      ],
+      "deliverables": [
+        "Versioned automation SDK",
+        "Script examples and extension policy",
+        "CLI job protocol"
+      ],
+      "fixtures": [
+        "B1",
+        "B6"
+      ],
+      "quality_requirements": [
+        "NFR-003",
+        "NFR-010",
+        "NFR-016",
+        "NFR-018",
+        "NFR-022",
+        "NFR-026",
+        "NFR-027"
+      ],
+      "risks": [
+        "ABI stability, trust boundaries and expression nondeterminism."
+      ],
+      "milestone": "Automation release",
+      "feature_ids": [
+        "ANI-011",
+        "AUT-001",
+        "AUT-002",
+        "AUT-003",
+        "AUT-004",
+        "AUT-005",
+        "AUT-006"
+      ]
+    },
+    {
+      "id": "P13",
+      "title": "Advanced rigging and artist controllers",
+      "status": "planned",
+      "depends_on": [
+        "P12"
+      ],
+      "effort_engineer_weeks": [
+        24,
+        46
+      ],
+      "outcome": "Build sophisticated reusable character controls and layered deformation rigs.",
+      "work_packages": [
+        {
+          "id": "P13-W1",
+          "description": "Implement IK, constraints/nails, hierarchy tools and guided breakdown with explicit solve order.",
+          "status": "planned"
+        },
+        {
+          "id": "P13-W2",
+          "description": "Add free-form, shape-aware and weighted deformations plus deform-on-deform composition; evaluate selected Eigen/libigl solvers.",
+          "status": "planned"
+        },
+        {
+          "id": "P13-W3",
+          "description": "Build sliders, pose grids, function mapping, widgets and dashboards; expose scripted controls through the versioned automation API.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Complete WF-06 with a 60-control rig, mirrored poses and combined substitutions/deformations.",
+        "Test unreachable IK targets and degenerate weighted meshes without NaNs or corrupted saved data.",
+        "Controller mappings round-trip through templates and behave consistently with direct channel editing.",
+        "Measure solve cost during interaction and final render; document approximation and influence limits per solver."
+      ],
+      "deliverables": [
+        "Advanced rig examples and solver reports",
+        "Controller authoring tools",
+        "Reusable control schema"
+      ],
+      "fixtures": [
+        "B2",
+        "B4"
+      ],
+      "quality_requirements": [
+        "NFR-003",
+        "NFR-009",
+        "NFR-012",
+        "NFR-017",
+        "NFR-027"
+      ],
+      "risks": [
+        "Solver stability, dependency ordering and opaque controller behavior."
+      ],
+      "milestone": "Advanced character animation",
+      "feature_ids": [
+        "RIG-009",
+        "RIG-010",
+        "RIG-011",
+        "RIG-013",
+        "RIG-014",
+        "DEF-005",
+        "DEF-006",
+        "DEF-007",
+        "CTL-001",
+        "CTL-002",
+        "CTL-003",
+        "CTL-004",
+        "CTL-005",
+        "CTL-006",
+        "CTL-007",
+        "CTL-008"
+      ]
+    },
+    {
+      "id": "P14",
+      "title": "Morphing and drawing interpolation",
+      "status": "planned",
+      "depends_on": [
+        "P12",
+        "P13"
+      ],
+      "effort_engineer_weeks": [
+        18,
+        34
+      ],
+      "outcome": "Interpolate compatible drawings with artist-controlled correspondences.",
+      "work_packages": [
+        {
+          "id": "P14-W1",
+          "description": "Define compatibility rules for contour topology, art layers, palette references and holes.",
+          "status": "planned"
+        },
+        {
+          "id": "P14-W2",
+          "description": "Implement correspondence hints, intermediate keys, timing and preview; preserve source drawings and derived results separately.",
+          "status": "planned"
+        },
+        {
+          "id": "P14-W3",
+          "description": "Add explicit diagnostics and bake options for unsupported topology changes and raster content.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Complete shape interpolation fixtures with holes and alpha without losing contour identity.",
+        "An incompatible pair reports actionable reasons instead of silently producing a broken drawing.",
+        "Hint editing is reversible and deterministic across save/reopen.",
+        "Compare endpoints exactly and intermediates against approved animation references with bounded geometric error."
+      ],
+      "deliverables": [
+        "Morph compatibility specification",
+        "Morph authoring tools and fixtures",
+        "Bake and migration documentation"
+      ],
+      "fixtures": [
+        "B1",
+        "B4"
+      ],
+      "quality_requirements": [
+        "NFR-003",
+        "NFR-011",
+        "NFR-012",
+        "NFR-025",
+        "NFR-027"
+      ],
+      "risks": [
+        "Topology changes and correspondence ambiguities."
+      ],
+      "milestone": "Morphing release",
+      "feature_ids": [
+        "MOR-001",
+        "MOR-002",
+        "MOR-003",
+        "MOR-004",
+        "MOR-005",
+        "MOR-006"
+      ]
+    },
+    {
+      "id": "P15",
+      "title": "Advanced effects, particles and OpenFX",
+      "status": "planned",
+      "depends_on": [
+        "P12",
+        "P13"
+      ],
+      "effort_engineer_weeks": [
+        24,
+        44
+      ],
+      "outcome": "Create procedural effects and particle scenes inside the managed compositor.",
+      "work_packages": [
+        {
+          "id": "P15-W1",
+          "description": "Add remaining filters, channel operations, generated mattes, texture animation, distortions and surface/normal lighting.",
+          "status": "planned"
+        },
+        {
+          "id": "P15-W2",
+          "description": "Build a seeded particle simulation with emitters, forces, collisions, lifecycle, caches and versioned baked results.",
+          "status": "planned"
+        },
+        {
+          "id": "P15-W3",
+          "description": "Evaluate OpenFX host support in an isolated worker with explicit supported suites, capabilities and plugin license records.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Rerender seeded particles identically on the supported deterministic path; timeline jumps use valid simulation state.",
+        "Test out-of-frame regions, premultiplied alpha, HDR values and tiled boundaries for every added effect.",
+        "A crashing or incompatible external plugin reports failure without damaging the project.",
+        "Benchmark B3/B5 memory and cancellation, and publish operator-specific tolerances and OpenFX compatibility."
+      ],
+      "deliverables": [
+        "Advanced operator catalog",
+        "Particle cache format and examples",
+        "OpenFX support matrix"
+      ],
+      "fixtures": [
+        "B3",
+        "B5",
+        "B6"
+      ],
+      "quality_requirements": [
+        "NFR-009",
+        "NFR-010",
+        "NFR-011",
+        "NFR-012",
+        "NFR-018",
+        "NFR-019",
+        "NFR-025",
+        "NFR-027"
+      ],
+      "risks": [
+        "Simulation determinism, expensive effect chains and third-party plugin behavior."
+      ],
+      "milestone": "Advanced compositing release",
+      "feature_ids": [
+        "FX-004",
+        "FX-005",
+        "FX-010",
+        "FX-011",
+        "FX-012",
+        "FX-014",
+        "FX-015",
+        "FX-016",
+        "FX-017",
+        "FX-018",
+        "FX-019",
+        "FX-020",
+        "PAR-001",
+        "PAR-002",
+        "PAR-003",
+        "PAR-004",
+        "PAR-005",
+        "PAR-006",
+        "PAR-007"
+      ]
+    },
+    {
+      "id": "P16",
+      "title": "Production interchange",
+      "status": "planned",
+      "depends_on": [
+        "P12",
+        "P15"
+      ],
+      "effort_engineer_weeks": [
+        16,
+        30
+      ],
+      "outcome": "Exchange layered artwork, editorial timing and compositing results with external tools.",
+      "work_packages": [
+        {
+          "id": "P16-W1",
+          "description": "Add layered PSD import/export with explicit layer/mask/blend subsets; evaluate PSD-specific tooling where generic image IO cannot preserve layers.",
+          "status": "planned"
+        },
+        {
+          "id": "P16-W2",
+          "description": "Implement vector interchange, linked image updates, scan/vectorization workflow and OTIO timeline mapping.",
+          "status": "planned"
+        },
+        {
+          "id": "P16-W3",
+          "description": "Add editorial and After Effects-oriented interchange adapters with exact supported schemas, conversion reports and portable references.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Round-trip redistributable layered/vector fixtures and list every unsupported construct; no blanket lossless claim.",
+        "Changing a linked image creates a controlled revision and can be undone or reverted.",
+        "Import editorial timing at rational rates without silently shifting audio or exposures.",
+        "Render comparison fixtures for downstream exchange and document version-specific limitations."
+      ],
+      "deliverables": [
+        "Interchange matrix and fixture corpus",
+        "Conversion reports and relinking tools",
+        "External workflow guides"
+      ],
+      "fixtures": [
+        "B1",
+        "B5",
+        "B6"
+      ],
+      "quality_requirements": [
+        "NFR-017",
+        "NFR-018",
+        "NFR-019",
+        "NFR-025",
+        "NFR-027"
+      ],
+      "risks": [
+        "Format semantics, external version drift and unsupported PSD/AE constructs."
+      ],
+      "milestone": "Pipeline interoperability",
+      "feature_ids": [
+        "IMP-002",
+        "IMP-003",
+        "IMP-004",
+        "IMP-006",
+        "IMP-007",
+        "IMP-008",
+        "IMP-010",
+        "OUT-009",
+        "OUT-010"
+      ]
+    },
+    {
+      "id": "P17",
+      "title": "Mixed 2D and 3D scenes",
+      "status": "planned",
+      "depends_on": [
+        "P15",
+        "P16"
+      ],
+      "effort_engineer_weeks": [
+        24,
+        48
+      ],
+      "outcome": "Integrate imported 3D assets into a controlled 2D animation workflow.",
+      "work_packages": [
+        {
+          "id": "P17-W1",
+          "description": "Evaluate ufbx/fastgltf import adapters, coordinate/unit conversions, materials, hierarchy, skinning and animation clips.",
+          "status": "planned"
+        },
+        {
+          "id": "P17-W2",
+          "description": "Add 3D subnode visibility/overrides, normalized depth and compositing with 2D planes through a declared renderer contract.",
+          "status": "planned"
+        },
+        {
+          "id": "P17-W3",
+          "description": "Add an optional external-render bridge with versioned job manifests and portable asset references.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Complete WF-09 using redistributable models with known units, skin weights and animated clips.",
+        "Compare axis/handedness and camera projections with reference transforms; texture paths remain portable.",
+        "Document which material/shader features are mapped, approximated or unsupported.",
+        "GPU failure or external renderer failure yields recoverable job errors and preserves editable 2D work."
+      ],
+      "deliverables": [
+        "3D import/render contract",
+        "Mixed scene fixture",
+        "Supported material and external-render matrix"
+      ],
+      "fixtures": [
+        "B3",
+        "B5",
+        "B6"
+      ],
+      "quality_requirements": [
+        "NFR-009",
+        "NFR-010",
+        "NFR-011",
+        "NFR-018",
+        "NFR-019",
+        "NFR-025",
+        "NFR-027"
+      ],
+      "risks": [
+        "Material parity, 3D GPU complexity and import format edge cases."
+      ],
+      "milestone": "Mixed-media 3D release",
+      "feature_ids": [
+        "THR-001",
+        "THR-002",
+        "THR-003",
+        "THR-004",
+        "THR-005",
+        "THR-006",
+        "THR-007",
+        "THR-008",
+        "THR-009"
+      ]
+    },
+    {
+      "id": "P18",
+      "title": "Game animation export",
+      "status": "planned",
+      "depends_on": [
+        "P13",
+        "P15",
+        "P16"
+      ],
+      "effort_engineer_weeks": [
+        16,
+        30
+      ],
+      "outcome": "Deliver predictable sprite and skeletal assets to a documented open runtime.",
+      "work_packages": [
+        {
+          "id": "P18-W1",
+          "description": "Implement atlas packing, variants, anchors/collision metadata and effects baking with deterministic frame bounds.",
+          "status": "planned"
+        },
+        {
+          "id": "P18-W2",
+          "description": "Add game-oriented bones and an independently documented animation runtime format; avoid dependence on proprietary SDKs.",
+          "status": "planned"
+        },
+        {
+          "id": "P18-W3",
+          "description": "Build a minimal open reference runtime and import example; define runtime skinning, color and interpolation support.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Complete WF-10 and compare runtime playback with baked reference frames.",
+        "Verify atlas padding, rotated regions, trim offsets and transparent borders at multiple scales.",
+        "Report unsupported rig/effect behavior and offer a bake fallback with size estimates.",
+        "Version the exported schema and test a previous exporter version against the runtime."
+      ],
+      "deliverables": [
+        "Open runtime schema and example player",
+        "Game export fixtures",
+        "Bake/support report"
+      ],
+      "fixtures": [
+        "B1",
+        "B4"
+      ],
+      "quality_requirements": [
+        "NFR-011",
+        "NFR-012",
+        "NFR-018",
+        "NFR-019",
+        "NFR-021",
+        "NFR-025",
+        "NFR-027"
+      ],
+      "risks": [
+        "Runtime parity, shader constraints and asset size."
+      ],
+      "milestone": "Game delivery release",
+      "feature_ids": [
+        "DEF-002",
+        "GAM-001",
+        "GAM-002",
+        "GAM-003",
+        "GAM-004",
+        "GAM-005",
+        "GAM-006"
+      ]
+    },
+    {
+      "id": "P19",
+      "title": "Studio coordination and render queues",
+      "status": "planned",
+      "depends_on": [
+        "P12",
+        "P16",
+        "P18"
+      ],
+      "effort_engineer_weeks": [
+        24,
+        48
+      ],
+      "outcome": "Coordinate shared productions while preserving reliable offline scene ownership.",
+      "work_packages": [
+        {
+          "id": "P19-W1",
+          "description": "Model productions, roles, asset checkout, scene/drawing locks and lease recovery with explicit conflict semantics.",
+          "status": "planned"
+        },
+        {
+          "id": "P19-W2",
+          "description": "Add revision comparison and limited semantic merges; keep unresolved artistic conflicts visible instead of overwriting them.",
+          "status": "planned"
+        },
+        {
+          "id": "P19-W3",
+          "description": "Build idempotent render queue workers, shared storage adapters and role-specific Paint/Scan workspaces.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Complete WF-11 under concurrent edits, network loss and expired leases; no silent last-writer data loss.",
+        "A requeued render job cannot publish conflicting outputs for one revision.",
+        "Audit access and lock state using English diagnostics; offline checkout remains usable under documented rules.",
+        "Test backup/restore, migrations and worker version skew in a small real production pilot."
+      ],
+      "deliverables": [
+        "Optional studio services and deployment guide",
+        "Concurrency and recovery evidence",
+        "Production pilot report"
+      ],
+      "fixtures": [
+        "B2",
+        "B6"
+      ],
+      "quality_requirements": [
+        "NFR-001",
+        "NFR-002",
+        "NFR-010",
+        "NFR-016",
+        "NFR-017",
+        "NFR-018",
+        "NFR-026",
+        "NFR-027"
+      ],
+      "risks": [
+        "Distributed state, merge ambiguity and operational cost."
+      ],
+      "milestone": "Studio extension",
+      "feature_ids": [
+        "STU-001",
+        "STU-002",
+        "STU-003",
+        "STU-004",
+        "STU-005",
+        "STU-006",
+        "STU-007",
+        "STU-008"
+      ]
+    },
+    {
+      "id": "P20",
+      "title": "Optional local AI tools",
+      "status": "planned",
+      "depends_on": [
+        "P12",
+        "P15"
+      ],
+      "effort_engineer_weeks": [
+        18,
+        40
+      ],
+      "outcome": "Offer opt-in assistive image operations with explicit model provenance and reversible results.",
+      "work_packages": [
+        {
+          "id": "P20-W1",
+          "description": "Evaluate ONNX Runtime and redistribution-compatible models for masks, erase, outpaint, upscale and fill separately.",
+          "status": "planned"
+        },
+        {
+          "id": "P20-W2",
+          "description": "Implement cancellable worker jobs, model/download manifests, resource budgets and preview/apply through document transactions.",
+          "status": "planned"
+        },
+        {
+          "id": "P20-W3",
+          "description": "Provide offline operation after optional model installation, clear generated-content provenance and quality comparisons with manual workflows.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "The editor installs, opens, draws and exports without any model, login or network service.",
+        "Every enabled operation has a usable licensed model, evaluated visual quality and explicit memory/hardware requirements.",
+        "Cancel or reject a generated result without changing source artwork; applying it is undoable.",
+        "No user artwork is uploaded by default; any later remote adapter requires a separately explicit action and disclosure."
+      ],
+      "deliverables": [
+        "Optional AI worker and model registry",
+        "Per-operation quality/resource reports",
+        "Model licenses and generated-result metadata"
+      ],
+      "fixtures": [
+        "B3",
+        "B6"
+      ],
+      "quality_requirements": [
+        "NFR-003",
+        "NFR-009",
+        "NFR-010",
+        "NFR-016",
+        "NFR-018",
+        "NFR-019",
+        "NFR-027"
+      ],
+      "risks": [
+        "Usable model licenses, artifacts and large downloads; runtime alone supplies no models."
+      ],
+      "milestone": "Optional AI extension",
+      "feature_ids": [
+        "AIX-001",
+        "AIX-002",
+        "AIX-003",
+        "AIX-004",
+        "AIX-005",
+        "AIX-006"
+      ]
+    },
+    {
+      "id": "P21",
+      "title": "Legacy migration adapters",
+      "status": "planned",
+      "depends_on": [
+        "P16",
+        "P18"
+      ],
+      "effort_engineer_weeks": [
+        8,
+        18
+      ],
+      "outcome": "Provide isolated legacy conversion where technically viable and worthwhile.",
+      "work_packages": [
+        {
+          "id": "P21-W1",
+          "description": "Investigate FLA/SWF input and EaselJS export with redistributable fixtures and current parser/runtime maintenance evidence.",
+          "status": "planned"
+        },
+        {
+          "id": "P21-W2",
+          "description": "Implement supported static/timeline subsets behind optional adapters or a documented external conversion path.",
+          "status": "planned"
+        },
+        {
+          "id": "P21-W3",
+          "description": "Publish exact conversion losses and record an explicit deferred disposition for unsupported executable or proprietary constructs.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Each legacy requirement has a tested supported subset or a documented deferred decision; a deferred item remains unimplemented.",
+        "No active legacy content is executed merely to inspect or import a file.",
+        "Malformed and oversized inputs are bounded and isolated.",
+        "Reference animations compare before/after in a maintained viewer or reproducible fixture pipeline."
+      ],
+      "deliverables": [
+        "Legacy support and disposition matrix",
+        "Optional converters and hostile-input fixtures",
+        "Migration guide"
+      ],
+      "fixtures": [
+        "B6"
+      ],
+      "quality_requirements": [
+        "NFR-018",
+        "NFR-019",
+        "NFR-025",
+        "NFR-027"
+      ],
+      "risks": [
+        "Obsolete formats, active content and low maintenance value."
+      ],
+      "milestone": "Optional migration pack",
+      "feature_ids": [
+        "IMP-009",
+        "GAM-007"
+      ]
+    },
+    {
+      "id": "P22",
+      "title": "Coverage audit and long-term maintenance",
+      "status": "planned",
+      "depends_on": [
+        "P14",
+        "P17",
+        "P19",
+        "P20",
+        "P21"
+      ],
+      "effort_engineer_weeks": [
+        12,
+        24
+      ],
+      "outcome": "Publish evidence of actual capability coverage and sustain the application across releases.",
+      "work_packages": [
+        {
+          "id": "P22-W1",
+          "description": "Audit all 282 feature records and all 193 node-reference entries; expand family entries into concrete operators/properties before claiming parity.",
+          "status": "planned"
+        },
+        {
+          "id": "P22-W2",
+          "description": "Run end-to-end artistic workflows, dependency upgrades, format migration history and supported platform/device regression suites.",
+          "status": "planned"
+        },
+        {
+          "id": "P22-W3",
+          "description": "Publish verified/partial/deferred coverage, maintenance ownership, support policy and the next evidence-driven roadmap.",
+          "status": "planned"
+        }
+      ],
+      "acceptance": [
+        "Every feature and node reference has an accountable disposition and linked evidence; counts alone never certify parity.",
+        "Optional or legacy deferrals are visible and do not block maintenance releases of the core editor.",
+        "Retained project fixtures survive supported upgrades; retired platforms/formats have documented migration paths.",
+        "Release notes and public claims match measured functionality, including limitations and unresolved gaps."
+      ],
+      "deliverables": [
+        "Evidence-backed capability matrix",
+        "LTS/support and vulnerability response policy",
+        "Next-generation roadmap"
+      ],
+      "fixtures": [
+        "B0",
+        "B1",
+        "B2",
+        "B3",
+        "B4",
+        "B5",
+        "B6"
+      ],
+      "quality_requirements": [
+        "NFR-001",
+        "NFR-012",
+        "NFR-013",
+        "NFR-017",
+        "NFR-018",
+        "NFR-019",
+        "NFR-020",
+        "NFR-024",
+        "NFR-025",
+        "NFR-027"
+      ],
+      "risks": [
+        "Documentation drift and unfunded maintenance."
+      ],
+      "milestone": "Coverage audit and sustainable releases",
+      "feature_ids": []
+    }
+  ],
+  "feature_assignments": [
+    {
+      "feature_id": "PRJ-001",
+      "completion_phase": "P01",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "PRJ-002",
+      "completion_phase": "P01",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "PRJ-003",
+      "completion_phase": "P01",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "PRJ-004",
+      "completion_phase": "P01",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "PRJ-005",
+      "completion_phase": "P01",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "PRJ-006",
+      "completion_phase": "P11",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "PRJ-007",
+      "completion_phase": "P11",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "PRJ-008",
+      "completion_phase": "P01",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "PRJ-009",
+      "completion_phase": "P11",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "PRJ-010",
+      "completion_phase": "P01",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "UI-001",
+      "completion_phase": "P01",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "UI-002",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "UI-003",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "UI-004",
+      "completion_phase": "P01",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "UI-005",
+      "completion_phase": "P01",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "UI-006",
+      "completion_phase": "P01",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "UI-007",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "UI-008",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "UI-009",
+      "completion_phase": "P01",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "UI-010",
+      "completion_phase": "P01",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "LYR-001",
+      "completion_phase": "P02",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "LYR-002",
+      "completion_phase": "P02",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "LYR-003",
+      "completion_phase": "P02",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "LYR-004",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "LYR-005",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "LYR-006",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "LYR-007",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "LYR-008",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "LYR-009",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "LYR-010",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "LYR-011",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-001",
+      "completion_phase": "P02",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-002",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-003",
+      "completion_phase": "P02",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-004",
+      "completion_phase": "P05",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-005",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-006",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-007",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-008",
+      "completion_phase": "P02",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-009",
+      "completion_phase": "P02",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-010",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-011",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-012",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-013",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-014",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-015",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-016",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-017",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-018",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-019",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-020",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-021",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-022",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-023",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-024",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-025",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-026",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "VEC-027",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RAS-001",
+      "completion_phase": "P05",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RAS-002",
+      "completion_phase": "P05",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RAS-003",
+      "completion_phase": "P05",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RAS-004",
+      "completion_phase": "P05",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RAS-005",
+      "completion_phase": "P05",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RAS-006",
+      "completion_phase": "P05",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RAS-007",
+      "completion_phase": "P05",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "COL-001",
+      "completion_phase": "P02",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "COL-002",
+      "completion_phase": "P02",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "COL-003",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "COL-004",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "COL-005",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "COL-006",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "COL-007",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "COL-008",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "COL-009",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "COL-010",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "COL-011",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "COL-012",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "COL-013",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "COL-014",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "COL-015",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "TIM-001",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "TIM-002",
+      "completion_phase": "P02",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "TIM-003",
+      "completion_phase": "P02",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "TIM-004",
+      "completion_phase": "P02",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "TIM-005",
+      "completion_phase": "P02",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "TIM-006",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "TIM-007",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "TIM-008",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "TIM-009",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "TIM-010",
+      "completion_phase": "P02",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "TIM-011",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "TIM-012",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "TIM-013",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "TIM-014",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FBF-001",
+      "completion_phase": "P02",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FBF-002",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FBF-003",
+      "completion_phase": "P02",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FBF-004",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FBF-005",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FBF-006",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FBF-007",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FBF-008",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FBF-009",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FBF-010",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FBF-011",
+      "completion_phase": "P04",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FBF-012",
+      "completion_phase": "P03",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "ANI-001",
+      "completion_phase": "P06",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "ANI-002",
+      "completion_phase": "P06",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "ANI-003",
+      "completion_phase": "P06",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "ANI-004",
+      "completion_phase": "P06",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "ANI-005",
+      "completion_phase": "P06",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "ANI-006",
+      "completion_phase": "P06",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "ANI-007",
+      "completion_phase": "P06",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "ANI-008",
+      "completion_phase": "P06",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "ANI-009",
+      "completion_phase": "P06",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "ANI-010",
+      "completion_phase": "P06",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "ANI-011",
+      "completion_phase": "P12",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "ANI-012",
+      "completion_phase": "P06",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "ANI-013",
+      "completion_phase": "P06",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RIG-001",
+      "completion_phase": "P08",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RIG-002",
+      "completion_phase": "P08",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RIG-003",
+      "completion_phase": "P08",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RIG-004",
+      "completion_phase": "P08",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RIG-005",
+      "completion_phase": "P08",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RIG-006",
+      "completion_phase": "P08",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RIG-007",
+      "completion_phase": "P08",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RIG-008",
+      "completion_phase": "P08",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RIG-009",
+      "completion_phase": "P13",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RIG-010",
+      "completion_phase": "P13",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RIG-011",
+      "completion_phase": "P13",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RIG-012",
+      "completion_phase": "P08",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RIG-013",
+      "completion_phase": "P13",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "RIG-014",
+      "completion_phase": "P13",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "DEF-001",
+      "completion_phase": "P09",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "DEF-002",
+      "completion_phase": "P18",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "DEF-003",
+      "completion_phase": "P09",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "DEF-004",
+      "completion_phase": "P09",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "DEF-005",
+      "completion_phase": "P13",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "DEF-006",
+      "completion_phase": "P13",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "DEF-007",
+      "completion_phase": "P13",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "DEF-008",
+      "completion_phase": "P09",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "DEF-009",
+      "completion_phase": "P09",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "DEF-010",
+      "completion_phase": "P09",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "DEF-011",
+      "completion_phase": "P09",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "DEF-012",
+      "completion_phase": "P09",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "DEF-013",
+      "completion_phase": "P09",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "DEF-014",
+      "completion_phase": "P09",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "DEF-015",
+      "completion_phase": "P09",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "CTL-001",
+      "completion_phase": "P13",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "CTL-002",
+      "completion_phase": "P13",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "CTL-003",
+      "completion_phase": "P13",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "CTL-004",
+      "completion_phase": "P13",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "CTL-005",
+      "completion_phase": "P13",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "CTL-006",
+      "completion_phase": "P13",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "CTL-007",
+      "completion_phase": "P13",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "CTL-008",
+      "completion_phase": "P13",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "MOR-001",
+      "completion_phase": "P14",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "MOR-002",
+      "completion_phase": "P14",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "MOR-003",
+      "completion_phase": "P14",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "MOR-004",
+      "completion_phase": "P14",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "MOR-005",
+      "completion_phase": "P14",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "MOR-006",
+      "completion_phase": "P14",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "CAM-001",
+      "completion_phase": "P06",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "CAM-002",
+      "completion_phase": "P06",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "CAM-003",
+      "completion_phase": "P06",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "CAM-004",
+      "completion_phase": "P06",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "CAM-005",
+      "completion_phase": "P06",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "CAM-006",
+      "completion_phase": "P06",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "CAM-007",
+      "completion_phase": "P06",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "NOD-001",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "NOD-002",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "NOD-003",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "NOD-004",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "NOD-005",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "NOD-006",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "NOD-007",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "NOD-008",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "NOD-009",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "NOD-010",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FX-001",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FX-002",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FX-003",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FX-004",
+      "completion_phase": "P15",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FX-005",
+      "completion_phase": "P15",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FX-006",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FX-007",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FX-008",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FX-009",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FX-010",
+      "completion_phase": "P15",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FX-011",
+      "completion_phase": "P15",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FX-012",
+      "completion_phase": "P15",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FX-013",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FX-014",
+      "completion_phase": "P15",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FX-015",
+      "completion_phase": "P15",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FX-016",
+      "completion_phase": "P15",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FX-017",
+      "completion_phase": "P15",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FX-018",
+      "completion_phase": "P15",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FX-019",
+      "completion_phase": "P15",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "FX-020",
+      "completion_phase": "P15",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "PAR-001",
+      "completion_phase": "P15",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "PAR-002",
+      "completion_phase": "P15",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "PAR-003",
+      "completion_phase": "P15",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "PAR-004",
+      "completion_phase": "P15",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "PAR-005",
+      "completion_phase": "P15",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "PAR-006",
+      "completion_phase": "P15",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "PAR-007",
+      "completion_phase": "P15",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "AUD-001",
+      "completion_phase": "P07",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "AUD-002",
+      "completion_phase": "P07",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "AUD-003",
+      "completion_phase": "P07",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "AUD-004",
+      "completion_phase": "P07",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "AUD-005",
+      "completion_phase": "P07",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "AUD-006",
+      "completion_phase": "P08",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "AUD-007",
+      "completion_phase": "P08",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "AUD-008",
+      "completion_phase": "P08",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "AUD-009",
+      "completion_phase": "P07",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "AUD-010",
+      "completion_phase": "P07",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "IMP-001",
+      "completion_phase": "P02",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "IMP-002",
+      "completion_phase": "P16",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "IMP-003",
+      "completion_phase": "P16",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "IMP-004",
+      "completion_phase": "P16",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "IMP-005",
+      "completion_phase": "P07",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "IMP-006",
+      "completion_phase": "P16",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "IMP-007",
+      "completion_phase": "P16",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "IMP-008",
+      "completion_phase": "P16",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "IMP-009",
+      "completion_phase": "P21",
+      "status": "planned",
+      "disposition": "conditional_extension"
+    },
+    {
+      "feature_id": "IMP-010",
+      "completion_phase": "P16",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "THR-001",
+      "completion_phase": "P17",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "THR-002",
+      "completion_phase": "P17",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "THR-003",
+      "completion_phase": "P17",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "THR-004",
+      "completion_phase": "P17",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "THR-005",
+      "completion_phase": "P17",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "THR-006",
+      "completion_phase": "P17",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "THR-007",
+      "completion_phase": "P17",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "THR-008",
+      "completion_phase": "P17",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "THR-009",
+      "completion_phase": "P17",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "OUT-001",
+      "completion_phase": "P02",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "OUT-002",
+      "completion_phase": "P07",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "OUT-003",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "OUT-004",
+      "completion_phase": "P02",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "OUT-005",
+      "completion_phase": "P07",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "OUT-006",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "OUT-007",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "OUT-008",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "OUT-009",
+      "completion_phase": "P16",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "OUT-010",
+      "completion_phase": "P16",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "OUT-011",
+      "completion_phase": "P07",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "OUT-012",
+      "completion_phase": "P07",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "OUT-013",
+      "completion_phase": "P10",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "LIB-001",
+      "completion_phase": "P08",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "LIB-002",
+      "completion_phase": "P08",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "LIB-003",
+      "completion_phase": "P08",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "LIB-004",
+      "completion_phase": "P08",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "LIB-005",
+      "completion_phase": "P08",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "LIB-006",
+      "completion_phase": "P08",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "LIB-007",
+      "completion_phase": "P08",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "GAM-001",
+      "completion_phase": "P18",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "GAM-002",
+      "completion_phase": "P18",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "GAM-003",
+      "completion_phase": "P18",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "GAM-004",
+      "completion_phase": "P18",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "GAM-005",
+      "completion_phase": "P18",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "GAM-006",
+      "completion_phase": "P18",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "GAM-007",
+      "completion_phase": "P21",
+      "status": "planned",
+      "disposition": "conditional_extension"
+    },
+    {
+      "feature_id": "AUT-001",
+      "completion_phase": "P12",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "AUT-002",
+      "completion_phase": "P12",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "AUT-003",
+      "completion_phase": "P12",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "AUT-004",
+      "completion_phase": "P12",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "AUT-005",
+      "completion_phase": "P12",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "AUT-006",
+      "completion_phase": "P12",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "STU-001",
+      "completion_phase": "P19",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "STU-002",
+      "completion_phase": "P19",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "STU-003",
+      "completion_phase": "P19",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "STU-004",
+      "completion_phase": "P19",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "STU-005",
+      "completion_phase": "P19",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "STU-006",
+      "completion_phase": "P19",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "STU-007",
+      "completion_phase": "P19",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "STU-008",
+      "completion_phase": "P19",
+      "status": "planned",
+      "disposition": "planned_delivery"
+    },
+    {
+      "feature_id": "AIX-001",
+      "completion_phase": "P20",
+      "status": "planned",
+      "disposition": "conditional_extension"
+    },
+    {
+      "feature_id": "AIX-002",
+      "completion_phase": "P20",
+      "status": "planned",
+      "disposition": "conditional_extension"
+    },
+    {
+      "feature_id": "AIX-003",
+      "completion_phase": "P20",
+      "status": "planned",
+      "disposition": "conditional_extension"
+    },
+    {
+      "feature_id": "AIX-004",
+      "completion_phase": "P20",
+      "status": "planned",
+      "disposition": "conditional_extension"
+    },
+    {
+      "feature_id": "AIX-005",
+      "completion_phase": "P20",
+      "status": "planned",
+      "disposition": "conditional_extension"
+    },
+    {
+      "feature_id": "AIX-006",
+      "completion_phase": "P20",
+      "status": "planned",
+      "disposition": "conditional_extension"
+    }
+  ]
+}

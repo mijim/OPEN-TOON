@@ -26,7 +26,7 @@ Aislar funciones de IA para que todo el editor principal funcione sin ellas.
 
 **Alcance:** `optional_extension` · **Nivel:** `optional` · **Estado:** `not_started`.
 
-**Referencia:** [H25-e3cb778b39](https://docs.toonboom.com/help/harmony-25/premium/ai/ai-features.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## AIX-002 — Máscaras de IA
 
@@ -36,7 +36,7 @@ Crear, modificar y borrar máscaras con expansión controlada.
 
 **Alcance:** `optional_extension` · **Nivel:** `optional` · **Estado:** `not_started`.
 
-**Referencia:** [H25-7357c304d0](https://docs.toonboom.com/help/harmony-25/premium/ai/ai-masking.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## AIX-003 — Borrado asistido
 
@@ -46,7 +46,7 @@ Generar una propuesta para eliminar contenido enmascarado sin destruir el origin
 
 **Alcance:** `optional_extension` · **Nivel:** `optional` · **Estado:** `not_started`.
 
-**Referencia:** [H25-6c35c5ea37](https://docs.toonboom.com/help/harmony-25/premium/ai/ai-erase.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## AIX-004 — Expansión de imagen
 
@@ -56,7 +56,7 @@ Generar contenido más allá de los límites manteniendo el original identificab
 
 **Alcance:** `optional_extension` · **Nivel:** `optional` · **Estado:** `not_started`.
 
-**Referencia:** [H25-b2ac012495](https://docs.toonboom.com/help/harmony-25/premium/ai/expand-image.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## AIX-005 — Aumento de resolución
 
@@ -66,7 +66,7 @@ Proponer imágenes o texturas de mayor resolución como variantes.
 
 **Alcance:** `optional_extension` · **Nivel:** `optional` · **Estado:** `not_started`.
 
-**Referencia:** [H25-44c8e3fbea](https://docs.toonboom.com/help/harmony-25/premium/ai/increase-image-resolution.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## AIX-006 — Relleno generativo
 
@@ -76,4 +76,4 @@ Generar contenido en una región guiado por texto con aceptación manual.
 
 **Alcance:** `optional_extension` · **Nivel:** `optional` · **Estado:** `not_started`.
 
-**Referencia:** [H25-7a85f4304a](https://docs.toonboom.com/help/harmony-25/premium/ai/ai-generative-fill.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

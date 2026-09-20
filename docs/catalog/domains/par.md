@@ -26,7 +26,7 @@ Emitir imágenes con tasa, vida y semilla controladas.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-42286bad6a](https://docs.toonboom.com/help/harmony-25/premium/reference/node/particle-effects/sprite-emitter.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## PAR-002 — Regiones de emisión
 
@@ -36,7 +36,7 @@ Definir emisión por regiones planas o espaciales.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-bdfad01957](https://docs.toonboom.com/help/harmony-25/premium/reference/node/particle-effects/3d-region.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## PAR-003 — Velocidad y variación
 
@@ -46,7 +46,7 @@ Asignar velocidad, tamaño, orientación y dispersión por parámetros.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-04b955d55b](https://docs.toonboom.com/help/harmony-25/premium/reference/node/particle-effects/velocity.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## PAR-004 — Fuerzas y movimiento
 
@@ -56,7 +56,7 @@ Aplicar gravedad, viento, fricción, vórtices y atracción o repulsión.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-ee964793a7](https://docs.toonboom.com/help/harmony-25/premium/reference/node/particle-effects/gravity.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## PAR-005 — Colisiones y vida
 
@@ -66,7 +66,7 @@ Gestionar rebote, muerte y regiones sumidero.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-bc447263a6](https://docs.toonboom.com/help/harmony-25/premium/reference/node/particle-effects/bounce.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## PAR-006 — Bake y composición
 
@@ -76,7 +76,7 @@ Cachear simulaciones y mezclar sistemas con otras capas.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-6a6d9b674d](https://docs.toonboom.com/help/harmony-25/premium/reference/node/particle-effects/baker.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## PAR-007 — Plantillas de partículas
 
@@ -86,4 +86,4 @@ Guardar sistemas reutilizables con sus assets y parámetros.
 
 **Alcance:** `base` · **Nivel:** `advanced` · **Estado:** `not_started`.
 
-**Referencia:** [H25-9fb51aa72b](https://docs.toonboom.com/help/harmony-25/premium/effects/access-default-particle-template.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

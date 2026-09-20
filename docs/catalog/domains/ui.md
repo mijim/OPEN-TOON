@@ -26,7 +26,7 @@ Mover, dividir, agrupar y restablecer paneles sin perder el documento.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-c15782c56a](https://docs.toonboom.com/help/harmony-25/premium/user-interface/about-interface.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## UI-002 — Espacios guardados
 
@@ -36,7 +36,7 @@ Guardar y alternar configuraciones orientadas a dibujo, animación, rig y compos
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-c15782c56a](https://docs.toonboom.com/help/harmony-25/premium/user-interface/about-interface.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## UI-003 — Barras personalizables
 
@@ -46,7 +46,7 @@ Mostrar herramientas relevantes y permitir ordenar acciones frecuentes.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-2a7e37b5db](https://docs.toonboom.com/help/harmony-25/premium/user-interface/about-toolbar.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## UI-004 — Atajos configurables
 
@@ -56,7 +56,7 @@ Asignar atajos por contexto con detección de conflictos y búsqueda de comandos
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-c41ad42e04](https://docs.toonboom.com/help/harmony-25/premium/keyboard-shortcuts/about-keyboard-shortcuts.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## UI-005 — Preferencias persistentes
 
@@ -66,7 +66,7 @@ Separar preferencias personales, ajustes del documento y valores temporales.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-b45f86a251](https://docs.toonboom.com/help/harmony-25/premium/preferences-guide/access-preference.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## UI-006 — Zoom, pan y rotación de vista
 
@@ -76,7 +76,7 @@ Navegar el lienzo sin alterar la geometría ni los keyframes.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-b6961de319](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-drawing-space.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## UI-007 — Espejo de vista
 
@@ -86,7 +86,7 @@ Invertir la visualización para inspección del dibujo sin reflejar los datos.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-1c10b08976](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-mirror-view.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## UI-008 — Vistas de cámara y dibujo
 
@@ -96,7 +96,7 @@ Distinguir edición de dibujo aislado y resultado compuesto de la escena.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-b6961de319](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-drawing-space.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## UI-009 — Inspector contextual
 
@@ -106,7 +106,7 @@ Mostrar atributos editables, su animación y sus unidades para la selección act
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-3ef1042670](https://docs.toonboom.com/help/harmony-25/premium/staging/about-layer-property-view.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## UI-010 — Entrada con tableta
 
@@ -116,4 +116,4 @@ Usar presión y ajustes de sensibilidad; degradar de forma visible si el disposi
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-62e4dfd23a](https://docs.toonboom.com/help/harmony-25/premium/drawing/about-pen-pressure-feel.html) · `documentation_linked`.
+**Evidencia:** `proposal`.

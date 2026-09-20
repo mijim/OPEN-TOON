@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "id": "b3318d6f-df46-483a-90e6-93204c05492f",
+  "title": "Improve tests flow",
+  "summary": "2 files changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T16:45:38.429Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "docs/catalog/features.schema.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 0,
+      "removed": 2
+    },
+    {
+      "path": "scripts/catalog.py",
+      "kind": "modified",
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "1c1c0223-85d8-4f62-afb6-22ade98bd691",
+        "2cde0a88-2e3f-4915-ad3d-811bcb43da88"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "1c1c0223-85d8-4f62-afb6-22ade98bd691",
+      "title": "Simplify Features.schema",
+      "explanation": "This part of features.schema.json removes 2 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "docs/catalog/features.schema.json",
+      "startLine": 87,
+      "endLine": 87,
+      "area": "tests",
+      "added": 0,
+      "removed": 2
+    },
+    {
+      "id": "2cde0a88-2e3f-4915-ad3d-811bcb43da88",
+      "title": "Reshape `documents`",
+      "explanation": "The `documents` section replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "scripts/catalog.py",
+      "startLine": 30,
+      "endLine": 30,
+      "area": "tests",
+      "symbol": "documents",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

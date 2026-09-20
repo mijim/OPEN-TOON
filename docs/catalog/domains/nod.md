@@ -26,7 +26,7 @@ Crear, mover, conectar, buscar y eliminar nodos con navegación del grafo.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-3f3f640f81](https://docs.toonboom.com/help/harmony-25/premium/nodes/about-node-view.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## NOD-002 — Puertos tipados
 
@@ -36,7 +36,7 @@ Distinguir imagen, transformación, matte y otros flujos de datos.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-3f3f640f81](https://docs.toonboom.com/help/harmony-25/premium/nodes/about-node-view.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## NOD-003 — Biblioteca de nodos
 
@@ -46,7 +46,7 @@ Organizar operadores por categoría y búsqueda con descripción.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-1f877774be](https://docs.toonboom.com/help/harmony-25/premium/effects/about-node-category.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## NOD-004 — Grupos y puertos publicados
 
@@ -56,7 +56,7 @@ Encapsular subgrafos con entradas y salidas reutilizables.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-2c01d639e3](https://docs.toonboom.com/help/harmony-25/premium/reference/node/group/group-node.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## NOD-005 — Composición por capas
 
@@ -66,7 +66,7 @@ Combinar entradas manteniendo orden, alfa y profundidad según el modo.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-5abeeb75d8](https://docs.toonboom.com/help/harmony-25/premium/reference/node/combine/composite-node.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## NOD-006 — Máscaras y cutters
 
@@ -76,7 +76,7 @@ Recortar por matte con inversión y tratamiento de alfa definidos.
 
 **Alcance:** `base` · **Nivel:** `core` · **Estado:** `not_started`.
 
-**Referencia:** [H25-3262d0b15b](https://docs.toonboom.com/help/harmony-25/premium/reference/node/combine/cutter-node.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## NOD-007 — Switches
 
@@ -86,7 +86,7 @@ Seleccionar imágenes o transformaciones según atributos animados.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-0b90fa5495](https://docs.toonboom.com/help/harmony-25/premium/reference/node/combine/image-switch-node.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## NOD-008 — Display y Write
 
@@ -96,7 +96,7 @@ Separar salida de preview y salidas finales exportables.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-3840e4e148](https://docs.toonboom.com/help/harmony-25/premium/reference/node/output/display-node.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## NOD-009 — Bypass y cache
 
@@ -106,7 +106,7 @@ Anular temporalmente operadores y reutilizar resultados válidos.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-2cbd28e138](https://docs.toonboom.com/help/harmony-25/premium/reference/node/miscellaneous/pre-render-cache-node.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
 
 ## NOD-010 — Notas y organización
 
@@ -116,4 +116,4 @@ Añadir notas y organización espacial sin influencia en la imagen.
 
 **Alcance:** `base` · **Nivel:** `pro` · **Estado:** `not_started`.
 
-**Referencia:** [H25-fa38c883e3](https://docs.toonboom.com/help/harmony-25/premium/reference/node/miscellaneous/note-node.html) · `documentation_linked`.
+**Evidencia:** `proposal`.
