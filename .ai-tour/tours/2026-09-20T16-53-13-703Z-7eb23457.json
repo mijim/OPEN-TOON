@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "id": "7eb23457-9fe7-44cd-92ae-2d1a5cd077b6",
+  "title": "Improve tests flow",
+  "summary": "3 files changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T16:53:13.703Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "docs/planning/roadmap.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 2,
+      "removed": 2
+    },
+    {
+      "path": "scripts/roadmap.py",
+      "kind": "modified",
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "path": "scripts/validate_docs.py",
+      "kind": "modified",
+      "area": "tests",
+      "added": 3,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "00f345e5-1336-4103-bc35-8dcfc1abf111",
+        "32d475cc-a97b-4e6a-89d0-089173bf6b2f",
+        "48247b1c-af73-449e-8190-e9540f95a57b",
+        "1f83b3b8-a215-44d6-8846-172a74b1c786",
+        "3d0b4ec2-d491-4b37-bb7c-03af77ac59d8",
+        "3a93c180-0d0b-4773-a105-f2bb1b455fea"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "00f345e5-1336-4103-bc35-8dcfc1abf111",
+      "title": "Simplify Roadmap",
+      "explanation": "This part of roadmap.json removes 1 line. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 207,
+      "endLine": 207,
+      "area": "tests",
+      "added": 0,
+      "removed": 1
+    },
+    {
+      "id": "32d475cc-a97b-4e6a-89d0-089173bf6b2f",
+      "title": "Extend Roadmap",
+      "explanation": "This part of roadmap.json adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 686,
+      "endLine": 686,
+      "area": "tests",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "48247b1c-af73-449e-8190-e9540f95a57b",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 1840,
+      "endLine": 1840,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "1f83b3b8-a215-44d6-8846-172a74b1c786",
+      "title": "Reshape `documents`",
+      "explanation": "The `documents` section replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "scripts/roadmap.py",
+      "startLine": 43,
+      "endLine": 43,
+      "area": "tests",
+      "symbol": "documents",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "3d0b4ec2-d491-4b37-bb7c-03af77ac59d8",
+      "title": "Extend Validate docs",
+      "explanation": "This part of validate_docs.py adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "scripts/validate_docs.py",
+      "startLine": 10,
+      "endLine": 10,
+      "area": "tests",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "3a93c180-0d0b-4773-a105-f2bb1b455fea",
+      "title": "Reshape `visit`",
+      "explanation": "The `visit` section replaces 1 line and adds 2. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "scripts/validate_docs.py",
+      "startLine": 67,
+      "endLine": 68,
+      "area": "tests",
+      "symbol": "visit",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "68ff1c14-7f76-4fc4-b3e9-8c337d68a955",
+  "title": "Update Libraries",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T16:55:36.193Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "docs/planning/libraries.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "df9ae3b8-062e-477f-b4ea-dbbfe682d0ff"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "df9ae3b8-062e-477f-b4ea-dbbfe682d0ff",
+      "title": "Reshape Libraries",
+      "explanation": "This part of libraries.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This is the main implementation change.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 224,
+      "endLine": 224,
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    }
+  ]
+}
