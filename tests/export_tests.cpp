@@ -96,12 +96,20 @@ TEST_CASE("Recovery saves an immutable snapshot without clearing newer unsaved e
     REQUIRE(editor.modified());
     REQUIRE(editor.sceneName() == "After autosave");
     auto path = QSettings().value("recoveryPath").toString();
+    INFO(editor.status().toStdString());
+    REQUIRE_FALSE(path.isEmpty());
     REQUIRE(opentoon::ProjectStore::load(std::filesystem::path(path.toStdString())).document == saved);
     QFile::remove(path);
 }
 int main(int argc, char** argv) {
     QGuiApplication application(argc, argv);
     QCoreApplication::setApplicationName("OPEN-TOON-export-tests");
+    QCoreApplication::setOrganizationName("OPEN-TOON-tests");
+    QTemporaryDir settingsDirectory;
+    if (!settingsDirectory.isValid())
+        return 1;
+    QSettings::setDefaultFormat(QSettings::IniFormat);
+    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, settingsDirectory.path());
     QStandardPaths::setTestModeEnabled(true);
     return Catch::Session().run(argc, argv);
 }

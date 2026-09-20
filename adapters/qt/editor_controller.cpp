@@ -702,6 +702,9 @@ void EditorController::autosave() {
             QSettings settings;
             settings.setValue("recoveryPath", destination);
             settings.sync();
+            if (settings.status() != QSettings::NoError)
+                throw std::runtime_error("Recovery file was saved but its location could not be recorded: " +
+                                         destination.toStdString());
         } catch (const std::exception& e) {
             error = QString::fromUtf8(e.what());
         }

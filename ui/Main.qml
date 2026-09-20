@@ -462,11 +462,13 @@ ApplicationWindow {
                 }
                 C.ToolButton {
                     text: "Fill shape"
+                    visible: !editor.tool.startsWith("Raster ")
                     active: editor.filled
                     onClicked: editor.filled = !editor.filled
                     hint: "Fill new rectangles and ellipses"
                 }
                 ComboBox {
+                    visible: !editor.tool.startsWith("Raster ")
                     model: ["Underlay Art", "Color Art", "Line Art", "Overlay Art"]
                     currentIndex: editor.artLayer
                     implicitHeight: 28
