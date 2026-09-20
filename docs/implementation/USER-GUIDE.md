@@ -19,7 +19,7 @@ The built-in bouncing-ball example provides 24 distinct drawings exposed on twos
 - **Raster ink:** select the filled-circle tool, then choose Ink, Soft, Dry, Smudge or Eraser from the preset menu. Paint with the mouse or pressure input. Each gesture is undoable; Escape cancels the preview. Raster pixels retain the color painted and do not recolor with palette edits. Imported images remain separate; paint appears above the image and below vector art.
 - **Eraser:** cuts sampled strokes approximately. Analytic shape erasing and region topology are not implemented.
 - **Rectangle / Ellipse:** drag to create a primitive; enable the filled option for a solid shape.
-- **Select:** select and drag one stroke. Delete removes it. Use Marquee for rectangular whole-stroke selection; lasso remains pending.
+- **Select:** select and drag vectors. Shift-click adds strokes; Alt-click subtracts. Delete removes the selected group. Marquee selects enclosed whole strokes; lasso remains pending.
 - **Edit points:** drag individual sampled points. **Smooth selected stroke** averages interior points while preserving endpoints.
 - **Recolor:** assign the selected palette swatch to a stroke or shape. It does not flood-fill arbitrary enclosed regions.
 - Pan with the middle mouse button or trackpad scroll. Ctrl+scroll zooms. `F` fits the canvas. View rotation and mirror do not change the document or exported artwork.
@@ -93,9 +93,23 @@ Press **M** or choose **Marquee**. Select **Vectors**, **Raster pixels** or
 Vectors must fit completely, including stroke width; crossing strokes stay untouched.
 The rectangle selects raster pixels exactly. Imported image assets are excluded.
 
+With **Vectors**, Shift-drag a marquee to add strokes or Alt-drag to subtract them.
+With **Select (V)**, use Shift-click / Alt-click instead. Alt takes priority if both
+modifiers are held. Repeated additions do not duplicate membership. Switching between
+V and M keeps a vector group selected; changing the media filter clears the selection.
+Dotted object bounds show group members, and Properties reports their actual count.
+A normal click on an unselected stroke inside the group box selects that stroke.
+Raster/mixed additive masks and lasso are not available yet.
+
+Duplicate selects only the new copies, including when they overlap the originals.
+Moving or deleting that group leaves unselected strokes inside its box unchanged.
+
+
 Drag inside the rectangle to move it. Drag an edge/corner handle to scale, or the
 circle above the box to rotate. Artwork previews while dragging and commits on
-release. Shift preserves corner proportions or snaps rotation to 15°; Escape cancels.
+release. Start dragging a handle, then hold Shift to preserve corner proportions or
+snap rotation to 15°; Escape cancels. Shift/Alt held before pressing start selection
+addition/subtraction instead.
 The top toolbar provides Duplicate, Flip H, Flip V and Deselect without opening a
 dialog. Delete/Backspace removes a selected region while the canvas has focus.
 

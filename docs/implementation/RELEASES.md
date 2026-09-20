@@ -1,5 +1,15 @@
 # Experimental releases
 
+## 0.2.0-experimental.9 — additive vector selection
+
+- Shift adds and Alt subtracts whole vectors by click or rectangular marquee.
+- Sparse groups retain their members when switching Select/Marquee; dotted bounds and Properties show the actual selection.
+- Direct group move/scale/rotation keeps enclosed bystanders untouched.
+- Duplicate selects only new copies, including overlapping copies; previews cancel and edits undo atomically.
+- macOS: 56 CTest entries and native selection/animation workflows passed. Source only; format 3 unchanged; no new dependencies.
+
+VEC-009/P04 remains partial: no lasso, partial contour selection or raster masks. See ADR-020.
+
 ## 0.2.0-experimental.8 — canvas motion positions
 
 - Animate → Path: click/drag pose markers on the canvas; double-click the trajectory to add a sampled pose.

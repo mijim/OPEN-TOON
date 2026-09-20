@@ -1,0 +1,5 @@
+#pragma once
+class EditorController;
+class CanvasItem;
+class QQuickWindow;
+void vectorSelectionSmoke(EditorController&, CanvasItem&, QQuickWindow&);

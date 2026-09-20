@@ -98,12 +98,20 @@ class CanvasItem : public QQuickPaintedItem {
     bool transforming_ = false, previewValid_ = false, committing_ = false, shift_ = false;
     QTransform selectionWorld() const;
     void selectStroke(opentoon::Id);
+    void setVectorSelection(std::vector<opentoon::Id>);
+    void modifyVectorSelection(const std::vector<opentoon::Id>&, int operation);
+    void paintVectorSelection(QPainter*, const QTransform& itemTransform);
+    opentoon::SelectionMedia activeSelectionMedia() const;
+    bool vectorSelection_ = false, subtract_ = false;
+    int marqueeOperation_ = 0; // Replace, add, subtract; captured on press.
+
     void startTransform(int);
     void previewTransform(QTransform);
     void commitTransform();
     opentoon::SelectionMedia selectionMedia_ = opentoon::SelectionMedia::Both;
     bool movingRegion_ = false;
     QPointer<EditorController> editor_;
+    QString previousTool_;
     QPointer<QQuickWindow> filteredWindow_;
     double zoom_ = 1, angle_ = 0;
     bool mirrored_ = false, drawing_ = false, panning_ = false, tablet_ = false;

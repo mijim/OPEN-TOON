@@ -98,6 +98,47 @@ RasterImage editRaster(const RasterImage& source, PixelRect r, SelectionAction a
     return output;
 }
 } // namespace
+std::optional<PixelRect> strokeBounds(const Stroke& stroke) {
+    if (stroke.points.empty())
+        return {};
+    double left = stroke.points.front().x, right = left, top = stroke.points.front().y, bottom = top;
+    for (const auto& p : stroke.points) {
+        left = std::min(left, p.x);
+        right = std::max(right, p.x);
+        top = std::min(top, p.y);
+        bottom = std::max(bottom, p.y);
+    }
+    const double margin = stroke.width / 2;
+    left = std::floor(left - margin);
+    top = std::floor(top - margin);
+    right = std::ceil(right + margin);
+    bottom = std::ceil(bottom + margin);
+    if (!std::isfinite(left) || !std::isfinite(top) || !std::isfinite(right) || !std::isfinite(bottom) ||
+        std::abs(left) > 20000000 || std::abs(top) > 20000000 || right - left > 40000000 ||
+        bottom - top > 40000000)
+        throw std::invalid_argument("Selected vectors exceed supported bounds.");
+    return PixelRect{int(left), int(top), std::max(1, int(right - left)), std::max(1, int(bottom - top))};
+}
+std::optional<PixelRect> strokeSelectionBounds(const Drawing& drawing, const std::vector<Id>& ids) {
+    const std::set<Id> selected(ids.begin(), ids.end());
+    std::optional<PixelRect> result;
+    for (const auto& stroke : drawing.strokes) {
+        if (!selected.contains(stroke.id))
+            continue;
+        const auto bounds = strokeBounds(stroke);
+        if (!bounds)
+            continue;
+        if (!result)
+            result = bounds;
+        else {
+            const int left = std::min(result->x, bounds->x), top = std::min(result->y, bounds->y);
+            const int right = std::max(result->x + result->width, bounds->x + bounds->width);
+            const int bottom = std::max(result->y + result->height, bounds->y + bounds->height);
+            result = PixelRect{left, top, right - left, bottom - top};
+        }
+    }
+    return result;
+}
 std::vector<Id> enclosedStrokes(const Drawing& drawing, PixelRect rect) {
     validate(rect);
     std::vector<Id> result;
@@ -119,18 +160,31 @@ std::vector<Id> enclosedStrokes(const Drawing& drawing, PixelRect rect) {
     return result;
 }
 void editDrawingSelection(Drawing& drawing, PixelRect rect, SelectionMedia media, SelectionAction action,
-                          int dx, int dy, Id& nextId, const std::vector<Id>* selectedIds) {
+                          int dx, int dy, Id& nextId, const std::vector<Id>* selectedIds,
+                          std::vector<Id>* resultingIds) {
     validate(rect);
     if (int(media) < 0 || int(media) > 2 || int(action) < 0 || int(action) > 5 ||
         std::abs(std::int64_t(dx)) > 10000000 || std::abs(std::int64_t(dy)) > 10000000)
         throw std::invalid_argument("Invalid selection operation.");
-    if (action == SelectionAction::Move && dx == 0 && dy == 0)
-        return;
     if (action == SelectionAction::FlipHorizontal || action == SelectionAction::FlipVertical ||
         action == SelectionAction::RotateClockwise)
         dx = dy = 0;
+    if (action == SelectionAction::Move && dx == 0 && dy == 0) {
+        if (resultingIds) {
+            const auto ids = selectedIds ? *selectedIds : enclosedStrokes(drawing, rect);
+            const std::set<Id> selected(ids.begin(), ids.end());
+            std::vector<Id> output;
+            if (media != SelectionMedia::Raster)
+                for (const auto& stroke : drawing.strokes)
+                    if (selected.contains(stroke.id))
+                        output.push_back(stroke.id);
+            *resultingIds = std::move(output);
+        }
+        return;
+    }
     auto result = drawing;
     auto allocated = nextId;
+    std::vector<Id> outputIds;
     if (media != SelectionMedia::Raster) {
         auto ids = selectedIds ? *selectedIds : enclosedStrokes(drawing, rect);
         std::set<Id> selected(ids.begin(), ids.end());
@@ -156,8 +210,10 @@ void editDrawingSelection(Drawing& drawing, PixelRect rect, SelectionMedia media
                 }
                 if (action == SelectionAction::Duplicate) {
                     stroke.id = allocated++;
+                    outputIds.push_back(stroke.id);
                     result.strokes.push_back(std::move(stroke));
                 } else {
+                    outputIds.push_back(stroke.id);
                     result.strokes[index] = std::move(stroke);
                 }
             }
@@ -167,6 +223,8 @@ void editDrawingSelection(Drawing& drawing, PixelRect rect, SelectionMedia media
         result.raster = editRaster(*drawing.raster, rect, action, dx, dy);
     drawing = std::move(result);
     nextId = allocated;
+    if (resultingIds)
+        *resultingIds = std::move(outputIds);
 }
 
 void transformDrawingSelection(Drawing& drawing, PixelRect rect, SelectionMedia media,

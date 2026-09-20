@@ -33,6 +33,12 @@ void keyBlockSmoke(EditorController& editor, QQuickWindow& window) {
     };
     auto click = [&](QPointF p, Qt::KeyboardModifiers modifiers = Qt::NoModifier) { drag(p, p, modifiers); };
     auto key = [&](int code, Qt::KeyboardModifiers modifiers = Qt::NoModifier) {
+        // Native Shortcut dispatch requires an active window even for synthetic key events.
+        if (!window.isActive()) {
+            window.requestActivate();
+            settle();
+        }
+        require(window.isActive(), "Activate the smoke window before checking native key shortcuts.");
         QKeyEvent press(QEvent::KeyPress, code, modifiers), release(QEvent::KeyRelease, code, modifiers);
         QCoreApplication::sendEvent(&window, &press);
         QCoreApplication::sendEvent(&window, &release);

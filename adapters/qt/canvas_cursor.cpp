@@ -31,6 +31,10 @@ QCursor toolCursor(const QString& tool) {
         if (tool == "Marquee")
             p.setPen(QPen(Qt::white, 1.5, Qt::DashLine));
         p.drawRect(13, 13, 14, 12);
+    } else if (tool == "Add selection" || tool == "Subtract selection") {
+        p.drawLine(14, 21, 28, 21);
+        if (tool == "Add selection")
+            p.drawLine(21, 14, 21, 28);
     } else if (tool == "Ellipse")
         p.drawEllipse(13, 13, 14, 12);
     else if (tool == "Edit points") {
@@ -101,6 +105,10 @@ void CanvasItem::updateCursor(QPointF point) {
             setCursor(motionPathFrameAt(point) >= 0 ? Qt::PointingHandCursor : Qt::CrossCursor);
         return;
     }
+    if ((tool == "Select" || tool == "Marquee") && !transforming_ && (shift_ || subtract_)) {
+        setCursor(toolCursor(subtract_ ? "Subtract selection" : "Add selection"));
+        return;
+    }
     if (tool == "Select" || tool == "Marquee" || tool == "Animate") {
         if (hasRegion()) {
             for (int h = 8; h >= 0; --h) {
@@ -147,10 +155,14 @@ void CanvasItem::updateCursor(QPointF point) {
     setCursor(toolCursor(tool));
 }
 void CanvasItem::hoverMoveEvent(QHoverEvent* e) {
+    shift_ = e->modifiers() & Qt::ShiftModifier;
+    subtract_ = e->modifiers() & Qt::AltModifier;
     updateCursor(e->position());
     e->accept();
 }
 void CanvasItem::hoverEnterEvent(QHoverEvent* e) {
+    shift_ = e->modifiers() & Qt::ShiftModifier;
+    subtract_ = e->modifiers() & Qt::AltModifier;
     updateCursor(e->position());
     e->accept();
 }

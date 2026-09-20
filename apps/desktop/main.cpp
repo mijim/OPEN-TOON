@@ -5,6 +5,7 @@
 #include "project_store.h"
 #include "scene_renderer.h"
 #include "serialization.h"
+#include "vector_selection_smoke.h"
 #include "visual_editing_smoke.h"
 #include <QDir>
 #include <QElapsedTimer>
@@ -428,6 +429,7 @@ int main(int argc, char** argv) {
                                     auto* canvas = window->findChild<CanvasItem*>("drawingCanvas");
                                     visualEditingSmoke(editor, *canvas, *window);
                                     keyBlockSmoke(editor, *window);
+                                    vectorSelectionSmoke(editor, *canvas, *window);
                                     motionPathSmoke(editor, *canvas, *window);
                                     QTimer::singleShot(150, &app, [&, window] {
                                         auto image = window->grabWindow();

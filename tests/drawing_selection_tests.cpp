@@ -185,3 +185,42 @@ TEST_CASE("Sampled point insertion preserves pressure and point deletion preserv
     removeStrokePoint(s, 3);
     REQUIRE_THROWS(removeStrokePoint(s, 0));
 }
+
+TEST_CASE("Sparse vector selection bounds and duplicate identities exclude enclosed bystanders") {
+    auto d = rasterDrawing();
+    d.strokes = {{1, 5, 2, Shape::Rectangle, true, 1, {{10, 20, 1}, {20, 30, 1}}},
+                 {2, 5, 2, Shape::Stroke, false, 2, {{25, 25, .4}, {30, 30, .8}}},
+                 {3, 5, 2, Shape::Ellipse, true, 3, {{40, 20, 1}, {50, 30, 1}}}};
+    put(*d.raster, 25, 25, {1000, 2000, 3000, 4000});
+    const auto before = d;
+    std::vector<Id> ids{3, 1, 3};
+    REQUIRE(strokeSelectionBounds(d, ids) == PixelRect{9, 19, 42, 12});
+    REQUIRE_FALSE(strokeSelectionBounds(d, {999}));
+    REQUIRE(strokeSelectionBounds(d, {2}) == PixelRect{24, 24, 7, 7});
+    const auto bounds = *strokeSelectionBounds(d, ids);
+    Id next = 4;
+    editDrawingSelection(d, bounds, SelectionMedia::Vectors, SelectionAction::Duplicate, 0, 0, next, &ids,
+                         &ids);
+    REQUIRE(ids == std::vector<Id>{4, 5});
+    REQUIRE(d.strokes.size() == 5);
+    REQUIRE(d.strokes[0] == before.strokes[0]);
+    REQUIRE(d.strokes[1] == before.strokes[1]);
+    REQUIRE(d.strokes[2] == before.strokes[2]);
+    REQUIRE(d.strokes[3].artLayer == 1);
+    REQUIRE(d.strokes[4].artLayer == 3);
+    transformDrawingSelection(d, bounds, SelectionMedia::Vectors, ids, {1, 0, 0, 1, 20, -10});
+    REQUIRE(d.strokes[0] == before.strokes[0]);
+    REQUIRE(d.strokes[1] == before.strokes[1]);
+    REQUIRE(d.strokes[2] == before.strokes[2]);
+    REQUIRE(d.raster == before.raster);
+    editDrawingSelection(d, bounds, SelectionMedia::Vectors, SelectionAction::Delete, 0, 0, next, &ids, &ids);
+    REQUIRE(ids.empty());
+    REQUIRE(d == before);
+    ids = {1, 3};
+    const auto originalIds = ids;
+    REQUIRE_THROWS(editDrawingSelection(d, bounds, SelectionMedia::Both, SelectionAction::Duplicate, -100, 0,
+                                        next, &ids, &ids));
+    REQUIRE(d == before);
+    REQUIRE(ids == originalIds);
+    REQUIRE(next == 6);
+}

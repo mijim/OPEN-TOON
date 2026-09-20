@@ -768,7 +768,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/status.json; docs/architecture/adr/016-visual-animation-and-bezier.md; bounded visual-editing subset only, catalog acceptance not closed"
+      "implementation_evidence": "docs/implementation/status.json; docs/architecture/adr/020-additive-vector-selection.md; whole-stroke additive/subtractive selection only; lasso and partial geometry pending"
     },
     {
       "id": "VEC-010",

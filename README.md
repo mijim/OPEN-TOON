@@ -2,15 +2,15 @@
 
 An independent open-source desktop animation project combining vector and bitmap drawing, frame-by-frame and cut-out animation, rigging, compositing and production tools.
 
-**Current version: 0.2.0-experimental.8. P11 is not complete.** A C++20/Qt Quick application now supports mouse drawing, vector editing, MyPaint raster brushes with opacity, direct vector/raster transform handles, selection-owned Properties, integrated timing/curves, layer and range editing, explicit animation modes, visual pose animation, draggable Bézier easing/overshoot, forgiving thin-line picking, contextual cursors, compact controls and a draggable timeline/curve divider, editable All motion with linked easing and time zoom, shared key selection, group move/stretch/duplication and motion copy/paste, editable canvas trajectory keys, point insertion/deletion, animation-aware Clear, key-only retiming, compressed SQLite project revisions and PNG export. The roadmap still covers 282 capabilities in 26 domains; working subsets are marked partial, with no phase claimed complete.
+**Current version: 0.2.0-experimental.9. P11 is not complete.** A C++20/Qt Quick application now supports mouse drawing, vector editing, MyPaint raster brushes with opacity, direct vector/raster transform handles, selection-owned Properties, integrated timing/curves, layer and range editing, explicit animation modes, visual pose animation, draggable Bézier easing/overshoot, forgiving thin-line picking, contextual cursors, compact controls and a draggable timeline/curve divider, editable All motion with linked easing and time zoom, shared key selection, group move/stretch/duplication and motion copy/paste, editable canvas trajectory keys, additive/subtractive vector groups with identity-safe duplication, point insertion/deletion, animation-aware Clear, key-only retiming, compressed SQLite project revisions and PNG export. The roadmap still covers 282 capabilities in 26 domains; working subsets are marked partial, with no phase claimed complete.
 
-**Coverage mascot: a pencil taking its keyframes for a walk.** The little poses can now be grabbed along their route on the canvas—even when a parent layer turns the map upside down. They still have **0 of 23 fully completed phases**: independent spatial curves, cameras, audio, deformers, drawing morphing and node compositing are waiting at the next stops. Working subsets are useful; graduation comes after every exit criterion passes. [See the honest coverage ledger](docs/implementation/status.json).
+**Coverage mascot: a pencil organizing a tiny conga line.** Shift invites another stroke, Alt lets one sit out, and duplicates bring only their own friends. The party still has **0 of 23 fully completed phases**: lasso, independent spatial curves, cameras, audio, deformers and node compositing are waiting for their invitation. Working subsets are useful; phase completion requires every exit criterion. [See the honest coverage ledger](docs/implementation/status.json).
 
 Start with the [build instructions](docs/implementation/BUILD.md), [user guide](docs/implementation/USER-GUIDE.md) and [implementation status](docs/implementation/STATUS.md).
 
 The product will use a clean black, white and gray interface. **The entire first-party product is in English by requirement:** UI, messages, built-in assets, help, code and public documentation. The previous research, Markdown documents and canonical catalogs have also been translated into English. User-created content remains multilingual.
 
-![Editable canvas motion positions and combined timing curves](docs/implementation/visual-animation.png)
+![Sparse vector selection with direct handles and selection-owned Properties](docs/implementation/vector-selection.png)
 
 ## Start here
 

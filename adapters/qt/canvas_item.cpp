@@ -37,6 +37,7 @@ void CanvasItem::setEditor(EditorController* editor) {
     if (editor_)
         disconnect(editor_, nullptr, this, nullptr);
     editor_ = editor;
+    previousTool_ = editor ? editor->tool() : QString{};
     if (editor) {
         connect(editor, &EditorController::changed, this, [this] {
             if (committing_)
@@ -62,12 +63,20 @@ void CanvasItem::setEditor(EditorController* editor) {
         connect(editor, &EditorController::toolChanged, this, [this] {
             if (committing_)
                 return;
-            if (editor_->tool() != "Animate")
+            const auto tool = editor_->tool();
+            const bool keepSelection = (previousTool_ == "Select" || previousTool_ == "Marquee") &&
+                                       (tool == "Select" || tool == "Marquee") && vectorSelection_;
+            previousTool_ = tool;
+            if (tool != "Animate")
                 setMotionPathEditing(false);
             cancelGesture();
-            clearRegion();
-            selectedStroke_ = 0;
-            selectAnimationBounds();
+            if (!keepSelection) {
+                clearRegion();
+                selectAnimationBounds();
+            } else if (tool == "Marquee") {
+                selectionMedia_ = SelectionMedia::Vectors;
+                emit regionChanged();
+            }
             updateCursor(hoverPosition_);
             update();
         });
@@ -208,6 +217,7 @@ void CanvasItem::paint(QPainter* p) {
         }
         if (editor_->tool() == "Animate" && (hasRegion() || (motionPathEditing_ && motionReferenceValid_)))
             paintMotionPath(p, displayDocument, itemTransform);
+        paintVectorSelection(p, itemTransform);
         if (hasRegion() && !motionPathEditing_ &&
             (editor_->tool() == "Select" || editor_->tool() == "Marquee" || editor_->tool() == "Animate")) {
             p->save();
@@ -269,6 +279,26 @@ void CanvasItem::begin(QPointF position, double pressure) {
         }
         auto point = localPoint(position, pressure);
         if (editor_->tool() == "Marquee" || editor_->tool() == "Select" || editor_->tool() == "Animate") {
+            const bool selectionTool = editor_->tool() != "Animate";
+            const int operation = subtract_ ? 2 : shift_ ? 1 : 0;
+            if (selectionTool && operation) {
+                if ((hasRegion() && activeSelectionMedia() != SelectionMedia::Vectors) ||
+                    (editor_->tool() == "Marquee" && selectionMedia_ != SelectionMedia::Vectors)) {
+                    editor_->report("Choose Vectors in Marquee before adding or subtracting strokes.");
+                    return;
+                }
+                if (editor_->tool() == "Select") {
+                    const auto hit = hitVector(position);
+                    if (hit)
+                        modifyVectorSelection({hit}, operation);
+                } else {
+                    marqueeOperation_ = operation;
+                    samples_ = {point};
+                    drawing_ = true;
+                }
+                update();
+                return;
+            }
             if (hasRegion()) {
                 for (int handle = 8; handle >= 0; --handle)
                     if (handleVisible(handle) && QLineF(position, handlePosition(handle)).length() <= 10) {
@@ -280,6 +310,12 @@ void CanvasItem::begin(QPointF position, double pressure) {
                     }
                 if (QRectF(region_.x, region_.y, region_.width, region_.height)
                         .contains(QPointF(point.x, point.y))) {
+                    if (editor_->tool() == "Select") {
+                        const auto hit = hitVector(position);
+                        if (hit && std::find(regionStrokes_.begin(), regionStrokes_.end(), hit) ==
+                                       regionStrokes_.end())
+                            selectStroke(hit);
+                    }
                     samples_ = {point};
                     drawing_ = true;
                     startTransform(-1);
@@ -494,12 +530,22 @@ void CanvasItem::end() {
             double y = std::floor(std::min(points.front().y, points.back().y));
             double right = std::ceil(std::max(points.front().x, points.back().x));
             double bottom = std::ceil(std::max(points.front().y, points.back().y));
-            if (std::abs(x) <= 10000000 && std::abs(y) <= 10000000 && right - x <= 20000000 &&
-                bottom - y <= 20000000)
-                region_ = {int(x), int(y), int(right - x), int(bottom - y)};
-            if (hasRegion())
-                if (auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame()))
-                    regionStrokes_ = enclosedStrokes(*d, region_);
+            if (std::abs(x) <= 10000000 && std::abs(y) <= 10000000 && right - x > 0 && bottom - y > 0 &&
+                right - x <= 20000000 && bottom - y <= 20000000) {
+                const PixelRect box{int(x), int(y), int(right - x), int(bottom - y)};
+                std::vector<Id> ids;
+                if (selectionMedia_ != SelectionMedia::Raster)
+                    if (auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame()))
+                        ids = enclosedStrokes(*d, box);
+                if (selectionMedia_ == SelectionMedia::Vectors)
+                    modifyVectorSelection(ids, marqueeOperation_);
+                else {
+                    region_ = box;
+                    regionStrokes_ = std::move(ids);
+                    vectorSelection_ = false;
+                }
+            }
+            marqueeOperation_ = 0;
             emit regionChanged();
             editor_->report(regionInfo());
         }
@@ -527,6 +573,7 @@ void CanvasItem::end() {
 }
 void CanvasItem::cancelGesture() {
     motionKey_ = -1;
+    marqueeOperation_ = 0;
     posePreview_.reset();
     pointDrawingPreview_ = {};
     selectedPoint_ = -1;
@@ -547,6 +594,7 @@ void CanvasItem::cancelGesture() {
 }
 void CanvasItem::mousePressEvent(QMouseEvent* e) {
     shift_ = e->modifiers() & Qt::ShiftModifier;
+    subtract_ = e->modifiers() & Qt::AltModifier;
     if (tablet_) {
         e->accept();
         return;
@@ -566,6 +614,7 @@ void CanvasItem::mousePressEvent(QMouseEvent* e) {
 }
 void CanvasItem::mouseMoveEvent(QMouseEvent* e) {
     shift_ = e->modifiers() & Qt::ShiftModifier;
+    subtract_ = e->modifiers() & Qt::AltModifier;
     if (!tablet_)
         move(e->position(), 1);
     updateCursor(e->position());
@@ -607,6 +656,7 @@ bool CanvasItem::eventFilter(QObject*, QEvent* event) {
         auto* e = static_cast<QTabletEvent*>(event);
         auto point = mapFromScene(e->position());
         shift_ = e->modifiers() & Qt::ShiftModifier;
+        subtract_ = e->modifiers() & Qt::AltModifier;
         tiltX_ = std::clamp(e->xTilt() / 90.0, -1.0, 1.0);
         tiltY_ = std::clamp(e->yTilt() / 90.0, -1.0, 1.0);
         if (event->type() == QEvent::TabletPress) {
@@ -654,7 +704,7 @@ void CanvasItem::deleteSelection() {
             editor_->report("Select a control point to delete it.");
         return;
     }
-    if (editor_ && editor_->tool() == "Marquee" && hasRegion()) {
+    if (editor_ && (editor_->tool() == "Marquee" || editor_->tool() == "Select") && hasRegion()) {
         transformRegion(int(SelectionAction::Delete));
     } else if (editor_ && selectedStroke_) {
         editor_->deleteStroke(selectedStroke_);
@@ -664,8 +714,10 @@ void CanvasItem::deleteSelection() {
 }
 
 void CanvasItem::setSelectionMedia(int value) {
-    if (value < 0 || value > 2)
+    if (value < 0 || value > 2 || value == int(selectionMedia_))
         return;
+    cancelGesture();
+    clearRegion();
     selectionMedia_ = static_cast<SelectionMedia>(value);
     emit regionChanged();
     update();
@@ -673,11 +725,7 @@ void CanvasItem::setSelectionMedia(int value) {
 QString CanvasItem::regionInfo() const {
     if (!hasRegion())
         return "Drag a rectangle. Vectors must fit completely; imported images are excluded.";
-    std::size_t count = 0;
-    if (editor_ && editor_->selectedLayer() && selectionMedia_ != SelectionMedia::Raster) {
-        if (auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame()))
-            count = enclosedStrokes(*d, region_).size();
-    }
+    const auto count = regionStrokes_.size();
     return QString("%1 × %2 px · %3 vector strokes · drag handles to scale, top circle to rotate")
         .arg(region_.width)
         .arg(region_.height)
@@ -686,6 +734,7 @@ QString CanvasItem::regionInfo() const {
 void CanvasItem::clearRegion() {
     region_ = {};
     regionStrokes_.clear();
+    vectorSelection_ = false;
     selectedStroke_ = 0;
     emit regionChanged();
     update();
@@ -696,8 +745,8 @@ void CanvasItem::transformRegion(int action, int dx, int dy) {
     auto rect = region_;
     auto ids = regionStrokes_;
     QScopedValueRollback<bool> guard(committing_, true);
-    if (editor_->editDrawingRegion(rect, selectedStroke_ ? SelectionMedia::Vectors : selectionMedia_,
-                                   static_cast<SelectionAction>(action), dx, dy, &ids)) {
+    if (editor_->editDrawingRegion(rect, activeSelectionMedia(), static_cast<SelectionAction>(action), dx, dy,
+                                   &ids, &ids)) {
         if (action == int(SelectionAction::Delete))
             clearRegion();
         else {
@@ -708,14 +757,9 @@ void CanvasItem::transformRegion(int action, int dx, int dy) {
             if (action == int(SelectionAction::RotateClockwise))
                 std::swap(rect.width, rect.height);
             region_ = rect;
-            if (action == int(SelectionAction::Duplicate)) {
-                if (selectedStroke_)
-                    selectionMedia_ = SelectionMedia::Vectors;
-                selectedStroke_ = 0;
-                if (auto* d = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame()))
-                    regionStrokes_ = enclosedStrokes(*d, region_);
-            } else if (selectedStroke_)
-                selectStroke(selectedStroke_);
+            regionStrokes_ = ids;
+            if (vectorSelection_)
+                setVectorSelection(ids);
         }
     }
     emit regionChanged();
@@ -745,32 +789,6 @@ QPointF CanvasItem::handlePosition(int handle) const {
     }
     return world.map(points[std::clamp(handle, 0, 7)]);
 }
-void CanvasItem::selectStroke(Id id) {
-    selectedStroke_ = id;
-    regionStrokes_.clear();
-    region_ = {};
-    if (id && editor_)
-        if (auto* drawing = editor_->document().drawingAt(editor_->selectedLayer(), editor_->frame()))
-            for (const auto& stroke : drawing->strokes)
-                if (stroke.id == id && !stroke.points.empty()) {
-                    double x = stroke.points.front().x, y = stroke.points.front().y, right = x, bottom = y;
-                    for (auto p : stroke.points) {
-                        x = std::min(x, p.x);
-                        y = std::min(y, p.y);
-                        right = std::max(right, p.x);
-                        bottom = std::max(bottom, p.y);
-                    }
-                    double half = stroke.width / 2;
-                    x = std::floor(x - half);
-                    y = std::floor(y - half);
-                    right = std::ceil(right + half);
-                    bottom = std::ceil(bottom + half);
-                    region_ = {int(x), int(y), std::max(1, int(right - x)), std::max(1, int(bottom - y))};
-                    regionStrokes_ = {id};
-                }
-    emit regionChanged();
-    update();
-}
 void CanvasItem::startTransform(int handle) {
     if (!editor_ || !hasRegion())
         return;
@@ -794,8 +812,7 @@ void CanvasItem::previewTransform(QTransform matrix) {
     try {
         transformPreview_ = transformSource_;
         transformDrawingSelection(
-            transformPreview_, region_, selectedStroke_ ? SelectionMedia::Vectors : selectionMedia_,
-            regionStrokes_,
+            transformPreview_, region_, activeSelectionMedia(), regionStrokes_,
             {matrix.m11(), matrix.m12(), matrix.m21(), matrix.m22(), matrix.dx(), matrix.dy()});
         previewValid_ = true;
     } catch (const std::exception& error) {
@@ -819,7 +836,6 @@ void CanvasItem::commitTransform() {
     }
     auto matrix = pendingTransform_;
     auto original = region_;
-    auto id = selectedStroke_;
     auto ids = regionStrokes_;
     bool valid = previewValid_;
     transforming_ = false;
@@ -829,14 +845,14 @@ void CanvasItem::commitTransform() {
     if (valid && !matrix.isIdentity()) {
         QScopedValueRollback<bool> guard(committing_, true);
         if (editor_->transformDrawingRegion(
-                original, id ? SelectionMedia::Vectors : selectionMedia_, ids,
+                original, activeSelectionMedia(), ids,
                 {matrix.m11(), matrix.m12(), matrix.m21(), matrix.m22(), matrix.dx(), matrix.dy()})) {
             auto r = matrix.mapRect(QRectF(original.x, original.y, original.width, original.height))
                          .toAlignedRect();
             region_ = {r.x(), r.y(), r.width(), r.height()};
             regionStrokes_ = ids;
-            if (id)
-                selectStroke(id);
+            if (vectorSelection_)
+                setVectorSelection(ids);
         }
     }
     emit regionChanged();
@@ -847,9 +863,9 @@ QVariantMap CanvasItem::objectProperties() const {
     if (!hasRegion() || !editor_ || editor_->tool() == "Animate")
         return result;
     auto bounds = pendingTransform_.mapRect(QRectF(region_.x, region_.y, region_.width, region_.height));
-    result = {{"kind", selectedStroke_                             ? "vector"
-                       : selectionMedia_ == SelectionMedia::Raster ? "raster"
-                                                                   : "selection"},
+    result = {{"kind", selectedStroke_                                    ? "vector"
+                       : activeSelectionMedia() == SelectionMedia::Raster ? "raster"
+                                                                          : "selection"},
               {"x", bounds.x()},
               {"y", bounds.y()},
               {"width", bounds.width()},

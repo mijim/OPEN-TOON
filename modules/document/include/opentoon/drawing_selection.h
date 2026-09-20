@@ -15,9 +15,12 @@ struct SelectionTransform {
 // Explicit vector IDs freeze selection membership during interactive transforms.
 void transformDrawingSelection(Drawing&, PixelRect, SelectionMedia, const std::vector<Id>&,
                                SelectionTransform);
+[[nodiscard]] std::optional<PixelRect> strokeBounds(const Stroke&);
+[[nodiscard]] std::optional<PixelRect> strokeSelectionBounds(const Drawing&, const std::vector<Id>&);
 [[nodiscard]] std::vector<Id> enclosedStrokes(const Drawing&, PixelRect);
 // Half-open pixel bounds. Vector strokes must be wholly enclosed including their width.
 // Imported ImageAsset is excluded. Apply inside Session::apply for document-wide atomicity.
 void editDrawingSelection(Drawing&, PixelRect, SelectionMedia, SelectionAction, int dx, int dy, Id& nextId,
-                          const std::vector<Id>* selectedIds = nullptr);
+                          const std::vector<Id>* selectedIds = nullptr,
+                          std::vector<Id>* resultingIds = nullptr);
 } // namespace opentoon

@@ -550,6 +550,11 @@ ApplicationWindow {
                     implicitHeight: 28
                     Accessible.name: "Drawing selection media"
                 }
+                Label {
+                    visible: editor.tool === "Select" || (editor.tool === "Marquee" && canvas.selectionMedia === 0)
+                    text: "Shift adds · Alt subtracts · Drag handles to transform"
+                    color: "#bbbbbb"
+                }
                 C.ToolButton {
                     visible: editor.tool === "Marquee" || editor.tool === "Select"
                     text: "Duplicate"
@@ -1954,7 +1959,7 @@ ApplicationWindow {
         Label {
             width: parent.width
             wrapMode: Text.WordWrap
-            text: "B — Pencil\nE — Eraser\nV — Select and move a stroke\nA — Animate layer poses on canvas\nM — Rectangular vector/raster selection\nO — Onion skin\nF — Fit canvas\nSpace — Play / pause\nLeft / Right — Previous / next frame\nCmd/Ctrl+Z — Undo\n\nDraw with the left mouse button. Pan with the middle button or trackpad scroll. Ctrl+scroll zooms. Double-click a timeline cell to create a new drawing.\n\nTablets use pressure when available; physical tablet validation is pending. This is an experimental build, not the P11 release."
+            text: "B — Pencil\nE — Eraser\nV — Select and move vectors (Shift adds, Alt subtracts)\nA — Animate layer poses on canvas\nM — Rectangular vector/raster selection\nO — Onion skin\nF — Fit canvas\nSpace — Play / pause\nLeft / Right — Previous / next frame\nCmd/Ctrl+Z — Undo\n\nDraw with the left mouse button. Pan with the middle button or trackpad scroll. Ctrl+scroll zooms. Double-click a timeline cell to create a new drawing.\n\nTablets use pressure when available; physical tablet validation is pending. This is an experimental build, not the P11 release."
         }
     }
     Dialog {

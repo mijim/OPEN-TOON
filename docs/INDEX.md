@@ -1,6 +1,6 @@
 # Documentation map
 
-**Updated: 2026-09-20.** The repository contains specifications, an execution roadmap and an experimental native editor. [Implementation status](implementation/STATUS.md) records the available subsets and open P00–P11 gates.
+**Updated: 2026-09-21.** The repository contains specifications, an execution roadmap and an experimental native editor. [Implementation status](implementation/STATUS.md) records the available subsets and open P00–P11 gates.
 
 ## Current decisions
 

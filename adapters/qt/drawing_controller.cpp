@@ -8,15 +8,20 @@ void EditorController::setBrushOpacity(double value) {
     emit toolChanged();
 }
 bool EditorController::editDrawingRegion(PixelRect rect, SelectionMedia media, SelectionAction action, int dx,
-                                         int dy, const std::vector<Id>* selectedIds) {
+                                         int dy, const std::vector<Id>* selectedIds,
+                                         std::vector<Id>* resultingIds) {
     if (!layer_)
         return false;
-    return edit("Edit drawing selection", [&](Document& d) {
+    std::vector<Id> output;
+    const bool success = edit("Edit drawing selection", [&](Document& d) {
         if (!d.drawingAt(layer_, frame_))
             return;
         auto& drawing = d.editableDrawing(layer_, frame_);
-        editDrawingSelection(drawing, rect, media, action, dx, dy, d.nextId, selectedIds);
+        editDrawingSelection(drawing, rect, media, action, dx, dy, d.nextId, selectedIds, &output);
     });
+    if (success && resultingIds)
+        *resultingIds = std::move(output);
+    return success;
 }
 
 bool EditorController::transformDrawingRegion(PixelRect rect, SelectionMedia media,

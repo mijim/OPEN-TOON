@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "as_of": "2026-09-20",
+  "as_of": "2026-09-21",
   "release_stage": "experimental",
   "target_phase": "P11",
   "target_complete": false,
@@ -34,8 +34,8 @@
     {
       "id": "P04",
       "status": "in_progress",
-      "available": "Sampled vector strokes, approximate eraser, primitives, single-stroke selection, point editing/smoothing, stable palette IDs and shape recoloring. Rectangular whole-stroke multi-selection, move/duplicate/delete, flips and quarter turns preserve editable geometry, swatch and art-layer IDs. On-canvas scale/rotation handles with live previews and explicit selected-vector properties. Thin vectors have a constant screen-space hit margin respecting art order; point dragging previews the complete stroke, with contextual tool/handle cursors. Pencil/polygon points can be inserted on segments by double-click and deleted individually while preserving identity, pressure interpolation and minimum geometry.",
-      "remaining": "Region topology/fill, analytic erasing, Bezier/contour/width editors, presets/textures/guides, lasso/partial/additive selection and vector optimization."
+      "available": "Sampled vector strokes, approximate eraser, primitives, single-stroke selection, point editing/smoothing, stable palette IDs and shape recoloring. Rectangular whole-stroke multi-selection, move/duplicate/delete, flips and quarter turns preserve editable geometry, swatch and art-layer IDs. On-canvas scale/rotation handles with live previews and explicit selected-vector properties. Thin vectors have a constant screen-space hit margin respecting art order; point dragging previews the complete stroke, with contextual tool/handle cursors. Pencil/polygon points can be inserted on segments by double-click and deleted individually while preserving identity, pressure interpolation and minimum geometry. Shift/Alt add/subtract whole vectors by click or marquee, with sparse membership, individual selection bounds, tool-switch preservation and identity-safe duplication.",
+      "remaining": "Region topology/fill, analytic erasing, Bezier/contour/width editors, presets/textures/guides, lasso/partial geometry selection and vector optimization."
     },
     {
       "id": "P05",
@@ -84,7 +84,7 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 54,
+      "count": 55,
       "command": "ctest --test-dir build/locked --output-on-failure"
     },
     "native_input_workflow": {
@@ -144,7 +144,11 @@
         "sampled full-pose insertion by path double-click",
         "zero-scale child movement and singular-parent/locked-layer rejection",
         "fixed path reference across different drawings and undo",
-        "motion-path semantic/pixel-equivalent save/reopen"
+        "motion-path semantic/pixel-equivalent save/reopen",
+        "Shift/Alt whole-vector picking and marquee with actual Properties counts",
+        "vector selection survives Select/Marquee switching and rejects enclosed bystanders",
+        "sparse group movement in mirrored/rotated views, scaling, cancellation and atomic undo",
+        "overlapping duplicate selection identity, move/delete and pixel-equivalent persistence"
       ],
       "limits": "Synthetic mouse/tablet events on macOS; no physical tablet available. Window-layout flush required for occluded native smoke instances."
     },
@@ -172,7 +176,7 @@
         "windows-2022": "32 CTest entries passed with Qt 6.8.3; POSIX process termination test excluded",
         "sanitizers": "27 Qt-free core and MyPaint cases passed with AddressSanitizer and UndefinedBehaviorSanitizer"
       },
-      "limits": "Build/test evidence only; Windows crash-termination test is not implemented, GUI interaction outside macOS, physical tablets and clean-machine installation remain unqualified. Historical evidence; experimental.8 is macOS-validated only under the source-release policy."
+      "limits": "Build/test evidence only; Windows crash-termination test is not implemented, GUI interaction outside macOS, physical tablets and clean-machine installation remain unqualified. Historical evidence; experimental.9 is macOS-validated only under the source-release policy."
     },
     "standalone_package": {
       "status": "failed",
@@ -203,7 +207,7 @@
         "motion-path X/Y commands retain non-position pose fields and easing, with locked-edit rejection and saved pixel equivalence"
       ]
     },
-    "total_local_ctest_entries": 55,
+    "total_local_ctest_entries": 56,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -212,8 +216,9 @@
     "drawing_selection": {
       "status": "passed",
       "platform": "macOS",
-      "core_cases": 7,
-      "scope": "Overlapping tile-boundary moves, shared untouched tiles, sparse transparency, source-over compositing, flips and four quarter turns, vector identity and art/palette preservation, undo and atomic rejection. Free affine transforms, transparent raster resampling and explicit vector-ID membership. Point insertion interpolates pressure and preserves metadata; deletion enforces minimum geometry and rejects analytic primitives."
+      "core_cases": 8,
+      "scope": "Overlapping tile-boundary moves, shared untouched tiles, sparse transparency, source-over compositing, flips and four quarter turns, vector identity and art/palette preservation, undo and atomic rejection. Free affine transforms, transparent raster resampling and explicit vector-ID membership. Point insertion interpolates pressure and preserves metadata; deletion enforces minimum geometry and rejects analytic primitives. Sparse additive selection and zero-offset duplicate identity output preserve enclosed bystanders and raster media; outputs remain unpublished on rejected edits.",
+      "screenshot": "docs/implementation/vector-selection.png"
     },
     "brush_opacity": {
       "status": "passed",
@@ -251,7 +256,7 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.8",
+  "version": "0.2.0-experimental.9",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",

@@ -9,11 +9,11 @@ ColumnLayout {
     property var objectData: drawingCanvas.objectProperties
     spacing: 10
     Label {
-        text: root.objectData.kind === "vector" ? "Vector object" : root.objectData.kind === "raster" ? "Raster selection" : "Drawing selection"
+        text: root.objectData.kind === "vector" ? "Vector object" : root.objectData.kind === "raster" ? "Raster selection" : "Drawing selection · " + (root.objectData.count || 0) + " vectors"
         font.bold: true
     }
     Label {
-        text: "Drag corners to scale. Drag the circle to rotate. Shift constrains proportions or snaps rotation."
+        text: "Drag corners to scale. Drag the circle to rotate. Hold Shift after starting a drag to constrain proportions or snap rotation."
         wrapMode: Text.WordWrap
         Layout.fillWidth: true
         color: "#999999"
