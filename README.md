@@ -1,4 +1,4 @@
-# OPEN-TOON
+# OPEN TOON
 
 An open-source desktop application for 2D drawing and animation, built around direct
 canvas editing, an integrated timeline and visual motion curves.
