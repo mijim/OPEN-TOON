@@ -223,3 +223,57 @@ TEST_CASE("Drawing selections respect locked layers and media filters without ad
     editor.setBrushOpacity(.25);
     REQUIRE(editor.brushOpacity() == .25);
 }
+
+TEST_CASE("Pose-key selection edits only animation and reconciles after history or layer changes") {
+    EditorController editor;
+    editor.newScene();
+    editor.addCurveKey(4, "x", 20);
+    editor.addCurveKey(8, "x", 40);
+    editor.addCurveKey(12, "x", 80);
+    const auto layer = editor.selectedLayer();
+    editor.clearPoseSelection();
+    editor.selectPoseKey(4);
+    editor.selectPoseKey(12, true);
+    REQUIRE(editor.selectedPoseFrames() == QVariantList{4, 8, 12});
+    editor.selectPoseKey(8, false, true);
+    REQUIRE(editor.selectedPoseFrames() == QVariantList{4, 12});
+    auto before = editor.document();
+    REQUIRE(editor.moveSelectedPoseKeys(2));
+    REQUIRE(editor.selectedPoseFrames() == QVariantList{6, 14});
+    REQUIRE(editor.document().drawings == before.drawings);
+    REQUIRE(editor.document().layer(layer).exposures == before.layer(layer).exposures);
+    REQUIRE_FALSE(editor.moveSelectedPoseKeys(2)); // frame 8 is occupied by the unselected key.
+    REQUIRE(editor.selectedPoseFrames() == QVariantList{6, 14});
+    editor.undo();
+    REQUIRE(editor.document() == before);
+    REQUIRE(editor.selectedPoseFrames().empty());
+    editor.selectPoseRange(4, 12);
+    editor.copyPoseKeys();
+    editor.addLayer();
+    const auto target = editor.selectedLayer();
+    REQUIRE(editor.selectedPoseFrames().empty());
+    REQUIRE(editor.hasPoseClipboard());
+    editor.setFrame(20);
+    before = editor.document();
+    REQUIRE(editor.pastePoseKeys());
+    REQUIRE(editor.selectedPoseFrames() == QVariantList{20, 24, 28});
+    REQUIRE(editor.document().drawings == before.drawings);
+    REQUIRE(editor.document().layer(layer) == before.layer(layer));
+    REQUIRE(editor.document().layer(target).exposures == before.layer(target).exposures);
+    auto pasted = editor.document();
+    REQUIRE_FALSE(editor.pastePoseKeys());
+    REQUIRE(editor.document() == pasted);
+    REQUIRE(editor.deleteSelectedPoseKeys());
+    REQUIRE(editor.document() == before);
+    editor.undo();
+    REQUIRE(editor.document() == pasted);
+    editor.selectPoseRange(20, 28);
+    editor.toggleLayer(target, "locked");
+    before = editor.document();
+    REQUIRE_FALSE(editor.moveSelectedPoseKeys(1));
+    REQUIRE_FALSE(editor.deleteSelectedPoseKeys());
+    REQUIRE(editor.document() == before);
+    editor.newScene();
+    REQUIRE(editor.selectedPoseFrames().empty());
+    REQUIRE(editor.hasPoseClipboard());
+}

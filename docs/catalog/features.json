@@ -2313,7 +2313,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/status.json; docs/architecture/adr/013-animation-editing.md; experimental subset only, catalog acceptance not closed"
+      "implementation_evidence": "docs/implementation/status.json; docs/architecture/adr/018-pose-key-block-editing.md; single-layer full-pose block operations in local units only; catalog acceptance not closed"
     },
     {
       "id": "ANI-010",
@@ -2324,7 +2324,7 @@
         "Copying motion does not duplicate the underlying drawing."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "animation-curves",
@@ -2333,7 +2333,8 @@
         "LYR"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/status.json; docs/architecture/adr/018-pose-key-block-editing.md; single-layer full-pose block operations in local units only; catalog acceptance not closed"
     },
     {
       "id": "ANI-011",

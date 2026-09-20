@@ -1,5 +1,17 @@
 # Experimental releases
 
+## 0.2.0-experimental.7 — direct pose-key blocks
+
+- Shared selection across Curves, Timeline and Xsheet, with span/toggle/box gestures.
+- Move selected diamonds together, Alt-drag to duplicate, drag the right edge to stretch timing.
+- Collision-safe local-pose copy/paste between layers preserves pivots/easing without drawings.
+- Focus-aware copy/paste, select all, key nudges and Delete; Escape or selection changes cancel previews.
+- One undo per committed operation, existing format 3 and no new dependencies.
+- macOS: 54 CTest entries plus native group editing, shortcuts and persistence checks. Source only.
+
+P06 remains partial: no independent channel times, cross-layer batch selection,
+world-space retargeting or cameras. See ADR-018 for the exact supported scope.
+
 ## 0.2.0-experimental.6 — editable combined motion
 
 - All motion is the default: highlight a channel and edit square keys or round handles in place.

@@ -3,7 +3,7 @@ import QtQuick.Controls.Basic
 import QtQuick.Layouts
 import "." as C
 
-Item {
+FocusScope {
     id: root
     objectName: "curveEditorPanel"
     required property var controller
@@ -258,7 +258,7 @@ Item {
                 onClicked: root.preset([.25, 0, .65, 1.8])
             }
             Label {
-                text: "Frame " + (root.controller.frame + 1) + (root.selected && root.selected.easing[root.channel] ? " · Bézier" : "")
+                text: (root.controller.selectedPoseFrames.length > 1 ? root.controller.selectedPoseFrames.length + " keys · " : "") + "Frame " + (root.controller.frame + 1) + (root.selected && root.selected.easing[root.channel] ? " · Bézier" : "")
                 color: "#999999"
                 font.pixelSize: 10
                 Layout.fillWidth: true
@@ -271,9 +271,21 @@ Item {
             }
             C.ToolButton {
                 text: "− Key"
-                hint: "Delete current pose key"
-                enabled: root.selected !== null
-                onClicked: root.controller.deleteKey()
+                hint: "Delete selected pose keys, or the current key when no keys are selected"
+                enabled: root.selected !== null || root.controller.selectedPoseFrames.length > 0
+                onClicked: root.controller.selectedPoseFrames.length ? root.controller.deleteSelectedPoseKeys() : root.controller.deleteKey()
+            }
+            C.ToolButton {
+                text: "Copy"
+                hint: "Copy selected pose keys in local layer units, including pivots"
+                enabled: root.controller.selectedPoseFrames.length > 0
+                onClicked: root.controller.copyPoseKeys()
+            }
+            C.ToolButton {
+                text: "Paste"
+                hint: "Paste pose keys at the playhead on the selected layer; existing keys are protected"
+                enabled: root.controller.hasPoseClipboard
+                onClicked: root.controller.pastePoseKeys()
             }
             C.ToolButton {
                 text: "Values"
@@ -306,7 +318,7 @@ Item {
             property real plotLeft: 64
             property real plotRight: width - 20
             property real plotTop: 12
-            property real plotBottom: height - 22
+            property real plotBottom: height - 64
             function px(frame) {
                 return plotLeft + (frame - root.firstFrame) / Math.max(1, root.lastFrame - root.firstFrame) * (plotRight - plotLeft);
             }
@@ -433,6 +445,8 @@ Item {
                     origin = Qt.point(mouse.x, mouse.y);
                     dragKey = graph.keyAt(mouse.x, mouse.y);
                     if (dragKey) {
+                        root.controller.clearPoseSelection();
+                        root.controller.selectPoseKey(dragKey.frame);
                         targetFrame = dragKey.frame;
                         targetValue = dragKey[root.channel];
                         root.controller.frame = dragKey.frame;
@@ -495,6 +509,16 @@ Item {
                     }
                 }
                 Accessible.name: "Animation curve. Use the numeric controls to edit keys without dragging."
+            }
+            PoseKeyStrip {
+                controller: root.controller
+                firstFrame: root.firstFrame
+                lastFrame: root.lastFrame
+                plotLeft: graph.plotLeft
+                plotRight: graph.plotRight
+                y: graph.height - 42
+                width: graph.width
+                height: 42
             }
         }
         ScrollBar {

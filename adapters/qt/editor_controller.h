@@ -1,5 +1,6 @@
 #pragma once
 #include "opentoon/drawing_selection.h"
+#include "opentoon/key_block.h"
 #include "opentoon/session.h"
 #include "opentoon/timeline.h"
 #include <QColor>
@@ -15,6 +16,8 @@ class EditorController final : public QObject {
     Q_PROPERTY(bool animateMode READ animateMode WRITE setAnimateMode NOTIFY animationModeChanged)
     Q_PROPERTY(bool autoKey READ autoKey WRITE setAutoKey NOTIFY animationModeChanged)
     Q_PROPERTY(QVariantList animationKeys READ animationKeys NOTIFY changed)
+    Q_PROPERTY(QVariantList selectedPoseFrames READ selectedPoseFrames NOTIFY keySelectionChanged)
+    Q_PROPERTY(bool hasPoseClipboard READ hasPoseClipboard NOTIFY keySelectionChanged)
     Q_PROPERTY(QString keyState READ keyState NOTIFY frameChanged)
     Q_PROPERTY(int rangeStart READ rangeStart NOTIFY rangeChanged)
     Q_PROPERTY(int rangeEnd READ rangeEnd NOTIFY rangeChanged)
@@ -61,6 +64,16 @@ class EditorController final : public QObject {
     void setAutoKey(bool);
     QVariantList animationKeys() const;
     QString keyState() const;
+    QVariantList selectedPoseFrames() const;
+    bool hasPoseClipboard() const { return !poseClipboard_.keys.empty(); }
+    Q_INVOKABLE void selectPoseKey(int frame, bool extend = false, bool toggle = false);
+    Q_INVOKABLE void selectPoseRange(int first, int last, bool additive = false);
+    Q_INVOKABLE void clearPoseSelection();
+    Q_INVOKABLE void copyPoseKeys();
+    Q_INVOKABLE bool pastePoseKeys();
+    Q_INVOKABLE bool moveSelectedPoseKeys(int offset, bool duplicate = false);
+    Q_INVOKABLE bool stretchSelectedPoseKeys(int last);
+    Q_INVOKABLE bool deleteSelectedPoseKeys();
     Q_INVOKABLE QVariantList curveSamples(QString channel, int samples = 400) const;
     Q_INVOKABLE void nextKey(int direction);
     Q_INVOKABLE bool updateKey(int source, int destination, QString channel, double value, int interpolation);
@@ -174,6 +187,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE void autosave();
     Q_INVOKABLE void report(QString message);
   signals:
+    void keySelectionChanged();
     void animationModeChanged();
     void rangeChanged();
     void changed();
@@ -187,6 +201,13 @@ class EditorController final : public QObject {
 
   private:
     opentoon::Session session_;
+    std::vector<opentoon::Frame> poseSelection_;
+    opentoon::Id poseSelectionLayer_ = 0;
+    int poseSelectionAnchor_ = -1;
+    opentoon::KeyBlock poseClipboard_;
+    void reconcilePoseSelection();
+    void setPoseSelection(std::vector<opentoon::Frame>);
+    bool retimePoseSelection(int first, int last, bool duplicate);
     opentoon::ExposureClipboard clipboard_;
     std::vector<opentoon::Id> rangeLayers_;
     int rangeStart_ = 0, rangeEnd_ = 1;

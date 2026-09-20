@@ -48,6 +48,7 @@ ApplicationWindow {
     property bool allowClose: false
     property bool textEditing: activeFocusItem instanceof TextInput || activeFocusItem instanceof TextEdit
     property bool xsheet: false
+    readonly property bool keyWorkspaceFocused: (showCurves && curveEditor.activeFocus) || (!showCurves && keyEditing && timeline.activeFocus)
     property bool keyEditing: editor.tool === "Animate"
     property int timelineCell: 22
     property int timelineRow: 34
@@ -91,13 +92,18 @@ ApplicationWindow {
 
     Shortcut {
         sequences: [StandardKey.Copy]
-        enabled: !root.textEditing && timeline.activeFocus
-        onActivated: editor.copyTimelineRange()
+        enabled: !root.textEditing && (root.keyWorkspaceFocused || timeline.activeFocus)
+        onActivated: root.keyWorkspaceFocused ? editor.copyPoseKeys() : editor.copyTimelineRange()
     }
     Shortcut {
         sequences: [StandardKey.Paste]
-        enabled: !root.textEditing && timeline.activeFocus
-        onActivated: editor.pasteTimelineRange(0, false)
+        enabled: !root.textEditing && (root.keyWorkspaceFocused || timeline.activeFocus)
+        onActivated: root.keyWorkspaceFocused ? editor.pastePoseKeys() : editor.pasteTimelineRange(0, false)
+    }
+    Shortcut {
+        sequences: [StandardKey.SelectAll]
+        enabled: !root.textEditing && root.keyWorkspaceFocused
+        onActivated: editor.selectPoseRange(0, editor.duration - 1)
     }
     Dialog {
         id: markerDialog
@@ -175,12 +181,12 @@ ApplicationWindow {
     Shortcut {
         sequence: "Right"
         enabled: !root.textEditing
-        onActivated: editor.frame++
+        onActivated: root.keyWorkspaceFocused && editor.selectedPoseFrames.length ? editor.moveSelectedPoseKeys(1) : editor.frame++
     }
     Shortcut {
         sequence: "Left"
         enabled: !root.textEditing
-        onActivated: editor.frame--
+        onActivated: root.keyWorkspaceFocused && editor.selectedPoseFrames.length ? editor.moveSelectedPoseKeys(-1) : editor.frame--
     }
     Shortcut {
         sequence: "F"
@@ -190,7 +196,15 @@ ApplicationWindow {
     Shortcut {
         sequences: ["Delete", "Backspace"]
         enabled: !root.textEditing
-        onActivated: canvas.deleteSelection()
+        onActivated: {
+            if (root.keyWorkspaceFocused) {
+                if (editor.selectedPoseFrames.length)
+                    editor.deleteSelectedPoseKeys();
+                else
+                    editor.deleteKey();
+            } else
+                canvas.deleteSelection();
+        }
     }
     Shortcut {
         sequence: "O"
@@ -1100,7 +1114,7 @@ ApplicationWindow {
                     onClicked: root.showTimingTools = !root.showTimingTools
                 }
                 C.ToolButton {
-                    text: "Keys"
+                    text: editor.selectedPoseFrames.length > 1 ? "Keys · " + editor.selectedPoseFrames.length : "Keys"
                     visible: !root.showCurves
                     active: root.keyEditing
                     hint: "Key mode: drag diamonds to move poses; double-click an empty cell to add a key. Turn off to select exposure ranges."
@@ -1476,11 +1490,17 @@ ApplicationWindow {
                         for (let r = 0; r < data.length; ++r)
                             for (const frame of data[r].keys) {
                                 const p = keyPosition(frame, r);
-                                if (p.x >= 0 && p.x <= width && p.y >= 0 && p.y <= height)
+                                if (p.x >= 0 && p.x <= width && p.y >= 0 && p.y <= height) {
+                                    const selected = data[r].id === editor.selectedLayer && editor.selectedPoseFrames.indexOf(frame) >= 0;
+                                    ctx.fillStyle = selected ? "#ffffff" : "#888888";
                                     diamond(ctx, p, true);
+                                    if (selected)
+                                        ctx.strokeRect(p.x - 8, p.y - 8, 16, 16);
+                                }
                             }
                         if (timelineInput.keySource >= 0)
-                            diamond(ctx, keyPosition(timelineInput.previewFrame, timelineInput.anchorRow), false);
+                            for (const frame of editor.selectedPoseFrames)
+                                diamond(ctx, keyPosition(frame + timelineInput.previewFrame - timelineInput.keySource, timelineInput.anchorRow), false);
                     }
                     MouseArea {
                         id: timelineInput
@@ -1494,6 +1514,7 @@ ApplicationWindow {
                         preventStealing: true
                         anchors.fill: parent
                         property int keySource: -1
+                        property bool duplicateKeys: false
                         property bool canceled: false
                         function keyAt(mouse) {
                             const row = rowAt(mouse);
@@ -1538,7 +1559,7 @@ ApplicationWindow {
                             const coordinate = root.xsheet ? mouse.y : mouse.x;
                             resizing = !root.keyEditing && anchorRow >= 0 && anchorRow < editor.layers.length && editor.selectedLayers.indexOf(editor.layers[anchorRow].id) >= 0 && Math.abs(coordinate - edge) <= 5;
                             previewEnd = editor.rangeEnd;
-                            moving = !resizing && (mouse.modifiers & Qt.AltModifier) && anchorRow >= 0 && anchorRow < editor.layers.length && anchorFrame >= editor.rangeStart && anchorFrame < editor.rangeEnd && editor.selectedLayers.indexOf(editor.layers[anchorRow].id) >= 0;
+                            moving = !root.keyEditing && !resizing && (mouse.modifiers & Qt.AltModifier) && anchorRow >= 0 && anchorRow < editor.layers.length && anchorFrame >= editor.rangeStart && anchorFrame < editor.rangeEnd && editor.selectedLayers.indexOf(editor.layers[anchorRow].id) >= 0;
                             if (resizing) {
                                 timeline.requestPaint();
                                 return;
@@ -1546,8 +1567,11 @@ ApplicationWindow {
                             const key = keyAt(mouse);
                             if (!moving && key >= 0) {
                                 editor.selectedLayer = editor.layers[anchorRow].id;
-                                editor.frame = key;
-                                canceled = false;
+                                editor.selectPoseKey(key, !!(mouse.modifiers & Qt.ShiftModifier), !!(mouse.modifiers & (Qt.ControlModifier | Qt.MetaModifier)));
+                                duplicateKeys = !!(mouse.modifiers & Qt.AltModifier);
+                                canceled = editor.selectedPoseFrames.indexOf(key) < 0;
+                                if (canceled)
+                                    return;
                                 keySource = key;
                                 previewFrame = key;
                                 timeline.requestPaint();
@@ -1570,7 +1594,9 @@ ApplicationWindow {
                             if (!pressed || canceled)
                                 return;
                             if (keySource >= 0) {
-                                previewFrame = Math.max(0, Math.min(editor.duration - 1, keySource + frameAt(mouse) - anchorFrame));
+                                const selected = editor.selectedPoseFrames;
+                                const offset = Math.max(-selected[0], Math.min(editor.duration - 1 - selected[selected.length - 1], frameAt(mouse) - anchorFrame));
+                                previewFrame = keySource + offset;
                                 timeline.requestPaint();
                                 return;
                             }
@@ -1594,10 +1620,10 @@ ApplicationWindow {
                             if (canceled)
                                 return;
                             if (keySource >= 0) {
-                                const source = keySource, destination = previewFrame;
+                                const offset = previewFrame - keySource, duplicate = duplicateKeys;
                                 cancel();
-                                if (source !== destination)
-                                    editor.movePoseKey(source, destination);
+                                if (offset !== 0)
+                                    editor.moveSelectedPoseKeys(offset, duplicate);
                                 return;
                             }
                             if (resizing)
@@ -1625,7 +1651,10 @@ ApplicationWindow {
                         Accessible.name: "Timeline. Drag diamonds to retime poses. Enable Keys to add keys by double-clicking. Alt-drag moves an exposure range."
                     }
                     Keys.onEscapePressed: {
-                        timelineInput.cancel();
+                        if (timelineInput.keySource >= 0 || timelineInput.moving || timelineInput.resizing)
+                            timelineInput.cancel();
+                        else
+                            editor.clearPoseSelection();
                     }
                 }
                 Connections {
@@ -1642,6 +1671,11 @@ ApplicationWindow {
                         timeline.requestPaint();
                     }
                     function onRangeChanged() {
+                        timeline.requestPaint();
+                    }
+                    function onKeySelectionChanged() {
+                        if (timelineInput.keySource >= 0)
+                            timelineInput.cancel();
                         timeline.requestPaint();
                     }
                 }

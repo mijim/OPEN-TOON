@@ -2,15 +2,15 @@
 
 An independent open-source desktop animation project combining vector and bitmap drawing, frame-by-frame and cut-out animation, rigging, compositing and production tools.
 
-**Current version: 0.2.0-experimental.6. P11 is not complete.** A C++20/Qt Quick application now supports mouse drawing, vector editing, MyPaint raster brushes with opacity, direct vector/raster transform handles, selection-owned Properties, integrated timing/curves, layer and range editing, explicit animation modes, visual pose animation, draggable Bézier easing/overshoot, forgiving thin-line picking, contextual cursors, compact controls and a draggable timeline/curve divider, editable All motion with linked easing and time zoom, draggable pose diamonds, point insertion/deletion, animation-aware Clear, key-only retiming, compressed SQLite project revisions and PNG export. The roadmap still covers 282 capabilities in 26 domains; working subsets are marked partial, with no phase claimed complete.
+**Current version: 0.2.0-experimental.7. P11 is not complete.** A C++20/Qt Quick application now supports mouse drawing, vector editing, MyPaint raster brushes with opacity, direct vector/raster transform handles, selection-owned Properties, integrated timing/curves, layer and range editing, explicit animation modes, visual pose animation, draggable Bézier easing/overshoot, forgiving thin-line picking, contextual cursors, compact controls and a draggable timeline/curve divider, editable All motion with linked easing and time zoom, shared key selection, group move/stretch/duplication and motion copy/paste, point insertion/deletion, animation-aware Clear, key-only retiming, compressed SQLite project revisions and PNG export. The roadmap still covers 282 capabilities in 26 domains; working subsets are marked partial, with no phase claimed complete.
 
-**Coverage mascot: a pencil conducting a tiny motion orchestra.** X and Y can now bend their timing together, pose diamonds can slide into place, and Clear remembers to send the keyframes home too. The orchestra still has **0 of 23 fully completed phases**: cameras, audio, deformers, drawing morphing and node compositing have not arrived for rehearsal. Working subsets are useful; graduation comes after every exit criterion passes. [See the honest coverage ledger](docs/implementation/status.json).
+**Coverage mascot: a pencil teaching its keyframes a group dance.** The little diamonds can now move in formation, stretch their timing and send a copy of the choreography to another layer. They still have **0 of 23 fully completed phases**: cameras, audio, deformers, drawing morphing and node compositing have not joined the troupe. Working subsets are useful; graduation comes after every exit criterion passes. [See the honest coverage ledger](docs/implementation/status.json).
 
 Start with the [build instructions](docs/implementation/BUILD.md), [user guide](docs/implementation/USER-GUIDE.md) and [implementation status](docs/implementation/STATUS.md).
 
 The product will use a clean black, white and gray interface. **The entire first-party product is in English by requirement:** UI, messages, built-in assets, help, code and public documentation. The previous research, Markdown documents and canonical catalogs have also been translated into English. User-created content remains multilingual.
 
-![Direct canvas animation and editable combined motion curves](docs/implementation/visual-animation.png)
+![Direct canvas animation, combined curves and selected pose-key blocks](docs/implementation/visual-animation.png)
 
 ## Start here
 

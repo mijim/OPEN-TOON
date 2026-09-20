@@ -1,5 +1,6 @@
 #include "canvas_item.h"
 #include "editor_controller.h"
+#include "key_block_smoke.h"
 #include "project_store.h"
 #include "scene_renderer.h"
 #include "serialization.h"
@@ -425,6 +426,7 @@ int main(int argc, char** argv) {
                                         throw std::runtime_error("Selection screenshot failed.");
                                     auto* canvas = window->findChild<CanvasItem*>("drawingCanvas");
                                     visualEditingSmoke(editor, *canvas, *window);
+                                    keyBlockSmoke(editor, *window);
                                     QTimer::singleShot(150, &app, [&, window] {
                                         auto image = window->grabWindow();
                                         std::cout << "Visual animation smoke passed: thin picking, cursor "

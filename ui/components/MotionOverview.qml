@@ -244,18 +244,6 @@ Item {
                 }
                 return nearest;
             }
-            function diamond(ctx, x, y, filled) {
-                ctx.beginPath();
-                ctx.moveTo(x, y - 6);
-                ctx.lineTo(x + 6, y);
-                ctx.lineTo(x, y + 6);
-                ctx.lineTo(x - 6, y);
-                ctx.closePath();
-                if (filled)
-                    ctx.fill();
-                else
-                    ctx.stroke();
-            }
             onPaint: {
                 const ctx = getContext("2d");
                 ctx.reset();
@@ -272,8 +260,6 @@ Item {
                     ctx.fillStyle = "#777777";
                     ctx.fillText(String(i * 50) + "%", 3, y + 3);
                 }
-                ctx.fillStyle = "#888888";
-                ctx.fillText("Keys", 3, keyY + 3);
                 ctx.save();
                 ctx.beginPath();
                 ctx.rect(plotLeft - 7, plotTop - 7, plotRight - plotLeft + 14, keyY - plotTop + 14);
@@ -309,7 +295,6 @@ Item {
                 ctx.stroke();
                 for (const k of root.keys) {
                     ctx.fillStyle = k.frame === root.controller.frame ? "#ffffff" : "#999999";
-                    diamond(ctx, px(k.frame), keyY, true);
                     if (root.activeCurve)
                         ctx.fillRect(px(k.frame) - 5, py(k[root.activeChannel], root.activeCurve) - 5, 10, 10);
                 }
@@ -334,8 +319,6 @@ Item {
                     ctx.strokeStyle = "#ffffff";
                     if (pointer.dragValue && root.activeCurve)
                         ctx.strokeRect(px(pointer.targetFrame) - 7, py(pointer.targetValue, root.activeCurve) - 7, 14, 14);
-                    else
-                        diamond(ctx, px(pointer.targetFrame), keyY, false);
                 }
                 ctx.restore();
                 for (let i = 0; i <= 4; ++i) {
@@ -381,12 +364,13 @@ Item {
                         dragHandle = handle;
                         return;
                     }
-                    const lane = graph.keyAt(mouse.x, mouse.y, true), key = lane || graph.keyAt(mouse.x, mouse.y, false);
+                    const key = graph.keyAt(mouse.x, mouse.y, false);
                     if (key) {
-                        root.controller.frame = key.frame;
+                        root.controller.clearPoseSelection();
+                        root.controller.selectPoseKey(key.frame);
                         sourceFrame = key.frame;
                         targetFrame = key.frame;
-                        dragValue = !lane;
+                        dragValue = true;
                         targetValue = key[root.activeChannel];
                         interpolation = key.interpolation;
                     } else {
@@ -435,8 +419,6 @@ Item {
                             root.controller.setCurveHandles(source, root.activeChannel, h[0], h[1], h[2], h[3]);
                     } else if (isValue)
                         root.controller.updateKey(source, destination, root.activeChannel, value, mode);
-                    else if (source !== destination)
-                        root.controller.movePoseKey(source, destination);
                 }
                 onCanceled: cancel()
                 onDoubleClicked: mouse => {
@@ -455,6 +437,16 @@ Item {
                     event.accepted = true;
                 }
                 Accessible.name: "All motion editor. Choose a channel in the legend. Drag square keys to edit, round handles to ease, or diamonds to retime poses."
+            }
+            PoseKeyStrip {
+                controller: root.controller
+                firstFrame: root.firstFrame
+                lastFrame: root.lastFrame
+                plotLeft: graph.plotLeft
+                plotRight: graph.plotRight
+                y: graph.height - 42
+                width: graph.width
+                height: 42
             }
         }
     }

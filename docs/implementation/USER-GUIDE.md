@@ -19,7 +19,7 @@ The built-in bouncing-ball example provides 24 distinct drawings exposed on twos
 - **Raster ink:** select the filled-circle tool, then choose Ink, Soft, Dry, Smudge or Eraser from the preset menu. Paint with the mouse or pressure input. Each gesture is undoable; Escape cancels the preview. Raster pixels retain the color painted and do not recolor with palette edits. Imported images remain separate; paint appears above the image and below vector art.
 - **Eraser:** cuts sampled strokes approximately. Analytic shape erasing and region topology are not implemented.
 - **Rectangle / Ellipse:** drag to create a primitive; enable the filled option for a solid shape.
-- **Select:** select and drag one stroke. Delete removes it. There is no lasso or multi-selection yet.
+- **Select:** select and drag one stroke. Delete removes it. Use Marquee for rectangular whole-stroke selection; lasso remains pending.
 - **Edit points:** drag individual sampled points. **Smooth selected stroke** averages interior points while preserving endpoints.
 - **Recolor:** assign the selected palette swatch to a stroke or shape. It does not flood-fill arbitrary enclosed regions.
 - Pan with the middle mouse button or trackpad scroll. Ctrl+scroll zooms. `F` fits the canvas. View rotation and mirror do not change the document or exported artwork.
@@ -201,3 +201,35 @@ Select to delete the entire object. Rectangle/ellipse point counts are fixed.
 layers, regardless of the paste-content dropdown. The frame menu action clears one
 cell and its key. Outside keys, rest transforms and drawing resources are preserved;
 Undo restores the cleared exposures and keys together.
+
+## Edit a block of pose keys
+
+The **Keys** lane under either curve view now shares selection with Timeline and
+Xsheet. Click a diamond, Shift-click to include the intervening keys, or Cmd/Ctrl-click
+to toggle individual keys. Drag blank space in the curve Keys lane to select a span.
+Clicking blank space in that lane clears selection; a selected diamond remains selected
+when you begin a drag. Square curve keys continue to edit a single pose/channel.
+
+Drag any selected diamond to move the whole group, retaining its spacing and curves.
+**Alt-drag** duplicates it. With at least two keys selected, drag the slim **right edge**
+of the highlighted band to stretch or compress timing around its first key. Rounding
+that would merge keys, or a destination containing an unselected key, rejects the whole
+operation. Escape cancels the preview. One Undo restores the complete edit.
+
+**Copy** stores the selected poses; move to the desired frame/layer and **Paste** to
+transfer the block. This copies local position, rotation, scale, opacity, pivots and
+outgoing easing. It does not copy drawings or exposures, change the parent hierarchy,
+convert between canvas sizes, or preserve a path in world space under a different
+parent. Copy/Paste in Timing tools remains the separate exposure-range clipboard.
+
+With the curve workspace or Timeline's **Keys** mode focused:
+
+- Cmd/Ctrl+A selects all pose keys on the active layer.
+- Cmd/Ctrl+C and Cmd/Ctrl+V copy/paste pose keys.
+- Left/Right nudges the selected block by one frame; without selection it moves the playhead.
+- Delete/Backspace removes the selected pose keys, preserving artwork and exposures.
+
+Text fields keep their usual editing behavior. Changing layers clears key selection;
+Undo restores document data and drops selected frames that no longer contain keys.
+The in-memory motion clipboard can be reused after opening a different scene. These
+operations use full-pose keys; independent channel timing remains pending.

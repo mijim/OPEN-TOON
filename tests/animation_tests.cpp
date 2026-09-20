@@ -1,4 +1,5 @@
 #include "opentoon/animation.h"
+#include "opentoon/key_block.h"
 #include "opentoon/session.h"
 #include "serialization.h"
 #include <catch2/catch_approx.hpp>
@@ -164,4 +165,114 @@ TEST_CASE("Combined pose timing and easing preserve artwork and edit every chann
     REQUIRE_THROWS(
         session.apply("Invalid ease", [&](Document& d) { setPoseEase(d.layer(id), 0, {.9, 0, .1, 1}); }));
     REQUIRE(session.document() == before);
+}
+
+TEST_CASE("Sparse key blocks move together and collisions leave the domain untouched") {
+    auto d = makeBouncingBall();
+    auto& layer = d.layers.front();
+    layer.keys = {{0, {}, Interpolation::Linear},
+                  {4, {10, 20}, Interpolation::Smooth},
+                  {8, {30, 40}, Interpolation::Step},
+                  {12, {50, 60}, Interpolation::Linear},
+                  {24, {80, 90}, Interpolation::Linear}};
+    setKeyEase(layer, 4, "x", {.2, 0, .8, 1.6});
+    auto original = layer;
+    auto frames = retimeKeyBlock(layer, {4, 12}, 6, 14);
+    REQUIRE(frames == std::vector<Frame>{6, 14});
+    REQUIRE(layer.keys[1].value == original.keys[1].value);
+    REQUIRE(layer.keys[1].easing == original.keys[1].easing);
+    REQUIRE(layer.keys[2] == original.keys[2]);
+    auto before = layer;
+    REQUIRE_THROWS(retimeKeyBlock(layer, {6, 14}, 8, 16));
+    REQUIRE(layer == before);
+    REQUIRE_THROWS(retimeKeyBlock(layer, {6, 14}, -1, 7));
+    REQUIRE(layer == before);
+    REQUIRE_THROWS(retimeKeyBlock(layer, {6, 7}, 10, 11));
+    REQUIRE(layer == before);
+    REQUIRE_THROWS(retimeKeyBlock(layer, {6, 6}, 10, 11));
+    REQUIRE(layer == before);
+}
+TEST_CASE("Stretching a selected key block preserves evaluated motion and rejects rounded collisions") {
+    Session session;
+    const auto id = session.document().layers.front().id;
+    session.apply("Fixture", [&](Document& d) {
+        auto& layer = d.layer(id);
+        layer.keys = {{4, {}, Interpolation::Linear},
+                      {8, {40, 10}, Interpolation::Smooth},
+                      {12, {80, 30}, Interpolation::Linear}};
+        setKeyEase(layer, 4, "x", {.2, 0, .7, 1.6});
+    });
+    const auto before = session.document();
+    session.apply("Stretch", [&](Document& d) { retimeKeyBlock(d.layer(id), {4, 8, 12}, 4, 20); });
+    for (int f = 4; f <= 12; ++f)
+        REQUIRE(evaluateTransform(session.document().layer(id), 4 + (f - 4) * 2) ==
+                evaluateTransform(before.layer(id), f));
+    REQUIRE_THROWS(
+        session.apply("Collapse", [&](Document& d) { retimeKeyBlock(d.layer(id), {4, 12, 20}, 4, 5); }));
+    session.undo();
+    REQUIRE(session.document() == before);
+    session.redo();
+    REQUIRE(session.document().layer(id).keys.back().frame == 20);
+}
+TEST_CASE("Motion clipboard transfers local poses and pivots without drawings or hierarchy changes") {
+    auto d = makeBouncingBall();
+    auto& source = d.layers.front();
+    Transform pose;
+    pose.x = 30;
+    pose.y = -20;
+    pose.pivotX = 17;
+    pose.rotation = 350;
+    pose.scaleX = -2;
+    source.keys = {{4, pose, Interpolation::Smooth}, {10, {70, 20}, Interpolation::Linear}};
+    setKeyEase(source, 4, "rotation", {.3, -.2, .8, 1.4});
+    const auto block = copyKeyBlock(source, {4, 10});
+    const auto drawings = d.drawings;
+    Layer target;
+    target.id = d.allocateId();
+    target.name = "Target";
+    target.parent = source.id;
+    target.transform.y = 150;
+    auto rest = target.transform;
+    auto frames = pasteKeyBlock(target, block, 20);
+    REQUIRE(frames == std::vector<Frame>{20, 26});
+    REQUIRE(target.keys.front().value == pose);
+    REQUIRE(target.keys.front().easing == source.keys.front().easing);
+    REQUIRE(target.parent == source.id);
+    REQUIRE(target.transform == rest);
+    REQUIRE(target.exposures.empty());
+    d.layers.push_back(target);
+    REQUIRE(d.drawings == drawings);
+    auto reopened = deserializeDocument(serializeDocument(d));
+    for (int f = 0; f < d.duration; ++f)
+        REQUIRE(evaluateTransform(reopened.layers.back(), f) == evaluateTransform(target, f));
+    auto before = target;
+    REQUIRE_THROWS(pasteKeyBlock(target, block, 20));
+    REQUIRE(target == before);
+    REQUIRE_THROWS(pasteKeyBlock(target, block, 999999));
+    REQUIRE(target == before);
+}
+TEST_CASE("Duplicate and delete selected pose keys preserve originals and reject locked edits") {
+    auto layer = makeDocument().layers.front();
+    layer.keys = {{0, {}, Interpolation::Linear},
+                  {4, {10, 20}, Interpolation::Smooth},
+                  {8, {20, 30}, Interpolation::Step}};
+    auto original = layer;
+    retimeKeyBlock(layer, {0, 4}, 12, 16, true);
+    REQUIRE(layer.keys.size() == 5);
+    for (int i = 0; i < 3; ++i)
+        REQUIRE(layer.keys[i] == original.keys[i]);
+    REQUIRE(layer.keys[3].value == original.keys[0].value);
+    auto before = layer;
+    REQUIRE_THROWS(retimeKeyBlock(layer, {0, 4}, 4, 8, true));
+    REQUIRE(layer == before);
+    REQUIRE_THROWS(deleteKeyBlock(layer, {12, 17}));
+    REQUIRE(layer == before);
+    deleteKeyBlock(layer, {12, 16});
+    REQUIRE(layer == original);
+    layer.locked = true;
+    before = layer;
+    REQUIRE_THROWS(deleteKeyBlock(layer, {0}));
+    REQUIRE_THROWS(retimeKeyBlock(layer, {0}, 12, 12));
+    REQUIRE_THROWS(pasteKeyBlock(layer, copyKeyBlock(layer, {0, 4}), 12));
+    REQUIRE(layer == before);
 }

@@ -14,7 +14,7 @@ The editor runs locally on macOS and supports mouse drawing, sampled-pressure in
 | P03 | in_progress | Synchronized virtualized timeline/Xsheet, create/hold/clear exposures, insert/remove frames and navigate drawings. Multi-layer range clipboard, independent drawing paste, key paste, cycles, ones/twos/threes, overwrite retiming, Alt-drag moves, markers and bounded Xsheet PDF export. Clear removes selected exposures and pose keys together. Timeline/Xsheet diamonds can be dragged directly; Keys mode adds poses by double-click, with adjustable timeline cell width. | Frame annotations/thumbnails, advanced onion/tracing controls, paperless workflows and artist acceptance. |
 | P04 | in_progress | Sampled vector strokes, approximate eraser, primitives, single-stroke selection, point editing/smoothing, stable palette IDs and shape recoloring. Rectangular whole-stroke multi-selection, move/duplicate/delete, flips and quarter turns preserve editable geometry, swatch and art-layer IDs. On-canvas scale/rotation handles with live previews and explicit selected-vector properties. Thin vectors have a constant screen-space hit margin respecting art order; point dragging previews the complete stroke, with contextual tool/handle cursors. Pencil/polygon points can be inserted on segments by double-click and deleted individually while preserving identity, pressure interpolation and minimum geometry. | Region topology/fill, analytic erasing, Bezier/contour/width editors, presets/textures/guides, lasso/partial/additive selection and vector optimization. |
 | P05 | in_progress | Sparse immutable 15-bit premultiplied tiles, libmypaint ink/soft/dry/smudge/eraser presets, pressure input, cancellable gestures, shared preview/export and compressed project resources. Brush opacity and rectangular pixel selection with integer move/duplicate/delete, flips and lossless quarter turns, alpha-safe overlap and guarded canvas bounds. Free scale/rotation preview and commit using nearest-neighbor sampling with transparent surroundings. | Brush texture/import/preset management, lasso/soft masks, high-quality resampling and transform performance qualification, resolution changes, production workload and physical-device qualification. |
-| P06 | in_progress | Layer transform keys with linear/held/smooth interpolation, inherited transforms/opacity, explicit Setup/Animate and Auto key, key navigation/state, editable pose-channel graph and key-only multi-layer retiming with collision rejection. Curves stay in the main workspace; timeline/Xsheet range-end dragging stretches timing. Animate (A) records layer poses directly with move/scale/rotation handles and an initial anchor. Per-channel normalized Bezier handles, overshoot presets, graph key creation and a read-only canvas trajectory share evaluation with export. All motion defaults to normalized combined channels with in-place channel selection, square-key editing, linked/unlinked easing handles, a full-pose retiming lane and time zoom/panning. | Independent channel keys, linked/free analytic tangents, separate spatial paths and velocity, complete batched editing, cameras and multiplane evaluation. |
+| P06 | in_progress | Layer transform keys with linear/held/smooth interpolation, inherited transforms/opacity, explicit Setup/Animate and Auto key, key navigation/state, editable pose-channel graph and key-only multi-layer retiming with collision rejection. Curves stay in the main workspace; timeline/Xsheet range-end dragging stretches timing. Animate (A) records layer poses directly with move/scale/rotation handles and an initial anchor. Per-channel normalized Bezier handles, overshoot presets, graph key creation and a read-only canvas trajectory share evaluation with export. All motion defaults to normalized combined channels with in-place channel selection, square-key editing, linked/unlinked easing handles, a full-pose retiming lane and time zoom/panning. Shared sparse pose-key selection, direct group drag/Alt-duplicate, right-edge timing stretch, keyboard nudges/delete and local-unit motion copy/paste with collision protection and atomic undo. | Independent channel keys, linked/free analytic tangents, separate spatial paths and velocity, multi-layer/channel-mask batched editing and world-space motion retargeting, cameras and multiplane evaluation. |
 | P07 | planned | Exact rational frame-to-sample arithmetic has a domain test; no audio playback. | Audio decode/timeline/waveform/sync, media policies, FFmpeg adapter and video output. |
 | P08 | in_progress | Parented layers, pivots, independent duplicates and linked drawing clones. | Production cut-out tools, asset/template library, substitution workflow, pose preservation, lip sync and animator validation. |
 | P09 | planned | No deformation subsystem implemented. | Curve/bone/mesh deformation, constraints, binding/weights, deterministic solvers and reference fixtures. |
@@ -23,7 +23,7 @@ The editor runs locally on macOS and supports mouse drawing, sampled-pressure in
 
 ## Verification
 
-- Current macOS locked build: 50/50 CTest entries pass (49 core/render cases and seven integration cases in one executable). Tests cover failed commands, rational time, exposure edits, hierarchy validation, rendering consistency, stale writers, schema rejection, rollback failures and abrupt process termination with a large image.
+- Current macOS locked build: 54/54 CTest entries pass (53 core/render cases and eight integration cases in one executable). Tests cover failed commands, rational time, exposure edits, hierarchy validation, rendering consistency, stale writers, schema rejection, rollback failures and abrupt process termination with a large image.
 - Export integration: 48 PNGs from an immutable snapshot, rational-time metadata, cancellation and a successful subsequent job.
 - Native input smoke: mouse strokes, synthetic pen pressure, cancelled gestures, undo/redo, palette validity after undo, save/reopen and a real window screenshot.
 - Synthetic two-second fixture: 48 PNG frames at 1920 × 1080; reopened document is semantically identical. Initial CPU export measured 3,077 ms on this Mac; it is not a large-scene or pen-latency benchmark.
@@ -117,3 +117,20 @@ point insertion/deletion, Clear and atomic Undo. Screenshot review confirms the
 compact combined editor and reachable overshoot handles.
 See [ADR-017](../architecture/adr/017-combined-motion-and-point-editing.md).
 No format change, new dependency, completed phase or binary installer is claimed.
+
+## P06 pose-key block source release
+
+Experimental.7 adds direct editing of sparse pose-key blocks. Curves, Timeline and
+Xsheet share selection; Shift selects spans, Cmd/Ctrl toggles individual keys and the
+curve Keys lane supports box selection. Selected diamonds move together, Alt-drag
+duplicates, and the right edge stretches timing around the first key. Copy/Paste
+transfers local transforms, pivots and easing to another layer without drawings or
+hierarchy changes. Collisions and locked edits reject atomically. Keyboard shortcuts
+respect workspace focus and text fields; selection changes cancel active group drags.
+
+macOS validation: 54 CTest entries plus native selection/move/stretch/duplicate,
+collision/cancellation, shortcuts, Timeline grouping and saved/reopened pixel
+consistency. Screenshot review confirms compact controls and the visible group edge.
+P06 remains partial: independent channels, multi-layer batches, spatial velocity,
+world-space retargeting and cameras are still open. See
+[ADR-018](../architecture/adr/018-pose-key-block-editing.md).

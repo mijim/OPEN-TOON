@@ -114,7 +114,7 @@ Transfer animation between objects with explicit pivot and unit rules.
 
 **Initial acceptance:** Copying motion does not duplicate the underlying drawing.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Evidence:** `proposal`.
 

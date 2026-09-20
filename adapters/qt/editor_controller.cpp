@@ -28,6 +28,7 @@ QString local(QUrl url) {
 } // namespace
 EditorController::EditorController(QObject* parent) : QObject(parent) {
     resetSelection();
+    connect(this, &EditorController::changed, this, &EditorController::reconcilePoseSelection);
     playTimer_.setTimerType(Qt::PreciseTimer);
     playTimer_.setInterval(8);
     connect(&playTimer_, &QTimer::timeout, this, [this] {
@@ -60,6 +61,7 @@ void EditorController::report(QString message) {
     emit statusChanged();
 }
 void EditorController::resetSelection() {
+    clearPoseSelection();
     ++sceneGeneration_;
     rangeStart_ = 0;
     rangeEnd_ = 1;
