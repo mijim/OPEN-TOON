@@ -170,3 +170,10 @@ cleanup, constrained primitives, grid/snapping and batch animation patterns are 
 See [ADR-021](../architecture/adr/021-vector-authoring-and-key-patterns.md) for exact contracts.
 The final 65-entry suite and native authoring journey pass on macOS. This expands P04/P06
 subsets without completing either phase. [Screenshot](authoring.png).
+
+## Publication update
+
+The owner cancelled macOS binary publication after the local package passed validation.
+Source tag `v0.2.0-experimental.10` and code are public; the ZIP, source archive and
+checksums remain local. The package verification evidence above remains valid, but
+no downloadable binary release is claimed.

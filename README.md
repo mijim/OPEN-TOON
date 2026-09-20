@@ -5,15 +5,15 @@ canvas editing, an integrated timeline and visual motion curves.
 
 ![OPEN-TOON drawing workspace](docs/implementation/authoring.png)
 
-## Download
+## Get started
 
-[Download the macOS preview](https://github.com/mijim/OPEN-TOON/releases/tag/v0.2.0-experimental.10)
-for **Apple Silicon, macOS 15 or later**. Extract the ZIP and open `OPEN-TOON.app`.
-The application includes its runtime dependencies. This experimental build is
-ad-hoc signed and has not been notarized by Apple; see the
-[installation notes](docs/implementation/MACOS-PREVIEW.md).
+Follow the [build instructions](docs/implementation/BUILD.md) to run the application
+from source. Public prebuilt downloads are not available yet. macOS is the primary
+development platform; Windows and Linux qualification remains in progress.
 
-For development or other platforms, follow the [build instructions](docs/implementation/BUILD.md).
+The [user guide](docs/implementation/USER-GUIDE.md) covers drawing, animation and
+project workflows. Developers preparing a macOS package can use the
+[packaging notes](docs/implementation/MACOS-PREVIEW.md).
 
 ## Features
 

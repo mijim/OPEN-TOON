@@ -199,7 +199,8 @@
         "runtime-manifest.json",
         "SHA256SUMS.txt"
       ],
-      "limits": "Development-host relocation only, not clean-machine/Intel/physical-tablet or complete supported-OS qualification."
+      "limits": "Development-host relocation only, not clean-machine/Intel/physical-tablet or complete supported-OS qualification.",
+      "publication": "cancelled at owner request; verified local artifacts only"
     },
     "sanitizers": {
       "status": "passed",
@@ -287,7 +288,7 @@
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
-    "release_artifacts": "Source and requested macOS arm64 preview for experimental.10; Windows/Linux binaries deferred",
+    "release_artifacts": "Source only; requested macOS preview was built and verified locally, then binary publication cancelled by owner",
     "cross_platform_builds": "manual future compiled-release qualification"
   }
 }

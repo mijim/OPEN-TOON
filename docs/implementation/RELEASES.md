@@ -10,8 +10,11 @@
 - Line tool, constrained primitives and drawing-local grid/snapping.
 - Batch full-pose interpolation/easing and collision-safe key-block repetition.
 - Professional project README and expanded English workflows/contracts.
-- Downloadable macOS arm64 preview, macOS 15 minimum, bundled runtime and notices,
+- Verified local macOS arm64 preview, macOS 15 minimum, bundled runtime and notices,
   matching dependency sources/recipes, checksums and verified ad-hoc signatures.
+
+Binary publication was cancelled at the owner's request; this tag distributes source only.
+The locally prepared package remains available in the development workspace.
 
 65/65 CTest entries and all native authoring/animation smoke journeys passed. The
 release ZIP also passes those native journeys after extraction outside the workspace,

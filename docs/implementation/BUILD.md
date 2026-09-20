@@ -76,7 +76,7 @@ current source-release workflow.
 
 ## Download or package the macOS preview
 
-Experimental.10 includes a standalone arm64 ZIP. See [MACOS-PREVIEW.md](MACOS-PREVIEW.md)
+Experimental.10 has a verified local standalone arm64 ZIP; binary publication was cancelled. See [MACOS-PREVIEW.md](MACOS-PREVIEW.md)
 for installation, runtime/source inventories, ad-hoc signing and packaging commands.
-This owner-requested artifact supersedes the source-only policy for this release;
+The packaging scripts remain available for future distribution;
 Linux/Windows builds remain deferred.

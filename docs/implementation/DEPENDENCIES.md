@@ -18,12 +18,12 @@ The Conan lock pins recipe revisions; it is not a byte-identical OS/toolchain/Qt
 
 Qt Test is discovered by the desktop build but is not a runtime dependency of the editor. The smoke workflow uses native events directly. qtmultimedia, Eigen and FFmpeg are available on the development machine but are **not linked into or used by this implementation**. Clipper2, Skia, OCIO, miniaudio, deformation libraries and other roadmap candidates remain unadopted.
 
-## macOS preview redistribution
+## macOS preview redistribution preparation
 
-Experimental.10 ships a macOS arm64 preview with 124 audited Mach-O files. The
+Experimental.10 prepares a local macOS arm64 preview with 124 audited Mach-O files. The
 application includes component license/copyright notices under
 `Contents/Resources/ThirdParty`, an exact runtime dependency inventory and source
-correspondence. A separate release asset contains verified upstream source archives,
+correspondence. A separate local archive contains verified upstream source archives,
 Homebrew formulae and patches, Conan recipes and upstream SPDX inventories. See
 [macos-dependencies.json](macos-dependencies.json) and [packaging notes](MACOS-PREVIEW.md).
 
@@ -35,7 +35,8 @@ omits GLib and storage uses static OpenSSL Crypto 3.5.8. Only the linked/deploye
 versions in the release inventory describe this binary. Upstream SPDX inventories
 can also describe upstream build dependencies; they are not the app's exact SBOM.
 
-The standalone ZIP passed native smoke outside the workspace without loading
+Binary publication was cancelled at the owner's request. The source tag is public;
+the prepared archives have not been uploaded. The standalone ZIP passed native smoke outside the workspace without loading
 Homebrew or developer-home libraries. Ad-hoc signatures verify. No third-party
 fonts or artwork are bundled; original presets remain first-party code. Automated
 release-wide SBOM generation, clean-machine qualification, Developer ID signing

@@ -1,16 +1,18 @@
 # macOS preview
 
-The experimental.10 release provides a standalone **Apple Silicon (arm64)** application
+An experimental.10 local build provides a standalone **Apple Silicon (arm64)** application
 for **macOS 15 or later**. It was tested on macOS 15.5. Intel Macs and other operating
 systems are not qualified by this artifact.
 
-## Install and open
+## Availability and opening a local package
 
-1. Download `OPEN-TOON-0.2.0-experimental.10-macOS-arm64.zip` from the
-   [release](https://github.com/mijim/OPEN-TOON/releases/tag/v0.2.0-experimental.10).
-2. Extract the ZIP and move `OPEN-TOON.app` to your preferred location.
-3. Open the application. Qt and its runtime libraries are bundled; Homebrew, Conan,
-   Qt SDKs and command-line developer tools are not required to use it.
+Binary publication was cancelled at the owner's request. The verified application
+ZIP, dependency sources and checksums were prepared locally; no public download is
+currently provided. The GitHub tag contains application source only.
+
+If you build/package locally, extract the resulting ZIP and open `OPEN-TOON.app`.
+Qt and its runtime libraries are bundled; users of that package do not need Homebrew,
+Conan, Qt SDKs or command-line developer tools.
 
 This preview is **ad-hoc signed**, without a Developer ID certificate or Apple
 notarization. If macOS blocks the downloaded application, review the app-specific
@@ -18,7 +20,7 @@ notarization. If macOS blocks the downloaded application, review the app-specifi
 require disabling Gatekeeper globally. An organization-managed Mac may restrict
 opening unnotarized applications.
 
-The release also includes SHA-256 checksums, a runtime inventory and a separate
+The local output also includes SHA-256 checksums, a runtime inventory and a separate
 archive of dependency sources/build recipes. Those files are for verification and
 rebuilding; only the application ZIP is needed to run OPEN-TOON.
 
@@ -38,8 +40,8 @@ provenance and must not be published.
 
 Before finalizing, supply `dependency-sources/sources.json` and the matching source
 archives/recipes, plus `OPEN-TOON.app/Contents/Resources/ThirdParty/NOTICE.txt` and
-component notices. For this exact release these are recoverable from its dependency
-source asset and application ZIP. [macos-dependencies.json](macos-dependencies.json)
+component notices. For this exact local build these are recoverable from its dependency
+source archive and application ZIP. [macos-dependencies.json](macos-dependencies.json)
 records upstream URLs and verified archive hashes. If any dependency changes,
 rebuild the inventory and corresponding source/notices rather than reusing old ones.
 
@@ -54,7 +56,7 @@ private signing key or library-validation restriction is imposed by this preview
 
 ## Verification boundaries
 
-The release ZIP was extracted outside the workspace and its native smoke journeys
+The local ZIP was extracted outside the workspace and its native smoke journeys
 run with Qt/QML/DYLD SDK overrides removed. Dynamic-loader output was checked for
 external Homebrew or developer-home libraries. This verifies the packaged runtime
 on the development Mac; it is not a clean-machine, Intel, physical-tablet or complete
