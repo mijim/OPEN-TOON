@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "id": "f01470de-2e19-4d46-af36-c4937f8d938d",
+  "title": "Update Main",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T17:41:54.810Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "220ed279-978c-402c-82e4-41272a1ec17f"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "220ed279-978c-402c-82e4-41272a1ec17f",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This is the main implementation change.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 86,
+      "endLine": 86,
+      "area": "tests",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "version": 1,
+  "id": "c31fc92a-99f9-4815-805c-6dc1d314cf9d",
+  "title": "Improve tests flow",
+  "summary": "4 files changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T20:30:15.683Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "tests/animation_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 45,
+      "removed": 0
+    },
+    {
+      "path": "tests/export_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 16,
+      "removed": 0
+    },
+    {
+      "path": "tests/render_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 31,
+      "removed": 0
+    },
+    {
+      "path": "tests/storage_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 16,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "b1de277b-5aab-443f-8b9a-beb0f90e2051",
+        "0df9325c-a0c5-4d73-ab84-fc20f49ff11e",
+        "118c49ae-ae47-4c66-a1da-8bdc63435d07",
+        "1ced08a0-3c62-4269-9021-d249d3b49be7",
+        "5373992e-1c93-41cb-b83b-ca60b69c3936",
+        "991e13c7-1254-4783-87c7-40841248edd5"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "b1de277b-5aab-443f-8b9a-beb0f90e2051",
+      "title": "Extend `TEST_CASE`",
+      "explanation": "The `TEST_CASE` section adds 45 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "tests/animation_tests.cpp",
+      "startLine": 88,
+      "endLine": 132,
+      "area": "tests",
+      "symbol": "TEST_CASE",
+      "added": 45,
+      "removed": 0
+    },
+    {
+      "id": "0df9325c-a0c5-4d73-ab84-fc20f49ff11e",
+      "title": "Extend `REQUIRE`",
+      "explanation": "The `REQUIRE` section adds 16 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "tests/export_tests.cpp",
+      "startLine": 104,
+      "endLine": 119,
+      "area": "tests",
+      "symbol": "REQUIRE",
+      "added": 16,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "118c49ae-ae47-4c66-a1da-8bdc63435d07",
+      "title": "Extend Render tests",
+      "explanation": "This part of render_tests.cpp adds 2 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "tests/render_tests.cpp",
+      "startLine": 2,
+      "endLine": 3,
+      "area": "tests",
+      "added": 2,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "1ced08a0-3c62-4269-9021-d249d3b49be7",
+      "title": "Extend Render tests",
+      "explanation": "This part of render_tests.cpp adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "tests/render_tests.cpp",
+      "startLine": 6,
+      "endLine": 6,
+      "area": "tests",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "5373992e-1c93-41cb-b83b-ca60b69c3936",
+      "title": "Extend `REQUIRE`",
+      "explanation": "The `REQUIRE` section adds 28 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "tests/render_tests.cpp",
+      "startLine": 74,
+      "endLine": 101,
+      "area": "tests",
+      "symbol": "REQUIRE",
+      "added": 28,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "991e13c7-1254-4783-87c7-40841248edd5",
+      "title": "Extend `TEST_CASE`",
+      "explanation": "The `TEST_CASE` section adds 16 lines. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "tests/storage_tests.cpp",
+      "startLine": 237,
+      "endLine": 252,
+      "area": "tests",
+      "symbol": "TEST_CASE",
+      "added": 16,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

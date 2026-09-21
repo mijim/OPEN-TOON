@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "id": "7b0b944c-bd8d-43b0-8ffa-8aca96de267c",
+  "title": "Improve authentication flow",
+  "summary": "2 files changed across 2 areas. The tour follows the implementation from authentication to error handling.",
+  "createdAt": "2026-09-20T18:24:52.864Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "modules/document/include/opentoon/timeline.h",
+      "kind": "created",
+      "area": "auth",
+      "added": 25,
+      "removed": 0
+    },
+    {
+      "path": "modules/document/src/timeline.cpp",
+      "kind": "created",
+      "area": "errors",
+      "added": 180,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "a9c323d5-dc66-44bf-a142-f18a23254191"
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "ff691f71-526d-4d4b-9b51-602b91a4d72c"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "a9c323d5-dc66-44bf-a142-f18a23254191",
+      "title": "Introduce Timeline",
+      "explanation": "This part of timeline.h adds 25 lines. It changes how identity or session data moves through the solution. This is the first building block in the change.",
+      "file": "modules/document/include/opentoon/timeline.h",
+      "startLine": 1,
+      "endLine": 25,
+      "area": "auth",
+      "added": 25,
+      "removed": 0
+    },
+    {
+      "id": "ff691f71-526d-4d4b-9b51-602b91a4d72c",
+      "title": "Introduce Timeline",
+      "explanation": "This part of timeline.cpp adds 180 lines. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "modules/document/src/timeline.cpp",
+      "startLine": 1,
+      "endLine": 180,
+      "area": "errors",
+      "added": 180,
+      "removed": 0,
+      "relation": "Builds on timeline.h and moves into error handling."
+    }
+  ]
+}

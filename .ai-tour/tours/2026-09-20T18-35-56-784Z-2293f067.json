@@ -1,0 +1,283 @@
+{
+  "version": 1,
+  "id": "2293f067-5f22-4733-a59d-7ec9ff1a2296",
+  "title": "Improve error handling flow",
+  "summary": "10 files changed across 2 areas. The tour follows the implementation from performance to error handling. 38 smaller changes remain in the overview.",
+  "createdAt": "2026-09-20T18:35:56.784Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "modules/document/include/opentoon/shared_buffer.h",
+      "kind": "modified",
+      "area": "performance",
+      "added": 4,
+      "removed": 1
+    },
+    {
+      "path": "modules/document/src/document.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 2,
+      "removed": 1
+    },
+    {
+      "path": "adapters/storage/project_store.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 72,
+      "removed": 16
+    },
+    {
+      "path": "adapters/storage/project_store.h",
+      "kind": "modified",
+      "area": "state",
+      "added": 7,
+      "removed": 0
+    },
+    {
+      "path": "modules/application/src/session.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 21,
+      "removed": 3
+    },
+    {
+      "path": "tests/storage_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 9,
+      "removed": 2
+    },
+    {
+      "path": "adapters/storage/resources.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 16,
+      "removed": 8
+    },
+    {
+      "path": "adapters/storage/resources.h",
+      "kind": "modified",
+      "area": "storage",
+      "added": 3,
+      "removed": 2
+    },
+    {
+      "path": "adapters/storage/serialization.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 35,
+      "removed": 16
+    },
+    {
+      "path": "adapters/storage/serialization.h",
+      "kind": "modified",
+      "area": "storage",
+      "added": 1,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "performance",
+      "label": "Performance",
+      "stepIds": [
+        "6ff08120-15b8-42f9-90ab-b30b8e1db905",
+        "f7e29b07-bf04-4a60-82a2-a59c51b58043"
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "27ce01f5-2ce6-4840-9001-08bde29d686a",
+        "eb7475a4-5c36-4957-93c0-62e726669b18",
+        "b3f7d244-4e54-4f78-8f81-738bfd7004b2",
+        "a4adb825-b550-4061-8403-998aa08de9f0",
+        "49af60ac-6265-4108-9f5e-0cf41609f344",
+        "eb69ee0e-84f3-4200-b382-b3513c1dbc2b",
+        "a714350c-196a-467f-8036-3a112263ec8e",
+        "c59523a1-8a16-47ce-9da5-910b99b0fa38",
+        "a418b760-7149-4351-825a-ab7e05af5c53",
+        "2289f243-c675-4235-98fb-582f130bf3cc",
+        "11251c23-601e-423d-a2bb-293ac0824511",
+        "362c84c1-c540-4c0a-a848-45eb0c736f77"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "6ff08120-15b8-42f9-90ab-b30b8e1db905",
+      "title": "Reshape `SharedBuffer`",
+      "explanation": "The `SharedBuffer` section replaces 1 line and adds 3. It reduces repeated work or moves it away from the critical path. This is the first building block in the change.",
+      "file": "modules/document/include/opentoon/shared_buffer.h",
+      "startLine": 23,
+      "endLine": 25,
+      "area": "performance",
+      "symbol": "SharedBuffer",
+      "added": 3,
+      "removed": 1
+    },
+    {
+      "id": "f7e29b07-bf04-4a60-82a2-a59c51b58043",
+      "title": "Extend `SharedBuffer`",
+      "explanation": "The `SharedBuffer` section adds 1 line. It reduces repeated work or moves it away from the critical path. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/include/opentoon/shared_buffer.h",
+      "startLine": 27,
+      "endLine": 27,
+      "area": "performance",
+      "symbol": "SharedBuffer",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the performance thread from the previous step."
+    },
+    {
+      "id": "27ce01f5-2ce6-4840-9001-08bde29d686a",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/document.cpp",
+      "startLine": 155,
+      "endLine": 156,
+      "area": "errors",
+      "symbol": "for",
+      "added": 2,
+      "removed": 1,
+      "relation": "Builds on shared_buffer.h and moves into error handling."
+    },
+    {
+      "id": "eb7475a4-5c36-4957-93c0-62e726669b18",
+      "title": "Simplify Project store",
+      "explanation": "This part of project_store.cpp removes 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 2,
+      "endLine": 2,
+      "area": "errors",
+      "added": 0,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "b3f7d244-4e54-4f78-8f81-738bfd7004b2",
+      "title": "Reshape Project store",
+      "explanation": "This part of project_store.cpp replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 3,
+      "endLine": 3,
+      "area": "errors",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "a4adb825-b550-4061-8403-998aa08de9f0",
+      "title": "Extend Project store",
+      "explanation": "This part of project_store.cpp adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 5,
+      "endLine": 5,
+      "area": "errors",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "49af60ac-6265-4108-9f5e-0cf41609f344",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 34,
+      "endLine": 34,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "eb69ee0e-84f3-4200-b382-b3513c1dbc2b",
+      "title": "Reshape Project store",
+      "explanation": "This part of project_store.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 92,
+      "endLine": 93,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "a714350c-196a-467f-8036-3a112263ec8e",
+      "title": "Reshape Project store",
+      "explanation": "This part of project_store.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 95,
+      "endLine": 96,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "c59523a1-8a16-47ce-9da5-910b99b0fa38",
+      "title": "Reshape Project store",
+      "explanation": "This part of project_store.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 99,
+      "endLine": 100,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "a418b760-7149-4351-825a-ab7e05af5c53",
+      "title": "Reshape Project store",
+      "explanation": "This part of project_store.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 106,
+      "endLine": 107,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "2289f243-c675-4235-98fb-582f130bf3cc",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 125,
+      "endLine": 126,
+      "area": "errors",
+      "symbol": "if",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "11251c23-601e-423d-a2bb-293ac0824511",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 2 lines and adds 5. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 148,
+      "endLine": 152,
+      "area": "errors",
+      "symbol": "if",
+      "added": 5,
+      "removed": 2,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "362c84c1-c540-4c0a-a848-45eb0c736f77",
+      "title": "Reshape Project store",
+      "explanation": "This part of project_store.cpp replaces 1 line and adds 9. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 160,
+      "endLine": 168,
+      "area": "errors",
+      "added": 9,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "id": "f7051f24-eb3e-4e61-95fc-a62510e4c8e1",
+  "title": "Improve tests flow",
+  "summary": "5 files changed across 3 areas. The tour follows the implementation from error handling to tests.",
+  "createdAt": "2026-09-20T18:14:37.559Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/editor_controller.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "path": "adapters/render/scene_renderer.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 2,
+      "removed": 0
+    },
+    {
+      "path": "tests/storage_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 1,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "a9ebf76d-de63-455c-b82b-18ae103e9be2",
+        "f5ffbf1b-e61d-4899-8958-09738cc8321d"
+      ]
+    },
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "f60e8d61-f243-4173-be54-7b40ae487fa8"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "962af708-1e8e-45d1-a484-581f34a830fa",
+        "a65d5350-0d1b-4522-90b3-6343b05e8d54",
+        "6bd60a78-57fb-4080-be16-9f8a7247c367"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "a9ebf76d-de63-455c-b82b-18ae103e9be2",
+      "title": "Extend Canvas item",
+      "explanation": "This part of canvas_item.cpp adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 10,
+      "endLine": 10,
+      "area": "errors",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "id": "f5ffbf1b-e61d-4899-8958-09738cc8321d",
+      "title": "Extend Scene renderer",
+      "explanation": "This part of scene_renderer.cpp adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/render/scene_renderer.cpp",
+      "startLine": 4,
+      "endLine": 4,
+      "area": "errors",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "f60e8d61-f243-4173-be54-7b40ae487fa8",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.cpp adds 1 line. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 15,
+      "endLine": 15,
+      "area": "auth",
+      "added": 1,
+      "removed": 0,
+      "relation": "Builds on scene_renderer.cpp and moves into authentication."
+    },
+    {
+      "id": "962af708-1e8e-45d1-a484-581f34a830fa",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 22,
+      "endLine": 22,
+      "area": "tests",
+      "added": 1,
+      "removed": 0,
+      "relation": "Builds on editor_controller.cpp and moves into tests."
+    },
+    {
+      "id": "a65d5350-0d1b-4522-90b3-6343b05e8d54",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 24,
+      "endLine": 24,
+      "area": "tests",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "6bd60a78-57fb-4080-be16-9f8a7247c367",
+      "title": "Extend Storage tests",
+      "explanation": "This part of storage_tests.cpp adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "tests/storage_tests.cpp",
+      "startLine": 6,
+      "endLine": 6,
+      "area": "tests",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

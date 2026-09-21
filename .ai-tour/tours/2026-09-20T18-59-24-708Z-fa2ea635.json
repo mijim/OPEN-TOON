@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "id": "fa2ea635-a014-4348-b92c-917d7e053dc9",
+  "title": "Improve tests flow",
+  "summary": "3 files changed across 3 areas. The tour follows the implementation from authentication to tests.",
+  "createdAt": "2026-09-20T18:59:24.708Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/editor_controller.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 4,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/timeline_controller.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 14,
+      "removed": 7
+    },
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 30,
+      "removed": 2
+    }
+  ],
+  "areas": [
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "925b8284-db20-44fa-9270-6e007e724e16"
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "dd03defa-1927-4c69-897e-f4b9a9bac575",
+        "ef2c98f4-dca2-4d12-bbf1-e5dd2c79a810"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "cde5b8aa-093b-4cb8-9bbe-aca0fcdba7f6",
+        "47a3d95f-7d0c-4abb-bbcf-0ad7c5fc8688",
+        "165d9d5d-f492-4ad1-a3f2-38f086159851"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "925b8284-db20-44fa-9270-6e007e724e16",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.cpp adds 4 lines. It changes how identity or session data moves through the solution. This is the first building block in the change.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 151,
+      "endLine": 154,
+      "area": "auth",
+      "added": 4,
+      "removed": 0
+    },
+    {
+      "id": "dd03defa-1927-4c69-897e-f4b9a9bac575",
+      "title": "Reshape Timeline controller",
+      "explanation": "This part of timeline_controller.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/timeline_controller.cpp",
+      "startLine": 33,
+      "endLine": 34,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Builds on editor_controller.cpp and moves into error handling."
+    },
+    {
+      "id": "ef2c98f4-dca2-4d12-bbf1-e5dd2c79a810",
+      "title": "Reshape `edit`",
+      "explanation": "The `edit` section replaces 6 lines and adds 12. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/timeline_controller.cpp",
+      "startLine": 98,
+      "endLine": 109,
+      "area": "errors",
+      "symbol": "edit",
+      "added": 12,
+      "removed": 6,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "cde5b8aa-093b-4cb8-9bbe-aca0fcdba7f6",
+      "title": "Reshape Main",
+      "explanation": "This part of main.cpp replaces 1 line and adds 2. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 98,
+      "endLine": 99,
+      "area": "tests",
+      "added": 2,
+      "removed": 1,
+      "relation": "Builds on timeline_controller.cpp and moves into tests."
+    },
+    {
+      "id": "47a3d95f-7d0c-4abb-bbcf-0ad7c5fc8688",
+      "title": "Reshape Main",
+      "explanation": "This part of main.cpp replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 101,
+      "endLine": 101,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "165d9d5d-f492-4ad1-a3f2-38f086159851",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 27 lines. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 193,
+      "endLine": 219,
+      "area": "tests",
+      "added": 27,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

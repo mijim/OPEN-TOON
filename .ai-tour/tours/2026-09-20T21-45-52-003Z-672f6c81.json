@@ -1,0 +1,180 @@
+{
+  "version": 1,
+  "id": "672f6c81-7d39-4053-a071-d060697bae7a",
+  "title": "Improve error handling flow",
+  "summary": "3 files changed across 2 areas. The tour follows the implementation from error handling to tests.",
+  "createdAt": "2026-09-20T21:45:52.003Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 9,
+      "removed": 0
+    },
+    {
+      "path": "tests/animation_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 28,
+      "removed": 0
+    },
+    {
+      "path": "tests/export_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 21,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "a14a5d18-5af8-41b0-8869-70bd01367324",
+        "3d6a08b7-e02c-4d28-b978-e561de35734e",
+        "de84a14e-cfa0-4b16-95c5-3ce9d0a2c62d",
+        "490945f8-3740-40ef-849f-bdacafa221cd",
+        "89272b29-9afa-4d65-a41b-c33d55968748",
+        "c3e54782-ba80-440f-b815-e36d4a2c0434",
+        "1fa77ef7-85a9-4742-8762-981e115da18b"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "3151cb74-2de9-419d-b87c-f8598663f3d2",
+        "94a9f0c6-2ae2-4733-8dba-e36ddee1aa99",
+        "66c9d6a6-1813-431a-b1b3-a0decb8f53a4"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "a14a5d18-5af8-41b0-8869-70bd01367324",
+      "title": "Extend Canvas item",
+      "explanation": "This part of canvas_item.cpp adds 3 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 22,
+      "endLine": 24,
+      "area": "errors",
+      "added": 3,
+      "removed": 0
+    },
+    {
+      "id": "3d6a08b7-e02c-4d28-b978-e561de35734e",
+      "title": "Extend Canvas item",
+      "explanation": "This part of canvas_item.cpp adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 87,
+      "endLine": 87,
+      "area": "errors",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "de84a14e-cfa0-4b16-95c5-3ce9d0a2c62d",
+      "title": "Extend Canvas item",
+      "explanation": "This part of canvas_item.cpp adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 94,
+      "endLine": 94,
+      "area": "errors",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "490945f8-3740-40ef-849f-bdacafa221cd",
+      "title": "Extend Canvas item",
+      "explanation": "This part of canvas_item.cpp adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 101,
+      "endLine": 101,
+      "area": "errors",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "89272b29-9afa-4d65-a41b-c33d55968748",
+      "title": "Extend Canvas item",
+      "explanation": "This part of canvas_item.cpp adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 108,
+      "endLine": 108,
+      "area": "errors",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "c3e54782-ba80-440f-b815-e36d4a2c0434",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 540,
+      "endLine": 540,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "1fa77ef7-85a9-4742-8762-981e115da18b",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 570,
+      "endLine": 570,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "3151cb74-2de9-419d-b87c-f8598663f3d2",
+      "title": "Extend Animation tests",
+      "explanation": "This part of animation_tests.cpp adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "tests/animation_tests.cpp",
+      "startLine": 7,
+      "endLine": 7,
+      "area": "tests",
+      "added": 1,
+      "removed": 0,
+      "relation": "Builds on canvas_item.cpp and moves into tests."
+    },
+    {
+      "id": "94a9f0c6-2ae2-4733-8dba-e36ddee1aa99",
+      "title": "Extend `REQUIRE`",
+      "explanation": "The `REQUIRE` section adds 27 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "tests/animation_tests.cpp",
+      "startLine": 280,
+      "endLine": 306,
+      "area": "tests",
+      "symbol": "REQUIRE",
+      "added": 27,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "66c9d6a6-1813-431a-b1b3-a0decb8f53a4",
+      "title": "Extend `REQUIRE`",
+      "explanation": "The `REQUIRE` section adds 21 lines. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "tests/export_tests.cpp",
+      "startLine": 280,
+      "endLine": 300,
+      "area": "tests",
+      "symbol": "REQUIRE",
+      "added": 21,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

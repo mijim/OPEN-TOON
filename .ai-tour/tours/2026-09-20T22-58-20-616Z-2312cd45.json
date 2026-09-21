@@ -1,0 +1,281 @@
+{
+  "version": 1,
+  "id": "2312cd45-431f-4f03-88fb-54c50813337e",
+  "title": "Improve tests flow",
+  "summary": "10 files changed across 2 areas. The tour follows the implementation from tests to error handling. 12 smaller changes remain in the overview.",
+  "createdAt": "2026-09-20T22:58:20.616Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "docs/catalog/features.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "path": "docs/implementation/status.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 13,
+      "removed": 9
+    },
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 9,
+      "removed": 9
+    },
+    {
+      "path": "adapters/qt/canvas_vector_selection.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 3,
+      "removed": 2
+    },
+    {
+      "path": "adapters/qt/drawing_controller.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 2,
+      "removed": 1
+    },
+    {
+      "path": "apps/desktop/vector_selection_smoke.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 8,
+      "removed": 4
+    },
+    {
+      "path": "modules/document/include/opentoon/drawing_selection.h",
+      "kind": "modified",
+      "area": "auth",
+      "added": 2,
+      "removed": 1
+    },
+    {
+      "path": "modules/document/src/drawing_selection.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 2,
+      "removed": 1
+    },
+    {
+      "path": "tests/drawing_selection_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 4,
+      "removed": 3
+    },
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "c3d80899-6f42-4c39-827f-3c3833044fd1",
+        "46198665-c662-4cf9-96b2-02c889a51ed1",
+        "fa683b6d-980e-4b7a-ac9f-b3f2854751c3",
+        "4946b92d-4549-446b-91b9-1730964b1ab4",
+        "04002d12-5b1c-4a84-9ece-1f7fd057e71e",
+        "4805eceb-e341-4ceb-b4d2-8e762ad7c557",
+        "bb1fac20-972d-4e18-8048-54358b209f11",
+        "3cacbf6c-aa18-4307-b49d-c022484c32cb",
+        "0fe4fb14-6b66-4fce-ad47-21077f12d7a7",
+        "fa3fa102-481f-4861-ab9a-5d226b3c1356",
+        "e92a6183-4d97-4062-b030-f9a828920286",
+        "52e9ca72-3257-401d-965c-329cea9549f9"
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "a089c867-1e10-4fd7-8699-a87c91b79f6f",
+        "668186f6-1bbc-4c15-b0b8-038978666c57"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "c3d80899-6f42-4c39-827f-3c3833044fd1",
+      "title": "Reshape Features",
+      "explanation": "This part of features.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "docs/catalog/features.json",
+      "startLine": 771,
+      "endLine": 771,
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "id": "46198665-c662-4cf9-96b2-02c889a51ed1",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/implementation/status.json",
+      "startLine": 3,
+      "endLine": 3,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "fa683b6d-980e-4b7a-ac9f-b3f2854751c3",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 2 lines and adds 2. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/implementation/status.json",
+      "startLine": 37,
+      "endLine": 38,
+      "area": "tests",
+      "added": 2,
+      "removed": 2,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "4946b92d-4549-446b-91b9-1730964b1ab4",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 1 line and adds 5. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/implementation/status.json",
+      "startLine": 147,
+      "endLine": 151,
+      "area": "tests",
+      "added": 5,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "04002d12-5b1c-4a84-9ece-1f7fd057e71e",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/implementation/status.json",
+      "startLine": 179,
+      "endLine": 179,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "4805eceb-e341-4ceb-b4d2-8e762ad7c557",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/implementation/status.json",
+      "startLine": 217,
+      "endLine": 217,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "bb1fac20-972d-4e18-8048-54358b209f11",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 2 lines and adds 2. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/implementation/status.json",
+      "startLine": 219,
+      "endLine": 220,
+      "area": "tests",
+      "added": 2,
+      "removed": 2,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "3cacbf6c-aa18-4307-b49d-c022484c32cb",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/implementation/status.json",
+      "startLine": 258,
+      "endLine": 258,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "0fe4fb14-6b66-4fce-ad47-21077f12d7a7",
+      "title": "Reshape `REQUIRE`",
+      "explanation": "The `REQUIRE` section replaces 1 line and adds 2. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "tests/drawing_selection_tests.cpp",
+      "startLine": 202,
+      "endLine": 203,
+      "area": "tests",
+      "symbol": "REQUIRE",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "fa3fa102-481f-4861-ab9a-5d226b3c1356",
+      "title": "Reshape `REQUIRE`",
+      "explanation": "The `REQUIRE` section replaces 2 lines and adds 2. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "tests/drawing_selection_tests.cpp",
+      "startLine": 221,
+      "endLine": 222,
+      "area": "tests",
+      "symbol": "REQUIRE",
+      "added": 2,
+      "removed": 2,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "e92a6183-4d97-4062-b030-f9a828920286",
+      "title": "Simplify Main",
+      "explanation": "This part of main.cpp removes 1 line. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 5,
+      "endLine": 5,
+      "area": "tests",
+      "added": 0,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "52e9ca72-3257-401d-965c-329cea9549f9",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 8,
+      "endLine": 8,
+      "area": "tests",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "a089c867-1e10-4fd7-8699-a87c91b79f6f",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 68,
+      "endLine": 68,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Builds on main.cpp and moves into error handling."
+    },
+    {
+      "id": "668186f6-1bbc-4c15-b0b8-038978666c57",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 315,
+      "endLine": 316,
+      "area": "errors",
+      "symbol": "if",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

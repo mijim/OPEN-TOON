@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "3d120822-f640-4bd4-afa1-603c7b9e526a",
+  "title": "Add Canvas motion path",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from error handling to error handling.",
+  "createdAt": "2026-09-20T21:44:36.278Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/canvas_motion_path.cpp",
+      "kind": "created",
+      "area": "errors",
+      "added": 153,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "3e4df3cd-d405-49b5-9b84-ce1fe17369e7"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "3e4df3cd-d405-49b5-9b84-ce1fe17369e7",
+      "title": "Introduce Canvas motion path",
+      "explanation": "This part of canvas_motion_path.cpp adds 153 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the main implementation change.",
+      "file": "adapters/qt/canvas_motion_path.cpp",
+      "startLine": 1,
+      "endLine": 153,
+      "area": "errors",
+      "added": 153,
+      "removed": 0
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "id": "2cdfb90d-d685-463a-8586-19e48830b864",
+  "title": "Improve tests flow",
+  "summary": "3 files changed across 3 areas. The tour follows the implementation from tests to error handling.",
+  "createdAt": "2026-09-20T17:23:31.257Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "CMakePresets.json",
+      "kind": "created",
+      "area": "tests",
+      "added": 10,
+      "removed": 0
+    },
+    {
+      "path": "modules/document/include/opentoon/document.h",
+      "kind": "created",
+      "area": "validation",
+      "added": 117,
+      "removed": 0
+    },
+    {
+      "path": "modules/document/src/document.cpp",
+      "kind": "created",
+      "area": "errors",
+      "added": 137,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "7768b092-2eb0-4063-a8ce-602571530bc4"
+      ]
+    },
+    {
+      "id": "validation",
+      "label": "Validation",
+      "stepIds": [
+        "36e6c100-b89b-4431-a361-acc170ceb732"
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "c4f78ca2-a05f-4621-b225-25015a502011"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "7768b092-2eb0-4063-a8ce-602571530bc4",
+      "title": "Introduce CMake Presets",
+      "explanation": "This part of CMakePresets.json adds 10 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "CMakePresets.json",
+      "startLine": 1,
+      "endLine": 10,
+      "area": "tests",
+      "added": 10,
+      "removed": 0
+    },
+    {
+      "id": "36e6c100-b89b-4431-a361-acc170ceb732",
+      "title": "Introduce Document",
+      "explanation": "This part of document.h adds 117 lines. It strengthens the checks applied before data is accepted. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/include/opentoon/document.h",
+      "startLine": 1,
+      "endLine": 117,
+      "area": "validation",
+      "added": 117,
+      "removed": 0,
+      "relation": "Builds on CMakePresets.json and moves into validation."
+    },
+    {
+      "id": "c4f78ca2-a05f-4621-b225-25015a502011",
+      "title": "Introduce Document",
+      "explanation": "This part of document.cpp adds 137 lines. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "modules/document/src/document.cpp",
+      "startLine": 1,
+      "endLine": 137,
+      "area": "errors",
+      "added": 137,
+      "removed": 0,
+      "relation": "Builds on document.h and moves into error handling."
+    }
+  ]
+}

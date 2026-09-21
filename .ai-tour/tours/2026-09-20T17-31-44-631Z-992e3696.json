@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "id": "992e3696-25d9-433a-8f5a-548e9e1d12ac",
+  "title": "Improve tests flow",
+  "summary": "2 files changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T17:31:44.631Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/editor_controller.cpp",
+      "kind": "created",
+      "area": "tests",
+      "added": 84,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/editor_controller.h",
+      "kind": "created",
+      "area": "tests",
+      "added": 77,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "f4903560-b0db-4a09-80f8-ab7b7e336a52",
+        "7d31317a-4eba-40b2-aeaa-83fd0fe41f86"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "f4903560-b0db-4a09-80f8-ab7b7e336a52",
+      "title": "Introduce Editor controller",
+      "explanation": "This part of editor_controller.cpp adds 84 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 1,
+      "endLine": 84,
+      "area": "tests",
+      "added": 84,
+      "removed": 0
+    },
+    {
+      "id": "7d31317a-4eba-40b2-aeaa-83fd0fe41f86",
+      "title": "Introduce Editor controller",
+      "explanation": "This part of editor_controller.h adds 77 lines. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 1,
+      "endLine": 77,
+      "area": "tests",
+      "added": 77,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

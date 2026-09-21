@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "id": "2e65e459-765e-485f-b94f-3cb5b44d25da",
+  "title": "Improve authentication flow",
+  "summary": "2 files changed across 1 area. The tour follows the implementation from authentication to authentication.",
+  "createdAt": "2026-09-20T20:57:48.737Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/editor_controller.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 2,
+      "removed": 1
+    },
+    {
+      "path": "adapters/qt/editor_controller.h",
+      "kind": "modified",
+      "area": "auth",
+      "added": 1,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "02ee0480-9396-4c53-96ae-777a76cb9ed8",
+        "59ca84ba-3acc-42ac-9087-97266a3a781f",
+        "a93f97e6-179c-4362-a3ab-aed1be107b8d"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "02ee0480-9396-4c53-96ae-777a76cb9ed8",
+      "title": "Reshape `edit`",
+      "explanation": "The `edit` section replaces 1 line and adds 1. It changes how identity or session data moves through the solution. This is the first building block in the change.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 463,
+      "endLine": 463,
+      "area": "auth",
+      "symbol": "edit",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "id": "59ca84ba-3acc-42ac-9087-97266a3a781f",
+      "title": "Extend `edit`",
+      "explanation": "The `edit` section adds 1 line. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 467,
+      "endLine": 467,
+      "area": "auth",
+      "symbol": "edit",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "a93f97e6-179c-4362-a3ab-aed1be107b8d",
+      "title": "Reshape Editor controller",
+      "explanation": "This part of editor_controller.h replaces 1 line and adds 1. It changes how identity or session data moves through the solution. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 76,
+      "endLine": 76,
+      "area": "auth",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the authentication thread from the previous step."
+    }
+  ]
+}

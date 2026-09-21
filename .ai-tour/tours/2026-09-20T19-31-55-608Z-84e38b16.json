@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "id": "84e38b16-81ee-4ca8-b164-2ab086365ee9",
+  "title": "Update Main",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T19:31:55.608Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 33,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "e380d043-391a-42aa-88e9-4ba7ee771f1b",
+        "a20222df-ed19-4539-82a9-ff39e7a972b9"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "e380d043-391a-42aa-88e9-4ba7ee771f1b",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 32 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 241,
+      "endLine": 272,
+      "area": "tests",
+      "added": 32,
+      "removed": 0
+    },
+    {
+      "id": "a20222df-ed19-4539-82a9-ff39e7a972b9",
+      "title": "Reshape Main",
+      "explanation": "This part of main.cpp replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 281,
+      "endLine": 281,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

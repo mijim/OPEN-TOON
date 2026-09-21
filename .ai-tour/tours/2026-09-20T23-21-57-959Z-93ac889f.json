@@ -1,0 +1,349 @@
+{
+  "version": 1,
+  "id": "93ac889f-5118-49f4-8cc3-b1fb4f4bb677",
+  "title": "Improve authentication flow",
+  "summary": "18 files changed across 4 areas. The tour follows the implementation from authentication to error handling. 55 smaller changes remain in the overview.",
+  "createdAt": "2026-09-20T23:21:57.959Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "apps/desktop/authoring_smoke.cpp",
+      "kind": "created",
+      "area": "auth",
+      "added": 192,
+      "removed": 0
+    },
+    {
+      "path": "apps/desktop/authoring_smoke.h",
+      "kind": "created",
+      "area": "auth",
+      "added": 5,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/canvas_cursor.cpp",
+      "kind": "modified",
+      "area": "ui",
+      "added": 2,
+      "removed": 1
+    },
+    {
+      "path": "adapters/qt/canvas_guides.cpp",
+      "kind": "modified",
+      "area": "api",
+      "added": 9,
+      "removed": 5
+    },
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 28,
+      "removed": 14
+    },
+    {
+      "path": "adapters/qt/canvas_vector_selection.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 27,
+      "removed": 12
+    },
+    {
+      "path": "adapters/qt/drawing_controller.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 9,
+      "removed": 6
+    },
+    {
+      "path": "adapters/qt/editor_controller.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 3,
+      "removed": 3
+    },
+    {
+      "path": "adapters/qt/editor_controller.h",
+      "kind": "modified",
+      "area": "auth",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "path": "adapters/qt/key_selection_controller.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 8,
+      "removed": 6
+    },
+    {
+      "path": "adapters/render/vector_hit.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 15,
+      "removed": 7
+    },
+    {
+      "path": "adapters/render/vector_hit.h",
+      "kind": "modified",
+      "area": "ui",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "path": "modules/document/src/key_block.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 3,
+      "removed": 3
+    },
+    {
+      "path": "modules/document/src/vector_edit.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 49,
+      "removed": 22
+    },
+    {
+      "path": "tests/animation_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 2,
+      "removed": 1
+    },
+    {
+      "path": "tests/render_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 2,
+      "removed": 1
+    },
+    {
+      "path": "tests/vector_edit_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 18,
+      "removed": 10
+    },
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 2,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "ce09b37f-41ec-4a92-b295-604379e31490",
+        "f303115a-0a23-4183-82a6-d65ff13fff26",
+        "af44e47e-62ed-4e4d-9faa-e1919cd91ec7",
+        "b5066843-8aaf-4e85-ae8d-5357e937d600",
+        "51e197b0-6a56-4abd-9b56-01d6c208031f"
+      ]
+    },
+    {
+      "id": "ui",
+      "label": "Interface",
+      "stepIds": [
+        "7389eaeb-5497-4f8e-80a7-277cdb4f12c3",
+        "c1a3b977-394b-409a-910a-9bc843c4c7c8"
+      ]
+    },
+    {
+      "id": "api",
+      "label": "API",
+      "stepIds": [
+        "a45c0ef6-671b-4f9e-ad9c-c0116c8cd69e",
+        "de0f7aa1-0f76-4c62-8ff2-b26754a52236",
+        "fb935302-6044-4e64-a596-90ae3bbfc869",
+        "a4a3174a-5d3a-438f-a9ed-681dbe3a94ba"
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "2516ebdd-d420-4188-9bf7-eebca841d5b4",
+        "29f45086-6b85-40aa-8fe8-fcdad0085825",
+        "97cb0dde-5d34-4136-b4b5-e6d7df8b7de0"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "ce09b37f-41ec-4a92-b295-604379e31490",
+      "title": "Introduce Authoring smoke",
+      "explanation": "This part of authoring_smoke.cpp adds 192 lines. It changes how identity or session data moves through the solution. This is the first building block in the change.",
+      "file": "apps/desktop/authoring_smoke.cpp",
+      "startLine": 1,
+      "endLine": 192,
+      "area": "auth",
+      "added": 192,
+      "removed": 0
+    },
+    {
+      "id": "f303115a-0a23-4183-82a6-d65ff13fff26",
+      "title": "Introduce Authoring smoke",
+      "explanation": "This part of authoring_smoke.h adds 5 lines. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/authoring_smoke.h",
+      "startLine": 1,
+      "endLine": 5,
+      "area": "auth",
+      "added": 5,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "af44e47e-62ed-4e4d-9faa-e1919cd91ec7",
+      "title": "Reshape Editor controller",
+      "explanation": "This part of editor_controller.cpp replaces 3 lines and adds 3. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 172,
+      "endLine": 174,
+      "area": "auth",
+      "added": 3,
+      "removed": 3,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "b5066843-8aaf-4e85-ae8d-5357e937d600",
+      "title": "Simplify Editor controller",
+      "explanation": "This part of editor_controller.h removes 1 line. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 3,
+      "endLine": 3,
+      "area": "auth",
+      "added": 0,
+      "removed": 1,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "51e197b0-6a56-4abd-9b56-01d6c208031f",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.h adds 1 line. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 6,
+      "endLine": 6,
+      "area": "auth",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "7389eaeb-5497-4f8e-80a7-277cdb4f12c3",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 2. It changes what the user sees or how the interface responds. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_cursor.cpp",
+      "startLine": 113,
+      "endLine": 114,
+      "area": "ui",
+      "symbol": "if",
+      "added": 2,
+      "removed": 1,
+      "relation": "Builds on editor_controller.h and moves into interface."
+    },
+    {
+      "id": "c1a3b977-394b-409a-910a-9bc843c4c7c8",
+      "title": "Reshape Vector hit",
+      "explanation": "This part of vector_hit.h replaces 1 line and adds 1. It changes what the user sees or how the interface responds. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/render/vector_hit.h",
+      "startLine": 13,
+      "endLine": 13,
+      "area": "ui",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the interface thread from the previous step."
+    },
+    {
+      "id": "a45c0ef6-671b-4f9e-ad9c-c0116c8cd69e",
+      "title": "Reshape Canvas guides",
+      "explanation": "This part of canvas_guides.cpp replaces 1 line and adds 2. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_guides.cpp",
+      "startLine": 17,
+      "endLine": 18,
+      "area": "api",
+      "added": 2,
+      "removed": 1,
+      "relation": "Builds on vector_hit.h and moves into api."
+    },
+    {
+      "id": "de0f7aa1-0f76-4c62-8ff2-b26754a52236",
+      "title": "Reshape Canvas guides",
+      "explanation": "This part of canvas_guides.cpp replaces 2 lines and adds 3. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_guides.cpp",
+      "startLine": 25,
+      "endLine": 27,
+      "area": "api",
+      "added": 3,
+      "removed": 2,
+      "relation": "Continues the api thread from the previous step."
+    },
+    {
+      "id": "fb935302-6044-4e64-a596-90ae3bbfc869",
+      "title": "Reshape Canvas guides",
+      "explanation": "This part of canvas_guides.cpp replaces 1 line and adds 2. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_guides.cpp",
+      "startLine": 34,
+      "endLine": 35,
+      "area": "api",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the api thread from the previous step."
+    },
+    {
+      "id": "a4a3174a-5d3a-438f-a9ed-681dbe3a94ba",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 2. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_guides.cpp",
+      "startLine": 51,
+      "endLine": 52,
+      "area": "api",
+      "symbol": "if",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the api thread from the previous step."
+    },
+    {
+      "id": "2516ebdd-d420-4188-9bf7-eebca841d5b4",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 2 lines and adds 3. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 67,
+      "endLine": 69,
+      "area": "errors",
+      "symbol": "if",
+      "added": 3,
+      "removed": 2,
+      "relation": "Builds on canvas_guides.cpp and moves into error handling."
+    },
+    {
+      "id": "29f45086-6b85-40aa-8fe8-fcdad0085825",
+      "title": "Reshape Canvas item",
+      "explanation": "This part of canvas_item.cpp replaces 2 lines and adds 3. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 194,
+      "endLine": 196,
+      "area": "errors",
+      "added": 3,
+      "removed": 2,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "97cb0dde-5d34-4136-b4b5-e6d7df8b7de0",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 212,
+      "endLine": 213,
+      "area": "errors",
+      "symbol": "if",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

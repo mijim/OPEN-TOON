@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "id": "223bbfc6-8fdb-41e5-82aa-113b42227edc",
+  "title": "Improve error handling flow",
+  "summary": "2 files changed across 2 areas. The tour follows the implementation from error handling to tests.",
+  "createdAt": "2026-09-20T18:41:16.794Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "modules/document/src/document.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 7,
+      "removed": 2
+    },
+    {
+      "path": "tests/storage_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 101,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "57da4821-96bb-438e-b4d5-c8990c07ac21",
+        "fce45144-caa7-4b82-abf3-9d102a39a5d5"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "5a29145a-adde-470b-b087-f71214b501b0"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "57da4821-96bb-438e-b4d5-c8990c07ac21",
+      "title": "Reshape `require`",
+      "explanation": "The `require` section replaces 1 line and adds 5. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "modules/document/src/document.cpp",
+      "startLine": 160,
+      "endLine": 164,
+      "area": "errors",
+      "symbol": "require",
+      "added": 5,
+      "removed": 1
+    },
+    {
+      "id": "fce45144-caa7-4b82-abf3-9d102a39a5d5",
+      "title": "Reshape `require`",
+      "explanation": "The `require` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/document.cpp",
+      "startLine": 173,
+      "endLine": 174,
+      "area": "errors",
+      "symbol": "require",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "5a29145a-adde-470b-b087-f71214b501b0",
+      "title": "Extend `REQUIRE`",
+      "explanation": "The `REQUIRE` section adds 101 lines. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "tests/storage_tests.cpp",
+      "startLine": 136,
+      "endLine": 236,
+      "area": "tests",
+      "symbol": "REQUIRE",
+      "added": 101,
+      "removed": 0,
+      "relation": "Builds on document.cpp and moves into tests."
+    }
+  ]
+}

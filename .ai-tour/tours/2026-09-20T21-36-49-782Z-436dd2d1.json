@@ -1,0 +1,130 @@
+{
+  "version": 1,
+  "id": "436dd2d1-ff64-4fa7-8810-828d2c5264d3",
+  "title": "Update Status",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T21:36:49.782Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "docs/implementation/status.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 22,
+      "removed": 8
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "ba4f8fe0-cdb4-410c-ad37-5377af311b21",
+        "73337a64-118b-47a4-95c3-276d598024e8",
+        "82f872a6-4e68-4ef7-952c-57008c56c159",
+        "241515e9-a174-49aa-8495-29e6c90ca57a",
+        "6450c71c-4daa-4821-98a8-047ff618c62b",
+        "9c11e28d-6ca6-40e0-8426-cfc644ea992f",
+        "3f52dcaf-5a4f-424e-b1f9-51d792af24e8",
+        "fafb108e-239f-41f8-8bc5-4e75abb4a424"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "ba4f8fe0-cdb4-410c-ad37-5377af311b21",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 2 lines and adds 2. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "docs/implementation/status.json",
+      "startLine": 49,
+      "endLine": 50,
+      "area": "tests",
+      "added": 2,
+      "removed": 2
+    },
+    {
+      "id": "73337a64-118b-47a4-95c3-276d598024e8",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/implementation/status.json",
+      "startLine": 87,
+      "endLine": 87,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "82f872a6-4e68-4ef7-952c-57008c56c159",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 1 line and adds 7. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/implementation/status.json",
+      "startLine": 133,
+      "endLine": 139,
+      "area": "tests",
+      "added": 7,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "241515e9-a174-49aa-8495-29e6c90ca57a",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/implementation/status.json",
+      "startLine": 181,
+      "endLine": 181,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "6450c71c-4daa-4821-98a8-047ff618c62b",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 1 line and adds 2. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/implementation/status.json",
+      "startLine": 193,
+      "endLine": 194,
+      "area": "tests",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "9c11e28d-6ca6-40e0-8426-cfc644ea992f",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/implementation/status.json",
+      "startLine": 197,
+      "endLine": 197,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "3f52dcaf-5a4f-424e-b1f9-51d792af24e8",
+      "title": "Extend Status",
+      "explanation": "This part of status.json adds 7 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/implementation/status.json",
+      "startLine": 219,
+      "endLine": 225,
+      "area": "tests",
+      "added": 7,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "fafb108e-239f-41f8-8bc5-4e75abb4a424",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "docs/implementation/status.json",
+      "startLine": 239,
+      "endLine": 239,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

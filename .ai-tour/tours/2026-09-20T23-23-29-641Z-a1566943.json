@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "id": "a1566943-9687-448f-8454-361621dbca84",
+  "title": "Update Canvas guides",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from api to api.",
+  "createdAt": "2026-09-20T23:23:29.641Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/canvas_guides.cpp",
+      "kind": "modified",
+      "area": "api",
+      "added": 2,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "api",
+      "label": "API",
+      "stepIds": [
+        "936fe86c-ce44-44ed-9d57-c3564474a58b"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "936fe86c-ce44-44ed-9d57-c3564474a58b",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 2. It updates the boundary where the application exchanges data. This is the main implementation change.",
+      "file": "adapters/qt/canvas_guides.cpp",
+      "startLine": 60,
+      "endLine": 61,
+      "area": "api",
+      "symbol": "if",
+      "added": 2,
+      "removed": 1
+    }
+  ]
+}

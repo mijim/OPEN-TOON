@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "id": "85b57f5c-ff05-4059-b338-7db07819f49d",
+  "title": "Improve error handling flow",
+  "summary": "2 files changed across 1 area. The tour follows the implementation from error handling to error handling.",
+  "createdAt": "2026-09-20T21:35:09.821Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "apps/desktop/key_block_smoke.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 6,
+      "removed": 0
+    },
+    {
+      "path": "modules/document/src/key_block.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 4,
+      "removed": 2
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "d83a430e-603d-4a60-a6f7-5bdc7ef1bd2d",
+        "bdb7dbdd-c3f8-46f5-82fb-e919c3224b7b",
+        "2ddb996b-7e54-4907-b186-39a7fae8de31"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "d83a430e-603d-4a60-a6f7-5bdc7ef1bd2d",
+      "title": "Extend `require`",
+      "explanation": "The `require` section adds 6 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "apps/desktop/key_block_smoke.cpp",
+      "startLine": 105,
+      "endLine": 110,
+      "area": "errors",
+      "symbol": "require",
+      "added": 6,
+      "removed": 0
+    },
+    {
+      "id": "bdb7dbdd-c3f8-46f5-82fb-e919c3224b7b",
+      "title": "Extend Key block",
+      "explanation": "This part of key_block.cpp adds 3 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/key_block.cpp",
+      "startLine": 17,
+      "endLine": 19,
+      "area": "errors",
+      "added": 3,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "2ddb996b-7e54-4907-b186-39a7fae8de31",
+      "title": "Reshape Key block",
+      "explanation": "This part of key_block.cpp replaces 2 lines and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "modules/document/src/key_block.cpp",
+      "startLine": 21,
+      "endLine": 21,
+      "area": "errors",
+      "added": 1,
+      "removed": 2,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

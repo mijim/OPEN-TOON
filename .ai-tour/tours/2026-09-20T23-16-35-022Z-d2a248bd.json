@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "id": "d2a248bd-42fd-443f-ab5d-fba9d8b60efd",
+  "title": "Update Canvas vector selection",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from error handling to error handling.",
+  "createdAt": "2026-09-20T23:16:35.022Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/canvas_vector_selection.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 1,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "f715b964-b2fe-48b0-85af-6c92a597af8b"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "f715b964-b2fe-48b0-85af-6c92a597af8b",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. This is the main implementation change.",
+      "file": "adapters/qt/canvas_vector_selection.cpp",
+      "startLine": 104,
+      "endLine": 104,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 0
+    }
+  ]
+}

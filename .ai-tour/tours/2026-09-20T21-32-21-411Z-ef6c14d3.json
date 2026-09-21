@@ -1,0 +1,267 @@
+{
+  "version": 1,
+  "id": "ef6c14d3-7ff3-4905-80c7-c1ea73b2ff81",
+  "title": "Improve error handling flow",
+  "summary": "8 files changed across 2 areas. The tour follows the implementation from authentication to error handling. 43 smaller changes remain in the overview.",
+  "createdAt": "2026-09-20T21:32:21.411Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/editor_controller.h",
+      "kind": "modified",
+      "area": "auth",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "path": "adapters/qt/key_selection_controller.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 67,
+      "removed": 32
+    },
+    {
+      "path": "modules/document/include/opentoon/key_block.h",
+      "kind": "modified",
+      "area": "api",
+      "added": 2,
+      "removed": 2
+    },
+    {
+      "path": "modules/document/src/key_block.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 28,
+      "removed": 16
+    },
+    {
+      "path": "apps/desktop/key_block_smoke.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 151,
+      "removed": 86
+    },
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "path": "tests/animation_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 97,
+      "removed": 66
+    },
+    {
+      "path": "tests/export_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 46,
+      "removed": 28
+    }
+  ],
+  "areas": [
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "47b161ac-6356-4cdf-b541-3d96760a6885",
+        "242e235e-8785-4bf2-b8be-36526b5bec83"
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "1f495e03-7412-4d45-94e4-77ab153a4b02",
+        "67eeadf4-988a-49d2-bcb1-9cbc9a88357c",
+        "c16e6b9b-2731-4ec1-910d-a6fc08ae12eb",
+        "c1923879-d75d-4e02-a637-fe1f8f59792e",
+        "0f2ef7fa-f412-42fa-b6ab-e227c872209e",
+        "6d076ea1-d66e-4d9b-8df9-2cf945b9d884",
+        "5878e031-f056-4662-9522-a2039e244662",
+        "f09ca08b-8339-436b-ab4a-57d6b16b4a74",
+        "8f69dfdd-3c67-43d5-b681-5a672b1ea4e5",
+        "f1a6b682-34c3-4217-92a3-a9ba11d8f254",
+        "ce08a761-cb96-41f4-bb20-71b21054142f",
+        "d6edc39b-3ca0-4f5a-9d6f-9d3d375eaea9"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "47b161ac-6356-4cdf-b541-3d96760a6885",
+      "title": "Simplify Editor controller",
+      "explanation": "This part of editor_controller.h removes 1 line. It changes how identity or session data moves through the solution. This is the first building block in the change.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 3,
+      "endLine": 3,
+      "area": "auth",
+      "added": 0,
+      "removed": 1
+    },
+    {
+      "id": "242e235e-8785-4bf2-b8be-36526b5bec83",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.h adds 1 line. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 4,
+      "endLine": 4,
+      "area": "auth",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "1f495e03-7412-4d45-94e4-77ab153a4b02",
+      "title": "Reshape Key selection controller",
+      "explanation": "This part of key_selection_controller.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/key_selection_controller.cpp",
+      "startLine": 6,
+      "endLine": 7,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Builds on editor_controller.h and moves into error handling."
+    },
+    {
+      "id": "67eeadf4-988a-49d2-bcb1-9cbc9a88357c",
+      "title": "Reshape Key selection controller",
+      "explanation": "This part of key_selection_controller.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/key_selection_controller.cpp",
+      "startLine": 13,
+      "endLine": 14,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "c16e6b9b-2731-4ec1-910d-a6fc08ae12eb",
+      "title": "Reshape Key selection controller",
+      "explanation": "This part of key_selection_controller.cpp replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/key_selection_controller.cpp",
+      "startLine": 25,
+      "endLine": 25,
+      "area": "errors",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "c1923879-d75d-4e02-a637-fe1f8f59792e",
+      "title": "Reshape Key selection controller",
+      "explanation": "This part of key_selection_controller.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/key_selection_controller.cpp",
+      "startLine": 27,
+      "endLine": 28,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "0f2ef7fa-f412-42fa-b6ab-e227c872209e",
+      "title": "Reshape Key selection controller",
+      "explanation": "This part of key_selection_controller.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/key_selection_controller.cpp",
+      "startLine": 31,
+      "endLine": 32,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "6d076ea1-d66e-4d9b-8df9-2cf945b9d884",
+      "title": "Reshape Key selection controller",
+      "explanation": "This part of key_selection_controller.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/key_selection_controller.cpp",
+      "startLine": 35,
+      "endLine": 36,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "5878e031-f056-4662-9522-a2039e244662",
+      "title": "Reshape Key selection controller",
+      "explanation": "This part of key_selection_controller.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/key_selection_controller.cpp",
+      "startLine": 40,
+      "endLine": 41,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "f09ca08b-8339-436b-ab4a-57d6b16b4a74",
+      "title": "Reshape Key selection controller",
+      "explanation": "This part of key_selection_controller.cpp replaces 2 lines and adds 4. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/key_selection_controller.cpp",
+      "startLine": 43,
+      "endLine": 46,
+      "area": "errors",
+      "added": 4,
+      "removed": 2,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "8f69dfdd-3c67-43d5-b681-5a672b1ea4e5",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 2 lines and adds 6. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/key_selection_controller.cpp",
+      "startLine": 51,
+      "endLine": 56,
+      "area": "errors",
+      "symbol": "if",
+      "added": 6,
+      "removed": 2,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "f1a6b682-34c3-4217-92a3-a9ba11d8f254",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/key_selection_controller.cpp",
+      "startLine": 63,
+      "endLine": 64,
+      "area": "errors",
+      "symbol": "if",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "ce08a761-cb96-41f4-bb20-71b21054142f",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/key_selection_controller.cpp",
+      "startLine": 67,
+      "endLine": 68,
+      "area": "errors",
+      "symbol": "if",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "d6edc39b-3ca0-4f5a-9d6f-9d3d375eaea9",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/key_selection_controller.cpp",
+      "startLine": 72,
+      "endLine": 73,
+      "area": "errors",
+      "symbol": "if",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

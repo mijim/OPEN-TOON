@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "8606852b-2aed-4bc0-880a-8653a958ff2b",
+  "title": "Update Main",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T18:47:24.359Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "6fb7b954-da84-4682-baca-eb8c95d27244"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "6fb7b954-da84-4682-baca-eb8c95d27244",
+      "title": "Reshape Main",
+      "explanation": "This part of main.cpp replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This is the main implementation change.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 167,
+      "endLine": 167,
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    }
+  ]
+}

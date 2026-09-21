@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "id": "543819a1-538f-4aa6-9353-a80cc66f6ae7",
+  "title": "Improve tests flow",
+  "summary": "2 files changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T19:29:08.321Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "tests/animation_tests.cpp",
+      "kind": "created",
+      "area": "tests",
+      "added": 87,
+      "removed": 0
+    },
+    {
+      "path": "tests/export_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 44,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "7e5b8792-9a84-4250-90ce-8ec0685863ea",
+        "c399cff5-50a0-466e-8586-95c822e3da4c"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "7e5b8792-9a84-4250-90ce-8ec0685863ea",
+      "title": "Introduce Animation tests",
+      "explanation": "This part of animation_tests.cpp adds 87 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "tests/animation_tests.cpp",
+      "startLine": 1,
+      "endLine": 87,
+      "area": "tests",
+      "added": 87,
+      "removed": 0
+    },
+    {
+      "id": "c399cff5-50a0-466e-8586-95c822e3da4c",
+      "title": "Extend `REQUIRE`",
+      "explanation": "The `REQUIRE` section adds 44 lines. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "tests/export_tests.cpp",
+      "startLine": 116,
+      "endLine": 159,
+      "area": "tests",
+      "symbol": "REQUIRE",
+      "added": 44,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

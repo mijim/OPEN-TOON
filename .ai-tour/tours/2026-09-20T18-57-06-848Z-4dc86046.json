@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "id": "4dc86046-7f00-47a0-bae2-002f764e02b9",
+  "title": "Update Canvas item",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from error handling to error handling.",
+  "createdAt": "2026-09-20T18:57:06.848Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 0,
+      "removed": 2
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "72774c6a-4052-491e-8be7-66c46f42d2c8",
+        "48d47510-7408-46de-9a15-428ba6965b92"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "72774c6a-4052-491e-8be7-66c46f42d2c8",
+      "title": "Simplify `if`",
+      "explanation": "The `if` section removes 1 line. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 194,
+      "endLine": 194,
+      "area": "errors",
+      "symbol": "if",
+      "added": 0,
+      "removed": 1
+    },
+    {
+      "id": "48d47510-7408-46de-9a15-428ba6965b92",
+      "title": "Simplify `if`",
+      "explanation": "The `if` section removes 1 line. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 279,
+      "endLine": 279,
+      "area": "errors",
+      "symbol": "if",
+      "added": 0,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

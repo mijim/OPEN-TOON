@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "id": "d93e5f91-0895-465b-8431-947bbb7f8081",
+  "title": "Update Status",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T23:40:00.346Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "docs/implementation/status.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 17,
+      "removed": 4
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "7351ce85-6aeb-4b90-812c-c4d5aac8edeb",
+        "1c7ba388-61a9-4fc8-b5fc-5dd6295c8b9b"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "7351ce85-6aeb-4b90-812c-c4d5aac8edeb",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 2 lines and adds 2. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "docs/implementation/status.json",
+      "startLine": 79,
+      "endLine": 80,
+      "area": "tests",
+      "added": 2,
+      "removed": 2
+    },
+    {
+      "id": "1c7ba388-61a9-4fc8-b5fc-5dd6295c8b9b",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 2 lines and adds 15. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "docs/implementation/status.json",
+      "startLine": 188,
+      "endLine": 202,
+      "area": "tests",
+      "added": 15,
+      "removed": 2,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

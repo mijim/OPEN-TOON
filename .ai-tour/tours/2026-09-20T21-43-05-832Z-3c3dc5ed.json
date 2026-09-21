@@ -1,0 +1,272 @@
+{
+  "version": 1,
+  "id": "3c3dc5ed-598c-48cb-99c3-404ec0bd56d8",
+  "title": "Improve error handling flow",
+  "summary": "7 files changed across 3 areas. The tour follows the implementation from error handling to api. 2 smaller changes remain in the overview.",
+  "createdAt": "2026-09-20T21:43:05.832Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/animation_controller.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 5,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/canvas_cursor.cpp",
+      "kind": "modified",
+      "area": "ui",
+      "added": 6,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 23,
+      "removed": 23
+    },
+    {
+      "path": "adapters/qt/canvas_item.h",
+      "kind": "modified",
+      "area": "api",
+      "added": 17,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/editor_controller.h",
+      "kind": "modified",
+      "area": "auth",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "path": "modules/document/include/opentoon/animation.h",
+      "kind": "modified",
+      "area": "api",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "path": "modules/document/src/animation.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 8,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "20d978d9-9cf1-469c-8951-f5f7b13543ce",
+        "96669a4b-4c07-4436-8e6d-516fb8955958",
+        "e2938b30-c588-4555-93eb-4d591271a2db",
+        "0844bfd4-8b3b-4d4e-aa86-c8cc8ef312b5",
+        "94b1cb1c-d236-4f1a-a03a-c1a97dbc2315",
+        "1baac190-c052-430a-9c8f-b5b0e4e93893",
+        "52d4d0c9-457c-4a88-afb5-9b1d475429dc",
+        "f54a3a04-ead3-4674-b600-f568e67a4754",
+        "ce182517-21c6-4961-9702-e52746d17d2e",
+        "416da55e-0235-4795-a563-d98ab110af53"
+      ]
+    },
+    {
+      "id": "ui",
+      "label": "Interface",
+      "stepIds": [
+        "708e1e25-6a64-4c56-84d4-cf89e740e60c"
+      ]
+    },
+    {
+      "id": "api",
+      "label": "API",
+      "stepIds": [
+        "a3774345-f779-4c4e-a2ea-41af5c2ee247",
+        "885647a2-623c-4ebe-b3d3-90e1a9b5fe7b",
+        "7567940c-f2b3-4b72-bd12-bfb5356e9a50"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "20d978d9-9cf1-469c-8951-f5f7b13543ce",
+      "title": "Extend Animation controller",
+      "explanation": "This part of animation_controller.cpp adds 5 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 167,
+      "endLine": 171,
+      "area": "errors",
+      "added": 5,
+      "removed": 0
+    },
+    {
+      "id": "96669a4b-4c07-4436-8e6d-516fb8955958",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 59,
+      "endLine": 59,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "e2938b30-c588-4555-93eb-4d591271a2db",
+      "title": "Extend Canvas item",
+      "explanation": "This part of canvas_item.cpp adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 75,
+      "endLine": 75,
+      "area": "errors",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "0844bfd4-8b3b-4d4e-aa86-c8cc8ef312b5",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 23 lines and adds 3. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 193,
+      "endLine": 195,
+      "area": "errors",
+      "symbol": "if",
+      "added": 3,
+      "removed": 23,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "94b1cb1c-d236-4f1a-a03a-c1a97dbc2315",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 4 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 250,
+      "endLine": 253,
+      "area": "errors",
+      "symbol": "if",
+      "added": 4,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "1baac190-c052-430a-9c8f-b5b0e4e93893",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 370,
+      "endLine": 370,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "52d4d0c9-457c-4a88-afb5-9b1d475429dc",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 462,
+      "endLine": 462,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "f54a3a04-ead3-4674-b600-f568e67a4754",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 507,
+      "endLine": 507,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "ce182517-21c6-4961-9702-e52746d17d2e",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 11 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 890,
+      "endLine": 900,
+      "area": "errors",
+      "symbol": "if",
+      "added": 11,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "416da55e-0235-4795-a563-d98ab110af53",
+      "title": "Extend Animation",
+      "explanation": "This part of animation.cpp adds 8 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/animation.cpp",
+      "startLine": 134,
+      "endLine": 141,
+      "area": "errors",
+      "added": 8,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "708e1e25-6a64-4c56-84d4-cf89e740e60c",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 6 lines. It changes what the user sees or how the interface responds. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_cursor.cpp",
+      "startLine": 95,
+      "endLine": 100,
+      "area": "ui",
+      "symbol": "if",
+      "added": 6,
+      "removed": 0,
+      "relation": "Builds on animation.cpp and moves into interface."
+    },
+    {
+      "id": "a3774345-f779-4c4e-a2ea-41af5c2ee247",
+      "title": "Extend `CanvasItem`",
+      "explanation": "The `CanvasItem` section adds 1 line. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.h",
+      "startLine": 15,
+      "endLine": 15,
+      "area": "api",
+      "symbol": "CanvasItem",
+      "added": 1,
+      "removed": 0,
+      "relation": "Builds on canvas_cursor.cpp and moves into api."
+    },
+    {
+      "id": "885647a2-623c-4ebe-b3d3-90e1a9b5fe7b",
+      "title": "Extend `CanvasItem`",
+      "explanation": "The `CanvasItem` section adds 3 lines. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.h",
+      "startLine": 32,
+      "endLine": 34,
+      "area": "api",
+      "symbol": "CanvasItem",
+      "added": 3,
+      "removed": 0,
+      "relation": "Continues the api thread from the previous step."
+    },
+    {
+      "id": "7567940c-f2b3-4b72-bd12-bfb5356e9a50",
+      "title": "Extend Canvas item",
+      "explanation": "This part of canvas_item.h adds 13 lines. It updates the boundary where the application exchanges data. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/canvas_item.h",
+      "startLine": 66,
+      "endLine": 78,
+      "area": "api",
+      "added": 13,
+      "removed": 0,
+      "relation": "Continues the api thread from the previous step."
+    }
+  ]
+}

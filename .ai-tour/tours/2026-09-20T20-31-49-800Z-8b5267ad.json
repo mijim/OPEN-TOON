@@ -1,0 +1,330 @@
+{
+  "version": 1,
+  "id": "8b5267ad-c2af-431f-bf8f-36b4f415e0a6",
+  "title": "Improve error handling flow",
+  "summary": "17 files changed across 1 area. The tour follows the implementation from error handling to error handling. 79 smaller changes remain in the overview.",
+  "createdAt": "2026-09-20T20:31:49.800Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "apps/desktop/visual_editing_smoke.cpp",
+      "kind": "created",
+      "area": "errors",
+      "added": 116,
+      "removed": 0
+    },
+    {
+      "path": "apps/desktop/visual_editing_smoke.h",
+      "kind": "created",
+      "area": "api",
+      "added": 5,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/animation_controller.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 10,
+      "removed": 5
+    },
+    {
+      "path": "adapters/qt/canvas_animation.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 28,
+      "removed": 15
+    },
+    {
+      "path": "adapters/qt/canvas_cursor.cpp",
+      "kind": "modified",
+      "area": "ui",
+      "added": 84,
+      "removed": 40
+    },
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 40,
+      "removed": 22
+    },
+    {
+      "path": "adapters/qt/editor_controller.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 5,
+      "removed": 3
+    },
+    {
+      "path": "adapters/render/vector_hit.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 18,
+      "removed": 10
+    },
+    {
+      "path": "adapters/render/vector_hit.h",
+      "kind": "modified",
+      "area": "ui",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "path": "adapters/storage/serialization.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 4,
+      "removed": 2
+    },
+    {
+      "path": "modules/document/src/animation.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 14,
+      "removed": 6
+    },
+    {
+      "path": "modules/document/src/document.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 6,
+      "removed": 3
+    },
+    {
+      "path": "tests/animation_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 21,
+      "removed": 11
+    },
+    {
+      "path": "tests/export_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 7,
+      "removed": 6
+    },
+    {
+      "path": "tests/render_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 28,
+      "removed": 20
+    },
+    {
+      "path": "tests/storage_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 20,
+      "removed": 9
+    },
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 20,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "c7747bcf-ed24-4a84-a353-64a970784bf9",
+        "932ea376-a48a-4685-8fda-780070d28b33",
+        "3e8780e1-0615-43a2-87a8-9a1949831fe6",
+        "59c54e01-0981-4766-b83d-5edd232ea442",
+        "a254dae8-e8b4-45ba-a569-63409ab0f5a5",
+        "f294b97f-edba-4021-b9ab-e2c486a16b56",
+        "8810ae8e-1f0f-45e0-928f-deec079fff29",
+        "7290e312-afbd-4bab-96ec-f5c5f5577a7a",
+        "32986e13-4e9c-46bd-bd4d-45b02b29d78e",
+        "07a29e6a-c99d-4c9b-a9ee-78c8b050681b",
+        "3acf07c1-98ab-4f6f-8249-de01cf0dea7e",
+        "086696ba-43b6-4572-9473-ed5b7a070e78",
+        "366cdfaa-5d59-4df0-86ec-68dbdda2d3c3",
+        "ee55ca36-aabe-4c7d-9c4e-521e4d6ad5a7"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "c7747bcf-ed24-4a84-a353-64a970784bf9",
+      "title": "Introduce Visual editing smoke",
+      "explanation": "This part of visual_editing_smoke.cpp adds 116 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "apps/desktop/visual_editing_smoke.cpp",
+      "startLine": 1,
+      "endLine": 116,
+      "area": "errors",
+      "added": 116,
+      "removed": 0
+    },
+    {
+      "id": "932ea376-a48a-4685-8fda-780070d28b33",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 122,
+      "endLine": 123,
+      "area": "errors",
+      "symbol": "if",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "3e8780e1-0615-43a2-87a8-9a1949831fe6",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 2 lines and adds 4. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 126,
+      "endLine": 129,
+      "area": "errors",
+      "symbol": "if",
+      "added": 4,
+      "removed": 2,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "59c54e01-0981-4766-b83d-5edd232ea442",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 135,
+      "endLine": 136,
+      "area": "errors",
+      "symbol": "if",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "a254dae8-e8b4-45ba-a569-63409ab0f5a5",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 143,
+      "endLine": 144,
+      "area": "errors",
+      "symbol": "if",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "f294b97f-edba-4021-b9ab-e2c486a16b56",
+      "title": "Reshape Canvas animation",
+      "explanation": "This part of canvas_animation.cpp replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_animation.cpp",
+      "startLine": 14,
+      "endLine": 14,
+      "area": "errors",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "8810ae8e-1f0f-45e0-928f-deec079fff29",
+      "title": "Reshape Canvas animation",
+      "explanation": "This part of canvas_animation.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_animation.cpp",
+      "startLine": 16,
+      "endLine": 17,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "7290e312-afbd-4bab-96ec-f5c5f5577a7a",
+      "title": "Reshape Canvas animation",
+      "explanation": "This part of canvas_animation.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_animation.cpp",
+      "startLine": 20,
+      "endLine": 21,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "32986e13-4e9c-46bd-bd4d-45b02b29d78e",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_animation.cpp",
+      "startLine": 25,
+      "endLine": 26,
+      "area": "errors",
+      "symbol": "for",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "07a29e6a-c99d-4c9b-a9ee-78c8b050681b",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 2 lines and adds 4. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_animation.cpp",
+      "startLine": 29,
+      "endLine": 32,
+      "area": "errors",
+      "symbol": "for",
+      "added": 4,
+      "removed": 2,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "3acf07c1-98ab-4f6f-8249-de01cf0dea7e",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_animation.cpp",
+      "startLine": 35,
+      "endLine": 35,
+      "area": "errors",
+      "symbol": "for",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "086696ba-43b6-4572-9473-ed5b7a070e78",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_animation.cpp",
+      "startLine": 37,
+      "endLine": 38,
+      "area": "errors",
+      "symbol": "for",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "366cdfaa-5d59-4df0-86ec-68dbdda2d3c3",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_animation.cpp",
+      "startLine": 42,
+      "endLine": 42,
+      "area": "errors",
+      "symbol": "for",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "ee55ca36-aabe-4c7d-9c4e-521e4d6ad5a7",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 3 lines and adds 5. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/canvas_animation.cpp",
+      "startLine": 66,
+      "endLine": 70,
+      "area": "errors",
+      "symbol": "if",
+      "added": 5,
+      "removed": 3,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "id": "ee16631e-cd76-4014-bc18-faf2ac1464bb",
+  "title": "Improve authentication flow",
+  "summary": "3 files changed across 3 areas. The tour follows the implementation from authentication to tests.",
+  "createdAt": "2026-09-20T18:49:00.316Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "apps/desktop/brush_benchmark.cpp",
+      "kind": "created",
+      "area": "auth",
+      "added": 44,
+      "removed": 0
+    },
+    {
+      "path": "adapters/render/scene_renderer.cpp",
+      "kind": "modified",
+      "area": "state",
+      "added": 3,
+      "removed": 0
+    },
+    {
+      "path": "tests/render_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 17,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "214012db-18b8-4e0a-9032-0a9bddb06735"
+      ]
+    },
+    {
+      "id": "state",
+      "label": "State",
+      "stepIds": [
+        "afc680df-ab0b-425c-a77e-5c87d2b36ee6"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "0df2e982-4e22-4fb9-a583-0f362cd1fae6"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "214012db-18b8-4e0a-9032-0a9bddb06735",
+      "title": "Introduce Brush benchmark",
+      "explanation": "This part of brush_benchmark.cpp adds 44 lines. It changes how identity or session data moves through the solution. This is the first building block in the change.",
+      "file": "apps/desktop/brush_benchmark.cpp",
+      "startLine": 1,
+      "endLine": 44,
+      "area": "auth",
+      "added": 44,
+      "removed": 0
+    },
+    {
+      "id": "afc680df-ab0b-425c-a77e-5c87d2b36ee6",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 3 lines. It changes the source of truth or the way updates propagate. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/render/scene_renderer.cpp",
+      "startLine": 46,
+      "endLine": 48,
+      "area": "state",
+      "symbol": "if",
+      "added": 3,
+      "removed": 0,
+      "relation": "Builds on brush_benchmark.cpp and moves into state."
+    },
+    {
+      "id": "0df2e982-4e22-4fb9-a583-0f362cd1fae6",
+      "title": "Extend `TEST_CASE`",
+      "explanation": "The `TEST_CASE` section adds 17 lines. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "tests/render_tests.cpp",
+      "startLine": 52,
+      "endLine": 68,
+      "area": "tests",
+      "symbol": "TEST_CASE",
+      "added": 17,
+      "removed": 0,
+      "relation": "Builds on scene_renderer.cpp and moves into tests."
+    }
+  ]
+}

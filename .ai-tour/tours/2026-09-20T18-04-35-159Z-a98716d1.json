@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "a98716d1-035e-452f-be0a-255e541c4cb8",
+  "title": "Update Document",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from validation to validation.",
+  "createdAt": "2026-09-20T18:04:35.159Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "modules/document/include/opentoon/document.h",
+      "kind": "modified",
+      "area": "validation",
+      "added": 1,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "validation",
+      "label": "Validation",
+      "stepIds": [
+        "7b030dcc-f531-46c8-ae6f-886bc8660d7b"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "7b030dcc-f531-46c8-ae6f-886bc8660d7b",
+      "title": "Extend Document",
+      "explanation": "This part of document.h adds 1 line. It strengthens the checks applied before data is accepted. This is the main implementation change.",
+      "file": "modules/document/include/opentoon/document.h",
+      "startLine": 4,
+      "endLine": 4,
+      "area": "validation",
+      "added": 1,
+      "removed": 0
+    }
+  ]
+}

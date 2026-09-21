@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "id": "df4f9c2c-fd24-455a-82b3-aa61a7f4a267",
+  "title": "Update Main",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T19:30:12.276Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 16,
+      "removed": 2
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "f683a7df-d25b-414f-a256-e491ecda9ac6",
+        "37d78c7a-17fa-475d-b846-e5b771e8e53f",
+        "5919cd96-a147-444c-aefa-360436628d01"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "f683a7df-d25b-414f-a256-e491ecda9ac6",
+      "title": "Reshape Main",
+      "explanation": "This part of main.cpp replaces 1 line and adds 9. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 225,
+      "endLine": 233,
+      "area": "tests",
+      "added": 9,
+      "removed": 1
+    },
+    {
+      "id": "37d78c7a-17fa-475d-b846-e5b771e8e53f",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 6 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 235,
+      "endLine": 240,
+      "area": "tests",
+      "added": 6,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "5919cd96-a147-444c-aefa-360436628d01",
+      "title": "Reshape Main",
+      "explanation": "This part of main.cpp replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 249,
+      "endLine": 249,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

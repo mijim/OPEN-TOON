@@ -1,0 +1,225 @@
+{
+  "version": 1,
+  "id": "7c3287dc-f0ff-4bfa-b365-5d598b4b9d79",
+  "title": "Improve tests flow",
+  "summary": "3 files changed across 1 area. The tour follows the implementation from tests to tests. 1 smaller change remain in the overview.",
+  "createdAt": "2026-09-21T10:20:35.154Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "docs/planning/node-assignments.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 9,
+      "removed": 9
+    },
+    {
+      "path": "docs/planning/roadmap.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "path": "scripts/roadmap.py",
+      "kind": "modified",
+      "area": "tests",
+      "added": 71,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "663bc780-bb74-4055-87f7-1a558735cd78",
+        "2567b77c-2590-4a1d-af05-ecd3fb07816f",
+        "c95aa024-c904-4f21-a927-9e391479ec95",
+        "18fff657-0a16-45e3-9e55-9fadf9b1aa1f",
+        "01909337-286c-40cb-9770-14e59316d60c",
+        "dab28ef0-958b-4ff9-a28e-6f8616ca4036",
+        "a0b964bf-6ad4-42a6-9dfb-36117fea97e1",
+        "c474e85c-01dc-40a0-a5b0-446384f3abff",
+        "3641ebd4-4500-4bf8-a5cd-09c938c43ee6",
+        "e0effff4-17ca-4a39-ac46-3d635274d907",
+        "67907a77-6593-4ecb-bc3e-6f76551acba7",
+        "3549ffdd-1707-4d09-aef9-d25ba9242aa5",
+        "1b9b867f-4cc9-4aea-b2a2-9045f1c5f1d0",
+        "c43ecbd3-2538-42ee-8e18-33f437c5be77"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "663bc780-bb74-4055-87f7-1a558735cd78",
+      "title": "Reshape Node assignments",
+      "explanation": "This part of node-assignments.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "docs/planning/node-assignments.json",
+      "startLine": 259,
+      "endLine": 259,
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "id": "2567b77c-2590-4a1d-af05-ecd3fb07816f",
+      "title": "Reshape Node assignments",
+      "explanation": "This part of node-assignments.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/node-assignments.json",
+      "startLine": 266,
+      "endLine": 266,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "c95aa024-c904-4f21-a927-9e391479ec95",
+      "title": "Reshape Node assignments",
+      "explanation": "This part of node-assignments.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/node-assignments.json",
+      "startLine": 336,
+      "endLine": 336,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "18fff657-0a16-45e3-9e55-9fadf9b1aa1f",
+      "title": "Reshape Node assignments",
+      "explanation": "This part of node-assignments.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/node-assignments.json",
+      "startLine": 357,
+      "endLine": 357,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "01909337-286c-40cb-9770-14e59316d60c",
+      "title": "Reshape Node assignments",
+      "explanation": "This part of node-assignments.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/node-assignments.json",
+      "startLine": 770,
+      "endLine": 770,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "dab28ef0-958b-4ff9-a28e-6f8616ca4036",
+      "title": "Reshape Node assignments",
+      "explanation": "This part of node-assignments.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/node-assignments.json",
+      "startLine": 819,
+      "endLine": 819,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "a0b964bf-6ad4-42a6-9dfb-36117fea97e1",
+      "title": "Reshape Node assignments",
+      "explanation": "This part of node-assignments.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/node-assignments.json",
+      "startLine": 980,
+      "endLine": 980,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "c474e85c-01dc-40a0-a5b0-446384f3abff",
+      "title": "Reshape Node assignments",
+      "explanation": "This part of node-assignments.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/node-assignments.json",
+      "startLine": 994,
+      "endLine": 994,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "3641ebd4-4500-4bf8-a5cd-09c938c43ee6",
+      "title": "Reshape Node assignments",
+      "explanation": "This part of node-assignments.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/node-assignments.json",
+      "startLine": 1064,
+      "endLine": 1064,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "e0effff4-17ca-4a39-ac46-3d635274d907",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 5106,
+      "endLine": 5106,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "67907a77-6593-4ecb-bc3e-6f76551acba7",
+      "title": "Extend `slice_schedule`",
+      "explanation": "The `slice_schedule` section adds 24 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "scripts/roadmap.py",
+      "startLine": 16,
+      "endLine": 39,
+      "area": "tests",
+      "symbol": "slice_schedule",
+      "added": 24,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "3549ffdd-1707-4d09-aef9-d25ba9242aa5",
+      "title": "Extend `documents`",
+      "explanation": "The `documents` section adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "scripts/roadmap.py",
+      "startLine": 47,
+      "endLine": 47,
+      "area": "tests",
+      "symbol": "documents",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "1b9b867f-4cc9-4aea-b2a2-9045f1c5f1d0",
+      "title": "Extend `documents`",
+      "explanation": "The `documents` section adds 4 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "scripts/roadmap.py",
+      "startLine": 59,
+      "endLine": 62,
+      "area": "tests",
+      "symbol": "documents",
+      "added": 4,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "c43ecbd3-2538-42ee-8e18-33f437c5be77",
+      "title": "Extend Roadmap",
+      "explanation": "This part of roadmap.py adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "scripts/roadmap.py",
+      "startLine": 88,
+      "endLine": 88,
+      "area": "tests",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

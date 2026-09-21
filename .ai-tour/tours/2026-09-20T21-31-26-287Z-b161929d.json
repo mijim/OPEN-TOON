@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "id": "b161929d-195d-477b-883b-03cc32ce4b02",
+  "title": "Improve tests flow",
+  "summary": "3 files changed across 3 areas. The tour follows the implementation from error handling to tests.",
+  "createdAt": "2026-09-20T21:31:26.287Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "apps/desktop/key_block_smoke.cpp",
+      "kind": "created",
+      "area": "errors",
+      "added": 111,
+      "removed": 0
+    },
+    {
+      "path": "apps/desktop/key_block_smoke.h",
+      "kind": "created",
+      "area": "api",
+      "added": 4,
+      "removed": 0
+    },
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 2,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "cc9d1740-82c4-4f93-8625-b47847a0026f"
+      ]
+    },
+    {
+      "id": "api",
+      "label": "API",
+      "stepIds": [
+        "8c7adf0d-5195-4054-a9cf-dd99b5f78cbd"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "e4a1d015-1fb9-4c05-8dbb-e786103feefe",
+        "fb7ee65a-38ba-4e33-9636-b6b5ff49e726"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "cc9d1740-82c4-4f93-8625-b47847a0026f",
+      "title": "Introduce Key block smoke",
+      "explanation": "This part of key_block_smoke.cpp adds 111 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "apps/desktop/key_block_smoke.cpp",
+      "startLine": 1,
+      "endLine": 111,
+      "area": "errors",
+      "added": 111,
+      "removed": 0
+    },
+    {
+      "id": "8c7adf0d-5195-4054-a9cf-dd99b5f78cbd",
+      "title": "Introduce Key block smoke",
+      "explanation": "This part of key_block_smoke.h adds 4 lines. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/key_block_smoke.h",
+      "startLine": 1,
+      "endLine": 4,
+      "area": "api",
+      "added": 4,
+      "removed": 0,
+      "relation": "Builds on key_block_smoke.cpp and moves into api."
+    },
+    {
+      "id": "e4a1d015-1fb9-4c05-8dbb-e786103feefe",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 7,
+      "endLine": 7,
+      "area": "tests",
+      "added": 1,
+      "removed": 0,
+      "relation": "Builds on key_block_smoke.h and moves into tests."
+    },
+    {
+      "id": "fb7ee65a-38ba-4e33-9636-b6b5ff49e726",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 429,
+      "endLine": 429,
+      "area": "tests",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

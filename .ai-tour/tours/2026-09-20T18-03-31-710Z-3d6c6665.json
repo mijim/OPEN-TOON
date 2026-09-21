@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "3d6c6665-7d5b-45ee-8b0a-a82e525ae5b3",
+  "title": "Update Native",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T18:03:31.710Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": ".github/workflows/native.yml",
+      "kind": "modified",
+      "area": "tests",
+      "added": 2,
+      "removed": 2
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "a602e40d-788c-4ba6-8cc5-cd9373226720"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "a602e40d-788c-4ba6-8cc5-cd9373226720",
+      "title": "Reshape Native",
+      "explanation": "This part of native.yml replaces 2 lines and adds 2. It captures the expected behavior so the implementation can be reviewed safely. This is the main implementation change.",
+      "file": ".github/workflows/native.yml",
+      "startLine": 55,
+      "endLine": 56,
+      "area": "tests",
+      "added": 2,
+      "removed": 2
+    }
+  ]
+}

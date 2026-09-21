@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "id": "2dc7617b-6570-4470-9910-928af0df9dfe",
+  "title": "Improve tests flow",
+  "summary": "3 files changed across 3 areas. The tour follows the implementation from error handling to tests.",
+  "createdAt": "2026-09-20T21:48:21.764Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "apps/desktop/motion_path_smoke.cpp",
+      "kind": "created",
+      "area": "errors",
+      "added": 118,
+      "removed": 0
+    },
+    {
+      "path": "apps/desktop/motion_path_smoke.h",
+      "kind": "created",
+      "area": "api",
+      "added": 5,
+      "removed": 0
+    },
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 2,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "60d3a89c-8ab3-4526-be53-2ae05a17352f"
+      ]
+    },
+    {
+      "id": "api",
+      "label": "API",
+      "stepIds": [
+        "c87387af-61e8-4a5c-964f-a0627b8d64e0"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "6b4a30b9-3c2b-4ee2-b2a9-19e142cec45c",
+        "80e957d0-6a18-40ad-a15c-06db0de21ed4"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "60d3a89c-8ab3-4526-be53-2ae05a17352f",
+      "title": "Introduce Motion path smoke",
+      "explanation": "This part of motion_path_smoke.cpp adds 118 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "apps/desktop/motion_path_smoke.cpp",
+      "startLine": 1,
+      "endLine": 118,
+      "area": "errors",
+      "added": 118,
+      "removed": 0
+    },
+    {
+      "id": "c87387af-61e8-4a5c-964f-a0627b8d64e0",
+      "title": "Introduce Motion path smoke",
+      "explanation": "This part of motion_path_smoke.h adds 5 lines. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/motion_path_smoke.h",
+      "startLine": 1,
+      "endLine": 5,
+      "area": "api",
+      "added": 5,
+      "removed": 0,
+      "relation": "Builds on motion_path_smoke.cpp and moves into api."
+    },
+    {
+      "id": "6b4a30b9-3c2b-4ee2-b2a9-19e142cec45c",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 4,
+      "endLine": 4,
+      "area": "tests",
+      "added": 1,
+      "removed": 0,
+      "relation": "Builds on motion_path_smoke.h and moves into tests."
+    },
+    {
+      "id": "80e957d0-6a18-40ad-a15c-06db0de21ed4",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 431,
+      "endLine": 431,
+      "area": "tests",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

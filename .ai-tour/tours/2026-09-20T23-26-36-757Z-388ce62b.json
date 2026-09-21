@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "388ce62b-7df3-4390-ad6b-8bde46483dc3",
+  "title": "Add Package macos",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from error handling to error handling.",
+  "createdAt": "2026-09-20T23:26:36.757Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "scripts/package_macos.py",
+      "kind": "created",
+      "area": "errors",
+      "added": 179,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "d597f579-65ab-4073-abc8-48986d3c2b7a"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "d597f579-65ab-4073-abc8-48986d3c2b7a",
+      "title": "Introduce Package macos",
+      "explanation": "This part of package_macos.py adds 179 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the main implementation change.",
+      "file": "scripts/package_macos.py",
+      "startLine": 1,
+      "endLine": 179,
+      "area": "errors",
+      "added": 179,
+      "removed": 0
+    }
+  ]
+}

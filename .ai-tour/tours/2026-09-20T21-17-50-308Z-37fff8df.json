@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "id": "37fff8df-0c8e-44ca-a4c7-dcea03db5d17",
+  "title": "Update Canvas item",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from error handling to error handling.",
+  "createdAt": "2026-09-20T21:17:50.308Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 3,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "4001aef8-0ab9-400a-b01d-10e594cdfe49"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "4001aef8-0ab9-400a-b01d-10e594cdfe49",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 3. It adjusts the failure path so callers get a clearer or safer outcome. This is the main implementation change.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 568,
+      "endLine": 570,
+      "area": "errors",
+      "symbol": "if",
+      "added": 3,
+      "removed": 1
+    }
+  ]
+}

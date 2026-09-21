@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "id": "e2f888b3-eab6-4176-a99f-fb073af020d2",
+  "title": "Improve tests flow",
+  "summary": "2 files changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T17:57:30.208Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "tests/render_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 13,
+      "removed": 0
+    },
+    {
+      "path": "tests/storage_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 17,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "a2d74046-c0b4-4208-9a0f-a723b0d780c9",
+        "4841395a-a760-49cb-a656-e0f61dc965c3"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "a2d74046-c0b4-4208-9a0f-a723b0d780c9",
+      "title": "Extend `TEST_CASE`",
+      "explanation": "The `TEST_CASE` section adds 13 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "tests/render_tests.cpp",
+      "startLine": 39,
+      "endLine": 51,
+      "area": "tests",
+      "symbol": "TEST_CASE",
+      "added": 13,
+      "removed": 0
+    },
+    {
+      "id": "4841395a-a760-49cb-a656-e0f61dc965c3",
+      "title": "Extend `TEST_CASE`",
+      "explanation": "The `TEST_CASE` section adds 17 lines. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "tests/storage_tests.cpp",
+      "startLine": 111,
+      "endLine": 127,
+      "area": "tests",
+      "symbol": "TEST_CASE",
+      "added": 17,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

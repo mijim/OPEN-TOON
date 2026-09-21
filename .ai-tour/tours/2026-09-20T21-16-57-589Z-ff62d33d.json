@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "id": "ff62d33d-6e71-4ddf-a624-1bc2c1aadc81",
+  "title": "Improve error handling flow",
+  "summary": "2 files changed across 2 areas. The tour follows the implementation from tests to error handling.",
+  "createdAt": "2026-09-20T21:16:57.589Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "path": "apps/desktop/visual_editing_smoke.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 2,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "62c2461b-76ec-4781-8f4d-2d0b2e48d4db"
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "f40878fd-6f36-4221-8637-18524093ce97",
+        "a5a0536d-cb01-48bc-b2d8-4854c4ea4c6d"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "62c2461b-76ec-4781-8f4d-2d0b2e48d4db",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 329,
+      "endLine": 329,
+      "area": "tests",
+      "symbol": "if",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "id": "f40878fd-6f36-4221-8637-18524093ce97",
+      "title": "Reshape `require`",
+      "explanation": "The `require` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/visual_editing_smoke.cpp",
+      "startLine": 149,
+      "endLine": 149,
+      "area": "errors",
+      "symbol": "require",
+      "added": 1,
+      "removed": 1,
+      "relation": "Builds on main.cpp and moves into error handling."
+    },
+    {
+      "id": "a5a0536d-cb01-48bc-b2d8-4854c4ea4c6d",
+      "title": "Extend `require`",
+      "explanation": "The `require` section adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "apps/desktop/visual_editing_smoke.cpp",
+      "startLine": 153,
+      "endLine": 153,
+      "area": "errors",
+      "symbol": "require",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

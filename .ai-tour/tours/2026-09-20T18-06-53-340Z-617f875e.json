@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "id": "617f875e-42ac-4eb9-8ffe-5c77c6a28aef",
+  "title": "Improve authentication flow",
+  "summary": "2 files changed across 2 areas. The tour follows the implementation from tests to authentication.",
+  "createdAt": "2026-09-20T18:06:53.340Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "tests/export_tests.cpp",
+      "kind": "created",
+      "area": "tests",
+      "added": 85,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/editor_controller.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 7,
+      "removed": 5
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "6ba59aed-40b3-4342-82c2-7aeb26deae71"
+      ]
+    },
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "d9466909-e316-4d7c-bbad-9ddd01399627",
+        "64da686f-1508-407f-8de8-ed38399f6df9"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "6ba59aed-40b3-4342-82c2-7aeb26deae71",
+      "title": "Introduce Export tests",
+      "explanation": "This part of export_tests.cpp adds 85 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "tests/export_tests.cpp",
+      "startLine": 1,
+      "endLine": 85,
+      "area": "tests",
+      "added": 85,
+      "removed": 0
+    },
+    {
+      "id": "d9466909-e316-4d7c-bbad-9ddd01399627",
+      "title": "Reshape `edit`",
+      "explanation": "The `edit` section replaces 2 lines and adds 3. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 610,
+      "endLine": 612,
+      "area": "auth",
+      "symbol": "edit",
+      "added": 3,
+      "removed": 2,
+      "relation": "Builds on export_tests.cpp and moves into authentication."
+    },
+    {
+      "id": "64da686f-1508-407f-8de8-ed38399f6df9",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 3 lines and adds 4. It changes how identity or session data moves through the solution. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 655,
+      "endLine": 658,
+      "area": "auth",
+      "symbol": "for",
+      "added": 4,
+      "removed": 3,
+      "relation": "Continues the authentication thread from the previous step."
+    }
+  ]
+}

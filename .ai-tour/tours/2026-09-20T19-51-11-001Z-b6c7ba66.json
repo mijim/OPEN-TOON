@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "id": "b6c7ba66-4cab-44db-8a9d-808e0f8c67ee",
+  "title": "Improve error handling flow",
+  "summary": "4 files changed across 2 areas. The tour follows the implementation from error handling to authentication.",
+  "createdAt": "2026-09-20T19:51:11.001Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/drawing_controller.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 20,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/editor_controller.h",
+      "kind": "modified",
+      "area": "auth",
+      "added": 2,
+      "removed": 0
+    },
+    {
+      "path": "modules/document/include/opentoon/drawing_selection.h",
+      "kind": "modified",
+      "area": "auth",
+      "added": 6,
+      "removed": 0
+    },
+    {
+      "path": "modules/document/src/drawing_selection.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 77,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "f2dc86f4-ff60-4f93-9693-73257ce20210",
+        "7d2060eb-03de-46fa-bdbd-6c22ce7a00a1"
+      ]
+    },
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "8b2a3988-633b-436c-b136-5382ff48973e",
+        "ac31d3be-5319-414d-b761-8ddec71c8a36"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "f2dc86f4-ff60-4f93-9693-73257ce20210",
+      "title": "Extend Drawing controller",
+      "explanation": "This part of drawing_controller.cpp adds 20 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/qt/drawing_controller.cpp",
+      "startLine": 21,
+      "endLine": 40,
+      "area": "errors",
+      "added": 20,
+      "removed": 0
+    },
+    {
+      "id": "7d2060eb-03de-46fa-bdbd-6c22ce7a00a1",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 77 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 149,
+      "endLine": 225,
+      "area": "errors",
+      "symbol": "if",
+      "added": 77,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "8b2a3988-633b-436c-b136-5382ff48973e",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.h adds 2 lines. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 105,
+      "endLine": 106,
+      "area": "auth",
+      "added": 2,
+      "removed": 0,
+      "relation": "Builds on drawing_selection.cpp and moves into authentication."
+    },
+    {
+      "id": "ac31d3be-5319-414d-b761-8ddec71c8a36",
+      "title": "Extend `class`",
+      "explanation": "The `class` section adds 6 lines. It changes how identity or session data moves through the solution. This completes the path introduced by the earlier steps.",
+      "file": "modules/document/include/opentoon/drawing_selection.h",
+      "startLine": 10,
+      "endLine": 15,
+      "area": "auth",
+      "symbol": "class",
+      "added": 6,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    }
+  ]
+}

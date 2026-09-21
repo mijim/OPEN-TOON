@@ -1,0 +1,147 @@
+{
+  "version": 1,
+  "id": "e7b6c7d2-6fe9-49d5-90cf-8c3e1824e052",
+  "title": "Improve error handling flow",
+  "summary": "2 files changed across 2 areas. The tour follows the implementation from error handling to authentication.",
+  "createdAt": "2026-09-20T17:54:12.128Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 4,
+      "removed": 4
+    },
+    {
+      "path": "adapters/qt/editor_controller.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 11,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "2682d648-cf0f-4435-b06f-0c51a310d5a6",
+        "1a449160-ec4f-422a-8175-8a0eaaa94018",
+        "cd236a3e-3ba2-4378-95c8-3655bc67e4c0",
+        "8a4ee491-2615-4d4f-b51f-1fcf88979b9d"
+      ]
+    },
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "1ed94fa6-02c5-4b8f-a2d2-709918ebbf22",
+        "d4d2449a-1747-4400-91cc-2fa8dc256357",
+        "573b6530-21d8-4229-8b1b-b8e6c1cfd7b1",
+        "8219b4a5-dba9-427f-85ba-3b12468901bc"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "2682d648-cf0f-4435-b06f-0c51a310d5a6",
+      "title": "Reshape Canvas item",
+      "explanation": "This part of canvas_item.cpp replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 114,
+      "endLine": 114,
+      "area": "errors",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "id": "1a449160-ec4f-422a-8175-8a0eaaa94018",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 172,
+      "endLine": 172,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "cd236a3e-3ba2-4378-95c8-3655bc67e4c0",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 176,
+      "endLine": 176,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "8a4ee491-2615-4d4f-b51f-1fcf88979b9d",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 250,
+      "endLine": 250,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "1ed94fa6-02c5-4b8f-a2d2-709918ebbf22",
+      "title": "Reshape Editor controller",
+      "explanation": "This part of editor_controller.cpp replaces 1 line and adds 1. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 156,
+      "endLine": 156,
+      "area": "auth",
+      "added": 1,
+      "removed": 1,
+      "relation": "Builds on canvas_item.cpp and moves into authentication."
+    },
+    {
+      "id": "d4d2449a-1747-4400-91cc-2fa8dc256357",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.cpp adds 3 lines. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 303,
+      "endLine": 305,
+      "area": "auth",
+      "added": 3,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "573b6530-21d8-4229-8b1b-b8e6c1cfd7b1",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.cpp adds 3 lines. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 321,
+      "endLine": 323,
+      "area": "auth",
+      "added": 3,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "8219b4a5-dba9-427f-85ba-3b12468901bc",
+      "title": "Extend `edit`",
+      "explanation": "The `edit` section adds 4 lines. It changes how identity or session data moves through the solution. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 583,
+      "endLine": 586,
+      "area": "auth",
+      "symbol": "edit",
+      "added": 4,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    }
+  ]
+}

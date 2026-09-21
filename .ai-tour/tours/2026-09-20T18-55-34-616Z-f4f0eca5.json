@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "id": "f4f0eca5-a6fc-4365-8cf0-f7899de61cc2",
+  "title": "Update Raster brush",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from error handling to error handling.",
+  "createdAt": "2026-09-20T18:55:34.616Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/brush/raster_brush.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 6,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "108d0569-8b8b-4f57-82d1-33c479a68ab5",
+        "e97ee2e0-6263-4797-9cfb-50d0f711e0ce"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "108d0569-8b8b-4f57-82d1-33c479a68ab5",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 5 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/brush/raster_brush.cpp",
+      "startLine": 138,
+      "endLine": 142,
+      "area": "errors",
+      "symbol": "if",
+      "added": 5,
+      "removed": 0
+    },
+    {
+      "id": "e97ee2e0-6263-4797-9cfb-50d0f711e0ce",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "adapters/brush/raster_brush.cpp",
+      "startLine": 144,
+      "endLine": 144,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

@@ -1,0 +1,249 @@
+{
+  "version": 1,
+  "id": "e563b5d5-3f7d-460b-b0f0-300080aa05e2",
+  "title": "Improve error handling flow",
+  "summary": "4 files changed across 3 areas. The tour follows the implementation from tests to authentication.",
+  "createdAt": "2026-09-20T18:28:43.093Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "tests/timeline_tests.cpp",
+      "kind": "created",
+      "area": "tests",
+      "added": 85,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/timeline_controller.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 31,
+      "removed": 10
+    },
+    {
+      "path": "modules/document/include/opentoon/timeline.h",
+      "kind": "modified",
+      "area": "auth",
+      "added": 2,
+      "removed": 2
+    },
+    {
+      "path": "modules/document/src/timeline.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 8,
+      "removed": 5
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "4bf50932-bec0-4f5e-9e14-61f423051082"
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "255de4c7-236d-440e-bf5a-50235da8b142",
+        "fa12f8ea-49e1-4e90-911c-a559611305b5",
+        "2948c883-7cf5-44f1-b84a-09412e763c05",
+        "196097df-bc71-45ec-8a70-373fc482a45b",
+        "c4d7d2c0-3a17-40db-a652-c5cabbe46684",
+        "4bcf8520-092c-425f-92fc-0f4b7db44df0",
+        "5af7b25c-4384-4e46-9b00-38323a848994",
+        "8ce3e8ce-7b83-4f1f-909f-3a3a36df875c",
+        "036ed1a1-6c77-4778-96fb-996b6838e07c",
+        "ffa6bedc-89aa-426c-a704-dd949f727c83",
+        "d49cb443-c784-41d8-a963-65ed04207879",
+        "418b635d-b7ca-4362-98c2-316d5509d2dc"
+      ]
+    },
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "dc1d2700-ea7c-4571-a580-eec248b6e0b9"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "4bf50932-bec0-4f5e-9e14-61f423051082",
+      "title": "Introduce Timeline tests",
+      "explanation": "This part of timeline_tests.cpp adds 85 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "tests/timeline_tests.cpp",
+      "startLine": 1,
+      "endLine": 85,
+      "area": "tests",
+      "added": 85,
+      "removed": 0
+    },
+    {
+      "id": "255de4c7-236d-440e-bf5a-50235da8b142",
+      "title": "Reshape Timeline controller",
+      "explanation": "This part of timeline_controller.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/timeline_controller.cpp",
+      "startLine": 10,
+      "endLine": 11,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Builds on timeline_tests.cpp and moves into error handling."
+    },
+    {
+      "id": "fa12f8ea-49e1-4e90-911c-a559611305b5",
+      "title": "Reshape Timeline controller",
+      "explanation": "This part of timeline_controller.cpp replaces 2 lines and adds 6. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/timeline_controller.cpp",
+      "startLine": 50,
+      "endLine": 55,
+      "area": "errors",
+      "added": 6,
+      "removed": 2,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "2948c883-7cf5-44f1-b84a-09412e763c05",
+      "title": "Reshape Timeline controller",
+      "explanation": "This part of timeline_controller.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/timeline_controller.cpp",
+      "startLine": 63,
+      "endLine": 64,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "196097df-bc71-45ec-8a70-373fc482a45b",
+      "title": "Reshape `edit`",
+      "explanation": "The `edit` section replaces 1 line and adds 4. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/timeline_controller.cpp",
+      "startLine": 111,
+      "endLine": 114,
+      "area": "errors",
+      "symbol": "edit",
+      "added": 4,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "c4d7d2c0-3a17-40db-a652-c5cabbe46684",
+      "title": "Reshape `edit`",
+      "explanation": "The `edit` section replaces 1 line and adds 4. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/timeline_controller.cpp",
+      "startLine": 126,
+      "endLine": 129,
+      "area": "errors",
+      "symbol": "edit",
+      "added": 4,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "4bcf8520-092c-425f-92fc-0f4b7db44df0",
+      "title": "Reshape `edit`",
+      "explanation": "The `edit` section replaces 1 line and adds 5. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/timeline_controller.cpp",
+      "startLine": 132,
+      "endLine": 136,
+      "area": "errors",
+      "symbol": "edit",
+      "added": 5,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "5af7b25c-4384-4e46-9b00-38323a848994",
+      "title": "Reshape Timeline controller",
+      "explanation": "This part of timeline_controller.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/timeline_controller.cpp",
+      "startLine": 141,
+      "endLine": 142,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "8ce3e8ce-7b83-4f1f-909f-3a3a36df875c",
+      "title": "Reshape Timeline controller",
+      "explanation": "This part of timeline_controller.cpp replaces 2 lines and adds 6. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/timeline_controller.cpp",
+      "startLine": 155,
+      "endLine": 160,
+      "area": "errors",
+      "added": 6,
+      "removed": 2,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "036ed1a1-6c77-4778-96fb-996b6838e07c",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 2 lines and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/timeline.cpp",
+      "startLine": 49,
+      "endLine": 50,
+      "area": "errors",
+      "symbol": "if",
+      "added": 2,
+      "removed": 2,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "ffa6bedc-89aa-426c-a704-dd949f727c83",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/timeline.cpp",
+      "startLine": 62,
+      "endLine": 63,
+      "area": "errors",
+      "symbol": "if",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "d49cb443-c784-41d8-a963-65ed04207879",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/timeline.cpp",
+      "startLine": 100,
+      "endLine": 101,
+      "area": "errors",
+      "symbol": "if",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "418b635d-b7ca-4362-98c2-316d5509d2dc",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/timeline.cpp",
+      "startLine": 179,
+      "endLine": 180,
+      "area": "errors",
+      "symbol": "for",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "dc1d2700-ea7c-4571-a580-eec248b6e0b9",
+      "title": "Reshape `class`",
+      "explanation": "The `class` section replaces 2 lines and adds 2. It changes how identity or session data moves through the solution. This completes the path introduced by the earlier steps.",
+      "file": "modules/document/include/opentoon/timeline.h",
+      "startLine": 18,
+      "endLine": 19,
+      "area": "auth",
+      "symbol": "class",
+      "added": 2,
+      "removed": 2,
+      "relation": "Builds on timeline.cpp and moves into authentication."
+    }
+  ]
+}

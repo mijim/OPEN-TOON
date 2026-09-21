@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "652bdc7c-be23-41e1-8bd5-99df930f11e6",
+  "title": "Add Conanfile",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from error handling to error handling.",
+  "createdAt": "2026-09-20T17:53:33.916Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "conanfile.py",
+      "kind": "created",
+      "area": "errors",
+      "added": 17,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "da814974-33fd-4b26-8a77-59e384eb1f25"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "da814974-33fd-4b26-8a77-59e384eb1f25",
+      "title": "Introduce Conanfile",
+      "explanation": "This part of conanfile.py adds 17 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the main implementation change.",
+      "file": "conanfile.py",
+      "startLine": 1,
+      "endLine": 17,
+      "area": "errors",
+      "added": 17,
+      "removed": 0
+    }
+  ]
+}

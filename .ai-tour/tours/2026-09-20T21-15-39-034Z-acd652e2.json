@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "id": "acd652e2-ae85-4ba5-afd0-e520d05af5fa",
+  "title": "Update Visual editing smoke",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from error handling to error handling.",
+  "createdAt": "2026-09-20T21:15:39.034Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "apps/desktop/visual_editing_smoke.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 3,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "6ebb5f24-1665-45fe-be9a-6defdcbacd74",
+        "52b906d3-c056-41bc-a057-a006339b9f71",
+        "134f2a67-7050-4e07-af20-932ddd24b621"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "6ebb5f24-1665-45fe-be9a-6defdcbacd74",
+      "title": "Extend `require`",
+      "explanation": "The `require` section adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "apps/desktop/visual_editing_smoke.cpp",
+      "startLine": 61,
+      "endLine": 61,
+      "area": "errors",
+      "symbol": "require",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "id": "52b906d3-c056-41bc-a057-a006339b9f71",
+      "title": "Extend `require`",
+      "explanation": "The `require` section adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/visual_editing_smoke.cpp",
+      "startLine": 268,
+      "endLine": 268,
+      "area": "errors",
+      "symbol": "require",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "134f2a67-7050-4e07-af20-932ddd24b621",
+      "title": "Extend `require`",
+      "explanation": "The `require` section adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "apps/desktop/visual_editing_smoke.cpp",
+      "startLine": 317,
+      "endLine": 317,
+      "area": "errors",
+      "symbol": "require",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "id": "b1dcc288-3134-4a82-9ba6-ecf359ef332a",
+  "title": "Improve tests flow",
+  "summary": "3 files changed across 3 areas. The tour follows the implementation from error handling to tests.",
+  "createdAt": "2026-09-20T22:56:47.751Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "apps/desktop/vector_selection_smoke.cpp",
+      "kind": "created",
+      "area": "errors",
+      "added": 155,
+      "removed": 0
+    },
+    {
+      "path": "apps/desktop/vector_selection_smoke.h",
+      "kind": "created",
+      "area": "api",
+      "added": 5,
+      "removed": 0
+    },
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 2,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "87dd157f-f830-4796-aa72-b148c2b77c33"
+      ]
+    },
+    {
+      "id": "api",
+      "label": "API",
+      "stepIds": [
+        "94cf0501-88bd-4663-b04c-433fe534891f"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "d3ad9a3b-9954-42dc-abb2-f987ef3fbb26",
+        "29fcad78-ba65-48af-a148-ca1269e8372b"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "87dd157f-f830-4796-aa72-b148c2b77c33",
+      "title": "Introduce Vector selection smoke",
+      "explanation": "This part of vector_selection_smoke.cpp adds 155 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "apps/desktop/vector_selection_smoke.cpp",
+      "startLine": 1,
+      "endLine": 155,
+      "area": "errors",
+      "added": 155,
+      "removed": 0
+    },
+    {
+      "id": "94cf0501-88bd-4663-b04c-433fe534891f",
+      "title": "Introduce Vector selection smoke",
+      "explanation": "This part of vector_selection_smoke.h adds 5 lines. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/vector_selection_smoke.h",
+      "startLine": 1,
+      "endLine": 5,
+      "area": "api",
+      "added": 5,
+      "removed": 0,
+      "relation": "Builds on vector_selection_smoke.cpp and moves into api."
+    },
+    {
+      "id": "d3ad9a3b-9954-42dc-abb2-f987ef3fbb26",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 5,
+      "endLine": 5,
+      "area": "tests",
+      "added": 1,
+      "removed": 0,
+      "relation": "Builds on vector_selection_smoke.h and moves into tests."
+    },
+    {
+      "id": "29fcad78-ba65-48af-a148-ca1269e8372b",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 432,
+      "endLine": 432,
+      "area": "tests",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

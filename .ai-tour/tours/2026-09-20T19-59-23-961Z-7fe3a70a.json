@@ -1,0 +1,195 @@
+{
+  "version": 1,
+  "id": "7fe3a70a-f554-4ab4-adad-0139eeca225e",
+  "title": "Improve error handling flow",
+  "summary": "5 files changed across 2 areas. The tour follows the implementation from error handling to authentication.",
+  "createdAt": "2026-09-20T19:59:23.961Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 12,
+      "removed": 3
+    },
+    {
+      "path": "adapters/qt/drawing_controller.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 2,
+      "removed": 2
+    },
+    {
+      "path": "adapters/qt/editor_controller.h",
+      "kind": "modified",
+      "area": "auth",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "path": "modules/document/include/opentoon/drawing_selection.h",
+      "kind": "modified",
+      "area": "auth",
+      "added": 2,
+      "removed": 1
+    },
+    {
+      "path": "modules/document/src/drawing_selection.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 2,
+      "removed": 2
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "cd8d9065-250f-43fc-abcd-218ed9bc2c2d",
+        "ae46864b-c10c-4445-99c7-398dff78427c",
+        "cbfe03e9-346b-4ecd-b51b-1a47c59c03c9",
+        "b90b990e-cec6-4f4f-bcd3-8502336009bf",
+        "0ff68d16-204c-4ea3-931a-cddf26d45fc7",
+        "7a5f96df-07f2-4ce4-882e-385bf4ede8b7",
+        "5ed829dc-d8ce-4e58-804a-628f0df0239d",
+        "e2a560ae-5d0f-4f00-8de5-7dc96c395e34"
+      ]
+    },
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "c11d46ee-5adc-4ca3-ba23-48e337d70915",
+        "09003e68-f77a-4141-8a9e-5f886fe457a6"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "cd8d9065-250f-43fc-abcd-218ed9bc2c2d",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 172,
+      "endLine": 172,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "id": "ae46864b-c10c-4445-99c7-398dff78427c",
+      "title": "Reshape Canvas item",
+      "explanation": "This part of canvas_item.cpp replaces 1 line and adds 4. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 589,
+      "endLine": 592,
+      "area": "errors",
+      "added": 4,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "cbfe03e9-346b-4ecd-b51b-1a47c59c03c9",
+      "title": "Reshape Canvas item",
+      "explanation": "This part of canvas_item.cpp replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 594,
+      "endLine": 594,
+      "area": "errors",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "b90b990e-cec6-4f4f-bcd3-8502336009bf",
+      "title": "Extend Canvas item",
+      "explanation": "This part of canvas_item.cpp adds 6 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 603,
+      "endLine": 608,
+      "area": "errors",
+      "added": 6,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "0ff68d16-204c-4ea3-931a-cddf26d45fc7",
+      "title": "Reshape Drawing controller",
+      "explanation": "This part of drawing_controller.cpp replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/drawing_controller.cpp",
+      "startLine": 11,
+      "endLine": 11,
+      "area": "errors",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "7a5f96df-07f2-4ce4-882e-385bf4ede8b7",
+      "title": "Reshape Drawing controller",
+      "explanation": "This part of drawing_controller.cpp replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/drawing_controller.cpp",
+      "startLine": 18,
+      "endLine": 18,
+      "area": "errors",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "5ed829dc-d8ce-4e58-804a-628f0df0239d",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 100,
+      "endLine": 100,
+      "area": "errors",
+      "symbol": "for",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "e2a560ae-5d0f-4f00-8de5-7dc96c395e34",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 113,
+      "endLine": 113,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "c11d46ee-5adc-4ca3-ba23-48e337d70915",
+      "title": "Reshape `std`",
+      "explanation": "The `std` section replaces 1 line and adds 1. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 109,
+      "endLine": 109,
+      "area": "auth",
+      "symbol": "std",
+      "added": 1,
+      "removed": 1,
+      "relation": "Builds on drawing_selection.cpp and moves into authentication."
+    },
+    {
+      "id": "09003e68-f77a-4141-8a9e-5f886fe457a6",
+      "title": "Reshape `class`",
+      "explanation": "The `class` section replaces 1 line and adds 2. It changes how identity or session data moves through the solution. This completes the path introduced by the earlier steps.",
+      "file": "modules/document/include/opentoon/drawing_selection.h",
+      "startLine": 19,
+      "endLine": 20,
+      "area": "auth",
+      "symbol": "class",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the authentication thread from the previous step."
+    }
+  ]
+}

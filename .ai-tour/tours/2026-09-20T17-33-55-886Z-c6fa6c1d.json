@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "id": "c6fa6c1d-ea1b-47a3-84ad-d18a634a7643",
+  "title": "Improve tests flow",
+  "summary": "3 files changed across 2 areas. The tour follows the implementation from tests to api.",
+  "createdAt": "2026-09-20T17:33:55.886Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "created",
+      "area": "tests",
+      "added": 34,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/canvas_item.h",
+      "kind": "created",
+      "area": "api",
+      "added": 31,
+      "removed": 0
+    },
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "created",
+      "area": "tests",
+      "added": 30,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "2584b285-949a-4287-a83a-2040235171cf",
+        "a017fd10-1224-4f77-b181-d0b72230670a"
+      ]
+    },
+    {
+      "id": "api",
+      "label": "API",
+      "stepIds": [
+        "20096ad0-4322-4eec-bfd8-b5d118329f3e"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "2584b285-949a-4287-a83a-2040235171cf",
+      "title": "Introduce Canvas item",
+      "explanation": "This part of canvas_item.cpp adds 34 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 1,
+      "endLine": 34,
+      "area": "tests",
+      "added": 34,
+      "removed": 0
+    },
+    {
+      "id": "a017fd10-1224-4f77-b181-d0b72230670a",
+      "title": "Introduce Main",
+      "explanation": "This part of main.cpp adds 30 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 1,
+      "endLine": 30,
+      "area": "tests",
+      "added": 30,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "20096ad0-4322-4eec-bfd8-b5d118329f3e",
+      "title": "Introduce Canvas item",
+      "explanation": "This part of canvas_item.h adds 31 lines. It updates the boundary where the application exchanges data. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/canvas_item.h",
+      "startLine": 1,
+      "endLine": 31,
+      "area": "api",
+      "added": 31,
+      "removed": 0,
+      "relation": "Builds on main.cpp and moves into api."
+    }
+  ]
+}

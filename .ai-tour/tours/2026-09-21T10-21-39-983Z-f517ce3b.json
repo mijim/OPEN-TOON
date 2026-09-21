@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "id": "f517ce3b-6698-4b2f-bda5-2ef5c055f507",
+  "title": "Update Roadmap",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-21T10:21:39.983Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "scripts/roadmap.py",
+      "kind": "modified",
+      "area": "tests",
+      "added": 99,
+      "removed": 3
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "a618e5cb-2954-4fc2-a27f-41706bf2b8b4",
+        "0b0d1797-78f4-404c-99c6-64b603886934",
+        "1e8f81fc-1f67-464b-8352-8c9cfcf53ca0",
+        "5c6697eb-afb2-4c5b-82de-5a89fb231b0a",
+        "45f00028-e654-4454-8acd-19cd7b8ded22"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "a618e5cb-2954-4fc2-a27f-41706bf2b8b4",
+      "title": "Extend Roadmap",
+      "explanation": "This part of roadmap.py adds 86 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "scripts/roadmap.py",
+      "startLine": 205,
+      "endLine": 290,
+      "area": "tests",
+      "added": 86,
+      "removed": 0
+    },
+    {
+      "id": "0b0d1797-78f4-404c-99c6-64b603886934",
+      "title": "Reshape `main`",
+      "explanation": "The `main` section replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "scripts/roadmap.py",
+      "startLine": 297,
+      "endLine": 297,
+      "area": "tests",
+      "symbol": "main",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "1e8f81fc-1f67-464b-8352-8c9cfcf53ca0",
+      "title": "Reshape `main`",
+      "explanation": "The `main` section replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "scripts/roadmap.py",
+      "startLine": 299,
+      "endLine": 299,
+      "area": "tests",
+      "symbol": "main",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "5c6697eb-afb2-4c5b-82de-5a89fb231b0a",
+      "title": "Reshape `main`",
+      "explanation": "The `main` section replaces 1 line and adds 7. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "scripts/roadmap.py",
+      "startLine": 317,
+      "endLine": 323,
+      "area": "tests",
+      "symbol": "main",
+      "added": 7,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "45f00028-e654-4454-8acd-19cd7b8ded22",
+      "title": "Extend `main`",
+      "explanation": "The `main` section adds 4 lines. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "scripts/roadmap.py",
+      "startLine": 329,
+      "endLine": 332,
+      "area": "tests",
+      "symbol": "main",
+      "added": 4,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

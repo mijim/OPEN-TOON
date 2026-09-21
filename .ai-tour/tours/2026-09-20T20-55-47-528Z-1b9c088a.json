@@ -1,0 +1,269 @@
+{
+  "version": 1,
+  "id": "1b9c088a-ec6c-4fbb-99d9-087e7eb099f5",
+  "title": "Improve error handling flow",
+  "summary": "9 files changed across 3 areas. The tour follows the implementation from error handling to authentication.",
+  "createdAt": "2026-09-20T20:55:47.528Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/animation_controller.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 16,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 45,
+      "removed": 1
+    },
+    {
+      "path": "adapters/qt/canvas_item.h",
+      "kind": "modified",
+      "area": "api",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/drawing_controller.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 21,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/editor_controller.h",
+      "kind": "modified",
+      "area": "auth",
+      "added": 4,
+      "removed": 0
+    },
+    {
+      "path": "modules/document/include/opentoon/animation.h",
+      "kind": "modified",
+      "area": "api",
+      "added": 2,
+      "removed": 0
+    },
+    {
+      "path": "modules/document/include/opentoon/drawing_selection.h",
+      "kind": "modified",
+      "area": "auth",
+      "added": 2,
+      "removed": 0
+    },
+    {
+      "path": "modules/document/src/animation.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 11,
+      "removed": 0
+    },
+    {
+      "path": "modules/document/src/drawing_selection.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 20,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "0b800b6f-865d-4d8b-a9c6-1e5771c6edf1",
+        "7a09147a-5ae0-49fa-acce-c54176462f69",
+        "f16b30d4-2912-4301-960f-3e37154f4c14",
+        "7834dc61-becf-4410-be65-0558b6d661de",
+        "aecd9b48-619a-497e-9e91-0fe930478c21",
+        "d3415528-304a-4ce7-a1ae-238824c1f26b",
+        "6487eb55-55f2-45e4-b305-b1a9cf304abf",
+        "e2a0c097-9178-4894-aa63-8fdb4c981f0c"
+      ]
+    },
+    {
+      "id": "api",
+      "label": "API",
+      "stepIds": [
+        "545c92d2-d228-4a8b-b362-53bb9cbb7afb",
+        "04e4ed07-401b-4938-aa7e-fbf4f527e8d6"
+      ]
+    },
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "36df9b3b-740a-4bb8-956d-3c8a677ca2be",
+        "e138cb88-80c4-4188-8cda-37560d453add",
+        "c4e5665e-3859-43c5-9743-81af1cf0a9ee"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "0b800b6f-865d-4d8b-a9c6-1e5771c6edf1",
+      "title": "Extend Animation controller",
+      "explanation": "This part of animation_controller.cpp adds 16 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 149,
+      "endLine": 164,
+      "area": "errors",
+      "added": 16,
+      "removed": 0
+    },
+    {
+      "id": "7a09147a-5ae0-49fa-acce-c54176462f69",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 3. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 247,
+      "endLine": 249,
+      "area": "errors",
+      "symbol": "if",
+      "added": 3,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "f16b30d4-2912-4301-960f-3e37154f4c14",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 504,
+      "endLine": 504,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "7834dc61-becf-4410-be65-0558b6d661de",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 9 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 628,
+      "endLine": 636,
+      "area": "errors",
+      "symbol": "if",
+      "added": 9,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "aecd9b48-619a-497e-9e91-0fe930478c21",
+      "title": "Extend Canvas item",
+      "explanation": "This part of canvas_item.cpp adds 32 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 894,
+      "endLine": 925,
+      "area": "errors",
+      "added": 32,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "d3415528-304a-4ce7-a1ae-238824c1f26b",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 21 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/drawing_controller.cpp",
+      "startLine": 56,
+      "endLine": 76,
+      "area": "errors",
+      "symbol": "if",
+      "added": 21,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "6487eb55-55f2-45e4-b305-b1a9cf304abf",
+      "title": "Extend Animation",
+      "explanation": "This part of animation.cpp adds 11 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/animation.cpp",
+      "startLine": 127,
+      "endLine": 137,
+      "area": "errors",
+      "added": 11,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "e2a0c097-9178-4894-aa63-8fdb4c981f0c",
+      "title": "Extend Drawing selection",
+      "explanation": "This part of drawing_selection.cpp adds 20 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 7,
+      "endLine": 26,
+      "area": "errors",
+      "added": 20,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "545c92d2-d228-4a8b-b362-53bb9cbb7afb",
+      "title": "Extend Canvas item",
+      "explanation": "This part of canvas_item.h adds 1 line. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.h",
+      "startLine": 52,
+      "endLine": 52,
+      "area": "api",
+      "added": 1,
+      "removed": 0,
+      "relation": "Builds on drawing_selection.cpp and moves into api."
+    },
+    {
+      "id": "04e4ed07-401b-4938-aa7e-fbf4f527e8d6",
+      "title": "Extend `class`",
+      "explanation": "The `class` section adds 2 lines. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/include/opentoon/animation.h",
+      "startLine": 10,
+      "endLine": 11,
+      "area": "api",
+      "symbol": "class",
+      "added": 2,
+      "removed": 0,
+      "relation": "Continues the api thread from the previous step."
+    },
+    {
+      "id": "36df9b3b-740a-4bb8-956d-3c8a677ca2be",
+      "title": "Extend `std`",
+      "explanation": "The `std` section adds 2 lines. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 133,
+      "endLine": 134,
+      "area": "auth",
+      "symbol": "std",
+      "added": 2,
+      "removed": 0,
+      "relation": "Builds on animation.h and moves into authentication."
+    },
+    {
+      "id": "e138cb88-80c4-4188-8cda-37560d453add",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.h adds 2 lines. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 163,
+      "endLine": 164,
+      "area": "auth",
+      "added": 2,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "c4e5665e-3859-43c5-9743-81af1cf0a9ee",
+      "title": "Extend Drawing selection",
+      "explanation": "This part of drawing_selection.h adds 2 lines. It changes how identity or session data moves through the solution. This completes the path introduced by the earlier steps.",
+      "file": "modules/document/include/opentoon/drawing_selection.h",
+      "startLine": 4,
+      "endLine": 5,
+      "area": "auth",
+      "added": 2,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    }
+  ]
+}
