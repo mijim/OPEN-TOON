@@ -1,971 +1,1357 @@
 {
   "schema_version": 1,
-  "note": "Specification ownership, not completion or a claim that every entry is a distinct operator. Earlier foundational subsets may be delivered in P02/P06/P09/P10. Each owning phase must expand family entries, define parameters and assign operator tickets; P22 audits all dispositions.",
+  "note": "Specification ownership only; preserved inventory IDs do not imply implemented operators or Harmony equivalence. delivery_slice assigns a bounded HM subset to selected entries; each needs its own ports/parameters/error/alpha contracts. Remaining entries stay in their long-term owner phase.",
   "assignments": [
     {
       "node_id": "NODE-5f0dde20ab",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-a06b79d317",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-450dce4d56",
       "specification_phase": "P17",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-e0088fd808",
       "specification_phase": "P17",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-59d78de94b",
       "specification_phase": "P17",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-27398d62d4",
       "specification_phase": "P17",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-13bbeb4faa",
       "specification_phase": "P17",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-09dc0cbf72",
       "specification_phase": "P17",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-4bb4003c85",
       "specification_phase": "P17",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-2e596c092a",
       "specification_phase": "P17",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-b02bff22a8",
       "specification_phase": "P17",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-303ad8d494",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-f06f7a2f68",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-5abeeb75d8",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": "HM-12",
+      "delivery_priority": "harmony_moment_subset"
     },
     {
       "node_id": "NODE-4ed89889be",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-3262d0b15b",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": "HM-12",
+      "delivery_priority": "harmony_moment_subset"
     },
     {
       "node_id": "NODE-85b5cbb854",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-0b90fa5495",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-b62d5c20ab",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-1354148e3f",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-a439ffc011",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-f3a568dc7a",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-6eff2bf33f",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-6cfa5e7153",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-c7475645cf",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-dc168aeb80",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-a8e7081e39",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-c3bac94d45",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-1c89563d25",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-7fb433fb89",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-968d914aee",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-aae033e5e0",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-1701509f0b",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-e451ae614f",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-fca74eed55",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-9e183f1471",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-81d8ec415e",
-      "specification_phase": "P13",
-      "status": "pending_specification"
+      "specification_phase": "P09",
+      "status": "pending_specification",
+      "delivery_slice": "HM-06",
+      "delivery_priority": "harmony_moment_subset"
     },
     {
       "node_id": "NODE-dd50b78b1a",
-      "specification_phase": "P13",
-      "status": "pending_specification"
+      "specification_phase": "P09",
+      "status": "pending_specification",
+      "delivery_slice": "HM-06",
+      "delivery_priority": "harmony_moment_subset"
     },
     {
       "node_id": "NODE-b9491e3784",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-5973dd3d5a",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-a3c5b76f87",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-9b0a4d9526",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-f454fa7582",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-1d5addd136",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-54856eaa8c",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-9db97dfc3c",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-c37ba7421a",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-0ac75ee0c4",
-      "specification_phase": "P13",
-      "status": "pending_specification"
+      "specification_phase": "P09",
+      "status": "pending_specification",
+      "delivery_slice": "HM-09",
+      "delivery_priority": "harmony_moment_subset"
     },
     {
       "node_id": "NODE-2ef7def4eb",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-3d446d1153",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-b049fd6684",
-      "specification_phase": "P13",
-      "status": "pending_specification"
+      "specification_phase": "P09",
+      "status": "pending_specification",
+      "delivery_slice": "HM-09",
+      "delivery_priority": "harmony_moment_subset"
     },
     {
       "node_id": "NODE-d85270ef67",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-1ae3c2d6f0",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-6239a7d604",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-1a92cef5c5",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-79042603fb",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-a1b75fc72e",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-404d536272",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-6f6d20f761",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-08f3cc6941",
       "specification_phase": "P13",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-34cc3c5ef1",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-a94126b0bc",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-fea4bf1696",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-be5265b356",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-54340ff712",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-cd9bdd6a5c",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-28e523f01d",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-674d718b26",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-a002538963",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-83b0cb533a",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-befac9a195",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-e2dd78046b",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-494ccf4929",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-0a2a946319",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-5b3f9fff47",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-13adf1b127",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-284bfc4093",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-d30174d7ca",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-efa4ccddee",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-481cf50ed6",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-3e9aa894ef",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-345b712f48",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-64b8853d40",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-14c7d66ca4",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-0235c2970b",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-26bc0eede4",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-136b52d28c",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-6ac02956c2",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-609aeaf262",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-0f28d1dc9a",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-3627cbb7f3",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-9225de77b3",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-a534097217",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-9005c38a21",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-d9af013dca",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-a348da5ab4",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-569964f17a",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-909074b8b0",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-edbfbf19fc",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-912f5e2635",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-f9b99d66da",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-946b242696",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-7abc084bfd",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-05201cb529",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-5ecef64ef3",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-df907b5949",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-8027641246",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-92aba889fe",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-26c2455619",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-b69e81e91d",
-      "specification_phase": "P15",
-      "status": "pending_specification"
+      "specification_phase": "P10",
+      "status": "pending_specification",
+      "delivery_slice": "HM-12",
+      "delivery_priority": "harmony_moment_subset"
     },
     {
       "node_id": "NODE-1605954b8a",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-83704e7075",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-9b7bf3ee52",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-62d4df6fb1",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-4c68960599",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-27da81224e",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-ce63ae5797",
-      "specification_phase": "P15",
-      "status": "pending_specification"
+      "specification_phase": "P10",
+      "status": "pending_specification",
+      "delivery_slice": "HM-04",
+      "delivery_priority": "harmony_moment_subset"
     },
     {
       "node_id": "NODE-7a8b1eb580",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-4f0de97918",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-166991ba4f",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-c04c6d8bb7",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-ece7678ae8",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-509ac67271",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-2c01d639e3",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-60b8b6a9a5",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-aaa0854231",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-c04d252ac9",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-5279f7012c",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-d7197c2eb3",
-      "specification_phase": "P15",
-      "status": "pending_specification"
+      "specification_phase": "P08",
+      "status": "pending_specification",
+      "delivery_slice": "HM-07",
+      "delivery_priority": "harmony_moment_subset"
     },
     {
       "node_id": "NODE-fa38c883e3",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-45b5a5aba5",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-890f4b7c1c",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-2cbd28e138",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-487343e338",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-1849afecb3",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-3caeb3fbee",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-c3ba0f4da2",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-35c19f293b",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-8009750100",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": "HM-04",
+      "delivery_priority": "harmony_moment_subset"
     },
     {
       "node_id": "NODE-2d71e5f74e",
-      "specification_phase": "P10",
-      "status": "pending_specification"
+      "specification_phase": "P06",
+      "status": "pending_specification",
+      "delivery_slice": "HM-13",
+      "delivery_priority": "harmony_moment_subset"
     },
     {
       "node_id": "NODE-a9c2c1b6bd",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-50825d1409",
-      "specification_phase": "P10",
-      "status": "pending_specification"
+      "specification_phase": "P08",
+      "status": "pending_specification",
+      "delivery_slice": "HM-03",
+      "delivery_priority": "harmony_moment_subset"
     },
     {
       "node_id": "NODE-dc6f0714ce",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-84f2d26aed",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-ea2b9f7d7b",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-3378009639",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-fa7e646fa7",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-fefc1d44a6",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-3840e4e148",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": "HM-04",
+      "delivery_priority": "harmony_moment_subset"
     },
     {
       "node_id": "NODE-82fe430e0d",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-7c79115cdd",
       "specification_phase": "P10",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-798d7924ab",
-      "specification_phase": "P10",
-      "status": "pending_specification"
+      "specification_phase": "P07",
+      "status": "pending_specification",
+      "delivery_slice": "HM-14",
+      "delivery_priority": "harmony_moment_subset"
     },
     {
       "node_id": "NODE-566a6f74a9",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-bdfad01957",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-6a6d9b674d",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-fafb647dee",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-bc447263a6",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-d11c3edc75",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-ee964793a7",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-c16d8060bc",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-59e2568aa3",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-04d023fb8a",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-dc58037115",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-e2dae65f68",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-6a22dd859d",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-8f72a14c36",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-946696dcd3",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-a231fa7d28",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-55c6e9c1c6",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-d1d0dd140d",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-42286bad6a",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-241434a0c5",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-04b955d55b",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-64b44b1ea1",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-dee6d2bda1",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-6dea93eb54",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-6e4f3b2399",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-95ad409179",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-f1a32d6965",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-9903c775ca",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-2c62f10be1",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-747a8cd407",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-9061822295",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-6b0896ff25",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-952bd13ba5",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-7409226e67",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-290455862d",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-00cdc0d7ac",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-291449ca85",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-0280e513cc",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-e29b493a5e",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-f609d4e5c0",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     },
     {
       "node_id": "NODE-8b6f458a81",
       "specification_phase": "P15",
-      "status": "pending_specification"
+      "status": "pending_specification",
+      "delivery_slice": null,
+      "delivery_priority": "long_term"
     }
   ]
 }

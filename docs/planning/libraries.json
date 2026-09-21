@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "as_of": "2026-09-20",
+  "as_of": "2026-09-21",
   "note": "Experimental adoption is recorded separately from production acceptance; see docs/implementation/DEPENDENCIES.md.",
   "libraries": [
     {
@@ -15,7 +15,12 @@
       "evaluation": "SP-01/02/07: real tablets, focus/DPI, graphics integration and clean installations.",
       "fallback": "Use one supported Qt rendering route; reconsider QML docking independently if its candidate fails.",
       "version": "6.11.2 (local SDK; CI targets 6.8.3)",
-      "installed": true
+      "installed": true,
+      "harmony_moment_slices": [
+        "HM-02",
+        "HM-04"
+      ],
+      "delivery_priority": "harmony_moment_boundary"
     },
     {
       "id": "LIB-SQLITE",
@@ -29,7 +34,11 @@
       "evaluation": "SP-03: terminate at every commit boundary, fill disk and recover reachable blobs.",
       "fallback": "Keep the repository port; revise the blob protocol before changing database technology.",
       "version": "3.53.4 (Conan lock)",
-      "installed": true
+      "installed": true,
+      "harmony_moment_slices": [
+        "HM-01"
+      ],
+      "delivery_priority": "harmony_moment_boundary"
     },
     {
       "id": "LIB-SKIA",
@@ -40,10 +49,12 @@
       "license_notes": "BSD-style; inventory third-party components",
       "purpose": "Vector/raster drawing and a possible CPU reference renderer.",
       "integration_boundary": "Skia is not an editable drawing model, rigging engine or whole compositor. Do not add a second permanent interactive renderer without evidence.",
-      "evaluation": "SP-02: compare CPU upload and GPU integration for tablet latency, tile updates, alpha, color and packaging.",
+      "evaluation": "SP-02: compare CPU upload and GPU integration for tablet latency, tile updates, alpha, color and packaging. Not a blanket HM prerequisite: keep the current constrained QML workspace and reference renderer until a measured consumer blocker justifies replacement.",
       "fallback": "Use the selected Qt/RHI adapter if Skia integration adds excessive copying or build cost.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-CLIPPER2",
@@ -57,7 +68,9 @@
       "evaluation": "SP-04: near-coincident edges, holes, self-intersections and large coordinate ranges.",
       "fallback": "Evaluate another maintained polygon kernel against the same corpus; do not silently rasterize edits.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-TESS",
@@ -68,10 +81,14 @@
       "license_notes": "Different licenses: verify chosen implementation at pinned revision",
       "purpose": "Select one suitable polygon tessellator for the renderer or mesh preparation.",
       "integration_boundary": "Earcut is an alternative, not an additional mandatory engine; triangle quality for deformation requires further refinement.",
-      "evaluation": "Compare holes/degeneracies and topology failures; do not infer solver-quality meshes from fast triangulation.",
+      "evaluation": "Compare holes/degeneracies and topology failures; do not infer solver-quality meshes from fast triangulation. HM-05 first tests a regular rest mesh over transparent artwork; add a tessellator only if the fixture demonstrates a need. Clipping and triangulation do not solve skinning or texture rendering.",
       "fallback": "Use renderer-native tessellation for display and a separately justified deformation mesher.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [
+        "HM-05"
+      ],
+      "delivery_priority": "harmony_moment_boundary"
     },
     {
       "id": "LIB-MYPAINT",
@@ -86,7 +103,11 @@
       "fallback": "Keep simple native brushes initially and defer advanced presets if the adapter cannot meet budgets.",
       "version": "1.6.1 (commit 2768251dacce3939136c839aeca413f4aa4241d0)",
       "installed": true,
-      "implementation_evidence": "docs/implementation/BRUSH-BENCHMARK.md; docs/architecture/adr/012-immutable-media-and-raster.md; production acceptance remains open"
+      "implementation_evidence": "docs/implementation/BRUSH-BENCHMARK.md; docs/architecture/adr/012-immutable-media-and-raster.md; production acceptance remains open",
+      "harmony_moment_slices": [
+        "HM-02"
+      ],
+      "delivery_priority": "harmony_moment_boundary"
     },
     {
       "id": "LIB-DOCK",
@@ -97,10 +118,12 @@
       "license_notes": "GPL-2.0-only OR GPL-3.0-only / commercial; inspect chosen files",
       "purpose": "Docking, tabbing and saved workspaces with a Qt Quick frontend.",
       "integration_boundary": "Qt Quick support must be evaluated independently of the mature Widgets path; avoid switching the entire UI for one library.",
-      "evaluation": "SP-00/07: nested docks, floating windows, restore, focus, HiDPI, accessibility and monochrome customization.",
+      "evaluation": "SP-00/07: nested docks, floating windows, restore, focus, HiDPI, accessibility and monochrome customization. Not a blanket HM prerequisite: keep the current constrained QML workspace and reference renderer until a measured consumer blocker justifies replacement.",
       "fallback": "Deliver a constrained QML split-panel layout first if Quick support fails; advanced docking stays incomplete.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-AUDIO",
@@ -111,10 +134,14 @@
       "license_notes": "Public domain or MIT No Attribution; record the selected option",
       "purpose": "Cross-platform audio device playback, mixing and capture infrastructure.",
       "integration_boundary": "One real-time audio engine; FFmpeg handles media formats outside it. No allocations or document locks in the audio callback.",
-      "evaluation": "SP-05: 10-minute rational-rate sync, device replacement, scrub and underrun traces.",
+      "evaluation": "SP-05: 10-minute rational-rate sync, device replacement, scrub and underrun traces. HM-10 starts with the already-resolved but unlinked miniaudio package; verify its exact revision and adopt only after clock/device tests. WAV/PCM does not require the FFmpeg adapter.",
       "fallback": "Evaluate Qt Multimedia behind the same audio port, choosing one engine after measurement.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [
+        "HM-10"
+      ],
+      "delivery_priority": "harmony_moment_boundary"
     },
     {
       "id": "LIB-FFMPEG",
@@ -125,10 +152,12 @@
       "license_notes": "Build-dependent LGPL/GPL; nonfree configurations excluded from redistributable profiles",
       "purpose": "Decode imported media and encode supported movie/audio exports.",
       "integration_boundary": "Use a restricted format/codec build and bounded jobs; available codecs are an explicit runtime capability.",
-      "evaluation": "Known-timestamp fixtures, cancellation, corrupt input and clean-machine export tests.",
+      "evaluation": "Known-timestamp fixtures, cancellation, corrupt input and clean-machine export tests. First follow-on output after HM: pin one redistributable review-movie profile and prove timestamps/muxing against the PNG+WAV reference; codec failure must not break the open delivery profile.",
       "fallback": "Always preserve image-sequence and WAV delivery if a movie codec cannot be distributed.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-OCIO",
@@ -139,10 +168,12 @@
       "license_notes": "Review exact release license plus configuration and LUT licenses",
       "purpose": "Scene/display/output color transformations.",
       "integration_boundary": "Define working space, premultiplied alpha boundaries and CPU/GPU transform equality; library does not choose artistic policy.",
-      "evaluation": "B5 charts, negative/HDR values, config changes and GPU/CPU tolerance.",
+      "evaluation": "B5 charts, negative/HDR values, config changes and GPU/CPU tolerance. HM-04 requires explicit restricted linear-sRGB/legacy profiles first; full OCIO/HDR configuration is deferred, not a waiver of alpha/color correctness.",
       "fallback": "A documented restricted sRGB workflow before advanced color support; never claim HDR parity.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-OIIO",
@@ -156,7 +187,9 @@
       "evaluation": "PNG/TIFF/EXR fixtures, resource limits, metadata/color preservation and package size.",
       "fallback": "Use Qt image IO for the first PNG slice; add professional formats only when their adapters pass.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-EXR",
@@ -170,7 +203,9 @@
       "evaluation": "B5 half/float values, channels, alpha and round-trip metadata.",
       "fallback": "Defer unsupported channel models with an explicit export report.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-OTIO",
@@ -184,7 +219,9 @@
       "evaluation": "Nested rates, gaps, missing media and round trips against specified adapter versions.",
       "fallback": "Documented image/audio sequence exchange with timing manifests.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-OFX",
@@ -198,7 +235,9 @@
       "evaluation": "Supported suite tests, crash recovery, ROI/tiles/color and plugin-specific compatibility.",
       "fallback": "Keep native operators usable and mark unsupported plugins clearly.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-EIGEN",
@@ -209,10 +248,16 @@
       "license_notes": "Primarily MPL-2.0; use eligible modules and record any optional dependencies",
       "purpose": "Linear algebra and numerical computations for geometry and rig solvers.",
       "integration_boundary": "Use behind algorithm boundaries; avoid leaking expression-template types across public ABI.",
-      "evaluation": "Conditioning, degenerate transforms, precision, vectorization and compile cost.",
+      "evaluation": "Conditioning, degenerate transforms, precision, vectorization and compile cost. HM-05/HM-06: use only required algebra through a narrow adapter; no blanket libigl adoption or assumed mesh renderer.",
       "fallback": "Use small explicit math types for simple operations; restrict solver complexity until proven.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [
+        "HM-05",
+        "HM-06",
+        "HM-09"
+      ],
+      "delivery_priority": "harmony_moment_boundary"
     },
     {
       "id": "LIB-LIBIGL",
@@ -226,7 +271,9 @@
       "evaluation": "SP-06 extended: texture distortion, weight quality, memory and extreme poses.",
       "fallback": "Ship proven bone/curve/envelope tools while advanced solvers remain partial.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-PYBIND",
@@ -240,21 +287,25 @@
       "evaluation": "Ownership/lifetime, exceptions, version negotiation and worker cancellation.",
       "fallback": "CLI manifest automation remains available if embedded scripting is deferred.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-LIPSYNC",
       "name": "Rhubarb Lip Sync",
-      "adoption_phase": "P08",
+      "adoption_phase": "P07",
       "status": "candidate_requires_spike",
       "upstream_url": "https://github.com/DanielSWolf/rhubarb-lip-sync",
       "license_notes": "MIT core; inspect recognizer/model dependencies",
-      "purpose": "Optional offline automatic mouth-timing generation.",
+      "purpose": "Optional offline mouth-timing proposals after manual mouth mapping/correction works; not required for the Harmony Moment.",
       "integration_boundary": "Subprocess adapter with editable results; default speech recognizer is English-oriented, phonetic mode requires separate quality evaluation.",
       "evaluation": "Human review of English and Spanish dialogue, timings, noise and character mouth mappings.",
       "fallback": "Manual lip sync and import of a documented timing file.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-UFBX",
@@ -268,7 +319,9 @@
       "evaluation": "Unit/axis/skin/clip corpus, malformed files and allocator limits.",
       "fallback": "Support an explicitly smaller glTF subset first.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-GLTF",
@@ -282,7 +335,9 @@
       "evaluation": "External URI handling, extensions, missing buffers, animation and memory limits.",
       "fallback": "Restrict supported glTF extensions and provide actionable import reports.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-ONNX",
@@ -296,7 +351,9 @@
       "evaluation": "Model conversion, CPU/GPU fallbacks, installation size, latency, peak memory and cancellation.",
       "fallback": "Keep AI optional; unsupported models remain unavailable without affecting normal editing.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-JSON",
@@ -310,7 +367,11 @@
       "evaluation": "Schema migration, malformed input and metadata size.",
       "fallback": "Keep hot-path snapshots strongly typed.",
       "version": "3.12.0",
-      "installed": true
+      "installed": true,
+      "harmony_moment_slices": [
+        "HM-01"
+      ],
+      "delivery_priority": "harmony_moment_boundary"
     },
     {
       "id": "LIB-ZSTD",
@@ -325,7 +386,11 @@
       "fallback": "Store small/hot resources uncompressed if compression harms responsiveness.",
       "version": "1.5.7 (Conan lock)",
       "installed": true,
-      "implementation_evidence": "docs/implementation/BRUSH-BENCHMARK.md; docs/architecture/adr/012-immutable-media-and-raster.md; production acceptance remains open"
+      "implementation_evidence": "docs/implementation/BRUSH-BENCHMARK.md; docs/architecture/adr/012-immutable-media-and-raster.md; production acceptance remains open",
+      "harmony_moment_slices": [
+        "HM-01"
+      ],
+      "delivery_priority": "harmony_moment_boundary"
     },
     {
       "id": "LIB-ARCHIVE",
@@ -337,9 +402,11 @@
       "purpose": "Portable project/library package transport.",
       "integration_boundary": "Whitelist formats; prevent path traversal, symlink escape, archive bombs and unsafe overwrite.",
       "evaluation": "Unicode paths, duplicate entries, size limits and hostile archives.",
-      "fallback": "Use folder-based local projects until safe package transport is ready.",
+      "fallback": "Use folder-based local projects until safe package transport is ready. HM-09 uses bounded folder manifests with dependency closure; compressed transport is not required for reusable rigs.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-CATCH",
@@ -353,7 +420,9 @@
       "evaluation": "Run deterministic fixtures and fault injection in CI.",
       "fallback": "Do not introduce a second C++ unit-test framework without a clear need.",
       "version": "3.15.0 (Conan lock)",
-      "installed": true
+      "installed": true,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-BENCH",
@@ -367,7 +436,9 @@
       "evaluation": "Fixed release build, recorded hardware, repetitions and distribution summaries.",
       "fallback": "Use end-to-end frame/input traces when isolation changes the workload.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-TRACY",
@@ -381,7 +452,9 @@
       "evaluation": "Measure instrumentation overhead and verify supported graphics backend capture.",
       "fallback": "Platform profilers and local structured timing traces.",
       "version": null,
-      "installed": false
+      "installed": false,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-BUILD",
@@ -395,7 +468,9 @@
       "evaluation": "Clean builds and dependency restoration on every supported OS.",
       "fallback": "Document a reproducible source-build recipe for dependencies missing a reliable package.",
       "version": "CMake 4.4.3, Ninja 1.13.2, Conan 2.20.1 (local)",
-      "installed": true
+      "installed": true,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-JSON-C",
@@ -409,7 +484,9 @@
       "evaluation": "Pinned engine build and deterministic brush replay; external brush JSON imports remain unsupported.",
       "fallback": "Keep original programmatic presets and validated engine adapter.",
       "version": "0.18 (Conan lock)",
-      "installed": true
+      "installed": true,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     },
     {
       "id": "LIB-OPENSSL",
@@ -423,7 +500,9 @@
       "evaluation": "Corrupt/missing resource rejection, deduplication, atomic save and 4K storage benchmark.",
       "fallback": "Replace the digest adapter while retaining the SHA-256 format contract and compatibility fixtures.",
       "version": "3.5.8 (Conan lock)",
-      "installed": true
+      "installed": true,
+      "harmony_moment_slices": [],
+      "delivery_priority": "after_harmony_moment"
     }
   ]
 }

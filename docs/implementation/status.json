@@ -53,13 +53,13 @@
       "id": "P07",
       "status": "planned",
       "available": "Exact rational frame-to-sample arithmetic has a domain test; no audio playback.",
-      "remaining": "Audio decode/timeline/waveform/sync, media policies, FFmpeg adapter and video output."
+      "remaining": "Audio decode/timeline/waveform/sync, mouth mapping/manual lip correction, optional detection, media policies, FFmpeg adapter and video output."
     },
     {
       "id": "P08",
       "status": "in_progress",
       "available": "Parented layers, pivots, independent duplicates and linked drawing clones.",
-      "remaining": "Production cut-out tools, asset/template library, substitution workflow, pose preservation, lip sync and animator validation."
+      "remaining": "Character/part identity, production cut-out tools, named substitutions and masked poses, Quick Rig, declarative controls, asset/template library, instance-safe mappings and animator validation."
     },
     {
       "id": "P09",
@@ -290,5 +290,11 @@
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
     "release_artifacts": "Source only; requested macOS preview was built and verified locally, then binary publication cancelled by owner",
     "cross_platform_builds": "manual future compiled-release qualification"
+  },
+  "planning_priority": {
+    "milestone": "HM",
+    "roadmap": "docs/planning/roadmap.json",
+    "state": "planned_only",
+    "note": "Character-first contract slices supersede numeric phase execution order. Existing implementation/verification counts and full phase completion claims are unchanged."
   }
 }

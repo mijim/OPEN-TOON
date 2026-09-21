@@ -1,6 +1,6 @@
 # Functional catalog
 
-282 original proposed capabilities across 26 domains. Application status: **experimental, with partial working subsets; no phase is complete**.
+283 original proposed capabilities across 26 domains. Application status: **experimental, with partial working subsets; no phase is complete**.
 
 Canonical source: [features.json](features.json). Acceptance criteria are OPEN-TOON objectives. Domain dependencies express relationships, not a requirement to finish an entire domain before starting another.
 
@@ -17,9 +17,9 @@ Levels: `core` foundations; `pro` professional workflow; `advanced` high complex
 | [TIM — Timeline, Xsheet and exposure](domains/tim.md) | 14 | `timeline` |
 | [FBF — Traditional and paperless animation](domains/fbf.md) | 12 | `animation-drawing` |
 | [ANI — Transforms, curves and keyframe animation](domains/ani.md) | 13 | `animation-curves` |
-| [RIG — Rigging, hierarchies and inverse kinematics](domains/rig.md) | 14 | `rigging` |
+| [RIG — Rigging, hierarchies and inverse kinematics](domains/rig.md) | 15 | `rigging` |
 | [DEF — Deformers and meshes](domains/def.md) | 15 | `deformation` |
-| [CTL — Advanced character controllers](domains/ctl.md) | 8 | `controllers` |
+| [CTL — Character controllers and dashboards](domains/ctl.md) | 8 | `controllers` |
 | [MOR — Vector morphing](domains/mor.md) | 6 | `morphing` |
 | [CAM — Camera, staging and 2.5D space](domains/cam.md) | 7 | `camera` |
 | [NOD — Compositing graph](domains/nod.md) | 10 | `compositor-graph` |

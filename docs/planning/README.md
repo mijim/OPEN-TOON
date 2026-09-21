@@ -1,100 +1,88 @@
 # Long-term development roadmap
 
-**Status: active execution plan. An experimental editor exists; no phase is complete.** See [implementation status](../implementation/STATUS.md). This plan covers all **282 catalog capabilities**, assigns specification ownership for **193 node/family entries**, and organizes delivery into **23 phases with 69 work packages**. The accepted direction is **C++20 + Qt 6 / Qt Quick**, with an offline modular core and mature open-source components behind explicit adapters.
+The immediate objective is a **Harmony Moment**: a reliable, reusable character shot
+from drawing/import through cut-out, substitutions, rigging, deformers, controls,
+animated dialogue, nodes and camera to preview/save/reopen/export. It is a bounded
+workflow milestone before full P11/1.0, not a claim of Harmony parity.
 
-**English is the product language.** UI, menus, tools, messages, accessibility labels, built-in assets, help, code identifiers and public documentation must be English. This roadmap and the previous research, Markdown documents and canonical catalogs are written in English. User-created names, dialogue, drawings and filenames remain multilingual. See [the language policy](../design/02-language-policy.md).
+The roadmap retains **23 phases**, **70 work packages**, **283 capabilities** and
+specification ownership for **193 node/family entries**. RIG-015 adds Quick Rig to
+the previous 282 requirements. No old feature was removed or declared complete.
+The experimental implementation remains unchanged by this planning revision.
 
-## Read and query the plan
+## Start here
 
-- [Phase table and individual specifications](PHASES.md): outcomes, dependencies, work packages, acceptance, effort and capability IDs.
-- [Open-source dependency register](LIBRARIES.md): 30 library/tool entries, primary sources, evaluation gates and fallback decisions.
-- [Engineering execution rules](EXECUTION.md): architecture, quality, dependency adoption and Definition of Done.
-- [Effort, staffing and uncertainty](ESTIMATES.md): honest long-term envelopes and recalibration rules.
-- [First implementation backlog](FIRST-STEPS.md): concrete issues for feasibility and the first usable slice.
-- Canonical machine-readable records: [roadmap](roadmap.json), [libraries](libraries.json), [node ownership](node-assignments.json).
+1. [Harmony Moment delivery plan](HARMONY-MOMENT.md): generated scope, hard contract
+   dependencies, acceptance profile, 16 slices and remaining effort.
+2. [Reorientation rationale](REORIENTATION.md): current code audit, dependency changes,
+   tradeoffs, intended differentiation and primary references.
+3. [Next tasks](FIRST-STEPS.md): executable order and permitted parallel work.
+4. [Full phase roadmap](PHASES.md): preserved long-term ownership and exit criteria.
+5. [Dependency register](LIBRARIES.md), [execution rules](EXECUTION.md) and
+   [estimation assumptions](ESTIMATES.md).
+6. [Implementation evidence](../implementation/status.json): what actually works.
 
-```sh
-python3 scripts/roadmap.py stats
-python3 scripts/roadmap.py phase P09
-python3 scripts/roadmap.py feature DEF-005
-python3 scripts/roadmap.py library LIB-MYPAINT
-python3 scripts/catalog.py show DEF-005
-python3 scripts/roadmap.py render
-python3 scripts/validate_docs.py
-```
-
-Read the assignment first, then the phase, then the feature requirement and relevant architecture contract. These are complementary: phase work packages do not replace the catalog acceptance criteria. The validator checks complete feature assignment, phase dependencies, node ownership, quality IDs, library entries and generated document freshness.
+Canonical records: [roadmap.json](roadmap.json), [libraries.json](libraries.json),
+[node-assignments.json](node-assignments.json) and the [feature catalog](../catalog/features.json).
+All first-party code, UI and documentation remain English. C++20 + Qt 6/QML and the
+offline modular architecture remain the accepted technical direction.
 
 ## Delivery strategy
 
-The first release must complete a real animation: **create → draw → expose → play → save → reopen → export**. A collection of attractive panels is not a milestone. A minimal ordered compositor and a shared scene evaluator exist in P02; a graph editor and advanced color pipeline come later. Define color/alpha and rational-time contracts early, even when the first implementation only supports a restricted subset.
+Extract **property/persistence and evaluation contracts**, then build **characters,
+substitutions, bind/render foundations, deformers and portable controls**. Audio,
+manual lipsync, camera and a small useful node compositor join through their actual
+prerequisites. A final integrated scene/reuse/failure journey establishes the milestone.
 
-| Horizon | Phases | Useful outcome |
-|---|---|---|
-| Technical confidence | P00–P01 | Measured graphics/tablet/storage decisions, safe documents and an English monochrome shell |
-| First usable animation | P02–P03 | v0.1 bouncing-ball film, then timeline/Xsheet and paperless workflows |
-| Drawing and timing | P04–P07 | Professional vectors/palettes, raster brushes, keyframes, cameras, sound and practical output |
-| Character and compositing tools | P08–P10 | Reusable cut-out rigs, deformation, nodes and managed color |
-| Reliable core product | P11 | v1.0: tested offline 2D workflows, installers, migrations, recovery and English help |
-| Advanced authoring | P12–P16 | Automation, advanced rigs/controllers, morphing, particles/effects and production interchange |
-| Extended pipelines | P17–P19 | Mixed 2D/3D, open game export/runtime and optional studio coordination |
-| Optional compatibility and assistance | P20–P21 | Licensed local AI tools and explicitly bounded legacy converters |
-| Continuing maintenance | P22 | Evidence-backed coverage audit, upgrades, support policy and next roadmap |
+Full early drawing/brush/paperless completion, PSD/SVG, scripting, advanced color/FX,
+optimal mesh solvers and movie encoding do not block this defined profile. Its
+mandatory output is PNG + PCM WAV + timing/color metadata. They remain explicit
+follow-on work, never implied supported features. Existing defects that block the
+shot take priority over adding conveniences.
 
-The version labels express usable scope, not compatibility with another application. 1.0 deliberately means a reliable supported 2D product; the longer catalog includes substantial later work. Optional AI, studio services and legacy formats never become requirements to open, draw or export a local project.
+Quick Rig generates an ordinary editable rig from artist-assigned parts/guides.
+Named substitutions, masked poses, published controls and an Animator workspace are
+first-class product concepts. The Rig workspace exposes full hierarchy/binding/graph
+detail over the same model. No scripting prerequisite or irreversible simplified rig.
 
-## Dependency graph
+## Dependency and completion rules
 
-```mermaid
-flowchart TD
-  P00["P00 Feasibility"] --> P01["P01 Foundation"] --> P02["P02 First film"] --> P03["P03 Paperless"] --> P04["P04 Vector tools"]
-  P04 --> P05["P05 Raster"]
-  P04 --> P06["P06 Animation / camera"]
-  P03 --> P07["P07 Sound / media"]
-  P05 --> P07
-  P06 --> P08["P08 Cut-out / library"]
-  P07 --> P08
-  P08 --> P09["P09 Deformation"]
-  P06 --> P10["P10 Nodes / color"]
-  P07 --> P10
-  P09 --> P10
-  P10 --> P11["P11 Reliable 1.0"] --> P12["P12 Automation"]
-  P12 --> P13["P13 Advanced rigs"]
-  P12 --> P14["P14 Morph"]
-  P13 --> P14
-  P12 --> P15["P15 Advanced FX"]
-  P13 --> P15
-  P12 --> P16["P16 Interchange"]
-  P15 --> P16
-  P15 --> P17["P17 3D"]
-  P16 --> P17
-  P13 --> P18["P18 Games"]
-  P15 --> P18
-  P16 --> P18
-  P12 --> P19["P19 Studio"]
-  P16 --> P19
-  P18 --> P19
-  P12 --> P20["P20 Optional AI"]
-  P15 --> P20
-  P16 --> P21["P21 Legacy"]
-  P18 --> P21
-  P14 --> P22["P22 Coverage audit"]
-  P17 --> P22
-  P19 --> P22
-  P20 --> P22
-  P21 --> P22
+- `delivery_slices[].requires` is the hard contract DAG for implementation entry.
+  Planned dependencies are not delivered contracts; baseline reuse needs evidence.
+- Phase `depends_on` lists whole-epic completion obligations, not a serial task queue.
+  Stable phase numbers identify ownership, not mandatory chronological execution.
+- Every feature still has one primary completion phase. A slice may deliver an early
+  subset without satisfying the complete catalog acceptance.
+- Every node entry has one specification owner. The small HM subset does not mean
+  all listed families/operators are implemented or equivalent to Harmony.
+- Keep at most two bounded slices active with explicit owners; one developer works
+  sequentially. The dependency graph does not assume extra people exist.
+- After HM, close the retained P00–P11 scope and wider qualification before claiming
+  supported 1.0. P12–P22 preserve advanced rigs/automation, morphing, FX, interchange,
+  3D, games, studio, optional AI/legacy and coverage maintenance.
+
+The current request is **planning only**. Implementation authority from earlier work
+does not override that instruction for this revision.
+
+## Queries and validation
+
+```sh
+python3 scripts/roadmap.py milestone HM
+python3 scripts/roadmap.py slice HM-05
+python3 scripts/roadmap.py next
+python3 scripts/roadmap.py feature CTL-001
+python3 scripts/roadmap.py phase P08
+python3 scripts/roadmap.py library LIB-AUDIO
+python3 scripts/roadmap.py stats
+python3 scripts/catalog.py show RIG-015
+python3 scripts/catalog.py render
+python3 scripts/roadmap.py render
+python3 scripts/validate_docs.py
+python3 -m unittest discover -s tests -p 'test_roadmap.py'
 ```
 
-Dependencies identify readiness for phase completion, not a ban on earlier experiments. For example, audio-clock feasibility happens in P00 and audio integration can start after P03; P07 completion includes mixed-media export after P05. Early lipsync timing does not require all advanced rigging. Studio work can start after stable revisions and command APIs; this staffing sequence completes game-export integration before the final shared queue/asset pilot. Teams may relax such delivery sequencing with a recorded capability-level dependency change.
-
-The P22 audit may run even when optional branches are explicitly deferred: it audits their disposition, not imaginary completion. Only two adjacent delivery phases should be active for the initial small team; dependency independence is not free staffing.
-
-## Coverage and scope control
-
-Every feature has one **primary completion phase**. Earlier subsets retain `partial` until all agreed acceptance passes. Example: P02 provides the basic timeline needed for a film; `TIM-001` completes in P03 when its Xsheet portion is delivered. Likewise typed layers expand as raster, pegs and nodes arrive; unsupported types are explicit, not represented as completed UI placeholders.
-
-Every node/family entry has a **specification owner phase**, distinct from feature completion. That owner must split family entries into operator tickets and define ports, parameter units/defaults, animability, color/alpha rules, bounds, tile halo, invalidation, errors and supported profiles. P22 audits the full inventory. No count is an automatic claim that all operators are independent or equivalent.
-
-Conditional AI and legacy entries require model/parser/license/quality evidence. If they cannot be delivered, record a deferred decision with the precise missing prerequisite and retain their unimplemented state. They are not quietly deleted or counted as done.
-
-Implementation is authorized through **P11**. Continue closing the outstanding gates in the [implementation status](../implementation/STATUS.md), using the issues in [FIRST-STEPS.md](FIRST-STEPS.md). Working subsets do not close a phase automatically.
+Validators enforce feature coverage, both dependency DAGs, slice ownership and
+prerequisite contracts, priority order, reciprocal feature/library assignments,
+node ownership, evidence paths, terminal milestone closure and generated view freshness.
+The [historical foundation backlog](FOUNDATION-BACKLOG.md) retains prior issue IDs;
+it is not the current execution queue.

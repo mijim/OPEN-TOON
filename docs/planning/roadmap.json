@@ -1,6 +1,6 @@
 {
-  "schema_version": 1,
-  "as_of": "2026-09-20",
+  "schema_version": 2,
+  "as_of": "2026-09-21",
   "status": "active_execution_plan",
   "product_language": "en",
   "implementation_status": "experimental_partial",
@@ -37,7 +37,7 @@
         "Record hardware, dependency revisions, build flags, licenses and raw measurements.",
         "Select one primary renderer and one fallback; prove a pressure-sensitive stroke on each target OS.",
         "Interrupt every save boundary without publishing missing blobs; demonstrate a viable fill and curve deformation.",
-        "Accept or reject each spike with an ADR; an unresolved core blocker prevents P01 production contracts."
+        "Accept or reject each spike with an ADR. Only an unresolved contract used by a delivery slice blocks that slice; unrelated device, fill, docking and renderer-comparison gates remain required for full phase completion."
       ],
       "deliverables": [
         "Technology ADRs and benchmark reports",
@@ -66,9 +66,7 @@
       "id": "P01",
       "title": "Application foundation and English design system",
       "status": "in_progress",
-      "depends_on": [
-        "P00"
-      ],
+      "depends_on": [],
       "effort_engineer_weeks": [
         12,
         22
@@ -313,7 +311,7 @@
       "title": "Professional vector drawing and palette workflow",
       "status": "in_progress",
       "depends_on": [
-        "P03"
+        "P02"
       ],
       "effort_engineer_weeks": [
         20,
@@ -411,7 +409,7 @@
       "title": "Raster and textured brush engine",
       "status": "in_progress",
       "depends_on": [
-        "P04"
+        "P02"
       ],
       "effort_engineer_weeks": [
         14,
@@ -480,7 +478,7 @@
       "title": "Keyframe animation and multiplane cameras",
       "status": "in_progress",
       "depends_on": [
-        "P04"
+        "P01"
       ],
       "effort_engineer_weeks": [
         16,
@@ -557,12 +555,11 @@
       "title": "Sound and practical media output",
       "status": "planned",
       "depends_on": [
-        "P03",
-        "P05"
+        "P01"
       ],
       "effort_engineer_weeks": [
-        12,
-        22
+        14,
+        26
       ],
       "outcome": "Edit dialogue against drawings and deliver synchronized image or movie output.",
       "work_packages": [
@@ -578,7 +575,7 @@
         },
         {
           "id": "P07-W3",
-          "description": "Add video import, video/audio export, GIF and standalone playback; distinguish input decoding support from redistributable output codec profiles.",
+          "description": "Add video import, video/audio export, GIF and standalone playback; distinguish input decoding support from redistributable output codec profiles. Deliver manual viseme mapping/correction after character substitution contracts; evaluate automatic detection separately after manual editing works.",
           "status": "planned"
         }
       ],
@@ -586,7 +583,8 @@
         "Play and export a ten-minute rational-rate scene with audiovisual drift within NFR-007.",
         "Cancel render and device changes cleanly; no partial output is reported as complete.",
         "Check waveform, trim and gain against a known waveform and exact sample boundaries.",
-        "Install the minimal licensed media build on clean target systems and list available codecs at runtime."
+        "Install the minimal licensed media build on clean target systems and list available codecs at runtime.",
+        "Complete WF-07 after the character substitution subset, preserving manual corrections and flagging unmapped labels; English and Spanish detector evaluations remain distinct."
       ],
       "deliverables": [
         "Audio/media adapters and clock contract",
@@ -616,6 +614,9 @@
         "AUD-003",
         "AUD-004",
         "AUD-005",
+        "AUD-006",
+        "AUD-007",
+        "AUD-008",
         "AUD-009",
         "AUD-010",
         "IMP-005",
@@ -627,17 +628,16 @@
     },
     {
       "id": "P08",
-      "title": "Cut-out rigs, reusable assets and lip sync",
+      "title": "Character assets, substitutions and accessible rig controls",
       "status": "in_progress",
       "depends_on": [
-        "P06",
-        "P07"
+        "P02"
       ],
       "effort_engineer_weeks": [
-        16,
-        30
+        23,
+        42
       ],
-      "outcome": "Build a reusable character, animate its rigid parts and map dialogue to mouth drawings.",
+      "outcome": "Build reusable characters with first-class parts, substitutions, poses and declarative controls; guide initial setup through an editable Quick Rig recipe.",
       "work_packages": [
         {
           "id": "P08-W1",
@@ -651,15 +651,21 @@
         },
         {
           "id": "P08-W3",
-          "description": "Add manual lip-sync editing and mouth mapping; evaluate Rhubarb as an optional subprocess, retaining editable generated timing.",
+          "description": "Implement saved partial poses, canvas widgets, one-dimensional pose sliders, mapping and compact character dashboards with stable portable bindings; no scripting prerequisite.",
+          "status": "planned"
+        },
+        {
+          "id": "P08-W4",
+          "description": "Deliver guided Quick Rig: map named parts, place joint guides, preview/correct FK hierarchy and controls, then commit once; extend recipes to proven deformer/IK capabilities only after their gates.",
           "status": "planned"
         }
       ],
       "acceptance": [
         "Complete WF-04 with a reusable waving character and independently editable instances.",
-        "Complete WF-07 using both manual keys and imported mouth timings; Spanish and English recordings are separate evaluation fixtures.",
         "Reimport a rig template without ID collisions or lost palette dependencies.",
-        "Document detector limitations: Rhubarb speech mode is English-oriented; language-independent mode needs its own quality results."
+        "Capture/apply a masked pose and switch coordinated substitutions without changing unrelated animation.",
+        "Create/cancel/undo Quick Rig, then edit the same document in the full rig workspace; two template instances have independent bindings.",
+        "Declarative controls remain usable without Python; advanced scripted controls belong to P12."
       ],
       "deliverables": [
         "Cut-out rig and asset schemas",
@@ -681,7 +687,7 @@
       "risks": [
         "Symbol ownership and mouth-drawing mapping; detector quality varies by language."
       ],
-      "milestone": "v0.5 — cut-out animation",
+      "milestone": "Reusable character authoring; Harmony Moment core subsets first",
       "feature_ids": [
         "LYR-001",
         "RIG-001",
@@ -693,16 +699,20 @@
         "RIG-007",
         "RIG-008",
         "RIG-012",
-        "AUD-006",
-        "AUD-007",
-        "AUD-008",
+        "RIG-014",
+        "CTL-001",
+        "CTL-002",
+        "CTL-004",
+        "CTL-005",
+        "CTL-008",
         "LIB-001",
         "LIB-002",
         "LIB-003",
         "LIB-004",
         "LIB-005",
         "LIB-006",
-        "LIB-007"
+        "LIB-007",
+        "RIG-015"
       ]
     },
     {
@@ -710,17 +720,17 @@
       "title": "Core deformation",
       "status": "planned",
       "depends_on": [
-        "P08"
+        "P01"
       ],
       "effort_engineer_weeks": [
-        20,
-        36
+        22,
+        40
       ],
       "outcome": "Animate curved limbs and flexible drawings with stable rest poses and attachments.",
       "work_packages": [
         {
           "id": "P09-W1",
-          "description": "Implement bone, curve and envelope evaluation over an explicit rest-space mesh with consistent texture coordinates.",
+          "description": "Implement bone, curve and envelope evaluation over an explicit rest-space mesh with consistent texture coordinates. Extract rest-space binding and bounded renderer-backed mesh/texture feasibility before the full phase; do not require region-fill completion for registered alpha artwork.",
           "status": "planned"
         },
         {
@@ -730,7 +740,7 @@
         },
         {
           "id": "P09-W3",
-          "description": "Implement kinematic attachments and bake-to-drawings with provenance and bounded approximation error.",
+          "description": "Implement kinematic attachments and bake-to-drawings with provenance and bounded approximation error. Add a bounded two-bone IK subset with limits, explicit solve order and unreachable-target behavior; multi-pin constraints remain in P13.",
           "status": "planned"
         }
       ],
@@ -759,6 +769,7 @@
       ],
       "milestone": "v0.6 — deformable characters",
       "feature_ids": [
+        "RIG-009",
         "DEF-001",
         "DEF-003",
         "DEF-004",
@@ -777,9 +788,7 @@
       "title": "Node compositor and managed color",
       "status": "planned",
       "depends_on": [
-        "P06",
-        "P07",
-        "P09"
+        "P01"
       ],
       "effort_engineer_weeks": [
         20,
@@ -865,13 +874,23 @@
       "title": "Reliable 1.0 release",
       "status": "planned",
       "depends_on": [
+        "P00",
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
         "P10"
       ],
       "effort_engineer_weeks": [
         16,
         28
       ],
-      "outcome": "Ship a dependable offline 2D product with a clearly bounded feature set.",
+      "outcome": "Ship a dependable supported offline 2D 1.0 after the complete phase gates; qualify the narrower Harmony Moment workflow earlier without claiming P11 completion.",
       "work_packages": [
         {
           "id": "P11-W1",
@@ -956,14 +975,14 @@
         "P11"
       ],
       "effort_engineer_weeks": [
-        12,
-        24
+        14,
+        28
       ],
       "outcome": "Automate editing and rendering through a documented, versioned command API.",
       "work_packages": [
         {
           "id": "P12-W1",
-          "description": "Expose stable document queries and transactions through a C++ application API and pybind11 Python bindings.",
+          "description": "Expose stable document queries and transactions through a C++ application API and pybind11 Python bindings. Scripted controllers (CTL-006) depend on the versioned extension boundary; declarative character controls do not.",
           "status": "planned"
         },
         {
@@ -1007,6 +1026,7 @@
       "milestone": "Automation release",
       "feature_ids": [
         "ANI-011",
+        "CTL-006",
         "AUT-001",
         "AUT-002",
         "AUT-003",
@@ -1017,20 +1037,22 @@
     },
     {
       "id": "P13",
-      "title": "Advanced rigging and artist controllers",
+      "title": "Advanced constraints, pose grids and deformation controls",
       "status": "planned",
       "depends_on": [
-        "P12"
+        "P08",
+        "P09",
+        "P10"
       ],
       "effort_engineer_weeks": [
-        24,
-        46
+        14,
+        28
       ],
       "outcome": "Build sophisticated reusable character controls and layered deformation rigs.",
       "work_packages": [
         {
           "id": "P13-W1",
-          "description": "Implement IK, constraints/nails, hierarchy tools and guided breakdown with explicit solve order.",
+          "description": "Extend the core two-bone IK solver to multi-chain constraints, nails and animated constraint transitions with explicit solve order; add the Breakdown Assistant.",
           "status": "planned"
         },
         {
@@ -1040,7 +1062,7 @@
         },
         {
           "id": "P13-W3",
-          "description": "Build sliders, pose grids, function mapping, widgets and dashboards; expose scripted controls through the versioned automation API.",
+          "description": "Extend declarative controllers with two-dimensional pose grids and deformer-on-deformer composition; custom scripting uses P12, while ordinary widgets/sliders/dashboard/templates are owned by P08.",
           "status": "planned"
         }
       ],
@@ -1071,22 +1093,14 @@
       ],
       "milestone": "Advanced character animation",
       "feature_ids": [
-        "RIG-009",
         "RIG-010",
         "RIG-011",
         "RIG-013",
-        "RIG-014",
         "DEF-005",
         "DEF-006",
         "DEF-007",
-        "CTL-001",
-        "CTL-002",
         "CTL-003",
-        "CTL-004",
-        "CTL-005",
-        "CTL-006",
-        "CTL-007",
-        "CTL-008"
+        "CTL-007"
       ]
     },
     {
@@ -1094,8 +1108,8 @@
       "title": "Morphing and drawing interpolation",
       "status": "planned",
       "depends_on": [
-        "P12",
-        "P13"
+        "P04",
+        "P06"
       ],
       "effort_engineer_weeks": [
         18,
@@ -1159,8 +1173,8 @@
       "title": "Advanced effects, particles and OpenFX",
       "status": "planned",
       "depends_on": [
-        "P12",
-        "P13"
+        "P10",
+        "P12"
       ],
       "effort_engineer_weeks": [
         24,
@@ -1241,8 +1255,7 @@
       "title": "Production interchange",
       "status": "planned",
       "depends_on": [
-        "P12",
-        "P15"
+        "P01"
       ],
       "effort_engineer_weeks": [
         16,
@@ -1310,7 +1323,8 @@
       "title": "Mixed 2D and 3D scenes",
       "status": "planned",
       "depends_on": [
-        "P15",
+        "P06",
+        "P10",
         "P16"
       ],
       "effort_engineer_weeks": [
@@ -1381,8 +1395,8 @@
       "title": "Game animation export",
       "status": "planned",
       "depends_on": [
-        "P13",
-        "P15",
+        "P08",
+        "P09",
         "P16"
       ],
       "effort_engineer_weeks": [
@@ -1450,9 +1464,8 @@
       "title": "Studio coordination and render queues",
       "status": "planned",
       "depends_on": [
-        "P12",
-        "P16",
-        "P18"
+        "P11",
+        "P12"
       ],
       "effort_engineer_weeks": [
         24,
@@ -1521,8 +1534,7 @@
       "title": "Optional local AI tools",
       "status": "planned",
       "depends_on": [
-        "P12",
-        "P15"
+        "P05"
       ],
       "effort_engineer_weeks": [
         18,
@@ -1661,7 +1673,7 @@
       "work_packages": [
         {
           "id": "P22-W1",
-          "description": "Audit all 282 feature records and all 193 node-reference entries; expand family entries into concrete operators/properties before claiming parity.",
+          "description": "Audit all 283 feature records and all 193 node-reference entries; expand family entries into concrete operators/properties before claiming parity.",
           "status": "planned"
         },
         {
@@ -1719,1694 +1731,3551 @@
       "feature_id": "PRJ-001",
       "completion_phase": "P01",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-00",
+        "HM-01"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "PRJ-002",
       "completion_phase": "P01",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "PRJ-003",
       "completion_phase": "P01",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-01"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "PRJ-004",
       "completion_phase": "P01",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-01",
+        "HM-14"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "PRJ-005",
       "completion_phase": "P01",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-01",
+        "HM-15"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "PRJ-006",
       "completion_phase": "P11",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-15"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "PRJ-007",
       "completion_phase": "P11",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-15"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "PRJ-008",
       "completion_phase": "P01",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "PRJ-009",
       "completion_phase": "P11",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-15"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "PRJ-010",
       "completion_phase": "P01",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "UI-001",
       "completion_phase": "P01",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "UI-002",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-07"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "UI-003",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "UI-004",
       "completion_phase": "P01",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "UI-005",
       "completion_phase": "P01",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "UI-006",
       "completion_phase": "P01",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-13"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "UI-007",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "UI-008",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-13"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "UI-009",
       "completion_phase": "P01",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-07"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "UI-010",
       "completion_phase": "P01",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "LYR-001",
       "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-01",
+        "HM-03",
+        "HM-10"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "LYR-002",
       "completion_phase": "P02",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-02"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "LYR-003",
       "completion_phase": "P02",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "LYR-004",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-03"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "LYR-005",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-03"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "LYR-006",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "LYR-007",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-03"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "LYR-008",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "LYR-009",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "LYR-010",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "LYR-011",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-001",
       "completion_phase": "P02",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-02"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "VEC-002",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-003",
       "completion_phase": "P02",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-02"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "VEC-004",
       "completion_phase": "P05",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-005",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-006",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-007",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-008",
       "completion_phase": "P02",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-009",
       "completion_phase": "P02",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-02"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "VEC-010",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-011",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-012",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-013",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-014",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-015",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-016",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-017",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-018",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-019",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-020",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-021",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-022",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-023",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-024",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-025",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-026",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "VEC-027",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "RAS-001",
       "completion_phase": "P05",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-02"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "RAS-002",
       "completion_phase": "P05",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "RAS-003",
       "completion_phase": "P05",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "RAS-004",
       "completion_phase": "P05",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "RAS-005",
       "completion_phase": "P05",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "RAS-006",
       "completion_phase": "P05",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "RAS-007",
       "completion_phase": "P05",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "COL-001",
       "completion_phase": "P02",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-02"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "COL-002",
       "completion_phase": "P02",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "COL-003",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "COL-004",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "COL-005",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "COL-006",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "COL-007",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "COL-008",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "COL-009",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "COL-010",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "COL-011",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "COL-012",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "COL-013",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "COL-014",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-04"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "COL-015",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-04"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "TIM-001",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "TIM-002",
       "completion_phase": "P02",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-03"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "TIM-003",
       "completion_phase": "P02",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-03"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "TIM-004",
       "completion_phase": "P02",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "TIM-005",
       "completion_phase": "P02",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-03"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "TIM-006",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "TIM-007",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "TIM-008",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "TIM-009",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "TIM-010",
       "completion_phase": "P02",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "TIM-011",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "TIM-012",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "TIM-013",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "TIM-014",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FBF-001",
       "completion_phase": "P02",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FBF-002",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FBF-003",
       "completion_phase": "P02",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FBF-004",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FBF-005",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FBF-006",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FBF-007",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FBF-008",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FBF-009",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FBF-010",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FBF-011",
       "completion_phase": "P04",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FBF-012",
       "completion_phase": "P03",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "ANI-001",
       "completion_phase": "P06",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-00",
+        "HM-01"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "ANI-002",
       "completion_phase": "P06",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-01"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "ANI-003",
       "completion_phase": "P06",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-01"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "ANI-004",
       "completion_phase": "P06",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-01"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "ANI-005",
       "completion_phase": "P06",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-01"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "ANI-006",
       "completion_phase": "P06",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-01"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "ANI-007",
       "completion_phase": "P06",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-01"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "ANI-008",
       "completion_phase": "P06",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "ANI-009",
       "completion_phase": "P06",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-01"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "ANI-010",
       "completion_phase": "P06",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "ANI-011",
       "completion_phase": "P12",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "ANI-012",
       "completion_phase": "P06",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "ANI-013",
       "completion_phase": "P06",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "RIG-001",
       "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-03",
+        "HM-08"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "RIG-002",
       "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-03",
+        "HM-08"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "RIG-003",
       "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-03",
+        "HM-08"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "RIG-004",
       "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-12"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "RIG-005",
       "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-12"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "RIG-006",
       "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-03",
+        "HM-11"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "RIG-007",
       "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-03"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "RIG-008",
       "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-03"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "RIG-009",
-      "completion_phase": "P13",
+      "completion_phase": "P09",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-09"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "RIG-010",
       "completion_phase": "P13",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "next_after_harmony_moment",
+      "scheduling_note": "High-value extension after HM; does not block the bounded character-shot profile."
     },
     {
       "feature_id": "RIG-011",
       "completion_phase": "P13",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "next_after_harmony_moment",
+      "scheduling_note": "High-value extension after HM; does not block the bounded character-shot profile."
     },
     {
       "feature_id": "RIG-012",
       "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-07",
+        "HM-09"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "RIG-013",
       "completion_phase": "P13",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "RIG-014",
-      "completion_phase": "P13",
+      "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-07",
+        "HM-08"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "DEF-001",
       "completion_phase": "P09",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-06"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "DEF-002",
       "completion_phase": "P18",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "DEF-003",
       "completion_phase": "P09",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-06"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "DEF-004",
       "completion_phase": "P09",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "next_after_harmony_moment",
+      "scheduling_note": "High-value extension after HM; does not block the bounded character-shot profile."
     },
     {
       "feature_id": "DEF-005",
       "completion_phase": "P13",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "DEF-006",
       "completion_phase": "P13",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "DEF-007",
       "completion_phase": "P13",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "DEF-008",
       "completion_phase": "P09",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-05",
+        "HM-06"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "DEF-009",
       "completion_phase": "P09",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-05",
+        "HM-06"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "DEF-010",
       "completion_phase": "P09",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-05",
+        "HM-06",
+        "HM-09"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "DEF-011",
       "completion_phase": "P09",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-09"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "DEF-012",
       "completion_phase": "P09",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-09"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "DEF-013",
       "completion_phase": "P09",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "DEF-014",
       "completion_phase": "P09",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "next_after_harmony_moment",
+      "scheduling_note": "High-value extension after HM; does not block the bounded character-shot profile."
     },
     {
       "feature_id": "DEF-015",
       "completion_phase": "P09",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-05",
+        "HM-06"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "CTL-001",
-      "completion_phase": "P13",
+      "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-07",
+        "HM-09"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "CTL-002",
-      "completion_phase": "P13",
+      "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-07"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "CTL-003",
       "completion_phase": "P13",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "next_after_harmony_moment",
+      "scheduling_note": "High-value extension after HM; does not block the bounded character-shot profile."
     },
     {
       "feature_id": "CTL-004",
-      "completion_phase": "P13",
+      "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-07"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "CTL-005",
-      "completion_phase": "P13",
+      "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-07",
+        "HM-08"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "CTL-006",
-      "completion_phase": "P13",
+      "completion_phase": "P12",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "CTL-007",
       "completion_phase": "P13",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "CTL-008",
-      "completion_phase": "P13",
+      "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-09",
+        "HM-15"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "MOR-001",
       "completion_phase": "P14",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "MOR-002",
       "completion_phase": "P14",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "MOR-003",
       "completion_phase": "P14",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "MOR-004",
       "completion_phase": "P14",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "MOR-005",
       "completion_phase": "P14",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "MOR-006",
       "completion_phase": "P14",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "CAM-001",
       "completion_phase": "P06",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-13"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "CAM-002",
       "completion_phase": "P06",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-13"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "CAM-003",
       "completion_phase": "P06",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "next_after_harmony_moment",
+      "scheduling_note": "High-value extension after HM; does not block the bounded character-shot profile."
     },
     {
       "feature_id": "CAM-004",
       "completion_phase": "P06",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "CAM-005",
       "completion_phase": "P06",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-13"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "CAM-006",
       "completion_phase": "P06",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-13"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "CAM-007",
       "completion_phase": "P06",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "NOD-001",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-12"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "NOD-002",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-04"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "NOD-003",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-12"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "NOD-004",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-12"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "NOD-005",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-04",
+        "HM-12"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "NOD-006",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-12"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "NOD-007",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "NOD-008",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-04",
+        "HM-12"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "NOD-009",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-04",
+        "HM-12"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "NOD-010",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FX-001",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FX-002",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FX-003",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FX-004",
       "completion_phase": "P15",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FX-005",
       "completion_phase": "P15",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FX-006",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FX-007",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FX-008",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FX-009",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FX-010",
       "completion_phase": "P15",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FX-011",
       "completion_phase": "P15",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FX-012",
       "completion_phase": "P15",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FX-013",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FX-014",
       "completion_phase": "P15",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FX-015",
       "completion_phase": "P15",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FX-016",
       "completion_phase": "P15",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FX-017",
       "completion_phase": "P15",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FX-018",
       "completion_phase": "P15",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FX-019",
       "completion_phase": "P15",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "FX-020",
       "completion_phase": "P15",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "PAR-001",
       "completion_phase": "P15",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "PAR-002",
       "completion_phase": "P15",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "PAR-003",
       "completion_phase": "P15",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "PAR-004",
       "completion_phase": "P15",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "PAR-005",
       "completion_phase": "P15",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "PAR-006",
       "completion_phase": "P15",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "PAR-007",
       "completion_phase": "P15",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "AUD-001",
       "completion_phase": "P07",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-10"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "AUD-002",
       "completion_phase": "P07",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-10"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "AUD-003",
       "completion_phase": "P07",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-10"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "AUD-004",
       "completion_phase": "P07",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-10"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "AUD-005",
       "completion_phase": "P07",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-10"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "AUD-006",
-      "completion_phase": "P08",
+      "completion_phase": "P07",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "next_after_harmony_moment",
+      "scheduling_note": "High-value extension after HM; does not block the bounded character-shot profile."
     },
     {
       "feature_id": "AUD-007",
-      "completion_phase": "P08",
+      "completion_phase": "P07",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-11"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "AUD-008",
-      "completion_phase": "P08",
+      "completion_phase": "P07",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-11"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "AUD-009",
       "completion_phase": "P07",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "AUD-010",
       "completion_phase": "P07",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-14"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "IMP-001",
       "completion_phase": "P02",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-02"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "IMP-002",
       "completion_phase": "P16",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "next_after_harmony_moment",
+      "scheduling_note": "High-value extension after HM; does not block the bounded character-shot profile."
     },
     {
       "feature_id": "IMP-003",
       "completion_phase": "P16",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "next_after_harmony_moment",
+      "scheduling_note": "High-value extension after HM; does not block the bounded character-shot profile."
     },
     {
       "feature_id": "IMP-004",
       "completion_phase": "P16",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "next_after_harmony_moment",
+      "scheduling_note": "High-value extension after HM; does not block the bounded character-shot profile."
     },
     {
       "feature_id": "IMP-005",
       "completion_phase": "P07",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "IMP-006",
       "completion_phase": "P16",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "IMP-007",
       "completion_phase": "P16",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "IMP-008",
       "completion_phase": "P16",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "IMP-009",
       "completion_phase": "P21",
       "status": "planned",
-      "disposition": "conditional_extension"
+      "disposition": "conditional_extension",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "IMP-010",
       "completion_phase": "P16",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "THR-001",
       "completion_phase": "P17",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "THR-002",
       "completion_phase": "P17",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "THR-003",
       "completion_phase": "P17",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "THR-004",
       "completion_phase": "P17",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "THR-005",
       "completion_phase": "P17",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "THR-006",
       "completion_phase": "P17",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "THR-007",
       "completion_phase": "P17",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "THR-008",
       "completion_phase": "P17",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "THR-009",
       "completion_phase": "P17",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "OUT-001",
       "completion_phase": "P02",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-14"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "OUT-002",
       "completion_phase": "P07",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-14"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "OUT-003",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-14"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "OUT-004",
       "completion_phase": "P02",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-14"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "OUT-005",
       "completion_phase": "P07",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "next_after_harmony_moment",
+      "scheduling_note": "First output extension after HM: validated review-movie encoding/muxing against the PNG+WAV reference."
     },
     {
       "feature_id": "OUT-006",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "OUT-007",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-14"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "OUT-008",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "OUT-009",
       "completion_phase": "P16",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "OUT-010",
       "completion_phase": "P16",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for the defined PNG/WAV character-shot delivery profile."
     },
     {
       "feature_id": "OUT-011",
       "completion_phase": "P07",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for the defined PNG/WAV character-shot delivery profile."
     },
     {
       "feature_id": "OUT-012",
       "completion_phase": "P07",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "OUT-013",
       "completion_phase": "P10",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "LIB-001",
       "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "LIB-002",
       "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-09",
+        "HM-15"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "LIB-003",
       "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "LIB-004",
       "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-09"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "LIB-005",
       "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-09"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     },
     {
       "feature_id": "LIB-006",
       "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "LIB-007",
       "completion_phase": "P08",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "GAM-001",
       "completion_phase": "P18",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "GAM-002",
       "completion_phase": "P18",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "GAM-003",
       "completion_phase": "P18",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "GAM-004",
       "completion_phase": "P18",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "GAM-005",
       "completion_phase": "P18",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "GAM-006",
       "completion_phase": "P18",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "GAM-007",
       "completion_phase": "P21",
       "status": "planned",
-      "disposition": "conditional_extension"
+      "disposition": "conditional_extension",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "AUT-001",
       "completion_phase": "P12",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "AUT-002",
       "completion_phase": "P12",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "AUT-003",
       "completion_phase": "P12",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "AUT-004",
       "completion_phase": "P12",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "AUT-005",
       "completion_phase": "P12",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "AUT-006",
       "completion_phase": "P12",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "STU-001",
       "completion_phase": "P19",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "STU-002",
       "completion_phase": "P19",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "STU-003",
       "completion_phase": "P19",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "STU-004",
       "completion_phase": "P19",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "STU-005",
       "completion_phase": "P19",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "STU-006",
       "completion_phase": "P19",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "STU-007",
       "completion_phase": "P19",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "STU-008",
       "completion_phase": "P19",
       "status": "planned",
-      "disposition": "planned_delivery"
+      "disposition": "planned_delivery",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "AIX-001",
       "completion_phase": "P20",
       "status": "planned",
-      "disposition": "conditional_extension"
+      "disposition": "conditional_extension",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "AIX-002",
       "completion_phase": "P20",
       "status": "planned",
-      "disposition": "conditional_extension"
+      "disposition": "conditional_extension",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "AIX-003",
       "completion_phase": "P20",
       "status": "planned",
-      "disposition": "conditional_extension"
+      "disposition": "conditional_extension",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "AIX-004",
       "completion_phase": "P20",
       "status": "planned",
-      "disposition": "conditional_extension"
+      "disposition": "conditional_extension",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "AIX-005",
       "completion_phase": "P20",
       "status": "planned",
-      "disposition": "conditional_extension"
+      "disposition": "conditional_extension",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
     },
     {
       "feature_id": "AIX-006",
       "completion_phase": "P20",
       "status": "planned",
-      "disposition": "conditional_extension"
+      "disposition": "conditional_extension",
+      "delivery_slices": [],
+      "delivery_priority": "long_term",
+      "scheduling_note": "Retained in its primary phase; not required for HM. Resume by measured artist value and real capability prerequisites, not phase numbering."
+    },
+    {
+      "feature_id": "RIG-015",
+      "completion_phase": "P08",
+      "status": "planned",
+      "disposition": "planned_delivery",
+      "delivery_slices": [
+        "HM-08",
+        "HM-09"
+      ],
+      "delivery_priority": "harmony_moment_subset",
+      "scheduling_note": "Deliver only the explicit slice subset first; retain all catalog acceptance for primary phase completion."
     }
   ],
-  "documentation_language": "en"
+  "documentation_language": "en",
+  "delivery_slices": [
+    {
+      "id": "HM-00",
+      "title": "Reference shot and foundation decisions",
+      "owner_phase": "P00",
+      "work_package": "P00-W2",
+      "owner_module": "architecture",
+      "status": "planned",
+      "effort_engineer_weeks": [
+        1,
+        2
+      ],
+      "feature_ids": [
+        "PRJ-001",
+        "ANI-001"
+      ],
+      "requires": [],
+      "scope": "Freeze the bounded character-shot profile, failure fixtures and only the contracts needed by its next consumers. Audit current code instead of restarting all feasibility work.",
+      "acceptance": [
+        "Record a redistributable 20-second 1080p/24fps character shot, a 24000/1001 variant and a ten-minute audio drift fixture with explicit budgets.",
+        "Approve IDs/space/time/color/migration and command-ownership contracts, plus a saved-scene success rubric reviewed by an animator; record hardware rather than infer performance."
+      ],
+      "excluded": [
+        "No blanket renderer rewrite, OpenToonz fork, full tablet matrix, docking framework or fill-topology gate."
+      ],
+      "reuse_evidence": [
+        "docs/implementation/status.json",
+        "modules/document/include/opentoon/document.h"
+      ],
+      "library_ids": [],
+      "completion_evidence": []
+    },
+    {
+      "id": "HM-01",
+      "title": "Persistent rig properties and typed document contracts",
+      "owner_phase": "P01",
+      "work_package": "P01-W2",
+      "owner_module": "document/application/storage",
+      "status": "planned",
+      "effort_engineer_weeks": [
+        3,
+        6
+      ],
+      "feature_ids": [
+        "PRJ-001",
+        "PRJ-004",
+        "PRJ-005",
+        "LYR-001",
+        "ANI-001",
+        "ANI-002",
+        "ANI-003",
+        "ANI-004",
+        "ANI-005",
+        "PRJ-003",
+        "ANI-006",
+        "ANI-007",
+        "ANI-009"
+      ],
+      "requires": [
+        {
+          "slice": "HM-00",
+          "contract": "Accepted stable entity/property IDs, transform spaces, rational time and migration policy"
+        }
+      ],
+      "scope": "Expose stable typed part/peg/property addresses over the existing full-pose evaluator and Session commands. Preserve the current transform-key representation through a compatibility adapter; introduce discrete or specialized tracks only with their actual character/deformer consumers. Define rest/authored/evaluated ownership and transactional persistence. Character/deformer/audio/node payloads are added by their owning slices, not empty schemas in advance.",
+      "acceptance": [
+        "Existing full-pose keys, easing, visual curve edits and key-block edits retain their sampled behavior through the property-address adapter; reject dangling IDs, invalid types/values and duplicate keys. No wholesale curve-engine rewrite is required.",
+        "Version new persisted semantics, back up migrations and fail safely in older readers; undo/save/reopen and injected failures retain all references.",
+        "Separate rest/setup values, authored animation, evaluated results and view state; expose one command/query boundary for the UI and evaluator."
+      ],
+      "excluded": [
+        "No embedded scripting, arbitrary expressions or general plugin API.",
+        "No upfront migration of every legacy transform channel to a new keyframe engine; version only schema changes required by actual consumers."
+      ],
+      "reuse_evidence": [
+        "modules/document/include/opentoon/document.h",
+        "modules/application",
+        "adapters/storage"
+      ],
+      "library_ids": [
+        "LIB-SQLITE",
+        "LIB-JSON",
+        "LIB-ZSTD"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "HM-02",
+      "title": "Registered artwork intake",
+      "owner_phase": "P02",
+      "work_package": "P02-W3",
+      "owner_module": "interchange/drawing",
+      "status": "planned",
+      "effort_engineer_weeks": [
+        1,
+        3
+      ],
+      "feature_ids": [
+        "IMP-001",
+        "VEC-001",
+        "RAS-001",
+        "COL-001",
+        "LYR-002",
+        "VEC-003",
+        "VEC-009"
+      ],
+      "requires": [
+        {
+          "slice": "HM-00",
+          "contract": "Defined image origin, alpha, color profile, resource bounds and part-registration fixture"
+        }
+      ],
+      "scope": "Qualify existing drawing and still-image import; add ordered PNG sequence intake and registered part intake with explicit sequence-versus-parts choice, missing-frame reports and asset bounds. Existing vector/raster tools supply original artwork.",
+      "acceptance": [
+        "Round-trip original sampled vectors and transparent PNG parts without shifting their registration or changing color IDs.",
+        "A failed/cancelled multi-file import leaves no half-created document; sequence gaps and ordering are explicit."
+      ],
+      "excluded": [
+        "PSD, SVG, vectorization, advanced brush presets and analytic fill are not required; pre-separated PNG parts are a supported route."
+      ],
+      "reuse_evidence": [
+        "adapters/qt/editor_controller.cpp",
+        "adapters/render/scene_renderer.cpp",
+        "adapters/brush"
+      ],
+      "library_ids": [
+        "LIB-QT",
+        "LIB-MYPAINT"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "HM-03",
+      "title": "Character identity, pegs and substitution sets",
+      "owner_phase": "P08",
+      "work_package": "P08-W1",
+      "owner_module": "rigging/document",
+      "status": "planned",
+      "effort_engineer_weeks": [
+        3,
+        6
+      ],
+      "feature_ids": [
+        "RIG-001",
+        "RIG-002",
+        "RIG-003",
+        "RIG-006",
+        "RIG-007",
+        "RIG-008",
+        "LYR-001",
+        "LYR-004",
+        "LYR-005",
+        "LYR-007",
+        "TIM-002",
+        "TIM-003",
+        "TIM-005"
+      ],
+      "requires": [
+        {
+          "slice": "HM-01",
+          "contract": "Typed stable part/peg/property IDs and atomic persistence"
+        },
+        {
+          "slice": "HM-02",
+          "contract": "Validated drawings and registered imported parts"
+        }
+      ],
+      "scope": "Create a character root and stable part roles; keep separate transform hierarchy and render order. Add preserve-world reparenting, rest pivots, named thumbnail substitutions, held selector tracks and coordinated variant sets.",
+      "acceptance": [
+        "Build a rigid character and change mouth/hand/view without moving its peg, overwriting transform keys or affecting another character.",
+        "Reparent supported negative/nonuniform transforms without registration jumps; reject nonrepresentable shear or singular cases explicitly.",
+        "Coordinated variants switch atomically, missing members are reported, and duplicate instances get independent bindings."
+      ],
+      "excluded": [
+        "Automatic image segmentation, full library management and deformation are not prerequisites for rigid cut-out."
+      ],
+      "reuse_evidence": [
+        "modules/document/include/opentoon/document.h",
+        "adapters/qt/editor_controller.cpp",
+        "modules/document/src/timeline.cpp"
+      ],
+      "library_ids": [],
+      "completion_evidence": []
+    },
+    {
+      "id": "HM-04",
+      "title": "Shared evaluation and typed graph kernel",
+      "owner_phase": "P10",
+      "work_package": "P10-W1",
+      "owner_module": "animation/compositing/render",
+      "status": "planned",
+      "effort_engineer_weeks": [
+        3,
+        6
+      ],
+      "feature_ids": [
+        "NOD-002",
+        "NOD-005",
+        "NOD-008",
+        "NOD-009",
+        "COL-014",
+        "COL-015"
+      ],
+      "requires": [
+        {
+          "slice": "HM-01",
+          "contract": "Addressed animated properties, immutable snapshots and versioned persistence"
+        }
+      ],
+      "scope": "Extract the existing ordered painter into a shared evaluation boundary with typed image/transform/matte inputs, DAG validation, revision invalidation and explicit Display/Write targets. Register operators only with consumers. Use a restricted linear-sRGB premultiplied composition profile and preserve legacy scene appearance through an explicit legacy profile.",
+      "acceptance": [
+        "Known ordered legacy scenes retain their declared appearance on migration; new-profile alpha charts and UI/headless outputs match within recorded tolerance.",
+        "Detect cycles, dangling references and incompatible ports; edited upstream properties invalidate descendants and stale jobs cannot publish.",
+        "Define solve ordering for property drivers, hierarchy, deformation, attachments, camera and image composition without conflating the transform graph with the image graph."
+      ],
+      "excluded": [
+        "No full node editor, large effect catalog, HDR/EXR, OCIO configuration manager or GPU rewrite."
+      ],
+      "reuse_evidence": [
+        "adapters/render/scene_renderer.cpp",
+        "modules/application"
+      ],
+      "library_ids": [
+        "LIB-QT"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "HM-05",
+      "title": "Rest binding and deformation rendering feasibility",
+      "owner_phase": "P09",
+      "work_package": "P09-W1",
+      "owner_module": "deformation/render",
+      "status": "planned",
+      "effort_engineer_weeks": [
+        2,
+        4
+      ],
+      "feature_ids": [
+        "DEF-008",
+        "DEF-009",
+        "DEF-010",
+        "DEF-015"
+      ],
+      "requires": [
+        {
+          "slice": "HM-03",
+          "contract": "Stable part/variant bindings and rest-space transforms"
+        },
+        {
+          "slice": "HM-04",
+          "contract": "One evaluated geometry/image boundary and explicit alpha/color contract"
+        }
+      ],
+      "scope": "Prove the complete bind-to-render route before authoring tools: rest mesh/UVs, editable bind controls and per-substitution binding compatibility. Start with bounded regular meshes over alpha artwork; compare tessellation only if the fixture requires it. Retain editable source vectors and use an explicitly resolution-limited render proxy where needed.",
+      "acceptance": [
+        "Checker artwork survives rest/pose/reset without UV drift, seams or accumulated deformation; benchmark the actual renderer, not only a solver.",
+        "Reject degenerate geometry and incompatible substitutions; rebinding reports affected animation rather than silently discarding it.",
+        "Choose and pin a proven numerical/render route within the spike budget; if the texture warp cannot meet quality/cost, resolve that blocker before HM-06."
+      ],
+      "excluded": [
+        "No claim of native analytic vector deformation; no dependency on full region topology, optimal meshing or libigl weight solvers."
+      ],
+      "reuse_evidence": [
+        "adapters/render/scene_renderer.cpp",
+        "docs/implementation/BRUSH-BENCHMARK.md"
+      ],
+      "library_ids": [
+        "LIB-EIGEN",
+        "LIB-TESS"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "HM-06",
+      "title": "Bone and curve deformers",
+      "owner_phase": "P09",
+      "work_package": "P09-W1",
+      "owner_module": "deformation/animation",
+      "status": "planned",
+      "effort_engineer_weeks": [
+        6,
+        12
+      ],
+      "feature_ids": [
+        "DEF-001",
+        "DEF-003",
+        "DEF-008",
+        "DEF-009",
+        "DEF-010",
+        "DEF-015"
+      ],
+      "requires": [
+        {
+          "slice": "HM-05",
+          "contract": "Accepted rest mesh/UV/binding representation and measured deformation render path"
+        }
+      ],
+      "scope": "Deliver editable bone chains and curve chains with defined local/rest spaces, stable weights, predictable joint/tangent behavior and saved animated properties. Controls drag on canvas with cancellable previews; variant changes resolve their own binding.",
+      "acceptance": [
+        "Animate a bent arm and curved torso/tail with rest reset, key interpolation, undo and saved/rendered equivalence.",
+        "Extreme bends, zero-length bones and invalid weights give bounded behavior without NaNs or corrupting rest data; proxy resolution limits are visible.",
+        "Pass the bounded B4/HM shot quality and interaction budgets; unresolved seam/texture artifacts block the deformer claim."
+      ],
+      "excluded": [
+        "Envelope/automatic envelope, free-form, shape-aware and deformer-on-deformer remain long-term requirements."
+      ],
+      "reuse_evidence": [],
+      "library_ids": [
+        "LIB-EIGEN"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "HM-07",
+      "title": "First-class poses and declarative animator controls",
+      "owner_phase": "P08",
+      "work_package": "P08-W3",
+      "owner_module": "controllers/rigging",
+      "status": "planned",
+      "effort_engineer_weeks": [
+        3,
+        6
+      ],
+      "feature_ids": [
+        "RIG-012",
+        "RIG-014",
+        "CTL-001",
+        "CTL-002",
+        "CTL-004",
+        "CTL-005",
+        "UI-002",
+        "UI-009"
+      ],
+      "requires": [
+        {
+          "slice": "HM-03",
+          "contract": "Stable character/part IDs, substitutions and transform properties"
+        },
+        {
+          "slice": "HM-04",
+          "contract": "Deterministic driver ordering, type checks and cycle rejection"
+        }
+      ],
+      "scope": "Save named masked poses including discrete substitutions; apply/mirror only explicitly mapped parts. Add direct widgets, limited sliders/switches and a compact character dashboard. Pose interpolation blends compatible numeric properties; discrete variants use an explicit threshold rule. Animator and Rig workspaces expose the same document at different detail levels.",
+      "acceptance": [
+        "A pose slider reproduces stored numeric and discrete endpoints exactly; applying a pose leaves excluded channels untouched.",
+        "A widget edits only its published properties through ordinary commands; conflicting drivers or graph cycles cannot silently win.",
+        "An animator can select a character, pose it and switch mouths without opening nodes; a rigger can inspect/edit all bindings in the same project."
+      ],
+      "excluded": [
+        "No Python, arbitrary script controllers, 2D pose grids or generic expression engine. Deformer controls activate only after HM-06."
+      ],
+      "reuse_evidence": [
+        "adapters/qt/key_selection_controller.cpp",
+        "ui/components/SelectionProperties.qml"
+      ],
+      "library_ids": [],
+      "completion_evidence": []
+    },
+    {
+      "id": "HM-08",
+      "title": "Quick Rig guided FK recipe",
+      "owner_phase": "P08",
+      "work_package": "P08-W4",
+      "owner_module": "rigging/presentation",
+      "status": "planned",
+      "effort_engineer_weeks": [
+        2,
+        4
+      ],
+      "feature_ids": [
+        "RIG-015",
+        "RIG-001",
+        "RIG-002",
+        "RIG-003",
+        "RIG-014",
+        "CTL-005"
+      ],
+      "requires": [
+        {
+          "slice": "HM-03",
+          "contract": "Character part/peg ownership and safe preserve-world operations"
+        },
+        {
+          "slice": "HM-07",
+          "contract": "Published control/pose bindings and animator workspace"
+        }
+      ],
+      "scope": "Assign part roles and place joint guides directly on canvas; preview an editable FK hierarchy and control set before one commit. Offer a simple biped recipe and manual correction. Generated rigs use the same model as hand-authored rigs.",
+      "acceptance": [
+        "Create a FK character from registered parts with no manual node wiring; record setup time/actions against the same manual workflow without claiming superiority before measurement.",
+        "Cancel/undo is atomic; missing roles, mirrored orientation and repeat-run update versus new-instance choice are explicit.",
+        "The full rig view reveals every generated binding; guides never render."
+      ],
+      "excluded": [
+        "No AI/auto-segmentation, irreversible bake or unsupported deformer recipe."
+      ],
+      "reuse_evidence": [],
+      "library_ids": [],
+      "completion_evidence": []
+    },
+    {
+      "id": "HM-09",
+      "title": "Integrated deformable rig, IK and portable templates",
+      "owner_phase": "P09",
+      "work_package": "P09-W3",
+      "owner_module": "rigging/deformation/library",
+      "status": "planned",
+      "effort_engineer_weeks": [
+        4,
+        8
+      ],
+      "feature_ids": [
+        "RIG-009",
+        "DEF-011",
+        "DEF-012",
+        "DEF-010",
+        "CTL-001",
+        "CTL-008",
+        "LIB-002",
+        "LIB-004",
+        "LIB-005",
+        "RIG-012",
+        "RIG-015"
+      ],
+      "requires": [
+        {
+          "slice": "HM-06",
+          "contract": "Working bone/curve evaluation with per-variant binding"
+        },
+        {
+          "slice": "HM-07",
+          "contract": "Pose/control mappings and saved driver semantics"
+        },
+        {
+          "slice": "HM-08",
+          "contract": "Editable guided rig recipe and role mappings"
+        }
+      ],
+      "scope": "Add kinematic endpoint/curve attachments, bounded two-bone IK with limits and explicit FK/IK ownership; extend Quick Rig with optional proven limb recipes. Close template dependency collection over parts, swatches, variants, poses, controls, bind data and animation. Use a validated local folder manifest first.",
+      "acceptance": [
+        "A hand/accessory follows a deformed arm without being deformed twice; unreachable targets preserve declared length/limit policy.",
+        "Switch variants and apply poses without orphaned deformer links; shared versus independent imports are explicit and two instances animate independently.",
+        "Template export/import remaps all IDs, rejects missing resources and includes all registered payload dependencies; later graph/matte payloads extend the same collector before HM-15."
+      ],
+      "excluded": [
+        "Multi-pin/nails, animated constraint switching, general IK networks, live template updates and archive transport are later."
+      ],
+      "reuse_evidence": [],
+      "library_ids": [
+        "LIB-EIGEN"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "HM-10",
+      "title": "Audio clock, waveform and manual timing",
+      "owner_phase": "P07",
+      "work_package": "P07-W1",
+      "owner_module": "audio/media",
+      "status": "planned",
+      "effort_engineer_weeks": [
+        4,
+        7
+      ],
+      "feature_ids": [
+        "AUD-001",
+        "AUD-002",
+        "AUD-003",
+        "AUD-004",
+        "AUD-005",
+        "LYR-001"
+      ],
+      "requires": [
+        {
+          "slice": "HM-01",
+          "contract": "Saved typed audio assets/clips, rational sample/frame conversion and cancellable snapshot jobs"
+        }
+      ],
+      "scope": "Adopt one playback backend after the miniaudio spike; start with WAV/PCM, waveform pyramids, trim/offset/gain, limited mixing and frame scrub. Audio device time drives playback, while headless sampling uses the same rational scene mapping.",
+      "acceptance": [
+        "Ten-minute 24 and 24000/1001 scenes stay within one-frame accumulated audiovisual drift; report underruns and dropped preview frames.",
+        "Seek, loop, pause, device loss and sample-rate conversion do not desynchronize the playhead or mutate media; waveform peaks align with sample positions.",
+        "Audio references, edits and original asset hashes survive undo/reopen; callbacks avoid document locks/allocations."
+      ],
+      "excluded": [
+        "No raster/vector completion, lip detector, FFmpeg codec catalog or audio recording prerequisite."
+      ],
+      "reuse_evidence": [
+        "modules/document/include/opentoon/document.h",
+        "adapters/qt/editor_controller.cpp",
+        "conanfile.py"
+      ],
+      "library_ids": [
+        "LIB-AUDIO"
+      ],
+      "completion_evidence": []
+    },
+    {
+      "id": "HM-11",
+      "title": "Mouth mapping and editable lip sync",
+      "owner_phase": "P07",
+      "work_package": "P07-W3",
+      "owner_module": "audio/rigging",
+      "status": "planned",
+      "effort_engineer_weeks": [
+        2,
+        4
+      ],
+      "feature_ids": [
+        "AUD-007",
+        "AUD-008",
+        "RIG-006"
+      ],
+      "requires": [
+        {
+          "slice": "HM-03",
+          "contract": "Named mouth substitution IDs and held selector track"
+        },
+        {
+          "slice": "HM-10",
+          "contract": "Audio time mapping, waveform and frame scrub"
+        }
+      ],
+      "scope": "Map a small labelled viseme set to each character and edit held mouth timings against audio. Import a documented timing JSON with rational conversion and previewed merge ranges; preserve manual corrections.",
+      "acceptance": [
+        "Complete English and Spanish dialogue by hand; flag unmapped labels and retain corrections through retiming, save/reopen and export.",
+        "Imported labels cannot overwrite unrelated or protected manual timings; gaps, overlaps and clip offsets have explicit rules."
+      ],
+      "excluded": [
+        "Automatic recognition is a follow-on enhancement, not a dependency of reliable lip-sync editing."
+      ],
+      "reuse_evidence": [],
+      "library_ids": [],
+      "completion_evidence": []
+    },
+    {
+      "id": "HM-12",
+      "title": "Useful nodes, cutters and part overlap",
+      "owner_phase": "P10",
+      "work_package": "P10-W2",
+      "owner_module": "compositing/presentation",
+      "status": "planned",
+      "effort_engineer_weeks": [
+        4,
+        7
+      ],
+      "feature_ids": [
+        "NOD-001",
+        "NOD-003",
+        "NOD-004",
+        "NOD-005",
+        "NOD-006",
+        "NOD-008",
+        "NOD-009",
+        "RIG-004",
+        "RIG-005"
+      ],
+      "requires": [
+        {
+          "slice": "HM-04",
+          "contract": "Typed graph runtime, color/alpha and shared output evaluator"
+        },
+        {
+          "slice": "HM-03",
+          "contract": "Character group and separate hierarchy/render-order identity"
+        }
+      ],
+      "scope": "Expose a small editable node graph: Drawing, Peg/Transform, ordered Composite, Opacity, Cutter/Matte, group ports, Display and Write. Add reversible front/back part ordering and manual joint matte recipes; a compact inspector hides graph complexity from animators.",
+      "acceptance": [
+        "Animate an arm crossing the torso and mask an eye/joint with fractional alpha; group/ungroup and bypass preserve intended pixels and references.",
+        "Graph edits reject incompatible ports/cycles and undo atomically; a matte is not treated as binary.",
+        "The template dependency collector includes graph and matte resources; deleting referenced nodes cannot silently leave a partial rig."
+      ],
+      "excluded": [
+        "No automatic Auto Patch topology, general Z/multiplane, effects catalog, OpenFX or full node inventory."
+      ],
+      "reuse_evidence": [
+        "adapters/render/scene_renderer.cpp"
+      ],
+      "library_ids": [],
+      "completion_evidence": []
+    },
+    {
+      "id": "HM-13",
+      "title": "Output camera and framing",
+      "owner_phase": "P06",
+      "work_package": "P06-W3",
+      "owner_module": "camera/animation",
+      "status": "planned",
+      "effort_engineer_weeks": [
+        2,
+        4
+      ],
+      "feature_ids": [
+        "CAM-001",
+        "CAM-002",
+        "CAM-005",
+        "CAM-006",
+        "UI-006",
+        "UI-008"
+      ],
+      "requires": [
+        {
+          "slice": "HM-04",
+          "contract": "Shared evaluator, addressed transform properties and scene-to-output boundary"
+        }
+      ],
+      "scope": "Add an explicit active orthographic output camera with animated pan/zoom/rotation and nonrendering framing guides. Separate camera edits from canvas navigation; retain drawing-local coordinates.",
+      "acceptance": [
+        "A camera move yields identical framing in preview, reopened scene and PNG export; viewport pan/zoom never changes exported composition.",
+        "Camera keys interpolate with existing animation semantics, and invalid/singular framing fails clearly."
+      ],
+      "excluded": [
+        "Multiplane parallax, perspective/3D staging views and camera switching UI are post-milestone."
+      ],
+      "reuse_evidence": [
+        "adapters/render/scene_renderer.cpp",
+        "adapters/qt/canvas_item.cpp"
+      ],
+      "library_ids": [],
+      "completion_evidence": []
+    },
+    {
+      "id": "HM-14",
+      "title": "Synchronized preview and deterministic delivery",
+      "owner_phase": "P07",
+      "work_package": "P07-W2",
+      "owner_module": "render/jobs/media",
+      "status": "planned",
+      "effort_engineer_weeks": [
+        3,
+        6
+      ],
+      "feature_ids": [
+        "OUT-001",
+        "OUT-002",
+        "OUT-003",
+        "OUT-004",
+        "OUT-007",
+        "AUD-010",
+        "PRJ-004"
+      ],
+      "requires": [
+        {
+          "slice": "HM-10",
+          "contract": "Authoritative audio clock and exact scene-to-sample mapping"
+        },
+        {
+          "slice": "HM-12",
+          "contract": "Evaluated node/matte composition and distinct Display/Write"
+        },
+        {
+          "slice": "HM-13",
+          "contract": "Output-camera sampling shared by preview/export"
+        }
+      ],
+      "scope": "Preview the bounded shot from revision-keyed caches with visible dropped-frame/quality state. Export an exact-range PNG sequence plus synchronized PCM WAV and an explicit timing/color manifest; save/reopen the same immutable revision before comparing output.",
+      "acceptance": [
+        "Deliver every expected frame and sample interval at 24 and 24000/1001 with declared endpoint rounding; cancellation never reports complete output.",
+        "UI, reopened and headless outputs agree for baseline drawing, camera and node/matte composition; late jobs cannot replace newer results. Deformer/rig combinations join the complete export regression at HM-15 after HM-09, without blocking this independent output slice.",
+        "PNG plus WAV is the mandatory open delivery profile. Movie encoding is explicitly the next output extension after the milestone, not an implied capability."
+      ],
+      "excluded": [
+        "No codec catalog, HDR/EXR/multi-pass, video reference import or distributed render queue gate."
+      ],
+      "reuse_evidence": [
+        "modules/application",
+        "tests/export_tests.cpp"
+      ],
+      "library_ids": [],
+      "completion_evidence": []
+    },
+    {
+      "id": "HM-15",
+      "title": "Harmony Moment reliability and artist acceptance",
+      "owner_phase": "P11",
+      "work_package": "P11-W1",
+      "owner_module": "quality/release",
+      "status": "planned",
+      "effort_engineer_weeks": [
+        4,
+        7
+      ],
+      "feature_ids": [
+        "PRJ-005",
+        "PRJ-006",
+        "PRJ-007",
+        "PRJ-009",
+        "LIB-002",
+        "CTL-008"
+      ],
+      "requires": [
+        {
+          "slice": "HM-09",
+          "contract": "Reusable deformable character with functioning controls, attachments and template closure"
+        },
+        {
+          "slice": "HM-11",
+          "contract": "Editable dialogue/mouth timing"
+        },
+        {
+          "slice": "HM-14",
+          "contract": "Camera/node preview and synchronized deterministic output"
+        }
+      ],
+      "scope": "Run the complete original-art and imported-parts routes on the declared Mac profile: create character, variants, Quick Rig, bone/curve edits, poses/IK, dialogue, cutters, camera move, preview, save/reopen and export. Reuse the character in a second scene and exercise failures; this is a bounded workflow milestone before full P11/1.0.",
+      "acceptance": [
+        "An animator other than the implementer completes both 20-second shot routes using the guide, without manual JSON repair or developer assistance; record blockers and setup/pose correction time.",
+        "No known data-loss or critical workflow blocker; undo/redo, crash recovery, missing assets and legacy migration retain recoverable project/rig state.",
+        "Reopened outputs match; template reuse remaps controls, bind variants, graph/matte and media references completely. Pass published frame/latency/memory budgets for the fixture, without claiming all catalog NFRs.",
+        "Record Mac hardware, exact dependencies/notices and limitations. Physical tablets and wider OS/install qualification remain explicit open gates; publication is a separate owner decision."
+      ],
+      "excluded": [
+        "Not Harmony parity, full phase completion or a supported cross-platform 1.0."
+      ],
+      "reuse_evidence": [
+        "docs/implementation/status.json",
+        "tests/storage_tests.cpp"
+      ],
+      "library_ids": [],
+      "completion_evidence": []
+    }
+  ],
+  "execution_policy": {
+    "primary_objective": "HM: reliable character animation Harmony Moment",
+    "current_instruction": "Planning only: do not implement new application capabilities in this revision.",
+    "phase_dependency_semantics": "Phase depends_on constrains full epic completion, not entry into an implementation slice. Only the explicit delivery-slice contract DAG gates the Harmony Moment. Domain dependencies are scope relationships, not all-features barriers.",
+    "entry_rule": "Start a slice only when each required contract has accepted evidence. Baseline reuse is partial and must be qualified; planned is not ready. Independent spikes may run without claiming their consumer ready.",
+    "wip_limit": 2,
+    "staffing": "One integration owner; at most two bounded slices with distinct owners when people are available. For one implementer, follow priority_order sequentially.",
+    "priority_order": [
+      "HM-00",
+      "HM-01",
+      "HM-02",
+      "HM-03",
+      "HM-04",
+      "HM-05",
+      "HM-06",
+      "HM-07",
+      "HM-08",
+      "HM-09",
+      "HM-10",
+      "HM-11",
+      "HM-12",
+      "HM-13",
+      "HM-14",
+      "HM-15"
+    ],
+    "full_phase_closure": "After HM-15, close retained P00-P11 scope/qualification for 1.0; do not erase unimplemented requirements to claim completion."
+  },
+  "harmony_moment": {
+    "id": "HM",
+    "title": "Harmony Moment: reusable speaking character shot",
+    "status": "planned",
+    "required_slices": [
+      "HM-00",
+      "HM-01",
+      "HM-02",
+      "HM-03",
+      "HM-04",
+      "HM-05",
+      "HM-06",
+      "HM-07",
+      "HM-08",
+      "HM-09",
+      "HM-10",
+      "HM-11",
+      "HM-12",
+      "HM-13",
+      "HM-14",
+      "HM-15"
+    ],
+    "terminal_slice": "HM-15",
+    "profile": {
+      "platform": "macOS development profile; exact hardware recorded in HM-00",
+      "artwork": "Original sampled vector/raster artwork and registered transparent PNG parts; no PSD/SVG prerequisite",
+      "shot": "20 seconds, 1920x1080, 24fps plus 24000/1001 variant; one 12-20-part character, 8 mouth variants, 3 hands, 2 coordinated views, 2 bone/curve chains, 1 attachment, 12 published controls, 2 audio clips, 3 mattes and 1 orthographic camera",
+      "delivery": "PNG sequence + PCM WAV + timing/color manifest; review movie encoding follows HM",
+      "audio_budget": "NFR-007 one-frame maximum drift over ten minutes; waveform/scrub aligns within one displayed frame",
+      "proposed_interaction_budget": "On recorded hardware, cached 1080p/24fps preview; p95 control-to-preview <=50 ms at declared preview quality; resident memory <=2 GiB for the fixture. Proposed acceptance targets, not current measurements. Recalibration requires an explicit scope/quality decision.",
+      "correctness": "No unresolved data loss/critical workflow defect; legacy migrations backed up, rig IDs portable, deterministic reopened exports, artistic acceptance required"
+    },
+    "not_claimed": [
+      "Harmony file compatibility or full feature parity",
+      "All P00-P11 phase exit criteria",
+      "Physical tablet, Intel, Linux/Windows or clean-machine qualification",
+      "Measured superiority over Harmony before comparative artist study"
+    ]
+  },
+  "estimate_revision": {
+    "basis": "Whole-program phase envelopes retain prior scope and are not estimates of remaining HM work. HM slice estimates cover remaining bounded work once, including integration; never add them to phase totals.",
+    "changes": [
+      "Move declarative controls/guides from P13 to P08: 6-10 engineer-weeks transferred.",
+      "Move core IK from P13 to P09: 2-4 transferred; move scripted controller from P13 to P12: 2-4 transferred.",
+      "Move lip-sync ownership from P08 to P07: 2-4 transferred.",
+      "Add distinct Quick Rig capability to P08: 3-6 additional whole-program engineer-weeks."
+    ],
+    "confidence": "Low. Re-estimate after HM-01 and the renderer-backed HM-05 spike; no calendar commitment."
+  }
 }

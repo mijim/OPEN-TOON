@@ -10,6 +10,8 @@ Record exact source revision, package checksum, build flags, enabled modules, li
 
 **Phase:** P01. **Decision:** `experimental_adopted`.
 
+**Delivery:** harmony_moment_boundary; slices: HM-02, HM-04.
+
 Desktop UI, tablet events, accessibility and platform integration.
 
 **Boundary:** QML visual layer only; no Qt types in domain APIs. QRhi usage is isolated and pinned to tested Qt versions.
@@ -25,6 +27,8 @@ Desktop UI, tablet events, accessibility and platform integration.
 ## LIB-SQLITE — SQLite
 
 **Phase:** P01. **Decision:** `experimental_adopted`.
+
+**Delivery:** harmony_moment_boundary; slices: HM-01.
 
 Metadata, revision transactions and local indices.
 
@@ -42,11 +46,13 @@ Metadata, revision transactions and local indices.
 
 **Phase:** P02. **Decision:** `candidate_requires_spike`.
 
+**Delivery:** after_harmony_moment; slices: none required for HM.
+
 Vector/raster drawing and a possible CPU reference renderer.
 
 **Boundary:** Skia is not an editable drawing model, rigging engine or whole compositor. Do not add a second permanent interactive renderer without evidence.
 
-**Evaluation:** SP-02: compare CPU upload and GPU integration for tablet latency, tile updates, alpha, color and packaging.
+**Evaluation:** SP-02: compare CPU upload and GPU integration for tablet latency, tile updates, alpha, color and packaging. Not a blanket HM prerequisite: keep the current constrained QML workspace and reference renderer until a measured consumer blocker justifies replacement.
 
 **Fallback:** Use the selected Qt/RHI adapter if Skia integration adds excessive copying or build cost.
 
@@ -57,6 +63,8 @@ Vector/raster drawing and a possible CPU reference renderer.
 ## LIB-CLIPPER2 — Clipper2
 
 **Phase:** P04. **Decision:** `candidate_requires_spike`.
+
+**Delivery:** after_harmony_moment; slices: none required for HM.
 
 Polygon clipping, offsets and geometric boolean operations.
 
@@ -74,11 +82,13 @@ Polygon clipping, offsets and geometric boolean operations.
 
 **Phase:** P09. **Decision:** `candidate_requires_spike`.
 
+**Delivery:** harmony_moment_boundary; slices: HM-05.
+
 Select one suitable polygon tessellator for the renderer or mesh preparation.
 
 **Boundary:** Earcut is an alternative, not an additional mandatory engine; triangle quality for deformation requires further refinement.
 
-**Evaluation:** Compare holes/degeneracies and topology failures; do not infer solver-quality meshes from fast triangulation.
+**Evaluation:** Compare holes/degeneracies and topology failures; do not infer solver-quality meshes from fast triangulation. HM-05 first tests a regular rest mesh over transparent artwork; add a tessellator only if the fixture demonstrates a need. Clipping and triangulation do not solve skinning or texture rendering.
 
 **Fallback:** Use renderer-native tessellation for display and a separately justified deformation mesher.
 
@@ -89,6 +99,8 @@ Select one suitable polygon tessellator for the renderer or mesh preparation.
 ## LIB-MYPAINT — libmypaint
 
 **Phase:** P05. **Decision:** `experimental_adopted`.
+
+**Delivery:** harmony_moment_boundary; slices: HM-02.
 
 Established pressure-sensitive raster brush engine used by several graphics applications.
 
@@ -106,11 +118,13 @@ Established pressure-sensitive raster brush engine used by several graphics appl
 
 **Phase:** P01. **Decision:** `candidate_requires_spike`.
 
+**Delivery:** after_harmony_moment; slices: none required for HM.
+
 Docking, tabbing and saved workspaces with a Qt Quick frontend.
 
 **Boundary:** Qt Quick support must be evaluated independently of the mature Widgets path; avoid switching the entire UI for one library.
 
-**Evaluation:** SP-00/07: nested docks, floating windows, restore, focus, HiDPI, accessibility and monochrome customization.
+**Evaluation:** SP-00/07: nested docks, floating windows, restore, focus, HiDPI, accessibility and monochrome customization. Not a blanket HM prerequisite: keep the current constrained QML workspace and reference renderer until a measured consumer blocker justifies replacement.
 
 **Fallback:** Deliver a constrained QML split-panel layout first if Quick support fails; advanced docking stays incomplete.
 
@@ -122,11 +136,13 @@ Docking, tabbing and saved workspaces with a Qt Quick frontend.
 
 **Phase:** P07. **Decision:** `candidate_requires_spike`.
 
+**Delivery:** harmony_moment_boundary; slices: HM-10.
+
 Cross-platform audio device playback, mixing and capture infrastructure.
 
 **Boundary:** One real-time audio engine; FFmpeg handles media formats outside it. No allocations or document locks in the audio callback.
 
-**Evaluation:** SP-05: 10-minute rational-rate sync, device replacement, scrub and underrun traces.
+**Evaluation:** SP-05: 10-minute rational-rate sync, device replacement, scrub and underrun traces. HM-10 starts with the already-resolved but unlinked miniaudio package; verify its exact revision and adopt only after clock/device tests. WAV/PCM does not require the FFmpeg adapter.
 
 **Fallback:** Evaluate Qt Multimedia behind the same audio port, choosing one engine after measurement.
 
@@ -138,11 +154,13 @@ Cross-platform audio device playback, mixing and capture infrastructure.
 
 **Phase:** P07. **Decision:** `selected_for_plan`.
 
+**Delivery:** after_harmony_moment; slices: none required for HM.
+
 Decode imported media and encode supported movie/audio exports.
 
 **Boundary:** Use a restricted format/codec build and bounded jobs; available codecs are an explicit runtime capability.
 
-**Evaluation:** Known-timestamp fixtures, cancellation, corrupt input and clean-machine export tests.
+**Evaluation:** Known-timestamp fixtures, cancellation, corrupt input and clean-machine export tests. First follow-on output after HM: pin one redistributable review-movie profile and prove timestamps/muxing against the PNG+WAV reference; codec failure must not break the open delivery profile.
 
 **Fallback:** Always preserve image-sequence and WAV delivery if a movie codec cannot be distributed.
 
@@ -154,11 +172,13 @@ Decode imported media and encode supported movie/audio exports.
 
 **Phase:** P10. **Decision:** `selected_for_plan`.
 
+**Delivery:** after_harmony_moment; slices: none required for HM.
+
 Scene/display/output color transformations.
 
 **Boundary:** Define working space, premultiplied alpha boundaries and CPU/GPU transform equality; library does not choose artistic policy.
 
-**Evaluation:** B5 charts, negative/HDR values, config changes and GPU/CPU tolerance.
+**Evaluation:** B5 charts, negative/HDR values, config changes and GPU/CPU tolerance. HM-04 requires explicit restricted linear-sRGB/legacy profiles first; full OCIO/HDR configuration is deferred, not a waiver of alpha/color correctness.
 
 **Fallback:** A documented restricted sRGB workflow before advanced color support; never claim HDR parity.
 
@@ -169,6 +189,8 @@ Scene/display/output color transformations.
 ## LIB-OIIO — OpenImageIO
 
 **Phase:** P07. **Decision:** `candidate_requires_spike`.
+
+**Delivery:** after_harmony_moment; slices: none required for HM.
 
 Professional image IO and metadata conversion.
 
@@ -186,6 +208,8 @@ Professional image IO and metadata conversion.
 
 **Phase:** P10. **Decision:** `candidate_requires_spike`.
 
+**Delivery:** after_harmony_moment; slices: none required for HM.
+
 HDR channels and professional image-sequence delivery.
 
 **Boundary:** Prefer the OpenImageIO path if sufficient; avoid a duplicate reader unless channel/deep-data needs justify it.
@@ -201,6 +225,8 @@ HDR channels and professional image-sequence delivery.
 ## LIB-OTIO — OpenTimelineIO
 
 **Phase:** P16. **Decision:** `candidate_requires_spike`.
+
+**Delivery:** after_harmony_moment; slices: none required for HM.
 
 Editorial timeline interchange and rational timing.
 
@@ -218,6 +244,8 @@ Editorial timeline interchange and rational timing.
 
 **Phase:** P15. **Decision:** `candidate_requires_spike`.
 
+**Delivery:** after_harmony_moment; slices: none required for HM.
+
 Interface specification and support code for third-party effects.
 
 **Boundary:** Implement declared host suites and process isolation; the API does not supply effects or make arbitrary plugins compatible.
@@ -234,11 +262,13 @@ Interface specification and support code for third-party effects.
 
 **Phase:** P09. **Decision:** `selected_for_plan`.
 
+**Delivery:** harmony_moment_boundary; slices: HM-05, HM-06, HM-09.
+
 Linear algebra and numerical computations for geometry and rig solvers.
 
 **Boundary:** Use behind algorithm boundaries; avoid leaking expression-template types across public ABI.
 
-**Evaluation:** Conditioning, degenerate transforms, precision, vectorization and compile cost.
+**Evaluation:** Conditioning, degenerate transforms, precision, vectorization and compile cost. HM-05/HM-06: use only required algebra through a narrow adapter; no blanket libigl adoption or assumed mesh renderer.
 
 **Fallback:** Use small explicit math types for simple operations; restrict solver complexity until proven.
 
@@ -249,6 +279,8 @@ Linear algebra and numerical computations for geometry and rig solvers.
 ## LIB-LIBIGL — libigl
 
 **Phase:** P13. **Decision:** `candidate_requires_spike`.
+
+**Delivery:** after_harmony_moment; slices: none required for HM.
 
 Selected mesh/geometry processing routines for advanced deformation.
 
@@ -266,6 +298,8 @@ Selected mesh/geometry processing routines for advanced deformation.
 
 **Phase:** P12. **Decision:** `selected_for_plan`.
 
+**Delivery:** after_harmony_moment; slices: none required for HM.
+
 Python bindings over the stable command/query API.
 
 **Boundary:** Bindings do not sandbox Python and must not expose mutable document internals.
@@ -280,9 +314,11 @@ Python bindings over the stable command/query API.
 
 ## LIB-LIPSYNC — Rhubarb Lip Sync
 
-**Phase:** P08. **Decision:** `candidate_requires_spike`.
+**Phase:** P07. **Decision:** `candidate_requires_spike`.
 
-Optional offline automatic mouth-timing generation.
+**Delivery:** after_harmony_moment; slices: none required for HM.
+
+Optional offline mouth-timing proposals after manual mouth mapping/correction works; not required for the Harmony Moment.
 
 **Boundary:** Subprocess adapter with editable results; default speech recognizer is English-oriented, phonetic mode requires separate quality evaluation.
 
@@ -297,6 +333,8 @@ Optional offline automatic mouth-timing generation.
 ## LIB-UFBX — ufbx
 
 **Phase:** P17. **Decision:** `candidate_requires_spike`.
+
+**Delivery:** after_harmony_moment; slices: none required for HM.
 
 FBX scene, hierarchy and animation import candidate.
 
@@ -314,6 +352,8 @@ FBX scene, hierarchy and animation import candidate.
 
 **Phase:** P17. **Decision:** `candidate_requires_spike`.
 
+**Delivery:** after_harmony_moment; slices: none required for HM.
+
 Modern C++ glTF parser candidate.
 
 **Boundary:** Map assets into our 3D scene contract; parsing does not supply renderer/material support.
@@ -329,6 +369,8 @@ Modern C++ glTF parser candidate.
 ## LIB-ONNX — ONNX Runtime
 
 **Phase:** P20. **Decision:** `candidate_requires_spike`.
+
+**Delivery:** after_harmony_moment; slices: none required for HM.
 
 Optional local inference runtime for approved assistive tools.
 
@@ -346,6 +388,8 @@ Optional local inference runtime for approved assistive tools.
 
 **Phase:** P01. **Decision:** `experimental_adopted`.
 
+**Delivery:** harmony_moment_boundary; slices: HM-01.
+
 Readable manifests, configuration and interchange metadata.
 
 **Boundary:** Bound input depth/size; do not put JSON serialization in tablet sample or render hot paths.
@@ -361,6 +405,8 @@ Readable manifests, configuration and interchange metadata.
 ## LIB-ZSTD — Zstandard
 
 **Phase:** P05. **Decision:** `experimental_adopted`.
+
+**Delivery:** harmony_moment_boundary; slices: HM-01.
 
 Compress tiles, undo snapshots and packaged resources.
 
@@ -378,13 +424,15 @@ Compress tiles, undo snapshots and packaged resources.
 
 **Phase:** P08. **Decision:** `candidate_requires_spike`.
 
+**Delivery:** after_harmony_moment; slices: none required for HM.
+
 Portable project/library package transport.
 
 **Boundary:** Whitelist formats; prevent path traversal, symlink escape, archive bombs and unsafe overwrite.
 
 **Evaluation:** Unicode paths, duplicate entries, size limits and hostile archives.
 
-**Fallback:** Use folder-based local projects until safe package transport is ready.
+**Fallback:** Use folder-based local projects until safe package transport is ready. HM-09 uses bounded folder manifests with dependency closure; compressed transport is not required for reusable rigs.
 
 **License investigation:** Inspect BSD-style core and optional format dependencies.
 
@@ -393,6 +441,8 @@ Portable project/library package transport.
 ## LIB-CATCH — Catch2
 
 **Phase:** P01. **Decision:** `experimental_adopted`.
+
+**Delivery:** after_harmony_moment; slices: none required for HM.
 
 Domain and adapter regression tests.
 
@@ -410,6 +460,8 @@ Domain and adapter regression tests.
 
 **Phase:** P00. **Decision:** `selected_for_plan`.
 
+**Delivery:** after_harmony_moment; slices: none required for HM.
+
 Repeatable isolated CPU benchmarks.
 
 **Boundary:** Microbenchmarks complement complete app traces; they do not measure physical pen-to-screen latency.
@@ -425,6 +477,8 @@ Repeatable isolated CPU benchmarks.
 ## LIB-TRACY — Tracy
 
 **Phase:** P00. **Decision:** `candidate_requires_spike`.
+
+**Delivery:** after_harmony_moment; slices: none required for HM.
 
 Developer CPU/GPU/lock/allocation profiling.
 
@@ -442,6 +496,8 @@ Developer CPU/GPU/lock/allocation profiling.
 
 **Phase:** P01. **Decision:** `experimental_adopted`.
 
+**Delivery:** after_harmony_moment; slices: none required for HM.
+
 Reproducible native builds, dependency graph and lockfiles.
 
 **Boundary:** Pin exact packages/revisions and flags after spikes; never track moving latest for releases.
@@ -458,6 +514,8 @@ Reproducible native builds, dependency graph and lockfiles.
 
 **Phase:** P05. **Decision:** `experimental_adopted`.
 
+**Delivery:** after_harmony_moment; slices: none required for HM.
+
 libmypaint settings parser dependency.
 
 **Boundary:** Private dependency of the MyPaint C adapter; document serialization continues to use nlohmann/json.
@@ -473,6 +531,8 @@ libmypaint settings parser dependency.
 ## LIB-OPENSSL — OpenSSL Crypto
 
 **Phase:** P05. **Decision:** `experimental_adopted`.
+
+**Delivery:** after_harmony_moment; slices: none required for HM.
 
 SHA-256 resource identity and integrity verification.
 

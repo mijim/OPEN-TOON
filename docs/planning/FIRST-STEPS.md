@@ -1,66 +1,82 @@
-# First implementation backlog
+# Next implementation tasks — character-first
 
-This is a reviewable starting backlog; no application task has been executed by writing it. Each issue is to be split further only if its acceptance cannot be demonstrated within an iteration. Stable issue IDs are local planning identifiers, not GitHub issues already created.
+Planning only in this revision. All HM slices remain planned; no implementation is
+implied by the task list. Use [the canonical contract DAG](HARMONY-MOMENT.md), not a
+phase number, to determine readiness. Two active slices maximum if owners exist;
+with one implementer use the recommended order below. Every delivered block must
+undo, save/reopen and exercise its real failure boundaries before consumers start.
 
-## P00 — feasibility issues
+## Immediate tickets
 
-| ID | Task | Prerequisite | Observable evidence |
+| Order / ID | Concrete next task | Prerequisite | Observable acceptance | Parallel option |
+|---|---|---|---|---|
+| 1 / HM-00-A | Create the original/PNG character asset fixture and scripted shot rubric; record baseline host, scene size, frame/latency/memory/audio targets and asset provenance | Inspect current code/status | Reproducible 20-second shot spec and ten-minute sync fixture; no proprietary artwork | HM-00-B contract review within the same slice |
+| 2 / HM-00-B | Specify typed part/peg/property identity, rest versus authored pose, driver ownership, space/time/color boundaries and format-3 compatibility | Current structs/renderer/storage audit | Reviewed schema examples and migration/failure acceptance; restrict the renderer spike to a real consumer | Fixture preparation above |
+| 3 / HM-01-A | Expose typed property addresses through existing Session/evaluation adapters; preserve full-pose keys and introduce new track payloads only for real consumers | Accepted HM-00 | Old-scene evaluated poses/easing preserved; dangling/duplicate/type-invalid references rejected; undo and migration backup tests | HM-02 after HM-00 with a separate owner |
+| 4 / HM-02-A | Qualify transparent PNG registration, then atomic parts/sequence intake with explicit mode, order/gap report and cancellation | Accepted HM-00 contracts | Original artwork and imported parts round-trip; failed batch leaves no partial scene | HM-01 |
+| 5 / HM-03-A | Add character root/part roles and separate peg hierarchy; preserve-world reparenting and permanent pivot editing | HM-01 + HM-02 | Assemble/rest-pose a rigid character without registration jumps; reject unsupported shear/singular cases | HM-04 after HM-01 |
+| 6 / HM-03-B | Add named thumbnail substitutions, held selector tracks and coordinated view sets | HM-03-A | Switch mouths/hands/views without changing transforms or another instance; all-or-nothing multi-part changes | Continue HM-04; no deformers yet |
+| 7 / HM-04-A | Extract shared evaluator and typed graph kernel; define invalidation, alpha/color profile and legacy appearance preservation | HM-01 | Legacy golden scenes + new-profile alpha fixtures, cycle/port rejection and UI/headless equivalence | HM-03; HM-10 is another eligible branch when a slot opens |
+| 8 / HM-05-A | Prove saved rest mesh/UV/weights + actual texture-warp rendering on bone/curve checker fixtures | HM-03 + HM-04 | Measured joint/texture quality and bounded cost; accepted backend/library decision or documented blocker | HM-07 controls or HM-10 audio |
+
+HM-01-A includes the typed persistence and failure evidence needed to close HM-01;
+it is not permission to start a consumer after only adding a field. Later payload
+schemas are introduced in their owning slices, with the common migration rules.
+
+## Continue in dependency order
+
+| Recommended priority | Work | Hard join | Parallel work once its prerequisites pass |
 |---|---|---|---|
-| BOOT-001 | Register hardware, OS, GPU/driver, tablet, compiler and benchmark recording format | None | Reproducible device matrix with tested/untested states and redistributable fixture sources |
-| BOOT-002 | Audit reuse of a pinned OpenToonz checkout and selected components; assess clean build and coupling | BOOT-001 | Build log, component/license map and timeboxed adopt/reject decision; no blanket fork |
-| BOOT-003 | Capture Qt tablet events and draw a pressure-sensitive B0 stroke | BOOT-001 | Pressure/tilt/focus/DPI traces and internal plus physical latency measurements |
-| BOOT-004 | Compare CPU/upload and GPU render integration with Skia/Qt candidates | BOOT-003 | Identical scene images, latency distributions, memory and build complexity; one primary renderer chosen |
-| BOOT-005 | Prototype stable IDs, SQLite revisions and immutable blob publication | BOOT-001 | Fault injection at each save boundary, disk-full recovery and no published missing blob |
-| BOOT-006 | Evaluate clipping/region topology and curve flattening against pathological drawings | BOOT-004 | Fill/erase behavior, holes and error tolerance; chosen geometry approach and remaining gaps |
-| BOOT-007 | Demonstrate rational time with audio resampling/scheduling | BOOT-001 | Ten-minute sync, exact sample/frame boundary checks and explicit drift budget |
-| BOOT-008 | Evaluate rest-space curve/envelope deformation and mesh quality | BOOT-006 | Checker-texture deformation fixture, extreme-pose handling and cost report |
-| BOOT-009 | Evaluate QML docking and a minimal redistributable package | BOOT-004 | Restored layout, keyboard/focus behavior, notices and install on clean target systems |
-| BOOT-010 | Close feasibility ADRs and recalculate P01/P02 | BOOT-002 through BOOT-009 | Accepted evidence, explicit rejected candidates, pinned prototype revisions and updated effort ranges |
+| 9 | HM-06 bone/curve authoring, animation and variant binding | HM-05 | HM-07 poses/declarative controls; HM-10 audio |
+| 10 | HM-07 character poses, widgets, one-dimensional sliders and Animator/Rig views | HM-03 + HM-04 | HM-06; no scripting needed |
+| 11 | HM-08 Quick Rig FK recipe: assign roles, place guides, preview/correct/commit | HM-03 + HM-07 | HM-06 or HM-10 |
+| 12 | HM-09 attachments, limited two-bone IK, optional rig recipes and dependency-closed templates | HM-06 + HM-07 + HM-08 | HM-10/11 and HM-12/13 branches |
+| Parallel branch A | HM-10 WAV device clock/waveform/trim/mix/scrub, then HM-11 mouth mapping and manual/timing-file lipsync | HM-01; HM-11 additionally needs HM-03 | Character/deformer work; audio need not wait for rig completion |
+| Parallel branch B | HM-12 node editor, groups, cutters, ordered overlap and template graph closure | HM-03 + HM-04 | Deformers and audio; no solver prerequisite |
+| Parallel branch C | HM-13 one output camera with pan/zoom/rotation and framing | HM-04 | HM-12 or HM-10; no multiplane prerequisite |
+| 13 | HM-14 revision-safe cached preview and exact PNG/WAV/manifest delivery | HM-10 + HM-12 + HM-13 | Final HM-09 rig/template integration |
+| 14 | HM-15 second-animator complete shot, second-scene reuse, save/reopen/export equivalence and fault recovery | HM-09 + HM-11 + HM-14 | Qualification tasks only; no shortcut around an unfinished branch |
 
-Timebox each investigation before it begins. BOOT-002 should initially consume no more than one focused engineer-week; if it finds a promising reusable subsystem, request a scoped follow-on issue rather than turning all of P00 into an unbounded fork study. The other experiments fit inside P00's combined 8–16 engineer-week envelope; failures trigger scope/architecture decisions before that envelope is silently extended.
+Branches describe technical independence, not three additional active tasks. With a
+small team prioritize the binding/deformation risk path, then fill another slot with
+an independent audio/control task. Select the next ready task using `roadmap.py next`.
+The estimated longest chain currently runs HM-00 → HM-01 → HM-03 → HM-05 → HM-06 →
+HM-09 → HM-15; HM-04 and all other incoming contracts must also pass at each join.
 
-## P01 — foundation issues
+## Follow-on queue, not milestone blockers
 
-| ID | Task | Prerequisite | Observable evidence |
-|---|---|---|---|
-| BASE-001 | Create C++20 module targets, CMake presets, package locks and platform CI | BOOT-010 | Clean builds; domain cannot depend on Qt or platform adapters |
-| BASE-002 | Specify IDs, coordinate spaces, rational intervals, alpha/color assumptions and command transactions | BASE-001 | Contract tests for time/identity/inverse commands and reviewed format examples |
-| BASE-003 | Implement project save/reopen/recovery adapter from the accepted prototype | BASE-002 | Semantic round trip, migration fixture and injected failure recovery |
-| BASE-004 | Implement QML tokens, English command/string registry and accessible shell | BASE-001 | Keyboard navigation, focus, HiDPI and monochrome screenshots on the declared matrix |
-| BASE-005 | Connect transactional scene configuration and document revision snapshots | BASE-003, BASE-004 | Edit/undo/redo/save/reopen operates on one real document; stale jobs cannot overwrite newer state |
-| BASE-006 | Audit the English glossary against command IDs, UI copy and first-party documentation | BASE-002 | Stable IDs retained, terminology consistent across implemented surfaces, generated views and links validated |
-| BASE-007 | Package the shell and document contributor setup | BASE-005, BASE-006 | Clean-machine install, English instructions, known limitations and dependency notices |
+After the workflow gate, use artist evidence to choose the next bounded task:
+review-movie export (FFmpeg adapter/profile after exact PNG/WAV timing), layered
+PSD/SVG intake (parser and loss reporting), automatic lipsync proposals (after manual
+mapping/correction), envelopes (after rest/render/binding), pose grids (after masked
+poses and interpolation), pins/constraint keys (after bounded IK and solve-order
+validation), and multiplane (after output-camera contract). Preserve all remaining
+P00–P22 scope and primary completion owners.
 
-## P02 — first useful film issues
+Original BOOT/BASE/FILM IDs remain in [FOUNDATION-BACKLOG.md](FOUNDATION-BACKLOG.md).
+Take an outstanding task from that backlog only when it supplies a named consumer
+contract or a later full-phase exit criterion; do not redo existing work blindly.
 
-| ID | Task | Prerequisite | Observable evidence |
-|---|---|---|---|
-| FILM-001 | Add drawing/exposure entities and a basic vector layer | BASE-007 | Independent drawings versus shared exposures survive save and undo |
-| FILM-002 | Integrate pressure pencil, eraser, selection and stable swatches | FILM-001 | Recorded and physical tablet input edits the document; whole gestures undo atomically |
-| FILM-003 | Add basic layer ordering and a minimal alpha-over scene evaluator | FILM-002 | Preview and headless PNG share evaluated geometry, transforms and alpha |
-| FILM-004 | Add timeline exposure editing, simple onion skin and playback | FILM-003 | Hold/insert/delete/scrub at exact rational times without duplicating drawings accidentally |
-| FILM-005 | Add still-image import and cancellable PNG sequence export | FILM-003 | Validated imports, correct frame numbering and no completed-looking partial output |
-| FILM-006 | Perform WF-01 with an animator and publish the experimental package | FILM-004, FILM-005 | Two-second 24fps film, 48 PNGs, reopened project equality, English help and B0 performance report |
-
-## Ticket template for subsequent phases
+## Ticket contract
 
 ```yaml
-id: P04-ISSUE-001
+id: HM-06-A
 status: planned
-phase: P04
-feature_ids: [COL-003, COL-005]
-owner_module: drawing-vector
-outcome: Fill one intended region without modifying its neighbour.
-requires: [accepted_topology_contract, reversible_document_commands]
-supported_subset: Closed vector regions; raster fill tracked separately.
-contract_changes: []
-fixtures: [adjacent_regions, near_coincident_edges, small_gap]
+slice: HM-06
+phase: P09
+feature_ids: [DEF-001, DEF-003, DEF-008, DEF-010]
+owner_module: deformation
+requires: [HM-05]
+supported_subset: Bone/curve chains using the accepted rest-mesh and render profile.
+contract_changes: [versioned_bind_payload, animated_deformer_properties]
 acceptance:
-  - Undo and redo restore semantic equality.
-  - Reopen and export preserve the selected region and swatch identity.
-  - Unsupported geometry produces an actionable English diagnostic.
+  - Bend and reset the fixture without changing the rest source.
+  - Switch compatible drawings and preserve their binding references.
+  - Preview, undo, reopen and export produce the same evaluated pose.
 evidence: []
-known_limits: []
+known_limits: [no_envelope_or_shape_aware_solver]
 ```
 
-Before implementing a later phase, replace symbolic prerequisites with concrete completed issues/contracts and add its catalog criteria. Do not infer readiness merely because a numerically earlier phase exists in the plan.
+Pin new library versions only when the consumer spike justifies adoption. Run relevant
+tests after coherent implementation blocks; this documentation change requires no
+application rebuild or new Linux/Windows compilation.

@@ -193,7 +193,7 @@
     },
     {
       "id": "CTL",
-      "title": "Advanced character controllers",
+      "title": "Character controllers and dashboards",
       "owner_module": "controllers",
       "depends_on": [
         "DEF",

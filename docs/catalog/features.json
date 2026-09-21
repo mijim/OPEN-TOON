@@ -2683,6 +2683,29 @@
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
     },
     {
+      "id": "RIG-015",
+      "domain": "RIG",
+      "title": "Quick Rig",
+      "requirement": "Build an editable character rig from explicitly assigned parts and artist-placed joint guides using a declarative recipe, with a preview of proposed hierarchy, pivots and controls before one transactional commit.",
+      "acceptance_criteria": [
+        "A registered part set can produce a usable FK character without manually wiring nodes; the same rig remains fully editable in the advanced workspace.",
+        "The artist can correct suggested part roles, left/right orientation and joint guides before committing; missing or ambiguous roles are reported.",
+        "Cancel leaves the scene unchanged; Undo restores the entire pre-rig state; a repeated run requires an explicit update or new-instance choice rather than duplicating bindings.",
+        "Two imported instances retain independent control, drawing-substitution and pose bindings after save/reopen."
+      ],
+      "evidence": "proposal",
+      "implementation_status": "not_started",
+      "scope": "base",
+      "capability_level": "pro",
+      "owner_module": "rigging",
+      "depends_on_domains": [
+        "LYR",
+        "ANI"
+      ],
+      "specification_status": "analysis_draft",
+      "notes": "Requested differentiation, not existing behavior or automatic image segmentation. Initial guided FK recipe precedes optional deformer/IK recipes. See Harmony Moment delivery slices."
+    },
+    {
       "id": "DEF-001",
       "domain": "DEF",
       "title": "Bone deformation",

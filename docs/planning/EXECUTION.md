@@ -58,7 +58,7 @@ A passed test that merely duplicates implementation logic is insufficient. Real 
 
 ## Cadence and release gates
 
-Work in two-week iterations as a coordination rhythm, not a delivery guarantee. At the start, select bounded capability tickets whose prerequisites are present. At the end, demonstrate a saved/reopened/exported scene, report measured regressions and revise the next iteration. Use an animator review at each workflow milestone; each phase has its own explicit exit criteria.
+Work in two-week iterations as a coordination rhythm, not a delivery guarantee. At the start, select bounded capability tickets whose named slice contracts have accepted evidence. Phase numbers and domain dependencies do not require exhaustive prior completion. Keep at most two slices active with explicit available owners. At the end, demonstrate a saved/reopened/exported scene, report measured regressions and revise the next iteration. Use an animator review at each workflow milestone; each phase has its own explicit exit criteria.
 
 Early builds cover all three desktop OSes; supported tablet/GPU configurations expand through measured profiles. Use the current macOS workstation for initial development convenience without asserting that untested Windows/Linux drivers work. A release advertises only the profiles actually validated.
 
@@ -68,9 +68,9 @@ Before a release, require zero known data-loss defects and zero unresolved criti
 
 ## Backlog and risk handling
 
-Phases are epics; the 69 work packages are planning units. Split them into issues small enough to demonstrate within one iteration. Do not turn the entire long roadmap into hundreds of rigid micro-tasks before the first benchmark. Re-estimate after P00, P02, P07 and P11, and whenever the renderer, format or staffing changes.
+Phases are epics; the 70 work packages are planning units. The 16 Harmony Moment delivery slices define the immediate execution contract DAG. Split them into issues small enough to demonstrate within one iteration. Do not turn the entire long roadmap into hundreds of rigid micro-tasks before the first benchmark. Re-estimate at HM-01, the renderer-backed HM-05 spike, HM-10 audio and HM-15 artist acceptance, and whenever the renderer, format or staffing changes.
 
-Highest early risks: tablet latency, editable vector topology, renderer/color integration and crash safety. Later risks: solver quality, OpenFX isolation, layered interchange semantics, 3D material mapping and distributed revision conflicts. Experiments that fail are valid evidence: narrow scope or change the adapter, document the decision and preserve the last working release.
+Highest Harmony Moment risks: stable property/variant identity, rest binding plus actual deformation rendering, control solve order, template dependency closure, audio clock and crash safety. Tablet latency and editable vector topology remain full-product gates but are not blanket blockers for the declared mouse/PNG character profile. Later risks: solver quality, OpenFX isolation, layered interchange semantics, 3D material mapping and distributed revision conflicts. Experiments that fail are valid evidence: narrow scope or change the adapter, document the decision and preserve the last working release.
 
 ## Current development verification cadence
 

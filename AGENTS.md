@@ -2,7 +2,7 @@
 
 ## Current context
 
-- The user explicitly authorized implementation through P11. An experimental native editor now exists. Read `docs/implementation/STATUS.md` and `status.json` for working behavior, evidence and remaining gates. Continue toward P11 without calling this prototype a completed phase or production release. Mouse input is required; the owner has no physical tablet available yet.
+- The immediate plan targets the character-animation Harmony Moment through contract-level delivery slices; the full P00-P11 scope remains required for supported 1.0. This revision is planning-only: do not infer authorization to implement new features from the earlier P11 request. Read `docs/planning/HARMONY-MOMENT.md`, `FIRST-STEPS.md` and implementation status before subsequent authorized work. Mouse input is required; the owner has no physical tablet available yet.
 - The user accepted C++20 + Qt 6/QML as the technical direction and explicitly requested proven, efficient open-source library reuse. Candidate libraries still require the documented adoption evidence.
 - **English is mandatory** for all first-party UI, menus, tooltips, messages, accessibility labels, built-in assets, help, code identifiers/comments and public documentation. User content remains multilingual. See `docs/design/02-language-policy.md` and `NFR-027`.
 - All project documentation and canonical catalog prose are now English. Preserve that language in future work; the owner may continue the conversation in Spanish.
@@ -22,7 +22,8 @@
 ## Maintain the planning records
 
 - Canonical catalog files: `features.json`, `domains.json`, `node-reference.json`, `nonfunctional.json` under `docs/catalog/`. Preserve stable IDs.
-- Canonical planning files: `roadmap.json`, `libraries.json`, `node-assignments.json` under `docs/planning/`.
+- Canonical planning files: `roadmap.json` (schema 2, including delivery slices), `libraries.json`, `node-assignments.json` under `docs/planning/`.
+- Use `roadmap.py slice HM-05` and `roadmap.py next` for implementation entry. Every required contract needs accepted evidence; an entire phase/domain is not a substitute gate. Keep at most two bounded slices active when separate owners exist.
 - Regenerate with `python3 scripts/catalog.py render` and `python3 scripts/roadmap.py render`; validate with `python3 scripts/validate_docs.py`.
 - Each feature has exactly one primary completion phase. Earlier subsets stay partial; optional deferrals remain unimplemented with an explicit decision.
 - Each new capability needs scope, observable behavior, acceptance and an owning module. Update phase coverage and estimates when scope changes.
@@ -50,7 +51,7 @@
 ## Verification and publication
 
 - Current owner policy: implement coherent functionality blocks, then run meaningful macOS tests at the end and fix failures iteratively. Do not rebuild or test after every small edit.
-- Develop and test coherent blocks on macOS. The owner requested a downloadable macOS preview for experimental.10; include its dependencies, notices, source correspondence and verification in the release. Linux/Windows builds and the full native CI matrix remain manual future qualification work, not every push or source tag.
+- Develop and test coherent blocks on macOS. The experimental.10 macOS preview was prepared and verified locally; the owner cancelled binary publication. Public distribution remains source-only until a later explicit release request. Linux/Windows builds and the full native CI matrix remain manual future qualification work, not every push or source tag.
 
 - Follow `docs/planning/EXECUTION.md`; choose meaningful invariant, recovery, image, input or artistic workflow checks for the change.
 - Use synthetic or redistributable fixtures with recorded provenance. Do not publish private third-party projects.

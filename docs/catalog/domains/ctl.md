@@ -1,4 +1,4 @@
-# CTL — Advanced character controllers
+# CTL — Character controllers and dashboards
 
 [Back to catalog](../README.md)
 

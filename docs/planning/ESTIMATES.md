@@ -1,34 +1,63 @@
 # Effort, staffing and uncertainty
 
-These are **planning judgments**, not measured implementation velocity, contractual dates or quotations. No application prototype has yet established the team's throughput. Estimates include integration, appropriate tests, documentation and ordinary iteration; they do not assume AI-generated code removes graphics research, device testing or artist review.
+These are planning judgments, not delivery dates or measured velocity. The editor
+exists, but the team has not demonstrated a complete deformable-character workflow.
+One engineer-week means five focused working days; it is not a calendar week at full
+availability. Include integration, failure handling, appropriate tests, documentation
+and artist review in each estimate.
 
-One focused engineer-week means five working days from one experienced engineer. Summing engineer-weeks measures labor, not calendar time. Phase estimates are incremental; shared infrastructure is budgeted in its owning phase. Later phases have much lower confidence and must be re-estimated before commitment.
+## Two different envelopes
 
-| Delivery envelope | Included phases | Focused engineer-weeks | Confidence today |
+| Envelope | Meaning | Engineer-weeks | Confidence |
 |---|---|---:|---|
-| First complete animation | P00–P02 | 36–66 | Low; improves after the spikes |
-| Drawing, timing and media toolbox | P00–P07 | 110–198 | Low |
-| Reliable offline 2D 1.0 | P00–P11 | 182–330 | Low |
-| Entire current roadmap including optional branches | P00–P22 | 378–716 | Very low; order-of-magnitude envelope |
+| Harmony Moment | Remaining bounded work in HM-00–HM-15 from experimental.10 | 47–92 | Low; deformation/render integration is the main unknown |
+| Dependency-only longest HM chain | Serial work with unlimited independent staffing; excludes resource contention | 23–45 | Low; not an elapsed-time promise |
+| Whole long-term program | Full scope of all 23 phases, including original work and optional branches | 381–722 | Very low; not remaining work |
 
-The P00–P07 cumulative row is a scope bundle, not a dependency claim: P06 and P07 can overlap with separate owners. The complete sum includes AI, legacy, studio and 3D branches that can be rescheduled or explicitly deferred. It excludes indefinite maintenance after P22. Phase-level ranges are in [PHASES.md](PHASES.md).
+`roadmap.py stats` computes the HM sum and dependency-only longest paths from canonical
+slice estimates. Those slices are subsets of the phase envelopes: **never add the two
+budgets**. Earlier estimates were whole-scope envelopes, not a reliable measurement
+of unfinished work. Source/test counts do not establish graphics or animator throughput.
 
-## Illustrative team scenario
+## Reallocation versus added scope
 
-A practical initial team has three experienced engineers: graphics/geometry, document/animation/persistence, and Qt/presentation/media. Add an animator/product reviewer and part-time QA/release capacity. Those roles are assumptions, not people currently assigned. Cross-review prevents a single specialist from owning an undocumented subsystem.
+The prior whole-program envelope was 378–716. This revision transfers 6–10 weeks of
+declarative controls/guides from P13 to P08, 2–4 of core IK from P13 to P09, 2–4 of
+scripted controls from P13 to P12, and 2–4 of lipsync from P08 to P07. These transfers
+are not added work. The distinct Quick Rig requirement adds 3–6 to P08, producing
+381–722 overall. Advanced constraints, pose grids and solver breadth stay in P13.
 
-At **70% focused engineering capacity**, three engineers deliver approximately **2.1 engineer-weeks per calendar week**. The remaining capacity covers planning, coordination and support. Reserve another **20% schedule contingency** for unknown integration/device problems; do not call it extra functionality.
+The 47–92 HM range estimates remaining work in the narrowed profile, with each slice
+charged once to its owner. Quick Rig's first FK recipe is smaller than its complete
+catalog requirement. Existing drawing/storage/animation reduce baseline work but
+must be qualified for new consumers. If a deformation renderer replacement becomes
+necessary, revise its owning slice before committing to the new cost; the estimate
+does not hide an unlimited rewrite.
 
-Under that simplified model, the first complete slice is roughly **21–38 calendar weeks**, and a reliable 2D 1.0 is roughly **104–189 weeks**. This illustrates the size of professional animation tooling, not a promised launch date. A team of five experienced engineers at the same capacity/contingency gives a naive 1.0 envelope of approximately **63–114 weeks**; critical dependencies and specialist availability can make it longer. Adding people does not linearly accelerate topology, rendering or architecture decisions.
+## Capacity and scheduling
 
-A single developer should narrow the initial scope and keep advanced/studio branches uncommitted; the full roadmap is a multi-year product program. Good open-source reuse reduces the amount of infrastructure we own, but cannot remove product integration or animation semantics. We should use actual P00/P02 evidence to replace these ranges, rather than invent an optimistic date now.
+The estimated longest chain is HM-00 → HM-01 → HM-03 → HM-05 → HM-06 → HM-09 → HM-15.
+Other parents, notably the graph/evaluation foundation, also gate joins. The path can
+change with actual measurements; parallel branches are not free work.
+
+For one engineer, the labor sum dominates. With two distinct owners, parallelize the
+character/deformation path and audio or control/composition work, with one integration
+owner and no more than two active slices. Never claim a twofold speedup: shared
+schemas, graphics review, artist feedback and integration constrain concurrency.
+No staffing or release calendar has been promised.
 
 ## Recalibration gates
 
-- **After P00:** choose renderer, brush/docking candidates and format protocol; update library adoption costs and foundational estimates.
-- **After P02:** use actual complete workflow throughput, tablet results and storage stability to estimate the paperless/vector releases.
-- **After P07:** use user feedback and mixed-media performance to resize rigs and composition.
-- **After P11:** commit only the next two advanced phases using production experience and staffing.
-- **Before each optional extension:** verify a real user workflow, viable dependency/model license and a maintenance owner.
+- HM-00: record current host, real fixture workload, acceptance budgets and evidence.
+- HM-01: measure migration/property integration cost and revise dependent slices.
+- HM-05: prove bind-to-render deformation quality/cost; adopt/reject the backend and
+  revise estimates before building its editor.
+- HM-10: measure device clock, drift, scrub and mixing; revisit the media adapter if needed.
+- HM-09/HM-15: measure reusable-rig closure and independent animator completion, then
+  schedule movie export and the highest-value retained follow-ons.
+- Before any broader platform, solver, parser, codec or optional extension: verify a
+  bounded profile, dependency provenance and a maintenance owner.
 
-Track completed end-to-end capabilities, reopened/rendered fixtures and regressions; avoid counting buttons, lines of code or closed micro-tickets as velocity. Publish revised ranges with their assumptions when evidence changes. If a deadline becomes a requirement, negotiate a smaller measurable scope instead of silently dropping recovery, English UI or data integrity.
+Physical tablets are not currently available. Synthetic input and mouse workflows
+remain useful evidence, but they cannot qualify tablet latency or driver behavior.
+Data integrity and a working deformation renderer cannot be waived to meet a date.

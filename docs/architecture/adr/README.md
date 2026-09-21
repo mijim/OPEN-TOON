@@ -64,3 +64,7 @@ See [ADR-020](020-additive-vector-selection.md) for additive/subtractive whole-v
 
 See [ADR-021](021-vector-authoring-and-key-patterns.md) for lasso, vector clipboard,
 arrangement, group styles, cleanup, guides and batch key patterns.
+
+See [ADR-022](022-character-first-delivery.md) for the character-first delivery DAG,
+property/evaluation/binding foundations and progressive rigging complexity. Planning
+is accepted; the new runtime contracts remain unimplemented.

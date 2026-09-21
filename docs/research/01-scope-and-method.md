@@ -20,7 +20,7 @@ The analysis is versioned with the repository and must be reviewed when product 
 ## Research process
 
 1. Agree on product scope with the owner.
-2. Classify families into **26 domains** and define **282 OPEN-TOON capabilities** with initial behavior and acceptance criteria.
+2. Classify families into **26 domains** and define the original **282 OPEN-TOON capabilities** (283 after the requested Quick Rig addition; see the current planning catalog) with initial behavior and acceptance criteria.
 3. Record the node inventory separately. Some entries are families rather than operators; they are not added to the capability count as unique requirements.
 4. Compare technology alternatives using primary documentation from the relevant open-source projects.
 5. Propose architecture, document model, visual language, workflows and quality gates for the [development plan](../planning/README.md).

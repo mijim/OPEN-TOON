@@ -35,7 +35,8 @@ covers planned cameras, audio, rigging, deformation and compositing.
 | [Release notes](docs/implementation/RELEASES.md) | Changes and verification by version |
 | [Documentation index](docs/INDEX.md) | Research, design and engineering references |
 | [Functional catalog](docs/catalog/README.md) | Requirements and acceptance criteria |
-| [Development plan](docs/planning/README.md) | Phases, dependencies and implementation order |
+| [Harmony Moment plan](docs/planning/HARMONY-MOMENT.md) | Critical path to a complete character-animation workflow |
+| [Development plan](docs/planning/README.md) | Full roadmap, dependencies and implementation order |
 | [Architecture](docs/architecture/02-system-design.md) | Module boundaries and design decisions |
 | [Dependencies](docs/implementation/DEPENDENCIES.md) | Open-source components and redistribution records |
 

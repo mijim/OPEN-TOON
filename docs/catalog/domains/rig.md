@@ -157,3 +157,13 @@ Identify controls, guides and names without including them in the render.
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
 **Evidence:** `proposal`.
+
+## RIG-015 — Quick Rig
+
+Build an editable character rig from explicitly assigned parts and artist-placed joint guides using a declarative recipe, with a preview of proposed hierarchy, pivots and controls before one transactional commit.
+
+**Initial acceptance:** A registered part set can produce a usable FK character without manually wiring nodes; the same rig remains fully editable in the advanced workspace.
+
+**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+
+**Evidence:** `proposal`.

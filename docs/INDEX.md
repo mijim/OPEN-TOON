@@ -15,13 +15,13 @@
 | Open-source reuse | Prefer proven libraries through tested adapters | User requirement; 30 library/tool entries evaluated in the roadmap |
 | Initial license | GPL-3.0-or-later for original contributions | Adopted |
 | Implementation | Experimental editor; partial catalog coverage | No complete phase or production release |
-| Development roadmap | 23 phases, 69 work packages, complete feature and node ownership mapping | Prepared; estimates subject to evidence |
+| Development roadmap | Harmony Moment: 16 contract-gated slices; 23 retained phases, 70 work packages, 283 capabilities | Prepared; estimates subject to evidence |
 
 ## Reading routes
 
 **Use or build the application:** [build](implementation/BUILD.md) → [user guide](implementation/USER-GUIDE.md) → [status](implementation/STATUS.md) → [machine-readable evidence](implementation/status.json).
 
-**Planning:** [roadmap](planning/README.md) → [phase table](planning/PHASES.md) → [first backlog](planning/FIRST-STEPS.md) → [execution rules](planning/EXECUTION.md) → [estimates](planning/ESTIMATES.md).
+**Planning:** [Harmony Moment](planning/HARMONY-MOMENT.md) → [dependency rationale](planning/REORIENTATION.md) → [roadmap](planning/README.md) → [phase table](planning/PHASES.md) → [first backlog](planning/FIRST-STEPS.md) → [execution rules](planning/EXECUTION.md) → [estimates](planning/ESTIMATES.md).
 
 **Dependencies:** [open-source register](planning/LIBRARIES.md), including upstream sources, intended use, benchmark gates, licensing investigations and fallback choices. Actual experimental dependency adoption is recorded in [implementation dependencies](implementation/DEPENDENCIES.md).
 
@@ -36,6 +36,8 @@
 | Need | Query or document |
 |---|---|
 | Where a feature completes | `python3 scripts/roadmap.py feature DEF-005` |
+| Current bounded delivery contract | `python3 scripts/roadmap.py slice HM-05` |
+| Ready slices after prerequisite evidence | `python3 scripts/roadmap.py next` |
 | Phase outcome, dependencies and gates | `python3 scripts/roadmap.py phase P13` |
 | Exact feature behavior | `python3 scripts/catalog.py show DEF-005` |
 | Domain context | `python3 scripts/catalog.py domain DEF` |
