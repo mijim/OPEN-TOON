@@ -41,6 +41,12 @@ Homebrew or developer-home libraries. Ad-hoc signatures verify. No third-party
 fonts or artwork are bundled; original presets remain first-party code. Automated
 release-wide SBOM generation, clean-machine qualification, Developer ID signing
 and notarization remain open P11 work.
+
+That cancellation applies to experimental.10. Experimental.11 reuses the audited
+macOS dependency/source inventory and publishes the verified arm64 bundle by explicit
+owner request. Its Linux x86_64 AppImage is assembled in Ubuntu 24.04 from the locked
+Conan dependencies and Qt 6.8.3, with the application license and this dependency
+record included. A complete release-wide generated Linux SBOM remains an open gate.
 Primary sources: [Qt licensing](https://doc.qt.io/qt-6/licensing.html), [SQLite copyright](https://sqlite.org/copyright.html), [nlohmann/json license](https://github.com/nlohmann/json/blob/v3.12.0/LICENSE.MIT), [Catch2 license](https://github.com/catchorg/Catch2/blob/v3.15.0/LICENSE.txt). No proprietary animation source or artwork was copied.
 
 The MyPaint archive hash and minimal upstream build are in `cmake/MyPaint.cmake`.

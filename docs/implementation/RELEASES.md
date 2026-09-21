@@ -1,5 +1,22 @@
 # Experimental releases
 
+## 0.2.0-experimental.11 — macOS and Linux distributables
+
+- Adds the OPEN-TOON logo with a white background to the application package and README.
+- Publishes an ad-hoc-signed macOS 15+ Apple Silicon ZIP.
+- Publishes an Ubuntu 24.04-built Linux x86_64 AppImage.
+- Links direct downloads and the project website from the README.
+- Changes packaging and presentation only; document format 3 and editor capabilities
+  are unchanged from experimental.10.
+
+The macOS package passed 65/65 CTest entries, the native mouse/synthetic-pen,
+selection, authoring, motion-path and animation smoke journeys, and a second smoke
+run after extraction outside the workspace. Its nested signatures and bundle icon
+were verified. The Linux workflow builds from the matching `main` commit and runs
+the same CTest suite headlessly before publishing. These are experimental previews,
+not a supported 1.0 release; macOS Intel, physical tablets, broader Linux distributions,
+Windows packaging, notarization and clean-machine qualification remain open.
+
 ## 0.2.0-experimental.10 — vector authoring and animation patterns
 
 - Whole-vector lasso with additive/subtractive selection, select all and invert.

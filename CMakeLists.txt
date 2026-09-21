@@ -51,11 +51,18 @@ if(OPENTOON_DESKTOP)
   target_include_directories(opentoon_render PUBLIC adapters/render)
   target_link_libraries(opentoon_render PUBLIC opentoon_document Qt6::Gui)
   qt_add_executable(open-toon MACOSX_BUNDLE apps/desktop/main.cpp apps/desktop/visual_editing_smoke.cpp apps/desktop/key_block_smoke.cpp apps/desktop/motion_path_smoke.cpp apps/desktop/vector_selection_smoke.cpp apps/desktop/authoring_smoke.cpp adapters/qt/editor_controller.cpp adapters/qt/timeline_controller.cpp adapters/qt/animation_controller.cpp adapters/qt/key_selection_controller.cpp adapters/qt/drawing_controller.cpp adapters/qt/editor_controller.h adapters/qt/canvas_item.cpp adapters/qt/canvas_animation.cpp adapters/qt/canvas_motion_path.cpp adapters/qt/canvas_vector_selection.cpp adapters/qt/canvas_guides.cpp adapters/qt/canvas_cursor.cpp adapters/qt/canvas_item.h)
-  target_compile_definitions(open-toon PRIVATE OPENTOON_VERSION="${PROJECT_VERSION}-experimental.10")
+  target_compile_definitions(open-toon PRIVATE OPENTOON_VERSION="${PROJECT_VERSION}-experimental.11")
   target_include_directories(open-toon PRIVATE adapters/qt)
   target_link_libraries(open-toon PRIVATE opentoon_application opentoon_storage opentoon_brush opentoon_render Qt6::Quick Qt6::QuickControls2 Qt6::QuickDialogs2)
   qt_add_qml_module(open-toon URI OpenToon VERSION 1.0 QML_FILES ui/Main.qml ui/components/ToolButton.qml ui/components/CurveEditor.qml ui/components/MotionOverview.qml ui/components/PoseKeyStrip.qml ui/components/PropertyNumber.qml ui/components/SelectionProperties.qml ui/components/VectorTools.qml ui/components/TimingTools.qml ui/components/CompactButton.qml ui/components/CompactComboBox.qml ui/components/CompactSpinBox.qml ui/components/CompactTextField.qml ui/components/CompactCheckBox.qml)
-  set_target_properties(open-toon PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME "OPEN-TOON" MACOSX_BUNDLE_GUI_IDENTIFIER "org.opentoon.editor" MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}" MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}")
+  set_target_properties(open-toon PROPERTIES
+    MACOSX_BUNDLE_BUNDLE_NAME "OPEN-TOON"
+    MACOSX_BUNDLE_GUI_IDENTIFIER "org.opentoon.editor"
+    MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}.11"
+    MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}-experimental.11"
+    MACOSX_BUNDLE_ICON_FILE "open-toon.icns")
+  set_source_files_properties(assets/branding/open-toon.icns PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+  target_sources(open-toon PRIVATE assets/branding/open-toon.icns)
   install(TARGETS open-toon BUNDLE DESTINATION . RUNTIME DESTINATION bin)
   qt_generate_deploy_qml_app_script(TARGET open-toon OUTPUT_SCRIPT deploy_script NO_UNSUPPORTED_PLATFORM_ERROR)
   install(SCRIPT ${deploy_script})

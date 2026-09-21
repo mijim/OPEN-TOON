@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=OPEN-TOON
+Comment=2D drawing and animation editor
+Exec=open-toon
+Icon=org.opentoon.editor
+Categories=Graphics;2DGraphics;RasterGraphics;VectorGraphics;
+Terminal=false

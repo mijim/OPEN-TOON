@@ -1,14 +1,13 @@
 # macOS preview
 
-An experimental.10 local build provides a standalone **Apple Silicon (arm64)** application
+An experimental.11 build provides a standalone **Apple Silicon (arm64)** application
 for **macOS 15 or later**. It was tested on macOS 15.5. Intel Macs and other operating
 systems are not qualified by this artifact.
 
-## Availability and opening a local package
+## Download and opening the package
 
-Binary publication was cancelled at the owner's request. The verified application
-ZIP, dependency sources and checksums were prepared locally; no public download is
-currently provided. The GitHub tag contains application source only.
+Download the [macOS arm64 ZIP](https://github.com/mijim/OPEN-TOON/releases/download/v0.2.0-experimental.11/OPEN-TOON-0.2.0-experimental.11-macOS-arm64.zip)
+from the experimental.11 GitHub release.
 
 If you build/package locally, extract the resulting ZIP and open `OPEN-TOON.app`.
 Qt and its runtime libraries are bundled; users of that package do not need Homebrew,
@@ -30,7 +29,7 @@ First complete the locked build in [BUILD.md](BUILD.md). Deploy using the instal
 Qt SDK, into an empty dedicated output directory:
 
 ```sh
-python3 scripts/package_macos.py --version 0.2.0-experimental.10
+python3 scripts/package_macos.py --version 0.2.0-experimental.11
 ```
 
 The script audits every bundled Mach-O dependency, fixes split Homebrew framework
@@ -46,7 +45,7 @@ records upstream URLs and verified archive hashes. If any dependency changes,
 rebuild the inventory and corresponding source/notices rather than reusing old ones.
 
 ```sh
-python3 scripts/finalize_macos.py --version 0.2.0-experimental.10
+python3 scripts/finalize_macos.py --version 0.2.0-experimental.11
 ```
 
 Finalization checks source hashes, signs nested code and the bundle ad hoc, verifies

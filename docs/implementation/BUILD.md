@@ -74,9 +74,11 @@ only; pushes, pull requests and source tags do not build Linux/Windows. Dispatch
 when qualifying a future compiled release. Binary installers are not part of the
 current source-release workflow.
 
-## Download or package the macOS preview
+## Download or package an experimental preview
 
-Experimental.10 has a verified local standalone arm64 ZIP; binary publication was cancelled. See [MACOS-PREVIEW.md](MACOS-PREVIEW.md)
-for installation, runtime/source inventories, ad-hoc signing and packaging commands.
-The packaging scripts remain available for future distribution;
-Linux/Windows builds remain deferred.
+Experimental.11 provides public macOS arm64 and Linux x86_64 downloads from the
+[GitHub release](https://github.com/mijim/OPEN-TOON/releases/tag/v0.2.0-experimental.11).
+See [MACOS-PREVIEW.md](MACOS-PREVIEW.md) for installation, runtime/source inventories,
+ad-hoc signing and packaging commands. The Linux AppImage is built and tested on
+Ubuntu 24.04 by the manual release workflow; broader distro/device qualification and
+Windows packaging remain deferred.
