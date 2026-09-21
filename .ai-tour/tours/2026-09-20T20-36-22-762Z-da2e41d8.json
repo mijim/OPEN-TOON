@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "id": "da2e41d8-fed9-499e-8067-f27bd934b56e",
+  "title": "Improve interface flow",
+  "summary": "2 files changed across 2 areas. The tour follows the implementation from interface to error handling.",
+  "createdAt": "2026-09-20T20:36:22.762Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/canvas_cursor.cpp",
+      "kind": "modified",
+      "area": "ui",
+      "added": 7,
+      "removed": 1
+    },
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 9,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "ui",
+      "label": "Interface",
+      "stepIds": [
+        "be768b44-74af-457d-82f5-9def27ea194c",
+        "1b9912fc-cd46-4fcd-88fe-5083e7e524bf",
+        "f4b4a75d-5285-46a6-8614-1c4eeb100aed"
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "b3d54877-dc05-47f3-83a0-230e767cc950",
+        "398b238e-a918-4848-87e8-f3862a893227",
+        "3284686b-de34-4f36-b0d3-127532b693d8"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "be768b44-74af-457d-82f5-9def27ea194c",
+      "title": "Extend Canvas cursor",
+      "explanation": "This part of canvas_cursor.cpp adds 1 line. It changes what the user sees or how the interface responds. This is the first building block in the change.",
+      "file": "adapters/qt/canvas_cursor.cpp",
+      "startLine": 4,
+      "endLine": 4,
+      "area": "ui",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "id": "1b9912fc-cd46-4fcd-88fe-5083e7e524bf",
+      "title": "Extend Canvas cursor",
+      "explanation": "This part of canvas_cursor.cpp adds 3 lines. It changes what the user sees or how the interface responds. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_cursor.cpp",
+      "startLine": 11,
+      "endLine": 13,
+      "area": "ui",
+      "added": 3,
+      "removed": 0,
+      "relation": "Continues the interface thread from the previous step."
+    },
+    {
+      "id": "f4b4a75d-5285-46a6-8614-1c4eeb100aed",
+      "title": "Reshape Canvas cursor",
+      "explanation": "This part of canvas_cursor.cpp replaces 1 line and adds 3. It changes what the user sees or how the interface responds. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_cursor.cpp",
+      "startLine": 68,
+      "endLine": 70,
+      "area": "ui",
+      "added": 3,
+      "removed": 1,
+      "relation": "Continues the interface thread from the previous step."
+    },
+    {
+      "id": "b3d54877-dc05-47f3-83a0-230e767cc950",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 330,
+      "endLine": 330,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 0,
+      "relation": "Builds on canvas_cursor.cpp and moves into error handling."
+    },
+    {
+      "id": "398b238e-a918-4848-87e8-f3862a893227",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 332,
+      "endLine": 332,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "3284686b-de34-4f36-b0d3-127532b693d8",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 7 lines. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 334,
+      "endLine": 340,
+      "area": "errors",
+      "symbol": "if",
+      "added": 7,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "id": "cb3e4a0d-78a0-4d97-bf56-8ebd5a7bc95c",
+  "title": "Update Main",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T20:57:21.388Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 7,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "3b357fcf-0d92-4f72-a2c6-b52b29b39d91",
+        "2f6d5c63-d1f7-47e6-865f-7ff01e5fce9e"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "3b357fcf-0d92-4f72-a2c6-b52b29b39d91",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 313,
+      "endLine": 313,
+      "area": "tests",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "id": "2f6d5c63-d1f7-47e6-865f-7ff01e5fce9e",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 6 lines. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 318,
+      "endLine": 323,
+      "area": "tests",
+      "symbol": "if",
+      "added": 6,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

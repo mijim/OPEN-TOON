@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "id": "1129e49d-6fd9-4fa8-bb3f-bf2bf76b5e0f",
+  "title": "Improve tests flow",
+  "summary": "2 files changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T19:01:23.900Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 5,
+      "removed": 0
+    },
+    {
+      "path": "docs/implementation/status.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 5,
+      "removed": 2
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "d43d60ac-2a0b-48fd-93d9-6ea0ce90d7d3",
+        "a8a731d6-fa89-4ee5-9c19-223e89e9f18e",
+        "023d33d2-2ed1-4891-acf8-8bf59166b5a0",
+        "63bb5c36-7573-4747-8c20-c80e79abba54"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "d43d60ac-2a0b-48fd-93d9-6ea0ce90d7d3",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 28,
+      "endLine": 28,
+      "area": "tests",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "id": "a8a731d6-fa89-4ee5-9c19-223e89e9f18e",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 4 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 32,
+      "endLine": 35,
+      "area": "tests",
+      "added": 4,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "023d33d2-2ed1-4891-acf8-8bf59166b5a0",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 1 line and adds 3. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/implementation/status.json",
+      "startLine": 105,
+      "endLine": 107,
+      "area": "tests",
+      "added": 3,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "63bb5c36-7573-4747-8c20-c80e79abba54",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 1 line and adds 2. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "docs/implementation/status.json",
+      "startLine": 176,
+      "endLine": 177,
+      "area": "tests",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

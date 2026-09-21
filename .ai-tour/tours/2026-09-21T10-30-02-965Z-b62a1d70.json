@@ -1,0 +1,222 @@
+{
+  "version": 1,
+  "id": "b62a1d70-b0bf-42dd-8049-bc664971aea4",
+  "title": "Improve tests flow",
+  "summary": "3 files changed across 1 area. The tour follows the implementation from tests to tests. 18 smaller changes remain in the overview.",
+  "createdAt": "2026-09-21T10:30:02.965Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": ".github/workflows/docs.yml",
+      "kind": "modified",
+      "area": "tests",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "path": "docs/planning/roadmap.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 113,
+      "removed": 70
+    },
+    {
+      "path": "scripts/roadmap.py",
+      "kind": "modified",
+      "area": "tests",
+      "added": 2,
+      "removed": 2
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "08e38266-ec8b-4381-8989-f2293a7be3de",
+        "39cb0ee3-9009-4007-b5d4-f360883c90d9",
+        "3d701467-8337-4d37-8cb3-9c212493bc13",
+        "239ff84b-94f9-45eb-9592-fe86963f3971",
+        "a5f4d495-91b1-4e99-aee2-44b24e34cd79",
+        "fafcbf73-a9bd-4cc7-aa30-8bc29a6dfa43",
+        "8224f8b4-17b7-4f1b-abc7-fd3d876978e4",
+        "184b2f6f-4aa9-4000-b4b9-ee9760985c1d",
+        "69b21613-e901-4cb7-8b6b-d0e77bff8109",
+        "8d2acdb5-716c-4a95-a745-f13394aaa67a",
+        "29dce9cc-8b7f-417e-89c1-414f112e16c3",
+        "454069c4-6cbd-43cd-bc83-2e5c3ea5367c",
+        "f213d096-7517-4fb4-8aab-5b8d11adf49e",
+        "dc61e1c4-b27a-4b59-8858-45a17dee3fa2"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "08e38266-ec8b-4381-8989-f2293a7be3de",
+      "title": "Extend Docs",
+      "explanation": "This part of docs.yml adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": ".github/workflows/docs.yml",
+      "startLine": 16,
+      "endLine": 16,
+      "area": "tests",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "id": "39cb0ee3-9009-4007-b5d4-f360883c90d9",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 3 lines and adds 5. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 1756,
+      "endLine": 1760,
+      "area": "tests",
+      "added": 5,
+      "removed": 3,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "3d701467-8337-4d37-8cb3-9c212493bc13",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 3 lines and adds 5. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 1851,
+      "endLine": 1855,
+      "area": "tests",
+      "added": 5,
+      "removed": 3,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "239ff84b-94f9-45eb-9592-fe86963f3971",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 3 lines and adds 5. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 1889,
+      "endLine": 1893,
+      "area": "tests",
+      "added": 5,
+      "removed": 3,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "a5f4d495-91b1-4e99-aee2-44b24e34cd79",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 3 lines and adds 5. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 1909,
+      "endLine": 1913,
+      "area": "tests",
+      "added": 5,
+      "removed": 3,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "fafcbf73-a9bd-4cc7-aa30-8bc29a6dfa43",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 3 lines and adds 5. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 1920,
+      "endLine": 1924,
+      "area": "tests",
+      "added": 5,
+      "removed": 3,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "8224f8b4-17b7-4f1b-abc7-fd3d876978e4",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 3 lines and adds 5. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 2071,
+      "endLine": 2075,
+      "area": "tests",
+      "added": 5,
+      "removed": 3,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "184b2f6f-4aa9-4000-b4b9-ee9760985c1d",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 3 lines and adds 5. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 2127,
+      "endLine": 2131,
+      "area": "tests",
+      "added": 5,
+      "removed": 3,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "69b21613-e901-4cb7-8b6b-d0e77bff8109",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 3 lines and adds 5. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 2515,
+      "endLine": 2519,
+      "area": "tests",
+      "added": 5,
+      "removed": 3,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "8d2acdb5-716c-4a95-a745-f13394aaa67a",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 3 lines and adds 5. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 2526,
+      "endLine": 2530,
+      "area": "tests",
+      "added": 5,
+      "removed": 3,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "29dce9cc-8b7f-417e-89c1-414f112e16c3",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 3 lines and adds 5. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 2546,
+      "endLine": 2550,
+      "area": "tests",
+      "added": 5,
+      "removed": 3,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "454069c4-6cbd-43cd-bc83-2e5c3ea5367c",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 3 lines and adds 5. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 2802,
+      "endLine": 2806,
+      "area": "tests",
+      "added": 5,
+      "removed": 3,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "f213d096-7517-4fb4-8aab-5b8d11adf49e",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 3 lines and adds 5. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 2813,
+      "endLine": 2817,
+      "area": "tests",
+      "added": 5,
+      "removed": 3,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "dc61e1c4-b27a-4b59-8858-45a17dee3fa2",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 3 lines and adds 5. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 2833,
+      "endLine": 2837,
+      "area": "tests",
+      "added": 5,
+      "removed": 3,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

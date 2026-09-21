@@ -1,0 +1,193 @@
+{
+  "version": 1,
+  "id": "03dfee5f-21b8-45e0-b0ae-b0730897b172",
+  "title": "Improve tests flow",
+  "summary": "4 files changed across 3 areas. The tour follows the implementation from error handling to tests.",
+  "createdAt": "2026-09-20T18:26:35.536Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/timeline_controller.cpp",
+      "kind": "created",
+      "area": "errors",
+      "added": 140,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/editor_controller.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 5,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/editor_controller.h",
+      "kind": "modified",
+      "area": "tests",
+      "added": 27,
+      "removed": 0
+    },
+    {
+      "path": "modules/document/src/timeline.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 3,
+      "removed": 4
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "8b7cf1a9-ed69-4167-bfa2-d6964ce7e0e6",
+        "12e4215d-04c5-4f8c-ad74-dd72bf8866ae",
+        "33d44a76-353c-4d48-bedf-34f4f532ee9c",
+        "9bf6d24f-f33c-4dac-87fd-804521cc4edc"
+      ]
+    },
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "d0b46c03-7504-45e8-8ca5-59bbc294e920"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "94e204ba-3fbe-4654-8398-edce2539430b",
+        "653cd447-cc12-4cc1-bfa1-b097e33249df",
+        "e731c5f6-6177-40c1-8192-3927226f8125",
+        "dda46cb2-a98f-4539-b12d-def88124246c",
+        "c1c1ed8a-ace5-4b14-9f0e-4e0da66c294d"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "8b7cf1a9-ed69-4167-bfa2-d6964ce7e0e6",
+      "title": "Introduce Timeline controller",
+      "explanation": "This part of timeline_controller.cpp adds 140 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/qt/timeline_controller.cpp",
+      "startLine": 1,
+      "endLine": 140,
+      "area": "errors",
+      "added": 140,
+      "removed": 0
+    },
+    {
+      "id": "12e4215d-04c5-4f8c-ad74-dd72bf8866ae",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/timeline.cpp",
+      "startLine": 50,
+      "endLine": 50,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "33d44a76-353c-4d48-bedf-34f4f532ee9c",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/timeline.cpp",
+      "startLine": 52,
+      "endLine": 52,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "9bf6d24f-f33c-4dac-87fd-804521cc4edc",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 2 lines and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/timeline.cpp",
+      "startLine": 123,
+      "endLine": 123,
+      "area": "errors",
+      "symbol": "for",
+      "added": 1,
+      "removed": 2,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "d0b46c03-7504-45e8-8ca5-59bbc294e920",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.cpp adds 5 lines. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 60,
+      "endLine": 64,
+      "area": "auth",
+      "added": 5,
+      "removed": 0,
+      "relation": "Builds on timeline.cpp and moves into authentication."
+    },
+    {
+      "id": "94e204ba-3fbe-4654-8398-edce2539430b",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.h adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 3,
+      "endLine": 3,
+      "area": "tests",
+      "added": 1,
+      "removed": 0,
+      "relation": "Builds on editor_controller.cpp and moves into tests."
+    },
+    {
+      "id": "653cd447-cc12-4cc1-bfa1-b097e33249df",
+      "title": "Extend `EditorController`",
+      "explanation": "The `EditorController` section adds 5 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 14,
+      "endLine": 18,
+      "area": "tests",
+      "symbol": "EditorController",
+      "added": 5,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "e731c5f6-6177-40c1-8192-3927226f8125",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.h adds 15 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 51,
+      "endLine": 65,
+      "area": "tests",
+      "added": 15,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "dda46cb2-a98f-4539-b12d-def88124246c",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.h adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 143,
+      "endLine": 143,
+      "area": "tests",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "c1c1ed8a-ace5-4b14-9f0e-4e0da66c294d",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.h adds 5 lines. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 154,
+      "endLine": 158,
+      "area": "tests",
+      "added": 5,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

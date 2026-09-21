@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "id": "e8f9318d-6229-4c50-8afa-743e6333bb84",
+  "title": "Improve error handling flow",
+  "summary": "2 files changed across 2 areas. The tour follows the implementation from error handling to interface.",
+  "createdAt": "2026-09-20T20:26:27.421Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/canvas_animation.cpp",
+      "kind": "created",
+      "area": "errors",
+      "added": 87,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/canvas_cursor.cpp",
+      "kind": "created",
+      "area": "ui",
+      "added": 99,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "a502cedf-3e12-4e70-a12b-f5eb40aef6cf"
+      ]
+    },
+    {
+      "id": "ui",
+      "label": "Interface",
+      "stepIds": [
+        "08b1077b-f87a-4696-b5e8-55d8251ea5a7"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "a502cedf-3e12-4e70-a12b-f5eb40aef6cf",
+      "title": "Introduce Canvas animation",
+      "explanation": "This part of canvas_animation.cpp adds 87 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/qt/canvas_animation.cpp",
+      "startLine": 1,
+      "endLine": 87,
+      "area": "errors",
+      "added": 87,
+      "removed": 0
+    },
+    {
+      "id": "08b1077b-f87a-4696-b5e8-55d8251ea5a7",
+      "title": "Introduce Canvas cursor",
+      "explanation": "This part of canvas_cursor.cpp adds 99 lines. It changes what the user sees or how the interface responds. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/canvas_cursor.cpp",
+      "startLine": 1,
+      "endLine": 99,
+      "area": "ui",
+      "added": 99,
+      "removed": 0,
+      "relation": "Builds on canvas_animation.cpp and moves into interface."
+    }
+  ]
+}

@@ -1,0 +1,262 @@
+{
+  "version": 1,
+  "id": "33181665-4cbf-475a-b91a-bc249342e230",
+  "title": "Improve tests flow",
+  "summary": "7 files changed across 2 areas. The tour follows the implementation from error handling to tests. 11 smaller changes remain in the overview.",
+  "createdAt": "2026-09-20T19:42:13.721Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "modules/document/src/drawing_selection.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 2,
+      "removed": 1
+    },
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 35,
+      "removed": 1
+    },
+    {
+      "path": "tests/export_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 20,
+      "removed": 0
+    },
+    {
+      "path": "tests/raster_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 17,
+      "removed": 0
+    },
+    {
+      "path": "adapters/brush/raster_brush.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 2,
+      "removed": 1
+    },
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 2,
+      "removed": 1
+    },
+    {
+      "path": "tests/drawing_selection_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 54,
+      "removed": 32
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "22a55821-8f59-488f-8b7a-c5eb2a711a8f",
+        "1c689128-eb6d-43c2-9f5f-a987fb38ed72",
+        "06f24b0b-58e1-4c95-a88e-01ba919d5dca"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "0d2fb736-1be8-45fd-9802-c87c0cf0091b",
+        "657bdafd-ddde-4953-96c0-bcd263f3ef70",
+        "3e13beb5-dc52-4c86-98bd-91c8939d73e7",
+        "497c0d1d-1ec6-4c04-a564-3237efac8b0c",
+        "644f6b74-2361-4447-bdf0-5db31142a933",
+        "a39677eb-a94b-4a8f-b8ed-b5672d1efe7a",
+        "bd170832-4b3d-4c82-ac3c-70ff218d6db7",
+        "5cbf99a6-35ab-4327-8d8d-7a2e9e104cc1",
+        "90da44c7-e1d5-4799-ab76-f3ea4b832bfd",
+        "616b7480-ff75-40c3-8918-99dbacfada8f",
+        "601600c8-21fe-4110-919d-5460d7e5fdb2"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "22a55821-8f59-488f-8b7a-c5eb2a711a8f",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 107,
+      "endLine": 108,
+      "area": "errors",
+      "symbol": "for",
+      "added": 2,
+      "removed": 1
+    },
+    {
+      "id": "1c689128-eb6d-43c2-9f5f-a987fb38ed72",
+      "title": "Reshape `Impl`",
+      "explanation": "The `Impl` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/brush/raster_brush.cpp",
+      "startLine": 90,
+      "endLine": 91,
+      "area": "errors",
+      "symbol": "Impl",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "06f24b0b-58e1-4c95-a88e-01ba919d5dca",
+      "title": "Reshape Canvas item",
+      "explanation": "This part of canvas_item.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 510,
+      "endLine": 511,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "0d2fb736-1be8-45fd-9802-c87c0cf0091b",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 33 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 192,
+      "endLine": 224,
+      "area": "tests",
+      "added": 33,
+      "removed": 0,
+      "relation": "Builds on canvas_item.cpp and moves into tests."
+    },
+    {
+      "id": "657bdafd-ddde-4953-96c0-bcd263f3ef70",
+      "title": "Reshape Main",
+      "explanation": "This part of main.cpp replaces 1 line and adds 2. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 314,
+      "endLine": 315,
+      "area": "tests",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "3e13beb5-dc52-4c86-98bd-91c8939d73e7",
+      "title": "Extend `REQUIRE`",
+      "explanation": "The `REQUIRE` section adds 20 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "tests/export_tests.cpp",
+      "startLine": 160,
+      "endLine": 179,
+      "area": "tests",
+      "symbol": "REQUIRE",
+      "added": 20,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "497c0d1d-1ec6-4c04-a564-3237efac8b0c",
+      "title": "Extend `TEST_CASE`",
+      "explanation": "The `TEST_CASE` section adds 17 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "tests/raster_tests.cpp",
+      "startLine": 65,
+      "endLine": 81,
+      "area": "tests",
+      "symbol": "TEST_CASE",
+      "added": 17,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "644f6b74-2361-4447-bdf0-5db31142a933",
+      "title": "Reshape Drawing selection tests",
+      "explanation": "This part of drawing_selection_tests.cpp replaces 1 line and adds 2. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "tests/drawing_selection_tests.cpp",
+      "startLine": 11,
+      "endLine": 12,
+      "area": "tests",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "a39677eb-a94b-4a8f-b8ed-b5672d1efe7a",
+      "title": "Reshape Drawing selection tests",
+      "explanation": "This part of drawing_selection_tests.cpp replaces 1 line and adds 2. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "tests/drawing_selection_tests.cpp",
+      "startLine": 18,
+      "endLine": 19,
+      "area": "tests",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "bd170832-4b3d-4c82-ac3c-70ff218d6db7",
+      "title": "Reshape Drawing selection tests",
+      "explanation": "This part of drawing_selection_tests.cpp replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "tests/drawing_selection_tests.cpp",
+      "startLine": 21,
+      "endLine": 21,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "5cbf99a6-35ab-4327-8d8d-7a2e9e104cc1",
+      "title": "Reshape Drawing selection tests",
+      "explanation": "This part of drawing_selection_tests.cpp replaces 1 line and adds 2. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "tests/drawing_selection_tests.cpp",
+      "startLine": 24,
+      "endLine": 25,
+      "area": "tests",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "90da44c7-e1d5-4799-ab76-f3ea4b832bfd",
+      "title": "Reshape Drawing selection tests",
+      "explanation": "This part of drawing_selection_tests.cpp replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "tests/drawing_selection_tests.cpp",
+      "startLine": 28,
+      "endLine": 28,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "616b7480-ff75-40c3-8918-99dbacfada8f",
+      "title": "Reshape `TEST_CASE`",
+      "explanation": "The `TEST_CASE` section replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "tests/drawing_selection_tests.cpp",
+      "startLine": 35,
+      "endLine": 35,
+      "area": "tests",
+      "symbol": "TEST_CASE",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "601600c8-21fe-4110-919d-5460d7e5fdb2",
+      "title": "Reshape `REQUIRE`",
+      "explanation": "The `REQUIRE` section replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "tests/drawing_selection_tests.cpp",
+      "startLine": 41,
+      "endLine": 41,
+      "area": "tests",
+      "symbol": "REQUIRE",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

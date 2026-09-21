@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "id": "c06d11c8-1dd9-4a24-b207-9b7e25195119",
+  "title": "Improve error handling flow",
+  "summary": "3 files changed across 3 areas. The tour follows the implementation from error handling to tests.",
+  "createdAt": "2026-09-20T18:43:28.343Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/brush/raster_brush.cpp",
+      "kind": "created",
+      "area": "errors",
+      "added": 128,
+      "removed": 0
+    },
+    {
+      "path": "adapters/brush/raster_brush.h",
+      "kind": "created",
+      "area": "performance",
+      "added": 25,
+      "removed": 0
+    },
+    {
+      "path": "tests/raster_tests.cpp",
+      "kind": "created",
+      "area": "tests",
+      "added": 40,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "9933cad1-6e15-4250-b015-6da4c70dd68f"
+      ]
+    },
+    {
+      "id": "performance",
+      "label": "Performance",
+      "stepIds": [
+        "068cbf4b-4a0d-4a6e-bc40-ef9ad7fb5197"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "b26ddc28-9e31-44aa-ad24-38c5a74a19d4"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "9933cad1-6e15-4250-b015-6da4c70dd68f",
+      "title": "Introduce Raster brush",
+      "explanation": "This part of raster_brush.cpp adds 128 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/brush/raster_brush.cpp",
+      "startLine": 1,
+      "endLine": 128,
+      "area": "errors",
+      "added": 128,
+      "removed": 0
+    },
+    {
+      "id": "068cbf4b-4a0d-4a6e-bc40-ef9ad7fb5197",
+      "title": "Introduce Raster brush",
+      "explanation": "This part of raster_brush.h adds 25 lines. It reduces repeated work or moves it away from the critical path. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/brush/raster_brush.h",
+      "startLine": 1,
+      "endLine": 25,
+      "area": "performance",
+      "added": 25,
+      "removed": 0,
+      "relation": "Builds on raster_brush.cpp and moves into performance."
+    },
+    {
+      "id": "b26ddc28-9e31-44aa-ad24-38c5a74a19d4",
+      "title": "Introduce Raster tests",
+      "explanation": "This part of raster_tests.cpp adds 40 lines. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "tests/raster_tests.cpp",
+      "startLine": 1,
+      "endLine": 40,
+      "area": "tests",
+      "added": 40,
+      "removed": 0,
+      "relation": "Builds on raster_brush.h and moves into tests."
+    }
+  ]
+}

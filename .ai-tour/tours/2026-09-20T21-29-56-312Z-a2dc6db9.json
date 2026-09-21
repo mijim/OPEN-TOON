@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "id": "a2dc6db9-43f8-44f2-a11e-cee8df5aa996",
+  "title": "Improve tests flow",
+  "summary": "2 files changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T21:29:56.312Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "tests/animation_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 80,
+      "removed": 0
+    },
+    {
+      "path": "tests/export_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 36,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "b1bc3e13-e8f7-4543-a4c0-5eee5cc71cd4",
+        "4c483d92-b8ec-461d-a612-7c59815ad85f",
+        "9d035b8e-8a7f-4dfc-a6ef-e5ac8e5d9428"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "b1bc3e13-e8f7-4543-a4c0-5eee5cc71cd4",
+      "title": "Extend Animation tests",
+      "explanation": "This part of animation_tests.cpp adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "tests/animation_tests.cpp",
+      "startLine": 2,
+      "endLine": 2,
+      "area": "tests",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "id": "4c483d92-b8ec-461d-a612-7c59815ad85f",
+      "title": "Extend `REQUIRE`",
+      "explanation": "The `REQUIRE` section adds 79 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "tests/animation_tests.cpp",
+      "startLine": 169,
+      "endLine": 247,
+      "area": "tests",
+      "symbol": "REQUIRE",
+      "added": 79,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "9d035b8e-8a7f-4dfc-a6ef-e5ac8e5d9428",
+      "title": "Extend `REQUIRE`",
+      "explanation": "The `REQUIRE` section adds 36 lines. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "tests/export_tests.cpp",
+      "startLine": 226,
+      "endLine": 261,
+      "area": "tests",
+      "symbol": "REQUIRE",
+      "added": 36,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

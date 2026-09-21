@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "a5be48cf-37cb-4e4d-aef2-a84f2b815ae8",
+  "title": "Add Status",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T18:03:00.127Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "docs/implementation/status.json",
+      "kind": "created",
+      "area": "tests",
+      "added": 136,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "79935713-8e99-48f4-a3fc-a6eb739f241a"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "79935713-8e99-48f4-a3fc-a6eb739f241a",
+      "title": "Introduce Status",
+      "explanation": "This part of status.json adds 136 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the main implementation change.",
+      "file": "docs/implementation/status.json",
+      "startLine": 1,
+      "endLine": 136,
+      "area": "tests",
+      "added": 136,
+      "removed": 0
+    }
+  ]
+}

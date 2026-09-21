@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "93b79102-6b51-4764-b952-41e6bbb1a2da",
+  "title": "Add Test roadmap",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-21T10:28:20.594Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "tests/test_roadmap.py",
+      "kind": "created",
+      "area": "tests",
+      "added": 70,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "f759f89a-8817-4767-91e4-683b9cf76246"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "f759f89a-8817-4767-91e4-683b9cf76246",
+      "title": "Introduce Test roadmap",
+      "explanation": "This part of test_roadmap.py adds 70 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the main implementation change.",
+      "file": "tests/test_roadmap.py",
+      "startLine": 1,
+      "endLine": 70,
+      "area": "tests",
+      "added": 70,
+      "removed": 0
+    }
+  ]
+}

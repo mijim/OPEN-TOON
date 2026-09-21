@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "f72c6919-e187-4002-b8f7-95636e598862",
+  "title": "Add Native",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T17:59:13.994Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": ".github/workflows/native.yml",
+      "kind": "created",
+      "area": "tests",
+      "added": 58,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "d69ae23a-034a-4151-be93-681560bf4ecc"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "d69ae23a-034a-4151-be93-681560bf4ecc",
+      "title": "Introduce Native",
+      "explanation": "This part of native.yml adds 58 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the main implementation change.",
+      "file": ".github/workflows/native.yml",
+      "startLine": 1,
+      "endLine": 58,
+      "area": "tests",
+      "added": 58,
+      "removed": 0
+    }
+  ]
+}

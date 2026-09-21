@@ -1,0 +1,274 @@
+{
+  "version": 1,
+  "id": "3f840bd5-52fa-487c-9bc1-2bdeec7db8fa",
+  "title": "Improve error handling flow",
+  "summary": "6 files changed across 5 areas. The tour follows the implementation from performance to validation. 2 smaller changes remain in the overview.",
+  "createdAt": "2026-09-20T18:32:51.301Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "modules/document/include/opentoon/shared_buffer.h",
+      "kind": "created",
+      "area": "performance",
+      "added": 28,
+      "removed": 0
+    },
+    {
+      "path": "adapters/storage/serialization.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 59,
+      "removed": 12
+    },
+    {
+      "path": "adapters/storage/serialization.h",
+      "kind": "modified",
+      "area": "storage",
+      "added": 6,
+      "removed": 2
+    },
+    {
+      "path": "modules/application/src/session.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 3,
+      "removed": 2
+    },
+    {
+      "path": "modules/document/include/opentoon/document.h",
+      "kind": "modified",
+      "area": "validation",
+      "added": 12,
+      "removed": 2
+    },
+    {
+      "path": "modules/document/src/document.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 14,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "performance",
+      "label": "Performance",
+      "stepIds": [
+        "77f3566e-ff89-4b05-9559-b5c278b3203f"
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "770141d6-4a3e-4468-aaed-611175261bfa",
+        "5eae25c4-bcf1-47bb-a88d-3b61fc9aa8a7",
+        "6e759f52-97cd-49f7-bc4e-9148a0b6a61b",
+        "ca481c38-d64e-4e20-9665-0e378c9ac4e9",
+        "e7363a2d-da07-4fd6-94c5-258e2c9ee4e7",
+        "e9a955a0-2717-4a12-b42e-254996746030",
+        "c10a9a6f-ea67-4b56-9a16-fe4fa0e036b8"
+      ]
+    },
+    {
+      "id": "storage",
+      "label": "Storage",
+      "stepIds": [
+        "e5eb74ea-5099-40c6-8d8c-798633397e64",
+        "f9d5127d-73df-4846-a6d7-ed3bd44ac0ca"
+      ]
+    },
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "dfefa1d9-2016-4a9f-b32d-ff55b13ad052"
+      ]
+    },
+    {
+      "id": "validation",
+      "label": "Validation",
+      "stepIds": [
+        "0fa359d0-2a70-42da-9970-7dea6d42bbc7",
+        "587d13c6-b931-418a-b102-f0933515d1dd",
+        "37a93bf5-b28c-4420-9273-0699d827a84c"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "77f3566e-ff89-4b05-9559-b5c278b3203f",
+      "title": "Introduce Shared buffer",
+      "explanation": "This part of shared_buffer.h adds 28 lines. It reduces repeated work or moves it away from the critical path. This is the first building block in the change.",
+      "file": "modules/document/include/opentoon/shared_buffer.h",
+      "startLine": 1,
+      "endLine": 28,
+      "area": "performance",
+      "added": 28,
+      "removed": 0
+    },
+    {
+      "id": "770141d6-4a3e-4468-aaed-611175261bfa",
+      "title": "Reshape Serialization",
+      "explanation": "This part of serialization.cpp replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/serialization.cpp",
+      "startLine": 28,
+      "endLine": 28,
+      "area": "errors",
+      "added": 1,
+      "removed": 1,
+      "relation": "Builds on shared_buffer.h and moves into error handling."
+    },
+    {
+      "id": "5eae25c4-bcf1-47bb-a88d-3b61fc9aa8a7",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 4 lines and adds 19. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/serialization.cpp",
+      "startLine": 59,
+      "endLine": 77,
+      "area": "errors",
+      "symbol": "if",
+      "added": 19,
+      "removed": 4,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "6e759f52-97cd-49f7-bc4e-9148a0b6a61b",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/serialization.cpp",
+      "startLine": 102,
+      "endLine": 102,
+      "area": "errors",
+      "symbol": "for",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "ca481c38-d64e-4e20-9665-0e378c9ac4e9",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/serialization.cpp",
+      "startLine": 111,
+      "endLine": 111,
+      "area": "errors",
+      "symbol": "for",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "e7363a2d-da07-4fd6-94c5-258e2c9ee4e7",
+      "title": "Reshape Serialization",
+      "explanation": "This part of serialization.cpp replaces 5 lines and adds 8. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/serialization.cpp",
+      "startLine": 155,
+      "endLine": 162,
+      "area": "errors",
+      "added": 8,
+      "removed": 5,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "e9a955a0-2717-4a12-b42e-254996746030",
+      "title": "Extend Serialization",
+      "explanation": "This part of serialization.cpp adds 29 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/serialization.cpp",
+      "startLine": 164,
+      "endLine": 192,
+      "area": "errors",
+      "added": 29,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "c10a9a6f-ea67-4b56-9a16-fe4fa0e036b8",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 14 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/document.cpp",
+      "startLine": 148,
+      "endLine": 161,
+      "area": "errors",
+      "symbol": "if",
+      "added": 14,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "e5eb74ea-5099-40c6-8d8c-798633397e64",
+      "title": "Extend Serialization",
+      "explanation": "This part of serialization.h adds 2 lines. It changes how persistent or cached data is read and written. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/serialization.h",
+      "startLine": 4,
+      "endLine": 5,
+      "area": "storage",
+      "added": 2,
+      "removed": 0,
+      "relation": "Builds on document.cpp and moves into storage."
+    },
+    {
+      "id": "f9d5127d-73df-4846-a6d7-ed3bd44ac0ca",
+      "title": "Reshape Serialization",
+      "explanation": "This part of serialization.h replaces 2 lines and adds 4. It changes how persistent or cached data is read and written. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/serialization.h",
+      "startLine": 7,
+      "endLine": 10,
+      "area": "storage",
+      "added": 4,
+      "removed": 2,
+      "relation": "Continues the storage thread from the previous step."
+    },
+    {
+      "id": "dfefa1d9-2016-4a9f-b32d-ff55b13ad052",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 2 lines and adds 3. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "modules/application/src/session.cpp",
+      "startLine": 27,
+      "endLine": 29,
+      "area": "auth",
+      "symbol": "for",
+      "added": 3,
+      "removed": 2,
+      "relation": "Builds on serialization.h and moves into authentication."
+    },
+    {
+      "id": "0fa359d0-2a70-42da-9970-7dea6d42bbc7",
+      "title": "Extend Document",
+      "explanation": "This part of document.h adds 1 line. It strengthens the checks applied before data is accepted. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/include/opentoon/document.h",
+      "startLine": 2,
+      "endLine": 2,
+      "area": "validation",
+      "added": 1,
+      "removed": 0,
+      "relation": "Builds on session.cpp and moves into validation."
+    },
+    {
+      "id": "587d13c6-b931-418a-b102-f0933515d1dd",
+      "title": "Reshape `class`",
+      "explanation": "The `class` section replaces 1 line and adds 1. It strengthens the checks applied before data is accepted. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/include/opentoon/document.h",
+      "startLine": 49,
+      "endLine": 49,
+      "area": "validation",
+      "symbol": "class",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the validation thread from the previous step."
+    },
+    {
+      "id": "37a93bf5-b28c-4420-9273-0699d827a84c",
+      "title": "Extend `class`",
+      "explanation": "The `class` section adds 8 lines. It strengthens the checks applied before data is accepted. This completes the path introduced by the earlier steps.",
+      "file": "modules/document/include/opentoon/document.h",
+      "startLine": 52,
+      "endLine": 59,
+      "area": "validation",
+      "symbol": "class",
+      "added": 8,
+      "removed": 0,
+      "relation": "Continues the validation thread from the previous step."
+    }
+  ]
+}

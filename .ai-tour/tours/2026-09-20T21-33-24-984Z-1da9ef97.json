@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "id": "1da9ef97-8039-4bd7-a677-74cd3b3c599e",
+  "title": "Update Features",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T21:33:24.984Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "docs/catalog/features.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 4,
+      "removed": 3
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "7dbd2943-dc72-4c24-8a24-7e0fe77d18f6",
+        "9aa7b803-961f-4c08-9dd6-bce5a645a0d5",
+        "6d5ee06c-0b19-403d-8242-ddeda71bc21a"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "7dbd2943-dc72-4c24-8a24-7e0fe77d18f6",
+      "title": "Reshape Features",
+      "explanation": "This part of features.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "docs/catalog/features.json",
+      "startLine": 2316,
+      "endLine": 2316,
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "id": "9aa7b803-961f-4c08-9dd6-bce5a645a0d5",
+      "title": "Reshape Features",
+      "explanation": "This part of features.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/catalog/features.json",
+      "startLine": 2327,
+      "endLine": 2327,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "6d5ee06c-0b19-403d-8242-ddeda71bc21a",
+      "title": "Reshape Features",
+      "explanation": "This part of features.json replaces 1 line and adds 2. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "docs/catalog/features.json",
+      "startLine": 2336,
+      "endLine": 2337,
+      "area": "tests",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

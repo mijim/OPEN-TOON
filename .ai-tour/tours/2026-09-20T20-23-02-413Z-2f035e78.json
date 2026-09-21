@@ -1,0 +1,274 @@
+{
+  "version": 1,
+  "id": "2f035e78-45a1-4577-b2ca-5f00b3a654b1",
+  "title": "Improve error handling flow",
+  "summary": "9 files changed across 1 area. The tour follows the implementation from error handling to error handling. 10 smaller changes remain in the overview.",
+  "createdAt": "2026-09-20T20:23:02.413Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/animation_controller.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 26,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/editor_controller.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 3,
+      "removed": 2
+    },
+    {
+      "path": "adapters/qt/editor_controller.h",
+      "kind": "modified",
+      "area": "auth",
+      "added": 3,
+      "removed": 0
+    },
+    {
+      "path": "adapters/storage/project_store.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 6,
+      "removed": 6
+    },
+    {
+      "path": "adapters/storage/serialization.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 23,
+      "removed": 7
+    },
+    {
+      "path": "modules/document/include/opentoon/animation.h",
+      "kind": "modified",
+      "area": "api",
+      "added": 5,
+      "removed": 0
+    },
+    {
+      "path": "modules/document/include/opentoon/document.h",
+      "kind": "modified",
+      "area": "validation",
+      "added": 6,
+      "removed": 1
+    },
+    {
+      "path": "modules/document/src/animation.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 41,
+      "removed": 0
+    },
+    {
+      "path": "modules/document/src/document.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 16,
+      "removed": 13
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "3c0db039-a9ae-4376-802f-432abb28869a",
+        "89356d86-f628-4ec3-8bf9-48eb0efbd5b7",
+        "307ef100-6f8e-4c81-b6fd-d541da781fcd",
+        "ad89b36b-927b-4a24-bdc7-b01c3c28adc6",
+        "ad6c84a1-f1e8-48ae-afa0-879be2ebbd86",
+        "998c7b8d-f784-4753-8820-b27f905d6779",
+        "4db10d91-d6fc-4de4-b2df-97c43c323507",
+        "1bd2b0c0-390a-450d-81a4-684d5cbadf01",
+        "73413571-51a6-4a99-beea-563a1f3b0b4b",
+        "71541d57-9c04-4595-847a-56c21b750fe8",
+        "a52f487a-8357-4287-a8b9-b0485b8f8ac8",
+        "eedf6e2e-9edb-484e-b5c3-69f253c23c85",
+        "b92fe684-4e66-4a8c-a28e-425481cbb6e5",
+        "5d909080-47a4-44c8-947c-5bdd0540f2a5"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "3c0db039-a9ae-4376-802f-432abb28869a",
+      "title": "Extend Animation controller",
+      "explanation": "This part of animation_controller.cpp adds 4 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 31,
+      "endLine": 34,
+      "area": "errors",
+      "added": 4,
+      "removed": 0
+    },
+    {
+      "id": "89356d86-f628-4ec3-8bf9-48eb0efbd5b7",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 22 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 120,
+      "endLine": 141,
+      "area": "errors",
+      "symbol": "if",
+      "added": 22,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "307ef100-6f8e-4c81-b6fd-d541da781fcd",
+      "title": "Reshape `Statement`",
+      "explanation": "The `Statement` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 71,
+      "endLine": 71,
+      "area": "errors",
+      "symbol": "Statement",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "ad89b36b-927b-4a24-bdc7-b01c3c28adc6",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 121,
+      "endLine": 121,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "ad6c84a1-f1e8-48ae-afa0-879be2ebbd86",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 123,
+      "endLine": 123,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "998c7b8d-f784-4753-8820-b27f905d6779",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 126,
+      "endLine": 126,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "4db10d91-d6fc-4de4-b2df-97c43c323507",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 131,
+      "endLine": 131,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "1bd2b0c0-390a-450d-81a4-684d5cbadf01",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 153,
+      "endLine": 153,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "73413571-51a6-4a99-beea-563a1f3b0b4b",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 4 lines and adds 7. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/serialization.cpp",
+      "startLine": 101,
+      "endLine": 107,
+      "area": "errors",
+      "symbol": "for",
+      "added": 7,
+      "removed": 4,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "71541d57-9c04-4595-847a-56c21b750fe8",
+      "title": "Reshape Serialization",
+      "explanation": "This part of serialization.cpp replaces 3 lines and adds 16. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/serialization.cpp",
+      "startLine": 231,
+      "endLine": 246,
+      "area": "errors",
+      "added": 16,
+      "removed": 3,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "a52f487a-8357-4287-a8b9-b0485b8f8ac8",
+      "title": "Extend Animation",
+      "explanation": "This part of animation.cpp adds 39 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/animation.cpp",
+      "startLine": 39,
+      "endLine": 77,
+      "area": "errors",
+      "added": 39,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "eedf6e2e-9edb-484e-b5c3-69f253c23c85",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 2 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/animation.cpp",
+      "startLine": 113,
+      "endLine": 114,
+      "area": "errors",
+      "symbol": "if",
+      "added": 2,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "b92fe684-4e66-4a8c-a28e-425481cbb6e5",
+      "title": "Extend Document",
+      "explanation": "This part of document.cpp adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/document.cpp",
+      "startLine": 2,
+      "endLine": 2,
+      "area": "errors",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "5d909080-47a4-44c8-947c-5bdd0540f2a5",
+      "title": "Extend `for`",
+      "explanation": "The `for` section adds 2 lines. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "modules/document/src/document.cpp",
+      "startLine": 196,
+      "endLine": 197,
+      "area": "errors",
+      "symbol": "for",
+      "added": 2,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

@@ -1,0 +1,251 @@
+{
+  "version": 1,
+  "id": "47f76680-4877-411a-9535-fa699c0b51a6",
+  "title": "Improve error handling flow",
+  "summary": "4 files changed across 3 areas. The tour follows the implementation from error handling to tests.",
+  "createdAt": "2026-09-20T18:34:24.365Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/storage/resources.cpp",
+      "kind": "created",
+      "area": "errors",
+      "added": 34,
+      "removed": 0
+    },
+    {
+      "path": "adapters/storage/resources.h",
+      "kind": "created",
+      "area": "storage",
+      "added": 10,
+      "removed": 0
+    },
+    {
+      "path": "adapters/storage/project_store.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 69,
+      "removed": 8
+    },
+    {
+      "path": "tests/storage_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "8659bb60-66d5-4e14-956b-cac625775ae0",
+        "ffbf4c07-1a26-43ac-90ab-401a91cede1c",
+        "c0abaff0-685f-41f6-a83d-3994a76b13c2",
+        "4c3a4e3f-8f90-46e0-b3be-b0ece73ea6f7",
+        "f5452c00-dd01-4edf-ad29-3a8e2c04d204",
+        "907773e2-8c56-4f3b-a941-7823717b1c53",
+        "ea8f8309-b36e-413c-a05d-9c1f0cc22d34",
+        "e519a0d3-c541-468c-ac9f-305cfb1c0d42",
+        "a2167a56-ba4c-4769-bdf9-e19573719494",
+        "5b3667d7-13e5-43ad-85f2-04880a93f722",
+        "00671d90-d2f3-4163-8743-b2cf8ff3a75d",
+        "09679361-95f9-48b3-b159-cf773d14925b"
+      ]
+    },
+    {
+      "id": "storage",
+      "label": "Storage",
+      "stepIds": [
+        "c61d62ab-c805-43ba-9f3c-ff11b0d4a9dc"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "111f3c12-ca8b-4ee8-a3f6-aca4b637c3e4"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "8659bb60-66d5-4e14-956b-cac625775ae0",
+      "title": "Introduce Resources",
+      "explanation": "This part of resources.cpp adds 34 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/storage/resources.cpp",
+      "startLine": 1,
+      "endLine": 34,
+      "area": "errors",
+      "added": 34,
+      "removed": 0
+    },
+    {
+      "id": "ffbf4c07-1a26-43ac-90ab-401a91cede1c",
+      "title": "Extend Project store",
+      "explanation": "This part of project_store.cpp adds 2 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 3,
+      "endLine": 4,
+      "area": "errors",
+      "added": 2,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "c0abaff0-685f-41f6-a83d-3994a76b13c2",
+      "title": "Reshape `Statement`",
+      "explanation": "The `Statement` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 61,
+      "endLine": 61,
+      "area": "errors",
+      "symbol": "Statement",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "4c3a4e3f-8f90-46e0-b3be-b0ece73ea6f7",
+      "title": "Reshape `Statement`",
+      "explanation": "The `Statement` section replaces 1 line and adds 4. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 68,
+      "endLine": 71,
+      "area": "errors",
+      "symbol": "Statement",
+      "added": 4,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "f5452c00-dd01-4edf-ad29-3a8e2c04d204",
+      "title": "Extend `Statement`",
+      "explanation": "The `Statement` section adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 73,
+      "endLine": 73,
+      "area": "errors",
+      "symbol": "Statement",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "907773e2-8c56-4f3b-a941-7823717b1c53",
+      "title": "Extend `Statement`",
+      "explanation": "The `Statement` section adds 22 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 87,
+      "endLine": 108,
+      "area": "errors",
+      "symbol": "Statement",
+      "added": 22,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "ea8f8309-b36e-413c-a05d-9c1f0cc22d34",
+      "title": "Reshape Project store",
+      "explanation": "This part of project_store.cpp replaces 3 lines and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 112,
+      "endLine": 112,
+      "area": "errors",
+      "added": 1,
+      "removed": 3,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "e519a0d3-c541-468c-ac9f-305cfb1c0d42",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 9. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 116,
+      "endLine": 124,
+      "area": "errors",
+      "symbol": "if",
+      "added": 9,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "a2167a56-ba4c-4769-bdf9-e19573719494",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 126,
+      "endLine": 126,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "5b3667d7-13e5-43ad-85f2-04880a93f722",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 21 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 143,
+      "endLine": 163,
+      "area": "errors",
+      "symbol": "if",
+      "added": 21,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "00671d90-d2f3-4163-8743-b2cf8ff3a75d",
+      "title": "Extend `for`",
+      "explanation": "The `for` section adds 6 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 170,
+      "endLine": 175,
+      "area": "errors",
+      "symbol": "for",
+      "added": 6,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "09679361-95f9-48b3-b159-cf773d14925b",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 201,
+      "endLine": 201,
+      "area": "errors",
+      "symbol": "for",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "c61d62ab-c805-43ba-9f3c-ff11b0d4a9dc",
+      "title": "Introduce Resources",
+      "explanation": "This part of resources.h adds 10 lines. It changes how persistent or cached data is read and written. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/resources.h",
+      "startLine": 1,
+      "endLine": 10,
+      "area": "storage",
+      "added": 10,
+      "removed": 0,
+      "relation": "Builds on project_store.cpp and moves into storage."
+    },
+    {
+      "id": "111f3c12-ca8b-4ee8-a3f6-aca4b637c3e4",
+      "title": "Reshape `TEST_CASE`",
+      "explanation": "The `TEST_CASE` section replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "tests/storage_tests.cpp",
+      "startLine": 61,
+      "endLine": 61,
+      "area": "tests",
+      "symbol": "TEST_CASE",
+      "added": 1,
+      "removed": 1,
+      "relation": "Builds on resources.h and moves into tests."
+    }
+  ]
+}

@@ -1,0 +1,253 @@
+{
+  "version": 1,
+  "id": "318b0058-a624-4c57-a16c-f1d0c4d5f339",
+  "title": "Improve authentication flow",
+  "summary": "6 files changed across 2 areas. The tour follows the implementation from authentication to tests. 8 smaller changes remain in the overview.",
+  "createdAt": "2026-09-20T18:50:28.149Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/editor_controller.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 43,
+      "removed": 5
+    },
+    {
+      "path": "adapters/qt/editor_controller.h",
+      "kind": "modified",
+      "area": "tests",
+      "added": 6,
+      "removed": 1
+    },
+    {
+      "path": "tests/export_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 22,
+      "removed": 0
+    },
+    {
+      "path": "apps/desktop/brush_benchmark.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 47,
+      "removed": 28
+    },
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 2,
+      "removed": 1
+    },
+    {
+      "path": "tests/render_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 15,
+      "removed": 13
+    }
+  ],
+  "areas": [
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "31e6db1c-903c-4144-8fe0-f83bddb7ae60",
+        "eb98dea5-caa7-449d-aad0-c8e8a2fe2951",
+        "57d09023-6fe4-4c6e-bd7e-99ccfe678ed7",
+        "58298e22-13b0-40b9-84cc-6a6b25cc1a3d",
+        "5cb9c081-91fb-4402-92f2-5564eb89101d",
+        "2165d081-39c0-4b21-b6d8-6b821d070cde",
+        "3ad55ceb-4761-445c-9a7b-9d49465fcb30",
+        "94116754-fe2a-471b-95c6-29792178d61d",
+        "f3dec3cc-f350-4a92-9f68-6a32dbdf998f",
+        "34a0b19c-537f-466b-ba3a-7ec44e2569a8",
+        "d9f969c3-9152-47b2-b5ed-5c307b28326b",
+        "d3410175-63f5-44d2-be12-de4920fd3102",
+        "3419603e-96cb-44f7-9345-6a87c4015ef3"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "b192b175-1359-4423-9ec8-c5162df7677d"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "31e6db1c-903c-4144-8fe0-f83bddb7ae60",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.cpp adds 2 lines. It changes how identity or session data moves through the solution. This is the first building block in the change.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 51,
+      "endLine": 52,
+      "area": "auth",
+      "added": 2,
+      "removed": 0
+    },
+    {
+      "id": "eb98dea5-caa7-449d-aad0-c8e8a2fe2951",
+      "title": "Reshape Editor controller",
+      "explanation": "This part of editor_controller.cpp replaces 1 line and adds 1. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 684,
+      "endLine": 684,
+      "area": "auth",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "57d09023-6fe4-4c6e-bd7e-99ccfe678ed7",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.cpp adds 34 lines. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 686,
+      "endLine": 719,
+      "area": "auth",
+      "added": 34,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "58298e22-13b0-40b9-84cc-6a6b25cc1a3d",
+      "title": "Reshape Editor controller",
+      "explanation": "This part of editor_controller.cpp replaces 3 lines and adds 5. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 721,
+      "endLine": 725,
+      "area": "auth",
+      "added": 5,
+      "removed": 3,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "5cb9c081-91fb-4402-92f2-5564eb89101d",
+      "title": "Reshape Editor controller",
+      "explanation": "This part of editor_controller.cpp replaces 1 line and adds 1. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 727,
+      "endLine": 727,
+      "area": "auth",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "2165d081-39c0-4b21-b6d8-6b821d070cde",
+      "title": "Simplify Brush benchmark",
+      "explanation": "This part of brush_benchmark.cpp removes 2 lines. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/brush_benchmark.cpp",
+      "startLine": 1,
+      "endLine": 1,
+      "area": "auth",
+      "added": 0,
+      "removed": 2,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "3ad55ceb-4761-445c-9a7b-9d49465fcb30",
+      "title": "Extend Brush benchmark",
+      "explanation": "This part of brush_benchmark.cpp adds 2 lines. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/brush_benchmark.cpp",
+      "startLine": 2,
+      "endLine": 3,
+      "area": "auth",
+      "added": 2,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "94116754-fe2a-471b-95c6-29792178d61d",
+      "title": "Reshape Brush benchmark",
+      "explanation": "This part of brush_benchmark.cpp replaces 1 line and adds 2. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/brush_benchmark.cpp",
+      "startLine": 11,
+      "endLine": 12,
+      "area": "auth",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "f3dec3cc-f350-4a92-9f68-6a32dbdf998f",
+      "title": "Reshape Brush benchmark",
+      "explanation": "This part of brush_benchmark.cpp replaces 4 lines and adds 7. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/brush_benchmark.cpp",
+      "startLine": 14,
+      "endLine": 20,
+      "area": "auth",
+      "added": 7,
+      "removed": 4,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "34a0b19c-537f-466b-ba3a-7ec44e2569a8",
+      "title": "Reshape Brush benchmark",
+      "explanation": "This part of brush_benchmark.cpp replaces 8 lines and adds 11. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/brush_benchmark.cpp",
+      "startLine": 22,
+      "endLine": 32,
+      "area": "auth",
+      "added": 11,
+      "removed": 8,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "d9f969c3-9152-47b2-b5ed-5c307b28326b",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 6 lines and adds 7. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/brush_benchmark.cpp",
+      "startLine": 36,
+      "endLine": 42,
+      "area": "auth",
+      "symbol": "for",
+      "added": 7,
+      "removed": 6,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "d3410175-63f5-44d2-be12-de4920fd3102",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 6 lines and adds 14. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/brush_benchmark.cpp",
+      "startLine": 44,
+      "endLine": 57,
+      "area": "auth",
+      "symbol": "for",
+      "added": 14,
+      "removed": 6,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "3419603e-96cb-44f7-9345-6a87c4015ef3",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 4. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/brush_benchmark.cpp",
+      "startLine": 59,
+      "endLine": 62,
+      "area": "auth",
+      "symbol": "for",
+      "added": 4,
+      "removed": 1,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "b192b175-1359-4423-9ec8-c5162df7677d",
+      "title": "Extend `EditorController`",
+      "explanation": "The `EditorController` section adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 37,
+      "endLine": 37,
+      "area": "tests",
+      "symbol": "EditorController",
+      "added": 1,
+      "removed": 0,
+      "relation": "Builds on brush_benchmark.cpp and moves into tests."
+    }
+  ]
+}

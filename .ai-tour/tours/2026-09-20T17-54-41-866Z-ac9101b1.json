@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "ac9101b1-5575-4d19-9deb-f776484f71bc",
+  "title": "Add CMake User Presets",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from core logic to core logic.",
+  "createdAt": "2026-09-20T17:54:41.866Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "CMakeUserPresets.json",
+      "kind": "created",
+      "area": "core",
+      "added": 9,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "core",
+      "label": "Core logic",
+      "stepIds": [
+        "ac883192-aad4-4de1-9d1e-071fe47dcb18"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "ac883192-aad4-4de1-9d1e-071fe47dcb18",
+      "title": "Introduce CMake User Presets",
+      "explanation": "This part of CMakeUserPresets.json adds 9 lines. It updates a central part of the implementation. This is the main implementation change.",
+      "file": "CMakeUserPresets.json",
+      "startLine": 1,
+      "endLine": 9,
+      "area": "core",
+      "added": 9,
+      "removed": 0
+    }
+  ]
+}

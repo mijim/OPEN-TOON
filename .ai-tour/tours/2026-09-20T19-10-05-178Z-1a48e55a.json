@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "id": "1a48e55a-5219-4220-bca6-e3cca54ffd33",
+  "title": "Update Libraries",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T19:10:05.178Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "docs/planning/libraries.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 37,
+      "removed": 7
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "36cba807-ff25-4594-8976-5778b486cc12",
+        "a13048b3-0832-4609-a3fc-3cfa3febcffe",
+        "e45cdc49-032f-4d41-bab6-05f324e1d153",
+        "b53f6eab-43f8-460c-867d-b6f9297f9bb1",
+        "55391a55-078e-4094-b869-3bb53a8677dd",
+        "19b9691f-5042-47d5-a774-e2ba66d27030"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "36cba807-ff25-4594-8976-5778b486cc12",
+      "title": "Reshape Libraries",
+      "explanation": "This part of libraries.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 28,
+      "endLine": 28,
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "id": "a13048b3-0832-4609-a3fc-3cfa3febcffe",
+      "title": "Reshape Libraries",
+      "explanation": "This part of libraries.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 80,
+      "endLine": 80,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "e45cdc49-032f-4d41-bab6-05f324e1d153",
+      "title": "Reshape Libraries",
+      "explanation": "This part of libraries.json replaces 2 lines and adds 3. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 87,
+      "endLine": 89,
+      "area": "tests",
+      "added": 3,
+      "removed": 2,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "b53f6eab-43f8-460c-867d-b6f9297f9bb1",
+      "title": "Reshape Libraries",
+      "explanation": "This part of libraries.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 319,
+      "endLine": 319,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "55391a55-078e-4094-b869-3bb53a8677dd",
+      "title": "Reshape Libraries",
+      "explanation": "This part of libraries.json replaces 2 lines and adds 3. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 326,
+      "endLine": 328,
+      "area": "tests",
+      "added": 3,
+      "removed": 2,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "19b9691f-5042-47d5-a774-e2ba66d27030",
+      "title": "Extend Libraries",
+      "explanation": "This part of libraries.json adds 28 lines. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 399,
+      "endLine": 426,
+      "area": "tests",
+      "added": 28,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

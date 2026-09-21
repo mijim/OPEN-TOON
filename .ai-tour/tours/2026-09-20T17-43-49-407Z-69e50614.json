@@ -1,0 +1,226 @@
+{
+  "version": 1,
+  "id": "69e50614-028b-4c08-aa6b-fdc9474b22af",
+  "title": "Improve tests flow",
+  "summary": "4 files changed across 2 areas. The tour follows the implementation from error handling to tests.",
+  "createdAt": "2026-09-20T17:43:49.407Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 60,
+      "removed": 12
+    },
+    {
+      "path": "adapters/qt/editor_controller.h",
+      "kind": "modified",
+      "area": "tests",
+      "added": 2,
+      "removed": 2
+    },
+    {
+      "path": "modules/document/src/document.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 13,
+      "removed": 7
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "466dec6c-f356-4c3a-9556-beb28677e374",
+        "9e58fe4f-451a-4660-8ce6-d347e72f239e",
+        "f9512177-d845-4d88-b88e-65ae829445e6"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "0da95fa5-bdac-460a-b706-64c1876ecf30",
+        "ba82cf6e-c5d4-418c-be7e-ff06f2922ab5",
+        "30266ea7-ccd9-4045-90e8-39a10bfe5849",
+        "62e82d39-aba7-46fd-91d0-16a04c485081",
+        "52d25dd7-473a-49a9-b71e-5e78e4bfaf5a",
+        "4770daa5-1155-44f7-9abf-5980bdc1386e",
+        "4ae4bed5-2c93-4c87-a136-012bb9e58bdf",
+        "8b3ad4f0-883a-4f74-94e5-b0679da897cf",
+        "1156a3b9-0b7c-4b19-b5aa-87d31361038f",
+        "8fc1efe3-185a-4809-b8ae-97f1f47c9382"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "466dec6c-f356-4c3a-9556-beb28677e374",
+      "title": "Reshape Canvas item",
+      "explanation": "This part of canvas_item.cpp replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 104,
+      "endLine": 104,
+      "area": "errors",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "id": "9e58fe4f-451a-4660-8ce6-d347e72f239e",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/document.cpp",
+      "startLine": 314,
+      "endLine": 314,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "f9512177-d845-4d88-b88e-65ae829445e6",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 6 lines and adds 12. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/document.cpp",
+      "startLine": 326,
+      "endLine": 337,
+      "area": "errors",
+      "symbol": "if",
+      "added": 12,
+      "removed": 6,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "0da95fa5-bdac-460a-b706-64c1876ecf30",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 12,
+      "endLine": 12,
+      "area": "tests",
+      "added": 1,
+      "removed": 0,
+      "relation": "Builds on document.cpp and moves into tests."
+    },
+    {
+      "id": "ba82cf6e-c5d4-418c-be7e-ff06f2922ab5",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 2 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 17,
+      "endLine": 18,
+      "area": "tests",
+      "added": 2,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "30266ea7-ccd9-4045-90e8-39a10bfe5849",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 4 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 27,
+      "endLine": 30,
+      "area": "tests",
+      "added": 4,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "62e82d39-aba7-46fd-91d0-16a04c485081",
+      "title": "Reshape Main",
+      "explanation": "This part of main.cpp replaces 1 line and adds 2. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 40,
+      "endLine": 41,
+      "area": "tests",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "52d25dd7-473a-49a9-b71e-5e78e4bfaf5a",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 2 lines and adds 2. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 65,
+      "endLine": 66,
+      "area": "tests",
+      "symbol": "for",
+      "added": 2,
+      "removed": 2,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "4770daa5-1155-44f7-9abf-5980bdc1386e",
+      "title": "Simplify Main",
+      "explanation": "This part of main.cpp removes 1 line. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 83,
+      "endLine": 83,
+      "area": "tests",
+      "added": 0,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "4ae4bed5-2c93-4c87-a136-012bb9e58bdf",
+      "title": "Reshape Main",
+      "explanation": "This part of main.cpp replaces 3 lines and adds 3. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 84,
+      "endLine": 86,
+      "area": "tests",
+      "added": 3,
+      "removed": 3,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "8b3ad4f0-883a-4f74-94e5-b0679da897cf",
+      "title": "Reshape Main",
+      "explanation": "This part of main.cpp replaces 1 line and adds 35. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 88,
+      "endLine": 122,
+      "area": "tests",
+      "added": 35,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "1156a3b9-0b7c-4b19-b5aa-87d31361038f",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 4 lines and adds 11. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 124,
+      "endLine": 134,
+      "area": "tests",
+      "symbol": "if",
+      "added": 11,
+      "removed": 4,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "8fc1efe3-185a-4809-b8ae-97f1f47c9382",
+      "title": "Reshape Editor controller",
+      "explanation": "This part of editor_controller.h replaces 2 lines and adds 2. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 59,
+      "endLine": 60,
+      "area": "tests",
+      "added": 2,
+      "removed": 2,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

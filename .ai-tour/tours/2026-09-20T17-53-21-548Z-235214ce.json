@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "id": "235214ce-3995-4b52-b046-ec57134f3f12",
+  "title": "Update Storage tests",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T17:53:21.548Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "tests/storage_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 3,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "b642e7f9-d1f8-4595-9349-214c842cce1a"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "b642e7f9-d1f8-4595-9349-214c842cce1a",
+      "title": "Extend `TEST_CASE`",
+      "explanation": "The `TEST_CASE` section adds 3 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the main implementation change.",
+      "file": "tests/storage_tests.cpp",
+      "startLine": 78,
+      "endLine": 80,
+      "area": "tests",
+      "symbol": "TEST_CASE",
+      "added": 3,
+      "removed": 0
+    }
+  ]
+}

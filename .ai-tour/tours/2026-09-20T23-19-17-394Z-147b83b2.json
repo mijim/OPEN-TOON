@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "id": "147b83b2-9f7b-4a1a-9d5f-f4e6a378e318",
+  "title": "Improve tests flow",
+  "summary": "4 files changed across 2 areas. The tour follows the implementation from tests to error handling.",
+  "createdAt": "2026-09-20T23:19:17.394Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "tests/vector_edit_tests.cpp",
+      "kind": "created",
+      "area": "tests",
+      "added": 152,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 11,
+      "removed": 0
+    },
+    {
+      "path": "tests/animation_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 39,
+      "removed": 0
+    },
+    {
+      "path": "tests/render_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 13,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "f44c7233-8e3e-4c4b-a512-7c162108e2ed",
+        "6f6b3862-d449-42ca-b2da-6b395958299f",
+        "9c4af736-c548-4deb-998d-c9d013905222"
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "b79807cd-bb32-47d9-9b0a-21647d6eeeb9"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "f44c7233-8e3e-4c4b-a512-7c162108e2ed",
+      "title": "Introduce Vector edit tests",
+      "explanation": "This part of vector_edit_tests.cpp adds 152 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "tests/vector_edit_tests.cpp",
+      "startLine": 1,
+      "endLine": 152,
+      "area": "tests",
+      "added": 152,
+      "removed": 0
+    },
+    {
+      "id": "6f6b3862-d449-42ca-b2da-6b395958299f",
+      "title": "Extend `REQUIRE`",
+      "explanation": "The `REQUIRE` section adds 39 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "tests/animation_tests.cpp",
+      "startLine": 329,
+      "endLine": 367,
+      "area": "tests",
+      "symbol": "REQUIRE",
+      "added": 39,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "9c4af736-c548-4deb-998d-c9d013905222",
+      "title": "Extend `TEST_CASE`",
+      "explanation": "The `TEST_CASE` section adds 13 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "tests/render_tests.cpp",
+      "startLine": 110,
+      "endLine": 122,
+      "area": "tests",
+      "symbol": "TEST_CASE",
+      "added": 13,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "b79807cd-bb32-47d9-9b0a-21647d6eeeb9",
+      "title": "Extend Canvas item",
+      "explanation": "This part of canvas_item.cpp adds 11 lines. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 899,
+      "endLine": 909,
+      "area": "errors",
+      "added": 11,
+      "removed": 0,
+      "relation": "Builds on render_tests.cpp and moves into error handling."
+    }
+  ]
+}

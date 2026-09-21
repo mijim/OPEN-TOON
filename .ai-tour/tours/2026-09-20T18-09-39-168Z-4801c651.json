@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "id": "4801c651-4e21-45fb-a352-7be309f8f914",
+  "title": "Update Native",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T18:09:39.168Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": ".github/workflows/native.yml",
+      "kind": "modified",
+      "area": "tests",
+      "added": 6,
+      "removed": 2
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "68874e56-1350-4e9f-8ac1-b68359d4510a",
+        "d335131d-e0a1-427d-99f2-e9ba5aef8b74",
+        "2cd0b0ad-bded-4747-a390-d62bafd51e24",
+        "1560734a-bb16-46c2-a5f5-71ebead262c3"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "68874e56-1350-4e9f-8ac1-b68359d4510a",
+      "title": "Extend Native",
+      "explanation": "This part of native.yml adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": ".github/workflows/native.yml",
+      "startLine": 33,
+      "endLine": 33,
+      "area": "tests",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "id": "d335131d-e0a1-427d-99f2-e9ba5aef8b74",
+      "title": "Extend Native",
+      "explanation": "This part of native.yml adds 3 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": ".github/workflows/native.yml",
+      "startLine": 35,
+      "endLine": 37,
+      "area": "tests",
+      "added": 3,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "2cd0b0ad-bded-4747-a390-d62bafd51e24",
+      "title": "Reshape Native",
+      "explanation": "This part of native.yml replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": ".github/workflows/native.yml",
+      "startLine": 39,
+      "endLine": 39,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "1560734a-bb16-46c2-a5f5-71ebead262c3",
+      "title": "Reshape Native",
+      "explanation": "This part of native.yml replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": ".github/workflows/native.yml",
+      "startLine": 43,
+      "endLine": 43,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

@@ -1,0 +1,218 @@
+{
+  "version": 1,
+  "id": "4273f8da-174b-4bfa-b72d-efe2f2bdccab",
+  "title": "Improve error handling flow",
+  "summary": "5 files changed across 3 areas. The tour follows the implementation from tests to authentication.",
+  "createdAt": "2026-09-20T19:41:22.473Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "tests/drawing_selection_tests.cpp",
+      "kind": "created",
+      "area": "tests",
+      "added": 101,
+      "removed": 0
+    },
+    {
+      "path": "adapters/brush/raster_brush.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 2,
+      "removed": 1
+    },
+    {
+      "path": "modules/document/include/opentoon/drawing_selection.h",
+      "kind": "modified",
+      "area": "auth",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "path": "modules/document/src/drawing_selection.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 15,
+      "removed": 6
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "48117b2b-658c-4800-8665-39f30df98424"
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "68ca9599-5b2d-430d-bdd2-547d84032901",
+        "b327c733-3252-4281-88d3-38a791ebf632",
+        "1160e2cf-0814-4a58-80de-21509698fa8d",
+        "6ae6899f-3111-41a1-bcc6-c3bd8534f3aa",
+        "ec208b82-77e1-4106-baff-28c856ce512f",
+        "6cacd163-c26d-4c04-9917-5d0cdb0da3d2",
+        "46253c46-027b-4bf6-8c22-314abe7ce134",
+        "adc2f5a0-39f8-4b47-99d7-36115e8de03b",
+        "2aaccb41-0cea-4538-9772-3b2711abf198"
+      ]
+    },
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "3db30633-4cc1-4f3f-99c0-858d709b8a1a"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "48117b2b-658c-4800-8665-39f30df98424",
+      "title": "Introduce Drawing selection tests",
+      "explanation": "This part of drawing_selection_tests.cpp adds 101 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "tests/drawing_selection_tests.cpp",
+      "startLine": 1,
+      "endLine": 101,
+      "area": "tests",
+      "added": 101,
+      "removed": 0
+    },
+    {
+      "id": "68ca9599-5b2d-430d-bdd2-547d84032901",
+      "title": "Reshape `Impl`",
+      "explanation": "The `Impl` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/brush/raster_brush.cpp",
+      "startLine": 90,
+      "endLine": 90,
+      "area": "errors",
+      "symbol": "Impl",
+      "added": 1,
+      "removed": 1,
+      "relation": "Builds on drawing_selection_tests.cpp and moves into error handling."
+    },
+    {
+      "id": "b327c733-3252-4281-88d3-38a791ebf632",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 499,
+      "endLine": 499,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "1160e2cf-0814-4a58-80de-21509698fa8d",
+      "title": "Extend Canvas item",
+      "explanation": "This part of canvas_item.cpp adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 510,
+      "endLine": 510,
+      "area": "errors",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "6ae6899f-3111-41a1-bcc6-c3bd8534f3aa",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 4 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 58,
+      "endLine": 61,
+      "area": "errors",
+      "symbol": "if",
+      "added": 4,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "ec208b82-77e1-4106-baff-28c856ce512f",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 102,
+      "endLine": 102,
+      "area": "errors",
+      "symbol": "for",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "6cacd163-c26d-4c04-9917-5d0cdb0da3d2",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 107,
+      "endLine": 107,
+      "area": "errors",
+      "symbol": "for",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "46253c46-027b-4bf6-8c22-314abe7ce134",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 117,
+      "endLine": 118,
+      "area": "errors",
+      "symbol": "if",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "adc2f5a0-39f8-4b47-99d7-36115e8de03b",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 6 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 123,
+      "endLine": 128,
+      "area": "errors",
+      "symbol": "if",
+      "added": 6,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "2aaccb41-0cea-4538-9772-3b2711abf198",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 3 lines and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 138,
+      "endLine": 138,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 3,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "3db30633-4cc1-4f3f-99c0-858d709b8a1a",
+      "title": "Reshape `class`",
+      "explanation": "The `class` section replaces 1 line and adds 1. It changes how identity or session data moves through the solution. This completes the path introduced by the earlier steps.",
+      "file": "modules/document/include/opentoon/drawing_selection.h",
+      "startLine": 9,
+      "endLine": 9,
+      "area": "auth",
+      "symbol": "class",
+      "added": 1,
+      "removed": 1,
+      "relation": "Builds on drawing_selection.cpp and moves into authentication."
+    }
+  ]
+}

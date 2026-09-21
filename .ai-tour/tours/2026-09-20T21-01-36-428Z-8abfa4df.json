@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "8abfa4df-23c9-429d-90b3-f1676b5fb443",
+  "title": "Update Visual editing smoke",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from error handling to error handling.",
+  "createdAt": "2026-09-20T21:01:36.428Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "apps/desktop/visual_editing_smoke.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 1,
+      "removed": 2
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "2312a511-c108-4cc1-a273-8a5f28028d90"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "2312a511-c108-4cc1-a273-8a5f28028d90",
+      "title": "Reshape Visual editing smoke",
+      "explanation": "This part of visual_editing_smoke.cpp replaces 2 lines and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. This is the main implementation change.",
+      "file": "apps/desktop/visual_editing_smoke.cpp",
+      "startLine": 191,
+      "endLine": 191,
+      "area": "errors",
+      "added": 1,
+      "removed": 2
+    }
+  ]
+}

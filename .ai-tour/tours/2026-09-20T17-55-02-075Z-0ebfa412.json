@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "id": "0ebfa412-89f6-45c7-884d-9841bb90346a",
+  "title": "Update Main",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T17:55:02.075Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 37,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "14e5b48b-eeae-4b56-a9eb-1ad9dfb6ea56",
+        "d9ebbaea-052f-4f1b-8c48-ce5c20bd897b",
+        "77447ee7-66ef-4105-98b7-a6fd227bf088",
+        "285eb5ec-249a-4501-a3fd-06043c158af6"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "14e5b48b-eeae-4b56-a9eb-1ad9dfb6ea56",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 13,
+      "endLine": 13,
+      "area": "tests",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "id": "d9ebbaea-052f-4f1b-8c48-ce5c20bd897b",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 1 line. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 19,
+      "endLine": 19,
+      "area": "tests",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "77447ee7-66ef-4105-98b7-a6fd227bf088",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 33 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 123,
+      "endLine": 155,
+      "area": "tests",
+      "symbol": "if",
+      "added": 33,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "285eb5ec-249a-4501-a3fd-06043c158af6",
+      "title": "Reshape Main",
+      "explanation": "This part of main.cpp replaces 1 line and adds 2. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 163,
+      "endLine": 164,
+      "area": "tests",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

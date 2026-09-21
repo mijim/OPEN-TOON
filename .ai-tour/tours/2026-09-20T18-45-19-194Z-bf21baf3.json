@@ -1,0 +1,251 @@
+{
+  "version": 1,
+  "id": "bf21baf3-87f6-4591-ac2e-4d3ea5ff0cd9",
+  "title": "Improve error handling flow",
+  "summary": "6 files changed across 1 area. The tour follows the implementation from error handling to error handling. 41 smaller changes remain in the overview.",
+  "createdAt": "2026-09-20T18:45:19.194Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/brush/raster_brush.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 86,
+      "removed": 58
+    },
+    {
+      "path": "adapters/brush/raster_brush.h",
+      "kind": "modified",
+      "area": "performance",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 40,
+      "removed": 28
+    },
+    {
+      "path": "adapters/qt/editor_controller.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 7,
+      "removed": 5
+    },
+    {
+      "path": "adapters/render/scene_renderer.cpp",
+      "kind": "modified",
+      "area": "state",
+      "added": 26,
+      "removed": 18
+    },
+    {
+      "path": "tests/raster_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 36,
+      "removed": 25
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "3d9308e7-0b47-4e36-9577-210cabca0274",
+        "24fdcf0e-de8e-488d-963f-ae08c4832ef8",
+        "12208b3f-96d4-4656-b131-34e3926b1551",
+        "731ef0d2-a9f5-4f6e-a4a8-207466d9f2b2",
+        "1703e642-9383-4fea-adcf-77e30bdab354",
+        "8aff5f31-9704-436a-a9f4-f6328742b25c",
+        "38153ae4-5e44-4e3b-9f4b-f6d5c9c89e50",
+        "ed1fbeb0-0f64-4429-81d4-78201c4a42ef",
+        "e45346f8-4096-4974-a65e-5f15d858a33b",
+        "6c4f98bb-6fb4-43bb-8b8a-e3863c9ab2a8",
+        "2228911d-83e5-4897-97c4-43c56185a8b7",
+        "c979edae-4b0b-42d5-af47-ae4e4ea7ebc5",
+        "047c93f7-25f9-4322-b73d-9a844718839c",
+        "4458d531-81ac-4345-89d1-92180003e227"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "3d9308e7-0b47-4e36-9577-210cabca0274",
+      "title": "Simplify Raster brush",
+      "explanation": "This part of raster_brush.cpp removes 2 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/brush/raster_brush.cpp",
+      "startLine": 2,
+      "endLine": 2,
+      "area": "errors",
+      "added": 0,
+      "removed": 2
+    },
+    {
+      "id": "24fdcf0e-de8e-488d-963f-ae08c4832ef8",
+      "title": "Extend Raster brush",
+      "explanation": "This part of raster_brush.cpp adds 2 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/brush/raster_brush.cpp",
+      "startLine": 5,
+      "endLine": 6,
+      "area": "errors",
+      "added": 2,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "12208b3f-96d4-4656-b131-34e3926b1551",
+      "title": "Reshape Raster brush",
+      "explanation": "This part of raster_brush.cpp replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/brush/raster_brush.cpp",
+      "startLine": 13,
+      "endLine": 13,
+      "area": "errors",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "731ef0d2-a9f5-4f6e-a4a8-207466d9f2b2",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 3 lines and adds 6. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/brush/raster_brush.cpp",
+      "startLine": 16,
+      "endLine": 21,
+      "area": "errors",
+      "symbol": "if",
+      "added": 6,
+      "removed": 3,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "1703e642-9383-4fea-adcf-77e30bdab354",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/brush/raster_brush.cpp",
+      "startLine": 23,
+      "endLine": 24,
+      "area": "errors",
+      "symbol": "if",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "8aff5f31-9704-436a-a9f4-f6328742b25c",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/brush/raster_brush.cpp",
+      "startLine": 28,
+      "endLine": 28,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "38153ae4-5e44-4e3b-9f4b-f6d5c9c89e50",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 3 lines and adds 3. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/brush/raster_brush.cpp",
+      "startLine": 31,
+      "endLine": 33,
+      "area": "errors",
+      "symbol": "if",
+      "added": 3,
+      "removed": 3,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "ed1fbeb0-0f64-4429-81d4-78201c4a42ef",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 2 lines and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/brush/raster_brush.cpp",
+      "startLine": 41,
+      "endLine": 42,
+      "area": "errors",
+      "symbol": "if",
+      "added": 2,
+      "removed": 2,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "e45346f8-4096-4974-a65e-5f15d858a33b",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/brush/raster_brush.cpp",
+      "startLine": 45,
+      "endLine": 45,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "6c4f98bb-6fb4-43bb-8b8a-e3863c9ab2a8",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/brush/raster_brush.cpp",
+      "startLine": 49,
+      "endLine": 50,
+      "area": "errors",
+      "symbol": "if",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "2228911d-83e5-4897-97c4-43c56185a8b7",
+      "title": "Reshape Raster brush",
+      "explanation": "This part of raster_brush.cpp replaces 2 lines and adds 4. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/brush/raster_brush.cpp",
+      "startLine": 52,
+      "endLine": 55,
+      "area": "errors",
+      "added": 4,
+      "removed": 2,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "c979edae-4b0b-42d5-af47-ae4e4ea7ebc5",
+      "title": "Reshape Raster brush",
+      "explanation": "This part of raster_brush.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/brush/raster_brush.cpp",
+      "startLine": 57,
+      "endLine": 58,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "047c93f7-25f9-4322-b73d-9a844718839c",
+      "title": "Reshape Raster brush",
+      "explanation": "This part of raster_brush.cpp replaces 1 line and adds 3. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/brush/raster_brush.cpp",
+      "startLine": 60,
+      "endLine": 62,
+      "area": "errors",
+      "added": 3,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "4458d531-81ac-4345-89d1-92180003e227",
+      "title": "Reshape `Impl`",
+      "explanation": "The `Impl` section replaces 4 lines and adds 6. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "adapters/brush/raster_brush.cpp",
+      "startLine": 70,
+      "endLine": 75,
+      "area": "errors",
+      "symbol": "Impl",
+      "added": 6,
+      "removed": 4,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

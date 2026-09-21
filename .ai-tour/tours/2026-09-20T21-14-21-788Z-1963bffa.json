@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "id": "1963bffa-e8d2-470c-88aa-d37792307269",
+  "title": "Update Visual editing smoke",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from error handling to error handling.",
+  "createdAt": "2026-09-20T21:14:21.788Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "apps/desktop/visual_editing_smoke.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 111,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "3a81282a-6a19-402d-a2b6-0a54d7aaf294",
+        "461f35b4-33d8-40c3-949d-acb44c60ad5f"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "3a81282a-6a19-402d-a2b6-0a54d7aaf294",
+      "title": "Extend `require`",
+      "explanation": "The `require` section adds 73 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "apps/desktop/visual_editing_smoke.cpp",
+      "startLine": 209,
+      "endLine": 281,
+      "area": "errors",
+      "symbol": "require",
+      "added": 73,
+      "removed": 0
+    },
+    {
+      "id": "461f35b4-33d8-40c3-949d-acb44c60ad5f",
+      "title": "Extend `require`",
+      "explanation": "The `require` section adds 38 lines. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "apps/desktop/visual_editing_smoke.cpp",
+      "startLine": 283,
+      "endLine": 320,
+      "area": "errors",
+      "symbol": "require",
+      "added": 38,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

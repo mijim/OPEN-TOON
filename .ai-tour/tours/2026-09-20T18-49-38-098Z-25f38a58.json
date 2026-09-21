@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "25f38a58-5418-4389-8aed-4678fd179a00",
+  "title": "Update CMake User Presets",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from core logic to core logic.",
+  "createdAt": "2026-09-20T18:49:38.098Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "CMakeUserPresets.json",
+      "kind": "modified",
+      "area": "core",
+      "added": 2,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "core",
+      "label": "Core logic",
+      "stepIds": [
+        "18fdbf7f-8c77-45ec-bddd-5f22636edea4"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "18fdbf7f-8c77-45ec-bddd-5f22636edea4",
+      "title": "Reshape CMake User Presets",
+      "explanation": "This part of CMakeUserPresets.json replaces 1 line and adds 2. It updates a central part of the implementation. This is the main implementation change.",
+      "file": "CMakeUserPresets.json",
+      "startLine": 7,
+      "endLine": 8,
+      "area": "core",
+      "added": 2,
+      "removed": 1
+    }
+  ]
+}

@@ -1,0 +1,252 @@
+{
+  "version": 1,
+  "id": "54aef262-d3f0-47ad-99b1-4aefae03a3f7",
+  "title": "Improve error handling flow",
+  "summary": "5 files changed across 2 areas. The tour follows the implementation from tests to error handling. 39 smaller changes remain in the overview.",
+  "createdAt": "2026-09-20T19:56:18.957Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 2,
+      "removed": 3
+    },
+    {
+      "path": "modules/document/src/drawing_selection.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 105,
+      "removed": 59
+    },
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 272,
+      "removed": 129
+    },
+    {
+      "path": "adapters/qt/drawing_controller.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 27,
+      "removed": 12
+    },
+    {
+      "path": "adapters/qt/editor_controller.h",
+      "kind": "modified",
+      "area": "auth",
+      "added": 2,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "0138d689-8784-4063-bed1-05e790f4890f"
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "26f62b93-fe41-499a-825b-e18de3d33ceb",
+        "866ff4ca-8dec-457a-adbc-287386ba7b8c",
+        "af2fe734-b2ca-432d-ad41-84c9187e3626",
+        "eb43d4a2-7e09-474c-a597-0311df876569",
+        "84e7c631-dbd5-491f-8b94-33c91fd66ca2",
+        "3a952728-fb61-438b-bb03-aefc381480c1",
+        "ecc2eed2-e2eb-49e7-beb8-849b2ffc9201",
+        "1465c354-e3d9-4200-acb4-ef35073ed332",
+        "64b3cf35-e979-48a2-9ca9-e211f604831d",
+        "2f6c4e79-e9a7-4770-912d-afa94820bdc4",
+        "59734578-2eb1-45c9-b12b-608ce150c3ab",
+        "c5ef71c1-4704-4e35-8f6c-6dd4160b2deb",
+        "c3ec8c36-4b24-4e75-964b-ae3527703d2e"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "0138d689-8784-4063-bed1-05e790f4890f",
+      "title": "Reshape Main",
+      "explanation": "This part of main.cpp replaces 3 lines and adds 2. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 264,
+      "endLine": 265,
+      "area": "tests",
+      "added": 2,
+      "removed": 3
+    },
+    {
+      "id": "26f62b93-fe41-499a-825b-e18de3d33ceb",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 5 lines and adds 9. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 153,
+      "endLine": 161,
+      "area": "errors",
+      "symbol": "if",
+      "added": 9,
+      "removed": 5,
+      "relation": "Builds on main.cpp and moves into error handling."
+    },
+    {
+      "id": "866ff4ca-8dec-457a-adbc-287386ba7b8c",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 14 lines and adds 21. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 164,
+      "endLine": 184,
+      "area": "errors",
+      "symbol": "if",
+      "added": 21,
+      "removed": 14,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "af2fe734-b2ca-432d-ad41-84c9187e3626",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 6. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 186,
+      "endLine": 191,
+      "area": "errors",
+      "symbol": "for",
+      "added": 6,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "eb43d4a2-7e09-474c-a597-0311df876569",
+      "title": "Simplify `for`",
+      "explanation": "The `for` section removes 3 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 193,
+      "endLine": 193,
+      "area": "errors",
+      "symbol": "for",
+      "added": 0,
+      "removed": 3,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "84e7c631-dbd5-491f-8b94-33c91fd66ca2",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 195,
+      "endLine": 195,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "3a952728-fb61-438b-bb03-aefc381480c1",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 5 lines and adds 12. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 197,
+      "endLine": 208,
+      "area": "errors",
+      "symbol": "if",
+      "added": 12,
+      "removed": 5,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "ecc2eed2-e2eb-49e7-beb8-849b2ffc9201",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 4 lines and adds 9. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 210,
+      "endLine": 218,
+      "area": "errors",
+      "symbol": "if",
+      "added": 9,
+      "removed": 4,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "1465c354-e3d9-4200-acb4-ef35073ed332",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 220,
+      "endLine": 220,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "64b3cf35-e979-48a2-9ca9-e211f604831d",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 20 lines and adds 43. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 222,
+      "endLine": 264,
+      "area": "errors",
+      "symbol": "if",
+      "added": 43,
+      "removed": 20,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "2f6c4e79-e9a7-4770-912d-afa94820bdc4",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 4 lines and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 266,
+      "endLine": 267,
+      "area": "errors",
+      "symbol": "for",
+      "added": 2,
+      "removed": 4,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "59734578-2eb1-45c9-b12b-608ce150c3ab",
+      "title": "Reshape Drawing selection",
+      "explanation": "This part of drawing_selection.cpp replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 270,
+      "endLine": 270,
+      "area": "errors",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "c5ef71c1-4704-4e35-8f6c-6dd4160b2deb",
+      "title": "Extend Canvas item",
+      "explanation": "This part of canvas_item.cpp adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 4,
+      "endLine": 4,
+      "area": "errors",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "c3ec8c36-4b24-4e75-964b-ae3527703d2e",
+      "title": "Extend Canvas item",
+      "explanation": "This part of canvas_item.cpp adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 9,
+      "endLine": 9,
+      "area": "errors",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

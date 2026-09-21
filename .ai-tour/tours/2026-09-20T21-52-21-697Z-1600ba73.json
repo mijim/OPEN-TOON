@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "id": "1600ba73-6b41-4a6d-a999-7814bfe1446c",
+  "title": "Improve error handling flow",
+  "summary": "4 files changed across 4 areas. The tour follows the implementation from api to error handling.",
+  "createdAt": "2026-09-20T21:52:21.697Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/canvas_item.h",
+      "kind": "modified",
+      "area": "api",
+      "added": 2,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/canvas_motion_path.cpp",
+      "kind": "modified",
+      "area": "validation",
+      "added": 5,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/editor_controller.h",
+      "kind": "modified",
+      "area": "auth",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "path": "apps/desktop/motion_path_smoke.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 7,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "api",
+      "label": "API",
+      "stepIds": [
+        "88c1abf7-0b79-420b-829e-6ed9f5d3830c"
+      ]
+    },
+    {
+      "id": "validation",
+      "label": "Validation",
+      "stepIds": [
+        "1a36d7bc-1734-4e3b-aa8a-9fc662b13ab4"
+      ]
+    },
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "7be232e0-d6b3-4451-9323-f932214b1028"
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "a3da4ccd-4f8d-45c3-9c08-7d0353187114",
+        "3c8aee5d-1f09-4dff-bea0-120f4b829e6e"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "88c1abf7-0b79-420b-829e-6ed9f5d3830c",
+      "title": "Extend Canvas item",
+      "explanation": "This part of canvas_item.h adds 2 lines. It updates the boundary where the application exchanges data. This is the first building block in the change.",
+      "file": "adapters/qt/canvas_item.h",
+      "startLine": 73,
+      "endLine": 74,
+      "area": "api",
+      "added": 2,
+      "removed": 0
+    },
+    {
+      "id": "1a36d7bc-1734-4e3b-aa8a-9fc662b13ab4",
+      "title": "Extend Canvas motion path",
+      "explanation": "This part of canvas_motion_path.cpp adds 5 lines. It strengthens the checks applied before data is accepted. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_motion_path.cpp",
+      "startLine": 10,
+      "endLine": 14,
+      "area": "validation",
+      "added": 5,
+      "removed": 0,
+      "relation": "Builds on canvas_item.h and moves into validation."
+    },
+    {
+      "id": "7be232e0-d6b3-4451-9323-f932214b1028",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.h adds 1 line. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 61,
+      "endLine": 61,
+      "area": "auth",
+      "added": 1,
+      "removed": 0,
+      "relation": "Builds on canvas_motion_path.cpp and moves into authentication."
+    },
+    {
+      "id": "a3da4ccd-4f8d-45c3-9c08-7d0353187114",
+      "title": "Extend Motion path smoke",
+      "explanation": "This part of motion_path_smoke.cpp adds 5 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/motion_path_smoke.cpp",
+      "startLine": 45,
+      "endLine": 49,
+      "area": "errors",
+      "added": 5,
+      "removed": 0,
+      "relation": "Builds on editor_controller.h and moves into error handling."
+    },
+    {
+      "id": "3c8aee5d-1f09-4dff-bea0-120f4b829e6e",
+      "title": "Extend `require`",
+      "explanation": "The `require` section adds 2 lines. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "apps/desktop/motion_path_smoke.cpp",
+      "startLine": 117,
+      "endLine": 118,
+      "area": "errors",
+      "symbol": "require",
+      "added": 2,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

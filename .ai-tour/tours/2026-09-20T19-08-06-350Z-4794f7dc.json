@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "id": "4794f7dc-7f1c-45b7-97fa-6c05a2b64935",
+  "title": "Improve tests flow",
+  "summary": "2 files changed across 2 areas. The tour follows the implementation from authentication to tests.",
+  "createdAt": "2026-09-20T19:08:06.350Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/editor_controller.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 3,
+      "removed": 0
+    },
+    {
+      "path": "tests/export_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 8,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "4434f324-7e0c-4c76-ad3c-150339aad16a"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "d4aa6725-4078-49ee-8f23-e033cded1b6a",
+        "d68ef7a3-4edd-43f9-8572-9df5f40259e6"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "4434f324-7e0c-4c76-ad3c-150339aad16a",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.cpp adds 3 lines. It changes how identity or session data moves through the solution. This is the first building block in the change.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 705,
+      "endLine": 707,
+      "area": "auth",
+      "added": 3,
+      "removed": 0
+    },
+    {
+      "id": "d4aa6725-4078-49ee-8f23-e033cded1b6a",
+      "title": "Extend `REQUIRE`",
+      "explanation": "The `REQUIRE` section adds 2 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "tests/export_tests.cpp",
+      "startLine": 99,
+      "endLine": 100,
+      "area": "tests",
+      "symbol": "REQUIRE",
+      "added": 2,
+      "removed": 0,
+      "relation": "Builds on editor_controller.cpp and moves into tests."
+    },
+    {
+      "id": "d68ef7a3-4edd-43f9-8572-9df5f40259e6",
+      "title": "Extend `REQUIRE`",
+      "explanation": "The `REQUIRE` section adds 6 lines. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "tests/export_tests.cpp",
+      "startLine": 107,
+      "endLine": 112,
+      "area": "tests",
+      "symbol": "REQUIRE",
+      "added": 6,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

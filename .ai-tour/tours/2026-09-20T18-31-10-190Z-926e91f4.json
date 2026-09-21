@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "id": "926e91f4-b0f5-403f-9350-7e76b520f060",
+  "title": "Update Conanfile",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from error handling to error handling.",
+  "createdAt": "2026-09-20T18:31:10.190Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "conanfile.py",
+      "kind": "modified",
+      "area": "errors",
+      "added": 4,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "4699d673-16c9-49f8-ab7b-79c87bf48a59"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "4699d673-16c9-49f8-ab7b-79c87bf48a59",
+      "title": "Extend `requirements`",
+      "explanation": "The `requirements` section adds 4 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the main implementation change.",
+      "file": "conanfile.py",
+      "startLine": 15,
+      "endLine": 18,
+      "area": "errors",
+      "symbol": "requirements",
+      "added": 4,
+      "removed": 0
+    }
+  ]
+}

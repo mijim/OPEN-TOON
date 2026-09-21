@@ -1,0 +1,182 @@
+{
+  "version": 1,
+  "id": "00745caf-2bad-4908-abfe-b1290c84c008",
+  "title": "Improve tests flow",
+  "summary": "4 files changed across 3 areas. The tour follows the implementation from authentication to error handling.",
+  "createdAt": "2026-09-20T17:42:54.271Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/editor_controller.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "path": "adapters/qt/editor_controller.h",
+      "kind": "modified",
+      "area": "tests",
+      "added": 4,
+      "removed": 0
+    },
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 2,
+      "removed": 2
+    },
+    {
+      "path": "modules/document/src/document.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 14,
+      "removed": 6
+    }
+  ],
+  "areas": [
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "204b3bb7-a07c-41a9-8fbc-876de1065d6a"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "c1b290c8-a522-4637-889f-9a1ae7bf508c",
+        "5fdc1da0-ca16-4528-a4cc-98942834c7ea",
+        "66dc0e0b-6236-4fe3-bd16-6e89ffadc1cf",
+        "4937f1fe-11a3-4b5b-840b-2c1f573dfe92"
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "27544c6a-c1c4-4ef9-9383-87192f937ca5",
+        "3936ec6b-7cb5-4a91-a16d-1612092937d6",
+        "c1ef4b1b-eead-451b-b447-eb16b1d6c66b",
+        "2953578e-2fe4-4ba0-96f6-fd9c7fa983ad"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "204b3bb7-a07c-41a9-8fbc-876de1065d6a",
+      "title": "Reshape Editor controller",
+      "explanation": "This part of editor_controller.cpp replaces 1 line and adds 1. It changes how identity or session data moves through the solution. This is the first building block in the change.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 18,
+      "endLine": 18,
+      "area": "auth",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "id": "c1b290c8-a522-4637-889f-9a1ae7bf508c",
+      "title": "Extend `EditorController`",
+      "explanation": "The `EditorController` section adds 2 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 27,
+      "endLine": 28,
+      "area": "tests",
+      "symbol": "EditorController",
+      "added": 2,
+      "removed": 0,
+      "relation": "Builds on editor_controller.cpp and moves into tests."
+    },
+    {
+      "id": "5fdc1da0-ca16-4528-a4cc-98942834c7ea",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.h adds 2 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 59,
+      "endLine": 60,
+      "area": "tests",
+      "added": 2,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "66dc0e0b-6236-4fe3-bd16-6e89ffadc1cf",
+      "title": "Reshape Main",
+      "explanation": "This part of main.cpp replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 33,
+      "endLine": 33,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "4937f1fe-11a3-4b5b-840b-2c1f573dfe92",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 58,
+      "endLine": 58,
+      "area": "tests",
+      "symbol": "for",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "27544c6a-c1c4-4ef9-9383-87192f937ca5",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 3 lines and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/document.cpp",
+      "startLine": 314,
+      "endLine": 314,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 3,
+      "relation": "Builds on main.cpp and moves into error handling."
+    },
+    {
+      "id": "3936ec6b-7cb5-4a91-a16d-1612092937d6",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 10 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/document.cpp",
+      "startLine": 324,
+      "endLine": 333,
+      "area": "errors",
+      "symbol": "if",
+      "added": 10,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "c1ef4b1b-eead-451b-b447-eb16b1d6c66b",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 2 lines and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/document.cpp",
+      "startLine": 346,
+      "endLine": 347,
+      "area": "errors",
+      "symbol": "if",
+      "added": 2,
+      "removed": 2,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "2953578e-2fe4-4ba0-96f6-fd9c7fa983ad",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "modules/document/src/document.cpp",
+      "startLine": 360,
+      "endLine": 360,
+      "area": "errors",
+      "symbol": "for",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

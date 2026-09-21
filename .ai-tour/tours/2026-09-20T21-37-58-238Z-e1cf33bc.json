@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "e1cf33bc-4204-4e6b-ae01-a2518192b1e7",
+  "title": "Update Status",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T21:37:58.238Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "docs/implementation/status.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "7d8a9150-ed9a-473a-807a-ef8a54f50746"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "7d8a9150-ed9a-473a-807a-ef8a54f50746",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This is the main implementation change.",
+      "file": "docs/implementation/status.json",
+      "startLine": 167,
+      "endLine": 167,
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    }
+  ]
+}

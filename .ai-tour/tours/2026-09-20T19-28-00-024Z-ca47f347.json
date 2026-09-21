@@ -1,0 +1,234 @@
+{
+  "version": 1,
+  "id": "ca47f347-36ae-420f-b33f-ac7b1bac3f5e",
+  "title": "Improve error handling flow",
+  "summary": "4 files changed across 1 area. The tour follows the implementation from error handling to error handling. 21 smaller changes remain in the overview.",
+  "createdAt": "2026-09-20T19:28:00.024Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/animation_controller.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 56,
+      "removed": 25
+    },
+    {
+      "path": "adapters/qt/editor_controller.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 4,
+      "removed": 2
+    },
+    {
+      "path": "modules/document/include/opentoon/animation.h",
+      "kind": "modified",
+      "area": "api",
+      "added": 2,
+      "removed": 4
+    },
+    {
+      "path": "modules/document/src/animation.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 46,
+      "removed": 23
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "654c3b49-f7fa-4589-95f1-e66822608d9d",
+        "d46df2da-0e55-4783-bc77-e898b7b6ec56",
+        "9ff4ccdb-617b-48b4-b380-933a7bfc3a4d",
+        "e61544df-8666-4cca-8fe2-2e09fe40eb5e",
+        "e1b43fb1-d443-4ecc-93dd-71162d158248",
+        "e1eee7db-20ff-4c33-a518-a017580b6778",
+        "0b914535-0b8a-4aca-a913-883e8c5231e3",
+        "f769ddd3-4e74-43fb-b041-9b0a959207ef",
+        "9bdbc36a-36df-4c89-b744-340849545a1f",
+        "481f5d94-0972-4d25-8525-864656771903",
+        "3dc95580-c156-4bb1-920f-1c4e6abdf451",
+        "2e744540-9fae-4f3b-9070-dc27a2bb5e99",
+        "fc0fadc1-b96f-47fb-89e5-19603d0e5601",
+        "9257aff6-7e4d-4e02-9c50-f69be1b80621"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "654c3b49-f7fa-4589-95f1-e66822608d9d",
+      "title": "Reshape Animation controller",
+      "explanation": "This part of animation_controller.cpp replaces 2 lines and adds 3. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 7,
+      "endLine": 9,
+      "area": "errors",
+      "added": 3,
+      "removed": 2
+    },
+    {
+      "id": "d46df2da-0e55-4783-bc77-e898b7b6ec56",
+      "title": "Reshape Animation controller",
+      "explanation": "This part of animation_controller.cpp replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 11,
+      "endLine": 11,
+      "area": "errors",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "9ff4ccdb-617b-48b4-b380-933a7bfc3a4d",
+      "title": "Reshape Animation controller",
+      "explanation": "This part of animation_controller.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 13,
+      "endLine": 14,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "e61544df-8666-4cca-8fe2-2e09fe40eb5e",
+      "title": "Reshape Animation controller",
+      "explanation": "This part of animation_controller.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 20,
+      "endLine": 21,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "e1b43fb1-d443-4ecc-93dd-71162d158248",
+      "title": "Reshape Animation controller",
+      "explanation": "This part of animation_controller.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 27,
+      "endLine": 28,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "e1eee7db-20ff-4c33-a518-a017580b6778",
+      "title": "Reshape Animation controller",
+      "explanation": "This part of animation_controller.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 38,
+      "endLine": 39,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "0b914535-0b8a-4aca-a913-883e8c5231e3",
+      "title": "Reshape Animation controller",
+      "explanation": "This part of animation_controller.cpp replaces 4 lines and adds 8. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 41,
+      "endLine": 48,
+      "area": "errors",
+      "added": 8,
+      "removed": 4,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "f769ddd3-4e74-43fb-b041-9b0a959207ef",
+      "title": "Reshape Animation controller",
+      "explanation": "This part of animation_controller.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 53,
+      "endLine": 54,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "9bdbc36a-36df-4c89-b744-340849545a1f",
+      "title": "Reshape Animation controller",
+      "explanation": "This part of animation_controller.cpp replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 59,
+      "endLine": 60,
+      "area": "errors",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "481f5d94-0972-4d25-8525-864656771903",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 63,
+      "endLine": 64,
+      "area": "errors",
+      "symbol": "for",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "3dc95580-c156-4bb1-920f-1c4e6abdf451",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 2 lines and adds 7. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 66,
+      "endLine": 72,
+      "area": "errors",
+      "symbol": "for",
+      "added": 7,
+      "removed": 2,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "2e744540-9fae-4f3b-9070-dc27a2bb5e99",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 76,
+      "endLine": 77,
+      "area": "errors",
+      "symbol": "for",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "fc0fadc1-b96f-47fb-89e5-19603d0e5601",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 5. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 80,
+      "endLine": 84,
+      "area": "errors",
+      "symbol": "if",
+      "added": 5,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "9257aff6-7e4d-4e02-9c50-f69be1b80621",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 5. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 86,
+      "endLine": 90,
+      "area": "errors",
+      "symbol": "if",
+      "added": 5,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

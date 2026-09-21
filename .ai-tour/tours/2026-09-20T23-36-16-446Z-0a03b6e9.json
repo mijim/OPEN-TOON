@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "id": "0a03b6e9-5a8b-49de-8126-8fcb52faff96",
+  "title": "Improve validation flow",
+  "summary": "2 files changed across 2 areas. The tour follows the implementation from validation to interface.",
+  "createdAt": "2026-09-20T23:36:16.446Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "scripts/finalize_macos.py",
+      "kind": "created",
+      "area": "validation",
+      "added": 47,
+      "removed": 0
+    },
+    {
+      "path": "docs/implementation/macos-dependencies.json",
+      "kind": "created",
+      "area": "ui",
+      "added": 195,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "validation",
+      "label": "Validation",
+      "stepIds": [
+        "c4e7742d-6c3e-4d81-82aa-1322415edce5"
+      ]
+    },
+    {
+      "id": "ui",
+      "label": "Interface",
+      "stepIds": [
+        "2a703f26-87a1-4124-ab25-d3ab7c04a5d8"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "c4e7742d-6c3e-4d81-82aa-1322415edce5",
+      "title": "Introduce Finalize macos",
+      "explanation": "This part of finalize_macos.py adds 47 lines. It strengthens the checks applied before data is accepted. This is the first building block in the change.",
+      "file": "scripts/finalize_macos.py",
+      "startLine": 1,
+      "endLine": 47,
+      "area": "validation",
+      "added": 47,
+      "removed": 0
+    },
+    {
+      "id": "2a703f26-87a1-4124-ab25-d3ab7c04a5d8",
+      "title": "Introduce Macos dependencies",
+      "explanation": "This part of macos-dependencies.json adds 195 lines. It changes what the user sees or how the interface responds. This completes the path introduced by the earlier steps.",
+      "file": "docs/implementation/macos-dependencies.json",
+      "startLine": 1,
+      "endLine": 195,
+      "area": "ui",
+      "added": 195,
+      "removed": 0,
+      "relation": "Builds on finalize_macos.py and moves into interface."
+    }
+  ]
+}

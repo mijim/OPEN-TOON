@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "id": "5c913da2-9857-46b5-8dd5-209456f8ab58",
+  "title": "Improve error handling flow",
+  "summary": "2 files changed across 2 areas. The tour follows the implementation from error handling to tests.",
+  "createdAt": "2026-09-20T17:44:57.437Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/storage/project_store.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 14,
+      "removed": 0
+    },
+    {
+      "path": "tests/storage_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 42,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "0dbd5ab3-2b88-483f-b808-bc7441506479",
+        "7610d2ad-3db1-49d7-84f0-58f8bd4b21d6",
+        "73482033-d280-48eb-b060-3acd52e1a33f",
+        "206ff93f-a1c3-4029-88ef-3fe28c727cbc"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "0262139f-c9bf-4f88-a598-9b802289e36f"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "0dbd5ab3-2b88-483f-b808-bc7441506479",
+      "title": "Extend `Statement`",
+      "explanation": "The `Statement` section adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 68,
+      "endLine": 68,
+      "area": "errors",
+      "symbol": "Statement",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "id": "7610d2ad-3db1-49d7-84f0-58f8bd4b21d6",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 7 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 70,
+      "endLine": 76,
+      "area": "errors",
+      "symbol": "if",
+      "added": 7,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "73482033-d280-48eb-b060-3acd52e1a33f",
+      "title": "Extend Project store",
+      "explanation": "This part of project_store.cpp adds 3 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 112,
+      "endLine": 114,
+      "area": "errors",
+      "added": 3,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "206ff93f-a1c3-4029-88ef-3fe28c727cbc",
+      "title": "Extend Project store",
+      "explanation": "This part of project_store.cpp adds 3 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 129,
+      "endLine": 131,
+      "area": "errors",
+      "added": 3,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "0262139f-c9bf-4f88-a598-9b802289e36f",
+      "title": "Extend `TEST_CASE`",
+      "explanation": "The `TEST_CASE` section adds 42 lines. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "tests/storage_tests.cpp",
+      "startLine": 66,
+      "endLine": 107,
+      "area": "tests",
+      "symbol": "TEST_CASE",
+      "added": 42,
+      "removed": 0,
+      "relation": "Builds on project_store.cpp and moves into tests."
+    }
+  ]
+}

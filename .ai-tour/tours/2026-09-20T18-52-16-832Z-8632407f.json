@@ -1,0 +1,108 @@
+{
+  "version": 1,
+  "id": "8632407f-46cd-4d9f-8d04-d4eaedd001c7",
+  "title": "Improve state flow",
+  "summary": "3 files changed across 3 areas. The tour follows the implementation from error handling to tests.",
+  "createdAt": "2026-09-20T18:52:16.832Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/brush/raster_brush.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 2,
+      "removed": 0
+    },
+    {
+      "path": "adapters/render/scene_renderer.cpp",
+      "kind": "modified",
+      "area": "state",
+      "added": 5,
+      "removed": 5
+    },
+    {
+      "path": "tests/raster_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 13,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "848d1854-8edf-4e88-9e96-bb0e57ba35f5"
+      ]
+    },
+    {
+      "id": "state",
+      "label": "State",
+      "stepIds": [
+        "99421963-6aee-40b8-9076-5bbeea7b12a0",
+        "6e35c322-2bf5-4504-b9d2-ae00d4508929"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "08dada6a-6570-4e81-b8a3-048a8bf032f2"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "848d1854-8edf-4e88-9e96-bb0e57ba35f5",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 2 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/brush/raster_brush.cpp",
+      "startLine": 134,
+      "endLine": 135,
+      "area": "errors",
+      "symbol": "if",
+      "added": 2,
+      "removed": 0
+    },
+    {
+      "id": "99421963-6aee-40b8-9076-5bbeea7b12a0",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 5 lines. It changes the source of truth or the way updates propagate. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/render/scene_renderer.cpp",
+      "startLine": 44,
+      "endLine": 48,
+      "area": "state",
+      "symbol": "if",
+      "added": 5,
+      "removed": 0,
+      "relation": "Builds on raster_brush.cpp and moves into state."
+    },
+    {
+      "id": "6e35c322-2bf5-4504-b9d2-ae00d4508929",
+      "title": "Simplify `if`",
+      "explanation": "The `if` section removes 5 lines. It changes the source of truth or the way updates propagate. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/render/scene_renderer.cpp",
+      "startLine": 59,
+      "endLine": 59,
+      "area": "state",
+      "symbol": "if",
+      "added": 0,
+      "removed": 5,
+      "relation": "Continues the state thread from the previous step."
+    },
+    {
+      "id": "08dada6a-6570-4e81-b8a3-048a8bf032f2",
+      "title": "Extend `REQUIRE`",
+      "explanation": "The `REQUIRE` section adds 13 lines. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "tests/raster_tests.cpp",
+      "startLine": 52,
+      "endLine": 64,
+      "area": "tests",
+      "symbol": "REQUIRE",
+      "added": 13,
+      "removed": 0,
+      "relation": "Builds on scene_renderer.cpp and moves into tests."
+    }
+  ]
+}

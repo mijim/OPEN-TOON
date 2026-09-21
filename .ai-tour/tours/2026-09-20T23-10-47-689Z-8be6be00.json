@@ -1,0 +1,160 @@
+{
+  "version": 1,
+  "id": "8be6be00-ef04-4848-a74d-180aed910e72",
+  "title": "Improve error handling flow",
+  "summary": "5 files changed across 3 areas. The tour follows the implementation from error handling to api.",
+  "createdAt": "2026-09-20T23:10:47.689Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/drawing_controller.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 29,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/editor_controller.h",
+      "kind": "modified",
+      "area": "auth",
+      "added": 6,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/key_selection_controller.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 20,
+      "removed": 0
+    },
+    {
+      "path": "modules/document/include/opentoon/key_block.h",
+      "kind": "modified",
+      "area": "api",
+      "added": 4,
+      "removed": 0
+    },
+    {
+      "path": "modules/document/src/key_block.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 45,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "007b4f57-97fc-4808-b403-c2d8f47b63fa",
+        "750858f0-5ba6-4183-9b22-b31622413ee4",
+        "885d3f52-e1c8-49da-8e6b-5df5b2dada43",
+        "8452dff9-1f62-4e64-adc6-fe273c5a022a"
+      ]
+    },
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "9c177564-0e17-4cfc-81b0-41fa016815ee",
+        "76f57871-1023-4315-ac43-9563d2fea61d"
+      ]
+    },
+    {
+      "id": "api",
+      "label": "API",
+      "stepIds": [
+        "a5850495-aa6d-4473-aa85-bfdcdf844525"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "007b4f57-97fc-4808-b403-c2d8f47b63fa",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 29 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/qt/drawing_controller.cpp",
+      "startLine": 88,
+      "endLine": 116,
+      "area": "errors",
+      "symbol": "if",
+      "added": 29,
+      "removed": 0
+    },
+    {
+      "id": "750858f0-5ba6-4183-9b22-b31622413ee4",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 20 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/key_selection_controller.cpp",
+      "startLine": 139,
+      "endLine": 158,
+      "area": "errors",
+      "symbol": "if",
+      "added": 20,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "885d3f52-e1c8-49da-8e6b-5df5b2dada43",
+      "title": "Extend Key block",
+      "explanation": "This part of key_block.cpp adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/key_block.cpp",
+      "startLine": 2,
+      "endLine": 2,
+      "area": "errors",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "8452dff9-1f62-4e64-adc6-fe273c5a022a",
+      "title": "Extend `for`",
+      "explanation": "The `for` section adds 44 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/key_block.cpp",
+      "startLine": 90,
+      "endLine": 133,
+      "area": "errors",
+      "symbol": "for",
+      "added": 44,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "9c177564-0e17-4cfc-81b0-41fa016815ee",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.h adds 1 line. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 3,
+      "endLine": 3,
+      "area": "auth",
+      "added": 1,
+      "removed": 0,
+      "relation": "Builds on key_block.cpp and moves into authentication."
+    },
+    {
+      "id": "76f57871-1023-4315-ac43-9563d2fea61d",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.h adds 5 lines. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 79,
+      "endLine": 83,
+      "area": "auth",
+      "added": 5,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "a5850495-aa6d-4473-aa85-bfdcdf844525",
+      "title": "Extend Key block",
+      "explanation": "This part of key_block.h adds 4 lines. It updates the boundary where the application exchanges data. This completes the path introduced by the earlier steps.",
+      "file": "modules/document/include/opentoon/key_block.h",
+      "startLine": 13,
+      "endLine": 16,
+      "area": "api",
+      "added": 4,
+      "removed": 0,
+      "relation": "Builds on editor_controller.h and moves into api."
+    }
+  ]
+}

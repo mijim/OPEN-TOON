@@ -1,0 +1,171 @@
+{
+  "version": 1,
+  "id": "156b4f73-0c90-4581-96fc-37de71f55cdd",
+  "title": "Improve authentication flow",
+  "summary": "5 files changed across 3 areas. The tour follows the implementation from authentication to api.",
+  "createdAt": "2026-09-20T19:37:27.108Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "modules/document/include/opentoon/drawing_selection.h",
+      "kind": "created",
+      "area": "auth",
+      "added": 14,
+      "removed": 0
+    },
+    {
+      "path": "modules/document/src/drawing_selection.cpp",
+      "kind": "created",
+      "area": "errors",
+      "added": 117,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/drawing_controller.cpp",
+      "kind": "created",
+      "area": "api",
+      "added": 16,
+      "removed": 0
+    },
+    {
+      "path": "adapters/qt/editor_controller.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "path": "adapters/qt/editor_controller.h",
+      "kind": "modified",
+      "area": "auth",
+      "added": 6,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "bd721b7b-1e8d-42cd-9dda-89e75d2c8a24",
+        "15d3c80b-898c-4582-8889-df451708c9ab",
+        "33059240-a8ab-4b75-9bd3-3f3861012ebb",
+        "ad452799-81a2-4cb5-a0c3-0f435efcc39a",
+        "99c28179-0d09-495b-81cf-707f2c6d6e7d",
+        "97208fe2-e148-4c90-9df5-36ecc81e9c3b"
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "4fc5fec7-5426-4fe4-bad0-3020c041a01c"
+      ]
+    },
+    {
+      "id": "api",
+      "label": "API",
+      "stepIds": [
+        "cdfb223e-29dd-4a21-834f-c08583ee0efd"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "bd721b7b-1e8d-42cd-9dda-89e75d2c8a24",
+      "title": "Introduce Drawing selection",
+      "explanation": "This part of drawing_selection.h adds 14 lines. It changes how identity or session data moves through the solution. This is the first building block in the change.",
+      "file": "modules/document/include/opentoon/drawing_selection.h",
+      "startLine": 1,
+      "endLine": 14,
+      "area": "auth",
+      "added": 14,
+      "removed": 0
+    },
+    {
+      "id": "15d3c80b-898c-4582-8889-df451708c9ab",
+      "title": "Reshape Editor controller",
+      "explanation": "This part of editor_controller.cpp replaces 1 line and adds 1. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 170,
+      "endLine": 170,
+      "area": "auth",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "33059240-a8ab-4b75-9bd3-3f3861012ebb",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.h adds 1 line. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 3,
+      "endLine": 3,
+      "area": "auth",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "ad452799-81a2-4cb5-a0c3-0f435efcc39a",
+      "title": "Extend `EditorController`",
+      "explanation": "The `EditorController` section adds 1 line. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 44,
+      "endLine": 44,
+      "area": "auth",
+      "symbol": "EditorController",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "99c28179-0d09-495b-81cf-707f2c6d6e7d",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.h adds 3 lines. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 103,
+      "endLine": 105,
+      "area": "auth",
+      "added": 3,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "97208fe2-e148-4c90-9df5-36ecc81e9c3b",
+      "title": "Reshape Editor controller",
+      "explanation": "This part of editor_controller.h replaces 1 line and adds 1. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 187,
+      "endLine": 187,
+      "area": "auth",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "4fc5fec7-5426-4fe4-bad0-3020c041a01c",
+      "title": "Introduce Drawing selection",
+      "explanation": "This part of drawing_selection.cpp adds 117 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/drawing_selection.cpp",
+      "startLine": 1,
+      "endLine": 117,
+      "area": "errors",
+      "added": 117,
+      "removed": 0,
+      "relation": "Builds on editor_controller.h and moves into error handling."
+    },
+    {
+      "id": "cdfb223e-29dd-4a21-834f-c08583ee0efd",
+      "title": "Introduce Drawing controller",
+      "explanation": "This part of drawing_controller.cpp adds 16 lines. It updates the boundary where the application exchanges data. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/drawing_controller.cpp",
+      "startLine": 1,
+      "endLine": 16,
+      "area": "api",
+      "added": 16,
+      "removed": 0,
+      "relation": "Builds on drawing_selection.cpp and moves into api."
+    }
+  ]
+}

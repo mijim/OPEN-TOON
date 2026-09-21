@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "id": "1dbc063b-48da-4fff-9905-01f16ead8ce0",
+  "title": "Improve tests flow",
+  "summary": "4 files changed across 2 areas. The tour follows the implementation from api to tests.",
+  "createdAt": "2026-09-21T10:27:34.805Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "docs/catalog/domains.json",
+      "kind": "modified",
+      "area": "api",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "path": "docs/implementation/status.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 6,
+      "removed": 0
+    },
+    {
+      "path": "docs/planning/roadmap.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "path": "scripts/roadmap.py",
+      "kind": "modified",
+      "area": "tests",
+      "added": 6,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "api",
+      "label": "API",
+      "stepIds": [
+        "e0497261-c4e5-47e5-b94b-644e649c17d4"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "c8ba3ec3-8d84-4839-96b9-f62a07bb30aa",
+        "a7f7d871-a52a-4d7e-85dd-a084aa17ee49",
+        "d166a20f-6505-49c6-bf1d-fa410c53bf3f",
+        "e14b7edb-61da-404f-92ba-e9bd8be98c4f",
+        "37dda606-00f5-4077-9a73-5a35276fe5a6"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "e0497261-c4e5-47e5-b94b-644e649c17d4",
+      "title": "Reshape Domains",
+      "explanation": "This part of domains.json replaces 1 line and adds 1. It updates the boundary where the application exchanges data. This is the first building block in the change.",
+      "file": "docs/catalog/domains.json",
+      "startLine": 196,
+      "endLine": 196,
+      "area": "api",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "id": "c8ba3ec3-8d84-4839-96b9-f62a07bb30aa",
+      "title": "Extend Status",
+      "explanation": "This part of status.json adds 6 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/implementation/status.json",
+      "startLine": 293,
+      "endLine": 298,
+      "area": "tests",
+      "added": 6,
+      "removed": 0,
+      "relation": "Builds on domains.json and moves into tests."
+    },
+    {
+      "id": "a7f7d871-a52a-4d7e-85dd-a084aa17ee49",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 1676,
+      "endLine": 1676,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "d166a20f-6505-49c6-bf1d-fa410c53bf3f",
+      "title": "Extend Roadmap",
+      "explanation": "This part of roadmap.py adds 2 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "scripts/roadmap.py",
+      "startLine": 262,
+      "endLine": 263,
+      "area": "tests",
+      "added": 2,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "e14b7edb-61da-404f-92ba-e9bd8be98c4f",
+      "title": "Extend Roadmap",
+      "explanation": "This part of roadmap.py adds 2 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "scripts/roadmap.py",
+      "startLine": 268,
+      "endLine": 269,
+      "area": "tests",
+      "added": 2,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "37dda606-00f5-4077-9a73-5a35276fe5a6",
+      "title": "Extend Roadmap",
+      "explanation": "This part of roadmap.py adds 2 lines. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "scripts/roadmap.py",
+      "startLine": 273,
+      "endLine": 274,
+      "area": "tests",
+      "added": 2,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "id": "28e1944a-8c77-4892-8fca-43e2cff74bc5",
+  "title": "Improve tests flow",
+  "summary": "2 files changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-21T10:30:58.725Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "docs/implementation/status.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 2,
+      "removed": 2
+    },
+    {
+      "path": "docs/planning/roadmap.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "8d5c9629-930d-42a3-a6cd-798721d50df7",
+        "58d1e9f8-b7cc-4bc1-91fd-3f331c092340",
+        "69aa0b2b-b976-4c42-afb7-6b3bf2ca4d5b"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "8d5c9629-930d-42a3-a6cd-798721d50df7",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "docs/implementation/status.json",
+      "startLine": 56,
+      "endLine": 56,
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "id": "58d1e9f8-b7cc-4bc1-91fd-3f331c092340",
+      "title": "Reshape Status",
+      "explanation": "This part of status.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/implementation/status.json",
+      "startLine": 62,
+      "endLine": 62,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "69aa0b2b-b976-4c42-afb7-6b3bf2ca4d5b",
+      "title": "Reshape Roadmap",
+      "explanation": "This part of roadmap.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "docs/planning/roadmap.json",
+      "startLine": 5141,
+      "endLine": 5141,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

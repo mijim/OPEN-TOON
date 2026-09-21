@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "id": "f5b1a7fe-28f9-4017-b25b-3642b32ce8e1",
+  "title": "Improve error handling flow",
+  "summary": "2 files changed across 2 areas. The tour follows the implementation from error handling to tests.",
+  "createdAt": "2026-09-20T18:46:28.828Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/timeline_controller.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 6,
+      "removed": 1
+    },
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 36,
+      "removed": 2
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "9e0abe19-fdd6-4526-a933-bad4fa62babf",
+        "ea138abc-5411-46ba-b504-97285202070d"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "c33e64e0-f8ad-41a5-a4dc-37f51c49c3f6",
+        "675dd5a2-1920-431d-b4dd-780a50ccc6f8"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "9e0abe19-fdd6-4526-a933-bad4fa62babf",
+      "title": "Extend `edit`",
+      "explanation": "The `edit` section adds 5 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/qt/timeline_controller.cpp",
+      "startLine": 110,
+      "endLine": 114,
+      "area": "errors",
+      "symbol": "edit",
+      "added": 5,
+      "removed": 0
+    },
+    {
+      "id": "ea138abc-5411-46ba-b504-97285202070d",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/timeline_controller.cpp",
+      "startLine": 129,
+      "endLine": 129,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "c33e64e0-f8ad-41a5-a4dc-37f51c49c3f6",
+      "title": "Reshape Main",
+      "explanation": "This part of main.cpp replaces 1 line and adds 34. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 158,
+      "endLine": 191,
+      "area": "tests",
+      "added": 34,
+      "removed": 1,
+      "relation": "Builds on timeline_controller.cpp and moves into tests."
+    },
+    {
+      "id": "675dd5a2-1920-431d-b4dd-780a50ccc6f8",
+      "title": "Reshape Main",
+      "explanation": "This part of main.cpp replaces 1 line and adds 2. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 199,
+      "endLine": 200,
+      "area": "tests",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

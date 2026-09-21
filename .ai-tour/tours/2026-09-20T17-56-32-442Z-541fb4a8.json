@@ -1,0 +1,198 @@
+{
+  "version": 1,
+  "id": "541fb4a8-eacd-4298-b13f-d8c278c2ef88",
+  "title": "Improve error handling flow",
+  "summary": "3 files changed across 2 areas. The tour follows the implementation from authentication to error handling.",
+  "createdAt": "2026-09-20T17:56:32.442Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/editor_controller.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 10,
+      "removed": 2
+    },
+    {
+      "path": "adapters/render/scene_renderer.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 4,
+      "removed": 3
+    },
+    {
+      "path": "adapters/storage/project_store.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 23,
+      "removed": 10
+    }
+  ],
+  "areas": [
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "2258304b-fa2a-40ca-82c3-deef2155ada6",
+        "41925e1c-1025-48cd-9aa6-4e9782497881"
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "dbed850f-77de-48e8-b581-57be33521a51",
+        "3f0fe340-1666-4550-a317-7330ef056f61",
+        "167d7a3c-fff1-4805-8ccf-536d22aa17f2",
+        "103b0a60-59af-4278-8182-d169064eb031",
+        "e86945c3-3ea3-4d90-ae9f-4038788bb2bd",
+        "46721c56-143e-4352-85e9-da260661e13d",
+        "aea1c475-8ff4-41db-adbe-47aef5bd5907",
+        "48efd02c-2162-49ec-a339-ef04cf38484e",
+        "0b86fd6b-f907-4fa1-aeca-da48b170c2d1"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "2258304b-fa2a-40ca-82c3-deef2155ada6",
+      "title": "Reshape `edit`",
+      "explanation": "The `edit` section replaces 1 line and adds 6. It changes how identity or session data moves through the solution. This is the first building block in the change.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 407,
+      "endLine": 412,
+      "area": "auth",
+      "symbol": "edit",
+      "added": 6,
+      "removed": 1
+    },
+    {
+      "id": "41925e1c-1025-48cd-9aa6-4e9782497881",
+      "title": "Reshape `edit`",
+      "explanation": "The `edit` section replaces 1 line and adds 4. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 557,
+      "endLine": 560,
+      "area": "auth",
+      "symbol": "edit",
+      "added": 4,
+      "removed": 1,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "dbed850f-77de-48e8-b581-57be33521a51",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/render/scene_renderer.cpp",
+      "startLine": 96,
+      "endLine": 96,
+      "area": "errors",
+      "symbol": "for",
+      "added": 1,
+      "removed": 1,
+      "relation": "Builds on editor_controller.cpp and moves into error handling."
+    },
+    {
+      "id": "3f0fe340-1666-4550-a317-7330ef056f61",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/render/scene_renderer.cpp",
+      "startLine": 99,
+      "endLine": 99,
+      "area": "errors",
+      "symbol": "for",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "167d7a3c-fff1-4805-8ccf-536d22aa17f2",
+      "title": "Extend `for`",
+      "explanation": "The `for` section adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/render/scene_renderer.cpp",
+      "startLine": 105,
+      "endLine": 105,
+      "area": "errors",
+      "symbol": "for",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "103b0a60-59af-4278-8182-d169064eb031",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/render/scene_renderer.cpp",
+      "startLine": 109,
+      "endLine": 109,
+      "area": "errors",
+      "symbol": "for",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "e86945c3-3ea3-4d90-ae9f-4038788bb2bd",
+      "title": "Reshape `Database`",
+      "explanation": "The `Database` section replaces 1 line and adds 10. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 15,
+      "endLine": 24,
+      "area": "errors",
+      "symbol": "Database",
+      "added": 10,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "46721c56-143e-4352-85e9-da260661e13d",
+      "title": "Extend `Statement`",
+      "explanation": "The `Statement` section adds 10 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 59,
+      "endLine": 68,
+      "area": "errors",
+      "symbol": "Statement",
+      "added": 10,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "aea1c475-8ff4-41db-adbe-47aef5bd5907",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 3 lines and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 90,
+      "endLine": 90,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 3,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "48efd02c-2162-49ec-a339-ef04cf38484e",
+      "title": "Reshape Project store",
+      "explanation": "This part of project_store.cpp replaces 3 lines and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 129,
+      "endLine": 129,
+      "area": "errors",
+      "added": 1,
+      "removed": 3,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "0b86fd6b-f907-4fa1-aeca-da48b170c2d1",
+      "title": "Reshape Project store",
+      "explanation": "This part of project_store.cpp replaces 3 lines and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 144,
+      "endLine": 144,
+      "area": "errors",
+      "added": 1,
+      "removed": 3,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

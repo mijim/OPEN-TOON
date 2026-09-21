@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "id": "e7e9370e-e81a-4e23-8684-a616e59d5d48",
+  "title": "Improve tests flow",
+  "summary": "2 files changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T19:57:47.021Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 44,
+      "removed": 0
+    },
+    {
+      "path": "tests/drawing_selection_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 34,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "93bf635b-4b43-478e-84a2-cde9b99e3b62",
+        "d21c41de-369a-4cc9-bb62-a73642748681",
+        "b082dec1-7552-4c2e-9b47-965d428444ed"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "93bf635b-4b43-478e-84a2-cde9b99e3b62",
+      "title": "Extend `if`",
+      "explanation": "The `if` section adds 32 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 209,
+      "endLine": 240,
+      "area": "tests",
+      "symbol": "if",
+      "added": 32,
+      "removed": 0
+    },
+    {
+      "id": "d21c41de-369a-4cc9-bb62-a73642748681",
+      "title": "Extend Main",
+      "explanation": "This part of main.cpp adds 12 lines. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "apps/desktop/main.cpp",
+      "startLine": 276,
+      "endLine": 287,
+      "area": "tests",
+      "added": 12,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "b082dec1-7552-4c2e-9b47-965d428444ed",
+      "title": "Extend `REQUIRE`",
+      "explanation": "The `REQUIRE` section adds 34 lines. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "tests/drawing_selection_tests.cpp",
+      "startLine": 124,
+      "endLine": 157,
+      "area": "tests",
+      "symbol": "REQUIRE",
+      "added": 34,
+      "removed": 0,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

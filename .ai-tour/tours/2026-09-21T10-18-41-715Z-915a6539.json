@@ -1,0 +1,229 @@
+{
+  "version": 1,
+  "id": "915a6539-2e96-4f54-a90d-7e86bbaf2f48",
+  "title": "Improve tests flow",
+  "summary": "4 files changed across 1 area. The tour follows the implementation from tests to tests. 565 smaller changes remain in the overview.",
+  "createdAt": "2026-09-21T10:18:41.715Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "docs/catalog/features.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 23,
+      "removed": 0
+    },
+    {
+      "path": "docs/planning/libraries.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 120,
+      "removed": 41
+    },
+    {
+      "path": "docs/planning/node-assignments.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 581,
+      "removed": 195
+    },
+    {
+      "path": "docs/planning/roadmap.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 2190,
+      "removed": 364
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "45dfd94a-6776-4439-9421-7f76f8f6a087",
+        "f66279d5-681f-414b-b390-c1290dc7cfcf",
+        "f6d06574-0be3-4ba0-91c0-2579f4aecf92",
+        "04303a02-9cd1-466d-8f34-bf52b3394d54",
+        "fbcfcd94-192b-4331-94eb-23a17e3bd258",
+        "851b1de8-7f2d-4074-8f04-5bb18911f337",
+        "861f4fe6-4072-40be-a3cd-bfa3435df256",
+        "34eb1420-08a6-4c9c-a199-d46fe2246c01",
+        "759c813a-2199-4a95-8c83-dae57af37c51",
+        "53da230e-6736-4701-a0f8-97376e8170c1",
+        "89335887-f04a-40fb-b729-b4abb6540726",
+        "34ae0d38-54d7-4b14-91f9-88b690368595",
+        "edd0633f-47d3-43c1-bf16-758361389fef",
+        "0443635b-1858-4932-a5c1-07d8ba6b4553"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "45dfd94a-6776-4439-9421-7f76f8f6a087",
+      "title": "Extend Features",
+      "explanation": "This part of features.json adds 23 lines. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "docs/catalog/features.json",
+      "startLine": 2686,
+      "endLine": 2708,
+      "area": "tests",
+      "added": 23,
+      "removed": 0
+    },
+    {
+      "id": "f66279d5-681f-414b-b390-c1290dc7cfcf",
+      "title": "Reshape Libraries",
+      "explanation": "This part of libraries.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 3,
+      "endLine": 3,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "f6d06574-0be3-4ba0-91c0-2579f4aecf92",
+      "title": "Reshape Libraries",
+      "explanation": "This part of libraries.json replaces 1 line and adds 6. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 18,
+      "endLine": 23,
+      "area": "tests",
+      "added": 6,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "04303a02-9cd1-466d-8f34-bf52b3394d54",
+      "title": "Reshape Libraries",
+      "explanation": "This part of libraries.json replaces 1 line and adds 5. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 37,
+      "endLine": 41,
+      "area": "tests",
+      "added": 5,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "fbcfcd94-192b-4331-94eb-23a17e3bd258",
+      "title": "Reshape Libraries",
+      "explanation": "This part of libraries.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 52,
+      "endLine": 52,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "851b1de8-7f2d-4074-8f04-5bb18911f337",
+      "title": "Reshape Libraries",
+      "explanation": "This part of libraries.json replaces 1 line and adds 3. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 55,
+      "endLine": 57,
+      "area": "tests",
+      "added": 3,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "861f4fe6-4072-40be-a3cd-bfa3435df256",
+      "title": "Reshape Libraries",
+      "explanation": "This part of libraries.json replaces 1 line and adds 3. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 71,
+      "endLine": 73,
+      "area": "tests",
+      "added": 3,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "34eb1420-08a6-4c9c-a199-d46fe2246c01",
+      "title": "Reshape Libraries",
+      "explanation": "This part of libraries.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 84,
+      "endLine": 84,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "759c813a-2199-4a95-8c83-dae57af37c51",
+      "title": "Reshape Libraries",
+      "explanation": "This part of libraries.json replaces 1 line and adds 5. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 87,
+      "endLine": 91,
+      "area": "tests",
+      "added": 5,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "53da230e-6736-4701-a0f8-97376e8170c1",
+      "title": "Reshape Libraries",
+      "explanation": "This part of libraries.json replaces 1 line and adds 5. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 106,
+      "endLine": 110,
+      "area": "tests",
+      "added": 5,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "89335887-f04a-40fb-b729-b4abb6540726",
+      "title": "Reshape Libraries",
+      "explanation": "This part of libraries.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 121,
+      "endLine": 121,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "34ae0d38-54d7-4b14-91f9-88b690368595",
+      "title": "Reshape Libraries",
+      "explanation": "This part of libraries.json replaces 1 line and adds 3. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 124,
+      "endLine": 126,
+      "area": "tests",
+      "added": 3,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "edd0633f-47d3-43c1-bf16-758361389fef",
+      "title": "Reshape Libraries",
+      "explanation": "This part of libraries.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 137,
+      "endLine": 137,
+      "area": "tests",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    },
+    {
+      "id": "0443635b-1858-4932-a5c1-07d8ba6b4553",
+      "title": "Reshape Libraries",
+      "explanation": "This part of libraries.json replaces 1 line and adds 5. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "docs/planning/libraries.json",
+      "startLine": 140,
+      "endLine": 144,
+      "area": "tests",
+      "added": 5,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

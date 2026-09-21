@@ -1,0 +1,337 @@
+{
+  "version": 1,
+  "id": "4108faf0-cd0a-4065-838a-877d3a547d3c",
+  "title": "Improve error handling flow",
+  "summary": "18 files changed across 2 areas. The tour follows the implementation from api to error handling. 105 smaller changes remain in the overview.",
+  "createdAt": "2026-09-20T17:39:35.584Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/canvas_item.h",
+      "kind": "modified",
+      "area": "api",
+      "added": 43,
+      "removed": 22
+    },
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 300,
+      "removed": 26
+    },
+    {
+      "path": "adapters/qt/editor_controller.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 657,
+      "removed": 67
+    },
+    {
+      "path": "adapters/qt/editor_controller.h",
+      "kind": "modified",
+      "area": "tests",
+      "added": 100,
+      "removed": 36
+    },
+    {
+      "path": "adapters/render/scene_renderer.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 142,
+      "removed": 25
+    },
+    {
+      "path": "adapters/render/scene_renderer.h",
+      "kind": "modified",
+      "area": "ui",
+      "added": 12,
+      "removed": 7
+    },
+    {
+      "path": "adapters/storage/project_store.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 112,
+      "removed": 28
+    },
+    {
+      "path": "adapters/storage/project_store.h",
+      "kind": "modified",
+      "area": "state",
+      "added": 16,
+      "removed": 7
+    },
+    {
+      "path": "adapters/storage/serialization.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 163,
+      "removed": 33
+    },
+    {
+      "path": "adapters/storage/serialization.h",
+      "kind": "modified",
+      "area": "storage",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "path": "apps/desktop/main.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 83,
+      "removed": 18
+    },
+    {
+      "path": "modules/application/include/opentoon/session.h",
+      "kind": "modified",
+      "area": "auth",
+      "added": 11,
+      "removed": 7
+    },
+    {
+      "path": "modules/application/src/session.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 66,
+      "removed": 15
+    },
+    {
+      "path": "modules/document/include/opentoon/document.h",
+      "kind": "modified",
+      "area": "validation",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "path": "modules/document/src/document.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 320,
+      "removed": 96
+    },
+    {
+      "path": "tests/document_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 82,
+      "removed": 22
+    },
+    {
+      "path": "tests/render_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 32,
+      "removed": 8
+    },
+    {
+      "path": "tests/storage_tests.cpp",
+      "kind": "modified",
+      "area": "tests",
+      "added": 56,
+      "removed": 12
+    }
+  ],
+  "areas": [
+    {
+      "id": "api",
+      "label": "API",
+      "stepIds": [
+        "6f904441-737f-4665-a635-396214832c2c",
+        "038d9b53-dae3-4063-b77d-032e4b495786",
+        "d1bd7b5a-91ff-4b0e-a76b-b8bf8625cee5",
+        "f35b8e84-3e3b-46dd-8252-a2ce655bd8ce"
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "63b0fae9-de42-4686-b7cb-d36cbe27408f",
+        "4ac9b74f-66e6-4a80-ae91-f642513d03b8",
+        "9e958339-33b3-4d02-917f-d83e04adfbcf",
+        "2814626c-58fa-480a-9c97-3bb803022b7d",
+        "a4221f8c-dd20-4934-97d3-b6292a04d5e1",
+        "1846a2da-9210-49dc-83c6-c19741c54bcf",
+        "0dc95cb1-ea56-4a26-9fea-6731c24eb216",
+        "22d8d328-c180-40ff-99cd-900c28ef6f49",
+        "2b82d86e-5ee9-436b-96c2-c51f7437fd6c",
+        "d443a4af-8bbf-473f-89a5-a91272dddd14"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "6f904441-737f-4665-a635-396214832c2c",
+      "title": "Reshape Canvas item",
+      "explanation": "This part of canvas_item.h replaces 2 lines and adds 1. It updates the boundary where the application exchanges data. This is the first building block in the change.",
+      "file": "adapters/qt/canvas_item.h",
+      "startLine": 2,
+      "endLine": 2,
+      "area": "api",
+      "added": 1,
+      "removed": 2
+    },
+    {
+      "id": "038d9b53-dae3-4063-b77d-032e4b495786",
+      "title": "Reshape Canvas item",
+      "explanation": "This part of canvas_item.h replaces 2 lines and adds 3. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.h",
+      "startLine": 4,
+      "endLine": 6,
+      "area": "api",
+      "added": 3,
+      "removed": 2,
+      "relation": "Continues the api thread from the previous step."
+    },
+    {
+      "id": "d1bd7b5a-91ff-4b0e-a76b-b8bf8625cee5",
+      "title": "Reshape `CanvasItem`",
+      "explanation": "The `CanvasItem` section replaces 15 lines and adds 34. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.h",
+      "startLine": 12,
+      "endLine": 45,
+      "area": "api",
+      "symbol": "CanvasItem",
+      "added": 34,
+      "removed": 15,
+      "relation": "Continues the api thread from the previous step."
+    },
+    {
+      "id": "f35b8e84-3e3b-46dd-8252-a2ce655bd8ce",
+      "title": "Reshape Canvas item",
+      "explanation": "This part of canvas_item.h replaces 3 lines and adds 5. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.h",
+      "startLine": 47,
+      "endLine": 51,
+      "area": "api",
+      "added": 5,
+      "removed": 3,
+      "relation": "Continues the api thread from the previous step."
+    },
+    {
+      "id": "63b0fae9-de42-4686-b7cb-d36cbe27408f",
+      "title": "Reshape Canvas item",
+      "explanation": "This part of canvas_item.cpp replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 5,
+      "endLine": 5,
+      "area": "errors",
+      "added": 1,
+      "removed": 1,
+      "relation": "Builds on canvas_item.h and moves into error handling."
+    },
+    {
+      "id": "4ac9b74f-66e6-4a80-ae91-f642513d03b8",
+      "title": "Extend Canvas item",
+      "explanation": "This part of canvas_item.cpp adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 7,
+      "endLine": 7,
+      "area": "errors",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "9e958339-33b3-4d02-917f-d83e04adfbcf",
+      "title": "Simplify Canvas item",
+      "explanation": "This part of canvas_item.cpp removes 1 line. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 9,
+      "endLine": 9,
+      "area": "errors",
+      "added": 0,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "2814626c-58fa-480a-9c97-3bb803022b7d",
+      "title": "Reshape Canvas item",
+      "explanation": "This part of canvas_item.cpp replaces 24 lines and adds 298. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 11,
+      "endLine": 308,
+      "area": "errors",
+      "added": 298,
+      "removed": 24,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "a4221f8c-dd20-4934-97d3-b6292a04d5e1",
+      "title": "Reshape Scene renderer",
+      "explanation": "This part of scene_renderer.cpp replaces 5 lines and adds 2. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/render/scene_renderer.cpp",
+      "startLine": 6,
+      "endLine": 7,
+      "area": "errors",
+      "added": 2,
+      "removed": 5,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "1846a2da-9210-49dc-83c6-c19741c54bcf",
+      "title": "Extend Scene renderer",
+      "explanation": "This part of scene_renderer.cpp adds 7 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/render/scene_renderer.cpp",
+      "startLine": 9,
+      "endLine": 15,
+      "area": "errors",
+      "added": 7,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "0dc95cb1-ea56-4a26-9fea-6731c24eb216",
+      "title": "Reshape Scene renderer",
+      "explanation": "This part of scene_renderer.cpp replaces 8 lines and adds 69. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/render/scene_renderer.cpp",
+      "startLine": 17,
+      "endLine": 85,
+      "area": "errors",
+      "added": 69,
+      "removed": 8,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "22d8d328-c180-40ff-99cd-900c28ef6f49",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 11 lines and adds 50. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/render/scene_renderer.cpp",
+      "startLine": 88,
+      "endLine": 137,
+      "area": "errors",
+      "symbol": "if",
+      "added": 50,
+      "removed": 11,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "2b82d86e-5ee9-436b-96c2-c51f7437fd6c",
+      "title": "Reshape `for`",
+      "explanation": "The `for` section replaces 1 line and adds 13. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/render/scene_renderer.cpp",
+      "startLine": 139,
+      "endLine": 151,
+      "area": "errors",
+      "symbol": "for",
+      "added": 13,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "d443a4af-8bbf-473f-89a5-a91272dddd14",
+      "title": "Extend `for`",
+      "explanation": "The `for` section adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "adapters/render/scene_renderer.cpp",
+      "startLine": 153,
+      "endLine": 153,
+      "area": "errors",
+      "symbol": "for",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

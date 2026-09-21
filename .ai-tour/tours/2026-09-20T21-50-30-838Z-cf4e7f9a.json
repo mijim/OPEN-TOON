@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "id": "cf4e7f9a-e44a-48d6-a6a4-717ddfd4b4ec",
+  "title": "Update Features",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from tests to tests.",
+  "createdAt": "2026-09-20T21:50:30.838Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "docs/catalog/features.json",
+      "kind": "modified",
+      "area": "tests",
+      "added": 3,
+      "removed": 2
+    }
+  ],
+  "areas": [
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "8d335039-28c1-42a7-9905-dc37a4b8f232",
+        "d8d7962d-7bae-4f68-be47-f24c48f7acd6"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "8d335039-28c1-42a7-9905-dc37a4b8f232",
+      "title": "Reshape Features",
+      "explanation": "This part of features.json replaces 1 line and adds 1. It captures the expected behavior so the implementation can be reviewed safely. This is the first building block in the change.",
+      "file": "docs/catalog/features.json",
+      "startLine": 2286,
+      "endLine": 2286,
+      "area": "tests",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "id": "d8d7962d-7bae-4f68-be47-f24c48f7acd6",
+      "title": "Reshape Features",
+      "explanation": "This part of features.json replaces 1 line and adds 2. It captures the expected behavior so the implementation can be reviewed safely. This completes the path introduced by the earlier steps.",
+      "file": "docs/catalog/features.json",
+      "startLine": 2295,
+      "endLine": 2296,
+      "area": "tests",
+      "added": 2,
+      "removed": 1,
+      "relation": "Continues the tests thread from the previous step."
+    }
+  ]
+}

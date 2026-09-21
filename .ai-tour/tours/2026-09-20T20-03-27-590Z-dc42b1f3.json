@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "id": "dc42b1f3-e449-4f3a-af45-e997e2e6ee69",
+  "title": "Update Canvas item",
+  "summary": "1 file changed across 1 area. The tour follows the implementation from error handling to error handling.",
+  "createdAt": "2026-09-20T20:03:27.590Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 4,
+      "removed": 1
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "0032a0f0-7137-4bf6-a7fe-7862b7fd28bf",
+        "f292d91e-27ce-4a60-ad78-bca29ddffa87",
+        "1244d48a-8f97-4c20-92e5-c76b53a6a8f4"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "0032a0f0-7137-4bf6-a7fe-7862b7fd28bf",
+      "title": "Extend Canvas item",
+      "explanation": "This part of canvas_item.cpp adds 1 line. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 123,
+      "endLine": 123,
+      "area": "errors",
+      "added": 1,
+      "removed": 0
+    },
+    {
+      "id": "f292d91e-27ce-4a60-ad78-bca29ddffa87",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 172,
+      "endLine": 172,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "1244d48a-8f97-4c20-92e5-c76b53a6a8f4",
+      "title": "Extend Canvas item",
+      "explanation": "This part of canvas_item.cpp adds 2 lines. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 605,
+      "endLine": 606,
+      "area": "errors",
+      "added": 2,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

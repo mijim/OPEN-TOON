@@ -1,0 +1,157 @@
+{
+  "version": 1,
+  "id": "f669cbc3-a06c-4ca2-a085-3d4edf886953",
+  "title": "Improve error handling flow",
+  "summary": "6 files changed across 4 areas. The tour follows the implementation from state to authentication.",
+  "createdAt": "2026-09-20T17:25:53.762Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/storage/project_store.h",
+      "kind": "created",
+      "area": "state",
+      "added": 18,
+      "removed": 0
+    },
+    {
+      "path": "adapters/storage/serialization.cpp",
+      "kind": "created",
+      "area": "errors",
+      "added": 42,
+      "removed": 0
+    },
+    {
+      "path": "adapters/storage/serialization.h",
+      "kind": "created",
+      "area": "storage",
+      "added": 7,
+      "removed": 0
+    },
+    {
+      "path": "modules/application/include/opentoon/session.h",
+      "kind": "created",
+      "area": "auth",
+      "added": 30,
+      "removed": 0
+    },
+    {
+      "path": "modules/application/src/session.cpp",
+      "kind": "created",
+      "area": "auth",
+      "added": 20,
+      "removed": 0
+    },
+    {
+      "path": "adapters/storage/project_store.cpp",
+      "kind": "created",
+      "area": "errors",
+      "added": 43,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "state",
+      "label": "State",
+      "stepIds": [
+        "42b6e0bc-fe11-417b-908c-3d80a1bd8a7c"
+      ]
+    },
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "f6479245-242a-4523-a00c-30686fb05dcf",
+        "afca8974-f2dd-4791-a46c-7093909902c0"
+      ]
+    },
+    {
+      "id": "storage",
+      "label": "Storage",
+      "stepIds": [
+        "1f8fd8a2-9307-409e-93fe-51c11c47ff75"
+      ]
+    },
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "b7d6bdc6-17c4-43e8-994a-9dc2898517d0",
+        "bdec2df3-6ff3-4ae8-8fa3-47b768cb26f7"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "42b6e0bc-fe11-417b-908c-3d80a1bd8a7c",
+      "title": "Introduce Project store",
+      "explanation": "This part of project_store.h adds 18 lines. It changes the source of truth or the way updates propagate. This is the first building block in the change.",
+      "file": "adapters/storage/project_store.h",
+      "startLine": 1,
+      "endLine": 18,
+      "area": "state",
+      "added": 18,
+      "removed": 0
+    },
+    {
+      "id": "f6479245-242a-4523-a00c-30686fb05dcf",
+      "title": "Introduce Serialization",
+      "explanation": "This part of serialization.cpp adds 42 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/serialization.cpp",
+      "startLine": 1,
+      "endLine": 42,
+      "area": "errors",
+      "added": 42,
+      "removed": 0,
+      "relation": "Builds on project_store.h and moves into error handling."
+    },
+    {
+      "id": "afca8974-f2dd-4791-a46c-7093909902c0",
+      "title": "Introduce Project store",
+      "explanation": "This part of project_store.cpp adds 43 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/project_store.cpp",
+      "startLine": 1,
+      "endLine": 43,
+      "area": "errors",
+      "added": 43,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "1f8fd8a2-9307-409e-93fe-51c11c47ff75",
+      "title": "Introduce Serialization",
+      "explanation": "This part of serialization.h adds 7 lines. It changes how persistent or cached data is read and written. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/storage/serialization.h",
+      "startLine": 1,
+      "endLine": 7,
+      "area": "storage",
+      "added": 7,
+      "removed": 0,
+      "relation": "Builds on project_store.cpp and moves into storage."
+    },
+    {
+      "id": "b7d6bdc6-17c4-43e8-994a-9dc2898517d0",
+      "title": "Introduce Session",
+      "explanation": "This part of session.h adds 30 lines. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "modules/application/include/opentoon/session.h",
+      "startLine": 1,
+      "endLine": 30,
+      "area": "auth",
+      "added": 30,
+      "removed": 0,
+      "relation": "Builds on serialization.h and moves into authentication."
+    },
+    {
+      "id": "bdec2df3-6ff3-4ae8-8fa3-47b768cb26f7",
+      "title": "Introduce Session",
+      "explanation": "This part of session.cpp adds 20 lines. It changes how identity or session data moves through the solution. This completes the path introduced by the earlier steps.",
+      "file": "modules/application/src/session.cpp",
+      "startLine": 1,
+      "endLine": 20,
+      "area": "auth",
+      "added": 20,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    }
+  ]
+}

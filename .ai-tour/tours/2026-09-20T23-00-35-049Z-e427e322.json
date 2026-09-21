@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "id": "e427e322-8755-4f61-956d-33f9e52f4e13",
+  "title": "Improve error handling flow",
+  "summary": "2 files changed across 1 area. The tour follows the implementation from error handling to error handling.",
+  "createdAt": "2026-09-20T23:00:35.049Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/canvas_item.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "path": "apps/desktop/key_block_smoke.cpp",
+      "kind": "modified",
+      "area": "errors",
+      "added": 6,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "33f8c7ad-154e-49a3-a2d3-fe3acc2dafc0",
+        "e97087f4-8f13-4732-8785-bc4c07b96731"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "33f8c7ad-154e-49a3-a2d3-fe3acc2dafc0",
+      "title": "Reshape `if`",
+      "explanation": "The `if` section replaces 1 line and adds 1. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/qt/canvas_item.cpp",
+      "startLine": 707,
+      "endLine": 707,
+      "area": "errors",
+      "symbol": "if",
+      "added": 1,
+      "removed": 1
+    },
+    {
+      "id": "e97087f4-8f13-4732-8785-bc4c07b96731",
+      "title": "Extend Key block smoke",
+      "explanation": "This part of key_block_smoke.cpp adds 6 lines. It adjusts the failure path so callers get a clearer or safer outcome. This completes the path introduced by the earlier steps.",
+      "file": "apps/desktop/key_block_smoke.cpp",
+      "startLine": 36,
+      "endLine": 41,
+      "area": "errors",
+      "added": 6,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    }
+  ]
+}

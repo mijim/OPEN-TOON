@@ -1,0 +1,238 @@
+{
+  "version": 1,
+  "id": "deff7eba-123e-4c52-a26e-e837f590e397",
+  "title": "Improve authentication flow",
+  "summary": "6 files changed across 4 areas. The tour follows the implementation from error handling to authentication.",
+  "createdAt": "2026-09-20T19:26:19.182Z",
+  "source": "detected",
+  "files": [
+    {
+      "path": "adapters/qt/animation_controller.cpp",
+      "kind": "created",
+      "area": "errors",
+      "added": 84,
+      "removed": 0
+    },
+    {
+      "path": "modules/document/include/opentoon/animation.h",
+      "kind": "created",
+      "area": "api",
+      "added": 15,
+      "removed": 0
+    },
+    {
+      "path": "modules/document/src/animation.cpp",
+      "kind": "created",
+      "area": "errors",
+      "added": 86,
+      "removed": 0
+    },
+    {
+      "path": ".github/workflows/native.yml",
+      "kind": "modified",
+      "area": "tests",
+      "added": 1,
+      "removed": 2
+    },
+    {
+      "path": "adapters/qt/editor_controller.cpp",
+      "kind": "modified",
+      "area": "auth",
+      "added": 6,
+      "removed": 34
+    },
+    {
+      "path": "adapters/qt/editor_controller.h",
+      "kind": "modified",
+      "area": "auth",
+      "added": 16,
+      "removed": 0
+    }
+  ],
+  "areas": [
+    {
+      "id": "errors",
+      "label": "Error handling",
+      "stepIds": [
+        "b42cb9b6-623e-4965-b120-b9aa294b874f",
+        "86406856-98a5-41b0-91c0-1ddbc0bf6b04"
+      ]
+    },
+    {
+      "id": "api",
+      "label": "API",
+      "stepIds": [
+        "57aa4be3-13be-4cd3-a912-bfa6c27f25bd"
+      ]
+    },
+    {
+      "id": "tests",
+      "label": "Tests",
+      "stepIds": [
+        "e437437f-c6ca-42a6-854d-d6a65c39d4eb"
+      ]
+    },
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "stepIds": [
+        "aa69dfe0-fe76-4125-9bb2-2c7575f51d91",
+        "c87af50a-2ff6-4264-b029-7b56a08e135b",
+        "b96114c2-2bb1-4151-a78a-454670c88410",
+        "bfe2728f-9fa4-41ef-a3d9-dab0c720c1e6",
+        "afb76fb1-26c6-40fb-9293-19302e468e35",
+        "defd3e76-1131-4e06-b47f-df5480fff389",
+        "329bc242-e6df-440c-ad04-d14ab01a0222",
+        "b8575bfa-fbea-47f1-9e37-f7c4596cb6b8"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "b42cb9b6-623e-4965-b120-b9aa294b874f",
+      "title": "Introduce Animation controller",
+      "explanation": "This part of animation_controller.cpp adds 84 lines. It adjusts the failure path so callers get a clearer or safer outcome. This is the first building block in the change.",
+      "file": "adapters/qt/animation_controller.cpp",
+      "startLine": 1,
+      "endLine": 84,
+      "area": "errors",
+      "added": 84,
+      "removed": 0
+    },
+    {
+      "id": "86406856-98a5-41b0-91c0-1ddbc0bf6b04",
+      "title": "Introduce Animation",
+      "explanation": "This part of animation.cpp adds 86 lines. It adjusts the failure path so callers get a clearer or safer outcome. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/src/animation.cpp",
+      "startLine": 1,
+      "endLine": 86,
+      "area": "errors",
+      "added": 86,
+      "removed": 0,
+      "relation": "Continues the error handling thread from the previous step."
+    },
+    {
+      "id": "57aa4be3-13be-4cd3-a912-bfa6c27f25bd",
+      "title": "Introduce Animation",
+      "explanation": "This part of animation.h adds 15 lines. It updates the boundary where the application exchanges data. It connects the preceding change to the remaining implementation.",
+      "file": "modules/document/include/opentoon/animation.h",
+      "startLine": 1,
+      "endLine": 15,
+      "area": "api",
+      "added": 15,
+      "removed": 0,
+      "relation": "Builds on animation.cpp and moves into api."
+    },
+    {
+      "id": "e437437f-c6ca-42a6-854d-d6a65c39d4eb",
+      "title": "Reshape Native",
+      "explanation": "This part of native.yml replaces 2 lines and adds 1. It captures the expected behavior so the implementation can be reviewed safely. It connects the preceding change to the remaining implementation.",
+      "file": ".github/workflows/native.yml",
+      "startLine": 3,
+      "endLine": 3,
+      "area": "tests",
+      "added": 1,
+      "removed": 2,
+      "relation": "Builds on animation.h and moves into tests."
+    },
+    {
+      "id": "aa69dfe0-fe76-4125-9bb2-2c7575f51d91",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.cpp adds 1 line. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 2,
+      "endLine": 2,
+      "area": "auth",
+      "added": 1,
+      "removed": 0,
+      "relation": "Builds on native.yml and moves into authentication."
+    },
+    {
+      "id": "c87af50a-2ff6-4264-b029-7b56a08e135b",
+      "title": "Reshape Editor controller",
+      "explanation": "This part of editor_controller.cpp replaces 1 line and adds 1. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 136,
+      "endLine": 136,
+      "area": "auth",
+      "added": 1,
+      "removed": 1,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "b96114c2-2bb1-4151-a78a-454670c88410",
+      "title": "Reshape `edit`",
+      "explanation": "The `edit` section replaces 33 lines and adds 2. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 519,
+      "endLine": 520,
+      "area": "auth",
+      "symbol": "edit",
+      "added": 2,
+      "removed": 33,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "bfe2728f-9fa4-41ef-a3d9-dab0c720c1e6",
+      "title": "Extend `edit`",
+      "explanation": "The `edit` section adds 2 lines. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.cpp",
+      "startLine": 524,
+      "endLine": 525,
+      "area": "auth",
+      "symbol": "edit",
+      "added": 2,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "afb76fb1-26c6-40fb-9293-19302e468e35",
+      "title": "Extend `EditorController`",
+      "explanation": "The `EditorController` section adds 4 lines. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 14,
+      "endLine": 17,
+      "area": "auth",
+      "symbol": "EditorController",
+      "added": 4,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "defd3e76-1131-4e06-b47f-df5480fff389",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.h adds 10 lines. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 56,
+      "endLine": 65,
+      "area": "auth",
+      "added": 10,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "329bc242-e6df-440c-ad04-d14ab01a0222",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.h adds 1 line. It changes how identity or session data moves through the solution. It connects the preceding change to the remaining implementation.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 161,
+      "endLine": 161,
+      "area": "auth",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    },
+    {
+      "id": "b8575bfa-fbea-47f1-9e37-f7c4596cb6b8",
+      "title": "Extend Editor controller",
+      "explanation": "This part of editor_controller.h adds 1 line. It changes how identity or session data moves through the solution. This completes the path introduced by the earlier steps.",
+      "file": "adapters/qt/editor_controller.h",
+      "startLine": 183,
+      "endLine": 183,
+      "area": "auth",
+      "added": 1,
+      "removed": 0,
+      "relation": "Continues the authentication thread from the previous step."
+    }
+  ]
+}
