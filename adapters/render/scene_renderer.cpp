@@ -1,4 +1,5 @@
 #include "scene_renderer.h"
+#include "graph_renderer.h"
 #include <QPainterPath>
 #include <cmath>
 #include <stdexcept>
@@ -122,6 +123,15 @@ void SceneRenderer::paintStroke(QPainter& painter, const Stroke& s, const std::v
     painter.restore();
 }
 void SceneRenderer::paint(QPainter& painter, const Document& d, Frame frame, RenderOptions options) {
+    if (d.composition == CompositionProfile::LinearSrgb) {
+        painter.save();
+        painter.setClipRect(QRectF(0, 0, d.width, d.height));
+        painter.drawImage(QPointF(0, 0),
+                          GraphRenderer::render(CompositionGraph::orderedLayers(d), d, frame,
+                                                {d.width, d.height}, options, GraphTarget::Display));
+        painter.restore();
+        return;
+    }
     painter.save();
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setClipRect(QRectF(0, 0, d.width, d.height));
@@ -181,6 +191,9 @@ QImage SceneRenderer::render(const Document& d, Frame frame, QSize size, RenderO
         size = QSize(d.width, d.height);
     if (size.width() > 8192 || size.height() > 8192 || size.width() <= 0 || size.height() <= 0)
         throw std::invalid_argument("Invalid render dimensions.");
+    if (d.composition == CompositionProfile::LinearSrgb)
+        return GraphRenderer::render(CompositionGraph::orderedLayers(d), d, frame, size,
+                                     options, GraphTarget::Write);
     QImage result(size, QImage::Format_ARGB32_Premultiplied);
     if (result.isNull())
         throw std::runtime_error("Unable to allocate render surface.");

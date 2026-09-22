@@ -308,6 +308,17 @@ void EditorController::setSelectedSwatch(int value) {
             emit selectionChanged();
         }
 }
+void EditorController::setCompositionProfile(int profile) {
+    if (profile < 0 || profile > 1) {
+        report("Unknown composition profile");
+        return;
+    }
+    if (compositionProfile() == profile)
+        return;
+    edit("Set composition profile", [profile](Document& d) {
+        d.composition = static_cast<CompositionProfile>(profile);
+    });
+}
 void EditorController::setTool(QString value) {
     if (QStringList{"Animate", "Pencil", "Eraser", "Select", "Marquee", "Lasso", "Line", "Rectangle",
                     "Ellipse", "Recolor", "Edit points", "Raster ink", "Raster soft", "Raster dry",

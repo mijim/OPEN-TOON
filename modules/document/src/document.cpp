@@ -124,6 +124,9 @@ void Document::validate() const {
             require(std::isfinite(v) && v >= 0 && v <= 1, "Invalid color component.");
     };
     color(background);
+    require(composition == CompositionProfile::LegacyQt ||
+                composition == CompositionProfile::LinearSrgb,
+            "Unknown composition profile.");
     for (const auto& s : palette) {
         id(s.id);
         swatches.insert(s.id);

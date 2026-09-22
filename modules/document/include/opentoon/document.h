@@ -28,6 +28,7 @@ struct Color {
     double r = 0, g = 0, b = 0, a = 1;
     auto operator<=>(const Color&) const = default;
 };
+enum class CompositionProfile : std::uint8_t { LegacyQt, LinearSrgb };
 struct Swatch {
     Id id = 0;
     std::string name;
@@ -124,12 +125,13 @@ struct Marker {
     auto operator<=>(const Marker&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 5;
+    static constexpr int formatVersion = 6;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;
     FrameRate rate;
     Color background{1, 1, 1, 1};
+    CompositionProfile composition = CompositionProfile::LegacyQt;
     Id nextId = 1;
     std::vector<Layer> layers;
     std::map<Id, Drawing> drawings;

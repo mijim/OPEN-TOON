@@ -46,6 +46,7 @@ class EditorController final : public QObject {
     Q_PROPERTY(int duration READ duration NOTIFY changed)
     Q_PROPERTY(int sceneWidth READ sceneWidth NOTIFY changed)
     Q_PROPERTY(int sceneHeight READ sceneHeight NOTIFY changed)
+    Q_PROPERTY(int compositionProfile READ compositionProfile NOTIFY changed)
     Q_PROPERTY(double fps READ fps NOTIFY changed)
     Q_PROPERTY(int fpsNumerator READ fpsNumerator NOTIFY changed)
     Q_PROPERTY(int fpsDenominator READ fpsDenominator NOTIFY changed)
@@ -128,6 +129,8 @@ class EditorController final : public QObject {
     QVariantMap transform() const;
     int frame() const { return frame_; }
     int duration() const { return document().duration; }
+    int compositionProfile() const { return static_cast<int>(document().composition); }
+    Q_INVOKABLE void setCompositionProfile(int profile);
     int sceneWidth() const { return document().width; }
     int sceneHeight() const { return document().height; }
     int fpsNumerator() const { return document().rate.numerator; }

@@ -4,6 +4,13 @@
 
 The editor runs locally on macOS and supports mouse drawing, sampled-pressure input, vector editing, layers, exposures, transform keys, project revisions and PNG export. See the [build instructions](BUILD.md) and [user guide](USER-GUIDE.md).
 
+The [HM-04 composition kernel record](HM04-GRAPH-KERNEL.md) lists its ten bounded
+capabilities, tests and remaining acceptance work.
+
+The current source milestone is `v0.2.0-experimental.12`. It is a source-only
+milestone; the last locally qualified macOS preview and any earlier binaries
+do not qualify this composition change.
+
 ## Phase coverage
 
 | Phase | Status | Available subset | Remaining before completion |
@@ -18,7 +25,7 @@ The editor runs locally on macOS and supports mouse drawing, sampled-pressure in
 | P07 | planned | Exact rational frame-to-sample arithmetic has a domain test; no audio playback. | Audio decode/timeline/waveform/sync, mouth mapping/manual lip correction, optional detection, media policies, FFmpeg adapter and video output. |
 | P08 | in_progress | Parented layers and typed character roots, pegs and parts; role editing, preserve-world rigid reparenting, stable rest pivots, named held substitutions, renderer-backed thumbnail browsing and coordinated view sets. Batch Part assembly, independent or explicitly linked-artwork Part/Peg branch copies, safe branch deletion, Part detachment, Peg dissolution and view-range editing preserve view membership with format-5 save/reopen. | Artist-led rigid-character acceptance, animated-ancestor reparenting, masked poses, Quick Rig, declarative controls, portable assets/templates and production-scale qualification. |
 | P09 | planned | No deformation subsystem implemented. | Curve/bone/mesh deformation, constraints, binding/weights, deterministic solvers and reference fixtures. |
-| P10 | planned | CPU layer painting is available; it is not a node compositor. | Typed graph evaluation, node UI, masks/effects, ROI/cache scheduling, OCIO and alpha/color reference scenes. |
+| P10 | in_progress | Qt-free typed image/transform/matte graph, validated DAG, downstream layer invalidation, explicit Display/Write outputs, alpha matte operation and opt-in saved linear-sRGB composition profile. Legacy scenes keep their direct-painter appearance. | Revision-safe cache/job publication, solve ordering for deformers and cameras, node UI, effects, ROI scheduling, cost qualification and broader color reference scenes. |
 | P11 | planned | Saved revisions, recovery UX, English guide, regression tests and source CI are initial prerequisites. Format 1/2 migration backups, format 3 curve metadata and checked compressed media resources, explicit backed-up compaction and asynchronous recovery snapshots. Requested arm64 macOS preview now includes audited runtime dependencies, notices, matching source archives/recipes and verified ad-hoc signatures. | All required journeys, remaining hardening, supported device/OS matrix, accessibility, reproducible release SBOM automation, clean-machine validation and Developer ID signed/notarized releases. |
 
 ## Verification
@@ -43,7 +50,7 @@ The domain and application layers contain no Qt. Commands validate candidates be
 
 ## Continue toward P11
 
-Follow the [contract-level execution plan](../planning/FIRST-STEPS.md): extract only the foundations required by character/substitution, deformation, control, audio and composition consumers, then qualify the complete shot. Do not wait for unrelated early-phase tools or skip an actual required contract. Full phase exit criteria remain open. HM-00 is accepted with [owner artistic review](HM00-REVIEW.md), [reproducible character input](../../tests/fixtures/harmony-moment/README.md) and the [foundation engineering contract](../architecture/adr/023-harmony-foundation-contracts.md). [HM-02 artwork intake](HM02-ARTWORK-INTAKE.md) is accepted as a bounded contract; HM-01 property identity is underway. Neither implies character, audio or compositor capabilities. The complete animated shot and independent animator journey are HM-15 outcomes.
+Follow the [contract-level execution plan](../planning/FIRST-STEPS.md): extract only the foundations required by character/substitution, deformation, control, audio and composition consumers, then qualify the complete shot. Do not wait for unrelated early-phase tools or skip an actual required contract. Full phase exit criteria remain open. HM-00 is accepted with [owner artistic review](HM00-REVIEW.md), [reproducible character input](../../tests/fixtures/harmony-moment/README.md) and the [foundation engineering contract](../architecture/adr/023-harmony-foundation-contracts.md). HM-01 property identity and [HM-02 artwork intake](HM02-ARTWORK-INTAKE.md) are accepted bounded contracts. HM-03 character editing and [HM-04 typed composition](../architecture/adr/027-typed-composition-profile.md) have working subsets; audio, deformers and complete node compositing remain open. The complete animated shot and independent animator journey are HM-15 outcomes.
 
 Machine-readable source: [status.json](status.json). The catalog and roadmap retain their stable IDs and complete acceptance requirements.
 

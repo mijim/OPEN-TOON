@@ -222,7 +222,7 @@ Create a character root and stable part roles; keep separate transform hierarchy
 
 ## HM-04
 
-**Shared evaluation and typed graph kernel** — `planned`; owner `animation/compositing/render`, work package `P10-W1`.
+**Shared evaluation and typed graph kernel** — `in_progress`; owner `animation/compositing/render`, work package `P10-W1`.
 
 Extract the existing ordered painter into a shared evaluation boundary with typed image/transform/matte inputs, DAG validation, revision invalidation and explicit Display/Write targets. Register operators only with consumers. Use a restricted linear-sRGB premultiplied composition profile and preserve legacy scene appearance through an explicit legacy profile.
 

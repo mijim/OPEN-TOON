@@ -1,7 +1,9 @@
 #include "opentoon/animation.h"
 #include "scene_renderer.h"
+#include "graph_renderer.h"
 #include "serialization.h"
 #include "vector_hit.h"
+#include <QPainter>
 #include <catch2/catch_test_macros.hpp>
 #include <cmath>
 using namespace opentoon;
@@ -12,6 +14,62 @@ TEST_CASE("Saved and reopened scenes produce the same forty-eight rendered frame
         REQUIRE(SceneRenderer::render(original, frame, QSize(240, 135)) ==
                 SceneRenderer::render(reopened, frame, QSize(240, 135)));
     REQUIRE(SceneRenderer::render(original, 0) != SceneRenderer::render(original, 12));
+}
+TEST_CASE("Linear composition preserves transparent alpha and agrees across outputs") {
+    auto document = makeDocument();
+    document.width = 1;
+    document.height = 1;
+    document.background = {0, 0, 0, 0};
+    auto& base = document.editableDrawing(document.layers.front().id, 0);
+    base.image = ImageAsset{1, 1, {255, 0, 0, 128}};
+    Layer upper = document.layers.front();
+    upper.id = document.allocateId();
+    upper.name = "Upper";
+    auto drawing = base;
+    drawing.id = document.allocateId();
+    drawing.image = ImageAsset{1, 1, {0, 0, 255, 128}};
+    document.drawings.emplace(drawing.id, drawing);
+    for (auto& exposure : upper.exposures)
+        exposure.drawing = drawing.id;
+    document.layers.push_back(upper);
+    document.validate();
+    const auto graph = CompositionGraph::orderedLayers(document);
+    const auto legacy = SceneRenderer::render(document, 0);
+    document.composition = CompositionProfile::LinearSrgb;
+    const auto display = GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Display);
+    const auto write = GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Write);
+    REQUIRE(display == write);
+    REQUIRE(SceneRenderer::render(document, 0) == write);
+    QImage canvas({1, 1}, QImage::Format_ARGB32_Premultiplied);
+    canvas.fill(Qt::transparent);
+    {
+        QPainter painter(&canvas);
+        SceneRenderer::paint(painter, document, 0);
+    }
+    REQUIRE(canvas == display);
+    GraphNode transform{99, GraphNodeKind::LayerTransform, document.layers.front().id, {}};
+    REQUIRE(GraphRenderer::evaluatedTransform(transform, document, 0) ==
+            evaluateTransform(document.layers.front(), 0));
+    auto branched = graph;
+    branched.nodes[5].inputs.front().source = 1;
+    REQUIRE(qAlpha(GraphRenderer::render(branched, document, 0, {}, {},
+                                         GraphTarget::Display).pixel(0, 0)) == 0);
+    REQUIRE(GraphRenderer::render(branched, document, 0, {}, {}, GraphTarget::Write) == write);
+    REQUIRE(qAlpha(write.pixel(0, 0)) >= 190);
+    REQUIRE(qRed(write.pixel(0, 0)) > qRed(legacy.pixel(0, 0)));
+    const auto reopened = deserializeDocument(serializeDocument(document));
+    REQUIRE(SceneRenderer::render(reopened, 0) == write);
+    auto masked = graph;
+    masked.nodes.push_back({8, GraphNodeKind::MatteFromImage, 0, {{2, 0}}});
+    masked.nodes.push_back({9, GraphNodeKind::ApplyMatte, 0, {{4, 0}, {8, 1}}});
+    masked.nodes[5].inputs.front().source = 9;
+    masked.nodes[6].inputs.front().source = 9;
+    masked.validate(document);
+    auto maskOutput = GraphRenderer::render(masked, document, 0, {}, {}, GraphTarget::Write);
+    REQUIRE(qAlpha(maskOutput.pixel(0, 0)) == 64);
+    document.layers.front().visible = false;
+    document.layers.back().visible = false;
+    REQUIRE(qRgba(0, 0, 0, 0) == SceneRenderer::render(document, 0).pixel(0, 0));
 }
 TEST_CASE("Palette identity recolors only referenced strokes and opacity preserves alpha") {
     auto d = makeBouncingBall();

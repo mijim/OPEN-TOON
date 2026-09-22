@@ -82,3 +82,6 @@ format-4 persistence, source-version migration backups and rigid substitutions.
 
 See [ADR-026](026-character-view-sets.md) for format-5 coordinated character
 views, independent hierarchy copying and renderer-backed substitution tiles.
+
+See [ADR-027](027-typed-composition-profile.md) for the opt-in format-6
+composition profile, typed graph kernel and bounded alpha behavior.

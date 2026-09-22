@@ -60,7 +60,7 @@ TEST_CASE("Saving a stale revision cannot overwrite another writer") {
 }
 TEST_CASE("Unknown versions and excessive nesting do not enter the document model") {
     auto text = serializeDocument(makeDocument());
-    auto position = text.find("\"version\":5");
+    auto position = text.find("\"version\":6");
     REQUIRE(position != std::string::npos);
     text.replace(position, 11, "\"version\":9");
     REQUIRE_THROWS(deserializeDocument(text));
@@ -276,7 +276,7 @@ TEST_CASE("Schema two upgrades preserve an original backup and protect Bezier me
     }
     {
         FixtureDatabase db(p.file);
-        REQUIRE(db.count("PRAGMA user_version") == 5);
+        REQUIRE(db.count("PRAGMA user_version") == 6);
     }
 }
 TEST_CASE("Format three scene migrates through typed characters with an original backup") {
@@ -322,7 +322,7 @@ TEST_CASE("Format three scene migrates through typed characters with an original
     REQUIRE(ProjectStore::load(p.file).document == upgraded);
     REQUIRE(ProjectStore::load(backup).document == legacy);
     FixtureDatabase current(p.file);
-    REQUIRE(current.count("PRAGMA user_version") == 5);
+    REQUIRE(current.count("PRAGMA user_version") == 6);
 }
 TEST_CASE("Format four character scene migrates to view sets with a preserved backup") {
     TemporaryProject p;
@@ -359,5 +359,35 @@ TEST_CASE("Format four character scene migrates to view sets with a preserved ba
     REQUIRE(ProjectStore::load(p.file).document == upgraded);
     REQUIRE(ProjectStore::load(backup).document == legacy);
     FixtureDatabase current(p.file);
-    REQUIRE(current.count("PRAGMA user_version") == 5);
+    REQUIRE(current.count("PRAGMA user_version") == 6);
+}
+TEST_CASE("Format five scenes default to legacy appearance and migrate with a backup") {
+    TemporaryProject project;
+    auto old = makeBouncingBall();
+    const auto revision = ProjectStore::save(project.file, old);
+    auto json = nlohmann::json::parse(serializeDocument(old));
+    json["version"] = 5;
+    json.erase("composition");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(json.dump());
+        db.execute("PRAGMA user_version=5");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == old);
+    auto next = old;
+    next.composition = CompositionProfile::LinearSrgb;
+    REQUIRE_THROWS(ProjectStore::save(project.file, next, "Injected profile migration failure",
+                                      revision, [](auto point) {
+                                          if (point == ProjectStore::SavePoint::BeforeTransaction)
+                                              throw std::runtime_error("Injected migration failure");
+                                      }));
+    REQUIRE(ProjectStore::load(project.file).document == old);
+    auto backup = project.file;
+    backup += ".pre-v5.bak";
+    REQUIRE(std::filesystem::exists(backup));
+    REQUIRE(ProjectStore::load(backup).document == old);
+    REQUIRE(ProjectStore::save(project.file, next, "Linear composition", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == next);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == 6);
 }

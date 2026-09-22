@@ -86,6 +86,23 @@ TEST_CASE("Registered PNG parts preserve a shared canvas and undo as one edit") 
     editor.redo();
     REQUIRE(editor.document() == imported);
 }
+TEST_CASE("Composition profile edits are undoable and persist through project save") {
+    EditorController editor;
+    editor.newScene();
+    REQUIRE(editor.compositionProfile() == 0);
+    editor.setCompositionProfile(1);
+    REQUIRE(editor.compositionProfile() == 1);
+    editor.undo();
+    REQUIRE(editor.compositionProfile() == 0);
+    editor.redo();
+    REQUIRE(editor.compositionProfile() == 1);
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto path = std::filesystem::path(directory.filePath("composition.otoon").toStdString());
+    REQUIRE(opentoon::ProjectStore::save(path, editor.document()) > 0);
+    REQUIRE(opentoon::ProjectStore::load(path).document.composition ==
+            opentoon::CompositionProfile::LinearSrgb);
+}
 
 TEST_CASE("Character inspector actions build a saved rigid rig with held substitutions") {
     EditorController editor;

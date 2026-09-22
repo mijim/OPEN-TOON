@@ -357,6 +357,21 @@ ApplicationWindow {
         }
         Menu {
             title: "View"
+            Menu {
+                title: "Composition"
+                Action {
+                    text: "Legacy appearance"
+                    checkable: true
+                    checked: editor.compositionProfile === 0
+                    onTriggered: editor.setCompositionProfile(0)
+                }
+                Action {
+                    text: "Linear sRGB"
+                    checkable: true
+                    checked: editor.compositionProfile === 1
+                    onTriggered: editor.setCompositionProfile(1)
+                }
+            }
             Action {
                 text: "Fit canvas"
                 onTriggered: canvas.fit()
