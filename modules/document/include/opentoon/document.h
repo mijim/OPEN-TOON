@@ -88,7 +88,7 @@ struct Keyframe {
     std::map<std::string, BezierEase> easing;
     auto operator<=>(const Keyframe&) const = default;
 };
-enum class LayerKind : std::uint8_t { Drawing, Character, Peg, Part };
+enum class LayerKind : std::uint8_t { Drawing, Character, Peg, Part, Camera };
 struct Substitution {
     Id drawing = 0;
     std::string name;
@@ -125,13 +125,14 @@ struct Marker {
     auto operator<=>(const Marker&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 6;
+    static constexpr int formatVersion = 7;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;
     FrameRate rate;
     Color background{1, 1, 1, 1};
     CompositionProfile composition = CompositionProfile::LegacyQt;
+    Id activeCamera = 0;
     Id nextId = 1;
     std::vector<Layer> layers;
     std::map<Id, Drawing> drawings;

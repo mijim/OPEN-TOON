@@ -40,7 +40,7 @@
     {
       "id": "P05",
       "status": "in_progress",
-      "available": "Sparse immutable 15-bit premultiplied tiles, libmypaint ink/soft/dry/smudge/eraser presets, pressure input, cancellable gestures, shared preview/export and compressed project resources. Brush opacity and rectangular pixel selection with integer move/duplicate/delete, flips and lossless quarter turns, alpha-safe overlap and guarded canvas bounds. Free scale/rotation preview and commit using nearest-neighbor sampling with transparent surroundings.",
+      "available": "Sparse immutable 15-bit premultiplied tiles, libmypaint ink/soft/dry/smudge/eraser presets, pressure input, cancellable gestures, shared preview/export and compressed project resources. Brush opacity and rectangular pixel selection with integer move/duplicate/delete, flips and lossless quarter turns, alpha-safe overlap and guarded canvas bounds. Free scale/rotation preview and commit using nearest-neighbor sampling with transparent surroundings. One orthographic output camera has direct pan/rotate/zoom handles, frame keys, guides and save/reopen/export parity.",
       "remaining": "Brush texture/import/preset management, lasso/soft masks, high-quality resampling and transform performance qualification, resolution changes, production workload and physical-device qualification."
     },
     {
@@ -84,7 +84,7 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 95,
+      "count": 99,
       "command": "ctest --test-dir build/locked --output-on-failure"
     },
     "native_input_workflow": {
@@ -217,7 +217,7 @@
     },
     "export_workflows": {
       "status": "passed",
-      "cases": 15,
+      "cases": 20,
       "ctest_entry": "export_workflows",
       "covers": [
         "immutable snapshot during concurrent edit",
@@ -237,10 +237,11 @@
         "numbered PNG sequence sorts frames, leaves gaps empty, extends duration and round-trips through save/reopen",
         "ten compact layer pose actions copy, paste masked/full/mirrored values and reset with one undo while locked targets reject",
         "explicit later-frame pose paste anchors rest and survives project save/reopen",
-        "single-image import converts tagged Display P3 to sRGB and creates an absent layer atomically"
+        "single-image import converts tagged Display P3 to sRGB and creates an absent layer atomically",
+        "animated orthographic camera matches reopened preview and two exported PNG frames"
       ]
     },
-    "total_local_ctest_entries": 72,
+    "total_local_ctest_entries": 99,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -325,7 +326,7 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.14",
+  "version": "0.2.0-experimental.15",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
@@ -335,7 +336,7 @@
   "planning_priority": {
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
-    "state": "HM-00_HM-01_HM-02_complete__HM-03_HM-04_in_progress",
-    "note": "HM-00 owner review, HM-01 typed properties and HM-02 artwork intake are accepted bounded contracts. HM-03 has persisted rigid characters and an automated 19-part journey but still needs artist-led acceptance. HM-04 has a typed image graph, revision-keyed canvas cache, speculative next-frame worker and original 19-part color/cost evidence; timed native playback and denser production scenes remain open. No full phase or catalog capability is claimed complete."
+    "state": "HM-00_HM-01_HM-02_HM-04_HM-13_complete__HM-03_in_progress",
+    "note": "HM-00, HM-01, HM-02, bounded HM-04 and one-camera HM-13 have accepted evidence. HM-03 still needs artist-led rigid-character acceptance before HM-05 deformers and HM-12 nodes. HM-10 audio is independently eligible. No full phase or catalog capability is claimed complete."
   }
 }

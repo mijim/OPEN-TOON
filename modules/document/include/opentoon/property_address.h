@@ -4,7 +4,7 @@
 #include <string_view>
 
 namespace opentoon {
-enum class PropertyEntityKind : std::uint8_t { Layer, Character, Peg, Part };
+enum class PropertyEntityKind : std::uint8_t { Layer, Character, Peg, Part, Camera };
 enum class PropertyKind : std::uint8_t {
     PositionX,
     PositionY,
@@ -22,6 +22,8 @@ struct PropertyAddress {
     PropertyKind kind = PropertyKind::PositionX;
     PropertyAddress() = default;
     PropertyAddress(Id layerId, PropertyKind property) : layer(layerId), kind(property) {}
+    PropertyAddress(PropertyEntityKind entityKind, Id layerId, PropertyKind property)
+        : entity(entityKind), layer(layerId), kind(property) {}
     auto operator<=>(const PropertyAddress&) const = default;
 };
 struct PropertyEdit {

@@ -85,3 +85,6 @@ views, independent hierarchy copying and renderer-backed substitution tiles.
 
 See [ADR-027](027-typed-composition-profile.md) for the opt-in format-6
 composition profile, typed graph kernel and bounded alpha behavior.
+
+See [ADR-028](028-output-camera.md) for format-7 orthographic output framing,
+direct camera gestures and the preview/export coordinate boundary.

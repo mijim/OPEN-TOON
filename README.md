@@ -21,11 +21,12 @@ project workflows. Developers preparing a macOS package can use the
 - Direct selection, transforms, vector lasso, clipboard, alignment and cleanup.
 - Layers, exposures, onion skin, playback and integrated Timeline/Xsheet editing.
 - Visual pose animation, editable motion curves and grouped keyframe operations.
+- Orthographic output camera with direct framing handles, animated poses and guides.
 - Local project revisions, recovery snapshots and PNG sequence export.
 
 OPEN-TOON is under active development. The [implementation status](docs/implementation/STATUS.md)
 describes supported workflows and current limitations; the [roadmap](docs/planning/PHASES.md)
-covers planned cameras, audio, rigging, deformation and compositing.
+covers planned audio, deformation and expanded rigging/compositing workflows.
 
 ## Documentation
 

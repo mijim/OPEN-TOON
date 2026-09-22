@@ -1,7 +1,7 @@
 # HM-04 typed composition kernel — working subset
 
-This bounded implementation adds ten observable capabilities without claiming
-the HM-04 contract or P10 phase complete:
+The first bounded block added ten observable behaviors. The [HM-04 acceptance
+record](HM04-ACCEPTANCE.md) now closes the bounded contract; P10 remains open:
 
 1. Compile ordered Drawing and Part layers into a derived composition DAG.
 2. Check typed Image, Transform and Matte input/output contracts.
@@ -64,8 +64,6 @@ Ten additional observable behaviors now work on the macOS development build:
     pixels at three tested poses; the 1080p workload has a recorded cost baseline.
 
 This is speculative preparation, not a separate evaluator or a promise of real-time
-playback on all scenes. The native smoke covers the foreground canvas cache/profile
-path; the producer's immutable snapshot and publication behavior have an adapter
-test. A timed native playback/scrub journey, fuller color charts and denser scene
-cost qualification remain before HM-04 contract acceptance. The graph still has no
-editable node topology in the UI.
+playback on all scenes. Native timed playback/scrub, expanded color charts and
+animated original-art cost measurements now close the bounded HM-04 gate. The
+graph still has no editable node topology in the UI.

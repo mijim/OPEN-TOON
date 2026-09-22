@@ -66,6 +66,7 @@ void PreviewRenderQueue::run() {
             options.background = job.ticket.key.background;
             options.onionSkin = job.ticket.key.onionSkin;
             options.onionRange = job.ticket.key.onionRange;
+            options.ignoreCamera = job.ticket.key.ignoreCamera;
             options.cancelled = cancelled;
             auto pixels = GraphRenderer::render(CompositionGraph::orderedLayers(*job.document),
                                                 *job.document, job.ticket.key.frame,

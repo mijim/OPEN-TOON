@@ -4683,7 +4683,7 @@
       "owner_phase": "P10",
       "work_package": "P10-W1",
       "owner_module": "animation/compositing/render",
-      "status": "in_progress",
+      "status": "complete",
       "effort_engineer_weeks": [
         3,
         6
@@ -4727,7 +4727,8 @@
         "tests/storage_tests.cpp",
         "adapters/render/preview_render_queue.cpp",
         "apps/desktop/compositor_benchmark.cpp",
-        "docs/implementation/COMPOSITOR-BENCHMARK.md"
+        "docs/implementation/COMPOSITOR-BENCHMARK.md",
+        "docs/implementation/HM04-ACCEPTANCE.md"
       ]
     },
     {
@@ -5093,7 +5094,7 @@
       "owner_phase": "P06",
       "work_package": "P06-W3",
       "owner_module": "camera/animation",
-      "status": "planned",
+      "status": "complete",
       "effort_engineer_weeks": [
         2,
         4
@@ -5125,7 +5126,13 @@
         "adapters/qt/canvas_item.cpp"
       ],
       "library_ids": [],
-      "completion_evidence": []
+      "completion_evidence": [
+        "docs/implementation/HM13-ACCEPTANCE.md",
+        "docs/architecture/adr/028-output-camera.md",
+        "tests/render_tests.cpp",
+        "tests/export_tests.cpp",
+        "apps/desktop/camera_smoke.cpp"
+      ]
     },
     {
       "id": "HM-14",
@@ -5230,7 +5237,7 @@
   ],
   "execution_policy": {
     "primary_objective": "HM: reliable character animation Harmony Moment",
-    "current_instruction": "HM-01 and HM-02 are accepted. HM-03 rigid-character workflow and HM-04 typed composition kernel are in progress. HM-04 now has a speculative immutable-snapshot preview worker, stale-publication rejection and original 19-part alpha/output and cost evidence. Finish timed native playback/scrub qualification, fuller color charts and a denser animated production workload before acceptance. HM-03 still needs artist-led rigid-character review. HM-10 is independently eligible.",
+    "current_instruction": "HM-00, HM-01, HM-02, bounded HM-04 and HM-13 are accepted. HM-03 rigid-character workflow still needs artist-led acceptance; this blocks HM-05 deformers and HM-12 nodes. HM-10 audio is independently eligible now, with HM-03 review and HM-05 binding feasibility the next critical-path tasks.",
     "phase_dependency_semantics": "Phase depends_on constrains full epic completion, not entry into an implementation slice. Only the explicit delivery-slice contract DAG gates the Harmony Moment. Domain dependencies are scope relationships, not all-features barriers.",
     "entry_rule": "Start a slice only when each required contract has accepted evidence. Baseline reuse is partial and must be qualified; planned is not ready. Independent spikes may run without claiming their consumer ready.",
     "wip_limit": 2,

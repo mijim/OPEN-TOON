@@ -21,6 +21,7 @@ struct RenderCacheKey {
     bool background = true;
     bool onionSkin = false;
     int onionRange = 1;
+    bool ignoreCamera = false;
     bool operator==(const RenderCacheKey&) const = default;
 };
 struct RenderTicket {

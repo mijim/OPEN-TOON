@@ -78,6 +78,134 @@ TEST_CASE("Linear composition preserves transparent alpha and agrees across outp
     document.layers.back().visible = false;
     REQUIRE(qRgba(0, 0, 0, 0) == SceneRenderer::render(document, 0).pixel(0, 0));
 }
+TEST_CASE("Linear color chart keeps bounded alpha and premultiplied color across coverage levels") {
+    auto document = makeDocument();
+    document.width = 8;
+    document.height = 8;
+    document.background = {0, 0, 0, 0};
+    auto& lower = document.editableDrawing(document.layers.front().id, 0);
+    std::vector<std::uint8_t> red(8 * 8 * 4), blue(8 * 8 * 4);
+    for (int y = 0; y < 8; ++y)
+        for (int x = 0; x < 8; ++x) {
+            const auto i = std::size_t((y * 8 + x) * 4);
+            red[i] = 255;
+            red[i + 3] = std::uint8_t(x * 36);
+            blue[i + 2] = 255;
+            blue[i + 3] = std::uint8_t(y * 36);
+        }
+    lower.image = ImageAsset{8, 8, std::move(red)};
+    Layer upper = document.layers.front();
+    upper.id = document.allocateId();
+    upper.name = "Blue coverage";
+    Drawing drawing;
+    drawing.id = document.allocateId();
+    drawing.image = ImageAsset{8, 8, std::move(blue)};
+    document.drawings.emplace(drawing.id, drawing);
+    upper.exposures = {{0, 1, drawing.id}};
+    document.layers.push_back(upper);
+    document.validate();
+    const auto legacy = SceneRenderer::render(document, 0);
+    document.composition = CompositionProfile::LinearSrgb;
+    const auto graph = CompositionGraph::orderedLayers(document);
+    const auto display = GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Display);
+    const auto write = GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Write);
+    REQUIRE(display == write);
+    for (int y = 0; y < 8; ++y)
+        for (int x = 0; x < 8; ++x) {
+            const auto pixel = write.pixel(x, y);
+            REQUIRE(std::abs(qAlpha(pixel) - qAlpha(legacy.pixel(x, y))) <= 1);
+            REQUIRE(qRed(pixel) <= qAlpha(pixel));
+            REQUIRE(qGreen(pixel) <= qAlpha(pixel));
+            REQUIRE(qBlue(pixel) <= qAlpha(pixel));
+            if (x == 0 && y == 0)
+                REQUIRE(pixel == qRgba(0, 0, 0, 0));
+        }
+}
+TEST_CASE("Orthographic output camera changes framing without changing drawing coordinates") {
+    auto document = makeDocument();
+    document.width = document.height = 64;
+    document.background = {0, 0, 0, 0};
+    auto& artwork = document.editableDrawing(document.layers.front().id, 0);
+    artwork.image = ImageAsset{8, 8, std::vector<std::uint8_t>(8 * 8 * 4, 255)};
+    document.layers.front().transform.x = 16;
+    document.layers.front().transform.y = 16;
+    document.validate();
+    for (const auto profile : {CompositionProfile::LegacyQt, CompositionProfile::LinearSrgb}) {
+        document.composition = profile;
+        const auto original = SceneRenderer::render(document, 0);
+        Layer camera;
+        camera.id = document.allocateId();
+        camera.kind = LayerKind::Camera;
+        camera.name = "Output camera";
+        camera.transform.x = camera.transform.y = 32;
+        document.activeCamera = camera.id;
+        document.layers.push_back(camera);
+        document.validate();
+        REQUIRE(SceneRenderer::render(document, 0) == original);
+        document.layer(camera.id).transform.x = 40;
+        document.validate();
+        const auto moved = SceneRenderer::render(document, 0);
+        REQUIRE(qAlpha(moved.pixel(12, 20)) == 255);
+        REQUIRE(qAlpha(moved.pixel(20, 20)) == 0);
+        REQUIRE(document.layers.front().transform.x == 16);
+        auto zoomed = document.layer(camera.id).transform;
+        zoomed.scaleX = zoomed.scaleY = 2;
+        document.layer(camera.id).transform = zoomed;
+        document.validate();
+        const auto mapped = SceneRenderer::cameraTransform(document, 0).map(QPointF(20, 20));
+        REQUIRE(mapped == QPointF(-8, 8));
+        const auto graph = CompositionGraph::orderedLayers(document);
+        if (profile == CompositionProfile::LinearSrgb)
+            REQUIRE(GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Display) ==
+                    SceneRenderer::render(document, 0));
+        document.layers.pop_back();
+        document.activeCamera = 0;
+    }
+}
+TEST_CASE("Camera keys are validated and survive output save and reopen") {
+    auto document = makeBouncingBall();
+    Layer camera;
+    camera.id = document.allocateId();
+    camera.kind = LayerKind::Camera;
+    camera.name = "Output camera";
+    camera.transform.x = document.width / 2;
+    camera.transform.y = document.height / 2;
+    document.activeCamera = camera.id;
+    document.layers.push_back(camera);
+    auto final = camera.transform;
+    final.x += 100;
+    final.rotation = 20;
+    final.scaleX = final.scaleY = 1.5;
+    recordPose(document.layer(camera.id), 0, camera.transform);
+    recordPose(document.layer(camera.id), 24, final);
+    document.validate();
+    REQUIRE(evaluateTransform(document.layer(camera.id), 12).x == camera.transform.x + 50);
+    const auto reopened = deserializeDocument(serializeDocument(document));
+    REQUIRE(reopened == document);
+    for (int frame : {0, 12, 24})
+        REQUIRE(SceneRenderer::render(reopened, frame, QSize(240, 135)) ==
+                SceneRenderer::render(document, frame, QSize(240, 135)));
+    auto invalid = document;
+    invalid.layer(camera.id).transform.scaleX = 0;
+    REQUIRE_THROWS(invalid.validate());
+    invalid = document;
+    invalid.layer(camera.id).keys.front().easing["scaleX"] = {.25, -1, .75, 2};
+    REQUIRE_THROWS(invalid.validate());
+    invalid = document;
+    invalid.activeCamera = 0;
+    REQUIRE_THROWS(invalid.validate());
+    invalid = document;
+    invalid.layer(camera.id).parent = document.layers.front().id;
+    REQUIRE_THROWS(invalid.validate());
+    invalid = document;
+    invalid.layers.front().parent = camera.id;
+    REQUIRE_THROWS(invalid.validate());
+    invalid = document;
+    auto duplicate = camera;
+    duplicate.id = invalid.allocateId();
+    invalid.layers.push_back(duplicate);
+    REQUIRE_THROWS(invalid.validate());
+}
 TEST_CASE("Revision render cache reuses frames and separates view options") {
     RevisionRenderCache cache(8);
     RenderCacheKey key{7, 11, 0, 1, 1, CompositionProfile::LinearSrgb,

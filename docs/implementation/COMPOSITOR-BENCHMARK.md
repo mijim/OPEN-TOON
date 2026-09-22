@@ -46,3 +46,10 @@ that startup variance is not included in the median. This fixture has real alpha
 artwork but no deformation, effects, masks, camera or continuous motion. The
 linear route is close to a 24 fps frame budget before presentation and editing
 overhead, so it does not establish real-time playback for a full character shot.
+
+The HM-04 closing run samples animated root-pose frames 0, 120 and 240 rather
+than three adjacent rest frames. Five additional process runs on the same host
+yielded a **39.19 ms/frame** median linear cost (38.55–39.79 ms) and a
+**1.86 ms/frame** legacy median (1.73–1.95 ms). No renderer optimization is
+inferred from this measurement. The native canvas smoke also confirms that a
+prefetched frame publishes and that timed playback and rapid scrubbing work.

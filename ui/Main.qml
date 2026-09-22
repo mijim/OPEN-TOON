@@ -262,6 +262,10 @@ ApplicationWindow {
                 onTriggered: sequenceDialog.open()
             }
             Action {
+                text: editor.activeCamera ? "Edit output camera" : "Add output camera"
+                onTriggered: { editor.addCamera(); root.inspectorMode = "layer"; canvas.clearRegion(); }
+            }
+            Action {
                 text: "Export PNG sequence…"
                 enabled: !editor.exporting
                 onTriggered: exportDialog.open()
@@ -518,13 +522,13 @@ ApplicationWindow {
                     Accessible.name: "Raster brush preset"
                 }
                 Text {
-                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate"
+                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate" && editor.tool !== "Camera"
                     text: "Size"
                     color: "#858585"
                     font.pixelSize: 11
                 }
                 Slider {
-                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate"
+                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate" && editor.tool !== "Camera"
                     from: 0.5
                     to: 100
                     value: editor.brushSize
@@ -533,7 +537,7 @@ ApplicationWindow {
                     Accessible.name: "Brush size"
                 }
                 Text {
-                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate"
+                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate" && editor.tool !== "Camera"
                     text: editor.brushSize.toFixed(1) + " px"
                     color: "#aaaaaa"
                     Layout.preferredWidth: 58
@@ -563,6 +567,28 @@ ApplicationWindow {
                     visible: editor.tool === "Edit points"
                     text: "Drag points · Double-click a segment to add · Delete removes the selected point"
                     color: "#bbbbbb"
+                }
+                Label {
+                    visible: editor.tool === "Camera"
+                    text: "Drag frame to pan · corners to zoom · circle to rotate · Shift constrains"
+                    color: "#bbbbbb"
+                }
+                Label {
+                    visible: editor.tool === "Camera"
+                    text: editor.cameraZoom.toFixed(2) + "×"
+                    color: "#dddddd"
+                }
+                C.ToolButton {
+                    visible: editor.tool === "Camera"
+                    text: "Reset frame"
+                    hint: "Return this camera key to full-scene framing"
+                    onClicked: editor.resetCameraPose()
+                }
+                C.ToolButton {
+                    visible: editor.activeCamera > 0
+                    text: canvas.cameraGuidesVisible ? "Guides on" : "Guides"
+                    hint: "Show non-exported safe-frame guides"
+                    onClicked: canvas.cameraGuidesVisible = !canvas.cameraGuidesVisible
                 }
                 C.ToolButton {
                     text: "Guides ▾"
@@ -734,6 +760,7 @@ ApplicationWindow {
                                     name: "Animate",
                                     key: "A"
                                 },
+                                { name: "Camera", key: "" },
                                 {
                                     name: "Marquee",
                                     key: "M"
@@ -775,6 +802,7 @@ ApplicationWindow {
                                 height: 28
                                 toolIcon: modelData.name
                                 active: editor.tool === modelData.name
+                                enabled: modelData.name !== "Camera" || editor.activeCamera > 0
                                 hint: modelData.name + (modelData.key ? " · " + modelData.key : "")
                                 onClicked: editor.tool = modelData.name
                             }
@@ -871,7 +899,7 @@ ApplicationWindow {
                                 Layout.leftMargin: 16
                                 C.CompactComboBox {
                                     model: ["Setup", "Animate"]
-                                    enabled: editor.tool !== "Animate"
+                                    enabled: editor.tool !== "Animate" && editor.tool !== "Camera"
                                     currentIndex: editor.animateMode ? 1 : 0
                                     onActivated: editor.animateMode = currentIndex === 1
                                     Accessible.name: "Animation edit mode"
@@ -879,8 +907,8 @@ ApplicationWindow {
                                 }
                                 C.CompactCheckBox {
                                     text: editor.tool === "Animate" ? "Gesture keys" : "Auto key"
-                                    checked: editor.tool === "Animate" || editor.autoKey
-                                    enabled: editor.tool !== "Animate" && editor.animateMode
+                                    checked: editor.tool === "Animate" || editor.tool === "Camera" || editor.autoKey
+                                    enabled: editor.tool !== "Animate" && editor.tool !== "Camera" && editor.animateMode
                                     onToggled: editor.autoKey = checked
                                 }
                             }
@@ -912,6 +940,7 @@ ApplicationWindow {
                                 }
                                 C.ToolButton {
                                     text: "Pose ▾"
+                                    visible: layerInspector.rigLayer?.kind !== 4
                                     hint: "Copy, paste or reset the selected layer transform"
                                     onClicked: layerPoseMenu.open()
                                     Menu {
@@ -940,7 +969,12 @@ ApplicationWindow {
                                 columnSpacing: 8
                                 rowSpacing: 8
                                 Repeater {
-                                    model: [
+                                    model: layerInspector.rigLayer?.kind === 4 ? [
+                                        { key: "x", name: "Center X · px" },
+                                        { key: "y", name: "Center Y · px" },
+                                        { key: "rotation", name: "Rotation °" },
+                                        { key: "zoom", name: "Zoom · ratio" }
+                                    ] : [
                                         {
                                             key: "x",
                                             name: "Position X"
@@ -988,10 +1022,12 @@ ApplicationWindow {
                                             Layout.preferredWidth: 96
                                             number: {
                                                 const f = editor.frame;
-                                                return Number(editor.transform[modelData.key] || 0);
+                                                return modelData.key === "zoom" ? editor.cameraZoom :
+                                                    Number(editor.transform[modelData.key] || 0);
                                             }
                                             label: modelData.name
-                                            onCommitted: value => editor.setTransform(modelData.key, value)
+                                            onCommitted: value => modelData.key === "zoom" ?
+                                                editor.setCameraZoom(value) : editor.setTransform(modelData.key, value)
                                         }
                                     }
                                 }
@@ -1015,14 +1051,14 @@ ApplicationWindow {
                                 Layout.rightMargin: 16
                                 Layout.fillWidth: true
                                 implicitHeight: 30
-                                enabled: layerInspector.rigLayer?.kind !== 1
+                                enabled: layerInspector.rigLayer?.kind !== 1 && layerInspector.rigLayer?.kind !== 4
                                 model: {
                                     const layers = editor.layers;
                                     const selected = layerInspector.rigLayer;
                                     if (!selected)
                                         return [];
                                     if (selected.kind !== 2 && selected.kind !== 3)
-                                        return [{id: 0, name: "No parent"}].concat(layers.filter(l => l.id !== selected.id));
+                                        return [{id: 0, name: "No parent"}].concat(layers.filter(l => l.id !== selected.id && l.kind !== 4));
                                     function ancestor(id) {
                                         let node = layers.find(l => l.id === id);
                                         let depth = 0;
@@ -1112,7 +1148,7 @@ ApplicationWindow {
                                 }
                                 Label {
                                     Layout.fillWidth: true
-                                    text: ({0: "Drawing", 1: "Character", 2: "Peg", 3: "Part"})[layerInspector.rigLayer?.kind ?? 0]
+                                    text: ({0: "Drawing", 1: "Character", 2: "Peg", 3: "Part", 4: "Camera"})[layerInspector.rigLayer?.kind ?? 0]
                                     color: "#999999"
                                     font.pixelSize: 11
                                     horizontalAlignment: Text.AlignRight
@@ -1697,6 +1733,7 @@ ApplicationWindow {
                                 spacing: 2
                                 C.ToolButton {
                                     text: modelData.visible ? "◉" : "○"
+                                    visible: modelData.kind !== 4
                                     implicitWidth: 24
                                     hint: "Toggle visibility"
                                     onClicked: editor.toggleLayer(modelData.id, "visible")
@@ -1723,6 +1760,7 @@ ApplicationWindow {
                                 }
                                 C.ToolButton {
                                     text: "S"
+                                    visible: modelData.kind !== 4
                                     active: modelData.solo
                                     implicitWidth: 24
                                     hint: "Solo layer"

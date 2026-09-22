@@ -1,5 +1,21 @@
 # Experimental releases
 
+## 0.2.0-experimental.15 — orthographic output camera
+
+- Add 20 bounded camera behaviors: direct pan/rotate/zoom, constrained gestures,
+  animated framing, guides, selected-camera Properties, safe undo/deletion and
+  identical preview, reopened and PNG output. See [HM-13 acceptance](HM13-ACCEPTANCE.md).
+- Save one explicit output camera in format 7. Format-6 projects migrate with a
+  source-version backup; invalid and singular camera framing is rejected.
+- Close the bounded HM-04 graph contract with native timed playback/scrubbing,
+  fuller alpha/color checks and repeated animated original-art cost measurements.
+  This does not complete the wider P10 node-compositor phase.
+- macOS locked build: 99/99 CTest entries and the native input/composition/camera
+  smoke pass. Source only; no new dependency or Windows/Linux build qualification.
+
+P06 and P10 remain in progress. HM-03 artist-led rigid-character acceptance,
+deformation, audio and editable node topology remain on the Harmony Moment path.
+
 ## 0.2.0-experimental.14 — speculative compositor preview
 
 - The linear-sRGB canvas prepares its next frame on one background worker from an

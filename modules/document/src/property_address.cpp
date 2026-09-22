@@ -11,7 +11,8 @@ std::string_view layerChannel(const Document& document, PropertyAddress address)
     const bool compatible = address.entity == PropertyEntityKind::Layer ||
                             (address.entity == PropertyEntityKind::Character && kind == LayerKind::Character) ||
                             (address.entity == PropertyEntityKind::Peg && kind == LayerKind::Peg) ||
-                            (address.entity == PropertyEntityKind::Part && kind == LayerKind::Part);
+                            (address.entity == PropertyEntityKind::Part && kind == LayerKind::Part) ||
+                            (address.entity == PropertyEntityKind::Camera && kind == LayerKind::Camera);
     if (!compatible)
         throw std::invalid_argument("Property entity kind does not match its stable identity.");
     return propertyChannel(address.kind);

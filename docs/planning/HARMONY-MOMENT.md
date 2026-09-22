@@ -222,7 +222,7 @@ Create a character root and stable part roles; keep separate transform hierarchy
 
 ## HM-04
 
-**Shared evaluation and typed graph kernel** — `in_progress`; owner `animation/compositing/render`, work package `P10-W1`.
+**Shared evaluation and typed graph kernel** — `complete`; owner `animation/compositing/render`, work package `P10-W1`.
 
 Extract the existing ordered painter into a shared evaluation boundary with typed image/transform/matte inputs, DAG validation, revision invalidation and explicit Display/Write targets. Register operators only with consumers. Use a restricted linear-sRGB premultiplied composition profile and preserve legacy scene appearance through an explicit legacy profile.
 
@@ -485,7 +485,7 @@ Expose a small editable node graph: Drawing, Peg/Transform, ordered Composite, O
 
 ## HM-13
 
-**Output camera and framing** — `planned`; owner `camera/animation`, work package `P06-W3`.
+**Output camera and framing** — `complete`; owner `camera/animation`, work package `P06-W3`.
 
 Add an explicit active orthographic output camera with animated pan/zoom/rotation and nonrendering framing guides. Separate camera edits from canvas navigation; retain drawing-local coordinates.
 

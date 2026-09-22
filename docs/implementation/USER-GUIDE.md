@@ -44,7 +44,17 @@ The four art categories are Underlay, Color, Line and Overlay. Their drawing ord
 
 Click a swatch to select it. Double-click to edit its color; all strokes referencing that ID update. The document retains color IDs across save/reopen. Palette import, variants, gradients and managed color are pending.
 
-The inspector edits position, rotation, scale, opacity and pivot. Add transform keys with Linear, Hold or Smooth interpolation. If a layer already has keys, editing a transform inserts or updates a key at the current frame. Parent layers apply inherited transforms and opacity. Character parts and pegs preserve the visible image when reparented within one character, provided the result has no shear or singular transform and the moved layer and its ancestors are not animated. Curves can be edited in the main workspace. Camera, IK and deformation remain pending.
+The inspector edits position, rotation, scale, opacity and pivot. Add transform keys with Linear, Hold or Smooth interpolation. If a layer already has keys, editing a transform inserts or updates a key at the current frame. Parent layers apply inherited transforms and opacity. Character parts and pegs preserve the visible image when reparented within one character, provided the result has no shear or singular transform and the moved layer and its ancestors are not animated. Curves can be edited in the main workspace. IK and deformation remain pending.
+
+**Scene → Add output camera** creates one orthographic camera. Choose the Camera
+tool to see the shot frame: drag inside it to pan, drag the round top handle to
+rotate, or drag a corner to zoom. Shift constrains pan to one axis or rotation
+to 15-degree increments. The compact camera bar and selected-camera Properties
+show zoom and pose; **Reset** restores the scene-center frame. **Guides** shows
+the frame and safe area over normal artwork editing. Camera moves at later
+frames create keys and can be edited in Curves. Camera framing affects preview
+and PNG export; viewport pan, zoom and fit only change how you inspect the shot.
+The camera is single-output for now; multiplane and perspective are pending.
 
 To assemble a rigid character, import registered PNG parts and select one layer in the layer list. In its Properties panel, open **Rig → Make character from layer**. That layer becomes a Part below a new Character root. Select another imported drawing layer and choose the Character or a Peg as its parent; the drawing becomes a Part while retaining its visible placement. **Rig → Add parent peg** inserts a transform parent over the selected Part or Peg. Edit the Part role in Properties. **Center rest pivot on drawing** places its saved pivot at the local artwork center while retaining its position; do this before animating the layer. Precise on-canvas pivot placement is pending.
 

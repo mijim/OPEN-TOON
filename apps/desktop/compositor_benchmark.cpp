@@ -25,6 +25,11 @@ Document originalArt() {
     Layer root;
     root.id = document.allocateId();
     root.name = "Character root";
+    for (const auto& pose : spec.value("reference_key_poses").toArray()) {
+        Transform transform;
+        transform.x = pose.toObject().value("root_dx_px").toDouble();
+        root.keys.push_back({pose.toObject().value("frame").toInt(), transform});
+    }
     document.layers.push_back(root);
     const auto centers = spec.value("reference_centers_px").toObject();
     for (const auto& entry : spec.value("reference_paint_order").toArray()) {
@@ -94,7 +99,8 @@ int main(int argc, char** argv) {
         document.composition = profile;
         (void)SceneRenderer::render(document, 0); // Warm renderer and color tables.
         const auto start = std::chrono::steady_clock::now();
-        for (int frame = 0; frame < 3; ++frame)
+        for (int frame : (original ? std::vector<int>{0, 120, 240} :
+                                          std::vector<int>{0, 1, 2}))
             (void)SceneRenderer::render(document, frame);
         const auto elapsed = std::chrono::steady_clock::now() - start;
         return std::chrono::duration<double, std::milli>(elapsed).count() / 3;

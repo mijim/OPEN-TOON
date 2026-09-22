@@ -1,6 +1,6 @@
 # ADR-027 — Typed composition kernel and format-6 profile
 
-Status: experimental implementation for HM-04, 2026-09-23. HM-04 remains open.
+Status: accepted bounded HM-04 implementation, 2026-09-23. P10 remains open.
 
 ## Decision
 
@@ -29,14 +29,14 @@ Qt remains behind the render adapter; graph types and validation are Qt-free.
 
 The retained solve order is: authored keys and future property drivers → local
 transforms → parent hierarchy → future deformation → future scene-space
-attachments → future output camera → layer rasterization → typed image graph
+attachments → output camera → layer rasterization → typed image graph
 → Display or Write. A driver must resolve before its consumer; the future
 deformer samples the completed scene-space transform and rest binding; the
 camera maps scene to output space once; image nodes cannot feed a Transform
 port. Cycles within or between these stages must fail validation rather than
-depend on iteration order. Today only authored keys, hierarchy, rasterization
-and the image graph are executable. This order defines where the later HM-05,
-HM-09 and HM-13 contracts connect without claiming their implementation.
+depend on iteration order. Authored keys, hierarchy, orthographic camera,
+rasterization and the image graph are executable. This order defines where
+the later HM-05 and HM-09 contracts connect; ADR-028 defines the camera mapping.
 
 Canvas composition now uses a 96 MiB least-recently-used cache keyed by scene
 generation, document revision, frame, size, profile, output and view options.
@@ -66,7 +66,6 @@ This is an 8-bit CPU reference path, not a full color-management system. At
 fractional resizes, isolating layers before `Over` can differ from the direct
 legacy painter. The profile is opt-in; old scenes remain exact on their old
 path. Alpha fixtures, graph rejection and save/reopen tests cover the bounded
-behavior. HM-04 still needs a timed native playback/scrub qualification,
-denser production-scene cost evidence and fuller alpha/color charts
-before its contract can be accepted. No full
+behavior. The bounded HM-04 contract has native playback/scrub, animated
+original-art cost and alpha/color chart evidence in HM04-ACCEPTANCE.md. No full
 node editor, effects catalog, HDR/EXR or OCIO manager is claimed.

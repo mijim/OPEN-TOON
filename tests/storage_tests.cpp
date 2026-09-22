@@ -60,7 +60,7 @@ TEST_CASE("Saving a stale revision cannot overwrite another writer") {
 }
 TEST_CASE("Unknown versions and excessive nesting do not enter the document model") {
     auto text = serializeDocument(makeDocument());
-    auto position = text.find("\"version\":6");
+    auto position = text.find("\"version\":7");
     REQUIRE(position != std::string::npos);
     text.replace(position, 11, "\"version\":9");
     REQUIRE_THROWS(deserializeDocument(text));
@@ -276,7 +276,7 @@ TEST_CASE("Schema two upgrades preserve an original backup and protect Bezier me
     }
     {
         FixtureDatabase db(p.file);
-        REQUIRE(db.count("PRAGMA user_version") == 6);
+        REQUIRE(db.count("PRAGMA user_version") == 7);
     }
 }
 TEST_CASE("Format three scene migrates through typed characters with an original backup") {
@@ -322,7 +322,7 @@ TEST_CASE("Format three scene migrates through typed characters with an original
     REQUIRE(ProjectStore::load(p.file).document == upgraded);
     REQUIRE(ProjectStore::load(backup).document == legacy);
     FixtureDatabase current(p.file);
-    REQUIRE(current.count("PRAGMA user_version") == 6);
+    REQUIRE(current.count("PRAGMA user_version") == 7);
 }
 TEST_CASE("Format four character scene migrates to view sets with a preserved backup") {
     TemporaryProject p;
@@ -359,7 +359,7 @@ TEST_CASE("Format four character scene migrates to view sets with a preserved ba
     REQUIRE(ProjectStore::load(p.file).document == upgraded);
     REQUIRE(ProjectStore::load(backup).document == legacy);
     FixtureDatabase current(p.file);
-    REQUIRE(current.count("PRAGMA user_version") == 6);
+    REQUIRE(current.count("PRAGMA user_version") == 7);
 }
 TEST_CASE("Format five scenes default to legacy appearance and migrate with a backup") {
     TemporaryProject project;
@@ -389,5 +389,35 @@ TEST_CASE("Format five scenes default to legacy appearance and migrate with a ba
     REQUIRE(ProjectStore::save(project.file, next, "Linear composition", revision) > revision);
     REQUIRE(ProjectStore::load(project.file).document == next);
     FixtureDatabase current(project.file);
-    REQUIRE(current.count("PRAGMA user_version") == 6);
+    REQUIRE(current.count("PRAGMA user_version") == 7);
+}
+TEST_CASE("Format six scene gains an output camera with a readable original backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    const auto revision = ProjectStore::save(project.file, original);
+    auto oldJson = nlohmann::json::parse(serializeDocument(original));
+    oldJson["version"] = 6;
+    oldJson.erase("activeCamera");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(oldJson.dump());
+        db.execute("PRAGMA user_version=6");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto next = original;
+    Layer camera;
+    camera.id = next.allocateId();
+    camera.name = "Output camera";
+    camera.kind = LayerKind::Camera;
+    camera.transform.x = next.width / 2;
+    camera.transform.y = next.height / 2;
+    next.activeCamera = camera.id;
+    next.layers.push_back(camera);
+    REQUIRE(ProjectStore::save(project.file, next, "Add camera", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == next);
+    auto backup = project.file;
+    backup += ".pre-v6.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == 7);
 }

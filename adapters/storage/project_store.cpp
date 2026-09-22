@@ -129,7 +129,7 @@ std::int64_t ProjectStore::save(const std::filesystem::path& path, const Documen
             backupDatabase(db, backup);
         }
     } else {
-        db.execute("PRAGMA application_id=1330925390; PRAGMA user_version=6;");
+        db.execute("PRAGMA application_id=1330925390; PRAGMA user_version=7;");
     }
     db.execute("PRAGMA journal_mode=DELETE; PRAGMA synchronous=FULL; PRAGMA foreign_keys=ON;");
     db.execute("CREATE TABLE IF NOT EXISTS revisions (id INTEGER PRIMARY KEY, created TEXT NOT NULL DEFAULT "
@@ -151,7 +151,7 @@ std::int64_t ProjectStore::save(const std::filesystem::path& path, const Documen
                    "CREATE TABLE IF NOT EXISTS revision_resources(revision INTEGER NOT NULL REFERENCES "
                    "revisions(id) ON DELETE CASCADE,hash TEXT NOT NULL REFERENCES resources(hash),PRIMARY "
                    "KEY(revision,hash));"
-                   "PRAGMA user_version=6;");
+                   "PRAGMA user_version=7;");
         std::set<std::string> references;
         auto data = serializeDocument(document, [&](std::span<const std::uint8_t> bytes) {
             auto hash = resourceHash(bytes);

@@ -119,6 +119,15 @@ void CanvasItem::schedulePreview(const RenderCacheKey& current) {
         (void)previewQueue_.request(editor_->snapshot(), next);
     }, Qt::QueuedConnection);
 }
+bool CanvasItem::hasPreparedFrame(int frame) {
+    if (!editor_ || frame < 0 || frame >= editor_->duration())
+        return false;
+    const auto& document = editor_->document();
+    RenderCacheKey key{editor_->sceneGeneration(), editor_->documentRevision(), frame,
+                       document.width, document.height, document.composition,
+                       GraphTarget::Display, true, editor_->onionSkin(), 1};
+    return previewCache_.lookup(key).has_value();
+}
 void CanvasItem::setZoom(double value) {
     if (motionKey_ >= 0)
         cancelGesture();
@@ -165,8 +174,13 @@ QTransform CanvasItem::viewTransform() const {
     transform.translate(-editor_->sceneWidth() / 2.0, -editor_->sceneHeight() / 2.0);
     return transform;
 }
+QTransform CanvasItem::contentTransform() const {
+    if (!editor_ || editor_->tool() == "Camera")
+        return viewTransform();
+    return SceneRenderer::cameraTransform(editor_->document(), editor_->frame()) * viewTransform();
+}
 Point CanvasItem::localPoint(QPointF p, double pressure) const {
-    QTransform transform = viewTransform();
+    QTransform transform = contentTransform();
     if (editor_ && editor_->selectedLayer())
         transform = SceneRenderer::worldTransform(editor_->document(),
                                                   editor_->document().layer(editor_->selectedLayer()),
@@ -202,12 +216,13 @@ void CanvasItem::paint(QPainter* p) {
                           : (drawing_ && selectedPoint_ >= 0 && editor_->tool() == "Edit points")
                               ? &pointDrawingPreview_
                               : (transforming_ && previewValid_ && !posePreview_ ? &transformPreview_ : nullptr)};
+    options.ignoreCamera = editor_->tool() == "Camera";
     if (displayDocument.composition == CompositionProfile::LinearSrgb && !posePreview_ &&
         !options.previewDrawing) {
         RenderCacheKey key{editor_->sceneGeneration(), editor_->documentRevision(), editor_->frame(),
                            displayDocument.width, displayDocument.height, displayDocument.composition,
                            GraphTarget::Display, options.background, options.onionSkin,
-                           options.onionRange};
+                           options.onionRange, options.ignoreCamera};
         auto image = previewCache_.resolve(key, [&] {
             return GraphRenderer::render(CompositionGraph::orderedLayers(displayDocument),
                                          displayDocument, editor_->frame(),
@@ -215,16 +230,20 @@ void CanvasItem::paint(QPainter* p) {
                                          GraphTarget::Display);
         });
         p->drawImage(QPointF(0, 0), image);
-        if (!image.isNull())
+        if (!image.isNull() && !options.ignoreCamera)
             schedulePreview(key);
     } else {
         SceneRenderer::paint(*p, displayDocument, editor_->frame(), options);
     }
     if (editor_->selectedLayer()) {
         p->save();
-        p->setWorldTransform(SceneRenderer::worldTransform(displayDocument,
-                                                           displayDocument.layer(editor_->selectedLayer()),
-                                                           editor_->frame()),
+        auto selectedTransform = SceneRenderer::worldTransform(displayDocument,
+                                                               displayDocument.layer(editor_->selectedLayer()),
+                                                               editor_->frame());
+        if (!options.ignoreCamera)
+            selectedTransform = selectedTransform * SceneRenderer::cameraTransform(displayDocument,
+                                                                                   editor_->frame());
+        p->setWorldTransform(selectedTransform,
                              true);
         paintGrid(p);
         if (!rasterBrush_ && drawing_ && !samples_.empty() && editor_->tool() != "Eraser" &&
@@ -314,6 +333,7 @@ void CanvasItem::paint(QPainter* p) {
         p->restore();
     }
     p->restore();
+    paintCameraGuide(p, itemTransform);
 }
 void CanvasItem::begin(QPointF position, double pressure) {
     if (!editor_ || !editor_->selectedLayer() || editor_->playing())
@@ -323,7 +343,16 @@ void CanvasItem::begin(QPointF position, double pressure) {
         editor_->report("Unlock the layer before drawing.");
         return;
     }
+    if (editor_->document().layer(editor_->selectedLayer()).kind == LayerKind::Camera &&
+        editor_->tool() != "Camera") {
+        editor_->report("Choose Camera to edit the output frame, or select artwork to draw.");
+        return;
+    }
     try {
+        if (editor_->tool() == "Camera") {
+            beginCamera(position);
+            return;
+        }
         if (editor_->tool() == "Animate" && motionPathEditing_) {
             beginMotionPath(position);
             return;
@@ -474,6 +503,10 @@ void CanvasItem::move(QPointF position, double pressure) {
     if (!drawing_ || !editor_)
         return;
     try {
+        if (cameraHandle_ >= 0) {
+            previewCamera(position);
+            return;
+        }
         if (motionKey_ >= 0) {
             previewMotionPath(position);
             return;
@@ -575,6 +608,10 @@ void CanvasItem::end() {
     if (!drawing_ || !editor_)
         return;
     drawing_ = false;
+    if (cameraHandle_ >= 0) {
+        commitCamera();
+        return;
+    }
     if (motionKey_ >= 0) {
         commitMotionPath();
         return;
@@ -642,6 +679,7 @@ void CanvasItem::end() {
     update();
 }
 void CanvasItem::cancelGesture() {
+    cameraHandle_ = -1;
     motionKey_ = -1;
     marqueeOperation_ = 0;
     posePreview_.reset();
@@ -840,10 +878,10 @@ void CanvasItem::transformRegion(int action, int dx, int dy) {
 
 QTransform CanvasItem::selectionWorld() const {
     if (!editor_ || !editor_->selectedLayer())
-        return viewTransform();
+        return contentTransform();
     const auto& doc = posePreview_ ? *posePreview_ : editor_->document();
     return SceneRenderer::worldTransform(doc, doc.layer(editor_->selectedLayer()), editor_->frame()) *
-           viewTransform();
+           contentTransform();
 }
 QPointF CanvasItem::handlePosition(int handle) const {
     QRectF r(region_.x, region_.y, region_.width, region_.height);

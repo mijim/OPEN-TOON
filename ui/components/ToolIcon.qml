@@ -56,6 +56,12 @@ Item {
                 node(20.5, 19.5);
                 polygon([12, 7.5, 16, 12, 12, 16.5, 8, 12], false);
                 break;
+            case "Camera":
+                ctx.strokeRect(3, 6, 18, 13);
+                line(7, 6, 9, 3); line(9, 3, 15, 3); line(15, 3, 17, 6);
+                ctx.beginPath(); ctx.arc(12, 12.5, 3.5, 0, Math.PI * 2); ctx.stroke();
+                node(3, 6); node(21, 6); node(3, 19); node(21, 19);
+                break;
             case "Marquee":
                 line(3, 5, 7, 5); line(10, 5, 14, 5); line(17, 5, 21, 5);
                 line(21, 8, 21, 12); line(21, 15, 21, 19);

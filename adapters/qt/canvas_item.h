@@ -7,6 +7,7 @@
 #include <QElapsedTimer>
 #include <QPointer>
 #include <QQuickPaintedItem>
+#include <QPolygonF>
 class CanvasItem : public QQuickPaintedItem {
     Q_OBJECT
     Q_PROPERTY(QVariantMap objectProperties READ objectProperties NOTIFY regionChanged)
@@ -19,6 +20,7 @@ class CanvasItem : public QQuickPaintedItem {
     Q_PROPERTY(bool gridVisible READ gridVisible WRITE setGridVisible NOTIFY viewChanged)
     Q_PROPERTY(bool snapToGrid READ snapToGrid WRITE setSnapToGrid NOTIFY viewChanged)
     Q_PROPERTY(int gridSpacing READ gridSpacing WRITE setGridSpacing NOTIFY viewChanged)
+    Q_PROPERTY(bool cameraGuidesVisible READ cameraGuidesVisible WRITE setCameraGuidesVisible NOTIFY viewChanged)
     Q_PROPERTY(double zoom READ zoom WRITE setZoom NOTIFY viewChanged)
     Q_PROPERTY(bool mirrored READ mirrored WRITE setMirrored NOTIFY viewChanged)
     Q_PROPERTY(double rotationAngle READ rotationAngle WRITE setRotationAngle NOTIFY viewChanged)
@@ -43,6 +45,8 @@ class CanvasItem : public QQuickPaintedItem {
     void setGridVisible(bool);
     void setSnapToGrid(bool);
     void setGridSpacing(int);
+    bool cameraGuidesVisible() const { return cameraGuidesVisible_; }
+    void setCameraGuidesVisible(bool value) { cameraGuidesVisible_ = value; emit viewChanged(); update(); }
 
     Q_INVOKABLE void transformRegion(int action, int dx = 0, int dy = 0);
     explicit CanvasItem(QQuickItem* parent = nullptr);
@@ -63,6 +67,8 @@ class CanvasItem : public QQuickPaintedItem {
     Q_INVOKABLE void deleteSelection();
     Q_INVOKABLE void cancelGesture();
     Q_INVOKABLE void capture(QString path);
+    bool hasPreparedFrame(int frame);
+    Q_INVOKABLE QPointF cameraHandlePosition(int index) const;
   signals:
     void regionChanged();
     void editorChanged();
@@ -124,10 +130,20 @@ class CanvasItem : public QQuickPaintedItem {
     bool vectorSelection_ = false, subtract_ = false;
     opentoon::VectorBlock vectorClipboard_;
     bool gridVisible_ = false, snapToGrid_ = false;
+    bool cameraGuidesVisible_ = false;
+    int cameraHandle_ = -1;
+    QPointF cameraPress_;
+    opentoon::Transform cameraSourcePose_;
     int gridSpacing_ = 40;
     opentoon::Point snapDrawingPoint(opentoon::Point) const;
     opentoon::Point constrainedEndpoint(opentoon::Point) const;
     void paintGrid(QPainter*);
+    QPolygonF cameraFrame(const opentoon::Document&) const;
+    int cameraHandleAt(QPointF) const;
+    void paintCameraGuide(QPainter*, const QTransform&);
+    void beginCamera(QPointF);
+    void previewCamera(QPointF);
+    void commitCamera();
     void schedulePreview(const opentoon::RenderCacheKey&);
 
     int marqueeOperation_ = 0; // Replace, add, subtract; captured on press.
@@ -154,6 +170,7 @@ class CanvasItem : public QQuickPaintedItem {
     QElapsedTimer sampleClock_;
     double tiltX_ = 0, tiltY_ = 0;
     QTransform viewTransform() const;
+    QTransform contentTransform() const;
     opentoon::Point localPoint(QPointF, double) const;
     void begin(QPointF, double);
     void move(QPointF, double);

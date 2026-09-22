@@ -186,7 +186,7 @@ void Document::validate() const {
     for (const auto& l : layers) {
         id(l.id);
         require(l.name.size() <= 4096, "Layer name is too long.");
-        require(static_cast<int>(l.kind) >= 0 && static_cast<int>(l.kind) <= 3,
+        require(static_cast<int>(l.kind) >= 0 && static_cast<int>(l.kind) <= 4,
                 "Unknown layer kind.");
         require(l.role.size() <= 128 && l.variants.size() <= 10000 && l.views.size() <= 1000,
                 "Invalid part metadata size.");
@@ -194,8 +194,8 @@ void Document::validate() const {
             require(l.role.empty() && l.variants.empty(), "Only parts may own roles and variants.");
         if (l.kind != LayerKind::Character)
             require(l.views.empty(), "Only character roots may own view sets.");
-        if (l.kind == LayerKind::Character || l.kind == LayerKind::Peg)
-            require(l.exposures.empty(), "Character roots and pegs cannot own drawings.");
+        if (l.kind == LayerKind::Character || l.kind == LayerKind::Peg || l.kind == LayerKind::Camera)
+            require(l.exposures.empty(), "Character roots, pegs and cameras cannot own drawings.");
         std::set<Id> variants;
         for (const auto& variant : l.variants)
             require(drawings.contains(variant.drawing) && variant.name.size() > 0 &&
@@ -204,6 +204,13 @@ void Document::validate() const {
         if (l.kind == LayerKind::Part)
             require(!l.role.empty(), "Character part needs a role.");
         validateTransform(l.transform);
+        if (l.kind == LayerKind::Camera) {
+            require(l.parent == 0 && l.visible && !l.solo && l.transform.scaleX >= .05 &&
+                        l.transform.scaleX <= 20 && l.transform.scaleY >= .05 &&
+                        l.transform.scaleY <= 20 && l.transform.opacity == 1 &&
+                        l.transform.pivotX == 0 && l.transform.pivotY == 0,
+                    "Camera needs a root, positive zoom and a fixed projection opacity/pivot.");
+        }
         Frame last = 0;
         for (auto e : l.exposures) {
             require(e.start >= last && e.end > e.start && e.end <= duration,
@@ -217,14 +224,34 @@ void Document::validate() const {
         for (auto k : l.keys) {
             require(k.frame > previous && k.frame < duration, "Invalid keyframe order or range.");
             validateTransform(k.value);
+            if (l.kind == LayerKind::Camera)
+                require(k.value.scaleX >= .05 && k.value.scaleX <= 20 &&
+                            k.value.scaleY >= .05 && k.value.scaleY <= 20 &&
+                            k.value.opacity == 1 && k.value.pivotX == 0 && k.value.pivotY == 0,
+                        "Camera key needs positive zoom and a fixed projection opacity/pivot.");
             require(static_cast<int>(k.interpolation) >= 0 && static_cast<int>(k.interpolation) <= 2,
                     "Unknown interpolation.");
-            for (const auto& [channel, ease] : k.easing)
+            for (const auto& [channel, ease] : k.easing) {
                 validateEase(channel, ease);
+                if (l.kind == LayerKind::Camera && (channel == "scaleX" || channel == "scaleY"))
+                    require(ease.y1 >= 0 && ease.y1 <= 1 && ease.y2 >= 0 && ease.y2 <= 1,
+                            "Camera zoom easing must stay within its keyed range.");
+            }
             previous = k.frame;
         }
     }
+    std::size_t cameras = 0;
+    for (const auto& layer : layers)
+        if (layer.kind == LayerKind::Camera) {
+            ++cameras;
+            require(layer.id == activeCamera, "Camera must be the explicit output camera.");
+        }
+    require(cameras <= 1 && ((cameras == 0) == (activeCamera == 0)),
+            "The bounded output profile supports one active camera.");
     for (const auto& l : layers) {
+        if (l.parent)
+            require(layer(l.parent).kind != LayerKind::Camera,
+                    "Artwork cannot be parented to the output camera.");
         std::set<Id> chain{l.id};
         Id parent = l.parent;
         while (parent) {

@@ -88,6 +88,14 @@ bool EditorController::edit(const std::string& label, const std::function<void(D
         bool result = session_.apply(label, operation);
         if (result) {
             frame_ = std::clamp(frame_, 0, duration() - 1);
+            if (layer_ && std::none_of(document().layers.begin(), document().layers.end(),
+                                       [this](const Layer& layer) { return layer.id == layer_; })) {
+                layer_ = document().layers.empty() ? 0 : document().layers.back().id;
+                rangeLayers_.clear();
+                selectedView_ = 0;
+                emit selectionChanged();
+                emit rangeChanged();
+            }
             emit changed();
             emit frameChanged();
             emit viewSelectionChanged();
@@ -319,14 +327,84 @@ void EditorController::setCompositionProfile(int profile) {
         d.composition = static_cast<CompositionProfile>(profile);
     });
 }
+double EditorController::cameraZoom() const {
+    return document().activeCamera
+               ? evaluateTransform(document().layer(document().activeCamera), frame_).scaleX
+               : 1.0;
+}
+void EditorController::addCamera() {
+    if (document().activeCamera) {
+        setSelectedLayer(int(document().activeCamera));
+        setTool("Camera");
+        return;
+    }
+    Id added = 0;
+    if (edit("Add output camera", [&](Document& d) {
+            Layer camera;
+            camera.id = d.allocateId();
+            camera.kind = LayerKind::Camera;
+            camera.name = "Output camera";
+            camera.transform.x = d.width / 2.0;
+            camera.transform.y = d.height / 2.0;
+            added = camera.id;
+            d.layers.push_back(std::move(camera));
+            d.activeCamera = added;
+        })) {
+        setSelectedLayer(int(added));
+        setTool("Camera");
+    }
+}
+void EditorController::resetCameraPose() {
+    if (!document().activeCamera)
+        return;
+    edit("Reset camera framing", [&](Document& d) {
+        auto& camera = d.layer(d.activeCamera);
+        if (camera.locked)
+            throw std::runtime_error("Unlock the camera before editing.");
+        Transform pose;
+        pose.x = d.width / 2.0;
+        pose.y = d.height / 2.0;
+        recordPose(camera, frame_, pose);
+    });
+}
+void EditorController::setCameraZoom(double zoom) {
+    if (!document().activeCamera || !std::isfinite(zoom) || zoom < .05 || zoom > 20) {
+        report("Camera zoom must be between 0.05 and 20.");
+        return;
+    }
+    edit("Set camera zoom", [&](Document& d) {
+        auto& camera = d.layer(d.activeCamera);
+        if (camera.locked)
+            throw std::runtime_error("Unlock the camera before editing.");
+        auto pose = evaluateTransform(camera, frame_);
+        pose.scaleX = pose.scaleY = zoom;
+        recordPose(camera, frame_, pose);
+    });
+}
+bool EditorController::commitCameraPose(const Transform& pose) {
+    if (!document().activeCamera)
+        return false;
+    return edit("Move output camera", [&](Document& d) {
+        auto& camera = d.layer(d.activeCamera);
+        if (camera.locked)
+            throw std::runtime_error("Unlock the camera before editing.");
+        recordPose(camera, frame_, pose);
+    });
+}
 void EditorController::setTool(QString value) {
-    if (QStringList{"Animate", "Pencil", "Eraser", "Select", "Marquee", "Lasso", "Line", "Rectangle",
+    if (value == "Camera" && !document().activeCamera) {
+        report("Add an output camera before choosing Camera.");
+        return;
+    }
+    if (QStringList{"Animate", "Camera", "Pencil", "Eraser", "Select", "Marquee", "Lasso", "Line", "Rectangle",
                     "Ellipse", "Recolor", "Edit points", "Raster ink", "Raster soft", "Raster dry",
                     "Raster smudge", "Raster eraser"}
             .contains(value)) {
         tool_ = std::move(value);
-        if (tool_ == "Animate")
+        if (tool_ == "Animate" || tool_ == "Camera")
             setAnimateMode(true);
+        if (tool_ == "Camera" && document().activeCamera)
+            setSelectedLayer(int(document().activeCamera));
         emit toolChanged();
     }
 }
@@ -527,17 +605,26 @@ void EditorController::removeLayer() {
                 opentoon::removeRigBranch(d, layer_);
                 return;
             }
+            if (kind == LayerKind::Camera)
+                d.activeCamera = 0;
             Id parent = d.layer(layer_).parent;
             for (auto& l : d.layers)
                 if (l.parent == layer_)
                     l.parent = parent;
             std::erase_if(d.layers, [&](auto& l) { return l.id == layer_; });
-        }))
+        })) {
+        if (kind == LayerKind::Camera && tool_ == "Camera")
+            setTool("Select");
         resetSelection();
+    }
 }
 void EditorController::duplicateLayer(bool linked) {
     if (!layer_)
         return;
+    if (document().layer(layer_).kind == LayerKind::Camera) {
+        report("The current shot supports one output camera.");
+        return;
+    }
     if (document().layer(layer_).kind == LayerKind::Character) {
         duplicateCharacter();
         return;
@@ -592,6 +679,8 @@ void EditorController::renameLayer(int id, QString name) {
 void EditorController::toggleLayer(int id, QString flag) {
     edit("Change layer state", [&](Document& d) {
         auto& l = d.layer(id);
+        if (l.kind == LayerKind::Camera && flag != "locked")
+            throw std::runtime_error("Camera visibility is controlled by the guide overlay.");
         if (flag == "visible")
             l.visible = !l.visible;
         else if (flag == "locked")
@@ -615,6 +704,9 @@ void EditorController::setParent(int parent) {
         return;
     edit("Set parent", [&](Document& d) {
         auto& layer = d.layer(layer_);
+        if (layer.kind == LayerKind::Camera ||
+            (parent && d.layer(parent).kind == LayerKind::Camera))
+            throw std::runtime_error("The output camera stays outside the artwork hierarchy.");
         if (layer.locked)
             throw std::runtime_error("Unlock the layer before editing.");
         if (layer.kind == LayerKind::Part || layer.kind == LayerKind::Peg)
@@ -951,6 +1043,15 @@ void EditorController::setTransform(QString field, double value) {
     if (!layer_)
         return;
     edit("Set " + field.toStdString(), [&](Document& d) {
+        if (d.layer(layer_).kind == LayerKind::Camera) {
+            auto& camera = d.layer(layer_);
+            if (camera.locked)
+                throw std::runtime_error("Unlock the camera before editing.");
+            auto pose = evaluateTransform(camera, frame_);
+            setTransformValue(pose, field.toStdString(), value);
+            recordPose(camera, frame_, pose);
+            return;
+        }
         const PropertyEdit property{{layer_, propertyKind(field.toStdString())}, value};
         editProperties(d, std::span(&property, 1), frame_,
                        animateMode_ ? AnimationEditMode::Animate : AnimationEditMode::Setup, autoKey_);

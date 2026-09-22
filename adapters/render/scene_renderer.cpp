@@ -75,6 +75,17 @@ QTransform SceneRenderer::worldTransform(const Document& d, const Layer& layer, 
     }
     return result;
 }
+QTransform SceneRenderer::cameraTransform(const Document& document, Frame frame) {
+    if (!document.activeCamera)
+        return {};
+    const auto pose = evaluateTransform(document.layer(document.activeCamera), frame);
+    QTransform transform;
+    transform.translate(document.width / 2.0, document.height / 2.0);
+    transform.rotate(-pose.rotation);
+    transform.scale(pose.scaleX, pose.scaleY);
+    transform.translate(-pose.x, -pose.y);
+    return transform;
+}
 QRect SceneRenderer::layerInkBounds(const Document& document, const Layer& layer, Frame frame,
                                     QSize size, RenderOptions options) {
     const QRect canvas(QPoint(0, 0), size);
@@ -106,7 +117,10 @@ QRect SceneRenderer::layerInkBounds(const Document& document, const Layer& layer
             include(QRectF(bounds->x, bounds->y, bounds->width, bounds->height));
     if (!hasInk)
         return {};
-    const auto transformed = worldTransform(document, layer, frame).mapRect(local);
+    auto transform = worldTransform(document, layer, frame);
+    if (!options.ignoreCamera)
+        transform = transform * cameraTransform(document, frame);
+    const auto transformed = transform.mapRect(local);
     const auto sx = double(size.width()) / document.width;
     const auto sy = double(size.height()) / document.height;
     const QRectF output(transformed.x() * sx, transformed.y() * sy,
@@ -182,8 +196,14 @@ void SceneRenderer::paint(QPainter& painter, const Document& d, Frame frame, Ren
     painter.setClipRect(QRectF(0, 0, d.width, d.height));
     if (options.background)
         painter.fillRect(QRectF(0, 0, d.width, d.height), qtColor(d.background));
-    bool solo = std::any_of(d.layers.begin(), d.layers.end(), [](const Layer& l) { return l.solo; });
+    if (!options.ignoreCamera)
+        painter.setWorldTransform(cameraTransform(d, frame), true);
+    bool solo = std::any_of(d.layers.begin(), d.layers.end(), [](const Layer& l) {
+        return l.kind != LayerKind::Camera && l.solo;
+    });
     for (const auto& l : d.layers) {
+        if (l.kind == LayerKind::Camera)
+            continue;
         if (!l.visible || (options.isolatedLayer && l.id != options.isolatedLayer))
             continue;
         double opacity = evaluateTransform(l, frame).opacity;

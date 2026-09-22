@@ -18,6 +18,7 @@ struct RenderOptions {
     Id previewLayer = 0;
     const Drawing* previewDrawing = nullptr;
     std::function<bool()> cancelled;
+    bool ignoreCamera = false; // Stage editing view; never used for saved output.
 };
 class SceneRenderer {
   public:
@@ -25,6 +26,7 @@ class SceneRenderer {
     static void paint(QPainter&, const Document&, Frame, RenderOptions = {});
     static void paintStroke(QPainter&, const Stroke&, const std::vector<Swatch>&, double opacity = 1);
     static QTransform worldTransform(const Document&, const Layer&, Frame);
+    static QTransform cameraTransform(const Document&, Frame);
     static QRect layerInkBounds(const Document&, const Layer&, Frame, QSize, RenderOptions = {});
 };
 } // namespace opentoon

@@ -36,6 +36,7 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
               {"rate", {d.rate.numerator, d.rate.denominator}},
               {"background", color(d.background)},
               {"composition", static_cast<int>(d.composition)},
+              {"activeCamera", d.activeCamera},
               {"nextId", d.nextId},
               {"layers", Json::array()},
               {"drawings", Json::array()},
@@ -149,6 +150,8 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
     d.background = readColor(j.at("background"));
     if (j.at("version").get<int>() >= 6)
         d.composition = static_cast<CompositionProfile>(j.at("composition").get<int>());
+    if (j.at("version").get<int>() >= 7)
+        d.activeCamera = j.at("activeCamera").get<Id>();
     limit(j.at("palette"), 65536);
     limit(j.at("drawings"), 50000);
     limit(j.at("layers"), 2000);

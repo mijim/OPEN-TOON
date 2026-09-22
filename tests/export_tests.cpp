@@ -332,6 +332,42 @@ TEST_CASE("Asynchronous export uses one snapshot and publishes complete rational
         QImage(output.filePath("frame_000001.png")).convertToFormat(QImage::Format_ARGB32_Premultiplied);
     REQUIRE(actual == opentoon::SceneRenderer::render(snapshot, 0));
 }
+TEST_CASE("Animated output camera matches reopened preview and exported PNG frames") {
+    QTemporaryDir temporary;
+    REQUIRE(temporary.isValid());
+    EditorController editor;
+    editor.newScene();
+    editor.setScene("Camera export", 64, 64, 48, 24, 1);
+    editor.commitStroke({{12, 14, 1}, {26, 34, 1}});
+    editor.addCamera();
+    REQUIRE(editor.activeCamera() > 0);
+    editor.setTransform("x", 40);
+    editor.setFrame(24);
+    editor.setTransform("x", 24);
+    const auto snapshot = editor.document();
+    REQUIRE(snapshot.layer(snapshot.activeCamera).keys.size() >= 2);
+    const auto before = opentoon::SceneRenderer::render(snapshot, 0);
+    const auto after = opentoon::SceneRenderer::render(snapshot, 24);
+    REQUIRE(before != after);
+    const auto project = QUrl::fromLocalFile(temporary.filePath("camera.otoon"));
+    REQUIRE(editor.saveProject(project));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(project));
+    REQUIRE(reopened.document() == snapshot);
+    REQUIRE(opentoon::SceneRenderer::render(reopened.document(), 0) == before);
+    REQUIRE(opentoon::SceneRenderer::render(reopened.document(), 24) == after);
+    editor.exportFrames(QUrl::fromLocalFile(temporary.path()));
+    waitForExport(editor);
+    QDir root(temporary.path());
+    const auto folders = root.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    REQUIRE(folders.size() == 1);
+    QDir output(root.filePath(folders.front()));
+    REQUIRE(manifest(root, folders.front())["status"].toString() == "complete");
+    REQUIRE(QImage(output.filePath("frame_000001.png"))
+                .convertToFormat(QImage::Format_ARGB32_Premultiplied) == before);
+    REQUIRE(QImage(output.filePath("frame_000025.png"))
+                .convertToFormat(QImage::Format_ARGB32_Premultiplied) == after);
+}
 TEST_CASE("Cancellation publishes an explicitly partial export and the next job can complete") {
     QTemporaryDir temporary;
     REQUIRE(temporary.isValid());
