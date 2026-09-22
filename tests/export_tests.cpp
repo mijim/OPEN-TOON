@@ -5,6 +5,7 @@
 #include <QDir>
 #include <QElapsedTimer>
 #include <QFile>
+#include <QImage>
 #include <QGuiApplication>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -14,7 +15,15 @@
 #include <QThread>
 #include <catch2/catch_session.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <cstring>
 namespace {
+const QString partFixture = QStringLiteral(OPENTOON_SOURCE_DIR "/tests/fixtures/harmony-moment/parts/");
+QVariantList paths(std::initializer_list<QString> values) {
+    QVariantList result;
+    for (const auto& value : values)
+        result.push_back(QUrl::fromLocalFile(value));
+    return result;
+}
 void waitForExport(EditorController& editor) {
     QElapsedTimer timeout;
     timeout.start();
@@ -30,6 +39,113 @@ QJsonObject manifest(const QDir& root, QString folder) {
     return QJsonDocument::fromJson(file.readAll()).object();
 }
 } // namespace
+TEST_CASE("Registered PNG parts preserve a shared canvas and undo as one edit") {
+    EditorController editor;
+    editor.newScene();
+    editor.setFrame(7);
+    const auto before = editor.document();
+    const auto originalPalette = before.palette;
+    REQUIRE(editor.importParts(paths({partFixture + "hand_right__open.png",
+                                      partFixture + "torso__base.png",
+                                      partFixture + "head__front.png"})));
+    const auto imported = editor.document();
+    REQUIRE(imported.layers.size() == before.layers.size() + 3);
+    REQUIRE(imported.drawings.size() == before.drawings.size() + 3);
+    REQUIRE(imported.palette == originalPalette);
+    REQUIRE(imported.layers[before.layers.size()].name == "hand_right__open");
+    REQUIRE(imported.layers[before.layers.size() + 1].name == "head__front");
+    REQUIRE(imported.layers[before.layers.size() + 2].name == "torso__base");
+    for (std::size_t index = before.layers.size(); index < imported.layers.size(); ++index) {
+        const auto& layer = imported.layers[index];
+        REQUIRE(layer.transform.x == 832);
+        REQUIRE(layer.transform.y == 412);
+        REQUIRE(layer.exposures.size() == 1);
+        REQUIRE(layer.exposures.front().start == 7);
+        REQUIRE(layer.exposures.front().end == imported.duration);
+        const auto& asset = *imported.drawings.at(layer.exposures.front().drawing).image;
+        REQUIRE(asset.width == 256);
+        const auto source = QImage(partFixture + QString::fromStdString(layer.name) + ".png")
+                                .convertToFormat(QImage::Format_RGBA8888);
+        REQUIRE_FALSE(source.isNull());
+        for (int y = 0; y < source.height(); ++y)
+            REQUIRE(std::memcmp(asset.rgba.data() + y * asset.width * 4,
+                                source.constScanLine(y), asset.width * 4) == 0);
+    }
+    const auto rendered = opentoon::SceneRenderer::render(imported, 7);
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto project = QUrl::fromLocalFile(directory.filePath("registered-parts.otoon"));
+    REQUIRE(editor.saveProject(project));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(project));
+    REQUIRE(reopened.document() == imported);
+    REQUIRE(opentoon::SceneRenderer::render(reopened.document(), 7) == rendered);
+    editor.undo();
+    REQUIRE(editor.document() == before);
+    editor.redo();
+    REQUIRE(editor.document() == imported);
+}
+
+TEST_CASE("Rejected registered part batch leaves the scene and selection intact") {
+    EditorController editor;
+    editor.newScene();
+    const auto before = editor.document();
+    const auto selected = editor.selectedLayer();
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto corrupt = directory.filePath("broken.png");
+    QFile invalid(corrupt);
+    REQUIRE(invalid.open(QIODevice::WriteOnly));
+    REQUIRE(invalid.write("not a PNG") == 9);
+    invalid.close();
+    REQUIRE_FALSE(editor.importParts(paths({partFixture + "torso__base.png", corrupt})));
+    REQUIRE(editor.document() == before);
+    REQUIRE(editor.selectedLayer() == selected);
+    QImage mismatched(16, 16, QImage::Format_RGBA8888);
+    mismatched.fill(Qt::transparent);
+    const auto wrongSize = directory.filePath("wrong-size.png");
+    REQUIRE(mismatched.save(wrongSize));
+    REQUIRE_FALSE(editor.importParts(paths({partFixture + "torso__base.png", wrongSize})));
+    REQUIRE(editor.document() == before);
+    REQUIRE(editor.selectedLayer() == selected);
+}
+
+TEST_CASE("Numbered PNG sequence orders frames, reports gaps and round-trips") {
+    EditorController editor;
+    editor.newScene();
+    editor.setFrame(47);
+    const auto before = editor.document();
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto first = directory.filePath("walk_0001.png");
+    const auto third = directory.filePath("walk_0003.png");
+    REQUIRE(QFile::copy(partFixture + "torso__base.png", first));
+    REQUIRE(QFile::copy(partFixture + "head__front.png", third));
+    REQUIRE(editor.importImageSequence(paths({third, first})));
+    const auto imported = editor.document();
+    REQUIRE(imported.duration == 50);
+    REQUIRE(imported.layers.size() == before.layers.size() + 1);
+    const auto& layer = imported.layers.back();
+    REQUIRE(layer.name == "walk_");
+    REQUIRE(layer.exposures.size() == 2);
+    REQUIRE(layer.exposures[0].start == 47);
+    REQUIRE(layer.exposures[0].end == 48);
+    REQUIRE(layer.exposures[1].start == 49);
+    REQUIRE(layer.exposures[1].end == 50);
+    REQUIRE_FALSE(imported.drawingAt(layer.id, 48));
+    REQUIRE(editor.status().contains("1 missing frame"));
+    const auto project = QUrl::fromLocalFile(directory.filePath("sequence.otoon"));
+    REQUIRE(editor.saveProject(project));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(project));
+    REQUIRE(reopened.document() == imported);
+    REQUIRE(opentoon::SceneRenderer::render(reopened.document(), 49) ==
+            opentoon::SceneRenderer::render(imported, 49));
+    editor.undo();
+    REQUIRE(editor.document() == before);
+    REQUIRE_FALSE(editor.importImageSequence(paths({first, first})));
+    REQUIRE(editor.document() == before);
+}
 TEST_CASE("Asynchronous export uses one snapshot and publishes complete rational-time metadata") {
     QTemporaryDir temporary;
     REQUIRE(temporary.isValid());

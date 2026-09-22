@@ -254,6 +254,14 @@ ApplicationWindow {
                 onTriggered: imageDialog.open()
             }
             Action {
+                text: "Import registered PNG parts…"
+                onTriggered: partsDialog.open()
+            }
+            Action {
+                text: "Import PNG sequence…"
+                onTriggered: sequenceDialog.open()
+            }
+            Action {
                 text: "Export PNG sequence…"
                 enabled: !editor.exporting
                 onTriggered: exportDialog.open()
@@ -1806,6 +1814,20 @@ ApplicationWindow {
         title: "Import image"
         nameFilters: ["Images (*.png *.jpg *.jpeg *.bmp *.webp)"]
         onAccepted: editor.importImage(selectedFile)
+    }
+    FileDialog {
+        id: partsDialog
+        title: "Import registered PNG parts · same canvas size"
+        fileMode: FileDialog.OpenFiles
+        nameFilters: ["PNG images (*.png)"]
+        onAccepted: editor.importParts(selectedFiles)
+    }
+    FileDialog {
+        id: sequenceDialog
+        title: "Import numbered PNG sequence · gaps stay empty"
+        fileMode: FileDialog.OpenFiles
+        nameFilters: ["PNG images (*.png)"]
+        onAccepted: editor.importImageSequence(selectedFiles)
     }
     FolderDialog {
         id: exportDialog

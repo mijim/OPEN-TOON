@@ -1,6 +1,7 @@
 #include "editor_controller.h"
 #include "opentoon/animation.h"
 #include "project_store.h"
+#include "image_batch_importer.h"
 #include "scene_renderer.h"
 #include <QDateTime>
 #include <QDir>
@@ -12,6 +13,8 @@
 #include <QSettings>
 #include <QStandardPaths>
 #include <QUuid>
+#include <algorithm>
+#include <cstdint>
 #include <cmath>
 #include <stdexcept>
 using namespace opentoon;
@@ -594,6 +597,74 @@ void EditorController::importImage(QUrl url) {
         asset.rgba.assign(image.constBits(), image.constBits() + image.sizeInBytes());
         drawing.image = std::move(asset);
     });
+}
+bool EditorController::importParts(QVariantList urls) {
+    return importImageBatch(std::move(urls), false);
+}
+bool EditorController::importImageSequence(QVariantList urls) {
+    return importImageBatch(std::move(urls), true);
+}
+bool EditorController::importImageBatch(QVariantList urls, bool sequence) {
+    QString error;
+    const auto batch = loadImageBatch(urls, sequence, frame_, error);
+    if (!batch) {
+        report(error);
+        return false;
+    }
+    const auto& inputs = batch->images;
+    const auto& registration = batch->canvas;
+    const int span = batch->span;
+    const auto& sequencePrefix = batch->sequencePrefix;
+    Id selected = 0;
+    const int start = frame_;
+    if (!edit(sequence ? "Import PNG sequence" : "Import registered PNG parts", [&](Document& d) {
+            if (sequence) {
+                d.duration = std::max(d.duration, start + span);
+                Layer layer;
+                layer.id = d.allocateId();
+                selected = layer.id;
+                layer.name = (sequencePrefix.isEmpty() ? QString("Image sequence") : sequencePrefix).toUtf8().toStdString();
+                layer.transform.x = (d.width - registration.width()) / 2.0;
+                layer.transform.y = (d.height - registration.height()) / 2.0;
+                for (const auto& input : inputs) {
+                    Drawing drawing;
+                    drawing.id = d.allocateId();
+                    drawing.name = input.name.toUtf8().toStdString();
+                    drawing.image = input.image;
+                    const Id drawingId = drawing.id;
+                    d.drawings.emplace(drawingId, std::move(drawing));
+                    const Frame at = start + input.number - inputs.front().number;
+                    layer.exposures.push_back({at, at + 1, drawingId});
+                }
+                d.layers.push_back(std::move(layer));
+            } else {
+                for (const auto& input : inputs) {
+                    Drawing drawing;
+                    drawing.id = d.allocateId();
+                    drawing.name = input.name.toUtf8().toStdString();
+                    drawing.image = input.image;
+                    const Id drawingId = drawing.id;
+                    d.drawings.emplace(drawingId, std::move(drawing));
+                    Layer layer;
+                    layer.id = d.allocateId();
+                    selected = layer.id;
+                    layer.name = input.name.toUtf8().toStdString();
+                    layer.transform.x = (d.width - registration.width()) / 2.0;
+                    layer.transform.y = (d.height - registration.height()) / 2.0;
+                    layer.exposures.push_back({start, d.duration, drawingId});
+                    d.layers.push_back(std::move(layer));
+                }
+            }
+        }))
+        return false;
+    setSelectedLayer(static_cast<int>(selected));
+    const int gaps = sequence ? span - int(inputs.size()) : 0;
+    const QString summary = sequence
+                                ? QString("Imported %1 PNG frames; %2 missing %3 left empty.")
+                                      .arg(inputs.size()).arg(gaps).arg(gaps == 1 ? "frame" : "frames")
+                                : QString("Imported %1 registered PNG parts.").arg(inputs.size());
+    report(summary + (batch->hasUntaggedColor ? " Untagged PNGs were interpreted as sRGB." : ""));
+    return true;
 }
 void EditorController::exportFrames(QUrl url) {
     if (exporting_)

@@ -61,9 +61,10 @@ detail over the same model. No scripting prerequisite or irreversible simplified
   supported 1.0. P12–P22 preserve advanced rigs/automation, morphing, FX, interchange,
   3D, games, studio, optional AI/legacy and coverage maintenance.
 
-Implementation has started with the HM-00 reproducible reference assets and foundation
-contract. HM-00 remains in progress until the shot rubric receives animator review;
-dependent slices are not yet eligible.
+HM-00's reproducible reference assets and foundation contract were accepted with
+[owner artistic review](../implementation/HM00-REVIEW.md). HM-01 and HM-02 can now
+enter their separate delivery contracts. The second-animator working-shot review
+remains an HM-15 gate.
 
 ## Queries and validation
 

@@ -45,8 +45,8 @@ from original drawing and from the generated PNG parts; name variants, bind arms
 publish and animate controls, correct mouth choices against audio, set overlap and
 matte order, frame the output camera, save/reopen, reuse the rig in a second scene,
 and export matching PNG/WAV/timing metadata. Record elapsed setup/correction time,
-errors and any workaround. HM-00 still needs that review of the shot rubric before
-the slice is accepted.
+errors and any workaround. The owner accepted the reference shot rubric for HM-00;
+the complete working-shot review remains HM-15.
 
 Failure fixtures for subsequent slices derive from this bundle: missing or duplicate
 registered parts, corrupted PNG/audio, alpha or origin mismatch, unresolved variant,

@@ -190,6 +190,8 @@ class EditorController final : public QObject {
     Q_INVOKABLE void deleteKey();
     Q_INVOKABLE void togglePlayback();
     Q_INVOKABLE void importImage(QUrl);
+    Q_INVOKABLE bool importParts(QVariantList urls);
+    Q_INVOKABLE bool importImageSequence(QVariantList urls);
     Q_INVOKABLE void exportFrames(QUrl);
     Q_INVOKABLE void cancelExport();
     Q_INVOKABLE void recover();
@@ -209,6 +211,7 @@ class EditorController final : public QObject {
     void recoveryChanged();
 
   private:
+    bool importImageBatch(QVariantList urls, bool sequence);
     opentoon::Session session_;
     std::vector<opentoon::Frame> poseSelection_;
     opentoon::Id poseSelectionLayer_ = 0;

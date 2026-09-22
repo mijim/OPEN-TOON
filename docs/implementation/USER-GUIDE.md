@@ -59,7 +59,23 @@ Use **Edit → Scene marker** to label the current frame; an empty name removes 
 
 PNG export evaluates an immutable snapshot, so later edits do not change the running export. Cancel stops between frames. `manifest.json` records the rational frame rate, frame count and completion/cancellation/failure state. A cancelled or failed directory contains partial output and must not be treated as a complete sequence.
 
-Image import loads a single image up to 4096 × 4096, subject to scene memory/save limits. Image sequences, layered PSD, audio, video output, lip sync, deformation, node effects, OCIO, reusable rig libraries and production installers are still pending. Consult the [phase status](STATUS.md) for the complete boundary.
+**Scene → Import image** loads one image up to 4096 × 4096. For character artwork,
+**Import registered PNG parts** creates one layer per selected file; every PNG must
+have an alpha channel and the same canvas size. Their shared canvas origin is
+preserved, with no automatic crop or orientation transform. Parts are ordered by
+filename. Transparent PNGs with a non-sRGB color profile are rejected; untagged
+PNGs are interpreted as sRGB and reported in the status bar.
+
+**Import PNG sequence** creates one layer with a separate one-frame drawing for each
+numbered file. Files need a common prefix and number width, such as `walk_0001.png`
+and `walk_0003.png`. Import begins at the current frame; missing numbers leave empty
+frames, which the status bar counts. Both batch modes have a 4096 × 4096 pixel/file
+limit, a 256 MiB decoded-media limit and an undoable all-or-nothing commit. Cancel
+the file chooser to leave the document untouched. The project format also enforces
+its overall scene media limit. Parts currently share a centered layer offset; there
+is no character-role assignment or substitution set yet. Layered PSD, audio, video
+output, lip sync, deformation, node effects, OCIO, reusable rig libraries and
+production installers remain pending. Consult the [phase status](STATUS.md).
 
 ## Animation edits and curves
 

@@ -1,9 +1,9 @@
 # ADR-023 — Harmony Moment foundation contracts
 
-Status: accepted engineering contract for HM-00, 2026-09-22. The artist review of
-the reference shot rubric is pending, so HM-00 is not complete and no dependent
-slice is released by this decision. No application code, schema version or library
-lock changes here.
+Status: accepted engineering contract for HM-00, 2026-09-22. The project owner
+accepted the reference material and rubric on the same date; see the
+[HM-00 review record](../../implementation/HM00-REVIEW.md). This ADR alone changes
+no application code, schema version or library lock.
 
 ## Existing boundary and reason for a contract
 
@@ -97,16 +97,18 @@ count and PCM sample count for each time variant. Offline output must be
 deterministic after reopen. If the mesh/render spike cannot meet the budget, record
 quality mode, bottleneck and an explicit revised target before broadening scope.
 
-## Artist acceptance and evidence still needed
+## Artist acceptance and later workflow evidence
 
-An animator must review the six-beat script and evaluate the eventual workflow on
-an actual saved scene. The rubric asks for original-art and PNG-part intake, a
+The owner approved the six-beat reference script and stills for HM-00. A second
+animator must evaluate the eventual workflow on an actual saved scene in HM-15.
+The rubric asks for original-art and PNG-part intake, a
 rigid pose and view switch, two deformable arm chains, an attached hand, twelve
 published controls, corrected mouth substitutions against both timing clips, three
 overlap/matte cases, camera framing, 480-frame preview/export, save/reopen and
 second-scene rig reuse. Record setup time, corrections, missed hits, hidden state,
 unexpected pose changes, recovery from missing assets, and output mismatches.
-Passing this review cannot be replaced with the synthetic test or author sign-off.
+Passing that later workflow review cannot be replaced with the synthetic test or
+the HM-00 owner sign-off.
 
 ## Alternatives deferred
 

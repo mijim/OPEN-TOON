@@ -22,7 +22,7 @@
     {
       "id": "P02",
       "status": "in_progress",
-      "available": "Mouse pencil, exposures, onion skin, playback, save/reopen and 48-frame 1080p PNG export.",
+      "available": "Mouse pencil, exposures, onion skin, playback, save/reopen, 48-frame 1080p PNG export, and atomic registered transparent PNG parts/numbered-sequence intake.",
       "remaining": "Full phase feature acceptance and animator-led workflow checks; large-project behavior and all fixture gates."
     },
     {
@@ -171,7 +171,7 @@
       "status": "passed_rigid_baseline_only",
       "ctest_entry": "Original registered character parts survive format-3 save and reopen",
       "scope": "Nineteen original registered PNG parts with embedded sRGB profile, one parent transform, 480-frame format-3 save/reopen, exact first-frame comparison with the source reference still, and 24000/1001 sample boundary. Python verifies 41 generated part images, five reference poses, exact dialogue cues and ten-minute drift markers.",
-      "limits": "Reference poses and timing audio are synthetic external targets. No character identity, substitutions, deformers, controls, sound playback, nodes or camera are implemented by this check; animator review remains pending."
+      "limits": "Reference poses and timing audio are synthetic external targets. No character identity, substitutions, deformers, controls, sound playback, nodes or camera are implemented by this check. Owner artistic review accepted HM-00; the independent working-shot animator review remains HM-15."
     },
     "physical_tablet": {
       "status": "pending",
@@ -216,7 +216,7 @@
     },
     "export_workflows": {
       "status": "passed",
-      "cases": 9,
+      "cases": 12,
       "ctest_entry": "export_workflows",
       "covers": [
         "immutable snapshot during concurrent edit",
@@ -230,7 +230,10 @@
         "visual pose/curve commands preserve existing easing and reject invalid handles atomically",
         "default Clear removes selected exposures and keys atomically, preserves outside keys and rejects locked layers",
         "shared pose-key selection/history reconciliation, cross-layer motion clipboard, focus-independent domain commands and locked-target rejection",
-        "motion-path X/Y commands retain non-position pose fields and easing, with locked-edit rejection and saved pixel equivalence"
+        "motion-path X/Y commands retain non-position pose fields and easing, with locked-edit rejection and saved pixel equivalence",
+        "registered sRGB PNG parts retain pixel bytes, common canvas alignment, palette IDs and one-step undo/redo through save/reopen",
+        "corrupt and mismatched PNG batches reject atomically without changing selection",
+        "numbered PNG sequence sorts frames, leaves gaps empty, extends duration and round-trips through save/reopen"
       ]
     },
     "total_local_ctest_entries": 65,
@@ -253,7 +256,7 @@
     "visual_animation": {
       "status": "passed",
       "platform": "macOS",
-      "scope": "Bezier endpoint/overshoot/channel isolation/opacity and retiming; invalid handle rejection; schema 1/2 backup migration; thin-stroke picking at 0.1\u201310x with rotated nonuniform transforms; native pose and curve gestures. Full-pose retiming preserves values/easing, linked easing validates all channels, collisions reject atomically.",
+      "scope": "Bezier endpoint/overshoot/channel isolation/opacity and retiming; invalid handle rejection; schema 1/2 backup migration; thin-stroke picking at 0.1–10x with rotated nonuniform transforms; native pose and curve gestures. Full-pose retiming preserves values/easing, linked easing validates all channels, collisions reject atomically.",
       "screenshot": "docs/implementation/visual-animation.png",
       "limitations": "Synthetic mouse/tablet input; physical tablets, Linux/Windows qualification and production-scale performance pending."
     },
@@ -300,7 +303,7 @@
   "planning_priority": {
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
-    "state": "HM-00_in_progress",
-    "note": "The reference asset generator and rigid baseline check are available. No new catalog capability or phase is complete; dependent HM slices still require the HM-00 animator review."
+    "state": "HM-00_complete__HM-02_in_progress",
+    "note": "Owner artistic review accepted the reference fixture and rubric. HM-00 contracts are complete; HM-01 and HM-02 are eligible. Registered PNG intake is implemented as a bounded subset under HM-02 qualification. No catalog capability or full phase is claimed complete."
   }
 }
