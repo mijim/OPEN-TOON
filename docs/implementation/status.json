@@ -289,12 +289,13 @@
       "platform": "macOS arm64",
       "evidence": [
         "tests/rigging_tests.cpp",
+        "tests/harmony_reference_tests.cpp",
         "tests/export_tests.cpp",
         "tests/storage_tests.cpp",
         "docs/implementation/HM03-RIG-FOUNDATION.md"
       ],
-      "scope": "Typed character roots, parts and pegs; named held substitutions with renderer-backed thumbnail chooser and ordered stepping; atomic coordinated character views; independent hierarchy and artwork duplication; format-5 save/reopen with format-4 migration backup. macOS domain, controller and storage tests; general native UI smoke.",
-      "limits": "Full 19-part character acceptance journey, artist validation of view interaction, animated-ancestor reparenting, masked poses and reusable linked rig assets remain open."
+      "scope": "Typed character roots, parts and pegs; named held substitutions with renderer-backed thumbnail chooser; coordinated view sets with range and single-Part editing; batch Part assembly; independent or explicitly linked-artwork Part/Peg branch copying; branch deletion, detachment and Peg dissolution with view cleanup; format-5 save/reopen and format-4 backup. Automated original-art 19-part view-switch and duplicate journey passes on macOS, with controller and general native UI smoke.",
+      "limits": "Artist-led 19-part workflow review, animated-ancestor reparenting, masked poses and reusable portable rig assets remain open."
     }
   },
   "ownership": {
@@ -319,6 +320,6 @@
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
     "state": "HM-00_HM-01_HM-02_complete__HM-03_in_progress",
-    "note": "HM-00 owner artistic review, HM-01 typed properties and HM-02 artwork intake are accepted bounded contracts. HM-03 has persisted rigid characters, thumbnail substitutions, coordinated view sets and independent copying; the full 19-part character acceptance and artist review remain open. No full phase or catalog capability is claimed complete."
+    "note": "HM-00 owner artistic review, HM-01 typed properties and HM-02 artwork intake are accepted bounded contracts. HM-03 has persisted rigid characters, thumbnail substitutions, coordinated view sets, identity-safe branch editing and an automated 19-part save/reopen journey; artist-led acceptance and animated-ancestor reparenting remain open. No full phase or catalog capability is claimed complete."
   }
 }

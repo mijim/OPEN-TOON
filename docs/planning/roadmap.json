@@ -5220,7 +5220,7 @@
   ],
   "execution_policy": {
     "primary_objective": "HM: reliable character animation Harmony Moment",
-    "current_instruction": "HM-01 and HM-02 bounded contracts are accepted. Continue HM-03 rigid character work: thumbnail substitutions, coordinated view sets and instance-safe duplication before claiming HM-03 complete. HM-04 and HM-10 are independently eligible but require separate bounded ownership.",
+    "current_instruction": "HM-01 and HM-02 bounded contracts are accepted. HM-03 has thumbnail substitutions, coordinated views, independent character and branch copies, and an automated 19-part save/reopen journey. Finish artist-led rigid-character review and remaining reparenting limits before claiming HM-03 complete. HM-04 and HM-10 are independently eligible but require separate bounded ownership.",
     "phase_dependency_semantics": "Phase depends_on constrains full epic completion, not entry into an implementation slice. Only the explicit delivery-slice contract DAG gates the Harmony Moment. Domain dependencies are scope relationships, not all-features barriers.",
     "entry_rule": "Start a slice only when each required contract has accepted evidence. Baseline reuse is partial and must be qualified; planned is not ready. Independent spikes may run without claiming their consumer ready.",
     "wip_limit": 2,

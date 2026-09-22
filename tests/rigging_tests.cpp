@@ -215,3 +215,123 @@ TEST_CASE("Duplicating a character remaps every part drawing and view without ch
     REQUIRE(SceneRenderer::render(d, 0, {320, 180}) != originalFrame);
     REQUIRE(deserializeDocument(serializeDocument(d)) == d);
 }
+
+TEST_CASE("Batch assembly registers new parts in saved views without moving artwork") {
+    Session session;
+    const Id body = session.document().layers.front().id;
+    Id root = 0, hand = 0, empty = 0, view = 0;
+    REQUIRE(session.apply("Prepare imported parts", [&](Document& d) {
+        root = makeCharacter(d, body, "Hero");
+        createSubstitution(d, body, 0, false, "Body");
+        view = captureCharacterView(d, root, 0, "Front");
+        Layer source;
+        source.id = d.allocateId();
+        hand = source.id;
+        source.name = "Hand";
+        source.transform.x = 40;
+        d.layers.push_back(source);
+        d.editableDrawing(hand, 0).strokes.push_back(
+            {d.allocateId(), d.palette.front().id, 4, Shape::Rectangle, true, 2,
+             {{5, 5}, {25, 25}}});
+        Layer blank;
+        blank.id = d.allocateId();
+        empty = blank.id;
+        blank.name = "Unexposed guide";
+        d.layers.push_back(blank);
+    }));
+    const auto before = SceneRenderer::render(session.document(), 0, {320, 180});
+    REQUIRE(session.apply("Assemble exposed drawings", [&](Document& d) {
+        REQUIRE(attachUnparentedDrawings(d, root, 0) == 1);
+    }));
+    REQUIRE(session.document().layer(hand).kind == LayerKind::Part);
+    REQUIRE(session.document().layer(hand).role == "Hand");
+    REQUIRE(session.document().layer(empty).kind == LayerKind::Drawing);
+    REQUIRE(session.document().layer(root).views.front().choices.size() == 2);
+    REQUIRE(SceneRenderer::render(session.document(), 0, {320, 180}) == before);
+    REQUIRE(session.undo());
+    REQUIRE(session.document().layer(hand).kind == LayerKind::Drawing);
+    REQUIRE(session.redo());
+    REQUIRE(session.document().layer(root).views.front().id == view);
+    REQUIRE(deserializeDocument(serializeDocument(session.document())) == session.document());
+}
+
+TEST_CASE("Rig branch copies keep view membership and choose independent or linked artwork") {
+    Session session;
+    const Id body = session.document().layers.front().id;
+    Id root = 0, peg = 0, drawing = 0, view = 0;
+    REQUIRE(session.apply("Build source", [&](Document& d) {
+        root = makeCharacter(d, body, "Hero");
+        drawing = createSubstitution(d, body, 0, false, "Body");
+        peg = addPeg(d, body, "Torso peg");
+        view = captureCharacterView(d, root, 0, "Front");
+    }));
+    Id independent = 0, linked = 0, copiedPeg = 0;
+    REQUIRE(session.apply("Copy branches", [&](Document& d) {
+        independent = duplicateRigBranch(d, body, false);
+        linked = duplicateRigBranch(d, body, true);
+        copiedPeg = duplicateRigBranch(d, peg, false);
+        applyCharacterView(d, root, view, 5);
+    }));
+    REQUIRE(session.document().drawingAt(independent, 0)->id != drawing);
+    REQUIRE(session.document().drawingAt(linked, 0)->id == drawing);
+    REQUIRE(session.document().layer(copiedPeg).kind == LayerKind::Peg);
+    REQUIRE(session.document().layer(root).views.front().choices.size() == 6);
+    REQUIRE(session.document().layer(independent).parent == peg);
+    REQUIRE(session.apply("Delete copied limb", [&](Document& d) {
+        removeRigBranch(d, copiedPeg);
+    }));
+    REQUIRE(session.document().layer(root).views.front().choices.size() == 3);
+    REQUIRE_THROWS(session.document().layer(copiedPeg));
+    REQUIRE(session.undo());
+    REQUIRE(session.document().layer(copiedPeg).kind == LayerKind::Peg);
+    REQUIRE(deserializeDocument(serializeDocument(session.document())) == session.document());
+}
+
+TEST_CASE("Detaching a part and dissolving its peg preserve registration and view validity") {
+    auto d = makeDocument();
+    const Id body = d.layers.front().id;
+    const Id root = makeCharacter(d, body, "Hero");
+    const Id artwork = createSubstitution(d, body, 0, false, "Body");
+    d.drawings.at(artwork).strokes.push_back(
+        {d.allocateId(), d.palette.front().id, 6, Shape::Rectangle, true, 2,
+         {{15, 15}, {50, 50}}});
+    const Id peg = addPeg(d, body, "Body peg");
+    d.layer(peg).transform.x = 35;
+    d.layer(peg).transform.y = 14;
+    const Id view = captureCharacterView(d, root, 0, "Front");
+    const auto before = SceneRenderer::render(d, 0, {320, 180});
+    dissolvePeg(d, peg);
+    REQUIRE(d.layer(body).parent == root);
+    REQUIRE(SceneRenderer::render(d, 0, {320, 180}) == before);
+    detachPart(d, body);
+    REQUIRE(d.layer(body).kind == LayerKind::Drawing);
+    REQUIRE(d.layer(root).views.front().id == view);
+    REQUIRE(d.layer(root).views.front().choices.empty());
+    REQUIRE(SceneRenderer::render(d, 0, {320, 180}) == before);
+    REQUIRE(deserializeDocument(serializeDocument(d)) == d);
+}
+
+TEST_CASE("View ranges and single-part updates preserve outside frames and order") {
+    auto d = makeDocument();
+    const Id body = d.layers.front().id;
+    const Id root = makeCharacter(d, body, "Hero");
+    const Id frontDrawing = createSubstitution(d, body, 0, false, "Front");
+    const Id sideDrawing = createSubstitution(d, body, 10, true, "Side");
+    const Id front = captureCharacterView(d, root, 0, "Front");
+    const Id side = captureCharacterView(d, root, 10, "Side");
+    applyCharacterViewRange(d, root, front, 20, 30);
+    REQUIRE(d.drawingAt(body, 19)->id == sideDrawing);
+    REQUIRE(d.drawingAt(body, 20)->id == frontDrawing);
+    REQUIRE(d.drawingAt(body, 29)->id == frontDrawing);
+    REQUIRE(d.drawingAt(body, 30)->id == sideDrawing);
+    auto locked = d;
+    locked.layer(body).locked = true;
+    REQUIRE_THROWS(applyCharacterViewRange(locked, root, side, 20, 30));
+    REQUIRE(locked.drawingAt(body, 20)->id == frontDrawing);
+    updateCharacterViewPart(d, root, front, body, 10);
+    REQUIRE(d.layer(root).views.front().choices.front().drawing == sideDrawing);
+    reorderCharacterView(d, root, side, -1);
+    REQUIRE(d.layer(root).views.front().id == side);
+    REQUIRE_THROWS(applyCharacterViewRange(d, root, front, 30, 20));
+    REQUIRE(deserializeDocument(serializeDocument(d)) == d);
+}

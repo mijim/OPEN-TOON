@@ -1,4 +1,5 @@
 #include "opentoon/document.h"
+#include "opentoon/rigging.h"
 #include "project_store.h"
 #include "scene_renderer.h"
 #include <QFile>
@@ -9,8 +10,10 @@
 #include <QJsonObject>
 #include <QTemporaryDir>
 #include <catch2/catch_test_macros.hpp>
+#include <algorithm>
 #include <cstring>
 #include <filesystem>
+#include <map>
 #include <vector>
 
 namespace {
@@ -75,6 +78,18 @@ opentoon::Document makeRigidReference(const QJsonObject& spec) {
     document.validate();
     return document;
 }
+opentoon::ImageAsset partImage(const QString& name) {
+    QImage image(fixture + "parts/" + name + ".png");
+    REQUIRE_FALSE(image.isNull());
+    image = image.convertToFormat(QImage::Format_RGBA8888);
+    std::vector<std::uint8_t> bytes;
+    bytes.reserve(std::size_t(image.width()) * image.height() * 4);
+    for (int y = 0; y < image.height(); ++y) {
+        const auto* row = image.constScanLine(y);
+        bytes.insert(bytes.end(), row, row + image.width() * 4);
+    }
+    return {image.width(), image.height(), std::move(bytes)};
+}
 } // namespace
 
 TEST_CASE("Original registered character parts survive current-format save and reopen") {
@@ -101,4 +116,78 @@ TEST_CASE("Original registered character parts survive current-format save and r
     REQUIRE(reopened.rate.sampleAt(480, 48000) == 960960);
     REQUIRE(opentoon::ProjectStore::save(path, reopened, "Fractional timing", 1) == 2);
     REQUIRE(opentoon::ProjectStore::load(path).document == reopened);
+}
+
+TEST_CASE("Nineteen-part character switches coordinated views and reopens with independent copy") {
+    auto document = makeRigidReference(shot());
+    const auto reference = QImage(fixture + "reference_0000.png")
+                               .convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    const auto original = opentoon::SceneRenderer::render(document, 0);
+    for (int y = 0; y < original.height(); ++y)
+        REQUIRE(std::memcmp(original.constScanLine(y), reference.constScanLine(y),
+                            original.width() * 4) == 0);
+    const auto root = document.layers.front().id;
+    document.layer(root).kind = opentoon::LayerKind::Character;
+    std::map<std::string, opentoon::Id> parts;
+    for (std::size_t index = 1; index < document.layers.size(); ++index) {
+        auto& layer = document.layers[index];
+        layer.kind = opentoon::LayerKind::Part;
+        layer.role = layer.name;
+        layer.variants.push_back({layer.exposures.front().drawing, "Front"});
+        parts.emplace(layer.role, layer.id);
+    }
+    const auto front = opentoon::captureCharacterView(document, root, 0, "Front");
+    for (const auto& [role, file] : std::vector<std::pair<std::string, QString>>{
+             {"head", "head__three_quarter"}, {"hair", "hair__three_quarter"},
+             {"eyes", "eyes__three_quarter"}, {"mouth", "mouth__three_quarter__ah"}}) {
+        const auto partId = parts.at(role);
+        const auto drawing = opentoon::createSubstitution(document, partId, 120, false,
+                                                           "Three-quarter " + role);
+        document.drawings.at(drawing).image = partImage(file);
+    }
+    const auto side = opentoon::captureCharacterView(document, root, 120, "Three-quarter");
+    REQUIRE(document.layer(root).views.front().choices.size() == 19);
+    REQUIRE(document.layer(root).views.back().choices.size() == 19);
+    opentoon::applyCharacterViewRange(document, root, front, 220, 240);
+    REQUIRE(document.drawingAt(parts.at("head"), 219)->id !=
+            document.drawingAt(parts.at("head"), 220)->id);
+    REQUIRE(document.drawingAt(parts.at("head"), 240)->id !=
+            document.drawingAt(parts.at("head"), 239)->id);
+    const auto copy = opentoon::duplicateCharacter(document, root);
+    const auto copiedHeadLayer = std::find_if(document.layers.begin(), document.layers.end(),
+                                              [&](const opentoon::Layer& layer) {
+                                                  return layer.role == "head" &&
+                                                         layer.id != parts.at("head") &&
+                                                         opentoon::characterFor(document, layer.id) == copy;
+                                              });
+    REQUIRE(copiedHeadLayer != document.layers.end());
+    const auto copiedHead = copiedHeadLayer->id;
+    REQUIRE(document.layer(copiedHead).kind == opentoon::LayerKind::Part);
+    opentoon::applyCharacterView(document, copy, document.layer(copy).views.front().id, 250);
+    const auto& sourceChoices = document.layer(root).views.back().choices;
+    const auto sourceChoice = std::find_if(sourceChoices.begin(), sourceChoices.end(),
+                                            [&](const opentoon::ViewChoice& choice) {
+                                                return choice.part == parts.at("head");
+                                            });
+    const auto& copyChoices = document.layer(copy).views.front().choices;
+    const auto copyChoice = std::find_if(copyChoices.begin(), copyChoices.end(),
+                                          [&](const opentoon::ViewChoice& choice) {
+                                              return choice.part == copiedHead;
+                                          });
+    REQUIRE(sourceChoice != sourceChoices.end());
+    REQUIRE(copyChoice != copyChoices.end());
+    const auto sideHead = sourceChoice->drawing;
+    const auto copyFrontHead = copyChoice->drawing;
+    REQUIRE(document.drawingAt(parts.at("head"), 250)->id == sideHead);
+    REQUIRE(document.drawingAt(copiedHead, 250)->id == copyFrontHead);
+    REQUIRE(document.layer(root).views.back().id == side);
+    document.validate();
+    QTemporaryDir temporary;
+    REQUIRE(temporary.isValid());
+    const auto path = std::filesystem::path((temporary.path() + "/rigged.otoon").toStdString());
+    REQUIRE(opentoon::ProjectStore::save(path, document) == 1);
+    const auto reopened = opentoon::ProjectStore::load(path).document;
+    REQUIRE(reopened == document);
+    REQUIRE(opentoon::SceneRenderer::render(reopened, 250) ==
+            opentoon::SceneRenderer::render(document, 250));
 }

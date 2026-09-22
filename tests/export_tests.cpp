@@ -184,6 +184,51 @@ TEST_CASE("Inspector view sets and thumbnail chooser survive duplicate save and 
     REQUIRE(editor.document() == snapshot);
 }
 
+TEST_CASE("Inspector rig branch and view-range commands stay undoable and saveable") {
+    EditorController editor;
+    editor.newScene();
+    REQUIRE(editor.importParts(paths({partFixture + "torso__base.png", partFixture + "head__front.png"})));
+    editor.makeCharacter();
+    const int root = editor.characterId();
+    editor.attachUnparentedDrawings();
+    REQUIRE(editor.document().layer(root).kind == opentoon::LayerKind::Character);
+    editor.captureCharacterView();
+    REQUIRE(editor.characterViews().size() == 1);
+    const int part = editor.selectedLayer();
+    editor.createSubstitution(true);
+    editor.updateSelectedPartInView();
+    editor.duplicateLayer(false);
+    const int copy = editor.selectedLayer();
+    REQUIRE(copy != part);
+    REQUIRE(editor.document().layer(root).views.front().choices.size() == 3);
+    editor.addPeg();
+    const int peg = int(editor.document().layer(copy).parent);
+    editor.setSelectedLayer(peg);
+    editor.duplicateLayer(false);
+    REQUIRE(editor.document().layer(editor.selectedLayer()).kind == opentoon::LayerKind::Peg);
+    editor.deleteRigBranch();
+    REQUIRE(editor.document().layer(root).views.front().choices.size() == 3);
+    editor.setSelectedLayer(part);
+    editor.captureCharacterView();
+    REQUIRE(editor.characterViews().size() == 2);
+    editor.moveCharacterView(-1);
+    editor.stepCharacterView(1);
+    editor.selectTimelineRange(4, 8, 0, 0);
+    editor.applyCharacterViewToRange();
+    const auto snapshot = editor.document();
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto project = QUrl::fromLocalFile(directory.filePath("rig-branch.otoon"));
+    REQUIRE(editor.saveProject(project));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(project));
+    REQUIRE(reopened.document() == snapshot);
+    editor.undo();
+    REQUIRE(editor.document() != snapshot);
+    editor.redo();
+    REQUIRE(editor.document() == snapshot);
+}
+
 TEST_CASE("Rejected registered part batch leaves the scene and selection intact") {
     EditorController editor;
     editor.newScene();

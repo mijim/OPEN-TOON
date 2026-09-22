@@ -503,10 +503,19 @@ void EditorController::addLayer() {
 void EditorController::removeLayer() {
     if (!layer_)
         return;
+    const auto kind = document().layer(layer_).kind;
+    if (kind == LayerKind::Peg) {
+        dissolvePeg();
+        return;
+    }
     if (edit("Remove layer", [&](Document& d) {
             for (const auto& l : d.layers)
                 if (l.parent == layer_)
                     throw std::runtime_error("Remove child layers before deleting their parent.");
+            if (kind == LayerKind::Part) {
+                opentoon::removeRigBranch(d, layer_);
+                return;
+            }
             Id parent = d.layer(layer_).parent;
             for (auto& l : d.layers)
                 if (l.parent == layer_)
@@ -520,6 +529,15 @@ void EditorController::duplicateLayer(bool linked) {
         return;
     if (document().layer(layer_).kind == LayerKind::Character) {
         duplicateCharacter();
+        return;
+    }
+    if (document().layer(layer_).kind == LayerKind::Part ||
+        document().layer(layer_).kind == LayerKind::Peg) {
+        Id added = 0;
+        if (edit(linked ? "Clone rig branch" : "Duplicate rig branch", [&](Document& d) {
+                added = opentoon::duplicateRigBranch(d, layer_, linked);
+            }))
+            setSelectedLayer(int(added));
         return;
     }
     Id added = 0;
@@ -603,11 +621,41 @@ void EditorController::makeCharacter() {
             opentoon::makeCharacter(d, layer_, "Character " + std::to_string(d.nextId));
         });
 }
+void EditorController::attachUnparentedDrawings() {
+    const int root = characterId();
+    if (!root)
+        return;
+    edit("Attach unparented drawings", [&](Document& d) {
+        const auto count = opentoon::attachUnparentedDrawings(d, root, frame_);
+        if (!count)
+            throw std::runtime_error("No exposed, unlocked root drawings are available to attach.");
+    });
+}
 void EditorController::addPeg() {
     if (layer_)
         edit("Add parent peg", [&](Document& d) {
             opentoon::addPeg(d, layer_, "Peg " + std::to_string(d.nextId));
         });
+}
+void EditorController::deleteRigBranch() {
+    if (layer_ && (document().layer(layer_).kind == LayerKind::Part ||
+                   document().layer(layer_).kind == LayerKind::Peg) &&
+        edit("Delete rig branch", [&](Document& d) {
+            opentoon::removeRigBranch(d, layer_);
+        }))
+        resetSelection();
+}
+void EditorController::detachPart() {
+    if (layer_ && edit("Detach character part", [&](Document& d) {
+            opentoon::detachPart(d, layer_);
+        }))
+        emit selectionChanged();
+}
+void EditorController::dissolvePeg() {
+    if (layer_ && edit("Dissolve peg", [&](Document& d) {
+            opentoon::dissolvePeg(d, layer_);
+        }))
+        resetSelection();
 }
 void EditorController::setPartRole(QString role) {
     if (layer_)
@@ -718,11 +766,25 @@ void EditorController::applyCharacterView() {
             opentoon::applyCharacterView(d, root, view, frame_);
         });
 }
+void EditorController::applyCharacterViewToRange() {
+    const int root = characterId(), view = selectedView();
+    if (root && view)
+        edit("Apply character view to range", [&](Document& d) {
+            opentoon::applyCharacterViewRange(d, root, view, rangeStart_, rangeEnd_);
+        });
+}
 void EditorController::updateCharacterView() {
     const int root = characterId(), view = selectedView();
     if (root && view)
         edit("Update character view", [&](Document& d) {
             opentoon::updateCharacterView(d, root, view, frame_);
+        });
+}
+void EditorController::updateSelectedPartInView() {
+    const int root = characterId(), view = selectedView();
+    if (root && view && layer_)
+        edit("Update part in character view", [&](Document& d) {
+            opentoon::updateCharacterViewPart(d, root, view, layer_, frame_);
         });
 }
 void EditorController::renameCharacterView(QString name) {
@@ -752,6 +814,27 @@ void EditorController::removeCharacterView() {
         selectedView_ = 0;
         emit viewSelectionChanged();
     }
+}
+void EditorController::moveCharacterView(int direction) {
+    const int root = characterId(), view = selectedView();
+    if (root && view)
+        edit("Reorder character view", [&](Document& d) {
+            opentoon::reorderCharacterView(d, root, view, direction);
+        });
+}
+void EditorController::stepCharacterView(int direction) {
+    const auto views = characterViews();
+    if (views.isEmpty() || (direction != -1 && direction != 1))
+        return;
+    auto current = selectedView();
+    int index = 0;
+    for (int i = 0; i < views.size(); ++i)
+        if (views[i].toMap().value("id").toInt() == current) {
+            index = i;
+            break;
+        }
+    const int next = (index + direction + views.size()) % views.size();
+    selectView(views[next].toMap().value("id").toInt());
 }
 void EditorController::duplicateCharacter() {
     const int root = characterId();

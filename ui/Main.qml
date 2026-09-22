@@ -1059,6 +1059,11 @@ ApplicationWindow {
                                             onTriggered: editor.makeCharacter()
                                         }
                                         MenuItem {
+                                            text: "Attach unparented drawings"
+                                            enabled: editor.characterId > 0
+                                            onTriggered: editor.attachUnparentedDrawings()
+                                        }
+                                        MenuItem {
                                             text: "Add parent peg"
                                             enabled: layerInspector.rigLayer?.kind === 2 || layerInspector.rigLayer?.kind === 3
                                             onTriggered: editor.addPeg()
@@ -1072,6 +1077,21 @@ ApplicationWindow {
                                             text: "Duplicate full character"
                                             enabled: editor.characterId > 0
                                             onTriggered: editor.duplicateCharacter()
+                                        }
+                                        MenuItem {
+                                            text: "Detach selected part"
+                                            enabled: layerInspector.rigLayer?.kind === 3
+                                            onTriggered: editor.detachPart()
+                                        }
+                                        MenuItem {
+                                            text: "Dissolve peg, keep children"
+                                            enabled: layerInspector.rigLayer?.kind === 2
+                                            onTriggered: editor.dissolvePeg()
+                                        }
+                                        MenuItem {
+                                            text: "Delete selected rig branch"
+                                            enabled: layerInspector.rigLayer?.kind === 2 || layerInspector.rigLayer?.kind === 3
+                                            onTriggered: editor.deleteRigBranch()
                                         }
                                     }
                                 }
@@ -1217,6 +1237,34 @@ ApplicationWindow {
                                 }
                                 RowLayout {
                                     Layout.fillWidth: true
+                                    C.CompactButton {
+                                        text: "‹"
+                                        enabled: editor.characterViews.length > 1
+                                        Accessible.name: "Previous character view"
+                                        onClicked: editor.stepCharacterView(-1)
+                                    }
+                                    C.CompactButton {
+                                        text: "›"
+                                        enabled: editor.characterViews.length > 1
+                                        Accessible.name: "Next character view"
+                                        onClicked: editor.stepCharacterView(1)
+                                    }
+                                    Item { Layout.fillWidth: true }
+                                    C.CompactButton {
+                                        text: "←"
+                                        enabled: editor.selectedView > 0
+                                        Accessible.name: "Move character view earlier"
+                                        onClicked: editor.moveCharacterView(-1)
+                                    }
+                                    C.CompactButton {
+                                        text: "→"
+                                        enabled: editor.selectedView > 0
+                                        Accessible.name: "Move character view later"
+                                        onClicked: editor.moveCharacterView(1)
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
                                     C.CompactButton { text: "+ Capture"; onClicked: editor.captureCharacterView() }
                                     C.CompactButton {
                                         text: "Apply"
@@ -1227,6 +1275,19 @@ ApplicationWindow {
                                         text: "Update"
                                         enabled: editor.selectedView > 0
                                         onClicked: editor.updateCharacterView()
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    C.CompactButton {
+                                        text: "Apply range"
+                                        enabled: editor.selectedView > 0
+                                        onClicked: editor.applyCharacterViewToRange()
+                                    }
+                                    C.CompactButton {
+                                        text: "Set this part"
+                                        enabled: editor.selectedView > 0 && layerInspector.rigLayer?.kind === 3
+                                        onClicked: editor.updateSelectedPartInView()
                                     }
                                 }
                                 RowLayout {
@@ -1581,11 +1642,13 @@ ApplicationWindow {
                         Menu {
                             id: layerMenu
                             Action {
-                                text: "Duplicate layer"
+                                text: layerInspector.rigLayer?.kind === 2 || layerInspector.rigLayer?.kind === 3 ?
+                                      "Duplicate rig branch" : "Duplicate layer"
                                 onTriggered: editor.duplicateLayer(false)
                             }
                             Action {
-                                text: "Clone linked drawings"
+                                text: layerInspector.rigLayer?.kind === 2 || layerInspector.rigLayer?.kind === 3 ?
+                                      "Clone branch with linked artwork" : "Clone linked drawings"
                                 onTriggered: editor.duplicateLayer(true)
                             }
                             Action {

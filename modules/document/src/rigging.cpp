@@ -121,6 +121,30 @@ std::vector<ViewChoice> currentChoices(const Document& document, Id root, Frame 
     require(!result.empty(), "Character has no parts to capture.");
     return result;
 }
+std::vector<ViewChoice> checkedViewChoices(Document& document, Id rootId, Id viewId) {
+    const auto choices = findView(character(document, rootId), viewId).choices;
+    std::map<Id, Id> selected;
+    for (const auto& choice : choices)
+        selected.emplace(choice.part, choice.drawing);
+    std::vector<ViewChoice> targets;
+    for (const auto& layer : document.layers) {
+        if (layer.kind != LayerKind::Part || characterFor(document, layer.id) != rootId)
+            continue;
+        require(!layer.locked, "Unlock every affected part before applying a character view.");
+        if (!selected.contains(layer.id))
+            throw std::invalid_argument("View set is missing part: " + layer.role);
+        checkVariant(layer, selected.at(layer.id));
+        targets.push_back({layer.id, selected.at(layer.id)});
+    }
+    require(targets.size() == choices.size(), "View set contains stale or duplicate parts.");
+    return targets;
+}
+bool inBranch(const Document& document, Id node, Id branch) {
+    for (Id current = node; current; current = document.layer(current).parent)
+        if (current == branch)
+            return true;
+    return false;
+}
 } // namespace
 Id characterFor(const Document& document, Id layerId) {
     Id current = layerId;
@@ -162,6 +186,10 @@ void attachDrawingAsPart(Document& document, Id drawingId, Id parentId, std::str
     require(parent.kind == LayerKind::Character || parent.kind == LayerKind::Peg,
             "Attach artwork below a character root or peg.");
     require(!role.empty() && role.size() <= 128, "Part role is invalid.");
+    const Id rootId = characterFor(document, parentId);
+    require(rootId != 0, "Attach parts below a character.");
+    require(document.layer(rootId).views.empty() || !drawing.exposures.empty(),
+            "Expose a drawing before adding this part to character views.");
     const Matrix targetSpace = inverse(ancestry(document, parentId));
     const double targetOpacity = ancestryOpacity(document, parentId);
     require(targetOpacity > 1e-10, "Cannot attach below a transparent parent.");
@@ -181,6 +209,23 @@ void attachDrawingAsPart(Document& document, Id drawingId, Id parentId, std::str
     for (const auto& exposure : drawing.exposures)
         if (known.insert(exposure.drawing).second)
             drawing.variants.push_back({exposure.drawing, drawingLabel(document, exposure.drawing)});
+    if (!drawing.variants.empty())
+        for (auto& view : document.layer(rootId).views)
+            view.choices.push_back({drawingId, drawing.variants.front().drawing});
+}
+std::size_t attachUnparentedDrawings(Document& document, Id rootId, Frame frame) {
+    (void)character(document, rootId);
+    require(frame >= 0 && frame < document.duration, "Assembly frame is outside the scene.");
+    std::vector<Id> candidates;
+    for (const auto& layer : document.layers)
+        if (layer.kind == LayerKind::Drawing && !layer.parent && !layer.locked &&
+            document.drawingAt(layer.id, frame))
+            candidates.push_back(layer.id);
+    for (const Id id : candidates) {
+        const auto role = document.layer(id).name.substr(0, 128);
+        attachDrawingAsPart(document, id, rootId, role);
+    }
+    return candidates.size();
 }
 Id addPeg(Document& document, Id childId, std::string name) {
     const auto child = document.layer(childId);
@@ -337,30 +382,40 @@ Id captureCharacterView(Document& document, Id rootId, Frame frame, std::string 
     return id;
 }
 void applyCharacterView(Document& document, Id rootId, Id viewId, Frame frame) {
-    auto& root = character(document, rootId);
-    const auto choices = findView(root, viewId).choices;
     require(frame >= 0 && frame < document.duration, "View-set frame is outside the scene.");
-    std::map<Id, Id> selected;
-    for (const auto& choice : choices)
-        selected.emplace(choice.part, choice.drawing);
-    std::vector<std::pair<Id, Frame>> targets;
-    for (const auto& layer : document.layers) {
-        if (layer.kind != LayerKind::Part || characterFor(document, layer.id) != rootId)
-            continue;
-        require(!layer.locked, "Unlock every affected part before applying a character view.");
-        if (!selected.contains(layer.id))
-            throw std::invalid_argument("View set is missing part: " + layer.role);
-        checkVariant(layer, selected.at(layer.id));
-        targets.emplace_back(layer.id, spanEnd(layer, frame, document.duration));
-    }
-    require(targets.size() == choices.size(), "View set contains stale or duplicate parts.");
-    for (const auto& [partId, end] : targets)
-        expose(document.layer(partId), frame, end, selected.at(partId));
+    const auto targets = checkedViewChoices(document, rootId, viewId);
+    for (const auto& choice : targets)
+        expose(document.layer(choice.part), frame,
+               spanEnd(document.layer(choice.part), frame, document.duration), choice.drawing);
+}
+void applyCharacterViewRange(Document& document, Id rootId, Id viewId, Frame start, Frame end) {
+    require(start >= 0 && end > start && end <= document.duration,
+            "Character view range is outside the scene.");
+    const auto targets = checkedViewChoices(document, rootId, viewId);
+    for (const auto& choice : targets)
+        expose(document.layer(choice.part), start, end, choice.drawing);
 }
 void updateCharacterView(Document& document, Id rootId, Id viewId, Frame frame) {
     auto choices = currentChoices(document, rootId, frame);
     auto& root = character(document, rootId);
     findView(root, viewId).choices = std::move(choices);
+}
+void updateCharacterViewPart(Document& document, Id rootId, Id viewId, Id partId, Frame frame) {
+    auto& root = character(document, rootId);
+    auto& target = part(document, partId);
+    require(characterFor(document, partId) == rootId && frame >= 0 && frame < document.duration,
+            "Selected part does not belong to this character or frame.");
+    const auto* drawing = document.drawingAt(partId, frame);
+    require(drawing != nullptr, "Expose a substitution before updating this view.");
+    checkVariant(target, drawing->id);
+    auto& choices = findView(root, viewId).choices;
+    auto found = std::find_if(choices.begin(), choices.end(), [partId](const ViewChoice& choice) {
+        return choice.part == partId;
+    });
+    if (found == choices.end())
+        choices.push_back({partId, drawing->id});
+    else
+        found->drawing = drawing->id;
 }
 void renameCharacterView(Document& document, Id rootId, Id viewId, std::string name) {
     auto& root = character(document, rootId);
@@ -389,6 +444,15 @@ void removeCharacterView(Document& document, Id rootId, Id viewId) {
     auto& root = character(document, rootId);
     (void)findView(root, viewId);
     std::erase_if(root.views, [viewId](const CharacterView& view) { return view.id == viewId; });
+}
+void reorderCharacterView(Document& document, Id rootId, Id viewId, int direction) {
+    auto& root = character(document, rootId);
+    require(direction == -1 || direction == 1, "Character view order must move one place.");
+    auto& current = findView(root, viewId);
+    const auto position = &current - root.views.data();
+    const auto target = position + direction;
+    if (target >= 0 && target < std::ptrdiff_t(root.views.size()))
+        std::iter_swap(root.views.begin() + position, root.views.begin() + target);
 }
 Id duplicateCharacter(Document& document, Id rootId, double offsetX, double offsetY) {
     const auto& root = document.layer(rootId);
@@ -440,5 +504,124 @@ Id duplicateCharacter(Document& document, Id rootId, double offsetX, double offs
         document.layers.push_back(std::move(source));
     }
     return layers.at(rootId);
+}
+Id duplicateRigBranch(Document& document, Id branchId, bool linkedArtwork) {
+    const auto sourceRoot = document.layer(branchId);
+    require((sourceRoot.kind == LayerKind::Part || sourceRoot.kind == LayerKind::Peg) &&
+                !sourceRoot.locked, "Select an unlocked part or peg branch to duplicate.");
+    const Id rootId = characterFor(document, branchId);
+    std::vector<Layer> originals;
+    for (const auto& layer : document.layers)
+        if (inBranch(document, layer.id, branchId)) {
+            require(!layer.locked, "Unlock every layer in the branch before duplicating.");
+            originals.push_back(layer);
+        }
+    std::map<Id, Id> layers, drawings;
+    for (const auto& source : originals)
+        layers[source.id] = document.allocateId();
+    auto mapDrawing = [&](Id old) {
+        if (linkedArtwork)
+            return old;
+        if (drawings.contains(old))
+            return drawings.at(old);
+        Drawing copy = document.drawings.at(old);
+        copy.id = document.allocateId();
+        for (auto& stroke : copy.strokes)
+            stroke.id = document.allocateId();
+        const Id id = copy.id;
+        document.drawings.emplace(id, std::move(copy));
+        drawings[old] = id;
+        return id;
+    };
+    for (auto source : originals) {
+        const Id old = source.id;
+        source.id = layers.at(old);
+        source.parent = layers.contains(source.parent) ? layers.at(source.parent) : source.parent;
+        if (old == branchId) {
+            source.name = source.name.substr(0, 4091) + (linkedArtwork ? " clone" : " copy");
+            source.transform.x += 32;
+            source.transform.y += 32;
+            for (auto& key : source.keys) {
+                key.value.x += 32;
+                key.value.y += 32;
+            }
+        }
+        for (auto& exposure : source.exposures)
+            exposure.drawing = mapDrawing(exposure.drawing);
+        for (auto& variant : source.variants)
+            variant.drawing = mapDrawing(variant.drawing);
+        document.layers.push_back(std::move(source));
+    }
+    for (auto& view : document.layer(rootId).views) {
+        std::vector<ViewChoice> additions;
+        for (const auto& choice : view.choices)
+            if (layers.contains(choice.part))
+                additions.push_back({layers.at(choice.part), mapDrawing(choice.drawing)});
+        view.choices.insert(view.choices.end(), additions.begin(), additions.end());
+    }
+    return layers.at(branchId);
+}
+void removeRigBranch(Document& document, Id branchId) {
+    const auto& branch = document.layer(branchId);
+    require(branch.kind == LayerKind::Part || branch.kind == LayerKind::Peg,
+            "Select a character part or peg branch to remove.");
+    const Id rootId = characterFor(document, branchId);
+    std::set<Id> removed;
+    for (const auto& layer : document.layers)
+        if (inBranch(document, layer.id, branchId)) {
+            require(!layer.locked, "Unlock every layer in the branch before removing.");
+            removed.insert(layer.id);
+        }
+    for (auto& view : document.layer(rootId).views)
+        std::erase_if(view.choices, [&](const ViewChoice& choice) {
+            return removed.contains(choice.part);
+        });
+    std::erase_if(document.layers, [&](const Layer& layer) { return removed.contains(layer.id); });
+}
+void detachPart(Document& document, Id partId) {
+    auto& layer = part(document, partId);
+    require(layer.keys.empty(), "Detach a part before animating it.");
+    require(std::none_of(document.layers.begin(), document.layers.end(),
+                         [partId](const Layer& child) { return child.parent == partId; }),
+            "Detach child layers first.");
+    const Id rootId = characterFor(document, partId);
+    const Matrix world = compose(ancestry(document, layer.parent), matrix(layer.transform));
+    Transform pose = decompose(world, layer.transform);
+    pose.opacity *= ancestryOpacity(document, layer.parent);
+    require(std::isfinite(pose.opacity) && pose.opacity >= 0 && pose.opacity <= 1,
+            "Detaching cannot preserve opacity.");
+    for (auto& view : document.layer(rootId).views)
+        std::erase_if(view.choices, [partId](const ViewChoice& choice) { return choice.part == partId; });
+    layer.transform = pose;
+    layer.parent = 0;
+    layer.kind = LayerKind::Drawing;
+    layer.role.clear();
+    layer.variants.clear();
+}
+void dissolvePeg(Document& document, Id pegId) {
+    const auto peg = document.layer(pegId);
+    require(peg.kind == LayerKind::Peg && !peg.locked && peg.keys.empty(),
+            "Select an unlocked, unanimated peg to dissolve.");
+    const Matrix oldSpace = ancestry(document, pegId);
+    const Matrix newSpace = inverse(ancestry(document, peg.parent));
+    const double opacityFactor = peg.transform.opacity;
+    std::vector<std::pair<Id, Transform>> changes;
+    for (const auto& child : document.layers)
+        if (child.parent == pegId) {
+            require(!child.locked && child.keys.empty(),
+                    "Dissolve a peg before its children are animated.");
+            Transform pose = decompose(compose(newSpace, compose(oldSpace, matrix(child.transform))),
+                                       child.transform);
+            pose.opacity *= opacityFactor;
+            require(std::isfinite(pose.opacity) && pose.opacity >= 0 && pose.opacity <= 1,
+                    "Dissolving cannot preserve child opacity.");
+            changes.emplace_back(child.id, pose);
+        }
+    for (const auto& [id, pose] : changes) {
+        auto& child = document.layer(id);
+        child.parent = peg.parent;
+        child.transform = pose;
+    }
+    std::erase_if(document.layers, [pegId](const Layer& layer) { return layer.id == pegId; });
 }
 } // namespace opentoon

@@ -187,7 +187,11 @@ class EditorController final : public QObject {
     Q_INVOKABLE void moveLayer(int);
     Q_INVOKABLE void setParent(int);
     Q_INVOKABLE void makeCharacter();
+    Q_INVOKABLE void attachUnparentedDrawings();
     Q_INVOKABLE void addPeg();
+    Q_INVOKABLE void deleteRigBranch();
+    Q_INVOKABLE void detachPart();
+    Q_INVOKABLE void dissolvePeg();
     Q_INVOKABLE void setPartRole(QString);
     Q_INVOKABLE void setRestPivot(double x, double y);
     Q_INVOKABLE void centerRestPivot();
@@ -199,10 +203,14 @@ class EditorController final : public QObject {
     Q_INVOKABLE void stepSubstitution(int direction);
     Q_INVOKABLE void captureCharacterView();
     Q_INVOKABLE void applyCharacterView();
+    Q_INVOKABLE void applyCharacterViewToRange();
     Q_INVOKABLE void updateCharacterView();
+    Q_INVOKABLE void updateSelectedPartInView();
     Q_INVOKABLE void renameCharacterView(QString name);
     Q_INVOKABLE void duplicateCharacterView();
     Q_INVOKABLE void removeCharacterView();
+    Q_INVOKABLE void moveCharacterView(int direction);
+    Q_INVOKABLE void stepCharacterView(int direction);
     Q_INVOKABLE void duplicateCharacter();
     Q_INVOKABLE void newDrawing(bool duplicate = false);
     Q_INVOKABLE void holdDrawing(int);
