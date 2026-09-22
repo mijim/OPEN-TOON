@@ -705,54 +705,44 @@ ApplicationWindow {
                             model: [
                                 {
                                     name: "Select",
-                                    icon: "↖",
                                     key: "V"
                                 },
                                 {
                                     name: "Animate",
-                                    icon: "◇",
                                     key: "A"
                                 },
                                 {
                                     name: "Marquee",
-                                    icon: "▧",
                                     key: "M"
                                 },
-                                { name: "Lasso", icon: "♧", key: "L" },
-                                { name: "Line", icon: "╲", key: "" },
+                                { name: "Lasso", key: "L" },
+                                { name: "Line", key: "" },
                                 {
                                     name: "Pencil",
-                                    icon: "╱",
                                     key: "B"
                                 },
                                 {
                                     name: "Raster ink",
-                                    icon: "◉",
                                     key: ""
                                 },
                                 {
                                     name: "Eraser",
-                                    icon: "▱",
                                     key: "E"
                                 },
                                 {
                                     name: "Rectangle",
-                                    icon: "□",
                                     key: ""
                                 },
                                 {
                                     name: "Ellipse",
-                                    icon: "○",
                                     key: ""
                                 },
                                 {
                                     name: "Recolor",
-                                    icon: "◒",
                                     key: ""
                                 },
                                 {
                                     name: "Edit points",
-                                    icon: "⌘",
                                     key: ""
                                 }
                             ]
@@ -760,8 +750,7 @@ ApplicationWindow {
                                 required property var modelData
                                 width: 34
                                 height: 28
-                                text: modelData.icon
-                                font.pixelSize: 18
+                                toolIcon: modelData.name
                                 active: editor.tool === modelData.name
                                 hint: modelData.name + (modelData.key ? " · " + modelData.key : "")
                                 onClicked: editor.tool = modelData.name
