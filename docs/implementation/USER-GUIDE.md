@@ -18,7 +18,9 @@ keeps the established Qt scene appearance and is the default for old projects.
 Linear sRGB composites drawing layers in linear light and can look brighter at
 semi-transparent overlaps. The choice is saved with the project, is undoable,
 and applies to canvas preview and PNG export. Current composition is 8-bit CPU
-rendering; node topology cannot yet be edited in the UI.
+rendering. Unchanged linear frames are reused while you pan, zoom or rotate the
+view; editing or switching scenes refreshes them. Node topology cannot yet be
+edited in the UI.
 
 ## Drawing and view controls
 

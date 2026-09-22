@@ -1,11 +1,14 @@
 #include "opentoon/animation.h"
 #include "scene_renderer.h"
 #include "graph_renderer.h"
+#include "revision_render_cache.h"
 #include "serialization.h"
 #include "vector_hit.h"
 #include <QPainter>
 #include <catch2/catch_test_macros.hpp>
 #include <cmath>
+#include <future>
+#include <thread>
 using namespace opentoon;
 TEST_CASE("Saved and reopened scenes produce the same forty-eight rendered frames") {
     auto original = makeBouncingBall();
@@ -57,6 +60,8 @@ TEST_CASE("Linear composition preserves transparent alpha and agrees across outp
     REQUIRE(GraphRenderer::render(branched, document, 0, {}, {}, GraphTarget::Write) == write);
     REQUIRE(qAlpha(write.pixel(0, 0)) >= 190);
     REQUIRE(qRed(write.pixel(0, 0)) > qRed(legacy.pixel(0, 0)));
+    REQUIRE(std::abs(qRed(write.pixel(0, 0)) - 118) <= 2);
+    REQUIRE(std::abs(qBlue(write.pixel(0, 0)) - 160) <= 2);
     const auto reopened = deserializeDocument(serializeDocument(document));
     REQUIRE(SceneRenderer::render(reopened, 0) == write);
     auto masked = graph;
@@ -70,6 +75,137 @@ TEST_CASE("Linear composition preserves transparent alpha and agrees across outp
     document.layers.front().visible = false;
     document.layers.back().visible = false;
     REQUIRE(qRgba(0, 0, 0, 0) == SceneRenderer::render(document, 0).pixel(0, 0));
+}
+TEST_CASE("Revision render cache reuses frames and separates view options") {
+    RevisionRenderCache cache(8);
+    RenderCacheKey key{7, 11, 0, 1, 1, CompositionProfile::LinearSrgb,
+                       GraphTarget::Display, true, false, 1};
+    int evaluations = 0;
+    auto render = [&] {
+        ++evaluations;
+        QImage image(1, 1, QImage::Format_ARGB32_Premultiplied);
+        image.fill(QColor(Qt::red));
+        return image;
+    };
+    REQUIRE(cache.resolve(key, render) == cache.resolve(key, render));
+    REQUIRE(evaluations == 1);
+    key.frame = 1;
+    (void)cache.resolve(key, render);
+    REQUIRE(evaluations == 2);
+    key.frame = 0;
+    (void)cache.resolve(key, render);
+    REQUIRE(evaluations == 2);
+    key.onionSkin = true;
+    (void)cache.resolve(key, render);
+    REQUIRE(evaluations == 3);
+    REQUIRE(cache.retainedBytes() <= 8);
+    key.frame = 1;
+    (void)cache.resolve(key, render);
+    REQUIRE(evaluations == 4); // Least recently used frame was evicted.
+    key.revision = 12;
+    (void)cache.resolve(key, render);
+    REQUIRE(evaluations == 5);
+    REQUIRE(cache.retainedBytes() == 4);
+    key.scene = 8;
+    (void)cache.resolve(key, render);
+    REQUIRE(evaluations == 6);
+}
+TEST_CASE("Late render results cannot publish after a new request or document revision") {
+    RevisionRenderCache cache(4);
+    RenderCacheKey old{1, 1, 0, 1, 1, CompositionProfile::LinearSrgb};
+    auto oldTicket = cache.begin(old);
+    auto newKey = old;
+    newKey.frame = 1;
+    auto newTicket = cache.begin(newKey);
+    QImage image(1, 1, QImage::Format_ARGB32_Premultiplied);
+    image.fill(Qt::black);
+    REQUIRE_FALSE(cache.current(oldTicket));
+    REQUIRE_FALSE(cache.publish(oldTicket, image));
+    REQUIRE(cache.current(newTicket));
+    REQUIRE(cache.publish(newTicket, image));
+    REQUIRE(cache.lookup(newKey).has_value());
+    auto stale = cache.begin(newKey);
+    newKey.revision = 2;
+    (void)cache.lookup(newKey);
+    REQUIRE_FALSE(cache.publish(stale, image));
+    REQUIRE_FALSE(cache.lookup(newKey).has_value());
+    auto fresh = cache.begin(newKey);
+    REQUIRE_FALSE(cache.lookup(old).has_value());
+    REQUIRE(cache.current(fresh));
+    REQUIRE_FALSE(cache.publish(fresh, QImage(2, 1, QImage::Format_ARGB32_Premultiplied)));
+    REQUIRE(cache.publish(fresh, image));
+    cache.clear();
+    REQUIRE_FALSE(cache.publish(fresh, image));
+    auto latest = newKey;
+    latest.revision = 3;
+    REQUIRE(cache.resolve(newKey, [&] {
+                (void)cache.begin(latest);
+                return image;
+            }).isNull());
+}
+TEST_CASE("A worker finishing after a scene change cannot publish its pixels") {
+    RevisionRenderCache cache(16);
+    RenderCacheKey key{1, 1, 0, 1, 1, CompositionProfile::LinearSrgb};
+    auto ticket = cache.begin(key);
+    std::promise<void> release;
+    const auto ready = release.get_future().share();
+    bool published = true;
+    std::thread worker([&] {
+        ready.wait();
+        QImage pixels(1, 1, QImage::Format_ARGB32_Premultiplied);
+        pixels.fill(Qt::red);
+        published = cache.publish(ticket, std::move(pixels));
+    });
+    key.scene = 2;
+    (void)cache.begin(key);
+    release.set_value();
+    worker.join();
+    REQUIRE_FALSE(published);
+    REQUIRE_FALSE(cache.lookup(key).has_value());
+}
+TEST_CASE("Linear compositor cancellation aborts inside the current frame") {
+    auto document = makeDocument();
+    document.width = 32;
+    document.height = 64;
+    document.composition = CompositionProfile::LinearSrgb;
+    auto& drawing = document.editableDrawing(document.layers.front().id, 0);
+    drawing.image = ImageAsset{32, 64, std::vector<std::uint8_t>(32 * 64 * 4, 160)};
+    int checks = 0;
+    RenderOptions options;
+    options.cancelled = [&] { return ++checks > 12; };
+    REQUIRE_THROWS_AS(SceneRenderer::render(document, 0, {}, options), RenderCancelled);
+    REQUIRE(checks > 12);
+}
+TEST_CASE("Conservative ink regions preserve rotated vector and sparse raster coverage") {
+    auto document = makeDocument();
+    document.width = 320;
+    document.height = 180;
+    document.background = {0, 0, 0, 0};
+    auto& layer = document.layers.front();
+    layer.transform.x = 35;
+    layer.transform.y = 12;
+    layer.transform.rotation = 25;
+    auto& drawing = document.editableDrawing(layer.id, 0);
+    drawing.strokes.push_back({document.allocateId(), document.palette.front().id, 22,
+                               Shape::Stroke, false, 2,
+                               {{30, 30, 1}, {160, 90, 1}}});
+    drawing.raster = RasterImage{320, 180, {}};
+    std::vector<std::uint16_t> pixels(64 * 64 * 4);
+    for (std::size_t i = 0; i < pixels.size(); i += 4) {
+        pixels[i] = 32768;
+        pixels[i + 3] = 32768;
+    }
+    drawing.raster->tiles[{2, 1}] = pixels;
+    document.validate();
+    for (const auto size : {QSize{640, 360}, QSize{80, 45}, QSize{333, 187}}) {
+        const auto legacy = SceneRenderer::render(document, 0, size);
+        document.composition = CompositionProfile::LinearSrgb;
+        const auto linear = SceneRenderer::render(document, 0, size);
+        for (int y = 0; y < legacy.height(); ++y)
+            for (int x = 0; x < legacy.width(); ++x)
+                REQUIRE(qAlpha(legacy.pixel(x, y)) == qAlpha(linear.pixel(x, y)));
+        document.composition = CompositionProfile::LegacyQt;
+    }
 }
 TEST_CASE("Palette identity recolors only referenced strokes and opacity preserves alpha") {
     auto d = makeBouncingBall();

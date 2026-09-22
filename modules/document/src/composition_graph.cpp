@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <functional>
 #include <map>
+#include <queue>
 #include <set>
 #include <stdexcept>
 
@@ -96,44 +97,70 @@ void CompositionGraph::validate(const Document& document) const {
 }
 std::vector<GraphNodeId> CompositionGraph::topologicalOrder() const {
     std::map<GraphNodeId, const GraphNode*> indexed;
+    std::map<GraphNodeId, std::size_t> pending;
+    std::map<GraphNodeId, std::vector<GraphNodeId>> consumers;
     for (const auto& node : nodes) {
         if (!node.id || !indexed.emplace(node.id, &node).second)
             throw std::invalid_argument("Duplicate or invalid compositor node ID.");
+        pending.emplace(node.id, node.inputs.size());
     }
-    std::map<GraphNodeId, int> state;
+    for (const auto& node : nodes)
+        for (const auto& input : node.inputs) {
+            if (!indexed.contains(input.source))
+                throw std::invalid_argument("Compositor references a missing node.");
+            consumers[input.source].push_back(node.id);
+        }
+    std::priority_queue<GraphNodeId, std::vector<GraphNodeId>, std::greater<>> ready;
+    for (const auto& [id, count] : pending)
+        if (count == 0)
+            ready.push(id);
     std::vector<GraphNodeId> ordered;
     ordered.reserve(nodes.size());
-    std::function<void(GraphNodeId)> visit = [&](GraphNodeId id) {
-        if (!indexed.contains(id))
-            throw std::invalid_argument("Compositor references a missing node.");
-        if (state[id] == 1)
-            throw std::invalid_argument("Compositor graph contains a cycle.");
-        if (state[id] == 2)
-            return;
-        state[id] = 1;
-        for (const auto& input : indexed.at(id)->inputs)
-            visit(input.source);
-        state[id] = 2;
+    while (!ready.empty()) {
+        const auto id = ready.top();
+        ready.pop();
         ordered.push_back(id);
-    };
-    for (const auto& node : nodes)
-        visit(node.id);
+        for (const auto consumer : consumers[id])
+            if (--pending.at(consumer) == 0)
+                ready.push(consumer);
+    }
+    if (ordered.size() != nodes.size())
+        throw std::invalid_argument("Compositor graph contains a cycle.");
     return ordered;
 }
-std::vector<GraphNodeId> CompositionGraph::affectedByLayer(Id layer) const {
+std::vector<GraphNodeId> CompositionGraph::affectedByLayer(const Document& document,
+                                                           Id layer) const {
+    (void)document.layer(layer);
+    std::map<Id, std::vector<Id>> children;
+    for (const auto& item : document.layers)
+        if (item.parent)
+            children[item.parent].push_back(item.id);
+    std::set<Id> layerBranch;
+    std::queue<Id> layers;
+    layers.push(layer);
+    while (!layers.empty()) {
+        const auto id = layers.front();
+        layers.pop();
+        if (!layerBranch.insert(id).second)
+            continue;
+        for (const auto child : children[id])
+            layers.push(child);
+    }
     std::set<GraphNodeId> affected;
+    std::map<GraphNodeId, std::vector<GraphNodeId>> consumers;
     for (const auto& node : nodes)
-        if (node.layer == layer)
-            affected.insert(node.id);
-    bool changed = true;
-    while (changed) {
-        changed = false;
-        for (const auto& node : nodes)
-            if (!affected.contains(node.id) &&
-                std::any_of(node.inputs.begin(), node.inputs.end(), [&](const auto& input) {
-                    return affected.contains(input.source);
-                }))
-                changed = affected.insert(node.id).second || changed;
+        for (const auto& input : node.inputs)
+            consumers[input.source].push_back(node.id);
+    std::queue<GraphNodeId> queue;
+    for (const auto& node : nodes)
+        if (node.layer && layerBranch.contains(node.layer) && affected.insert(node.id).second)
+            queue.push(node.id);
+    while (!queue.empty()) {
+        const auto id = queue.front();
+        queue.pop();
+        for (const auto consumer : consumers[id])
+            if (affected.insert(consumer).second)
+                queue.push(consumer);
     }
     return {affected.begin(), affected.end()};
 }

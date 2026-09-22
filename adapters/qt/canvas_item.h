@@ -2,6 +2,7 @@
 #include "editor_controller.h"
 #include "opentoon/document.h"
 #include "raster_brush.h"
+#include "revision_render_cache.h"
 #include <QElapsedTimer>
 #include <QPointer>
 #include <QQuickPaintedItem>
@@ -135,6 +136,7 @@ class CanvasItem : public QQuickPaintedItem {
     opentoon::SelectionMedia selectionMedia_ = opentoon::SelectionMedia::Both;
     bool movingRegion_ = false;
     QPointer<EditorController> editor_;
+    opentoon::RevisionRenderCache previewCache_;
     QString previousTool_;
     QPointer<QQuickWindow> filteredWindow_;
     double zoom_ = 1, angle_ = 0;

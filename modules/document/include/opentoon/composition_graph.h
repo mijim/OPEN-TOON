@@ -30,6 +30,6 @@ struct CompositionGraph {
     static CompositionGraph orderedLayers(const Document&);
     void validate(const Document&) const;
     [[nodiscard]] std::vector<GraphNodeId> topologicalOrder() const;
-    [[nodiscard]] std::vector<GraphNodeId> affectedByLayer(Id layer) const;
+    [[nodiscard]] std::vector<GraphNodeId> affectedByLayer(const Document&, Id layer) const;
 };
 } // namespace opentoon

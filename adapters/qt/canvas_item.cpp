@@ -2,6 +2,7 @@
 #include "editor_controller.h"
 #include "opentoon/animation.h"
 #include "scene_renderer.h"
+#include "graph_renderer.h"
 #include "vector_hit.h"
 #include <QCursor>
 #include <QMouseEvent>
@@ -37,6 +38,7 @@ void CanvasItem::setEditor(EditorController* editor) {
     if (editor_)
         disconnect(editor_, nullptr, this, nullptr);
     editor_ = editor;
+    previewCache_.clear();
     previousTool_ = editor ? editor->tool() : QString{};
     if (editor) {
         connect(editor, &EditorController::changed, this, [this] {
@@ -172,17 +174,31 @@ void CanvasItem::paint(QPainter* p) {
     p->save();
     p->setWorldTransform(view, true);
     p->fillRect(QRectF(-1, -1, editor_->sceneWidth() + 2, editor_->sceneHeight() + 2), QColor("#454545"));
-    SceneRenderer::paint(
-        *p, displayDocument, editor_->frame(),
-        {true, editor_->onionSkin(), 1, 0,
-         (rasterBrush_ || (drawing_ && selectedPoint_ >= 0 && editor_->tool() == "Edit points") ||
-          (transforming_ && previewValid_ && !posePreview_))
-             ? Id(editor_->selectedLayer())
-             : 0,
-         rasterBrush_ ? &rasterPreview_
-         : (drawing_ && selectedPoint_ >= 0 && editor_->tool() == "Edit points")
-             ? &pointDrawingPreview_
-             : (transforming_ && previewValid_ && !posePreview_ ? &transformPreview_ : nullptr)});
+    RenderOptions options{true, editor_->onionSkin(), 1, 0,
+                          (rasterBrush_ || (drawing_ && selectedPoint_ >= 0 && editor_->tool() == "Edit points") ||
+                           (transforming_ && previewValid_ && !posePreview_))
+                              ? Id(editor_->selectedLayer())
+                              : 0,
+                          rasterBrush_ ? &rasterPreview_
+                          : (drawing_ && selectedPoint_ >= 0 && editor_->tool() == "Edit points")
+                              ? &pointDrawingPreview_
+                              : (transforming_ && previewValid_ && !posePreview_ ? &transformPreview_ : nullptr)};
+    if (displayDocument.composition == CompositionProfile::LinearSrgb && !posePreview_ &&
+        !options.previewDrawing) {
+        RenderCacheKey key{editor_->sceneGeneration(), editor_->documentRevision(), editor_->frame(),
+                           displayDocument.width, displayDocument.height, displayDocument.composition,
+                           GraphTarget::Display, options.background, options.onionSkin,
+                           options.onionRange};
+        auto image = previewCache_.resolve(key, [&] {
+            return GraphRenderer::render(CompositionGraph::orderedLayers(displayDocument),
+                                         displayDocument, editor_->frame(),
+                                         {displayDocument.width, displayDocument.height}, options,
+                                         GraphTarget::Display);
+        });
+        p->drawImage(QPointF(0, 0), image);
+    } else {
+        SceneRenderer::paint(*p, displayDocument, editor_->frame(), options);
+    }
     if (editor_->selectedLayer()) {
         p->save();
         p->setWorldTransform(SceneRenderer::worldTransform(displayDocument,

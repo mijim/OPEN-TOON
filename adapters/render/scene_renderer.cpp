@@ -1,5 +1,6 @@
 #include "scene_renderer.h"
 #include "graph_renderer.h"
+#include "opentoon/drawing_selection.h"
 #include <QPainterPath>
 #include <cmath>
 #include <stdexcept>
@@ -73,6 +74,50 @@ QTransform SceneRenderer::worldTransform(const Document& d, const Layer& layer, 
         parent = p.parent;
     }
     return result;
+}
+QRect SceneRenderer::layerInkBounds(const Document& document, const Layer& layer, Frame frame,
+                                    QSize size, RenderOptions options) {
+    const QRect canvas(QPoint(0, 0), size);
+    if (options.onionSkin)
+        return canvas; // Ghost drawings can differ from the current exposure.
+    const auto* source = options.previewDrawing && options.previewLayer == layer.id
+                             ? options.previewDrawing
+                             : document.drawingAt(layer.id, frame);
+    if (!source)
+        return {};
+    QRectF local;
+    bool hasInk = false;
+    auto include = [&](QRectF rect) {
+        if (rect.isEmpty())
+            return;
+        local = hasInk ? local.united(rect) : rect;
+        hasInk = true;
+    };
+    if (source->image)
+        include(QRectF(0, 0, source->image->width, source->image->height));
+    if (source->raster)
+        for (const auto& [position, tile] : source->raster->tiles) {
+            (void)tile;
+            include(QRectF(position.first * 64, position.second * 64, 64, 64)
+                        .intersected(QRectF(0, 0, source->raster->width, source->raster->height)));
+        }
+    for (const auto& stroke : source->strokes)
+        if (const auto bounds = strokeBounds(stroke))
+            include(QRectF(bounds->x, bounds->y, bounds->width, bounds->height));
+    if (!hasInk)
+        return {};
+    const auto transformed = worldTransform(document, layer, frame).mapRect(local);
+    const auto sx = double(size.width()) / document.width;
+    const auto sy = double(size.height()) / document.height;
+    const QRectF output(transformed.x() * sx, transformed.y() * sy,
+                        transformed.width() * sx, transformed.height() * sy);
+    if (!std::isfinite(output.x()) || !std::isfinite(output.y()) ||
+        !std::isfinite(output.width()) || !std::isfinite(output.height()))
+        return canvas;
+    const auto clipped = output.intersected(QRectF(canvas));
+    if (clipped.isEmpty())
+        return {};
+    return clipped.toAlignedRect().adjusted(-4, -4, 4, 4).intersected(canvas);
 }
 void SceneRenderer::paintStroke(QPainter& painter, const Stroke& s, const std::vector<Swatch>& palette,
                                 double opacity) {
@@ -187,6 +232,8 @@ void SceneRenderer::paint(QPainter& painter, const Document& d, Frame frame, Ren
     painter.restore();
 }
 QImage SceneRenderer::render(const Document& d, Frame frame, QSize size, RenderOptions options) {
+    if (options.cancelled && options.cancelled())
+        throw RenderCancelled();
     if (size.isEmpty())
         size = QSize(d.width, d.height);
     if (size.width() > 8192 || size.height() > 8192 || size.width() <= 0 || size.height() <= 0)
@@ -201,6 +248,9 @@ QImage SceneRenderer::render(const Document& d, Frame frame, QSize size, RenderO
     QPainter painter(&result);
     painter.scale(double(size.width()) / d.width, double(size.height()) / d.height);
     paint(painter, d, frame, options);
+    painter.end();
+    if (options.cancelled && options.cancelled())
+        throw RenderCancelled();
     return result;
 }
 } // namespace opentoon

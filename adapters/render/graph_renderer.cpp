@@ -2,6 +2,7 @@
 #include <QColor>
 #include <QPainter>
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <map>
 #include <set>
@@ -18,12 +19,31 @@ float srgb(float value) {
 struct Pixel {
     float r = 0, g = 0, b = 0, a = 0;
 };
+const std::array<float, 256>& decodeTable() {
+    static const auto table = [] {
+        std::array<float, 256> values{};
+        for (int i = 0; i < 256; ++i)
+            values[i] = linear(i / 255.0f);
+        return values;
+    }();
+    return table;
+}
+const std::array<float, 65536>& encodeTable() {
+    static const auto table = [] {
+        std::array<float, 65536> values{};
+        for (int i = 0; i < 65536; ++i)
+            values[i] = srgb(i / 65535.0f);
+        return values;
+    }();
+    return table;
+}
 Pixel decode(QRgb pixel) {
     const float alpha = qAlpha(pixel) / 255.0f;
     if (alpha <= 0)
         return {};
     auto channel = [alpha](int value) {
-        return linear(std::clamp(value / (255.0f * alpha), 0.0f, 1.0f)) * alpha;
+        const int straight = std::clamp(int(std::lround(value / alpha)), 0, 255);
+        return decodeTable()[straight] * alpha;
     };
     return {channel(qRed(pixel)), channel(qGreen(pixel)), channel(qBlue(pixel)), alpha};
 }
@@ -33,24 +53,44 @@ QRgb encode(Pixel pixel) {
         return qRgba(0, 0, 0, 0);
     auto channel = [alpha](float value) {
         const float straight = std::clamp(value / alpha, 0.0f, 1.0f);
-        return std::clamp(int(std::lround(srgb(straight) * alpha * 255)), 0, 255);
+        const int index = std::clamp(int(std::lround(straight * 65535)), 0, 65535);
+        return std::clamp(int(std::lround(encodeTable()[index] * alpha * 255)), 0, 255);
     };
     return qRgba(channel(pixel.r), channel(pixel.g), channel(pixel.b),
                  std::clamp(int(std::lround(alpha * 255)), 0, 255));
 }
-QImage over(const QImage& background, const QImage& foreground, CompositionProfile profile) {
+void checkCancelled(const RenderOptions& options) {
+    if (options.cancelled && options.cancelled())
+        throw RenderCancelled();
+}
+QImage over(const QImage& background, const QImage& foreground, CompositionProfile profile,
+            const RenderOptions& options, QRect foregroundBounds) {
     if (background.size() != foreground.size())
         throw std::invalid_argument("Compositor images have different sizes.");
-    QImage result = background.copy();
     if (profile == CompositionProfile::LegacyQt) {
+        QImage result = background.copy();
         QPainter painter(&result);
         painter.drawImage(0, 0, foreground);
         return result;
     }
-    for (int y = 0; y < result.height(); ++y) {
+    foregroundBounds = foregroundBounds.intersected(QRect(QPoint(0, 0), foreground.size()));
+    if (foregroundBounds.isEmpty())
+        return background;
+    QImage result = background.copy();
+    for (int y = foregroundBounds.top(); y <= foregroundBounds.bottom(); ++y) {
+        checkCancelled(options);
         auto* target = reinterpret_cast<QRgb*>(result.scanLine(y));
         const auto* source = reinterpret_cast<const QRgb*>(foreground.constScanLine(y));
-        for (int x = 0; x < result.width(); ++x) {
+        for (int x = foregroundBounds.left(); x <= foregroundBounds.right(); ++x) {
+            if (qAlpha(source[x]) == 0) {
+                if (qAlpha(target[x]) == 0)
+                    target[x] = 0;
+                continue;
+            }
+            if (qAlpha(source[x]) == 255 || qAlpha(target[x]) == 0) {
+                target[x] = source[x];
+                continue;
+            }
             const auto front = decode(source[x]);
             const auto back = decode(target[x]);
             const float remaining = 1.0f - front.a;
@@ -60,9 +100,10 @@ QImage over(const QImage& background, const QImage& foreground, CompositionProfi
     }
     return result;
 }
-QImage matteFromImage(const QImage& image) {
+QImage matteFromImage(const QImage& image, const RenderOptions& options) {
     QImage matte(image.size(), QImage::Format_ARGB32_Premultiplied);
     for (int y = 0; y < matte.height(); ++y) {
+        checkCancelled(options);
         auto* target = reinterpret_cast<QRgb*>(matte.scanLine(y));
         const auto* source = reinterpret_cast<const QRgb*>(image.constScanLine(y));
         for (int x = 0; x < matte.width(); ++x)
@@ -70,11 +111,12 @@ QImage matteFromImage(const QImage& image) {
     }
     return matte;
 }
-QImage applyMatte(const QImage& image, const QImage& matte) {
+QImage applyMatte(const QImage& image, const QImage& matte, const RenderOptions& options) {
     if (image.size() != matte.size())
         throw std::invalid_argument("Matte and image sizes differ.");
     QImage result = image.copy();
     for (int y = 0; y < result.height(); ++y) {
+        checkCancelled(options);
         auto* target = reinterpret_cast<QRgb*>(result.scanLine(y));
         const auto* mask = reinterpret_cast<const QRgb*>(matte.constScanLine(y));
         for (int x = 0; x < result.width(); ++x) {
@@ -90,6 +132,7 @@ QImage applyMatte(const QImage& image, const QImage& matte) {
 QImage GraphRenderer::render(const CompositionGraph& graph, const Document& document,
                              Frame frame, QSize size, RenderOptions options, GraphTarget target) {
     graph.validate(document);
+    checkCancelled(options);
     if (frame < 0 || frame >= document.duration)
         throw std::invalid_argument("Compositor frame is outside the scene.");
     if (size.isEmpty())
@@ -103,13 +146,15 @@ QImage GraphRenderer::render(const CompositionGraph& graph, const Document& docu
         nodes.emplace(node.id, &node);
     }
     std::set<GraphNodeId> needed;
-    auto mark = [&](auto&& self, GraphNodeId id) -> void {
+    std::vector<GraphNodeId> pending{terminal};
+    while (!pending.empty()) {
+        const auto id = pending.back();
+        pending.pop_back();
         if (!needed.insert(id).second)
-            return;
+            continue;
         for (const auto& input : nodes.at(id)->inputs)
-            self(self, input.source);
-    };
-    mark(mark, terminal);
+            pending.push_back(input.source);
+    }
     std::map<GraphNodeId, int> uses;
     for (const auto& node : graph.nodes) {
         if (!needed.contains(node.id))
@@ -118,9 +163,11 @@ QImage GraphRenderer::render(const CompositionGraph& graph, const Document& docu
             ++uses[input.source];
     }
     std::map<GraphNodeId, QImage> images;
+    std::map<GraphNodeId, QRect> bounds;
     Document legacy = document;
     legacy.composition = CompositionProfile::LegacyQt;
     for (const auto id : order) {
+        checkCancelled(options);
         if (!needed.contains(id))
             continue;
         const auto& node = *nodes.at(id);
@@ -130,7 +177,14 @@ QImage GraphRenderer::render(const CompositionGraph& graph, const Document& docu
                     return images.at(connection.source);
             throw std::invalid_argument("Compositor input is missing.");
         };
+        auto inputBounds = [&](int slot) -> QRect {
+            for (const auto& connection : node.inputs)
+                if (connection.slot == slot)
+                    return bounds.at(connection.source);
+            throw std::invalid_argument("Compositor input is missing.");
+        };
         QImage image;
+        QRect bound;
         switch (node.kind) {
         case GraphNodeKind::Background:
             image = QImage(size, QImage::Format_ARGB32_Premultiplied);
@@ -139,6 +193,8 @@ QImage GraphRenderer::render(const CompositionGraph& graph, const Document& docu
                                                               document.background.b,
                                                               document.background.a)
                                           : QColor(Qt::transparent));
+            if (options.background && document.background.a > 0)
+                bound = QRect(QPoint(0, 0), size);
             break;
         case GraphNodeKind::LayerImage:
             if (!options.isolatedLayer || options.isolatedLayer == node.layer) {
@@ -146,6 +202,8 @@ QImage GraphRenderer::render(const CompositionGraph& graph, const Document& docu
                 isolated.background = false;
                 isolated.isolatedLayer = node.layer;
                 image = SceneRenderer::render(legacy, frame, size, isolated);
+                bound = SceneRenderer::layerInkBounds(document, document.layer(node.layer),
+                                                     frame, size, isolated);
             } else {
                 image = QImage(size, QImage::Format_ARGB32_Premultiplied);
                 image.fill(Qt::transparent);
@@ -155,25 +213,34 @@ QImage GraphRenderer::render(const CompositionGraph& graph, const Document& docu
             (void)evaluatedTransform(node, document, frame);
             break;
         case GraphNodeKind::Over:
-            image = over(input(0), input(1), document.composition);
+            image = over(input(0), input(1), document.composition, options, inputBounds(1));
+            bound = inputBounds(0).united(inputBounds(1));
             break;
         case GraphNodeKind::MatteFromImage:
-            image = matteFromImage(input(0));
+            image = matteFromImage(input(0), options);
+            bound = inputBounds(0);
             break;
         case GraphNodeKind::ApplyMatte:
-            image = applyMatte(input(0), input(1));
+            image = applyMatte(input(0), input(1), options);
+            bound = inputBounds(0).intersected(inputBounds(1));
             break;
         case GraphNodeKind::DisplayOutput:
         case GraphNodeKind::WriteOutput:
             image = input(0);
+            bound = inputBounds(0);
             break;
         }
-        if (!image.isNull())
+        if (!image.isNull()) {
             images.emplace(id, std::move(image));
+            bounds.emplace(id, bound);
+        }
         for (const auto& connection : node.inputs)
-            if (--uses.at(connection.source) == 0 && connection.source != terminal)
+            if (--uses.at(connection.source) == 0 && connection.source != terminal) {
                 images.erase(connection.source);
+                bounds.erase(connection.source);
+            }
     }
+    checkCancelled(options);
     return images.at(terminal);
 }
 Transform GraphRenderer::evaluatedTransform(const GraphNode& node, const Document& document,

@@ -70,8 +70,8 @@
     {
       "id": "P10",
       "status": "in_progress",
-      "available": "Qt-free typed image/transform/matte graph, validated DAG, downstream layer invalidation, explicit Display/Write outputs, alpha matte operation and opt-in saved linear-sRGB composition profile. Legacy scenes keep their direct-painter appearance.",
-      "remaining": "Revision-safe cache/job publication, solve ordering for deformers and cameras, node UI, effects, ROI scheduling, cost qualification and broader color reference scenes."
+      "available": "Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. A bounded revision cache reuses canvas frames; ink regions, pixel fast paths and lookup tables improve linear throughput. Legacy scenes keep their direct-painter appearance.",
+      "remaining": "End-to-end asynchronous preview publication, production workload and broader color charts, node UI, effects, full ROI scheduling and later deformer/camera integration."
     },
     {
       "id": "P11",
@@ -84,7 +84,7 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 85,
+      "count": 92,
       "command": "ctest --test-dir build/locked --output-on-failure"
     },
     "native_input_workflow": {
@@ -154,7 +154,8 @@
         "focus-aware native vector copy/cut/paste across drawings with locked-target rejection",
         "group styles, alignment/distribution and cleanup undo",
         "batch key interpolation/repetition, duration and collision rejection",
-        "authoring semantic and rendered-pixel persistence"
+        "authoring semantic and rendered-pixel persistence",
+        "linear canvas preview through revision cache and composition-profile undo"
       ],
       "limits": "Synthetic mouse/tablet events on macOS; no physical tablet available. Window-layout flush required for occluded native smoke instances."
     },
@@ -305,10 +306,12 @@
         "tests/render_tests.cpp",
         "tests/storage_tests.cpp",
         "tests/export_tests.cpp",
-        "docs/implementation/HM04-GRAPH-KERNEL.md"
+        "apps/desktop/compositor_benchmark.cpp",
+        "docs/implementation/HM04-GRAPH-KERNEL.md",
+        "docs/implementation/COMPOSITOR-BENCHMARK.md"
       ],
-      "scope": "Typed graph rejection, alpha matte, distinct Display/Write routing, undoable format-6 profile, format-5 migration backup and canvas/export/reopen equality.",
-      "limitations": "No persisted user-editable graph, revision-aware job cache, measured production workload or cross-platform qualification."
+      "scope": "Typed graph rejection, alpha/matte, distinct Display/Write, undoable format-6 profile and format-5 migration backup; revision-keyed 96 MiB canvas cache, stale-ticket rejection, mid-frame cancellation, hierarchy-aware invalidation, deep graph ordering and tested conservative ink regions. A synthetic 19-layer 1080p benchmark recorded 28.98 ms/frame median for the linear profile on M1 Pro.",
+      "limitations": "No persisted user-editable graph, actual asynchronous preview producer, production-scene or full alpha/color workload, or cross-platform qualification."
     }
   },
   "ownership": {
@@ -322,7 +325,7 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.12",
+  "version": "0.2.0-experimental.13",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
@@ -333,6 +336,6 @@
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
     "state": "HM-00_HM-01_HM-02_complete__HM-03_HM-04_in_progress",
-    "note": "HM-00 owner review, HM-01 typed properties and HM-02 artwork intake are accepted bounded contracts. HM-03 has persisted rigid characters and an automated 19-part journey but still needs artist-led acceptance. HM-04 has a validated typed image graph and opt-in saved linear-sRGB path; revision-safe publication, solve ordering and workload qualification remain open. No full phase or catalog capability is claimed complete."
+    "note": "HM-00 owner review, HM-01 typed properties and HM-02 artwork intake are accepted bounded contracts. HM-03 has persisted rigid characters and an automated 19-part journey but still needs artist-led acceptance. HM-04 has a typed image graph, revision-keyed canvas cache and bounded synthetic throughput; async preview publication and production-scene color/cost qualification remain open. No full phase or catalog capability is claimed complete."
   }
 }

@@ -8,7 +8,8 @@ workflow milestone before full P11/1.0, not a claim of Harmony parity.
 The roadmap retains **23 phases**, **70 work packages**, **283 capabilities** and
 specification ownership for **193 node/family entries**. RIG-015 adds Quick Rig to
 the previous 282 requirements. No old feature was removed or declared complete.
-Implementation proceeds under these contracts; bounded HM-03 rigid-character work is underway.
+Implementation proceeds under these contracts; bounded HM-03 rigid-character
+and HM-04 composition work is underway.
 
 ## Start here
 

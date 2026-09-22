@@ -25,13 +25,43 @@ alpha. Display and Write use the same graph evaluator; legacy scenes continue
 through the existing direct painter to preserve their established appearance.
 Qt remains behind the render adapter; graph types and validation are Qt-free.
 
+## Evaluation order and revision boundary
+
+The retained solve order is: authored keys and future property drivers → local
+transforms → parent hierarchy → future deformation → future scene-space
+attachments → future output camera → layer rasterization → typed image graph
+→ Display or Write. A driver must resolve before its consumer; the future
+deformer samples the completed scene-space transform and rest binding; the
+camera maps scene to output space once; image nodes cannot feed a Transform
+port. Cycles within or between these stages must fail validation rather than
+depend on iteration order. Today only authored keys, hierarchy, rasterization
+and the image graph are executable. This order defines where the later HM-05,
+HM-09 and HM-13 contracts connect without claiming their implementation.
+
+Canvas composition now uses a 96 MiB least-recently-used cache keyed by scene
+generation, document revision, frame, size, profile, output and view options.
+Transient brush/pose previews bypass it. A new revision drops old images; a
+render ticket may publish only while its request and revision remain current.
+The canvas currently renders missing frames synchronously. Export uses its
+existing immutable snapshot; a cancellation callback can stop a linear frame
+between graph nodes or pixel rows and records a partial cancelled export.
+Topological ordering and invalidation use iterative traversal, including
+images below a changed parent peg. Global state changes remain conservatively
+covered by revision-wide canvas invalidation.
+
+The linear path uses 8-bit sRGB lookup tables and conservative transformed ink
+bounds for source-over work. This changes only the opt-in profile. Rotated
+vector and sparse raster alpha coverage is compared against the direct painter;
+the [measured synthetic workload](../../implementation/COMPOSITOR-BENCHMARK.md)
+records throughput and the preview budget.
+
 ## Boundaries and next evidence
 
 This is an 8-bit CPU reference path, not a full color-management system. At
 fractional resizes, isolating layers before `Over` can differ from the direct
 legacy painter. The profile is opt-in; old scenes remain exact on their old
 path. Alpha fixtures, graph rejection and save/reopen tests cover the bounded
-behavior. HM-04 still needs revision-aware cache/job publication, measured
-production workloads, and a stated solve ordering across later deformer,
-attachment and camera consumers before its contract can be accepted. No full
+behavior. HM-04 still needs an end-to-end asynchronous preview publication
+journey, production-scene cost qualification and fuller alpha/color charts
+before its contract can be accepted. No full
 node editor, effects catalog, HDR/EXR or OCIO manager is claimed.

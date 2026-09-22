@@ -1140,7 +1140,9 @@ void EditorController::exportFrames(QUrl url) {
             for (int frame = 0; frame < snapshot->duration; ++frame) {
                 if (cancelExport_)
                     break;
-                auto image = SceneRenderer::render(*snapshot, frame);
+                RenderOptions options;
+                options.cancelled = [this] { return cancelExport_.load(); };
+                auto image = SceneRenderer::render(*snapshot, frame, {}, options);
                 QSaveFile file(destination + QString("/frame_%1.png").arg(frame + 1, 6, 10, QChar('0')));
                 if (!file.open(QIODevice::WriteOnly) || !image.save(&file, "PNG") || !file.commit())
                     throw std::runtime_error("Could not write an exported frame.");
@@ -1153,6 +1155,8 @@ void EditorController::exportFrames(QUrl url) {
                     },
                     Qt::QueuedConnection);
             }
+        } catch (const RenderCancelled&) {
+            cancelExport_ = true;
         } catch (const std::exception& e) {
             error = QString::fromUtf8(e.what());
         }

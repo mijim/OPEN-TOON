@@ -433,6 +433,16 @@ int main(int argc, char** argv) {
                                     vectorSelectionSmoke(editor, *canvas, *window);
                                     authoringSmoke(editor, *canvas, *window);
                                     motionPathSmoke(editor, *canvas, *window);
+                                    const auto beforeComposition = editor.document();
+                                    editor.setCompositionProfile(1);
+                                    QCoreApplication::processEvents();
+                                    if (window->grabWindow().isNull())
+                                        throw std::runtime_error("Linear canvas preview failed.");
+                                    editor.undo();
+                                    if (editor.document() != beforeComposition)
+                                        throw std::runtime_error("Composition profile undo failed.");
+                                    std::cout << "Composition smoke passed: linear canvas preview, "
+                                                 "revision cache path and undo.\n";
                                     QTimer::singleShot(150, &app, [&, window] {
                                         auto image = window->grabWindow();
                                         std::cout << "Visual animation smoke passed: thin picking, cursor "
