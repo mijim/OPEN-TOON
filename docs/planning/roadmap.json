@@ -5230,7 +5230,7 @@
   ],
   "execution_policy": {
     "primary_objective": "HM: reliable character animation Harmony Moment",
-    "current_instruction": "HM-01 and HM-02 are accepted. HM-03 rigid-character workflow and HM-04 typed composition kernel are in progress. HM-04 now has bounded revision-keyed canvas caching, stale-ticket rejection, hierarchy-aware invalidation, cancellable linear rendering, solve-order contract and synthetic 19-layer performance evidence. Finish end-to-end async preview publication and production-scene alpha/color/cost qualification before acceptance. HM-03 still needs artist-led rigid-character review. HM-10 is independently eligible.",
+    "current_instruction": "HM-01 and HM-02 are accepted. HM-03 rigid-character workflow and HM-04 typed composition kernel are in progress. HM-04 now has a speculative immutable-snapshot preview worker, stale-publication rejection and original 19-part alpha/output and cost evidence. Finish timed native playback/scrub qualification, fuller color charts and a denser animated production workload before acceptance. HM-03 still needs artist-led rigid-character review. HM-10 is independently eligible.",
     "phase_dependency_semantics": "Phase depends_on constrains full epic completion, not entry into an implementation slice. Only the explicit delivery-slice contract DAG gates the Harmony Moment. Domain dependencies are scope relationships, not all-features barriers.",
     "entry_rule": "Start a slice only when each required contract has accepted evidence. Baseline reuse is partial and must be qualified; planned is not ready. Independent spikes may run without claiming their consumer ready.",
     "wip_limit": 2,
