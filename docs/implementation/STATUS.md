@@ -23,10 +23,11 @@ The editor runs locally on macOS and supports mouse drawing, sampled-pressure in
 
 ## Verification
 
-- Current macOS locked build: 65/65 CTest entries pass (64 core/render cases and nine integration cases in one executable). Tests cover failed commands, rational time, exposure edits, hierarchy validation, rendering consistency, stale writers, schema rejection, rollback failures and abrupt process termination with a large image.
+- Current macOS locked build: 66/66 CTest entries pass (65 core/render cases and nine integration cases in one executable). Tests cover failed commands, rational time, exposure edits, hierarchy validation, rendering consistency, stale writers, schema rejection, rollback failures and abrupt process termination with a large image.
 - Export integration: 48 PNGs from an immutable snapshot, rational-time metadata, cancellation and a successful subsequent job.
 - Native input smoke: mouse strokes, synthetic pen pressure, cancelled gestures, undo/redo, palette validity after undo, save/reopen and a real window screenshot.
 - Synthetic two-second fixture: 48 PNG frames at 1920 × 1080; reopened document is semantically identical. Initial CPU export measured 3,077 ms on this Mac; it is not a large-scene or pen-latency benchmark.
+- HM-00 rigid baseline: 19 original sRGB PNG parts form a parented format-3 scene; save/reopen is semantically identical and the rendered first frame matches the checked-in 1080p reference. Generated dialogue cues and ten-minute drift markers pass exact sample-boundary checks. This verifies current infrastructure only, not substitutions or a completed character shot.
 - Historical experimental.1 address/undefined-behavior sanitizers: 27/27 Qt-free core/brush tests pass with locked Debug dependencies (4.35 seconds).
 - The physical tablet matrix is pending because the owner has no tablet currently. Tilt is routed to MyPaint; built-in presets do not use tilt mappings. Eraser-end behavior is not implemented. Mouse input works independently.
 - [CI run 35531337766](https://github.com/mijim/OPEN-TOON/actions/runs/35531337766) passes for source commit `c07414f`: Windows Server 2022, macOS 14 and Ubuntu 24.04 build and test with Qt 6.8.3, plus Linux core sanitizers. Native mouse/synthetic-pen, raster save/reopen and range-drag UI smoke pass on macOS. Windows process-termination recovery, other-platform GUI interaction, physical devices and installation remain unqualified.
@@ -42,7 +43,7 @@ The domain and application layers contain no Qt. Commands validate candidates be
 
 ## Continue toward P11
 
-Follow the [contract-level execution plan](../planning/FIRST-STEPS.md): extract only the foundations required by character/substitution, deformation, control, audio and composition consumers, then qualify the complete shot. Do not wait for unrelated early-phase tools or skip an actual required contract. Full phase exit criteria remain open. This planning revision changes no implementation evidence.
+Follow the [contract-level execution plan](../planning/FIRST-STEPS.md): extract only the foundations required by character/substitution, deformation, control, audio and composition consumers, then qualify the complete shot. Do not wait for unrelated early-phase tools or skip an actual required contract. Full phase exit criteria remain open. HM-00 has started: [reproducible character input](../../tests/fixtures/harmony-moment/README.md) and the [foundation engineering contract](../architecture/adr/023-harmony-foundation-contracts.md) are available. They are acceptance material, not implemented character, audio or compositor capabilities. The rigid saved-scene check is a baseline; animator review of the reference rubric remains open, so HM-01/HM-02 are still gated. The complete animated shot is an HM-15 outcome.
 
 Machine-readable source: [status.json](status.json). The catalog and roadmap retain their stable IDs and complete acceptance requirements.
 

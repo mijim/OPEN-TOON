@@ -103,7 +103,7 @@ Dependency-only longest chains under the lower/upper estimates (unlimited staffi
 
 ## HM-00
 
-**Reference shot and foundation decisions** — `planned`; owner `architecture`, work package `P00-W2`.
+**Reference shot and foundation decisions** — `in_progress`; owner `architecture`, work package `P00-W2`.
 
 Freeze the bounded character-shot profile, failure fixtures and only the contracts needed by its next consumers. Audit current code instead of restarting all feasibility work.
 

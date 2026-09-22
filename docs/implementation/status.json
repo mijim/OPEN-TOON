@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "as_of": "2026-09-21",
+  "as_of": "2026-09-22",
   "release_stage": "experimental",
   "target_phase": "P11",
   "target_complete": false,
@@ -84,7 +84,7 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 64,
+      "count": 65,
       "command": "ctest --test-dir build/locked --output-on-failure"
     },
     "native_input_workflow": {
@@ -166,6 +166,12 @@
       "semantic_round_trip": true,
       "elapsed_ms": 3077,
       "timing_scope": "Initial local CPU export; not a performance guarantee or release benchmark"
+    },
+    "harmony_reference": {
+      "status": "passed_rigid_baseline_only",
+      "ctest_entry": "Original registered character parts survive format-3 save and reopen",
+      "scope": "Nineteen original registered PNG parts with embedded sRGB profile, one parent transform, 480-frame format-3 save/reopen, exact first-frame comparison with the source reference still, and 24000/1001 sample boundary. Python verifies 41 generated part images, five reference poses, exact dialogue cues and ten-minute drift markers.",
+      "limits": "Reference poses and timing audio are synthetic external targets. No character identity, substitutions, deformers, controls, sound playback, nodes or camera are implemented by this check; animator review remains pending."
     },
     "physical_tablet": {
       "status": "pending",
@@ -294,7 +300,7 @@
   "planning_priority": {
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
-    "state": "planned_only",
-    "note": "Character-first contract slices supersede numeric phase execution order. Existing implementation/verification counts and full phase completion claims are unchanged."
+    "state": "HM-00_in_progress",
+    "note": "The reference asset generator and rigid baseline check are available. No new catalog capability or phase is complete; dependent HM slices still require the HM-00 animator review."
   }
 }

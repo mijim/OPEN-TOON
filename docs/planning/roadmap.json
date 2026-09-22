@@ -4484,7 +4484,7 @@
       "owner_phase": "P00",
       "work_package": "P00-W2",
       "owner_module": "architecture",
-      "status": "planned",
+      "status": "in_progress",
       "effort_engineer_weeks": [
         1,
         2
@@ -5204,7 +5204,7 @@
   ],
   "execution_policy": {
     "primary_objective": "HM: reliable character animation Harmony Moment",
-    "current_instruction": "Planning only: do not implement new application capabilities in this revision.",
+    "current_instruction": "Implement ready Harmony Moment slices in contract order; HM-00 artist review remains an open acceptance gate.",
     "phase_dependency_semantics": "Phase depends_on constrains full epic completion, not entry into an implementation slice. Only the explicit delivery-slice contract DAG gates the Harmony Moment. Domain dependencies are scope relationships, not all-features barriers.",
     "entry_rule": "Start a slice only when each required contract has accepted evidence. Baseline reuse is partial and must be qualified; planned is not ready. Independent spikes may run without claiming their consumer ready.",
     "wip_limit": 2,

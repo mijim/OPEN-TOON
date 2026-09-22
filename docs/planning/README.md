@@ -61,8 +61,9 @@ detail over the same model. No scripting prerequisite or irreversible simplified
   supported 1.0. P12–P22 preserve advanced rigs/automation, morphing, FX, interchange,
   3D, games, studio, optional AI/legacy and coverage maintenance.
 
-The current request is **planning only**. Implementation authority from earlier work
-does not override that instruction for this revision.
+Implementation has started with the HM-00 reproducible reference assets and foundation
+contract. HM-00 remains in progress until the shot rubric receives animator review;
+dependent slices are not yet eligible.
 
 ## Queries and validation
 

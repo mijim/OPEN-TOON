@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "title": "Clockwork Hello",
+  "purpose": "Original input and acceptance reference; these are not implemented rig features",
+  "canvas": {"width": 1920, "height": 1080, "pixel_aspect": [1, 1]},
+  "time_variants": [
+    {"name": "integer", "fps": [24, 1], "frames": 480, "sample_rate": 48000, "audio_samples": 960000},
+    {"name": "fractional", "fps": [24000, 1001], "frames": 480, "sample_rate": 48000, "audio_samples": 960960}
+  ],
+  "registration": {"image_size": [256, 256], "origin_px": [128, 128], "alpha": "straight RGBA8", "color_profile": "sRGB", "scene_space": "x right, y down; pixel centers at integer plus 0.5"},
+  "part_roles": ["torso", "pelvis", "neck", "head", "hair", "eyes", "mouth", "upper_arm_left", "lower_arm_left", "hand_left", "upper_arm_right", "lower_arm_right", "hand_right", "upper_leg_left", "lower_leg_left", "foot_left", "upper_leg_right", "lower_leg_right", "foot_right"],
+  "reference_centers_px": {"torso": [960, 565], "pelvis": [960, 665], "neck": [960, 450], "head": [960, 355], "hair": [960, 355], "eyes": [960, 355], "mouth": [960, 355], "upper_arm_left": [850, 525], "lower_arm_left": [815, 650], "hand_left": [810, 735], "upper_arm_right": [1070, 525], "lower_arm_right": [1105, 650], "hand_right": [1110, 735], "upper_leg_left": [915, 755], "lower_leg_left": [900, 875], "foot_left": [895, 950], "upper_leg_right": [1005, 755], "lower_leg_right": [1020, 875], "foot_right": [1025, 950]},
+  "reference_paint_order": ["upper_leg_left", "lower_leg_left", "foot_left", "upper_leg_right", "lower_leg_right", "foot_right", "upper_arm_left", "lower_arm_left", "hand_left", "upper_arm_right", "lower_arm_right", "hand_right", "pelvis", "torso", "neck", "head", "hair", "eyes", "mouth"],
+  "substitutions": {
+    "mouth": ["rest", "mbp", "fv", "ee", "ah", "oh", "l", "wide"],
+    "hand_left": ["open", "fist", "point"],
+    "hand_right": ["open", "fist", "point"],
+    "coordinated_views": ["front", "three_quarter"],
+    "view_members": ["head", "hair", "eyes", "mouth"]
+  },
+  "intended_rig": {"bone_or_curve_chains": ["left_arm", "right_arm"], "attachment": "hand_right to evaluated right_arm endpoint", "published_controls": ["root_x", "root_y", "root_rotation", "head_turn", "head_tilt", "look_x", "look_y", "left_arm_reach", "right_arm_reach", "left_hand_choice", "right_hand_choice", "mouth_choice"]},
+  "shot_beats": [
+    {"range": [0, 48], "action": "Idle front view and blink; camera holds."},
+    {"range": [48, 120], "action": "Turn to three-quarter view; lift right arm and open hand."},
+    {"range": [120, 240], "action": "Speak first synthetic timing phrase; cycle mapped mouth drawings."},
+    {"range": [240, 336], "action": "Point with right hand; bend both arm chains and move the attached hand."},
+    {"range": [336, 432], "action": "Speak second synthetic timing phrase; camera pushes in."},
+    {"range": [432, 480], "action": "Return to front rest pose; camera resets."}
+  ],
+  "reference_key_poses": [
+    {"frame": 0, "view": "front", "mouth": "rest", "right_hand": "open", "root_dx_px": 0, "camera_zoom": 1},
+    {"frame": 120, "view": "three_quarter", "mouth": "ah", "right_hand": "open", "root_dx_px": 60, "camera_zoom": 1},
+    {"frame": 240, "view": "three_quarter", "mouth": "rest", "right_hand": "point", "root_dx_px": 80, "camera_zoom": 1},
+    {"frame": 360, "view": "three_quarter", "mouth": "oh", "right_hand": "point", "root_dx_px": 80, "camera_zoom": 1.12},
+    {"frame": 479, "view": "front", "mouth": "rest", "right_hand": "open", "root_dx_px": 0, "camera_zoom": 1}
+  ],
+  "audio": {"clips": ["dialogue_reference_24.wav", "music_reference.wav"], "fractional_dialogue_clip": "dialogue_reference_24000_1001.wav", "cue_frames": [126, 144, 168, 190, 214, 345, 365, 388, 410], "drift_seconds": 600, "drift_marker_seconds": 30, "asset_samples": 960960, "integer_variant_trim_samples": 960000},
+  "compositing_targets": ["arm_overlap", "eye_highlight", "foreground_occlusion"],
+  "camera_target": "one orthographic output camera; separate from editor viewport"
+}

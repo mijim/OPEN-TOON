@@ -1,7 +1,8 @@
 # Next implementation tasks — character-first
 
-Planning only in this revision. All HM slices remain planned; no implementation is
-implied by the task list. Use [the canonical contract DAG](HARMONY-MOMENT.md), not a
+HM-00 reference assets and foundation contracts are underway. Animator review of
+the rubric remains open, so HM-01/HM-02 are not yet eligible. Use
+[the canonical contract DAG](HARMONY-MOMENT.md), not a
 phase number, to determine readiness. Two active slices maximum if owners exist;
 with one implementer use the recommended order below. Every delivered block must
 undo, save/reopen and exercise its real failure boundaries before consumers start.
@@ -22,6 +23,12 @@ undo, save/reopen and exercise its real failure boundaries before consumers star
 HM-01-A includes the typed persistence and failure evidence needed to close HM-01;
 it is not permission to start a consumer after only adding a field. Later payload
 schemas are introduced in their owning slices, with the common migration rules.
+
+HM-00 progress: [original generated fixture](../../tests/fixtures/harmony-moment/README.md)
+and [foundation contract](../architecture/adr/023-harmony-foundation-contracts.md)
+are prepared. A rigid, saved/reopened 19-part baseline matches the first reference
+still. The scripted shot and five stills are ready for animator review of the rubric.
+Producing the complete animated shot belongs to HM-15; it does not gate HM-01.
 
 ## Continue in dependency order
 
