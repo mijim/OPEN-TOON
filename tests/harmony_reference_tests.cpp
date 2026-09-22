@@ -77,7 +77,7 @@ opentoon::Document makeRigidReference(const QJsonObject& spec) {
 }
 } // namespace
 
-TEST_CASE("Original registered character parts survive format-3 save and reopen") {
+TEST_CASE("Original registered character parts survive current-format save and reopen") {
     const auto spec = shot();
     auto document = makeRigidReference(spec);
     REQUIRE(document.layers.size() == 20);

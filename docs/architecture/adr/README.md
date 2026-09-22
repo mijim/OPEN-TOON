@@ -76,3 +76,6 @@ the project owner accepted the reference-art rubric.
 
 See [ADR-024](024-typed-layer-properties.md) for the typed HM-01 transform-address
 adapter, explicit property sources and compact layer-pose transfer semantics.
+
+See [ADR-025](025-character-rig-format-four.md) for typed character layers,
+format-4 persistence, source-version migration backups and rigid substitutions.

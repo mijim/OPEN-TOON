@@ -1,0 +1,128 @@
+#include "opentoon/property_address.h"
+#include "opentoon/rigging.h"
+#include "opentoon/session.h"
+#include "serialization.h"
+#include "scene_renderer.h"
+#include <catch2/catch_test_macros.hpp>
+#include <cmath>
+
+using namespace opentoon;
+
+TEST_CASE("Character assembly preserves registered artwork through peg and pivot edits") {
+    Session session;
+    const Id body = session.document().layers.front().id;
+    REQUIRE(session.apply("Draw body", [&](Document& d) {
+        auto& drawing = d.editableDrawing(body, 0);
+        drawing.strokes.push_back({d.allocateId(), d.palette.front().id, 8, Shape::Rectangle, true, 2,
+                                   {{30, 40}, {90, 110}}});
+        d.layer(body).transform.x = 120;
+        d.layer(body).transform.rotation = 16;
+    }));
+    const auto before = SceneRenderer::render(session.document(), 0, {320, 180});
+    Id root = 0, peg = 0;
+    REQUIRE(session.apply("Build character", [&](Document& d) {
+        root = makeCharacter(d, body, "Hero");
+        peg = addPeg(d, body, "Torso peg");
+        setPartRole(d, body, "Torso");
+        setPivotPreservingArtwork(d, body, 60, 80);
+    }));
+    REQUIRE(session.document().layer(body).kind == LayerKind::Part);
+    REQUIRE(session.document().layer(body).parent == peg);
+    REQUIRE(session.document().layer(peg).parent == root);
+    REQUIRE(session.document().layer(body).role == "Torso");
+    REQUIRE(SceneRenderer::render(session.document(), 0, {320, 180}) == before);
+    auto typed = PropertyAddress{body, PropertyKind::Rotation};
+    typed.entity = PropertyEntityKind::Part;
+    REQUIRE(propertyValue(session.document(), typed, 0, PropertySource::Rest) == 16);
+    typed.entity = PropertyEntityKind::Peg;
+    REQUIRE_THROWS(propertyValue(session.document(), typed, 0, PropertySource::Rest));
+    REQUIRE(session.apply("Move peg", [&](Document& d) {
+        d.layer(peg).transform.x = 25;
+        d.layer(peg).transform.y = -14;
+    }));
+    const auto beforeReparent = SceneRenderer::render(session.document(), 0, {320, 180});
+    REQUIRE(session.apply("Reparent part", [&](Document& d) {
+        reparentPreservingWorld(d, body, root);
+    }));
+    REQUIRE(SceneRenderer::render(session.document(), 0, {320, 180}) == beforeReparent);
+    REQUIRE(session.undo());
+    REQUIRE(session.document().layer(body).parent == peg);
+    REQUIRE(session.redo());
+    REQUIRE(session.document().layer(body).parent == root);
+}
+
+TEST_CASE("Registered parts attach without jumps and reject singular or sheared reparenting") {
+    auto d = makeDocument();
+    const Id body = d.layers.front().id;
+    const Id root = makeCharacter(d, body, "Hero");
+    Layer hand;
+    hand.id = d.allocateId();
+    const Id handId = hand.id;
+    hand.name = "Hand";
+    hand.transform.x = 52;
+    hand.transform.y = 21;
+    d.layers.push_back(hand);
+    Layer peg;
+    peg.id = d.allocateId();
+    const Id pegId = peg.id;
+    peg.name = "Arm";
+    peg.kind = LayerKind::Peg;
+    peg.parent = root;
+    peg.transform.x = 10;
+    peg.transform.y = -3;
+    d.layers.push_back(peg);
+    attachDrawingAsPart(d, handId, pegId, "Hand");
+    auto local = d.layer(handId).transform;
+    REQUIRE(std::abs(local.x - 42) < 1e-8);
+    REQUIRE(std::abs(local.y - 24) < 1e-8);
+    REQUIRE(d.layer(handId).role == "Hand");
+    d.layer(pegId).transform.scaleX = 0;
+    const auto before = d;
+    REQUIRE_THROWS(reparentPreservingWorld(d, handId, root));
+    REQUIRE(d == before);
+    d.layer(pegId).transform.scaleX = 2;
+    d.layer(pegId).transform.rotation = 30;
+    d.layer(handId).transform.rotation = 17;
+    d.layer(handId).transform.scaleX = 1.5;
+    REQUIRE_THROWS(reparentPreservingWorld(d, handId, root));
+    d.layer(pegId).transform = {};
+    d.layer(handId).transform = {};
+    d.layer(handId).keys.push_back({0, {}, Interpolation::Linear});
+    const auto animated = d;
+    REQUIRE_THROWS(reparentPreservingWorld(d, handId, root));
+    REQUIRE_THROWS(setPivotPreservingArtwork(d, handId, 12, 15));
+    REQUIRE(d == animated);
+}
+
+TEST_CASE("Named substitutions switch held drawings without changing pose and reopen identically") {
+    Session session;
+    const Id partId = session.document().layers.front().id;
+    Id mouthA = 0, mouthB = 0;
+    REQUIRE(session.apply("Create mouth rig", [&](Document& d) {
+        makeCharacter(d, partId, "Speaker");
+        setPartRole(d, partId, "Mouth");
+        mouthA = createSubstitution(d, partId, 0, false, "Closed");
+        mouthB = createSubstitution(d, partId, 12, true, "Open");
+        d.layer(partId).transform.x = 25;
+    }));
+    REQUIRE(session.document().drawingAt(partId, 0)->id == mouthA);
+    REQUIRE(session.document().drawingAt(partId, 11)->id == mouthA);
+    REQUIRE(session.document().drawingAt(partId, 12)->id == mouthB);
+    REQUIRE(session.apply("Retiming and naming", [&](Document& d) {
+        renameSubstitution(d, partId, mouthB, "Wide open");
+        selectSubstitution(d, partId, 4, mouthB);
+    }));
+    REQUIRE(session.document().drawingAt(partId, 4)->id == mouthB);
+    REQUIRE(session.document().drawingAt(partId, 3)->id == mouthA);
+    REQUIRE(session.document().layer(partId).transform.x == 25);
+    REQUIRE(session.document().layer(partId).variants.back().name == "Wide open");
+    REQUIRE(session.apply("Remove closed", [&](Document& d) { removeSubstitution(d, partId, mouthA); }));
+    REQUIRE(session.document().drawingAt(partId, 0)->id == mouthB);
+    REQUIRE(session.undo());
+    REQUIRE(session.document().drawingAt(partId, 0)->id == mouthA);
+    REQUIRE(session.redo());
+    const auto serialized = serializeDocument(session.document());
+    REQUIRE(deserializeDocument(serialized) == session.document());
+    auto invalid = session.document();
+    REQUIRE_THROWS(selectSubstitution(invalid, partId, 0, 999999));
+}

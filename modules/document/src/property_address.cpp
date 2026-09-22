@@ -6,9 +6,14 @@
 
 namespace opentoon {
 namespace {
-std::string_view layerChannel(PropertyAddress address) {
-    if (address.entity != PropertyEntityKind::Layer)
-        throw std::invalid_argument("Unsupported property entity kind.");
+std::string_view layerChannel(const Document& document, PropertyAddress address) {
+    const auto kind = document.layer(address.layer).kind;
+    const bool compatible = address.entity == PropertyEntityKind::Layer ||
+                            (address.entity == PropertyEntityKind::Character && kind == LayerKind::Character) ||
+                            (address.entity == PropertyEntityKind::Peg && kind == LayerKind::Peg) ||
+                            (address.entity == PropertyEntityKind::Part && kind == LayerKind::Part);
+    if (!compatible)
+        throw std::invalid_argument("Property entity kind does not match its stable identity.");
     return propertyChannel(address.kind);
 }
 } // namespace
@@ -53,7 +58,7 @@ std::string_view propertyChannel(PropertyKind kind) {
     throw std::invalid_argument("Unknown transform property.");
 }
 double propertyValue(const Document& document, PropertyAddress address, Frame frame, PropertySource source) {
-    const auto channel = layerChannel(address);
+    const auto channel = layerChannel(document, address);
     const auto& layer = document.layer(address.layer);
     if (source == PropertySource::Rest)
         return transformValue(layer.transform, channel);
@@ -79,7 +84,7 @@ void editProperties(Document& document, std::span<const PropertyEdit> edits, Fra
     std::set<PropertyAddress> unique;
     std::set<Id> anchorLayers;
     for (const auto& edit : edits) {
-        (void)layerChannel(edit.address);
+        (void)layerChannel(document, edit.address);
         if (!unique.insert(edit.address).second)
             throw std::invalid_argument("Duplicate property in one edit.");
         const auto& layer = document.layer(edit.address.layer);
@@ -98,12 +103,14 @@ void editProperties(Document& document, std::span<const PropertyEdit> edits, Fra
     for (Id id : anchorLayers)
         recordPose(document.layer(id), 0, document.layer(id).transform);
     for (const auto& edit : edits)
-        editTransform(document.layer(edit.address.layer), frame, layerChannel(edit.address), edit.value, mode,
+        editTransform(document.layer(edit.address.layer), frame, layerChannel(document, edit.address), edit.value, mode,
                       autokey);
 }
 void recordPropertyKey(Document& document, PropertyAddress address, Frame frame, double value) {
-    const auto channel = layerChannel(address);
+    const auto channel = layerChannel(document, address);
     auto& layer = document.layer(address.layer);
+    if (layer.locked)
+        throw std::invalid_argument("Unlock the layer before editing.");
     if (frame < 0 || frame >= document.duration)
         throw std::invalid_argument("Property frame is outside the scene.");
     auto pose = evaluateTransform(layer, frame);
@@ -112,9 +119,13 @@ void recordPropertyKey(Document& document, PropertyAddress address, Frame frame,
 }
 void editPropertyKey(Document& document, PropertyAddress address, Frame source, Frame destination,
                      double value, Interpolation interpolation) {
-    editKey(document.layer(address.layer), source, destination, layerChannel(address), value, interpolation);
+    if (document.layer(address.layer).locked)
+        throw std::invalid_argument("Unlock the layer before editing.");
+    editKey(document.layer(address.layer), source, destination, layerChannel(document, address), value, interpolation);
 }
 void setPropertyEase(Document& document, PropertyAddress address, Frame frame, const BezierEase& ease) {
-    setKeyEase(document.layer(address.layer), frame, layerChannel(address), ease);
+    if (document.layer(address.layer).locked)
+        throw std::invalid_argument("Unlock the layer before editing.");
+    setKeyEase(document.layer(address.layer), frame, layerChannel(document, address), ease);
 }
 } // namespace opentoon

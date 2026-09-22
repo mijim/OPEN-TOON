@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "as_of": "2026-09-21",
+  "as_of": "2026-09-23",
   "status": "active_execution_plan",
   "product_language": "en",
   "implementation_status": "experimental_partial",
@@ -4520,7 +4520,7 @@
       "owner_phase": "P01",
       "work_package": "P01-W2",
       "owner_module": "document/application/storage",
-      "status": "in_progress",
+      "status": "complete",
       "effort_engineer_weeks": [
         3,
         6
@@ -4566,7 +4566,13 @@
         "LIB-JSON",
         "LIB-ZSTD"
       ],
-      "completion_evidence": []
+      "completion_evidence": [
+        "docs/implementation/HM01-RIG-PROPERTIES.md",
+        "docs/architecture/adr/025-character-rig-format-four.md",
+        "tests/storage_tests.cpp",
+        "tests/document_tests.cpp",
+        "tests/rigging_tests.cpp"
+      ]
     },
     {
       "id": "HM-02",
@@ -4624,7 +4630,7 @@
       "owner_phase": "P08",
       "work_package": "P08-W1",
       "owner_module": "rigging/document",
-      "status": "planned",
+      "status": "in_progress",
       "effort_engineer_weeks": [
         3,
         6
@@ -5214,7 +5220,7 @@
   ],
   "execution_policy": {
     "primary_objective": "HM: reliable character animation Harmony Moment",
-    "current_instruction": "HM-00 and the bounded HM-02 artwork-intake contract are accepted. Finish HM-01 typed persistent property contracts and migration/failure evidence before entering HM-03; keep full P00–P11 scope open.",
+    "current_instruction": "HM-01 and HM-02 bounded contracts are accepted. Continue HM-03 rigid character work: thumbnail substitutions, coordinated view sets and instance-safe duplication before claiming HM-03 complete. HM-04 and HM-10 are independently eligible but require separate bounded ownership.",
     "phase_dependency_semantics": "Phase depends_on constrains full epic completion, not entry into an implementation slice. Only the explicit delivery-slice contract DAG gates the Harmony Moment. Domain dependencies are scope relationships, not all-features barriers.",
     "entry_rule": "Start a slice only when each required contract has accepted evidence. Baseline reuse is partial and must be qualified; planned is not ready. Independent spikes may run without claiming their consumer ready.",
     "wip_limit": 2,

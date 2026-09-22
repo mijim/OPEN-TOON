@@ -93,11 +93,16 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
                   {"locked", l.locked},
                   {"solo", l.solo},
                   {"parent", l.parent},
+                  {"kind", static_cast<int>(l.kind)},
+                  {"role", l.role},
+                  {"variants", Json::array()},
                   {"transform", transform(l.transform)},
                   {"exposures", Json::array()},
                   {"keys", Json::array()}};
         for (auto e : l.exposures)
             x["exposures"].push_back({e.start, e.end, e.drawing});
+        for (const auto& variant : l.variants)
+            x["variants"].push_back({{"drawing", variant.drawing}, {"name", variant.name}});
         for (const auto& k : l.keys) {
             Json ease = Json::object();
             for (const auto& [channel, e] : k.easing)
@@ -225,6 +230,13 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
         l.locked = x.at("locked");
         l.solo = x.at("solo");
         l.parent = x.at("parent");
+        if (j.at("version").get<int>() >= 4) {
+            l.kind = static_cast<LayerKind>(x.at("kind").get<int>());
+            l.role = x.at("role").get<std::string>();
+            limit(x.at("variants"), 10000);
+            for (const auto& variant : x.at("variants"))
+                l.variants.push_back({variant.at("drawing"), variant.at("name")});
+        }
         l.transform = readTransform(x.at("transform"));
         limit(x.at("exposures"), 1000000);
         limit(x.at("keys"), 1000000);

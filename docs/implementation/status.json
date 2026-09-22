@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "as_of": "2026-09-22",
+  "as_of": "2026-09-23",
   "release_stage": "experimental",
   "target_phase": "P11",
   "target_complete": false,
@@ -16,7 +16,7 @@
     {
       "id": "P01",
       "status": "in_progress",
-      "available": "Native English QML shell, CMake modules, commands, immutable snapshots, undo/redo and validation. Integrated resizable timing/curve workspace and selection-owned object/layer Properties. Shared compact controls, optional curve numeric fields and a draggable workspace divider with dynamic bounds. Typed layer-transform property addresses now distinguish rest, authored keys and evaluated values with atomic edits.",
+      "available": "Native English QML shell, CMake modules, commands, immutable snapshots, undo/redo and validation. Integrated resizable timing/curve workspace and selection-owned object/layer Properties. Shared compact controls, optional curve numeric fields and a draggable workspace divider with dynamic bounds. Typed layer-transform property addresses now distinguish rest, authored keys and evaluated values with atomic edits. Format-4 typed character/peg/part addresses and source-version migration backups now persist and reject invalid references.",
       "remaining": "Docking/workspace persistence, configurable shortcuts, full accessibility, scalable resource/cache protocols and cross-platform qualification."
     },
     {
@@ -58,8 +58,8 @@
     {
       "id": "P08",
       "status": "in_progress",
-      "available": "Parented layers, pivots, independent duplicates and linked drawing clones.",
-      "remaining": "Character/part identity, production cut-out tools, named substitutions and masked poses, Quick Rig, declarative controls, asset/template library, instance-safe mappings and animator validation."
+      "available": "Parented layers, pivots, drawing clones, typed character roots/pegs/parts, role editing, preserve-world rigid reparenting and rest pivots, named held substitutions with in-panel selection and atomic undo/save/reopen.",
+      "remaining": "Thumbnail substitution browsing, coordinated view sets, instance-safe character duplication, production cut-out tools, masked poses, Quick Rig, declarative controls, asset/template library and animator validation."
     },
     {
       "id": "P09",
@@ -76,7 +76,7 @@
     {
       "id": "P11",
       "status": "planned",
-      "available": "Saved revisions, recovery UX, English guide, regression tests and source CI are initial prerequisites. Format 1/2 migration backups, format 3 curve metadata and checked compressed media resources, explicit backed-up compaction and asynchronous recovery snapshots. Requested arm64 macOS preview now includes audited runtime dependencies, notices, matching source archives/recipes and verified ad-hoc signatures.",
+      "available": "Saved revisions, recovery UX, English guide, regression tests and source CI are initial prerequisites. Format 1/2 migration backups, format 3 curve metadata and checked compressed media resources, explicit backed-up compaction and asynchronous recovery snapshots. Requested arm64 macOS preview now includes audited runtime dependencies, notices, matching source archives/recipes and verified ad-hoc signatures. Format-4 character migration with backups named for the source schema has local failure and reopen evidence.",
       "remaining": "All required journeys, remaining hardening, supported device/OS matrix, accessibility, reproducible release SBOM automation, clean-machine validation and Developer ID signed/notarized releases."
     }
   ],
@@ -84,7 +84,7 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 67,
+      "count": 71,
       "command": "ctest --test-dir build/locked --output-on-failure"
     },
     "native_input_workflow": {
@@ -169,9 +169,9 @@
     },
     "harmony_reference": {
       "status": "passed_rigid_baseline_only",
-      "ctest_entry": "Original registered character parts survive format-3 save and reopen",
-      "scope": "Nineteen original registered PNG parts with embedded sRGB profile, one parent transform, 480-frame format-3 save/reopen, exact first-frame comparison with the source reference still, and 24000/1001 sample boundary. Python verifies 41 generated part images, five reference poses, exact dialogue cues and ten-minute drift markers.",
-      "limits": "Reference poses and timing audio are synthetic external targets. No character identity, substitutions, deformers, controls, sound playback, nodes or camera are implemented by this check. Owner artistic review accepted HM-00; the independent working-shot animator review remains HM-15."
+      "ctest_entry": "Original registered character parts survive current-format save and reopen",
+      "scope": "Nineteen original registered PNG parts with embedded sRGB profile, one parent transform, 480-frame format-4 save/reopen, exact first-frame comparison with the source reference still, and 24000/1001 sample boundary. Python verifies 41 generated part images, five reference poses, exact dialogue cues and ten-minute drift markers.",
+      "limits": "Reference poses and timing audio are synthetic external targets. The baseline fixture still uses plain drawing layers; the separate HM-03 tests cover an initial rigid rig and substitutions, not the completed character shot."
     },
     "physical_tablet": {
       "status": "pending",
@@ -239,7 +239,7 @@
         "single-image import converts tagged Display P3 to sRGB and creates an absent layer atomically"
       ]
     },
-    "total_local_ctest_entries": 68,
+    "total_local_ctest_entries": 72,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -283,6 +283,17 @@
       "scope": "Cross-scene clipboard and swatches, explicit vector arrangement/stacking, batch style rejection, protected-corner smoothing, bounded pressure-aware simplification and concave whole-footprint lasso. Native authoring journey with Undo and persistence.",
       "screenshot": "docs/implementation/authoring.png",
       "limitations": "Whole vectors only; clipboard is application-local; no raster lasso, partial contours, analytic topology or production-scale qualification."
+    },
+    "character_rig": {
+      "status": "passed_partial",
+      "platform": "macOS arm64",
+      "evidence": [
+        "tests/rigging_tests.cpp",
+        "tests/export_tests.cpp",
+        "tests/storage_tests.cpp",
+        "docs/implementation/HM03-RIG-FOUNDATION.md"
+      ],
+      "limits": "No thumbnails, coordinated sets, animated-ancestor reparenting, instance duplication or animator acceptance."
     }
   },
   "ownership": {

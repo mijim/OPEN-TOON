@@ -120,15 +120,16 @@ std::int64_t ProjectStore::save(const std::filesystem::path& path, const Documen
         const auto version = verifyProject(db);
         if (version < Document::formatVersion) {
             auto backup = path;
-            backup += ".pre-v3.bak";
+            const auto source = ".pre-v" + std::to_string(version);
+            backup += source + ".bak";
             for (int suffix = 1; std::filesystem::exists(backup); ++suffix) {
                 backup = path;
-                backup += ".pre-v3-" + std::to_string(suffix) + ".bak";
+                backup += source + "-" + std::to_string(suffix) + ".bak";
             }
             backupDatabase(db, backup);
         }
     } else {
-        db.execute("PRAGMA application_id=1330925390; PRAGMA user_version=3;");
+        db.execute("PRAGMA application_id=1330925390; PRAGMA user_version=4;");
     }
     db.execute("PRAGMA journal_mode=DELETE; PRAGMA synchronous=FULL; PRAGMA foreign_keys=ON;");
     db.execute("CREATE TABLE IF NOT EXISTS revisions (id INTEGER PRIMARY KEY, created TEXT NOT NULL DEFAULT "
@@ -150,7 +151,7 @@ std::int64_t ProjectStore::save(const std::filesystem::path& path, const Documen
                    "CREATE TABLE IF NOT EXISTS revision_resources(revision INTEGER NOT NULL REFERENCES "
                    "revisions(id) ON DELETE CASCADE,hash TEXT NOT NULL REFERENCES resources(hash),PRIMARY "
                    "KEY(revision,hash));"
-                   "PRAGMA user_version=3;");
+                   "PRAGMA user_version=4;");
         std::set<std::string> references;
         auto data = serializeDocument(document, [&](std::span<const std::uint8_t> bytes) {
             auto hash = resourceHash(bytes);

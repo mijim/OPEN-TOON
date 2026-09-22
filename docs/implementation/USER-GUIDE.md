@@ -35,7 +35,11 @@ The four art categories are Underlay, Color, Line and Overlay. Their drawing ord
 
 Click a swatch to select it. Double-click to edit its color; all strokes referencing that ID update. The document retains color IDs across save/reopen. Palette import, variants, gradients and managed color are pending.
 
-The inspector edits position, rotation, scale, opacity and pivot. Add transform keys with Linear, Hold or Smooth interpolation. If a layer already has keys, editing a transform inserts or updates a key at the current frame. Parent layers apply inherited transforms and opacity. Reparenting does **not** preserve the world-space pose automatically. There is no camera, curve editor, IK or deformer yet.
+The inspector edits position, rotation, scale, opacity and pivot. Add transform keys with Linear, Hold or Smooth interpolation. If a layer already has keys, editing a transform inserts or updates a key at the current frame. Parent layers apply inherited transforms and opacity. Character parts and pegs preserve the visible image when reparented within one character, provided the result has no shear or singular transform and the moved layer and its ancestors are not animated. Curves can be edited in the main workspace. Camera, IK and deformation remain pending.
+
+To assemble a rigid character, import registered PNG parts and select one layer in the layer list. In its Properties panel, open **Rig → Make character from layer**. That layer becomes a Part below a new Character root. Select another imported drawing layer and choose the Character or a Peg as its parent; the drawing becomes a Part while retaining its visible placement. **Rig → Add parent peg** inserts a transform parent over the selected Part or Peg. Edit the Part role in Properties. **Center rest pivot on drawing** places its saved pivot at the local artwork center while retaining its position; do this before animating the layer. Precise on-canvas pivot placement is pending.
+
+Each Part lists named substitutions in Properties. **+ Blank** starts a new drawing, **Duplicate** copies the currently exposed drawing, and the selector chooses an option at the playhead through the current held interval. Rename or remove the selected option in the same panel. These edits undo, save and reopen with the rest of the rig. Thumbnail browsing, coordinated view sets and portable character duplication are still pending.
 
 ## Saving and recovery
 
@@ -43,7 +47,7 @@ Each manual save appends a complete revision. Scene history can restore a saved 
 
 Every 60 seconds, a modified document is saved to a recovery file. On a later launch, recovery can open that snapshot as an unsaved scene. Save it under a chosen name. Autosave runs from an immutable snapshot in a worker, so newer edits stay unsaved until the next save. Manual saves remain synchronous. Recovery from operating-system power loss and multiple simultaneous application instances has not been qualified.
 
-Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and total decoded media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening version 1/2 projects remains supported. Format 3 adds channel Bézier easing; the first save of an older schema creates a `.pre-v3.bak` copy before upgrading. The old editor requires that backup to reopen the original format.
+Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and total decoded media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening format 1–3 projects remains supported. Format 3 added channel Bézier easing; format 4 adds typed character layers and named substitutions. The first save of an older schema creates a backup named for its source version, such as `.pre-v3.bak`, before upgrading. Older editors require that backup to reopen the original format.
 
 **Scene → Compact project history** retains the chosen number of newest saved revisions and removes unreachable media, after creating a full `.pre-compact.bak` backup. Save pending edits first. This is an explicit operation and is not part of autosave.
 
@@ -76,7 +80,7 @@ frames, which the status bar counts. Both batch modes have a 4096 × 4096 pixel/
 limit, a 256 MiB decoded-media limit and an undoable all-or-nothing commit. Cancel
 the file chooser to leave the document untouched. The project format also enforces
 its overall scene media limit. Parts currently share a centered layer offset; there
-is no character-role assignment or substitution set yet. Layered PSD, audio, video
+is no automatic character-role assignment; use the Rig controls after import. Layered PSD, audio, video
 output, lip sync, deformation, node effects, OCIO, reusable rig libraries and
 production installers remain pending. Consult the [phase status](STATUS.md).
 

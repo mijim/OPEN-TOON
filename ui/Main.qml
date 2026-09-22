@@ -842,8 +842,10 @@ ApplicationWindow {
                             controller: editor
                         }
                         ColumnLayout {
+                            id: layerInspector
                             visible: root.inspectorMode === "layer" && canvas.objectProperties.kind === "none"
                             Layout.fillWidth: true
+                            property var rigLayer: editor.layers.find(l => l.id === editor.selectedLayer)
                             Label {
                                 Layout.leftMargin: 16
                                 text: "Layer · " + (editor.layers.find(l => l.id === editor.selectedLayer)?.name || "")
@@ -998,14 +1000,36 @@ ApplicationWindow {
                                 Layout.rightMargin: 16
                                 Layout.fillWidth: true
                                 implicitHeight: 30
-                                model: [
-                                    {
-                                        id: 0,
-                                        name: "No parent"
+                                enabled: layerInspector.rigLayer?.kind !== 1
+                                model: {
+                                    const layers = editor.layers;
+                                    const selected = layerInspector.rigLayer;
+                                    if (!selected)
+                                        return [];
+                                    if (selected.kind !== 2 && selected.kind !== 3)
+                                        return [{id: 0, name: "No parent"}].concat(layers.filter(l => l.id !== selected.id));
+                                    function ancestor(id) {
+                                        let node = layers.find(l => l.id === id);
+                                        let depth = 0;
+                                        while (node && node.parent && depth++ < layers.length)
+                                            node = layers.find(l => l.id === node.parent);
+                                        return node?.id || 0;
                                     }
-                                ].concat(editor.layers.filter(function (l) {
-                                    return l.id !== editor.selectedLayer;
-                                }))
+                                    function beneath(candidate, id) {
+                                        let node = candidate;
+                                        let depth = 0;
+                                        while (node && node.parent && depth++ < layers.length) {
+                                            if (node.parent === id)
+                                                return true;
+                                            node = layers.find(l => l.id === node.parent);
+                                        }
+                                        return false;
+                                    }
+                                    const rootId = ancestor(selected.id);
+                                    return layers.filter(l => (l.kind === 1 || l.kind === 2) &&
+                                                           l.id !== selected.id && ancestor(l.id) === rootId &&
+                                                           !beneath(l, selected.id));
+                                }
                                 currentIndex: {
                                     const selected = editor.layers.find(function (l) {
                                         return l.id === editor.selectedLayer;
@@ -1018,6 +1042,84 @@ ApplicationWindow {
                                 valueRole: "id"
                                 onActivated: editor.setParent(currentValue)
                                 Accessible.name: "Parent layer"
+                            }
+                            RowLayout {
+                                Layout.leftMargin: 12
+                                Layout.rightMargin: 16
+                                Layout.fillWidth: true
+                                C.ToolButton {
+                                    text: "Rig ▾"
+                                    hint: "Character and peg actions"
+                                    onClicked: rigMenu.open()
+                                    Menu {
+                                        id: rigMenu
+                                        MenuItem {
+                                            text: "Make character from layer"
+                                            enabled: layerInspector.rigLayer?.kind === 0
+                                            onTriggered: editor.makeCharacter()
+                                        }
+                                        MenuItem {
+                                            text: "Add parent peg"
+                                            enabled: layerInspector.rigLayer?.kind === 2 || layerInspector.rigLayer?.kind === 3
+                                            onTriggered: editor.addPeg()
+                                        }
+                                        MenuItem {
+                                            text: "Center rest pivot on drawing"
+                                            enabled: layerInspector.rigLayer?.kind === 0 || layerInspector.rigLayer?.kind === 3
+                                            onTriggered: editor.centerRestPivot()
+                                        }
+                                    }
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    text: ({0: "Drawing", 1: "Character", 2: "Peg", 3: "Part"})[layerInspector.rigLayer?.kind ?? 0]
+                                    color: "#999999"
+                                    font.pixelSize: 11
+                                    horizontalAlignment: Text.AlignRight
+                                }
+                            }
+                            ColumnLayout {
+                                visible: layerInspector.rigLayer?.kind === 3
+                                Layout.leftMargin: 16
+                                Layout.rightMargin: 16
+                                Layout.fillWidth: true
+                                spacing: 6
+                                Label { text: "Part role"; color: "#999999"; font.pixelSize: 10 }
+                                C.CompactTextField {
+                                    Layout.fillWidth: true
+                                    text: layerInspector.rigLayer?.role || ""
+                                    placeholderText: "e.g. Left hand"
+                                    onEditingFinished: editor.setPartRole(text)
+                                    Accessible.name: "Character part role"
+                                }
+                                Label { text: "Substitution at current frame"; color: "#999999"; font.pixelSize: 10 }
+                                C.CompactComboBox {
+                                    Layout.fillWidth: true
+                                    model: editor.substitutions
+                                    textRole: "name"
+                                    valueRole: "id"
+                                    currentIndex: model.findIndex(s => s.id === editor.selectedSubstitution)
+                                    onActivated: editor.selectSubstitution(currentValue)
+                                    Accessible.name: "Current part substitution"
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    C.CompactButton { text: "+ Blank"; onClicked: editor.createSubstitution(false) }
+                                    C.CompactButton { text: "Duplicate"; onClicked: editor.createSubstitution(true) }
+                                    C.CompactButton {
+                                        text: "Remove"
+                                        enabled: editor.selectedSubstitution > 0
+                                        onClicked: editor.removeSubstitution(editor.selectedSubstitution)
+                                    }
+                                }
+                                C.CompactTextField {
+                                    Layout.fillWidth: true
+                                    text: editor.substitutions.find(s => s.id === editor.selectedSubstitution)?.name || ""
+                                    placeholderText: "Rename selected substitution"
+                                    enabled: editor.selectedSubstitution > 0
+                                    onEditingFinished: editor.renameSubstitution(editor.selectedSubstitution, text)
+                                    Accessible.name: "Substitution name"
+                                }
                             }
                         }
                         Rectangle {

@@ -33,6 +33,8 @@ class EditorController final : public QObject {
     Q_PROPERTY(bool canUndo READ canUndo NOTIFY changed)
     Q_PROPERTY(bool canRedo READ canRedo NOTIFY changed)
     Q_PROPERTY(QVariantList layers READ layers NOTIFY changed)
+    Q_PROPERTY(QVariantList substitutions READ substitutions NOTIFY changed)
+    Q_PROPERTY(int selectedSubstitution READ selectedSubstitution NOTIFY frameChanged)
     Q_PROPERTY(QVariantList palette READ palette NOTIFY changed)
     Q_PROPERTY(QVariantList revisions READ revisions NOTIFY changed)
     Q_PROPERTY(int frame READ frame WRITE setFrame NOTIFY frameChanged)
@@ -108,6 +110,8 @@ class EditorController final : public QObject {
     bool canUndo() const { return session_.canUndo(); }
     bool canRedo() const { return session_.canRedo(); }
     QVariantList layers() const;
+    QVariantList substitutions() const;
+    int selectedSubstitution() const;
     QVariantList palette() const;
     QVariantList revisions() const;
     QVariantMap transform() const;
@@ -171,6 +175,15 @@ class EditorController final : public QObject {
     Q_INVOKABLE void toggleLayer(int, QString);
     Q_INVOKABLE void moveLayer(int);
     Q_INVOKABLE void setParent(int);
+    Q_INVOKABLE void makeCharacter();
+    Q_INVOKABLE void addPeg();
+    Q_INVOKABLE void setPartRole(QString);
+    Q_INVOKABLE void setRestPivot(double x, double y);
+    Q_INVOKABLE void centerRestPivot();
+    Q_INVOKABLE void createSubstitution(bool duplicate = false);
+    Q_INVOKABLE void renameSubstitution(int drawing, QString name);
+    Q_INVOKABLE void selectSubstitution(int drawing);
+    Q_INVOKABLE void removeSubstitution(int drawing);
     Q_INVOKABLE void newDrawing(bool duplicate = false);
     Q_INVOKABLE void holdDrawing(int);
     Q_INVOKABLE void clearExposure();

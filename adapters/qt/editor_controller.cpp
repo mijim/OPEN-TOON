@@ -1,6 +1,7 @@
 #include "editor_controller.h"
 #include "opentoon/animation.h"
 #include "opentoon/property_address.h"
+#include "opentoon/rigging.h"
 #include "project_store.h"
 #include "image_batch_importer.h"
 #include "scene_renderer.h"
@@ -110,10 +111,30 @@ QVariantList EditorController::layers() const {
                                      {"locked", it->locked},
                                      {"solo", it->solo},
                                      {"parent", int(it->parent)},
+                                     {"kind", int(it->kind)},
+                                     {"role", QString::fromStdString(it->role)},
                                      {"spans", spans},
                                      {"keys", keys}});
     }
     return result;
+}
+QVariantList EditorController::substitutions() const {
+    QVariantList result;
+    if (!layer_)
+        return result;
+    const auto& selected = document().layer(layer_);
+    if (selected.kind != LayerKind::Part)
+        return result;
+    for (const auto& substitution : selected.variants)
+        result.push_back(QVariantMap{{"id", int(substitution.drawing)},
+                                     {"name", QString::fromStdString(substitution.name)}});
+    return result;
+}
+int EditorController::selectedSubstitution() const {
+    if (!layer_ || document().layer(layer_).kind != LayerKind::Part)
+        return 0;
+    const auto* drawing = document().drawingAt(layer_, frame_);
+    return drawing ? int(drawing->id) : 0;
 }
 QVariantList EditorController::palette() const {
     QVariantList result;
@@ -162,6 +183,7 @@ void EditorController::setSelectedLayer(int value) {
         rangeEnd_ = frame_ + 1;
         emit rangeChanged();
         emit selectionChanged();
+        emit frameChanged();
         emit changed();
     } catch (...) {
     }
@@ -367,6 +389,9 @@ void EditorController::removeLayer() {
     if (!layer_)
         return;
     if (edit("Remove layer", [&](Document& d) {
+            for (const auto& l : d.layers)
+                if (l.parent == layer_)
+                    throw std::runtime_error("Remove child layers before deleting their parent.");
             Id parent = d.layer(layer_).parent;
             for (auto& l : d.layers)
                 if (l.parent == layer_)
@@ -396,6 +421,17 @@ void EditorController::duplicateLayer(bool linked) {
                         d.drawings.emplace(drawing.id, std::move(drawing));
                     }
                     e.drawing = copies[e.drawing];
+                }
+                for (auto& variant : copy.variants) {
+                    if (!copies.contains(variant.drawing)) {
+                        auto drawing = d.drawings.at(variant.drawing);
+                        drawing.id = d.allocateId();
+                        for (auto& stroke : drawing.strokes)
+                            stroke.id = d.allocateId();
+                        copies[variant.drawing] = drawing.id;
+                        d.drawings.emplace(drawing.id, std::move(drawing));
+                    }
+                    variant.drawing = copies[variant.drawing];
                 }
             }
             d.layers.push_back(copy);
@@ -433,8 +469,98 @@ void EditorController::setParent(int parent) {
         auto& layer = d.layer(layer_);
         if (layer.locked)
             throw std::runtime_error("Unlock the layer before editing.");
-        layer.parent = parent;
+        if (layer.kind == LayerKind::Part || layer.kind == LayerKind::Peg)
+            opentoon::reparentPreservingWorld(d, layer_, parent);
+        else if (layer.kind == LayerKind::Drawing && parent &&
+                 (d.layer(parent).kind == LayerKind::Character || d.layer(parent).kind == LayerKind::Peg))
+            opentoon::attachDrawingAsPart(d, layer_, parent, layer.name);
+        else
+            layer.parent = parent;
     });
+}
+void EditorController::makeCharacter() {
+    if (layer_)
+        edit("Create character", [&](Document& d) {
+            opentoon::makeCharacter(d, layer_, "Character " + std::to_string(d.nextId));
+        });
+}
+void EditorController::addPeg() {
+    if (layer_)
+        edit("Add parent peg", [&](Document& d) {
+            opentoon::addPeg(d, layer_, "Peg " + std::to_string(d.nextId));
+        });
+}
+void EditorController::setPartRole(QString role) {
+    if (layer_)
+        edit("Set part role", [&](Document& d) { opentoon::setPartRole(d, layer_, role.toStdString()); });
+}
+void EditorController::setRestPivot(double x, double y) {
+    if (layer_)
+        edit("Place rest pivot", [&](Document& d) { opentoon::setPivotPreservingArtwork(d, layer_, x, y); });
+}
+void EditorController::centerRestPivot() {
+    if (!layer_)
+        return;
+    const auto* drawing = document().drawingAt(layer_, frame_);
+    if (!drawing) {
+        report("Expose a drawing before centering its pivot.");
+        return;
+    }
+    double left = 0, top = 0, right = 0, bottom = 0;
+    bool present = false;
+    auto include = [&](double x, double y) {
+        if (!present) {
+            left = right = x;
+            top = bottom = y;
+            present = true;
+        } else {
+            left = std::min(left, x);
+            top = std::min(top, y);
+            right = std::max(right, x);
+            bottom = std::max(bottom, y);
+        }
+    };
+    if (drawing->image) {
+        include(0, 0);
+        include(drawing->image->width, drawing->image->height);
+    }
+    if (drawing->raster) {
+        include(0, 0);
+        include(drawing->raster->width, drawing->raster->height);
+    }
+    for (const auto& stroke : drawing->strokes)
+        for (const auto& point : stroke.points)
+            include(point.x, point.y);
+    if (!present) {
+        report("Draw or import artwork before centering its pivot.");
+        return;
+    }
+    setRestPivot((left + right) / 2, (top + bottom) / 2);
+}
+void EditorController::createSubstitution(bool duplicate) {
+    if (layer_)
+        edit(duplicate ? "Duplicate substitution" : "Add blank substitution", [&](Document& d) {
+            opentoon::createSubstitution(d, layer_, frame_, duplicate,
+                                         "Drawing " + std::to_string(d.nextId));
+        });
+}
+void EditorController::renameSubstitution(int drawing, QString name) {
+    if (layer_)
+        edit("Rename substitution", [&](Document& d) {
+            opentoon::renameSubstitution(d, layer_, drawing, name.toStdString());
+        });
+}
+void EditorController::selectSubstitution(int drawing) {
+    if (layer_)
+        edit("Switch substitution", [&](Document& d) {
+            opentoon::selectSubstitution(d, layer_, frame_, drawing);
+        });
+}
+void EditorController::removeSubstitution(int drawing) {
+    if (layer_)
+        edit("Remove substitution", [&](Document& d) {
+            opentoon::removeSubstitution(d, layer_, drawing);
+        });
 }
 void EditorController::newDrawing(bool duplicate) {
     if (!layer_)
@@ -453,6 +579,8 @@ void EditorController::newDrawing(bool duplicate) {
             s.id = d.allocateId();
         Id id = drawing.id;
         d.drawings.emplace(id, std::move(drawing));
+        if (l.kind == LayerKind::Part)
+            l.variants.push_back({id, d.drawings.at(id).name});
         expose(l, frame_, std::min(frame_ + 2, d.duration), id);
     });
 }

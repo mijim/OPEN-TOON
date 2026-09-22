@@ -1,6 +1,6 @@
 # Documentation map
 
-**Updated: 2026-09-22.** The repository contains specifications, an execution roadmap and an experimental native editor. [Implementation status](implementation/STATUS.md) records the available subsets and open P00–P11 gates. HM-00 reference and HM-02 artwork intake are accepted bounded contracts; HM-01 typed property work is in progress.
+**Updated: 2026-09-23.** The repository contains specifications, an execution roadmap and an experimental native editor. [Implementation status](implementation/STATUS.md) records the available subsets and open P00–P11 gates. HM-00, HM-01 and HM-02 are accepted bounded contracts; HM-03 rigid rigging is in progress.
 
 ## Current decisions
 
@@ -11,7 +11,7 @@
 | Language | English across first-party UI, assets, code, help and documentation | User requirement; previous documentation translated |
 | Technology | C++20, Qt 6 and Qt Quick/QML | Accepted by user; risky integration paths need spikes |
 | Renderer | CPU QPainter reference adapter; Qt RHI/Skia comparison remains open | Experimental |
-| Storage | SQLite revisions with compressed, checksummed immutable media; format 1/2 migration backups | See ADR-011 and recovery tests |
+| Storage | SQLite revisions with compressed, checksummed immutable media; format-4 typed characters and source-version migration backups | See ADR-025 and recovery tests |
 | Open-source reuse | Prefer proven libraries through tested adapters | User requirement; 30 library/tool entries evaluated in the roadmap |
 | Initial license | GPL-3.0-or-later for original contributions | Adopted |
 | Implementation | Experimental editor; partial catalog coverage | No complete phase or production release |

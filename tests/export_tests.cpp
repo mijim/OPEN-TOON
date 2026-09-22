@@ -87,6 +87,55 @@ TEST_CASE("Registered PNG parts preserve a shared canvas and undo as one edit") 
     REQUIRE(editor.document() == imported);
 }
 
+TEST_CASE("Character inspector actions build a saved rigid rig with held substitutions") {
+    EditorController editor;
+    editor.newScene();
+    REQUIRE(editor.importParts(paths({partFixture + "torso__base.png", partFixture + "head__front.png"})));
+    const auto head = editor.selectedLayer();
+    const auto body = int(editor.document().layers[1].id);
+    const auto before = opentoon::SceneRenderer::render(editor.document(), 0, {320, 180});
+    editor.makeCharacter();
+    REQUIRE(editor.document().layer(head).kind == opentoon::LayerKind::Part);
+    const auto character = editor.document().layer(head).parent;
+    editor.addPeg();
+    REQUIRE(editor.document().layer(head).parent != character);
+    editor.setPartRole("Head");
+    editor.centerRestPivot();
+    REQUIRE(editor.document().layer(head).transform.pivotX == 128);
+    REQUIRE(editor.document().layer(head).transform.pivotY == 128);
+    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 0, {320, 180}) == before);
+    editor.setSelectedLayer(body);
+    editor.setParent(int(character));
+    REQUIRE(editor.document().layer(body).kind == opentoon::LayerKind::Part);
+    REQUIRE(editor.substitutions().size() == 1);
+    const auto original = editor.selectedSubstitution();
+    editor.createSubstitution(true);
+    const auto open = editor.selectedSubstitution();
+    REQUIRE(open != original);
+    editor.renameSubstitution(open, "Turned head");
+    REQUIRE(editor.substitutions().back().toMap().value("name").toString() == "Turned head");
+    editor.setFrame(12);
+    editor.selectSubstitution(original);
+    REQUIRE(editor.selectedSubstitution() == original);
+    REQUIRE(editor.document().drawingAt(body, 11)->id == open);
+    editor.removeSubstitution(original);
+    REQUIRE(editor.selectedSubstitution() == open);
+    const auto rigged = editor.document();
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto project = QUrl::fromLocalFile(directory.filePath("rig.otoon"));
+    REQUIRE(editor.saveProject(project));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(project));
+    REQUIRE(reopened.document() == rigged);
+    REQUIRE(opentoon::SceneRenderer::render(reopened.document(), 0, {320, 180}) ==
+            opentoon::SceneRenderer::render(rigged, 0, {320, 180}));
+    editor.undo();
+    REQUIRE(editor.document() != rigged);
+    editor.redo();
+    REQUIRE(editor.document() == rigged);
+}
+
 TEST_CASE("Rejected registered part batch leaves the scene and selection intact") {
     EditorController editor;
     editor.newScene();

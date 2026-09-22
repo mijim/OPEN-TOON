@@ -3,6 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <chrono>
 #include <fstream>
+#include <nlohmann/json.hpp>
 #include <stdexcept>
 using namespace opentoon;
 namespace {
@@ -58,7 +59,7 @@ TEST_CASE("Saving a stale revision cannot overwrite another writer") {
 }
 TEST_CASE("Unknown versions and excessive nesting do not enter the document model") {
     auto text = serializeDocument(makeDocument());
-    auto position = text.find("\"version\":3");
+    auto position = text.find("\"version\":4");
     REQUIRE(position != std::string::npos);
     text.replace(position, 11, "\"version\":9");
     REQUIRE_THROWS(deserializeDocument(text));
@@ -153,6 +154,13 @@ struct FixtureDatabase {
         REQUIRE(result == SQLITE_ROW);
         return count;
     }
+    void replaceDocument(const std::string& json) {
+        sqlite3_stmt* update = nullptr;
+        REQUIRE(sqlite3_prepare_v2(db, "UPDATE revisions SET document=?", -1, &update, nullptr) == SQLITE_OK);
+        REQUIRE(sqlite3_bind_text(update, 1, json.data(), int(json.size()), SQLITE_TRANSIENT) == SQLITE_OK);
+        REQUIRE(sqlite3_step(update) == SQLITE_DONE);
+        sqlite3_finalize(update);
+    }
 };
 } // namespace
 TEST_CASE("Version one projects migrate with an independently readable original backup") {
@@ -170,7 +178,7 @@ TEST_CASE("Version one projects migrate with an independently readable original 
     REQUIRE(ProjectStore::load(p.file).document == changed);
     REQUIRE(ProjectStore::load(p.file, original.revision).document == original.document);
     auto backup = p.file;
-    backup += ".pre-v3.bak";
+    backup += ".pre-v1.bak";
     REQUIRE(ProjectStore::load(backup).document == original.document);
     {
         FixtureDatabase db(backup);
@@ -239,8 +247,16 @@ TEST_CASE("Schema two upgrades preserve an original backup and protect Bezier me
     TemporaryProject p;
     auto d = makeDocument();
     auto rev = ProjectStore::save(p.file, d);
+    auto oldJson = nlohmann::json::parse(serializeDocument(d));
+    oldJson["version"] = 2;
+    for (auto& layer : oldJson["layers"]) {
+        layer.erase("kind");
+        layer.erase("role");
+        layer.erase("variants");
+    }
     {
         FixtureDatabase db(p.file);
+        db.replaceDocument(oldJson.dump());
         db.execute("PRAGMA user_version=2");
     }
     Transform target;
@@ -250,7 +266,7 @@ TEST_CASE("Schema two upgrades preserve an original backup and protect Bezier me
     (void)ProjectStore::save(p.file, d, "Bezier upgrade", rev);
     REQUIRE(ProjectStore::load(p.file).document == d);
     auto backup = p.file;
-    backup += ".pre-v3.bak";
+    backup += ".pre-v2.bak";
     REQUIRE(ProjectStore::load(backup).document == makeDocument());
     {
         FixtureDatabase db(backup);
@@ -258,6 +274,50 @@ TEST_CASE("Schema two upgrades preserve an original backup and protect Bezier me
     }
     {
         FixtureDatabase db(p.file);
-        REQUIRE(db.count("PRAGMA user_version") == 3);
+        REQUIRE(db.count("PRAGMA user_version") == 4);
     }
+}
+TEST_CASE("Format three scene migrates to typed format four with an original backup") {
+    TemporaryProject p;
+    auto legacy = makeDocument();
+    const auto oldRevision = ProjectStore::save(p.file, legacy);
+    auto oldJson = nlohmann::json::parse(serializeDocument(legacy));
+    oldJson["version"] = 3;
+    for (auto& layer : oldJson["layers"]) {
+        layer.erase("kind");
+        layer.erase("role");
+        layer.erase("variants");
+    }
+    {
+        FixtureDatabase db(p.file);
+        db.replaceDocument(oldJson.dump());
+        db.execute("PRAGMA user_version=3");
+    }
+    REQUIRE(ProjectStore::load(p.file).document == legacy);
+    auto upgraded = legacy;
+    const Id partId = upgraded.layers.front().id;
+    Layer character;
+    character.id = upgraded.allocateId();
+    character.name = "Hero";
+    character.kind = LayerKind::Character;
+    upgraded.layers.push_back(character);
+    auto& part = upgraded.layer(partId);
+    part.kind = LayerKind::Part;
+    part.parent = character.id;
+    part.role = "Body";
+    REQUIRE_THROWS(ProjectStore::save(p.file, upgraded, "Rejected migration", oldRevision,
+                                     [](auto point) {
+                                         if (point == ProjectStore::SavePoint::BeforeTransaction)
+                                             throw std::runtime_error("Injected migration failure");
+                                     }));
+    REQUIRE(ProjectStore::load(p.file).document == legacy);
+    auto backup = p.file;
+    backup += ".pre-v3.bak";
+    REQUIRE(std::filesystem::exists(backup));
+    REQUIRE(ProjectStore::load(backup).document == legacy);
+    REQUIRE(ProjectStore::save(p.file, upgraded, "Character migration", oldRevision) > oldRevision);
+    REQUIRE(ProjectStore::load(p.file).document == upgraded);
+    REQUIRE(ProjectStore::load(backup).document == legacy);
+    FixtureDatabase current(p.file);
+    REQUIRE(current.count("PRAGMA user_version") == 4);
 }

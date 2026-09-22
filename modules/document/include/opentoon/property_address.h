@@ -4,7 +4,7 @@
 #include <string_view>
 
 namespace opentoon {
-enum class PropertyEntityKind : std::uint8_t { Layer };
+enum class PropertyEntityKind : std::uint8_t { Layer, Character, Peg, Part };
 enum class PropertyKind : std::uint8_t {
     PositionX,
     PositionY,

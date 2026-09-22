@@ -87,6 +87,12 @@ struct Keyframe {
     std::map<std::string, BezierEase> easing;
     auto operator<=>(const Keyframe&) const = default;
 };
+enum class LayerKind : std::uint8_t { Drawing, Character, Peg, Part };
+struct Substitution {
+    Id drawing = 0;
+    std::string name;
+    auto operator<=>(const Substitution&) const = default;
+};
 struct Layer {
     Id id = 0;
     std::string name;
@@ -95,6 +101,9 @@ struct Layer {
     Transform transform;
     std::vector<Exposure> exposures;
     std::vector<Keyframe> keys;
+    LayerKind kind = LayerKind::Drawing;
+    std::string role;
+    std::vector<Substitution> variants;
     auto operator<=>(const Layer&) const = default;
 };
 struct Marker {
@@ -103,7 +112,7 @@ struct Marker {
     auto operator<=>(const Marker&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 3;
+    static constexpr int formatVersion = 4;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;

@@ -69,11 +69,15 @@ const Drawing* Document::drawingAt(Id layerId, Frame frame) const {
 Drawing& Document::editableDrawing(Id layerId, Frame frame) {
     auto& l = layer(layerId);
     require(!l.locked, "Unlock the layer before editing.");
+    require(l.kind == LayerKind::Drawing || l.kind == LayerKind::Part,
+            "Draw on a drawing layer or character part.");
     require(frame >= 0 && frame < duration, "Frame is outside the scene.");
     if (const auto* existing = drawingAt(layerId, frame))
         return drawings.at(existing->id);
     const Id id = allocateId();
     drawings.emplace(id, Drawing{id, "Drawing " + std::to_string(id), {}, std::nullopt});
+    if (l.kind == LayerKind::Part)
+        l.variants.push_back({id, drawings.at(id).name});
     expose(l, frame, frame + 1, id);
     return drawings.at(id);
 }
@@ -179,12 +183,29 @@ void Document::validate() const {
     for (const auto& l : layers) {
         id(l.id);
         require(l.name.size() <= 4096, "Layer name is too long.");
+        require(static_cast<int>(l.kind) >= 0 && static_cast<int>(l.kind) <= 3,
+                "Unknown layer kind.");
+        require(l.role.size() <= 128 && l.variants.size() <= 10000,
+                "Invalid part metadata size.");
+        if (l.kind != LayerKind::Part)
+            require(l.role.empty() && l.variants.empty(), "Only parts may own roles and variants.");
+        if (l.kind == LayerKind::Character || l.kind == LayerKind::Peg)
+            require(l.exposures.empty(), "Character roots and pegs cannot own drawings.");
+        std::set<Id> variants;
+        for (const auto& variant : l.variants)
+            require(drawings.contains(variant.drawing) && variant.name.size() > 0 &&
+                        variant.name.size() <= 128 && variants.insert(variant.drawing).second,
+                    "Part references a missing or duplicate substitution.");
+        if (l.kind == LayerKind::Part)
+            require(!l.role.empty(), "Character part needs a role.");
         validateTransform(l.transform);
         Frame last = 0;
         for (auto e : l.exposures) {
             require(e.start >= last && e.end > e.start && e.end <= duration,
                     "Invalid or overlapping exposure interval.");
             require(drawings.contains(e.drawing), "Exposure references a missing drawing.");
+            if (l.kind == LayerKind::Part)
+                require(variants.contains(e.drawing), "Part exposure is not a registered substitution.");
             last = e.end;
         }
         Frame previous = -1;
@@ -204,6 +225,14 @@ void Document::validate() const {
         while (parent) {
             require(chain.insert(parent).second, "Layer hierarchy contains a cycle.");
             parent = layer(parent).parent;
+        }
+        if (l.kind == LayerKind::Character)
+            require(l.parent == 0, "Character root cannot have a parent.");
+        if (l.kind == LayerKind::Part || l.kind == LayerKind::Peg) {
+            Id ancestor = l.parent;
+            while (ancestor && layer(ancestor).kind != LayerKind::Character)
+                ancestor = layer(ancestor).parent;
+            require(ancestor != 0, "Part or peg must belong to a character.");
         }
     }
     for (const auto& m : markers)

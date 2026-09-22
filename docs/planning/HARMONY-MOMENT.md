@@ -131,7 +131,7 @@ Freeze the bounded character-shot profile, failure fixtures and only the contrac
 
 ## HM-01
 
-**Persistent rig properties and typed document contracts** — `in_progress`; owner `document/application/storage`, work package `P01-W2`.
+**Persistent rig properties and typed document contracts** — `complete`; owner `document/application/storage`, work package `P01-W2`.
 
 Expose stable typed part/peg/property addresses over the existing full-pose evaluator and Session commands. Preserve the current transform-key representation through a compatibility adapter; introduce discrete or specialized tracks only with their actual character/deformer consumers. Define rest/authored/evaluated ownership and transactional persistence. Character/deformer/audio/node payloads are added by their owning slices, not empty schemas in advance.
 
@@ -191,7 +191,7 @@ Qualify existing drawing and still-image import; add ordered PNG sequence intake
 
 ## HM-03
 
-**Character identity, pegs and substitution sets** — `planned`; owner `rigging/document`, work package `P08-W1`.
+**Character identity, pegs and substitution sets** — `in_progress`; owner `rigging/document`, work package `P08-W1`.
 
 Create a character root and stable part roles; keep separate transform hierarchy and render order. Add preserve-world reparenting, rest pivots, named thumbnail substitutions, held selector tracks and coordinated variant sets.
 
