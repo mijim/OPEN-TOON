@@ -6,6 +6,7 @@
 #include "vector_hit.h"
 #include <QCursor>
 #include <QMouseEvent>
+#include <QMetaObject>
 #include <QPainter>
 #include <QQuickItemGrabResult>
 #include <QQuickWindow>
@@ -38,10 +39,12 @@ void CanvasItem::setEditor(EditorController* editor) {
     if (editor_)
         disconnect(editor_, nullptr, this, nullptr);
     editor_ = editor;
+    previewQueue_.cancel();
     previewCache_.clear();
     previousTool_ = editor ? editor->tool() : QString{};
     if (editor) {
         connect(editor, &EditorController::changed, this, [this] {
+            previewQueue_.cancel();
             if (committing_)
                 return;
             cancelGesture();
@@ -63,6 +66,7 @@ void CanvasItem::setEditor(EditorController* editor) {
             update();
         });
         connect(editor, &EditorController::toolChanged, this, [this] {
+            previewQueue_.cancel();
             if (committing_)
                 return;
             const auto tool = editor_->tool();
@@ -99,6 +103,21 @@ void CanvasItem::setEditor(EditorController* editor) {
     }
     emit editorChanged();
     update();
+}
+void CanvasItem::schedulePreview(const RenderCacheKey& current) {
+    const auto sourceFrame = current.frame;
+    QMetaObject::invokeMethod(this, [this, current, sourceFrame] {
+        if (!editor_ || posePreview_ || editor_->frame() != sourceFrame ||
+            editor_->sceneGeneration() != current.scene ||
+            editor_->documentRevision() != current.revision ||
+            editor_->onionSkin() != current.onionSkin ||
+            editor_->compositionProfile() != int(CompositionProfile::LinearSrgb) ||
+            editor_->duration() < 2)
+            return;
+        auto next = current;
+        next.frame = (sourceFrame + 1) % editor_->duration();
+        (void)previewQueue_.request(editor_->snapshot(), next);
+    }, Qt::QueuedConnection);
 }
 void CanvasItem::setZoom(double value) {
     if (motionKey_ >= 0)
@@ -196,6 +215,8 @@ void CanvasItem::paint(QPainter* p) {
                                          GraphTarget::Display);
         });
         p->drawImage(QPointF(0, 0), image);
+        if (!image.isNull())
+            schedulePreview(key);
     } else {
         SceneRenderer::paint(*p, displayDocument, editor_->frame(), options);
     }

@@ -2,6 +2,7 @@
 #include "opentoon/rigging.h"
 #include "project_store.h"
 #include "scene_renderer.h"
+#include "graph_renderer.h"
 #include <QFile>
 #include <QColorSpace>
 #include <QImage>
@@ -116,6 +117,37 @@ TEST_CASE("Original registered character parts survive current-format save and r
     REQUIRE(reopened.rate.sampleAt(480, 48000) == 960960);
     REQUIRE(opentoon::ProjectStore::save(path, reopened, "Fractional timing", 1) == 2);
     REQUIRE(opentoon::ProjectStore::load(path).document == reopened);
+}
+
+TEST_CASE("Original nineteen-part artwork has stable linear color and alpha through save and output") {
+    auto document = makeRigidReference(shot());
+    document.background = {0, 0, 0, 0};
+    const auto legacy = opentoon::SceneRenderer::render(document, 0, QSize(480, 270));
+    document.composition = opentoon::CompositionProfile::LinearSrgb;
+    QTemporaryDir temporary;
+    REQUIRE(temporary.isValid());
+    const auto path = std::filesystem::path((temporary.path() + "/color-reference.otoon").toStdString());
+    REQUIRE(opentoon::ProjectStore::save(path, document) == 1);
+    const auto reopened = opentoon::ProjectStore::load(path).document;
+    REQUIRE(reopened == document);
+    for (const int frame : {0, 120, 240}) {
+        const auto graph = opentoon::CompositionGraph::orderedLayers(reopened);
+        const auto display = opentoon::GraphRenderer::render(
+            graph, reopened, frame, QSize(480, 270), {}, opentoon::GraphTarget::Display);
+        const auto write = opentoon::GraphRenderer::render(
+            graph, reopened, frame, QSize(480, 270), {}, opentoon::GraphTarget::Write);
+        REQUIRE(display == write);
+        REQUIRE(write == opentoon::SceneRenderer::render(reopened, frame, QSize(480, 270)));
+        for (int y = 0; y < write.height(); ++y)
+            for (int x = 0; x < write.width(); ++x) {
+                const auto pixel = write.pixel(x, y);
+                REQUIRE(qRed(pixel) <= qAlpha(pixel));
+                REQUIRE(qGreen(pixel) <= qAlpha(pixel));
+                REQUIRE(qBlue(pixel) <= qAlpha(pixel));
+                if (frame == 0)
+                    REQUIRE(qAlpha(pixel) == qAlpha(legacy.pixel(x, y)));
+            }
+    }
 }
 
 TEST_CASE("Nineteen-part character switches coordinated views and reopens with independent copy") {

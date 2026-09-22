@@ -68,6 +68,7 @@ class EditorController final : public QObject {
     explicit EditorController(QObject* parent = nullptr);
     ~EditorController() override;
     const opentoon::Document& document() const { return session_.document(); }
+    std::shared_ptr<const opentoon::Document> snapshot() const { return session_.snapshot(); }
     std::uint64_t sceneGeneration() const { return sceneGeneration_; }
     bool animateMode() const { return animateMode_; }
     bool autoKey() const { return autoKey_; }

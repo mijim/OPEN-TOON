@@ -76,6 +76,14 @@ QImage RevisionRenderCache::resolve(const RenderCacheKey& key,
     auto image = renderer();
     return publish(ticket, image) ? image : QImage{};
 }
+bool RevisionRenderCache::canRetain(const RenderCacheKey& key) const {
+    return key.width > 0 && key.height > 0 &&
+           std::size_t(key.width) * std::size_t(key.height) * 4 <= budget_;
+}
+void RevisionRenderCache::cancelPending() {
+    std::lock_guard lock(mutex_);
+    ++serial_;
+}
 void RevisionRenderCache::clear() {
     std::lock_guard lock(mutex_);
     ++serial_;

@@ -26,3 +26,23 @@ the fixture has no deformers, cameras, effects, dense full-frame paint or
 large masks. Render output tests compare alpha coverage for rotated vectors
 and sparse raster artwork; physical-tablet and other-platform performance
 remain unqualified.
+
+## Original character artwork, experimental.14
+
+Run `QT_QPA_PLATFORM=offscreen build/locked/opentoon_compositor_benchmark --original-art`
+after a Release build. The fixture uses the repository's original Clockwork Hello
+scene specification and its 19 registered 256 × 256 sRGB PNG parts. A transparent
+1920 × 1080 canvas and one character-root transform yield 20 layers. Five process
+runs on the same development Mac, each with a warm-up and three measured frames:
+
+| Profile | Median ms/frame | Range ms/frame |
+|---|---:|---:|
+| Direct legacy painter | 1.69 | 1.65–2.08 |
+| Linear-sRGB graph | 37.45 | 36.22–38.83 |
+
+The 1080p frame retains 8,294,400 bytes in the preview cache. The first cold
+process run before the five-run series measured 46.77 ms/frame for linear output;
+that startup variance is not included in the median. This fixture has real alpha
+artwork but no deformation, effects, masks, camera or continuous motion. The
+linear route is close to a 24 fps frame budget before presentation and editing
+overhead, so it does not establish real-time playback for a full character shot.

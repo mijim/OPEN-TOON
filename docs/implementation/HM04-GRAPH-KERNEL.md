@@ -41,9 +41,31 @@ Ten additional behaviors now work on the macOS development build:
 10. Linear compositing uses bounded ink regions, fast transparent/opaque paths
     and color lookup tables while preserving tested alpha coverage.
 
-The actual canvas uses the revision cache synchronously; there is no background
-preview producer yet. Export already runs on an immutable worker snapshot. The
-ticket protocol prevents a future background preview job from publishing stale
-pixels, but that workflow still needs an end-to-end qualification before HM-04
-acceptance. The 19-layer synthetic workload and measured limits are in
+Export runs on an immutable worker snapshot. The next bounded block adds a
+background preview producer to the actual canvas. The 19-layer synthetic workload
+and measured limits are in
 [the compositor benchmark](COMPOSITOR-BENCHMARK.md).
+
+## Third bounded block — speculative canvas preview and original artwork
+
+Ten additional observable behaviors now work on the macOS development build:
+
+1. A linear canvas repaint queues the next scene frame, including the loop boundary.
+2. A missed current frame still renders immediately, preserving accurate scrubbing.
+3. The queued frame evaluates an immutable document snapshot on a worker thread.
+4. Only one producer runs; a newer request replaces its one pending slot.
+5. Repeated requests for a pending, running or cached frame do not start duplicate work.
+6. Scene edits, view-option changes and canvas replacement cancel speculative work.
+7. Render-row cancellation and revision tickets prevent obsolete results from publishing.
+8. Frames too large for the preview cache are not queued speculatively.
+9. Original 19-part sRGB artwork retains exact alpha coverage between the legacy and
+   linear profiles at the tested half-resolution pose, including transparent pixels.
+10. That original-art scene produces identical Display, Write and reopened-project
+    pixels at three tested poses; the 1080p workload has a recorded cost baseline.
+
+This is speculative preparation, not a separate evaluator or a promise of real-time
+playback on all scenes. The native smoke covers the foreground canvas cache/profile
+path; the producer's immutable snapshot and publication behavior have an adapter
+test. A timed native playback/scrub journey, fuller color charts and denser scene
+cost qualification remain before HM-04 contract acceptance. The graph still has no
+editable node topology in the UI.

@@ -3,6 +3,7 @@
 #include "opentoon/document.h"
 #include "raster_brush.h"
 #include "revision_render_cache.h"
+#include "preview_render_queue.h"
 #include <QElapsedTimer>
 #include <QPointer>
 #include <QQuickPaintedItem>
@@ -127,6 +128,7 @@ class CanvasItem : public QQuickPaintedItem {
     opentoon::Point snapDrawingPoint(opentoon::Point) const;
     opentoon::Point constrainedEndpoint(opentoon::Point) const;
     void paintGrid(QPainter*);
+    void schedulePreview(const opentoon::RenderCacheKey&);
 
     int marqueeOperation_ = 0; // Replace, add, subtract; captured on press.
 
@@ -137,6 +139,7 @@ class CanvasItem : public QQuickPaintedItem {
     bool movingRegion_ = false;
     QPointer<EditorController> editor_;
     opentoon::RevisionRenderCache previewCache_;
+    opentoon::PreviewRenderQueue previewQueue_{previewCache_};
     QString previousTool_;
     QPointer<QQuickWindow> filteredWindow_;
     double zoom_ = 1, angle_ = 0;

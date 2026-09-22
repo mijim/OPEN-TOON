@@ -2,11 +2,13 @@
 #include "scene_renderer.h"
 #include "graph_renderer.h"
 #include "revision_render_cache.h"
+#include "preview_render_queue.h"
 #include "serialization.h"
 #include "vector_hit.h"
 #include <QPainter>
 #include <catch2/catch_test_macros.hpp>
 #include <cmath>
+#include <chrono>
 #include <future>
 #include <thread>
 using namespace opentoon;
@@ -162,6 +164,68 @@ TEST_CASE("A worker finishing after a scene change cannot publish its pixels") {
     worker.join();
     REQUIRE_FALSE(published);
     REQUIRE_FALSE(cache.lookup(key).has_value());
+}
+TEST_CASE("Speculative preview renders an immutable next frame and keeps the latest scene") {
+    auto document = makeDocument();
+    document.width = 32;
+    document.height = 32;
+    document.composition = CompositionProfile::LinearSrgb;
+    document.background = {0, 0, 0, 0};
+    auto& drawing = document.editableDrawing(document.layers.front().id, 0);
+    std::vector<std::uint8_t> redPixels(32 * 32 * 4, 0);
+    for (std::size_t i = 0; i < redPixels.size(); i += 4) {
+        redPixels[i] = 255;
+        redPixels[i + 3] = 255;
+    }
+    drawing.image = ImageAsset{32, 32, std::move(redPixels)};
+    expose(document.layers.front(), 0, 3, drawing.id);
+    document.validate();
+    RevisionRenderCache cache(32 * 32 * 4);
+    PreviewRenderQueue queue(cache);
+    RenderCacheKey key{1, 1, 1, 32, 32, CompositionProfile::LinearSrgb};
+    auto snapshot = std::make_shared<const Document>(document);
+    REQUIRE(queue.request(snapshot, key));
+    REQUIRE_FALSE(queue.request(snapshot, key));
+    auto changedPixels = drawing.image->rgba.values();
+    changedPixels[0] = 0;
+    drawing.image->rgba = std::move(changedPixels);
+    auto waitFor = [&](const RenderCacheKey& wanted) {
+        const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(3);
+        while (std::chrono::steady_clock::now() < deadline) {
+            if (auto ready = cache.lookup(wanted))
+                return *ready;
+            std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        }
+        return QImage{};
+    };
+    auto first = waitFor(key);
+    REQUIRE_FALSE(first.isNull());
+    REQUIRE(qRed(first.pixel(0, 0)) == 255);
+    REQUIRE_FALSE(queue.request(snapshot, key));
+    key.revision = 2;
+    snapshot = std::make_shared<const Document>(document);
+    REQUIRE(queue.request(snapshot, key));
+    auto second = waitFor(key);
+    REQUIRE_FALSE(second.isNull());
+    REQUIRE(qRed(second.pixel(0, 0)) == 0);
+    auto old = key;
+    old.revision = 1;
+    REQUIRE_FALSE(cache.lookup(old).has_value());
+    REQUIRE(cache.retainedBytes() <= 32 * 32 * 4);
+    queue.cancel();
+}
+TEST_CASE("Speculative preview skips frames that cannot fit its cache budget") {
+    auto source = makeDocument();
+    source.width = 1;
+    source.height = 1;
+    source.composition = CompositionProfile::LinearSrgb;
+    auto document = std::make_shared<const Document>(source);
+    RevisionRenderCache cache(3);
+    PreviewRenderQueue queue(cache);
+    RenderCacheKey key{1, 1, 0, document->width, document->height,
+                       CompositionProfile::LinearSrgb};
+    REQUIRE_FALSE(queue.request(document, key));
+    REQUIRE(cache.retainedBytes() == 0);
 }
 TEST_CASE("Linear compositor cancellation aborts inside the current frame") {
     auto document = makeDocument();

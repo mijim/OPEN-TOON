@@ -70,8 +70,8 @@
     {
       "id": "P10",
       "status": "in_progress",
-      "available": "Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. A bounded revision cache reuses canvas frames; ink regions, pixel fast paths and lookup tables improve linear throughput. Legacy scenes keep their direct-painter appearance.",
-      "remaining": "End-to-end asynchronous preview publication, production workload and broader color charts, node UI, effects, full ROI scheduling and later deformer/camera integration."
+      "available": "Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. A bounded revision cache reuses canvas frames and speculatively renders the next frame from an immutable snapshot; ink regions, pixel fast paths and lookup tables improve linear throughput. Original 19-part artwork has alpha/output and throughput evidence. Legacy scenes keep their direct-painter appearance.",
+      "remaining": "Timed native playback/scrub qualification, denser animated production workload and broader color charts, node UI, effects, full ROI scheduling and later deformer/camera integration."
     },
     {
       "id": "P11",
@@ -84,7 +84,7 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 92,
+      "count": 95,
       "command": "ctest --test-dir build/locked --output-on-failure"
     },
     "native_input_workflow": {
@@ -171,7 +171,7 @@
     "harmony_reference": {
       "status": "passed_rigid_baseline_only",
       "ctest_entry": "Original registered character parts survive current-format save and reopen",
-      "scope": "Nineteen original registered PNG parts with embedded sRGB profile, one parent transform, 480-frame current-format save/reopen, exact first-frame comparison with the source reference still, and 24000/1001 sample boundary. Python verifies 41 generated part images, five reference poses, exact dialogue cues and ten-minute drift markers.",
+      "scope": "Nineteen original registered PNG parts with embedded sRGB profile, one parent transform, 480-frame current-format save/reopen, exact first-frame comparison with the source reference still, and 24000/1001 sample boundary. Linear profile also has exact legacy alpha coverage at half resolution and Display/Write/reopened equality at three poses. Python verifies 41 generated part images, five reference poses, exact dialogue cues and ten-minute drift markers.",
       "limits": "Reference poses and timing audio are synthetic external targets. The baseline fixture still uses plain drawing layers; the separate HM-03 tests cover an initial rigid rig and substitutions, not the completed character shot."
     },
     "physical_tablet": {
@@ -325,7 +325,7 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.13",
+  "version": "0.2.0-experimental.14",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
@@ -336,6 +336,6 @@
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
     "state": "HM-00_HM-01_HM-02_complete__HM-03_HM-04_in_progress",
-    "note": "HM-00 owner review, HM-01 typed properties and HM-02 artwork intake are accepted bounded contracts. HM-03 has persisted rigid characters and an automated 19-part journey but still needs artist-led acceptance. HM-04 has a typed image graph, revision-keyed canvas cache and bounded synthetic throughput; async preview publication and production-scene color/cost qualification remain open. No full phase or catalog capability is claimed complete."
+    "note": "HM-00 owner review, HM-01 typed properties and HM-02 artwork intake are accepted bounded contracts. HM-03 has persisted rigid characters and an automated 19-part journey but still needs artist-led acceptance. HM-04 has a typed image graph, revision-keyed canvas cache, speculative next-frame worker and original 19-part color/cost evidence; timed native playback and denser production scenes remain open. No full phase or catalog capability is claimed complete."
   }
 }

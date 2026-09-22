@@ -1,5 +1,21 @@
 # Experimental releases
 
+## 0.2.0-experimental.14 — speculative compositor preview
+
+- The linear-sRGB canvas prepares its next frame on one background worker from an
+  immutable scene snapshot. Current-frame cache misses remain accurate during scrubbing.
+- The one-slot pending queue coalesces repeated requests, cancels superseded work,
+  rejects stale publication and skips frames that exceed the preview memory budget.
+- The original 19-part Clockwork Hello artwork now has exact alpha-coverage and
+  Display/Write/reopened-pixel checks, plus a 1080p compositor cost baseline.
+- macOS: 95 CTest entries and native UI smoke pass. No new dependency or project
+  format change; source only. See [HM-04 evidence](HM04-GRAPH-KERNEL.md) and the
+  [benchmark](COMPOSITOR-BENCHMARK.md).
+
+HM-04 and P10 remain partial. Timed native playback/scrubbing, denser animated
+scenes and fuller color charts are still required before the graph contract is
+accepted. Linux/Windows builds and binary publication are deferred.
+
 ## 0.2.0-experimental.10 — vector authoring and animation patterns
 
 - Whole-vector lasso with additive/subtractive selection, select all and invert.

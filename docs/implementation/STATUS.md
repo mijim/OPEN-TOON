@@ -4,10 +4,10 @@
 
 The editor runs locally on macOS and supports mouse drawing, sampled-pressure input, vector editing, layers, exposures, transform keys, project revisions and PNG export. See the [build instructions](BUILD.md) and [user guide](USER-GUIDE.md).
 
-The [HM-04 composition kernel record](HM04-GRAPH-KERNEL.md) lists its two bounded
+The [HM-04 composition kernel record](HM04-GRAPH-KERNEL.md) lists its three bounded
 blocks of ten capabilities, tests and remaining acceptance work.
 
-The current source milestone is `v0.2.0-experimental.13`. It is a source-only
+The current source milestone is `v0.2.0-experimental.14`. It is a source-only
 milestone; the last locally qualified macOS preview and any earlier binaries
 do not qualify this composition change.
 
@@ -25,12 +25,12 @@ do not qualify this composition change.
 | P07 | planned | Exact rational frame-to-sample arithmetic has a domain test; no audio playback. | Audio decode/timeline/waveform/sync, mouth mapping/manual lip correction, optional detection, media policies, FFmpeg adapter and video output. |
 | P08 | in_progress | Parented layers and typed character roots, pegs and parts; role editing, preserve-world rigid reparenting, stable rest pivots, named held substitutions, renderer-backed thumbnail browsing and coordinated view sets. Batch Part assembly, independent or explicitly linked-artwork Part/Peg branch copies, safe branch deletion, Part detachment, Peg dissolution and view-range editing preserve view membership with format-5 save/reopen. | Artist-led rigid-character acceptance, animated-ancestor reparenting, masked poses, Quick Rig, declarative controls, portable assets/templates and production-scale qualification. |
 | P09 | planned | No deformation subsystem implemented. | Curve/bone/mesh deformation, constraints, binding/weights, deterministic solvers and reference fixtures. |
-| P10 | in_progress | Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. A bounded revision cache reuses canvas frames; ink regions, pixel fast paths and lookup tables improve linear throughput. Legacy scenes keep their direct-painter appearance. | End-to-end asynchronous preview publication, production workload and broader color charts, node UI, effects, full ROI scheduling and later deformer/camera integration. |
+| P10 | in_progress | Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. A bounded revision cache reuses canvas frames and a worker speculatively prepares the next frame from an immutable snapshot. Original 19-part artwork has alpha/output and cost evidence. Legacy scenes keep their direct-painter appearance. | Timed native playback/scrub qualification, denser animated production workload and broader color charts, node UI, effects, full ROI scheduling and later deformer/camera integration. |
 | P11 | planned | Saved revisions, recovery UX, English guide, regression tests and source CI are initial prerequisites. Format 1/2 migration backups, format 3 curve metadata and checked compressed media resources, explicit backed-up compaction and asynchronous recovery snapshots. Requested arm64 macOS preview now includes audited runtime dependencies, notices, matching source archives/recipes and verified ad-hoc signatures. | All required journeys, remaining hardening, supported device/OS matrix, accessibility, reproducible release SBOM automation, clean-machine validation and Developer ID signed/notarized releases. |
 
 ## Verification
 
-- Current macOS locked build: 80/80 CTest entries pass, including format-4 migration, coordinated view-set rejection/undo, independent and linked rig-branch identities, 19-part view switching, and inspector save/reopen. Tests also cover typed rest/authored/evaluated properties, atomic pose transfer, failed commands, rational time, exposure edits, hierarchy validation, rendering consistency, registered PNG/sequence import with atomic rejection, stale writers, schema rejection, rollback failures and abrupt process termination with a large image.
+- Current macOS locked build: 95/95 CTest entries pass, including format-4 migration, coordinated view-set rejection/undo, independent and linked rig-branch identities, 19-part view switching, original-art linear alpha/output checks and immutable speculative preview publication. Tests also cover typed rest/authored/evaluated properties, atomic pose transfer, failed commands, rational time, exposure edits, hierarchy validation, rendering consistency, registered PNG/sequence import with atomic rejection, stale writers, schema rejection, rollback failures and abrupt process termination with a large image.
 - Export integration: 48 PNGs from an immutable snapshot, rational-time metadata, cancellation and a successful subsequent job.
 - Native input smoke: mouse strokes, synthetic pen pressure, cancelled gestures, undo/redo, palette validity after undo, save/reopen and a real window screenshot.
 - Synthetic two-second fixture: 48 PNG frames at 1920 × 1080; reopened document is semantically identical. Initial CPU export measured 3,077 ms on this Mac; it is not a large-scene or pen-latency benchmark.

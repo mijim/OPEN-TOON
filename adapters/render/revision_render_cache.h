@@ -35,6 +35,8 @@ class RevisionRenderCache {
     [[nodiscard]] bool current(const RenderTicket&) const;
     [[nodiscard]] bool publish(const RenderTicket&, QImage);
     [[nodiscard]] QImage resolve(const RenderCacheKey&, const std::function<QImage()>&);
+    [[nodiscard]] bool canRetain(const RenderCacheKey&) const;
+    void cancelPending();
     void clear();
     [[nodiscard]] std::size_t retainedBytes() const;
 

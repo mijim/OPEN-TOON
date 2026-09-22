@@ -4723,7 +4723,9 @@
         "docs/architecture/adr/027-typed-composition-profile.md",
         "tests/composition_graph_tests.cpp",
         "tests/render_tests.cpp",
+        "tests/harmony_reference_tests.cpp",
         "tests/storage_tests.cpp",
+        "adapters/render/preview_render_queue.cpp",
         "apps/desktop/compositor_benchmark.cpp",
         "docs/implementation/COMPOSITOR-BENCHMARK.md"
       ]

@@ -42,8 +42,11 @@ Canvas composition now uses a 96 MiB least-recently-used cache keyed by scene
 generation, document revision, frame, size, profile, output and view options.
 Transient brush/pose previews bypass it. A new revision drops old images; a
 render ticket may publish only while its request and revision remain current.
-The canvas currently renders missing frames synchronously. Export uses its
-existing immutable snapshot; a cancellation callback can stop a linear frame
+The canvas renders a missed current frame synchronously and speculatively queues
+the next frame on one background worker. Its immutable document snapshot, latest-only
+pending slot, cancellation and render tickets keep superseded work out of the cache.
+Oversized frames do not enter the speculative queue. Export uses its existing
+immutable snapshot; a cancellation callback can stop a linear frame
 between graph nodes or pixel rows and records a partial cancelled export.
 Topological ordering and invalidation use iterative traversal, including
 images below a changed parent peg. Global state changes remain conservatively
@@ -53,7 +56,9 @@ The linear path uses 8-bit sRGB lookup tables and conservative transformed ink
 bounds for source-over work. This changes only the opt-in profile. Rotated
 vector and sparse raster alpha coverage is compared against the direct painter;
 the [measured synthetic workload](../../implementation/COMPOSITOR-BENCHMARK.md)
-records throughput and the preview budget.
+records synthetic and original-art throughput and the preview budget. The original
+19-part sRGB fixture retains alpha coverage at half resolution and matches
+Display/Write/reopened pixels at three poses.
 
 ## Boundaries and next evidence
 
@@ -61,7 +66,7 @@ This is an 8-bit CPU reference path, not a full color-management system. At
 fractional resizes, isolating layers before `Over` can differ from the direct
 legacy painter. The profile is opt-in; old scenes remain exact on their old
 path. Alpha fixtures, graph rejection and save/reopen tests cover the bounded
-behavior. HM-04 still needs an end-to-end asynchronous preview publication
-journey, production-scene cost qualification and fuller alpha/color charts
+behavior. HM-04 still needs a timed native playback/scrub qualification,
+denser production-scene cost evidence and fuller alpha/color charts
 before its contract can be accepted. No full
 node editor, effects catalog, HDR/EXR or OCIO manager is claimed.
