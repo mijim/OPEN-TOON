@@ -185,10 +185,12 @@ void Document::validate() const {
         require(l.name.size() <= 4096, "Layer name is too long.");
         require(static_cast<int>(l.kind) >= 0 && static_cast<int>(l.kind) <= 3,
                 "Unknown layer kind.");
-        require(l.role.size() <= 128 && l.variants.size() <= 10000,
+        require(l.role.size() <= 128 && l.variants.size() <= 10000 && l.views.size() <= 1000,
                 "Invalid part metadata size.");
         if (l.kind != LayerKind::Part)
             require(l.role.empty() && l.variants.empty(), "Only parts may own roles and variants.");
+        if (l.kind != LayerKind::Character)
+            require(l.views.empty(), "Only character roots may own view sets.");
         if (l.kind == LayerKind::Character || l.kind == LayerKind::Peg)
             require(l.exposures.empty(), "Character roots and pegs cannot own drawings.");
         std::set<Id> variants;
@@ -233,6 +235,32 @@ void Document::validate() const {
             while (ancestor && layer(ancestor).kind != LayerKind::Character)
                 ancestor = layer(ancestor).parent;
             require(ancestor != 0, "Part or peg must belong to a character.");
+        }
+    }
+    for (const auto& root : layers) {
+        if (root.kind != LayerKind::Character)
+            continue;
+        std::set<std::string> names;
+        for (const auto& view : root.views) {
+            id(view.id);
+            require(!view.name.empty() && view.name.size() <= 128 && names.insert(view.name).second &&
+                        view.choices.size() <= 2000,
+                    "Invalid or duplicate character view set.");
+            std::set<Id> parts;
+            for (const auto& choice : view.choices) {
+                const auto& target = layer(choice.part);
+                require(target.kind == LayerKind::Part && parts.insert(choice.part).second,
+                        "View set contains a missing or duplicate part.");
+                Id ancestor = target.parent;
+                while (ancestor && ancestor != root.id)
+                    ancestor = layer(ancestor).parent;
+                require(ancestor == root.id &&
+                            std::any_of(target.variants.begin(), target.variants.end(),
+                                        [&](const Substitution& variant) {
+                                            return variant.drawing == choice.drawing;
+                                        }),
+                        "View set references a part or substitution outside its character.");
+            }
         }
     }
     for (const auto& m : markers)

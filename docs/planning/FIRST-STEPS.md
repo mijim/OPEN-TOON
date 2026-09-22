@@ -17,13 +17,13 @@ undo, save/reopen and exercise its real failure boundaries before consumers star
 | Done / HM-01-A | Expose typed property addresses through existing Session/evaluation adapters; preserve full-pose keys and introduce new track payloads only for real consumers | Accepted HM-00 | Old-scene evaluated poses/easing preserved; dangling/duplicate/type-invalid references rejected; undo and migration backup tests | HM-02 after HM-00 with a separate owner |
 | Done / HM-02-A | Qualify transparent PNG registration, then atomic parts/sequence intake with explicit mode, order/gap report and cancellation | Accepted HM-00 contracts | Original artwork and imported parts round-trip; failed batch leaves no partial scene | HM-01 |
 | Partial / HM-03-A | Add character root/part roles and separate peg hierarchy; preserve-world reparenting and permanent pivot editing | HM-01 + HM-02 | Assemble/rest-pose a rigid character without registration jumps; reject unsupported shear/singular cases | HM-04 after HM-01 |
-| Next / HM-03-B | Add named thumbnail substitutions, held selector tracks and coordinated view sets | HM-03-A | Switch mouths/hands/views without changing transforms or another instance; all-or-nothing multi-part changes | Continue HM-04; no deformers yet |
+| Partial / HM-03-B | Named thumbnail substitutions, held selector tracks, coordinated view sets and independent character copying are implemented | HM-03-A | Finish the complete 19-part saved character journey and artist review; verify view switching across frames and copied characters before accepting the contract | Continue HM-04; no deformers yet |
 | 7 / HM-04-A | Extract shared evaluator and typed graph kernel; define invalidation, alpha/color profile and legacy appearance preservation | HM-01 | Legacy golden scenes + new-profile alpha fixtures, cycle/port rejection and UI/headless equivalence | HM-03; HM-10 is another eligible branch when a slot opens |
 | 8 / HM-05-A | Prove saved rest mesh/UV/weights + actual texture-warp rendering on bone/curve checker fixtures | HM-03 + HM-04 | Measured joint/texture quality and bounded cost; accepted backend/library decision or documented blocker | HM-07 controls or HM-10 audio |
 
 HM-01-A has accepted typed persistence, source-version migration and failure evidence.
-HM-03-A is partially delivered; continue thumbnail substitutions, coordinated
-sets and instance-safe duplication before completing HM-03. Later payload
+HM-03-A and HM-03-B have working subsets; complete the full rigid-character
+acceptance journey and its failure cases before accepting HM-03. Later payload
 schemas are introduced in their owning slices, with the common migration rules.
 
 HM-00 evidence: [original generated fixture](../../tests/fixtures/harmony-moment/README.md)

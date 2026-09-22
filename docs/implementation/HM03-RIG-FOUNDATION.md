@@ -11,11 +11,19 @@ current exposure interval, is saved, undoes atomically and renders identically
 after reopen. Removing an option replaces its active spans with the first
 remaining option or clears them if none remains.
 
-This supports a simple rigid cut-out workflow using the existing timeline and
-Properties panel. It does not complete HM-03: thumbnail browsing, coordinated
-view sets, portable character duplication/instance remapping and a full
-19-part saved character acceptance fixture remain. The current reparent tool
-cannot solve animated-parent motion, reparent an animated child or store shear.
-Rest pivot placement must occur before that layer is animated. Subsequent HM-03 work should
-make substitutions visually scannable and add atomic multi-part view sets
-before HM-05 or HM-07 consumes this rig.
+The Properties panel now shows renderer-backed thumbnails for named
+substitutions. Artists can reorder and step through choices. A character root
+stores named view sets that capture each Part's active substitution at a frame;
+applying one validates the full target set and changes all Parts as one undoable
+command. View sets can be updated, renamed, copied and removed. A full
+character duplication remaps descendant layers, drawings, strokes and views,
+so editing copied artwork cannot alter the source. These data round-trip in
+format 5 with a preserved format-4 migration backup.
+
+This supports a rigid cut-out workflow using the existing timeline and
+Properties panel. HM-03 remains partial: a full 19-part saved character
+acceptance journey, artist validation of the thumbnail/view interaction and
+animated-ancestor reparenting remain. The reparent tool cannot solve
+animated-parent motion, reparent an animated child or store shear. Rest pivot
+placement must occur before that layer is animated. The copy is an independent
+snapshot, not a linked character asset or HM-09 template.

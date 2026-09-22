@@ -1068,6 +1068,11 @@ ApplicationWindow {
                                             enabled: layerInspector.rigLayer?.kind === 0 || layerInspector.rigLayer?.kind === 3
                                             onTriggered: editor.centerRestPivot()
                                         }
+                                        MenuItem {
+                                            text: "Duplicate full character"
+                                            enabled: editor.characterId > 0
+                                            onTriggered: editor.duplicateCharacter()
+                                        }
                                     }
                                 }
                                 Label {
@@ -1093,14 +1098,53 @@ ApplicationWindow {
                                     Accessible.name: "Character part role"
                                 }
                                 Label { text: "Substitution at current frame"; color: "#999999"; font.pixelSize: 10 }
-                                C.CompactComboBox {
+                                ListView {
                                     Layout.fillWidth: true
+                                    Layout.preferredHeight: 76
+                                    clip: true
+                                    orientation: ListView.Horizontal
+                                    spacing: 4
                                     model: editor.substitutions
-                                    textRole: "name"
-                                    valueRole: "id"
-                                    currentIndex: model.findIndex(s => s.id === editor.selectedSubstitution)
-                                    onActivated: editor.selectSubstitution(currentValue)
-                                    Accessible.name: "Current part substitution"
+                                    delegate: Rectangle {
+                                        required property var modelData
+                                        width: 62
+                                        height: 72
+                                        radius: 3
+                                        color: modelData.id === editor.selectedSubstitution ? "#363636" : "#181818"
+                                        border.color: modelData.id === editor.selectedSubstitution ? "#dedede" : "#303030"
+                                        Column {
+                                            anchors.centerIn: parent
+                                            spacing: 2
+                                            Rectangle {
+                                                width: 54
+                                                height: 54
+                                                color: "#eeeeee"
+                                                Image {
+                                                    anchors.fill: parent
+                                                    anchors.margins: 1
+                                                    fillMode: Image.PreserveAspectFit
+                                                    source: {
+                                                        const revision = editor.documentRevision;
+                                                        return editor.substitutionThumbnail(modelData.id);
+                                                    }
+                                                    asynchronous: false
+                                                }
+                                            }
+                                            Text {
+                                                width: 54
+                                                text: modelData.name
+                                                color: "#dddddd"
+                                                font.pixelSize: 9
+                                                horizontalAlignment: Text.AlignHCenter
+                                                elide: Text.ElideRight
+                                            }
+                                        }
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: editor.selectSubstitution(modelData.id)
+                                        }
+                                        Accessible.name: "Substitution " + modelData.name
+                                    }
                                 }
                                 RowLayout {
                                     Layout.fillWidth: true
@@ -1112,6 +1156,40 @@ ApplicationWindow {
                                         onClicked: editor.removeSubstitution(editor.selectedSubstitution)
                                     }
                                 }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    C.CompactButton {
+                                        text: "‹"
+                                        Accessible.name: "Previous substitution"
+                                        ToolTip.text: "Choose previous substitution at the playhead"
+                                        ToolTip.visible: hovered
+                                        onClicked: editor.stepSubstitution(-1)
+                                    }
+                                    C.CompactButton {
+                                        text: "›"
+                                        Accessible.name: "Next substitution"
+                                        ToolTip.text: "Choose next substitution at the playhead"
+                                        ToolTip.visible: hovered
+                                        onClicked: editor.stepSubstitution(1)
+                                    }
+                                    Item { Layout.fillWidth: true }
+                                    C.CompactButton {
+                                        text: "←"
+                                        enabled: editor.selectedSubstitution > 0
+                                        Accessible.name: "Move substitution earlier in gallery"
+                                        ToolTip.text: "Move selected substitution earlier in the gallery"
+                                        ToolTip.visible: hovered
+                                        onClicked: editor.moveSubstitution(editor.selectedSubstitution, -1)
+                                    }
+                                    C.CompactButton {
+                                        text: "→"
+                                        enabled: editor.selectedSubstitution > 0
+                                        Accessible.name: "Move substitution later in gallery"
+                                        ToolTip.text: "Move selected substitution later in the gallery"
+                                        ToolTip.visible: hovered
+                                        onClicked: editor.moveSubstitution(editor.selectedSubstitution, 1)
+                                    }
+                                }
                                 C.CompactTextField {
                                     Layout.fillWidth: true
                                     text: editor.substitutions.find(s => s.id === editor.selectedSubstitution)?.name || ""
@@ -1119,6 +1197,58 @@ ApplicationWindow {
                                     enabled: editor.selectedSubstitution > 0
                                     onEditingFinished: editor.renameSubstitution(editor.selectedSubstitution, text)
                                     Accessible.name: "Substitution name"
+                                }
+                            }
+                            ColumnLayout {
+                                visible: editor.characterId > 0
+                                Layout.leftMargin: 16
+                                Layout.rightMargin: 16
+                                Layout.fillWidth: true
+                                spacing: 6
+                                Label { text: "Character views"; color: "#999999"; font.pixelSize: 10 }
+                                C.CompactComboBox {
+                                    Layout.fillWidth: true
+                                    model: editor.characterViews
+                                    textRole: "name"
+                                    valueRole: "id"
+                                    currentIndex: model.findIndex(v => v.id === editor.selectedView)
+                                    onActivated: editor.selectView(currentValue)
+                                    Accessible.name: "Selected character view set"
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    C.CompactButton { text: "+ Capture"; onClicked: editor.captureCharacterView() }
+                                    C.CompactButton {
+                                        text: "Apply"
+                                        enabled: editor.selectedView > 0
+                                        onClicked: editor.applyCharacterView()
+                                    }
+                                    C.CompactButton {
+                                        text: "Update"
+                                        enabled: editor.selectedView > 0
+                                        onClicked: editor.updateCharacterView()
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    C.CompactButton {
+                                        text: "Duplicate"
+                                        enabled: editor.selectedView > 0
+                                        onClicked: editor.duplicateCharacterView()
+                                    }
+                                    C.CompactButton {
+                                        text: "Remove"
+                                        enabled: editor.selectedView > 0
+                                        onClicked: editor.removeCharacterView()
+                                    }
+                                }
+                                C.CompactTextField {
+                                    Layout.fillWidth: true
+                                    text: editor.characterViews.find(v => v.id === editor.selectedView)?.name || ""
+                                    placeholderText: "View set name"
+                                    enabled: editor.selectedView > 0
+                                    onEditingFinished: editor.renameCharacterView(text)
+                                    Accessible.name: "Character view set name"
                                 }
                             }
                         }

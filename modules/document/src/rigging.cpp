@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cmath>
 #include <numbers>
+#include <map>
 #include <set>
 #include <stdexcept>
 
@@ -95,7 +96,42 @@ std::string drawingLabel(const Document& document, Id drawing) {
     const auto& name = document.drawings.at(drawing).name;
     return name.empty() ? "Drawing " + std::to_string(drawing) : name.substr(0, 128);
 }
+Layer& character(Document& document, Id id) {
+    auto& root = document.layer(id);
+    require(root.kind == LayerKind::Character && !root.locked, "Select an unlocked character root.");
+    return root;
+}
+CharacterView& findView(Layer& root, Id id) {
+    auto found = std::find_if(root.views.begin(), root.views.end(),
+                              [id](const CharacterView& view) { return view.id == id; });
+    require(found != root.views.end(), "Character view set does not exist.");
+    return *found;
+}
+std::vector<ViewChoice> currentChoices(const Document& document, Id root, Frame frame) {
+    require(frame >= 0 && frame < document.duration, "View-set frame is outside the scene.");
+    std::vector<ViewChoice> result;
+    for (const auto& layer : document.layers) {
+        if (layer.kind != LayerKind::Part || characterFor(document, layer.id) != root)
+            continue;
+        const auto* drawing = document.drawingAt(layer.id, frame);
+        if (!drawing)
+            throw std::invalid_argument("View set needs a substitution for part: " + layer.role);
+        result.push_back({layer.id, drawing->id});
+    }
+    require(!result.empty(), "Character has no parts to capture.");
+    return result;
+}
 } // namespace
+Id characterFor(const Document& document, Id layerId) {
+    Id current = layerId;
+    while (current) {
+        const auto& layer = document.layer(current);
+        if (layer.kind == LayerKind::Character)
+            return current;
+        current = layer.parent;
+    }
+    return 0;
+}
 Id makeCharacter(Document& document, Id drawingLayer, std::string name) {
     auto& layer = document.layer(drawingLayer);
     require(layer.kind == LayerKind::Drawing && !layer.locked && layer.parent == 0,
@@ -251,11 +287,158 @@ void selectSubstitution(Document& document, Id partId, Frame frame, Id drawing) 
 void removeSubstitution(Document& document, Id partId, Id drawing) {
     auto& layer = part(document, partId);
     checkVariant(layer, drawing);
+    const Id root = characterFor(document, partId);
+    for (const auto& view : document.layer(root).views)
+        for (const auto& choice : view.choices)
+            require(choice.part != partId || choice.drawing != drawing,
+                    "Remove this substitution from character view sets first.");
     std::erase_if(layer.variants, [drawing](const auto& item) { return item.drawing == drawing; });
     const Id replacement = layer.variants.empty() ? 0 : layer.variants.front().drawing;
     auto exposures = layer.exposures;
     for (const auto& exposure : exposures)
         if (exposure.drawing == drawing)
             expose(layer, exposure.start, exposure.end, replacement);
+}
+void reorderSubstitution(Document& document, Id partId, Id drawing, int direction) {
+    auto& layer = part(document, partId);
+    require(direction == -1 || direction == 1, "Substitution order must move one place.");
+    checkVariant(layer, drawing);
+    auto it = std::find_if(layer.variants.begin(), layer.variants.end(),
+                           [drawing](const auto& value) { return value.drawing == drawing; });
+    const auto index = std::distance(layer.variants.begin(), it);
+    const auto target = index + direction;
+    if (target >= 0 && target < std::ptrdiff_t(layer.variants.size()))
+        std::iter_swap(it, layer.variants.begin() + target);
+}
+Id stepSubstitution(Document& document, Id partId, Frame frame, int direction) {
+    auto& layer = part(document, partId);
+    require((direction == -1 || direction == 1) && frame >= 0 && frame < document.duration,
+            "Invalid substitution step.");
+    require(!layer.variants.empty(), "This part has no substitutions.");
+    const auto* drawing = document.drawingAt(partId, frame);
+    auto it = std::find_if(layer.variants.begin(), layer.variants.end(),
+                           [drawing](const auto& item) { return drawing && item.drawing == drawing->id; });
+    const auto size = std::ptrdiff_t(layer.variants.size());
+    const auto index = it == layer.variants.end() ? (direction > 0 ? -1 : 0)
+                                                  : std::distance(layer.variants.begin(), it);
+    const Id next = layer.variants[std::size_t((index + direction + size) % size)].drawing;
+    selectSubstitution(document, partId, frame, next);
+    return next;
+}
+Id captureCharacterView(Document& document, Id rootId, Frame frame, std::string name) {
+    auto choices = currentChoices(document, rootId, frame);
+    auto& root = character(document, rootId);
+    require(!name.empty() && name.size() <= 128, "Character view name is invalid.");
+    require(std::none_of(root.views.begin(), root.views.end(),
+                         [&](const CharacterView& view) { return view.name == name; }),
+            "Character view name already exists.");
+    const Id id = document.allocateId();
+    root.views.push_back({id, std::move(name), std::move(choices)});
+    return id;
+}
+void applyCharacterView(Document& document, Id rootId, Id viewId, Frame frame) {
+    auto& root = character(document, rootId);
+    const auto choices = findView(root, viewId).choices;
+    require(frame >= 0 && frame < document.duration, "View-set frame is outside the scene.");
+    std::map<Id, Id> selected;
+    for (const auto& choice : choices)
+        selected.emplace(choice.part, choice.drawing);
+    std::vector<std::pair<Id, Frame>> targets;
+    for (const auto& layer : document.layers) {
+        if (layer.kind != LayerKind::Part || characterFor(document, layer.id) != rootId)
+            continue;
+        require(!layer.locked, "Unlock every affected part before applying a character view.");
+        if (!selected.contains(layer.id))
+            throw std::invalid_argument("View set is missing part: " + layer.role);
+        checkVariant(layer, selected.at(layer.id));
+        targets.emplace_back(layer.id, spanEnd(layer, frame, document.duration));
+    }
+    require(targets.size() == choices.size(), "View set contains stale or duplicate parts.");
+    for (const auto& [partId, end] : targets)
+        expose(document.layer(partId), frame, end, selected.at(partId));
+}
+void updateCharacterView(Document& document, Id rootId, Id viewId, Frame frame) {
+    auto choices = currentChoices(document, rootId, frame);
+    auto& root = character(document, rootId);
+    findView(root, viewId).choices = std::move(choices);
+}
+void renameCharacterView(Document& document, Id rootId, Id viewId, std::string name) {
+    auto& root = character(document, rootId);
+    require(!name.empty() && name.size() <= 128, "Character view name is invalid.");
+    require(std::none_of(root.views.begin(), root.views.end(),
+                         [&](const CharacterView& view) { return view.id != viewId && view.name == name; }),
+            "Character view name already exists.");
+    findView(root, viewId).name = std::move(name);
+}
+Id duplicateCharacterView(Document& document, Id rootId, Id viewId) {
+    auto& root = character(document, rootId);
+    const auto source = findView(root, viewId);
+    auto name = source.name + " copy";
+    for (int index = 2; std::any_of(root.views.begin(), root.views.end(),
+                                   [&](const CharacterView& view) { return view.name == name; }); ++index)
+        name = source.name + " copy " + std::to_string(index);
+    require(name.size() <= 128, "Character view name is too long to duplicate.");
+    CharacterView copy = source;
+    copy.id = document.allocateId();
+    copy.name = std::move(name);
+    const Id id = copy.id;
+    root.views.push_back(std::move(copy));
+    return id;
+}
+void removeCharacterView(Document& document, Id rootId, Id viewId) {
+    auto& root = character(document, rootId);
+    (void)findView(root, viewId);
+    std::erase_if(root.views, [viewId](const CharacterView& view) { return view.id == viewId; });
+}
+Id duplicateCharacter(Document& document, Id rootId, double offsetX, double offsetY) {
+    const auto& root = document.layer(rootId);
+    require(root.kind == LayerKind::Character && std::isfinite(offsetX) && std::isfinite(offsetY),
+            "Select a character to duplicate with a finite offset.");
+    std::vector<Layer> original;
+    for (const auto& layer : document.layers)
+        if (characterFor(document, layer.id) == rootId)
+            original.push_back(layer);
+    std::map<Id, Id> layers, drawings;
+    for (const auto& layer : original)
+        layers[layer.id] = document.allocateId();
+    auto copyDrawing = [&](Id old) {
+        if (drawings.contains(old))
+            return drawings.at(old);
+        Drawing copy = document.drawings.at(old);
+        copy.id = document.allocateId();
+        for (auto& stroke : copy.strokes)
+            stroke.id = document.allocateId();
+        const Id id = copy.id;
+        document.drawings.emplace(id, std::move(copy));
+        drawings[old] = id;
+        return id;
+    };
+    for (auto source : original) {
+        const Id old = source.id;
+        source.id = layers.at(old);
+        source.parent = source.parent ? layers.at(source.parent) : 0;
+        if (old == rootId) {
+            source.name = source.name.substr(0, 4091) + " copy";
+            source.transform.x += offsetX;
+            source.transform.y += offsetY;
+            for (auto& key : source.keys) {
+                key.value.x += offsetX;
+                key.value.y += offsetY;
+            }
+        }
+        for (auto& exposure : source.exposures)
+            exposure.drawing = copyDrawing(exposure.drawing);
+        for (auto& variant : source.variants)
+            variant.drawing = copyDrawing(variant.drawing);
+        for (auto& view : source.views) {
+            view.id = document.allocateId();
+            for (auto& choice : view.choices) {
+                choice.part = layers.at(choice.part);
+                choice.drawing = copyDrawing(choice.drawing);
+            }
+        }
+        document.layers.push_back(std::move(source));
+    }
+    return layers.at(rootId);
 }
 } // namespace opentoon

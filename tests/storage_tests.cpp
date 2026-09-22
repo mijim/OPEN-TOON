@@ -1,5 +1,6 @@
 #include "project_store.h"
 #include "serialization.h"
+#include "opentoon/rigging.h"
 #include <catch2/catch_test_macros.hpp>
 #include <chrono>
 #include <fstream>
@@ -59,7 +60,7 @@ TEST_CASE("Saving a stale revision cannot overwrite another writer") {
 }
 TEST_CASE("Unknown versions and excessive nesting do not enter the document model") {
     auto text = serializeDocument(makeDocument());
-    auto position = text.find("\"version\":4");
+    auto position = text.find("\"version\":5");
     REQUIRE(position != std::string::npos);
     text.replace(position, 11, "\"version\":9");
     REQUIRE_THROWS(deserializeDocument(text));
@@ -253,6 +254,7 @@ TEST_CASE("Schema two upgrades preserve an original backup and protect Bezier me
         layer.erase("kind");
         layer.erase("role");
         layer.erase("variants");
+        layer.erase("views");
     }
     {
         FixtureDatabase db(p.file);
@@ -274,10 +276,10 @@ TEST_CASE("Schema two upgrades preserve an original backup and protect Bezier me
     }
     {
         FixtureDatabase db(p.file);
-        REQUIRE(db.count("PRAGMA user_version") == 4);
+        REQUIRE(db.count("PRAGMA user_version") == 5);
     }
 }
-TEST_CASE("Format three scene migrates to typed format four with an original backup") {
+TEST_CASE("Format three scene migrates through typed characters with an original backup") {
     TemporaryProject p;
     auto legacy = makeDocument();
     const auto oldRevision = ProjectStore::save(p.file, legacy);
@@ -287,6 +289,7 @@ TEST_CASE("Format three scene migrates to typed format four with an original bac
         layer.erase("kind");
         layer.erase("role");
         layer.erase("variants");
+        layer.erase("views");
     }
     {
         FixtureDatabase db(p.file);
@@ -319,5 +322,42 @@ TEST_CASE("Format three scene migrates to typed format four with an original bac
     REQUIRE(ProjectStore::load(p.file).document == upgraded);
     REQUIRE(ProjectStore::load(backup).document == legacy);
     FixtureDatabase current(p.file);
-    REQUIRE(current.count("PRAGMA user_version") == 4);
+    REQUIRE(current.count("PRAGMA user_version") == 5);
+}
+TEST_CASE("Format four character scene migrates to view sets with a preserved backup") {
+    TemporaryProject p;
+    auto legacy = makeDocument();
+    const Id part = legacy.layers.front().id;
+    const Id root = makeCharacter(legacy, part, "Hero");
+    const Id closed = createSubstitution(legacy, part, 0, false, "Closed");
+    const auto revision = ProjectStore::save(p.file, legacy);
+    auto oldJson = nlohmann::json::parse(serializeDocument(legacy));
+    oldJson["version"] = 4;
+    for (auto& layer : oldJson["layers"])
+        layer.erase("views");
+    {
+        FixtureDatabase db(p.file);
+        db.replaceDocument(oldJson.dump());
+        db.execute("PRAGMA user_version=4");
+    }
+    REQUIRE(ProjectStore::load(p.file).document == legacy);
+    auto upgraded = legacy;
+    const Id view = captureCharacterView(upgraded, root, 0, "Front");
+    REQUIRE(upgraded.layer(root).views.front().id == view);
+    REQUIRE(upgraded.layer(root).views.front().choices.front().drawing == closed);
+    REQUIRE_THROWS(ProjectStore::save(p.file, upgraded, "Injected format-five failure", revision,
+                                      [](auto point) {
+                                          if (point == ProjectStore::SavePoint::BeforeTransaction)
+                                              throw std::runtime_error("Injected migration failure");
+                                      }));
+    REQUIRE(ProjectStore::load(p.file).document == legacy);
+    auto backup = p.file;
+    backup += ".pre-v4.bak";
+    REQUIRE(std::filesystem::exists(backup));
+    REQUIRE(ProjectStore::load(backup).document == legacy);
+    REQUIRE(ProjectStore::save(p.file, upgraded, "View sets", revision) > revision);
+    REQUIRE(ProjectStore::load(p.file).document == upgraded);
+    REQUIRE(ProjectStore::load(backup).document == legacy);
+    FixtureDatabase current(p.file);
+    REQUIRE(current.count("PRAGMA user_version") == 5);
 }

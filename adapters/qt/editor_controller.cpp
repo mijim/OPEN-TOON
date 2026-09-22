@@ -6,6 +6,7 @@
 #include "image_batch_importer.h"
 #include "scene_renderer.h"
 #include <QColorSpace>
+#include <QBuffer>
 #include <QDateTime>
 #include <QDir>
 #include <QFileInfo>
@@ -74,6 +75,8 @@ void EditorController::resetSelection() {
     rangeLayers_.clear();
     emit rangeChanged();
     layer_ = document().layers.empty() ? 0 : document().layers.back().id;
+    selectedView_ = 0;
+    emit viewSelectionChanged();
     swatch_ = document().palette.empty() ? 0 : document().palette.front().id;
     frame_ = 0;
     emit selectionChanged();
@@ -87,6 +90,7 @@ bool EditorController::edit(const std::string& label, const std::function<void(D
             frame_ = std::clamp(frame_, 0, duration() - 1);
             emit changed();
             emit frameChanged();
+            emit viewSelectionChanged();
             report(QString::fromStdString(label));
         }
         return result;
@@ -136,6 +140,113 @@ int EditorController::selectedSubstitution() const {
     const auto* drawing = document().drawingAt(layer_, frame_);
     return drawing ? int(drawing->id) : 0;
 }
+int EditorController::characterId() const {
+    return layer_ ? int(opentoon::characterFor(document(), layer_)) : 0;
+}
+QVariantList EditorController::characterViews() const {
+    QVariantList result;
+    const int root = characterId();
+    if (!root)
+        return result;
+    for (const auto& view : document().layer(root).views)
+        result.push_back(QVariantMap{{"id", int(view.id)},
+                                     {"name", QString::fromStdString(view.name)},
+                                     {"parts", int(view.choices.size())}});
+    return result;
+}
+int EditorController::selectedView() const {
+    const int root = characterId();
+    if (!root)
+        return 0;
+    const auto& views = document().layer(root).views;
+    if (std::any_of(views.begin(), views.end(), [&](const auto& item) { return item.id == selectedView_; }))
+        return int(selectedView_);
+    return views.empty() ? 0 : int(views.front().id);
+}
+void EditorController::selectView(int view) {
+    const auto options = characterViews();
+    if (std::any_of(options.begin(), options.end(), [view](const QVariant& option) {
+            return option.toMap().value("id").toInt() == view;
+        })) {
+        selectedView_ = view;
+        emit viewSelectionChanged();
+    }
+}
+QString EditorController::substitutionThumbnail(int drawingId) const {
+    if (!layer_ || drawingId <= 0)
+        return {};
+    const auto& layer = document().layer(layer_);
+    if (layer.kind != LayerKind::Part ||
+        std::none_of(layer.variants.begin(), layer.variants.end(),
+                     [drawingId](const auto& item) { return item.drawing == Id(drawingId); }))
+        return {};
+    if (thumbnailRevision_ != session_.revision()) {
+        thumbnailCache_.clear();
+        thumbnailRevision_ = session_.revision();
+    }
+    const qulonglong cacheKey = (qulonglong(layer_) << 32) ^ qulonglong(drawingId);
+    if (auto found = thumbnailCache_.constFind(cacheKey); found != thumbnailCache_.cend())
+        return *found;
+    const auto& artwork = document().drawings.at(Id(drawingId));
+    double left = 0, top = 0, right = 0, bottom = 0;
+    bool hasArtwork = false;
+    auto include = [&](double x, double y) {
+        if (!hasArtwork) {
+            left = right = x;
+            top = bottom = y;
+            hasArtwork = true;
+        } else {
+            left = std::min(left, x);
+            top = std::min(top, y);
+            right = std::max(right, x);
+            bottom = std::max(bottom, y);
+        }
+    };
+    if (artwork.image) {
+        include(0, 0);
+        include(artwork.image->width, artwork.image->height);
+    }
+    if (artwork.raster) {
+        include(0, 0);
+        include(artwork.raster->width, artwork.raster->height);
+    }
+    for (const auto& stroke : artwork.strokes)
+        for (const auto& point : stroke.points) {
+            include(point.x - stroke.width / 2, point.y - stroke.width / 2);
+            include(point.x + stroke.width / 2, point.y + stroke.width / 2);
+        }
+    QImage preview(56, 56, QImage::Format_ARGB32_Premultiplied);
+    preview.fill(Qt::transparent);
+    if (hasArtwork) {
+        const double width = std::max(1.0, right - left);
+        const double height = std::max(1.0, bottom - top);
+        const double extent = std::max(width, height) * 1.08;
+        const double scale = std::min(1.0, 8192.0 / extent);
+        const int side = std::max(1, int(std::ceil(extent * scale)));
+        Document thumbnail;
+        thumbnail.width = thumbnail.height = side;
+        thumbnail.duration = 1;
+        thumbnail.palette = document().palette;
+        thumbnail.drawings.emplace(Id(drawingId), artwork);
+        Layer sample;
+        sample.id = layer_;
+        sample.exposures.push_back({0, 1, Id(drawingId)});
+        sample.transform.scaleX = sample.transform.scaleY = scale;
+        sample.transform.x = (side - width * scale) / 2 - left * scale;
+        sample.transform.y = (side - height * scale) / 2 - top * scale;
+        thumbnail.layers.push_back(std::move(sample));
+        RenderOptions options;
+        options.background = false;
+        preview = SceneRenderer::render(thumbnail, 0, {56, 56}, options);
+    }
+    QByteArray bytes;
+    QBuffer buffer(&bytes);
+    if (!buffer.open(QIODevice::WriteOnly) || !preview.save(&buffer, "PNG"))
+        return {};
+    const QString url = "data:image/png;base64," + QString::fromLatin1(bytes.toBase64());
+    thumbnailCache_.insert(cacheKey, url);
+    return url;
+}
 QVariantList EditorController::palette() const {
     QVariantList result;
     for (auto s : document().palette)
@@ -178,6 +289,8 @@ void EditorController::setSelectedLayer(int value) {
     try {
         (void)document().layer(value);
         layer_ = value;
+        selectedView_ = 0;
+        emit viewSelectionChanged();
         rangeLayers_ = {layer_};
         rangeStart_ = frame_;
         rangeEnd_ = frame_ + 1;
@@ -352,6 +465,7 @@ void EditorController::undo() {
             swatch_ = document().palette.empty() ? 0 : document().palette.front().id;
         emit changed();
         emit frameChanged();
+        emit viewSelectionChanged();
         emit selectionChanged();
         report("Undone");
     }
@@ -370,6 +484,7 @@ void EditorController::redo() {
             swatch_ = document().palette.empty() ? 0 : document().palette.front().id;
         emit changed();
         emit frameChanged();
+        emit viewSelectionChanged();
         emit selectionChanged();
         report("Redone");
     }
@@ -403,6 +518,10 @@ void EditorController::removeLayer() {
 void EditorController::duplicateLayer(bool linked) {
     if (!layer_)
         return;
+    if (document().layer(layer_).kind == LayerKind::Character) {
+        duplicateCharacter();
+        return;
+    }
     Id added = 0;
     if (edit(linked ? "Clone layer" : "Duplicate layer", [&](Document& d) {
             auto copy = d.layer(layer_);
@@ -561,6 +680,88 @@ void EditorController::removeSubstitution(int drawing) {
         edit("Remove substitution", [&](Document& d) {
             opentoon::removeSubstitution(d, layer_, drawing);
         });
+}
+void EditorController::moveSubstitution(int drawing, int direction) {
+    if (layer_)
+        edit("Reorder substitution", [&](Document& d) {
+            opentoon::reorderSubstitution(d, layer_, drawing, direction);
+        });
+}
+void EditorController::stepSubstitution(int direction) {
+    if (layer_)
+        edit("Step substitution", [&](Document& d) {
+            opentoon::stepSubstitution(d, layer_, frame_, direction);
+        });
+}
+void EditorController::captureCharacterView() {
+    const int root = characterId();
+    if (!root)
+        return;
+    Id created = 0;
+    if (edit("Capture character view", [&](Document& d) {
+            const auto& views = d.layer(root).views;
+            int number = 1;
+            auto name = "View " + std::to_string(number);
+            while (std::any_of(views.begin(), views.end(),
+                               [&](const auto& view) { return view.name == name; }))
+                name = "View " + std::to_string(++number);
+            created = opentoon::captureCharacterView(d, root, frame_, name);
+        })) {
+        selectedView_ = created;
+        emit viewSelectionChanged();
+    }
+}
+void EditorController::applyCharacterView() {
+    const int root = characterId(), view = selectedView();
+    if (root && view)
+        edit("Apply character view", [&](Document& d) {
+            opentoon::applyCharacterView(d, root, view, frame_);
+        });
+}
+void EditorController::updateCharacterView() {
+    const int root = characterId(), view = selectedView();
+    if (root && view)
+        edit("Update character view", [&](Document& d) {
+            opentoon::updateCharacterView(d, root, view, frame_);
+        });
+}
+void EditorController::renameCharacterView(QString name) {
+    const int root = characterId(), view = selectedView();
+    if (root && view)
+        edit("Rename character view", [&](Document& d) {
+            opentoon::renameCharacterView(d, root, view, name.toStdString());
+        });
+}
+void EditorController::duplicateCharacterView() {
+    const int root = characterId(), view = selectedView();
+    if (!root || !view)
+        return;
+    Id created = 0;
+    if (edit("Duplicate character view", [&](Document& d) {
+            created = opentoon::duplicateCharacterView(d, root, view);
+        })) {
+        selectedView_ = created;
+        emit viewSelectionChanged();
+    }
+}
+void EditorController::removeCharacterView() {
+    const int root = characterId(), view = selectedView();
+    if (root && view && edit("Remove character view", [&](Document& d) {
+            opentoon::removeCharacterView(d, root, view);
+        })) {
+        selectedView_ = 0;
+        emit viewSelectionChanged();
+    }
+}
+void EditorController::duplicateCharacter() {
+    const int root = characterId();
+    if (!root)
+        return;
+    Id created = 0;
+    if (edit("Duplicate character", [&](Document& d) {
+            created = opentoon::duplicateCharacter(d, root);
+        }))
+        setSelectedLayer(int(created));
 }
 void EditorController::newDrawing(bool duplicate) {
     if (!layer_)

@@ -6,6 +6,7 @@
 #include "opentoon/vector_edit.h"
 #include <QColor>
 #include <QElapsedTimer>
+#include <QHash>
 #include <QObject>
 #include <QTimer>
 #include <QUrl>
@@ -35,6 +36,10 @@ class EditorController final : public QObject {
     Q_PROPERTY(QVariantList layers READ layers NOTIFY changed)
     Q_PROPERTY(QVariantList substitutions READ substitutions NOTIFY changed)
     Q_PROPERTY(int selectedSubstitution READ selectedSubstitution NOTIFY frameChanged)
+    Q_PROPERTY(int characterId READ characterId NOTIFY changed)
+    Q_PROPERTY(QVariantList characterViews READ characterViews NOTIFY changed)
+    Q_PROPERTY(int selectedView READ selectedView NOTIFY viewSelectionChanged)
+    Q_PROPERTY(qulonglong documentRevision READ documentRevision NOTIFY changed)
     Q_PROPERTY(QVariantList palette READ palette NOTIFY changed)
     Q_PROPERTY(QVariantList revisions READ revisions NOTIFY changed)
     Q_PROPERTY(int frame READ frame WRITE setFrame NOTIFY frameChanged)
@@ -112,6 +117,12 @@ class EditorController final : public QObject {
     QVariantList layers() const;
     QVariantList substitutions() const;
     int selectedSubstitution() const;
+    int characterId() const;
+    QVariantList characterViews() const;
+    int selectedView() const;
+    qulonglong documentRevision() const { return session_.revision(); }
+    Q_INVOKABLE QString substitutionThumbnail(int drawing) const;
+    Q_INVOKABLE void selectView(int view);
     QVariantList palette() const;
     QVariantList revisions() const;
     QVariantMap transform() const;
@@ -184,6 +195,15 @@ class EditorController final : public QObject {
     Q_INVOKABLE void renameSubstitution(int drawing, QString name);
     Q_INVOKABLE void selectSubstitution(int drawing);
     Q_INVOKABLE void removeSubstitution(int drawing);
+    Q_INVOKABLE void moveSubstitution(int drawing, int direction);
+    Q_INVOKABLE void stepSubstitution(int direction);
+    Q_INVOKABLE void captureCharacterView();
+    Q_INVOKABLE void applyCharacterView();
+    Q_INVOKABLE void updateCharacterView();
+    Q_INVOKABLE void renameCharacterView(QString name);
+    Q_INVOKABLE void duplicateCharacterView();
+    Q_INVOKABLE void removeCharacterView();
+    Q_INVOKABLE void duplicateCharacter();
     Q_INVOKABLE void newDrawing(bool duplicate = false);
     Q_INVOKABLE void holdDrawing(int);
     Q_INVOKABLE void clearExposure();
@@ -218,6 +238,7 @@ class EditorController final : public QObject {
   signals:
     void keySelectionChanged();
     void poseClipboardChanged();
+    void viewSelectionChanged();
     void animationModeChanged();
     void rangeChanged();
     void changed();
@@ -237,6 +258,9 @@ class EditorController final : public QObject {
     int poseSelectionAnchor_ = -1;
     opentoon::KeyBlock poseClipboard_;
     std::optional<opentoon::Transform> transformClipboard_;
+    opentoon::Id selectedView_ = 0;
+    mutable std::uint64_t thumbnailRevision_ = 0;
+    mutable QHash<qulonglong, QString> thumbnailCache_;
     void reconcilePoseSelection();
     void setPoseSelection(std::vector<opentoon::Frame>);
     bool retimePoseSelection(int first, int last, bool duplicate);

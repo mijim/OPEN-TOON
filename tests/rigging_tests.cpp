@@ -126,3 +126,92 @@ TEST_CASE("Named substitutions switch held drawings without changing pose and re
     auto invalid = session.document();
     REQUIRE_THROWS(selectSubstitution(invalid, partId, 0, 999999));
 }
+
+TEST_CASE("Character views coordinate held part choices and reject incomplete changes atomically") {
+    Session session;
+    const Id mouth = session.document().layers.front().id;
+    Id root = 0, hand = 0, mouthClosed = 0, mouthOpen = 0, handDown = 0, handUp = 0;
+    REQUIRE(session.apply("Assemble", [&](Document& d) {
+        root = makeCharacter(d, mouth, "Hero");
+        setPartRole(d, mouth, "Mouth");
+        mouthClosed = createSubstitution(d, mouth, 0, false, "Closed");
+        mouthOpen = createSubstitution(d, mouth, 10, true, "Open");
+        Layer source;
+        source.id = d.allocateId();
+        hand = source.id;
+        source.name = "Hand";
+        d.layers.push_back(source);
+        attachDrawingAsPart(d, hand, root, "Hand");
+        handDown = createSubstitution(d, hand, 0, false, "Down");
+        handUp = createSubstitution(d, hand, 10, true, "Up");
+    }));
+    Id front = 0, raised = 0;
+    REQUIRE(session.apply("Capture views", [&](Document& d) {
+        front = captureCharacterView(d, root, 0, "Front");
+        raised = captureCharacterView(d, root, 10, "Raised");
+    }));
+    REQUIRE(session.document().layer(root).views.size() == 2);
+    REQUIRE(session.apply("Switch both parts", [&](Document& d) {
+        applyCharacterView(d, root, raised, 4);
+    }));
+    REQUIRE(session.document().drawingAt(mouth, 4)->id == mouthOpen);
+    REQUIRE(session.document().drawingAt(hand, 4)->id == handUp);
+    REQUIRE(session.document().drawingAt(mouth, 3)->id == mouthClosed);
+    REQUIRE(session.document().drawingAt(hand, 3)->id == handDown);
+    REQUIRE(session.undo());
+    REQUIRE(session.document().drawingAt(mouth, 4)->id == mouthClosed);
+    REQUIRE(session.redo());
+    auto locked = session.document();
+    locked.layer(hand).locked = true;
+    REQUIRE_THROWS(applyCharacterView(locked, root, front, 4));
+    REQUIRE(locked.drawingAt(mouth, 4)->id == mouthOpen);
+    auto incomplete = session.document();
+    incomplete.layer(root).views.front().choices.pop_back();
+    REQUIRE_THROWS(applyCharacterView(incomplete, root, front, 4));
+    REQUIRE(incomplete.drawingAt(mouth, 4)->id == mouthOpen);
+    REQUIRE_THROWS(removeSubstitution(incomplete, mouth, mouthClosed));
+    REQUIRE(session.apply("Manage named views", [&](Document& d) {
+        renameCharacterView(d, root, front, "Neutral");
+        const Id copy = duplicateCharacterView(d, root, raised);
+        updateCharacterView(d, root, copy, 4);
+        removeCharacterView(d, root, copy);
+        reorderSubstitution(d, mouth, mouthOpen, -1);
+        REQUIRE(stepSubstitution(d, mouth, 8, 1) == mouthClosed);
+    }));
+    REQUIRE(session.document().layer(root).views.front().name == "Neutral");
+    REQUIRE(session.document().drawingAt(mouth, 8)->id == mouthClosed);
+    REQUIRE(deserializeDocument(serializeDocument(session.document())) == session.document());
+}
+
+TEST_CASE("Duplicating a character remaps every part drawing and view without changing the source") {
+    auto d = makeDocument();
+    const Id body = d.layers.front().id;
+    const Id root = makeCharacter(d, body, "Hero");
+    const Id drawingA = createSubstitution(d, body, 0, false, "A");
+    const Id drawingB = createSubstitution(d, body, 10, true, "B");
+    const Id view = captureCharacterView(d, root, 0, "Front");
+    d.drawings.at(drawingA).strokes.push_back({d.allocateId(), d.palette.front().id, 8,
+                                               Shape::Rectangle, true, 2, {{10, 10}, {30, 30}}});
+    d.validate();
+    const auto originalFrame = SceneRenderer::render(d, 0, {320, 180});
+    const Id clone = duplicateCharacter(d, root);
+    d.validate();
+    REQUIRE(d.layer(clone).name == "Hero copy");
+    REQUIRE(d.layer(clone).transform.x == d.layer(root).transform.x + 64);
+    REQUIRE(d.layer(clone).views.size() == 1);
+    REQUIRE(d.layer(clone).views.front().id != view);
+    const Id clonedPart = d.layer(clone).views.front().choices.front().part;
+    const Id clonedDrawing = d.layer(clone).views.front().choices.front().drawing;
+    REQUIRE(clonedPart != body);
+    REQUIRE(clonedDrawing != drawingA);
+    REQUIRE(d.drawingAt(clonedPart, 0)->id == clonedDrawing);
+    REQUIRE(d.layer(clonedPart).variants.size() == 2);
+    REQUIRE(d.layer(clonedPart).variants.back().drawing != drawingB);
+    d.drawings.at(clonedDrawing).strokes.front().points.front().x += 15;
+    REQUIRE(d.drawings.at(drawingA).strokes.front().points.front().x == 10);
+    applyCharacterView(d, clone, d.layer(clone).views.front().id, 12);
+    REQUIRE(d.drawingAt(body, 12)->id == drawingB);
+    REQUIRE(d.drawingAt(clonedPart, 12)->id == clonedDrawing);
+    REQUIRE(SceneRenderer::render(d, 0, {320, 180}) != originalFrame);
+    REQUIRE(deserializeDocument(serializeDocument(d)) == d);
+}

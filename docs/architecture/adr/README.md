@@ -79,3 +79,6 @@ adapter, explicit property sources and compact layer-pose transfer semantics.
 
 See [ADR-025](025-character-rig-format-four.md) for typed character layers,
 format-4 persistence, source-version migration backups and rigid substitutions.
+
+See [ADR-026](026-character-view-sets.md) for format-5 coordinated character
+views, independent hierarchy copying and renderer-backed substitution tiles.

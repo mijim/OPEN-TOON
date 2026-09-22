@@ -136,6 +136,54 @@ TEST_CASE("Character inspector actions build a saved rigid rig with held substit
     REQUIRE(editor.document() == rigged);
 }
 
+TEST_CASE("Inspector view sets and thumbnail chooser survive duplicate save and reopen") {
+    EditorController editor;
+    editor.newScene();
+    REQUIRE(editor.importParts(paths({partFixture + "torso__base.png", partFixture + "head__front.png"})));
+    const int head = editor.selectedLayer();
+    const int body = int(editor.document().layers[1].id);
+    editor.makeCharacter();
+    const int root = editor.characterId();
+    editor.setSelectedLayer(body);
+    editor.setParent(root);
+    const int original = editor.selectedSubstitution();
+    REQUIRE(editor.substitutionThumbnail(original).startsWith("data:image/png;base64,"));
+    editor.createSubstitution(true);
+    const int alternative = editor.selectedSubstitution();
+    editor.moveSubstitution(alternative, -1);
+    REQUIRE(editor.substitutions().front().toMap().value("id").toInt() == alternative);
+    editor.stepSubstitution(1);
+    REQUIRE(editor.selectedSubstitution() == original);
+    editor.captureCharacterView();
+    const int view = editor.selectedView();
+    REQUIRE(view > 0);
+    REQUIRE(editor.characterViews().size() == 1);
+    editor.renameCharacterView("Front");
+    editor.duplicateCharacterView();
+    REQUIRE(editor.characterViews().size() == 2);
+    editor.removeCharacterView();
+    REQUIRE(editor.characterViews().size() == 1);
+    editor.selectView(view);
+    editor.applyCharacterView();
+    REQUIRE(editor.document().drawingAt(body, 0)->id == opentoon::Id(original));
+    editor.setSelectedLayer(head);
+    editor.duplicateCharacter();
+    REQUIRE(editor.document().layer(editor.selectedLayer()).kind == opentoon::LayerKind::Character);
+    REQUIRE(editor.document().layer(editor.selectedLayer()).views.size() == 1);
+    const auto snapshot = editor.document();
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto project = QUrl::fromLocalFile(directory.filePath("views.otoon"));
+    REQUIRE(editor.saveProject(project));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(project));
+    REQUIRE(reopened.document() == snapshot);
+    editor.undo();
+    REQUIRE(editor.document() != snapshot);
+    editor.redo();
+    REQUIRE(editor.document() == snapshot);
+}
+
 TEST_CASE("Rejected registered part batch leaves the scene and selection intact") {
     EditorController editor;
     editor.newScene();
