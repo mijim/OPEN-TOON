@@ -67,8 +67,12 @@ arrangement, group styles, cleanup, guides and batch key patterns.
 
 See [ADR-022](022-character-first-delivery.md) for the character-first delivery DAG,
 property/evaluation/binding foundations and progressive rigging complexity. Planning
-is accepted; the new runtime contracts remain unimplemented.
+is accepted; a bounded property-address adapter is underway while rig, binding and
+evaluation contracts remain to be delivered.
 
 See [ADR-023](023-harmony-foundation-contracts.md) for the HM-00 identity, space,
 time, color, migration and command boundaries. Its engineering contract is accepted;
-artist review remains open before dependent implementation.
+the project owner accepted the reference-art rubric.
+
+See [ADR-024](024-typed-layer-properties.md) for the typed HM-01 transform-address
+adapter, explicit property sources and compact layer-pose transfer semantics.

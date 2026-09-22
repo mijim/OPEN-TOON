@@ -1,8 +1,10 @@
 #include "editor_controller.h"
 #include "opentoon/animation.h"
+#include "opentoon/property_address.h"
 #include "project_store.h"
 #include "image_batch_importer.h"
 #include "scene_renderer.h"
+#include <QColorSpace>
 #include <QDateTime>
 #include <QDir>
 #include <QFileInfo>
@@ -526,8 +528,9 @@ void EditorController::setTransform(QString field, double value) {
     if (!layer_)
         return;
     edit("Set " + field.toStdString(), [&](Document& d) {
-        editTransform(d.layer(layer_), frame_, field.toStdString(), value,
-                      animateMode_ ? AnimationEditMode::Animate : AnimationEditMode::Setup, autoKey_);
+        const PropertyEdit property{{layer_, propertyKind(field.toStdString())}, value};
+        editProperties(d, std::span(&property, 1), frame_,
+                       animateMode_ ? AnimationEditMode::Animate : AnimationEditMode::Setup, autoKey_);
     });
 }
 void EditorController::addKey(int interpolation) {
@@ -580,23 +583,44 @@ void EditorController::importImage(QUrl url) {
         report("Image import currently supports up to 4096 × 4096 pixels.");
         return;
     }
-    auto image = reader.read().convertToFormat(QImage::Format_RGBA8888);
+    auto image = reader.read();
     if (image.isNull()) {
         report("Could not import image: " + reader.errorString());
         return;
     }
+    const bool untagged = !image.colorSpace().isValid();
+    if (!untagged && image.colorSpace() != QColorSpace(QColorSpace::SRgb)) {
+        image = image.convertedToColorSpace(QColorSpace(QColorSpace::SRgb));
+        if (image.isNull()) {
+            report("Could not convert the image color profile to sRGB.");
+            return;
+        }
+    }
+    image = image.convertToFormat(QImage::Format_RGBA8888);
     if (image.width() > 4096 || image.height() > 4096) {
         report("Image import currently supports up to 4096 × 4096 pixels.");
         return;
     }
-    if (!layer_)
-        addLayer();
-    edit("Import image", [&](Document& d) {
-        auto& drawing = d.editableDrawing(layer_, frame_);
+    Id destination = layer_;
+    const bool createdLayer = !destination;
+    if (!edit("Import image", [&](Document& d) {
+        if (!destination) {
+            Layer layer;
+            layer.id = d.allocateId();
+            layer.name = "Imported image";
+            destination = layer.id;
+            d.layers.push_back(std::move(layer));
+        }
+        auto& drawing = d.editableDrawing(destination, frame_);
         ImageAsset asset{image.width(), image.height(), {}};
         asset.rgba.assign(image.constBits(), image.constBits() + image.sizeInBytes());
         drawing.image = std::move(asset);
-    });
+    }))
+        return;
+    if (createdLayer)
+        setSelectedLayer(static_cast<int>(destination));
+    if (untagged)
+        report("Imported image; untagged colors were interpreted as sRGB.");
 }
 bool EditorController::importParts(QVariantList urls) {
     return importImageBatch(std::move(urls), false);

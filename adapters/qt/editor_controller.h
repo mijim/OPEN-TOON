@@ -25,6 +25,7 @@ class EditorController final : public QObject {
     Q_PROPERTY(QVariantList selectedLayers READ selectedLayers NOTIFY rangeChanged)
     Q_PROPERTY(QVariantList markers READ markers NOTIFY changed)
     Q_PROPERTY(bool hasClipboard READ hasClipboard NOTIFY rangeChanged)
+    Q_PROPERTY(bool hasCopiedTransform READ hasCopiedTransform NOTIFY poseClipboardChanged)
     Q_PROPERTY(QString sceneName READ sceneName NOTIFY changed)
     Q_PROPERTY(QString projectPath READ projectPath NOTIFY changed)
     Q_PROPERTY(QString status READ status NOTIFY statusChanged)
@@ -180,6 +181,10 @@ class EditorController final : public QObject {
     Q_INVOKABLE void setSwatchColor(int, QColor);
     Q_INVOKABLE void setScene(QString, int, int, int, int, int);
     Q_INVOKABLE void setTransform(QString, double);
+    bool hasCopiedTransform() const { return transformClipboard_.has_value(); }
+    Q_INVOKABLE void copyTransformPose();
+    Q_INVOKABLE bool pasteTransformPose(int mode);
+    Q_INVOKABLE bool resetTransformPose();
     bool commitPose(const opentoon::Transform&);
     bool setPoseKeyPosition(int frame, double x, double y);
     Q_INVOKABLE bool movePoseKey(int source, int destination);
@@ -199,6 +204,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE void report(QString message);
   signals:
     void keySelectionChanged();
+    void poseClipboardChanged();
     void animationModeChanged();
     void rangeChanged();
     void changed();
@@ -217,6 +223,7 @@ class EditorController final : public QObject {
     opentoon::Id poseSelectionLayer_ = 0;
     int poseSelectionAnchor_ = -1;
     opentoon::KeyBlock poseClipboard_;
+    std::optional<opentoon::Transform> transformClipboard_;
     void reconcilePoseSelection();
     void setPoseSelection(std::vector<opentoon::Frame>);
     bool retimePoseSelection(int first, int last, bool duplicate);

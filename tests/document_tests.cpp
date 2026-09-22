@@ -1,4 +1,5 @@
 #include "opentoon/document.h"
+#include "opentoon/property_address.h"
 #include "opentoon/session.h"
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -90,4 +91,67 @@ TEST_CASE("Vector eraser splits a sparse segment and undo restores original geom
     REQUIRE(drawing->strokes.back().points.front().x > 60);
     s.undo();
     REQUIRE(s.document() == before);
+}
+
+TEST_CASE("Typed layer properties distinguish rest authored and evaluated values across identity changes") {
+    auto document = makeDocument();
+    const Id id = document.layers.front().id;
+    document.layers.front().transform.x = 12;
+    document.layers.front().keys = {{0, document.layers.front().transform, Interpolation::Linear},
+                                    {20, document.layers.front().transform, Interpolation::Linear}};
+    document.layers.front().keys.back().value.x = 112;
+    PropertyAddress address{id, PropertyKind::PositionX};
+    REQUIRE(propertyValue(document, address, 10, PropertySource::Rest) == 12);
+    REQUIRE(propertyValue(document, address, 20, PropertySource::AuthoredKey) == 112);
+    REQUIRE(propertyValue(document, address, 10, PropertySource::Evaluated) == 62);
+    REQUIRE_THROWS(propertyValue(document, address, 10, PropertySource::AuthoredKey));
+    document.layers.front().name = "Renamed character part";
+    REQUIRE(propertyValue(document, address, 10, PropertySource::Evaluated) == 62);
+    Layer other;
+    other.id = document.allocateId();
+    other.name = "Other part";
+    document.layers.push_back(other);
+    std::swap(document.layers[0], document.layers[1]);
+    REQUIRE(propertyValue(document, address, 10, PropertySource::Evaluated) == 62);
+    REQUIRE_THROWS(propertyValue(document, {999999, PropertyKind::PositionX}, 10, PropertySource::Rest));
+    REQUIRE_THROWS(propertyValue(document, {id, static_cast<PropertyKind>(255)}, 10, PropertySource::Rest));
+    auto wrongEntity = address;
+    wrongEntity.entity = static_cast<PropertyEntityKind>(255);
+    REQUIRE_THROWS(propertyValue(document, wrongEntity, 10, PropertySource::Rest));
+    REQUIRE_THROWS(propertyKind("not-a-property"));
+    for (const auto channel : {"x", "y", "rotation", "scaleX", "scaleY", "opacity", "pivotX", "pivotY"})
+        REQUIRE(propertyChannel(propertyKind(channel)) == channel);
+}
+
+TEST_CASE("Typed multi-property key edits anchor rest and reject invalid batches atomically") {
+    Session session;
+    const Id id = session.document().layers.front().id;
+    const auto before = session.document();
+    const std::array<PropertyEdit, 2> values{{{{id, PropertyKind::PositionX}, 80},
+                                               {{id, PropertyKind::PositionY}, 40}}};
+    REQUIRE(session.apply("Move pose", [&](auto& document) {
+        editProperties(document, values, 12, AnimationEditMode::Animate, true);
+    }));
+    const auto authored = session.document();
+    REQUIRE(authored.layer(id).keys.size() == 2);
+    REQUIRE(authored.layer(id).keys.front().frame == 0);
+    REQUIRE(propertyValue(authored, {id, PropertyKind::PositionX}, 12,
+                          PropertySource::AuthoredKey) == 80);
+    REQUIRE(propertyValue(authored, {id, PropertyKind::PositionY}, 6,
+                          PropertySource::Evaluated) == 20);
+    const std::array<PropertyEdit, 2> invalid{{{{id, PropertyKind::PositionX}, 120},
+                                                {{id, PropertyKind::Opacity}, 2}}};
+    REQUIRE_THROWS(session.apply("Invalid pose", [&](auto& document) {
+        editProperties(document, invalid, 12, AnimationEditMode::Animate, true);
+    }));
+    REQUIRE(session.document() == authored);
+    const std::array<PropertyEdit, 2> duplicate{{values[0], values[0]}};
+    REQUIRE_THROWS(session.apply("Duplicate target", [&](auto& document) {
+        editProperties(document, duplicate, 12, AnimationEditMode::Animate, true);
+    }));
+    REQUIRE(session.document() == authored);
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == before);
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == authored);
 }

@@ -893,6 +893,27 @@ ApplicationWindow {
                                     text: "Curves"
                                     onClicked: root.showCurves = true
                                 }
+                                C.ToolButton {
+                                    text: "Pose ▾"
+                                    hint: "Copy, paste or reset the selected layer transform"
+                                    onClicked: layerPoseMenu.open()
+                                    Menu {
+                                        id: layerPoseMenu
+                                        MenuItem { text: "Copy pose"; onTriggered: editor.copyTransformPose() }
+                                        MenuSeparator {}
+                                        MenuItem { text: "Paste full pose"; enabled: editor.hasCopiedTransform; onTriggered: editor.pasteTransformPose(0) }
+                                        MenuItem { text: "Paste position"; enabled: editor.hasCopiedTransform; onTriggered: editor.pasteTransformPose(1) }
+                                        MenuItem { text: "Paste rotation"; enabled: editor.hasCopiedTransform; onTriggered: editor.pasteTransformPose(2) }
+                                        MenuItem { text: "Paste scale"; enabled: editor.hasCopiedTransform; onTriggered: editor.pasteTransformPose(3) }
+                                        MenuItem { text: "Paste opacity"; enabled: editor.hasCopiedTransform; onTriggered: editor.pasteTransformPose(4) }
+                                        MenuItem { text: "Paste pivot"; enabled: editor.hasCopiedTransform; onTriggered: editor.pasteTransformPose(5) }
+                                        MenuSeparator {}
+                                        MenuItem { text: "Paste mirrored horizontally"; enabled: editor.hasCopiedTransform; onTriggered: editor.pasteTransformPose(6) }
+                                        MenuItem { text: "Paste mirrored vertically"; enabled: editor.hasCopiedTransform; onTriggered: editor.pasteTransformPose(7) }
+                                        MenuSeparator {}
+                                        MenuItem { text: editor.animateMode ? "Reset to setup pose" : "Reset setup transform"; onTriggered: editor.resetTransformPose() }
+                                    }
+                                }
                             }
                             GridLayout {
                                 Layout.leftMargin: 16

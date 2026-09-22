@@ -1,5 +1,6 @@
 #include "editor_controller.h"
 #include "opentoon/animation.h"
+#include "opentoon/property_address.h"
 #include <set>
 using namespace opentoon;
 namespace {
@@ -72,7 +73,8 @@ QVariantList EditorController::curveSamples(QString channel, int samples) const 
         for (auto frame : frames)
             result.push_back(QVariantMap{
                 {"frame", frame},
-                {"value", transformValue(evaluateTransform(layer, frame), channel.toStdString())}});
+                {"value", propertyValue(document(), {layer.id, propertyKind(channel.toStdString())},
+                                         frame, PropertySource::Evaluated)}});
     } catch (const std::exception&) {
         return {};
     }
@@ -101,8 +103,8 @@ bool EditorController::updateKey(int source, int destination, QString channel, d
     if (!layer_)
         return false;
     bool result = edit("Edit animation key", [&](Document& d) {
-        editKey(d.layer(layer_), source, destination, channel.toStdString(), value,
-                static_cast<Interpolation>(interpolation));
+        editPropertyKey(d, {layer_, propertyKind(channel.toStdString())}, source, destination,
+                        value, static_cast<Interpolation>(interpolation));
         d.duration = std::max(d.duration, destination + 1);
     });
     if (result)
@@ -130,17 +132,14 @@ bool EditorController::setCurveHandles(int frame, QString channel, double x1, do
     if (!layer_)
         return false;
     return edit("Edit Bezier handles", [&](Document& d) {
-        setKeyEase(d.layer(layer_), frame, channel.toStdString(), {x1, y1, x2, y2});
+        setPropertyEase(d, {layer_, propertyKind(channel.toStdString())}, frame, {x1, y1, x2, y2});
     });
 }
 bool EditorController::addCurveKey(int frame, QString channel, double value) {
     if (!layer_ || frame < 0 || frame >= duration())
         return false;
     bool result = edit("Add visual curve key", [&](Document& d) {
-        auto& layer = d.layer(layer_);
-        auto pose = evaluateTransform(layer, frame);
-        setTransformValue(pose, channel.toStdString(), value);
-        recordPose(layer, frame, pose);
+        recordPropertyKey(d, {layer_, propertyKind(channel.toStdString())}, frame, value);
     });
     if (result)
         setFrame(frame);

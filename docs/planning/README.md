@@ -62,9 +62,11 @@ detail over the same model. No scripting prerequisite or irreversible simplified
   3D, games, studio, optional AI/legacy and coverage maintenance.
 
 HM-00's reproducible reference assets and foundation contract were accepted with
-[owner artistic review](../implementation/HM00-REVIEW.md). HM-01 and HM-02 can now
-enter their separate delivery contracts. The second-animator working-shot review
-remains an HM-15 gate.
+[owner artistic review](../implementation/HM00-REVIEW.md). The bounded
+[HM-02 artwork-intake contract](../implementation/HM02-ARTWORK-INTAKE.md) is also
+accepted. HM-01 typed property work is in progress; its remaining persistent
+character/peg contracts gate HM-03. The second-animator working-shot review remains
+an HM-15 gate.
 
 ## Queries and validation
 

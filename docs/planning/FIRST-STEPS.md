@@ -1,7 +1,8 @@
 # Next implementation tasks — character-first
 
 HM-00 reference assets, foundation contracts and owner artistic review are
-accepted. HM-01/HM-02 are eligible; HM-02 artwork intake is underway. Use
+accepted. The bounded HM-02 artwork-intake contract is complete; HM-01 typed
+property work is underway. Use
 [the canonical contract DAG](HARMONY-MOMENT.md), not a
 phase number, to determine readiness. Two active slices maximum if owners exist;
 with one implementer use the recommended order below. Every delivered block must

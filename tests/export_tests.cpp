@@ -2,6 +2,7 @@
 #include "project_store.h"
 #include "scene_renderer.h"
 #include <QCoreApplication>
+#include <QColorSpace>
 #include <QDir>
 #include <QElapsedTimer>
 #include <QFile>
@@ -421,4 +422,124 @@ TEST_CASE("Motion-path position commands preserve easing and pixels through undo
     REQUIRE(editor.document() == locked);
     REQUIRE_FALSE(editor.setPoseKeyPosition(999, 0, 0));
     REQUIRE(editor.document() == locked);
+}
+
+TEST_CASE("Layer pose menu copies full and masked transforms without changing other channels") {
+    EditorController editor;
+    editor.newScene();
+    REQUIRE_FALSE(editor.pasteTransformPose(0));
+    editor.setTransform("x", 80);
+    editor.setTransform("y", 40);
+    editor.setTransform("rotation", 15);
+    editor.setTransform("scaleX", 1.5);
+    editor.setTransform("scaleY", .8);
+    editor.setTransform("opacity", .7);
+    editor.setTransform("pivotX", 5);
+    editor.setTransform("pivotY", 7);
+    const auto copied = editor.document().layer(editor.selectedLayer()).transform;
+    editor.copyTransformPose();
+    REQUIRE(editor.hasCopiedTransform());
+    editor.addLayer();
+    const auto target = editor.selectedLayer();
+    const auto baseline = editor.document();
+    for (int mode = 0; mode <= 7; ++mode) {
+        REQUIRE(editor.pasteTransformPose(mode));
+        const auto& pose = editor.document().layer(target).transform;
+        REQUIRE(pose.x == (mode == 0 || mode == 1 || mode >= 6 ? copied.x : 0));
+        REQUIRE(pose.y == (mode == 0 || mode == 1 || mode >= 6 ? copied.y : 0));
+        REQUIRE(pose.rotation == (mode == 0 || mode == 2 || mode >= 6 ? copied.rotation : 0));
+        REQUIRE(pose.scaleX == (mode == 6 ? -copied.scaleX :
+                                mode == 0 || mode == 3 || mode == 7 ? copied.scaleX : 1));
+        REQUIRE(pose.scaleY == (mode == 7 ? -copied.scaleY :
+                                mode == 0 || mode == 3 || mode == 6 ? copied.scaleY : 1));
+        REQUIRE(pose.opacity == (mode == 0 || mode == 4 || mode >= 6 ? copied.opacity : 1));
+        REQUIRE(pose.pivotX == (mode == 0 || mode == 5 || mode >= 6 ? copied.pivotX : 0));
+        REQUIRE(pose.pivotY == (mode == 0 || mode == 5 || mode >= 6 ? copied.pivotY : 0));
+        editor.undo();
+        REQUIRE(editor.document() == baseline);
+    }
+    REQUIRE_FALSE(editor.pasteTransformPose(8));
+    REQUIRE(editor.document() == baseline);
+    REQUIRE(editor.pasteTransformPose(0));
+    REQUIRE(editor.resetTransformPose());
+    REQUIRE(editor.document() == baseline);
+    editor.toggleLayer(target, "locked");
+    const auto locked = editor.document();
+    REQUIRE_FALSE(editor.pasteTransformPose(0));
+    REQUIRE_FALSE(editor.resetTransformPose());
+    REQUIRE(editor.document() == locked);
+}
+
+TEST_CASE("Explicit pose paste creates a later key, preserves rest and reopens identically") {
+    EditorController editor;
+    editor.newScene();
+    editor.setTransform("x", 100);
+    editor.setTransform("scaleX", -1);
+    editor.copyTransformPose();
+    editor.addLayer();
+    const auto target = editor.selectedLayer();
+    editor.setFrame(12);
+    editor.setAnimateMode(true);
+    editor.setAutoKey(false);
+    const auto before = editor.document();
+    REQUIRE(editor.pasteTransformPose(0));
+    const auto pasted = editor.document();
+    REQUIRE(pasted.layer(target).transform.x == 0);
+    REQUIRE(pasted.layer(target).keys.size() == 2);
+    REQUIRE(pasted.layer(target).keys[0].frame == 0);
+    REQUIRE(pasted.layer(target).keys[0].value.x == 0);
+    REQUIRE(pasted.layer(target).keys[1].frame == 12);
+    REQUIRE(pasted.layer(target).keys[1].value.x == 100);
+    REQUIRE(pasted.layer(target).keys[1].value.scaleX == -1);
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    auto project = QUrl::fromLocalFile(directory.filePath("copied-pose.otoon"));
+    REQUIRE(editor.saveProject(project));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(project));
+    REQUIRE(reopened.document() == pasted);
+    editor.undo();
+    REQUIRE(editor.document() == before);
+    REQUIRE(editor.resetTransformPose());
+    REQUIRE(editor.document() != before);
+    REQUIRE(editor.document().layer(target).keys.back().value == before.layer(target).transform);
+}
+
+TEST_CASE("Single image import creates its layer atomically and converts tagged color to sRGB") {
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    QImage source(2, 2, QImage::Format_RGBA8888);
+    source.fill(QColor(220, 45, 120, 180));
+    source.setColorSpace(QColorSpace(QColorSpace::DisplayP3));
+    const auto imagePath = directory.filePath("wide-gamut.png");
+    REQUIRE(source.save(imagePath));
+    auto expected = QImage(imagePath).convertedToColorSpace(QColorSpace(QColorSpace::SRgb))
+                                    .convertToFormat(QImage::Format_RGBA8888);
+    REQUIRE_FALSE(expected.isNull());
+    EditorController editor;
+    editor.newScene();
+    editor.removeLayer();
+    const auto empty = editor.document();
+    REQUIRE(empty.layers.empty());
+    editor.importImage(QUrl::fromLocalFile(directory.filePath("missing.png")));
+    REQUIRE(editor.document() == empty);
+    editor.importImage(QUrl::fromLocalFile(imagePath));
+    const auto imported = editor.document();
+    REQUIRE(imported.layers.size() == 1);
+    REQUIRE(imported.drawings.size() == 1);
+    REQUIRE(imported.palette == empty.palette);
+    const auto& asset = *imported.drawings.begin()->second.image;
+    REQUIRE(asset.width == 2);
+    REQUIRE(asset.height == 2);
+    for (int row = 0; row < 2; ++row)
+        REQUIRE(std::memcmp(asset.rgba.data() + row * 8, expected.constScanLine(row), 8) == 0);
+    const auto project = QUrl::fromLocalFile(directory.filePath("imported.otoon"));
+    REQUIRE(editor.saveProject(project));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(project));
+    REQUIRE(reopened.document() == imported);
+    editor.undo();
+    REQUIRE(editor.document() == empty);
+    editor.redo();
+    REQUIRE(editor.document() == imported);
 }

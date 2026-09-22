@@ -1,6 +1,6 @@
 # Documentation map
 
-**Updated: 2026-09-22.** The repository contains specifications, an execution roadmap and an experimental native editor. [Implementation status](implementation/STATUS.md) records the available subsets and open P00–P11 gates. HM-00 reference assets and foundation contracts have owner artistic approval; registered artwork intake is underway.
+**Updated: 2026-09-22.** The repository contains specifications, an execution roadmap and an experimental native editor. [Implementation status](implementation/STATUS.md) records the available subsets and open P00–P11 gates. HM-00 reference and HM-02 artwork intake are accepted bounded contracts; HM-01 typed property work is in progress.
 
 ## Current decisions
 

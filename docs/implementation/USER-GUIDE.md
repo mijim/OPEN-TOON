@@ -59,7 +59,10 @@ Use **Edit → Scene marker** to label the current frame; an empty name removes 
 
 PNG export evaluates an immutable snapshot, so later edits do not change the running export. Cancel stops between frames. `manifest.json` records the rational frame rate, frame count and completion/cancellation/failure state. A cancelled or failed directory contains partial output and must not be treated as a complete sequence.
 
-**Scene → Import image** loads one image up to 4096 × 4096. For character artwork,
+**Scene → Import image** loads one image up to 4096 × 4096. Tagged images are
+converted to sRGB; untagged colors are interpreted as sRGB. If the scene has no
+layers, creating the layer and importing its drawing are one undoable action.
+For character artwork,
 **Import registered PNG parts** creates one layer per selected file; every PNG must
 have an alpha channel and the same canvas size. Their shared canvas origin is
 preserved, with no automatic crop or orientation transform. Parts are ordered by
@@ -84,6 +87,19 @@ keys retain their poses; the canvas continues to display the evaluated animation
 Choose **Animate** to edit the current key. Enable **Auto key** to create a full-pose
 key when editing an unkeyed frame, or press **Add key** explicitly. With Auto key off,
 unkeyed edits are rejected. The inspector labels keyed, interpolated and held poses.
+
+The selected layer's **Pose** menu has ten actions: copy its current transform;
+paste all transform channels, only position, rotation, scale, opacity or pivot;
+paste a horizontally or vertically mirrored transform; and reset. Copy takes the
+rest transform in Setup or the evaluated transform at the playhead in Animate.
+Pasting in Setup edits the target layer's rest transform and leaves its existing
+keys alone. Pasting in Animate explicitly creates or updates one full-pose key,
+even with Auto key off; a first later-frame paste anchors the unchanged rest pose
+at frame zero. Mirrored paste negates the corresponding scale around the target
+pivot. Reset means identity transform in Setup, or the target layer's rest pose in
+Animate. Each paste/reset is one undo step. The copied transform stays available
+when changing scenes in the same window; it contains values, not artwork or rig
+references. Locked layers reject paste/reset.
 
 **‹ Key / Key ›** navigate the selected layer. **Curves** selects the integrated function editor in the bottom workspace.
 Choose a channel, click the graph to scrub, or drag a key to adjust its frame and

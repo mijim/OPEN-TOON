@@ -16,7 +16,7 @@
     {
       "id": "P01",
       "status": "in_progress",
-      "available": "Native English QML shell, CMake modules, commands, immutable snapshots, undo/redo and validation. Integrated resizable timing/curve workspace and selection-owned object/layer Properties. Shared compact controls, optional curve numeric fields and a draggable workspace divider with dynamic bounds.",
+      "available": "Native English QML shell, CMake modules, commands, immutable snapshots, undo/redo and validation. Integrated resizable timing/curve workspace and selection-owned object/layer Properties. Shared compact controls, optional curve numeric fields and a draggable workspace divider with dynamic bounds. Typed layer-transform property addresses now distinguish rest, authored keys and evaluated values with atomic edits.",
       "remaining": "Docking/workspace persistence, configurable shortcuts, full accessibility, scalable resource/cache protocols and cross-platform qualification."
     },
     {
@@ -46,7 +46,7 @@
     {
       "id": "P06",
       "status": "in_progress",
-      "available": "Layer transform keys with linear/held/smooth interpolation, inherited transforms/opacity, explicit Setup/Animate and Auto key, key navigation/state, editable pose-channel graph and key-only multi-layer retiming with collision rejection. Curves stay in the main workspace; timeline/Xsheet range-end dragging stretches timing. Animate (A) records layer poses directly with move/scale/rotation handles and an initial anchor. Per-channel normalized Bezier handles, overshoot presets, graph key creation and a evaluated canvas trajectory share evaluation with export. All motion defaults to normalized combined channels with in-place channel selection, square-key editing, linked/unlinked easing handles, a full-pose retiming lane and time zoom/panning. Shared sparse pose-key selection, direct group drag/Alt-duplicate, right-edge timing stretch, keyboard nudges/delete and local-unit motion copy/paste with collision protection and atomic undo. Animate Path mode edits individual pose positions directly on the canvas, with fixed drawing references, animated-parent mapping, screen-axis constraints, sampled pose insertion and atomic preview/undo. Batch full-pose interpolation/easing and append-key-block repetition preserve poses, reject collisions atomically and extend duration with one undo.",
+      "available": "Layer transform keys with linear/held/smooth interpolation, inherited transforms/opacity, explicit Setup/Animate and Auto key, key navigation/state, editable pose-channel graph and key-only multi-layer retiming with collision rejection. Curves stay in the main workspace; timeline/Xsheet range-end dragging stretches timing. Animate (A) records layer poses directly with move/scale/rotation handles and an initial anchor. Per-channel normalized Bezier handles, overshoot presets, graph key creation and a evaluated canvas trajectory share evaluation with export. All motion defaults to normalized combined channels with in-place channel selection, square-key editing, linked/unlinked easing handles, a full-pose retiming lane and time zoom/panning. Shared sparse pose-key selection, direct group drag/Alt-duplicate, right-edge timing stretch, keyboard nudges/delete and local-unit motion copy/paste with collision protection and atomic undo. Animate Path mode edits individual pose positions directly on the canvas, with fixed drawing references, animated-parent mapping, screen-axis constraints, sampled pose insertion and atomic preview/undo. Batch full-pose interpolation/easing and append-key-block repetition preserve poses, reject collisions atomically and extend duration with one undo. A compact Pose menu copies layer transforms, pastes full or position/rotation/scale/opacity/pivot channels, mirrors horizontal/vertical scale and resets setup/keyed poses.",
       "remaining": "Independent channel keys, linked/free analytic tangents, separate spatial paths and velocity, multi-layer/channel-mask batched editing and world-space motion retargeting, cameras and multiplane evaluation."
     },
     {
@@ -84,7 +84,7 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 65,
+      "count": 67,
       "command": "ctest --test-dir build/locked --output-on-failure"
     },
     "native_input_workflow": {
@@ -216,7 +216,7 @@
     },
     "export_workflows": {
       "status": "passed",
-      "cases": 12,
+      "cases": 15,
       "ctest_entry": "export_workflows",
       "covers": [
         "immutable snapshot during concurrent edit",
@@ -233,10 +233,13 @@
         "motion-path X/Y commands retain non-position pose fields and easing, with locked-edit rejection and saved pixel equivalence",
         "registered sRGB PNG parts retain pixel bytes, common canvas alignment, palette IDs and one-step undo/redo through save/reopen",
         "corrupt and mismatched PNG batches reject atomically without changing selection",
-        "numbered PNG sequence sorts frames, leaves gaps empty, extends duration and round-trips through save/reopen"
+        "numbered PNG sequence sorts frames, leaves gaps empty, extends duration and round-trips through save/reopen",
+        "ten compact layer pose actions copy, paste masked/full/mirrored values and reset with one undo while locked targets reject",
+        "explicit later-frame pose paste anchors rest and survives project save/reopen",
+        "single-image import converts tagged Display P3 to sRGB and creates an absent layer atomically"
       ]
     },
-    "total_local_ctest_entries": 65,
+    "total_local_ctest_entries": 68,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -303,7 +306,7 @@
   "planning_priority": {
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
-    "state": "HM-00_complete__HM-02_in_progress",
-    "note": "Owner artistic review accepted the reference fixture and rubric. HM-00 contracts are complete; HM-01 and HM-02 are eligible. Registered PNG intake is implemented as a bounded subset under HM-02 qualification. No catalog capability or full phase is claimed complete."
+    "state": "HM-00_and_HM-02_complete__HM-01_in_progress",
+    "note": "HM-00 owner artistic review and HM-02 bounded artwork-intake contract are accepted. HM-01 now has a typed transform-property adapter, but part/peg identities and any new persisted semantics still require versioned schema and failure evidence. No full phase or catalog capability is claimed complete."
   }
 }
