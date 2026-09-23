@@ -1,5 +1,7 @@
 # Historical foundation backlog
 
+**Historical — not the active execution queue.** For current work, start at [NOW](NOW.md).
+
 Preserved from the original foundation-first plan. These IDs and unclosed acceptance remain useful, but this sequence is superseded by [the character-first next tasks](FIRST-STEPS.md). Existing implementation evidence must be checked before redoing any task. Each issue is to be split further only if its acceptance cannot be demonstrated within an iteration. Stable issue IDs are local planning identifiers, not GitHub issues already created.
 
 ## P00 — feasibility issues
