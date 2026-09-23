@@ -76,8 +76,8 @@ Highest Harmony Moment risks: stable property/variant identity, rest binding plu
 
 Owner direction, 2026-09-20: develop coherent functionality blocks on macOS, then
 run relevant tests at the end and fix failures iteratively. Do not rebuild after
-every small edit. Current releases publish source code. The native cross-platform
-workflow is manual (`workflow_dispatch`); Linux and Windows qualification and binary
-packaging return for future compiled releases. Historical cross-platform results do
-not qualify newly changed source. This cadence does not waive correctness or phase
-acceptance; record which platform and source were actually checked.
+every small edit. The native cross-platform workflow is manual (`workflow_dispatch`).
+Experimental.11 adds macOS arm64 and Ubuntu 24.04 x86_64 packages by explicit owner
+request; Windows packaging and broader qualification remain future work. Historical
+cross-platform results do not qualify newly changed source. This cadence does not
+waive correctness or phase acceptance; record which platform and source were checked.

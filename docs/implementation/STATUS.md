@@ -185,9 +185,12 @@ See [ADR-021](../architecture/adr/021-vector-authoring-and-key-patterns.md) for 
 The final 65-entry suite and native authoring journey pass on macOS. This expands P04/P06
 subsets without completing either phase. [Screenshot](authoring.png).
 
-## Publication update
+## Publication update — experimental.11
 
-The owner cancelled macOS binary publication after the local package passed validation.
-Source tag `v0.2.0-experimental.10` and code are public; the ZIP, source archive and
-checksums remain local. The package verification evidence above remains valid, but
-no downloadable binary release is claimed.
+By explicit owner request, experimental.11 publishes a macOS 15+ arm64 ZIP and an
+Ubuntu 24.04-built Linux x86_64 AppImage. The macOS package passed the existing
+65-entry suite, native journeys and post-extraction smoke verification. The Linux
+workflow runs the suite headlessly before it can create the release. This packaging
+revision does not complete any product phase or broaden the supported feature set.
+macOS Intel, physical tablets, broader Linux distributions, Windows packaging,
+notarization and clean-machine qualification remain open.

@@ -345,8 +345,8 @@
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
-    "release_artifacts": "Source only; requested macOS preview was built and verified locally, then binary publication cancelled by owner",
-    "cross_platform_builds": "manual future compiled-release qualification"
+    "release_artifacts": "Experimental macOS 15+ arm64 ZIP and Ubuntu 24.04-built Linux x86_64 AppImage",
+    "cross_platform_builds": "Manual release workflow; broader Linux, Windows and device qualification remain open"
   },
   "planning_priority": {
     "milestone": "HM",

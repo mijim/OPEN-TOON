@@ -1,15 +1,28 @@
 # OPEN TOON
 
+<p align="center">
+  <img src="assets/branding/open-toon-logo.svg" alt="OPEN-TOON logo" width="220">
+</p>
+
 An open-source desktop application for 2D drawing and animation, built around direct
 canvas editing, an integrated timeline and visual motion curves.
+
+Project website: [opentoon.org](http://opentoon.org/)
 
 ![OPEN-TOON drawing workspace](docs/implementation/authoring.png)
 
 ## Get started
 
-Follow the [build instructions](docs/implementation/BUILD.md) to run the application
-from source. Public prebuilt downloads are not available yet. macOS is the primary
-development platform; Windows and Linux qualification remains in progress.
+Download the current experimental build:
+
+- [macOS 15+ — Apple Silicon (arm64) ZIP](https://github.com/mijim/OPEN-TOON/releases/download/v0.2.0-experimental.11/OPEN-TOON-0.2.0-experimental.11-macOS-arm64.zip)
+- [Linux — x86_64 AppImage](https://github.com/mijim/OPEN-TOON/releases/download/v0.2.0-experimental.11/OPEN-TOON-0.2.0-experimental.11-Linux-x86_64.AppImage)
+
+These packages are unsigned experimental previews, not supported 1.0 releases. The
+macOS build is ad-hoc signed but not notarized; use **Privacy & Security → Open Anyway**
+if Gatekeeper blocks it. On Linux, make the AppImage executable before opening it.
+The [build instructions](docs/implementation/BUILD.md) cover running from source and
+the [implementation status](docs/implementation/STATUS.md) lists current limitations.
 
 The [user guide](docs/implementation/USER-GUIDE.md) covers drawing, animation and
 project workflows. Developers preparing a macOS package can use the
