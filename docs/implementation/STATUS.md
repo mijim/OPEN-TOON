@@ -6,6 +6,8 @@ The editor runs locally on macOS and supports mouse drawing, sampled-pressure in
 
 The bounded [HM-04 composition kernel](HM04-ACCEPTANCE.md) and
 [HM-13 output camera](HM13-ACCEPTANCE.md) have accepted contract evidence.
+The [status audit](STATUS-AUDIT.md) reconciles catalog, slice, phase, quality and
+dependency classifications without claiming full feature completion.
 
 The current source milestone is `v0.2.0-experimental.15`. It is a source-only
 milestone; the last locally qualified macOS preview and any earlier binaries
@@ -53,6 +55,9 @@ The domain and application layers contain no Qt. Commands validate candidates be
 Follow the [contract-level execution plan](../planning/FIRST-STEPS.md): extract only the foundations required by character/substitution, deformation, control, audio and composition consumers, then qualify the complete shot. Do not wait for unrelated early-phase tools or skip an actual required contract. Full phase exit criteria remain open. HM-00 is accepted with [owner artistic review](HM00-REVIEW.md), [reproducible character input](../../tests/fixtures/harmony-moment/README.md) and the [foundation engineering contract](../architecture/adr/023-harmony-foundation-contracts.md). HM-01 property identity and [HM-02 artwork intake](HM02-ARTWORK-INTAKE.md) are accepted bounded contracts. HM-03 character editing has a working subset; [HM-04 typed composition](HM04-ACCEPTANCE.md) and [HM-13 output camera](HM13-ACCEPTANCE.md) have accepted bounded contracts; audio, deformers and complete node compositing remain open. The complete animated shot and independent animator journey are HM-15 outcomes.
 
 Machine-readable source: [status.json](status.json). The catalog and roadmap retain their stable IDs and complete acceptance requirements.
+
+The release sections below describe their respective historical source milestones.
+For the current state, use the phase table and verification above.
 
 ## Animation editing source release
 

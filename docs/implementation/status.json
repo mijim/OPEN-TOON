@@ -40,14 +40,14 @@
     {
       "id": "P05",
       "status": "in_progress",
-      "available": "Sparse immutable 15-bit premultiplied tiles, libmypaint ink/soft/dry/smudge/eraser presets, pressure input, cancellable gestures, shared preview/export and compressed project resources. Brush opacity and rectangular pixel selection with integer move/duplicate/delete, flips and lossless quarter turns, alpha-safe overlap and guarded canvas bounds. Free scale/rotation preview and commit using nearest-neighbor sampling with transparent surroundings. One orthographic output camera has direct pan/rotate/zoom handles, frame keys, guides and save/reopen/export parity.",
+      "available": "Sparse immutable 15-bit premultiplied tiles, libmypaint ink/soft/dry/smudge/eraser presets, pressure input, cancellable gestures, shared preview/export and compressed project resources. Brush opacity and rectangular pixel selection with integer move/duplicate/delete, flips and lossless quarter turns, alpha-safe overlap and guarded canvas bounds. Free scale/rotation preview and commit using nearest-neighbor sampling with transparent surroundings.",
       "remaining": "Brush texture/import/preset management, lasso/soft masks, high-quality resampling and transform performance qualification, resolution changes, production workload and physical-device qualification."
     },
     {
       "id": "P06",
       "status": "in_progress",
-      "available": "Layer transform keys with linear/held/smooth interpolation, inherited transforms/opacity, explicit Setup/Animate and Auto key, key navigation/state, editable pose-channel graph and key-only multi-layer retiming with collision rejection. Curves stay in the main workspace; timeline/Xsheet range-end dragging stretches timing. Animate (A) records layer poses directly with move/scale/rotation handles and an initial anchor. Per-channel normalized Bezier handles, overshoot presets, graph key creation and a evaluated canvas trajectory share evaluation with export. All motion defaults to normalized combined channels with in-place channel selection, square-key editing, linked/unlinked easing handles, a full-pose retiming lane and time zoom/panning. Shared sparse pose-key selection, direct group drag/Alt-duplicate, right-edge timing stretch, keyboard nudges/delete and local-unit motion copy/paste with collision protection and atomic undo. Animate Path mode edits individual pose positions directly on the canvas, with fixed drawing references, animated-parent mapping, screen-axis constraints, sampled pose insertion and atomic preview/undo. Batch full-pose interpolation/easing and append-key-block repetition preserve poses, reject collisions atomically and extend duration with one undo. A compact Pose menu copies layer transforms, pastes full or position/rotation/scale/opacity/pivot channels, mirrors horizontal/vertical scale and resets setup/keyed poses.",
-      "remaining": "Independent channel keys, linked/free analytic tangents, separate spatial paths and velocity, multi-layer/channel-mask batched editing and world-space motion retargeting, cameras and multiplane evaluation."
+      "available": "Layer transform keys with linear/held/smooth interpolation, inherited transforms/opacity, explicit Setup/Animate and Auto key, key navigation/state, editable pose-channel graph and key-only multi-layer retiming with collision rejection. Curves stay in the main workspace; timeline/Xsheet range-end dragging stretches timing. Animate (A) records layer poses directly with move/scale/rotation handles and an initial anchor. Per-channel normalized Bezier handles, overshoot presets, graph key creation and a evaluated canvas trajectory share evaluation with export. All motion defaults to normalized combined channels with in-place channel selection, square-key editing, linked/unlinked easing handles, a full-pose retiming lane and time zoom/panning. Shared sparse pose-key selection, direct group drag/Alt-duplicate, right-edge timing stretch, keyboard nudges/delete and local-unit motion copy/paste with collision protection and atomic undo. Animate Path mode edits individual pose positions directly on the canvas, with fixed drawing references, animated-parent mapping, screen-axis constraints, sampled pose insertion and atomic preview/undo. Batch full-pose interpolation/easing and append-key-block repetition preserve poses, reject collisions atomically and extend duration with one undo. A compact Pose menu copies layer transforms, pastes full or position/rotation/scale/opacity/pivot channels, mirrors horizontal/vertical scale and resets setup/keyed poses. One orthographic output camera has direct pan/rotate/zoom handles, frame keys, guides and preview/reopen/PNG parity.",
+      "remaining": "Independent channel keys, linked/free analytic tangents, separate spatial paths and velocity, multi-layer/channel-mask batched editing and world-space motion retargeting, multiplane staging and camera switching."
     },
     {
       "id": "P07",
@@ -58,8 +58,8 @@
     {
       "id": "P08",
       "status": "in_progress",
-      "available": "Parented layers, pivots, drawing clones, typed character roots/pegs/parts, role editing, preserve-world rigid reparenting and rest pivots, named held substitutions with in-panel selection and atomic undo/save/reopen.",
-      "remaining": "Thumbnail substitution browsing, coordinated view sets, instance-safe character duplication, production cut-out tools, masked poses, Quick Rig, declarative controls, asset/template library and animator validation."
+      "available": "Parented layers and typed character roots, pegs and Parts; role editing, preserve-world rigid reparenting, stable rest pivots, named held substitutions, renderer-backed thumbnails and coordinated view sets. Batch Part assembly, independent or explicitly linked-artwork Part/Peg branch copies, safe branch deletion, Part detachment, Peg dissolution and view-range edits preserve view membership through save/reopen.",
+      "remaining": "Artist-led rigid-character acceptance, animated-ancestor reparenting, masked poses, Quick Rig, declarative controls, portable assets/templates and production-scale qualification."
     },
     {
       "id": "P09",
@@ -70,13 +70,13 @@
     {
       "id": "P10",
       "status": "in_progress",
-      "available": "Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. A bounded revision cache reuses canvas frames and speculatively renders the next frame from an immutable snapshot; ink regions, pixel fast paths and lookup tables improve linear throughput. Original 19-part artwork has alpha/output and throughput evidence. Legacy scenes keep their direct-painter appearance.",
-      "remaining": "Timed native playback/scrub qualification, denser animated production workload and broader color charts, node UI, effects, full ROI scheduling and later deformer/camera integration."
+      "available": "Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. A bounded revision cache reuses canvas frames and speculatively prepares the next frame from an immutable snapshot. Native playback/scrub, alpha/color charts and animated original artwork close bounded HM-04; orthographic camera output joins HM-13. Legacy scenes keep their direct-painter appearance.",
+      "remaining": "Editable node UI, useful effects, full ROI scheduling, production-scale performance and later deformer integration."
     },
     {
       "id": "P11",
       "status": "planned",
-      "available": "Saved revisions, recovery UX, English guide, regression tests and source CI are initial prerequisites. Format 1/2 migration backups, format 3 curve metadata and checked compressed media resources, explicit backed-up compaction and asynchronous recovery snapshots. Requested arm64 macOS preview now includes audited runtime dependencies, notices, matching source archives/recipes and verified ad-hoc signatures. Format-4 character migration with backups named for the source schema has local failure and reopen evidence.",
+      "available": "Saved revisions, recovery UX, English guide, regression tests and source CI are initial prerequisites. Format 1/2 migration backups, format 3 curve metadata and checked compressed media resources, explicit backed-up compaction and asynchronous recovery snapshots. Requested arm64 macOS preview now includes audited runtime dependencies, notices, matching source archives/recipes and verified ad-hoc signatures. Format-7 output-camera migration and source-version backups have local failure and reopen evidence. The experimental.10 macOS package evidence is historical; current distribution is source only.",
       "remaining": "All required journeys, remaining hardening, supported device/OS matrix, accessibility, reproducible release SBOM automation, clean-machine validation and Developer ID signed/notarized releases."
     }
   ],
@@ -113,7 +113,6 @@
         "on-canvas scale/rotation handles and transactional live preview",
         "selection-preserving Properties edits",
         "timeline end-handle retiming and undo",
-        "integrated curve panel layout",
         "selected vector inspector and visible Retina transform handles",
         "six-screen-pixel thin-line picking and hover feedback",
         "point-handle margin, live preview atomicity and undo",
@@ -155,7 +154,10 @@
         "group styles, alignment/distribution and cleanup undo",
         "batch key interpolation/repetition, duration and collision rejection",
         "authoring semantic and rendered-pixel persistence",
-        "linear canvas preview through revision cache and composition-profile undo"
+        "linear canvas preview through revision cache and composition-profile undo",
+        "background next-frame publication, timed playback and rapid scrubbing on the native canvas",
+        "direct camera pan/rotate/zoom, locked-camera rejection, undo/redo and save/reopen",
+        "camera guides and viewport navigation leave output pixels unchanged"
       ],
       "limits": "Synthetic mouse/tablet events on macOS; no physical tablet available. Window-layout flush required for occluded native smoke instances."
     },
@@ -189,7 +191,7 @@
         "windows-2022": "32 CTest entries passed with Qt 6.8.3; POSIX process termination test excluded",
         "sanitizers": "27 Qt-free core and MyPaint cases passed with AddressSanitizer and UndefinedBehaviorSanitizer"
       },
-      "limits": "Build/test evidence only; Windows crash-termination test is not implemented, GUI interaction outside macOS, physical tablets and clean-machine installation remain unqualified. Historical evidence; experimental.10 is macOS-validated only ; new Windows/Linux binaries are deferred."
+      "limits": "Build/test evidence only for the recorded source commit. Windows crash-termination and GUI interaction outside macOS, physical tablets and clean-machine installation remain unqualified. Experimental.15 has no new Linux/Windows build qualification."
     },
     "standalone_package": {
       "status": "passed",
@@ -300,7 +302,7 @@
       "limits": "Artist-led 19-part workflow review, animated-ancestor reparenting, masked poses and reusable portable rig assets remain open."
     },
     "composition_kernel": {
-      "status": "passed_partial",
+      "status": "accepted_bounded_contract",
       "platform": "macOS arm64",
       "evidence": [
         "tests/composition_graph_tests.cpp",
@@ -309,10 +311,23 @@
         "tests/export_tests.cpp",
         "apps/desktop/compositor_benchmark.cpp",
         "docs/implementation/HM04-GRAPH-KERNEL.md",
-        "docs/implementation/COMPOSITOR-BENCHMARK.md"
+        "docs/implementation/COMPOSITOR-BENCHMARK.md",
+        "docs/implementation/HM04-ACCEPTANCE.md"
       ],
-      "scope": "Typed graph rejection, alpha/matte, distinct Display/Write, undoable format-6 profile and format-5 migration backup; revision-keyed 96 MiB canvas cache, stale-ticket rejection, mid-frame cancellation, hierarchy-aware invalidation, deep graph ordering and tested conservative ink regions. A synthetic 19-layer 1080p benchmark recorded 28.98 ms/frame median for the linear profile on M1 Pro.",
-      "limitations": "No persisted user-editable graph, actual asynchronous preview producer, production-scene or full alpha/color workload, or cross-platform qualification."
+      "scope": "Typed graph rejection, alpha/matte, distinct Display/Write, undoable format-6 profile and format-5 migration backup; revision-keyed 96 MiB canvas cache, immutable speculative next-frame worker, stale-ticket rejection, cancellation, hierarchy-aware invalidation and conservative ink regions. Native playback/scrub and expanded alpha/color charts pass. Animated original 19-part artwork measures 39.19 ms/frame median for linear composition at 1080p on the M1 Pro development host.",
+      "limitations": "HM-04 is accepted as a bounded contract; P10 remains open. No persisted user-editable graph, useful effects set, full ROI scheduling, production-scene real-time guarantee or current cross-platform qualification."
+    },
+    "output_camera": {
+      "status": "accepted_bounded_contract",
+      "platform": "macOS arm64",
+      "evidence": [
+        "docs/implementation/HM13-ACCEPTANCE.md",
+        "tests/render_tests.cpp",
+        "tests/export_tests.cpp",
+        "apps/desktop/camera_smoke.cpp"
+      ],
+      "scope": "One animated orthographic output camera with direct framing handles, guides, format-7 persistence, atomic undo and preview/reopened/PNG parity.",
+      "limitations": "No multiplane, perspective, camera switching or physical-tablet qualification; P06 remains in progress."
     }
   },
   "ownership": {

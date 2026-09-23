@@ -26,7 +26,11 @@ Create local scenes with an explicit name, location and configuration.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## PRJ-002 — Resolution and aspect ratio
 
@@ -36,7 +40,11 @@ Configure width, height, pixel aspect ratio and custom presets.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## PRJ-003 — Frame rate and duration
 
@@ -46,7 +54,11 @@ Define frame rate and length; specify whether changing frame rate preserves fram
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## PRJ-004 — Save and save a copy
 
@@ -56,7 +68,11 @@ Persist scene data and resources coherently; saving a copy preserves the origina
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## PRJ-005 — Autosave
 
@@ -66,7 +82,11 @@ Schedule recovery points without blocking drawing or silently replacing a manual
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## PRJ-006 — Scene versions
 
@@ -76,7 +96,11 @@ Retain identifiable revisions and open a selected version.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## PRJ-007 — Compact project format
 
@@ -86,7 +110,7 @@ Package and unpack scenes with their resources included.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## PRJ-008 — Project integrity
 
@@ -96,7 +120,11 @@ Detect missing files, invalid references and corrupt components with actionable 
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## PRJ-009 — Backup optimization
 
@@ -106,7 +134,7 @@ List backup size and usage before removing redundant resources.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## PRJ-010 — Recent scenes and welcome screen
 
@@ -116,4 +144,4 @@ Show recent scenes and actions to create, open or locate a moved file.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.

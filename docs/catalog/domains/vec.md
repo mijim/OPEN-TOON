@@ -26,7 +26,11 @@ Represent strokes as curves with editable width and configurable caps.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## VEC-002 — Vector brush
 
@@ -36,7 +40,7 @@ Create editable filled silhouettes from drawing gestures.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## VEC-003 — Variable width
 
@@ -46,7 +50,11 @@ Apply pressure and variable profiles along a stroke.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## VEC-004 — Pencil texture
 
@@ -56,7 +64,7 @@ Attach a texture and repetition parameters to a centerline.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## VEC-005 — Brush presets
 
@@ -66,7 +74,7 @@ Save size, tip, smoothing and texture as a reusable preset.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## VEC-006 — Pencil presets
 
@@ -76,7 +84,7 @@ Save line profiles and settings as distinct presets.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## VEC-007 — Stroke stabilizer
 
@@ -86,7 +94,7 @@ Smooth pen noise through configurable lag and stabilization.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## VEC-008 — Vector eraser
 
@@ -96,7 +104,11 @@ Trim geometry crossed by an eraser with size and pressure control.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## VEC-009 — Selection and lasso
 
@@ -106,7 +118,11 @@ Select strokes or regions, add to or subtract from the selection, and transform 
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/architecture/adr/021-vector-authoring-and-key-patterns.md](../../../docs/architecture/adr/021-vector-authoring-and-key-patterns.md) — Whole-footprint vector lasso, additive/subtractive selection, clipboard and direct transforms; raster masks and partial contours pending..
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## VEC-010 — Contour editor
 
@@ -116,7 +132,7 @@ Add, delete and move curve points and tangents.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## VEC-011 — Centerline editor
 
@@ -126,7 +142,11 @@ Edit a stroke's center path while preserving brush appearance where possible.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — docs/architecture/adr/016-visual-animation-and-bezier.md; docs/architecture/adr/017-combined-motion-and-point-editing.md; bounded visual-editing subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## VEC-012 — Width editor
 
@@ -136,7 +156,7 @@ Modify a pencil profile without redrawing its path.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## VEC-013 — Pencil retouching
 
@@ -146,7 +166,7 @@ Paint width or opacity adjustments using increase, decrease, replace and smooth 
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## VEC-014 — Post-stroke smoothing
 
@@ -156,7 +176,11 @@ Reduce contour irregularities with adjustable strength.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/architecture/adr/021-vector-authoring-and-key-patterns.md](../../../docs/architecture/adr/021-vector-authoring-and-key-patterns.md) — Adjustable open-pencil smoothing protects endpoints, pressure and sharp corners; analytic contour smoothing pending..
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## VEC-015 — Lines and primitives
 
@@ -166,7 +190,11 @@ Draw lines, rectangles and ellipses with constraints and optional fills.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/architecture/adr/021-vector-authoring-and-key-patterns.md](../../../docs/architecture/adr/021-vector-authoring-and-key-patterns.md) — Two-point Line, constrained Rectangle/Ellipse and 45-degree line angles; broader primitive acceptance pending..
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## VEC-016 — Polylines and Bézier curves
 
@@ -176,7 +204,7 @@ Construct precise curves using points and handles.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## VEC-017 — Cutter
 
@@ -186,7 +214,7 @@ Separate a region with a lasso and retain it as an editable selection.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## VEC-018 — Perspective deformation
 
@@ -196,7 +224,7 @@ Deform a selection using perspective controls.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## VEC-019 — Drawing envelope
 
@@ -206,7 +234,7 @@ Edit an envelope that deforms selected geometry.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## VEC-020 — Invisible strokes
 
@@ -216,7 +244,7 @@ Define fill boundaries that produce no visible line.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## VEC-021 — Stroke conversion
 
@@ -226,7 +254,7 @@ Convert line types under explicit constraints and retain a recoverable copy.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## VEC-022 — Vector optimization
 
@@ -236,7 +264,11 @@ Simplify geometry and combine compatible elements within a configured tolerance.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/architecture/adr/021-vector-authoring-and-key-patterns.md](../../../docs/architecture/adr/021-vector-authoring-and-key-patterns.md) — Bounded open-pencil centerline simplification with local geometric and pressure tolerances; combining and analytic contour optimization pending..
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## VEC-023 — Drawing stamps
 
@@ -246,7 +278,7 @@ Stamp reusable drawings with position, scale and rotation.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## VEC-024 — Text
 
@@ -256,7 +288,7 @@ Create editable text and convert it to geometry when portability is needed.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## VEC-025 — Guides and grid
 
@@ -266,7 +298,11 @@ Show a grid and reference guides with optional snapping.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/architecture/adr/021-vector-authoring-and-key-patterns.md](../../../docs/architecture/adr/021-vector-authoring-and-key-patterns.md) — Drawing-local grid and optional snapping for sampled tools/primitives; session-only settings, advanced reference guides pending..
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## VEC-026 — Perspective guides
 
@@ -276,7 +312,7 @@ Assist drawing using vanishing points, isometric and curved perspectives.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## VEC-027 — Reposition all drawings
 
@@ -286,4 +322,4 @@ Apply a geometric transform to a set of drawings belonging to an element.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.

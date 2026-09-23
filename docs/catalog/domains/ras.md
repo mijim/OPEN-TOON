@@ -26,7 +26,11 @@ Paint pixel images with a defined resolution and transparency.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset, complete catalog acceptance remains open.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## RAS-002 — Textured bitmap brush
 
@@ -36,7 +40,11 @@ Support brush tip, spacing, opacity and dynamics for raster strokes.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset, complete catalog acceptance remains open.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## RAS-003 — Bitmap eraser
 
@@ -46,7 +54,11 @@ Remove or reduce alpha with configurable edge softness and opacity.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset, complete catalog acceptance remains open.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## RAS-004 — Texture resolution
 
@@ -56,7 +68,7 @@ Change image resolution and quality while explaining resampling loss.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## RAS-005 — Raster selection
 
@@ -66,7 +78,11 @@ Transform selected pixels while preserving the mask and alpha channel.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — docs/architecture/adr/014-drawing-selection.md; bounded rectangular subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## RAS-006 — ABR brushes
 
@@ -76,7 +92,7 @@ Import a supported subset of Photoshop brushes and report ignored parameters.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## RAS-007 — Vector brush with bitmap texture
 
@@ -86,4 +102,4 @@ Keep vector geometry separate from resolution-dependent raster texture.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.

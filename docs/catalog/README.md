@@ -1,6 +1,6 @@
 # Functional catalog
 
-283 original proposed capabilities across 26 domains. Application status: **experimental, with partial working subsets; no phase is complete**.
+283 original proposed capabilities across 26 domains. Application status: **experimental; 78 partial, 205 not started; no complete capability or phase**.
 
 Canonical source: [features.json](features.json). Acceptance criteria are OPEN-TOON objectives. Domain dependencies express relationships, not a requirement to finish an entire domain before starting another.
 

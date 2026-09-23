@@ -28,7 +28,7 @@ animated-parent motion, reparent an animated child or store shear. Rest pivot
 placement must occur before that layer is animated. The copy is an independent
 snapshot, not a linked character asset or HM-09 template.
 
-The next structural block adds batch assembly of exposed root drawings,
+The subsequent structural block added batch assembly of exposed root drawings,
 automatic view membership for newly attached Parts, independent or
 linked-artwork duplication of Parts and Peg subtrees, branch deletion with
 view cleanup, Part detachment and Peg dissolution that preserve supported rest

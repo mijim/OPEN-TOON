@@ -24,8 +24,10 @@ def documents() -> dict[Path, str]:
     domains = read('domains.json')['domains']
     nodes = read('node-reference.json')['entries']
     files = {}
+    partial = sum(feature['implementation_status'] == 'partial' for feature in features)
+    not_started = sum(feature['implementation_status'] == 'not_started' for feature in features)
     index = ['# Functional catalog', '',
-             f'{len(features)} original proposed capabilities across {len(domains)} domains. Application status: **experimental, with partial working subsets; no phase is complete**.', '',
+             f'{len(features)} original proposed capabilities across {len(domains)} domains. Application status: **experimental; {partial} partial, {not_started} not started; no complete capability or phase**.', '',
              'Canonical source: [features.json](features.json). Acceptance criteria are OPEN-TOON objectives. Domain dependencies express relationships, not a requirement to finish an entire domain before starting another.', '',
              'Levels: `core` foundations; `pro` professional workflow; `advanced` high complexity; `optional` optional extension; `legacy` historical compatibility. These are not execution phases.', '',
              '| Domain | Capabilities | Module |', '|---|---:|---|']
@@ -45,7 +47,12 @@ def documents() -> dict[Path, str]:
             lines += [f"## {f['id']} — {f['title']}", '', f['requirement'], '',
                       f"**Initial acceptance:** {f['acceptance_criteria'][0]}", '',
                       f"**Scope:** `{f['scope']}` · **Level:** `{f['capability_level']}` · **Status:** `{f['implementation_status']}`.", '',
-                      f"**Evidence:** `{f['evidence']}`.", '']
+                      f"**Specification source:** `{f['evidence']}`.", '']
+            if f['implementation_status'] != 'not_started':
+                source, _, detail = f['implementation_evidence'].partition(';')
+                lines += [f"**Implementation evidence:** [{source}](../../../{source})"
+                          + (f" — {detail.strip()}" if detail else '') + '.', '',
+                          f"**Remaining scope:** {f['notes']}", '']
         files[CATALOG / 'domains' / filename] = '\n'.join(lines)
     index += ['', '## Related catalogs', '',
               '- [Capability JSON schema](features.schema.json).',

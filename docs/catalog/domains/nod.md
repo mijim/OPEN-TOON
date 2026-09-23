@@ -26,7 +26,7 @@ Create, move, connect, search and delete nodes while navigating the graph.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## NOD-002 — Typed ports
 
@@ -34,9 +34,13 @@ Distinguish image, transform, matte and other data flows.
 
 **Initial acceptance:** Incompatible connections are rejected before evaluation.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — typed Image, Transform and Matte graph boundary with rejection tests.
+
+**Remaining scope:** The internal derived graph has typed ports. Editable graph connections and wider port types remain open.
 
 ## NOD-003 — Node library
 
@@ -46,7 +50,7 @@ Organize operators by category with search and descriptions.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## NOD-004 — Groups and published ports
 
@@ -56,7 +60,7 @@ Encapsulate subgraphs with reusable inputs and outputs.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## NOD-005 — Layer compositing
 
@@ -64,9 +68,13 @@ Combine inputs while preserving order, alpha and depth according to the mode.
 
 **Initial acceptance:** A semitransparent layer produces the expected alpha over a transparent background.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — ordered premultiplied Over and alpha-chart evidence.
+
+**Remaining scope:** Ordered Over and alpha composition work. Depth modes and broader compositing operators remain open.
 
 ## NOD-006 — Masks and cutters
 
@@ -74,9 +82,13 @@ Clip by matte with defined inversion and alpha handling.
 
 **Initial acceptance:** A partial mask is not treated as binary unless explicitly configured.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — internal alpha-matte extraction and multiplication.
+
+**Remaining scope:** Internal alpha mattes work. Editable cutters, inversion controls and wider matte operators remain open.
 
 ## NOD-007 — Switches
 
@@ -86,7 +98,7 @@ Select images or transforms using animated attributes.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## NOD-008 — Display and Write
 
@@ -94,9 +106,13 @@ Separate preview output from exportable final outputs.
 
 **Initial acceptance:** An alternate Display does not change the configured Write output.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — explicit internal Display and Write outputs with matched evaluated pixels.
+
+**Remaining scope:** Display and Write exist in the derived graph. User-configurable alternate outputs remain open.
 
 ## NOD-009 — Bypass and cache
 
@@ -104,9 +120,13 @@ Temporarily bypass operators and reuse valid results.
 
 **Initial acceptance:** Editing a dependency invalidates all affected outputs.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — revision-aware preview cache and affected-descendant invalidation.
+
+**Remaining scope:** Revision-aware cache and invalidation work. User-controlled node bypass remains open.
 
 ## NOD-010 — Notes and organization
 
@@ -116,4 +136,4 @@ Add notes and spatial organization without changing the image.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.

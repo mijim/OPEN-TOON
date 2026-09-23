@@ -19,7 +19,7 @@
 
 ## Reading routes
 
-**Use or build the application:** [build](implementation/BUILD.md) → [user guide](implementation/USER-GUIDE.md) → [status](implementation/STATUS.md) → [machine-readable evidence](implementation/status.json).
+**Use or build the application:** [build](implementation/BUILD.md) → [user guide](implementation/USER-GUIDE.md) → [status](implementation/STATUS.md) → [status audit](implementation/STATUS-AUDIT.md) → [machine-readable evidence](implementation/status.json).
 
 **Planning:** [Harmony Moment](planning/HARMONY-MOMENT.md) → [dependency rationale](planning/REORIENTATION.md) → [roadmap](planning/README.md) → [phase table](planning/PHASES.md) → [first backlog](planning/FIRST-STEPS.md) → [execution rules](planning/EXECUTION.md) → [estimates](planning/ESTIMATES.md).
 

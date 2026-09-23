@@ -26,7 +26,11 @@ Provide horizontal and vertical views of the same time model.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## TIM-002 — Create drawings and exposures
 
@@ -36,7 +40,11 @@ Create unique drawings and reference them from one or more frame intervals.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## TIM-003 — Hold and extend exposures
 
@@ -46,7 +54,11 @@ Lengthen or shorten holds without duplicating drawing data.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## TIM-004 — Insert and remove frames
 
@@ -56,7 +68,11 @@ Change duration by shifting ranges according to an explicit rule.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## TIM-005 — Clear exposure
 
@@ -66,7 +82,11 @@ Remove a time reference while keeping the drawing available.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## TIM-006 — Copy and paste ranges
 
@@ -76,7 +96,11 @@ Distinguish pasting exposures, drawings, keyframes and combinations.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset, complete catalog acceptance remains open.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## TIM-007 — Repeats and cycles
 
@@ -86,7 +110,11 @@ Repeat sequences with shared drawings and an explicit time limit.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset, complete catalog acceptance remains open.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## TIM-008 — Timing on twos and threes
 
@@ -96,7 +124,11 @@ Apply regular exposure steps while preserving drawing order.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset, complete catalog acceptance remains open.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## TIM-009 — Drag, stretch and overwrite
 
@@ -106,7 +138,11 @@ Move blocks with controlled insertion and overwrite options.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset, complete catalog acceptance remains open.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## TIM-010 — Navigate between drawings
 
@@ -116,7 +152,11 @@ Jump to a distinct drawing, keyframe or range boundary.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## TIM-011 — Scene markers
 
@@ -126,7 +166,11 @@ Create named markers and ranges with duration and notes.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset, complete catalog acceptance remains open.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## TIM-012 — Frame marks
 
@@ -136,7 +180,7 @@ Classify keys, breakdowns and in-betweens using readable symbols.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## TIM-013 — Exposure thumbnails
 
@@ -146,7 +190,7 @@ Show cached drawing previews with selective updates.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## TIM-014 — Print Xsheet
 
@@ -156,4 +200,8 @@ Export or print sheets with columns, timing, numbering and annotations.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset, complete catalog acceptance remains open.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.

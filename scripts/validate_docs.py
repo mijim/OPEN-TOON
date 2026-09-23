@@ -39,12 +39,24 @@ for f in features:
         errors.append(f"Missing acceptance: {f['id']}")
     if f['implementation_status'] not in {'not_started', 'in_progress', 'partial', 'implemented', 'verified'}:
         errors.append(f"Invalid implementation status: {f['id']}")
+    if f['implementation_status'] in {'partial', 'in_progress', 'implemented', 'verified'}:
+        evidence = f.get('implementation_evidence', '')
+        source = evidence.split(';', 1)[0].strip()
+        if not source or not (ROOT / source).is_file():
+            errors.append(f"Missing implementation evidence file: {f['id']}")
     if f['scope'] not in {'base', 'studio_extension', 'optional_extension', 'legacy_candidate'}:
         errors.append(f"Invalid scope: {f['id']}")
     if f['capability_level'] not in {'core', 'pro', 'advanced', 'optional', 'legacy'}:
         errors.append(f"Invalid level: {f['id']}")
     if set(f['depends_on_domains']) - domain_ids:
         errors.append(f"Unknown dependency: {f['id']}")
+for requirement in nfr:
+    if requirement['status'] not in {'proposed_not_measured', 'partial_evidence', 'verified'}:
+        errors.append(f"Invalid quality status: {requirement['id']}")
+    if requirement['status'] in {'partial_evidence', 'verified'}:
+        evidence = requirement.get('implementation_evidence', '').split(';', 1)[0].strip()
+        if not evidence or not (ROOT / evidence).is_file():
+            errors.append(f"Missing quality evidence file: {requirement['id']}")
 
 graph = {d['id']: d['depends_on'] for d in domains}
 visited = set()
@@ -65,6 +77,27 @@ def visit(key, active):
 for domain in graph:
     visit(domain, [])
 errors.extend(validate_roadmap())
+roadmap = json.loads((ROOT / 'docs/planning/roadmap.json').read_text(encoding='utf-8'))
+status = json.loads((ROOT / 'docs/implementation/status.json').read_text(encoding='utf-8'))
+libraries = json.loads((ROOT / 'docs/planning/libraries.json').read_text(encoding='utf-8'))['libraries']
+for library in libraries:
+    if (library['status'] == 'experimental_adopted') != library['installed']:
+        errors.append(f"Library adoption and installed flags disagree: {library['id']}")
+planned_phases = {item['id']: item['status'] for item in roadmap['phases']}
+implemented_phases = {item['id']: item['status'] for item in status['phases']}
+for number in range(12):
+    key = f'P{number:02d}'
+    if implemented_phases.get(key) != planned_phases.get(key):
+        errors.append(f"Phase status differs between roadmap and implementation: {key}")
+if status['completed_phases'] != [key for key, value in implemented_phases.items() if value == 'complete']:
+    errors.append('Completed phase list differs from implementation phase statuses')
+cmake = (ROOT / 'CMakeLists.txt').read_text(encoding='utf-8')
+project_version = re.search(r'project\(OpenToon VERSION ([0-9.]+)', cmake)
+source_suffix = re.search(r'OPENTOON_VERSION="\$\{PROJECT_VERSION\}-(experimental\.[0-9]+)"', cmake)
+if not project_version or not source_suffix or status['version'] != f'{project_version[1]}-{source_suffix[1]}':
+    errors.append('Implementation version differs from the desktop source version')
+if status['verification']['total_local_ctest_entries'] != status['verification']['core_and_render_tests']['count']:
+    errors.append('Local CTest entry counts disagree within implementation status')
 for path, text in {**documents(), **roadmap_documents()}.items():
     if not path.exists() or path.read_text(encoding='utf-8') != text:
         errors.append(f'Stale generated view: {path.relative_to(ROOT)}')

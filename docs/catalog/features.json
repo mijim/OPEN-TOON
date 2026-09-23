@@ -291,8 +291,8 @@
         "PRJ"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/status.json; experimental subset only, catalog acceptance not closed"
+      "notes": "Canvas navigation is view-only. Full navigation/preferences acceptance remains open.",
+      "implementation_evidence": "docs/implementation/status.json; docs/implementation/HM13-ACCEPTANCE.md; viewport navigation remains independent of output camera"
     },
     {
       "id": "UI-007",
@@ -323,7 +323,7 @@
         "The selected drawing can be edited without baking effects into its data."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "workspace",
@@ -331,7 +331,8 @@
         "PRJ"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "Camera-stage and projected artwork views work. Full isolated drawing/compositing view management remains open.",
+      "implementation_evidence": "docs/implementation/HM13-ACCEPTANCE.md; separate camera-stage editing and projected drawing view"
     },
     {
       "id": "UI-009",
@@ -382,7 +383,7 @@
         "The inspector prevents assigning audio samples to a vector layer."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "document",
@@ -390,7 +391,8 @@
         "PRJ"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "Typed visual and transform layers work. Sound layers and their type-specific inspector validation remain open.",
+      "implementation_evidence": "docs/implementation/status.json; typed Drawing, Character, Peg, Part and Camera layers; sound layer remains open"
     },
     {
       "id": "LYR-002",
@@ -499,7 +501,7 @@
         "Clearing a cell does not delete its now-unexposed drawing."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "document",
@@ -507,7 +509,8 @@
         "PRJ"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "Exposure clearing preserves source drawings. Used/unexposed drawing management and safe renumbering remain open.",
+      "implementation_evidence": "docs/implementation/status.json; clearing an exposure retains its independently stored drawing"
     },
     {
       "id": "LYR-008",
@@ -1564,7 +1567,7 @@
         "A reference chart completes the pipeline with measured error."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "colour",
@@ -1574,7 +1577,8 @@
         "RAS"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The bounded sRGB input/compositing profile works. Managed display/output transforms and production color error targets remain open.",
+      "implementation_evidence": "docs/implementation/HM04-ACCEPTANCE.md; opt-in linear-sRGB premultiplied compositing and alpha/color charts"
     },
     {
       "id": "COL-015",
@@ -2181,7 +2185,7 @@
         "Moving a peg transforms all its children without changing their drawings."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "animation-curves",
@@ -2190,7 +2194,8 @@
         "LYR"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "Rigid pegs work. The full animation/rigging interactions and production acceptance remain open.",
+      "implementation_evidence": "docs/implementation/HM03-RIG-FOUNDATION.md; independent parent Peg transforms move child artwork"
     },
     {
       "id": "ANI-004",
@@ -2409,7 +2414,7 @@
         "The pieces visually reconstruct the original character at rest."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "rigging",
@@ -2418,7 +2423,8 @@
         "VEC"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "Registered imported parts reconstruct the rigid reference. General character breakdown and artist-led acceptance remain open.",
+      "implementation_evidence": "docs/implementation/HM03-RIG-FOUNDATION.md; registered 19-part artwork reconstructs a rigid character"
     },
     {
       "id": "RIG-002",
@@ -2511,7 +2517,7 @@
         "Changing a mouth does not alter the head transform."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "rigging",
@@ -2520,7 +2526,8 @@
         "VEC"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "Named Part substitutions work. Full production substitution workflow and artist-led acceptance remain open.",
+      "implementation_evidence": "docs/implementation/HM03-RIG-FOUNDATION.md; named held Part substitutions preserve transform and reopen"
     },
     {
       "id": "RIG-007",
@@ -2531,7 +2538,7 @@
         "Changing a view replaces the assigned parts in one transaction."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "rigging",
@@ -2540,7 +2547,8 @@
         "VEC"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "Coordinated rigid Part views work. Broader multi-substitution controls and artist-led acceptance remain open.",
+      "implementation_evidence": "docs/implementation/HM03-RIG-FOUNDATION.md; named coordinated view sets switch several Parts atomically"
     },
     {
       "id": "RIG-008",
@@ -3279,7 +3287,7 @@
         "Changing the active camera changes preview and export consistently."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "camera",
@@ -3287,7 +3295,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "Current subset supports one output camera. Multiple cameras and active-camera switching remain unimplemented.",
+      "implementation_evidence": "docs/implementation/HM13-ACCEPTANCE.md; one explicit active camera, preview/export parity; camera switching remains open"
     },
     {
       "id": "CAM-002",
@@ -3298,7 +3307,7 @@
         "Camera motion does not change local drawing coordinates."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "camera",
@@ -3306,7 +3315,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "Camera pose is directly animated. Peg-driven camera motion and wider camera rigging remain unimplemented.",
+      "implementation_evidence": "docs/implementation/HM13-ACCEPTANCE.md; direct pan, rotation, zoom and keyed curves; camera pegs remain open"
     },
     {
       "id": "CAM-003",
@@ -3355,7 +3365,7 @@
         "Equal objects at different depths retain the same apparent size."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "camera",
@@ -3363,7 +3373,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "Orthographic output is implemented for the current 2D scene. Depth-plane acceptance remains open.",
+      "implementation_evidence": "docs/implementation/HM13-ACCEPTANCE.md; orthographic one-plane output; depth and 2.5D staging remain open"
     },
     {
       "id": "CAM-006",
@@ -3374,7 +3385,7 @@
         "Guides are absent from the rendered image."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "camera",
@@ -3382,7 +3393,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "Frame and safe-area overlays work. Wider guide presets and staging aids remain open.",
+      "implementation_evidence": "docs/implementation/HM13-ACCEPTANCE.md; output frame and safe-area overlays excluded from PNG export"
     },
     {
       "id": "CAM-007",
@@ -3432,7 +3444,7 @@
         "Incompatible connections are rejected before evaluation."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "compositor-graph",
@@ -3441,7 +3453,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The internal derived graph has typed ports. Editable graph connections and wider port types remain open.",
+      "implementation_evidence": "docs/implementation/HM04-ACCEPTANCE.md; typed Image, Transform and Matte graph boundary with rejection tests"
     },
     {
       "id": "NOD-003",
@@ -3492,7 +3505,7 @@
         "A semitransparent layer produces the expected alpha over a transparent background."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "compositor-graph",
@@ -3501,7 +3514,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "Ordered Over and alpha composition work. Depth modes and broader compositing operators remain open.",
+      "implementation_evidence": "docs/implementation/HM04-ACCEPTANCE.md; ordered premultiplied Over and alpha-chart evidence"
     },
     {
       "id": "NOD-006",
@@ -3512,7 +3526,7 @@
         "A partial mask is not treated as binary unless explicitly configured."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "compositor-graph",
@@ -3521,7 +3535,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "Internal alpha mattes work. Editable cutters, inversion controls and wider matte operators remain open.",
+      "implementation_evidence": "docs/implementation/HM04-ACCEPTANCE.md; internal alpha-matte extraction and multiplication"
     },
     {
       "id": "NOD-007",
@@ -3552,7 +3567,7 @@
         "An alternate Display does not change the configured Write output."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "compositor-graph",
@@ -3561,7 +3576,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "Display and Write exist in the derived graph. User-configurable alternate outputs remain open.",
+      "implementation_evidence": "docs/implementation/HM04-ACCEPTANCE.md; explicit internal Display and Write outputs with matched evaluated pixels"
     },
     {
       "id": "NOD-009",
@@ -3572,7 +3588,7 @@
         "Editing a dependency invalidates all affected outputs."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "compositor-graph",
@@ -3581,7 +3597,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "Revision-aware cache and invalidation work. User-controlled node bypass remains open.",
+      "implementation_evidence": "docs/implementation/HM04-ACCEPTANCE.md; revision-aware preview cache and affected-descendant invalidation"
     },
     {
       "id": "NOD-010",

@@ -26,7 +26,7 @@ Emit images with controlled rate, lifetime and seed.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## PAR-002 — Emission regions
 
@@ -36,7 +36,7 @@ Define emission within planar or spatial regions.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## PAR-003 — Velocity and variation
 
@@ -46,7 +46,7 @@ Assign velocity, size, orientation and dispersion through parameters.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## PAR-004 — Forces and motion
 
@@ -56,7 +56,7 @@ Apply gravity, wind, friction, vortices, attraction and repulsion.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## PAR-005 — Collisions and lifetime
 
@@ -66,7 +66,7 @@ Handle bounce, death and sink regions.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## PAR-006 — Baking and compositing
 
@@ -76,7 +76,7 @@ Cache simulations and combine systems with other layers.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## PAR-007 — Particle templates
 
@@ -86,4 +86,4 @@ Save reusable systems with their assets and parameters.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.

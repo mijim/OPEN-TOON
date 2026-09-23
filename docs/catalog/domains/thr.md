@@ -26,7 +26,7 @@ Read supported formats with materials and hierarchies under a documented profile
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## THR-002 — Units and scale
 
@@ -36,7 +36,7 @@ Interpret file units and convert them to scene space.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## THR-003 — 3D animation clips
 
@@ -46,7 +46,7 @@ Select and retime animations included in an asset.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## THR-004 — Subnodes
 
@@ -56,7 +56,7 @@ Select and animate internal model components.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## THR-005 — Armatures and skinning
 
@@ -66,7 +66,7 @@ Animate model skeletons and deformation within supported limits.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## THR-006 — Subnode overrides
 
@@ -76,7 +76,7 @@ Bake imported transforms and clips into editable keys.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## THR-007 — 2D and 3D compositing
 
@@ -86,7 +86,7 @@ Combine drawn planes and models with consistent depth, transparency and cameras.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## THR-008 — External rendering
 
@@ -96,7 +96,7 @@ Orchestrate external renderers with explicit resources, cancellation and errors.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## THR-009 — Depth normalization
 
@@ -106,4 +106,4 @@ Handle depth boundaries and flattening of 3D results.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
