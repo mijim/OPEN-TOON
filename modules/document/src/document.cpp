@@ -69,11 +69,15 @@ const Drawing* Document::drawingAt(Id layerId, Frame frame) const {
 Drawing& Document::editableDrawing(Id layerId, Frame frame) {
     auto& l = layer(layerId);
     require(!l.locked, "Unlock the layer before editing.");
+    require(l.kind == LayerKind::Drawing || l.kind == LayerKind::Part,
+            "Draw on a drawing layer or character part.");
     require(frame >= 0 && frame < duration, "Frame is outside the scene.");
     if (const auto* existing = drawingAt(layerId, frame))
         return drawings.at(existing->id);
     const Id id = allocateId();
     drawings.emplace(id, Drawing{id, "Drawing " + std::to_string(id), {}, std::nullopt});
+    if (l.kind == LayerKind::Part)
+        l.variants.push_back({id, drawings.at(id).name});
     expose(l, frame, frame + 1, id);
     return drawings.at(id);
 }
@@ -120,6 +124,9 @@ void Document::validate() const {
             require(std::isfinite(v) && v >= 0 && v <= 1, "Invalid color component.");
     };
     color(background);
+    require(composition == CompositionProfile::LegacyQt ||
+                composition == CompositionProfile::LinearSrgb,
+            "Unknown composition profile.");
     for (const auto& s : palette) {
         id(s.id);
         swatches.insert(s.id);
@@ -179,31 +186,111 @@ void Document::validate() const {
     for (const auto& l : layers) {
         id(l.id);
         require(l.name.size() <= 4096, "Layer name is too long.");
+        require(static_cast<int>(l.kind) >= 0 && static_cast<int>(l.kind) <= 4,
+                "Unknown layer kind.");
+        require(l.role.size() <= 128 && l.variants.size() <= 10000 && l.views.size() <= 1000,
+                "Invalid part metadata size.");
+        if (l.kind != LayerKind::Part)
+            require(l.role.empty() && l.variants.empty(), "Only parts may own roles and variants.");
+        if (l.kind != LayerKind::Character)
+            require(l.views.empty(), "Only character roots may own view sets.");
+        if (l.kind == LayerKind::Character || l.kind == LayerKind::Peg || l.kind == LayerKind::Camera)
+            require(l.exposures.empty(), "Character roots, pegs and cameras cannot own drawings.");
+        std::set<Id> variants;
+        for (const auto& variant : l.variants)
+            require(drawings.contains(variant.drawing) && variant.name.size() > 0 &&
+                        variant.name.size() <= 128 && variants.insert(variant.drawing).second,
+                    "Part references a missing or duplicate substitution.");
+        if (l.kind == LayerKind::Part)
+            require(!l.role.empty(), "Character part needs a role.");
         validateTransform(l.transform);
+        if (l.kind == LayerKind::Camera) {
+            require(l.parent == 0 && l.visible && !l.solo && l.transform.scaleX >= .05 &&
+                        l.transform.scaleX <= 20 && l.transform.scaleY >= .05 &&
+                        l.transform.scaleY <= 20 && l.transform.opacity == 1 &&
+                        l.transform.pivotX == 0 && l.transform.pivotY == 0,
+                    "Camera needs a root, positive zoom and a fixed projection opacity/pivot.");
+        }
         Frame last = 0;
         for (auto e : l.exposures) {
             require(e.start >= last && e.end > e.start && e.end <= duration,
                     "Invalid or overlapping exposure interval.");
             require(drawings.contains(e.drawing), "Exposure references a missing drawing.");
+            if (l.kind == LayerKind::Part)
+                require(variants.contains(e.drawing), "Part exposure is not a registered substitution.");
             last = e.end;
         }
         Frame previous = -1;
         for (auto k : l.keys) {
             require(k.frame > previous && k.frame < duration, "Invalid keyframe order or range.");
             validateTransform(k.value);
+            if (l.kind == LayerKind::Camera)
+                require(k.value.scaleX >= .05 && k.value.scaleX <= 20 &&
+                            k.value.scaleY >= .05 && k.value.scaleY <= 20 &&
+                            k.value.opacity == 1 && k.value.pivotX == 0 && k.value.pivotY == 0,
+                        "Camera key needs positive zoom and a fixed projection opacity/pivot.");
             require(static_cast<int>(k.interpolation) >= 0 && static_cast<int>(k.interpolation) <= 2,
                     "Unknown interpolation.");
-            for (const auto& [channel, ease] : k.easing)
+            for (const auto& [channel, ease] : k.easing) {
                 validateEase(channel, ease);
+                if (l.kind == LayerKind::Camera && (channel == "scaleX" || channel == "scaleY"))
+                    require(ease.y1 >= 0 && ease.y1 <= 1 && ease.y2 >= 0 && ease.y2 <= 1,
+                            "Camera zoom easing must stay within its keyed range.");
+            }
             previous = k.frame;
         }
     }
+    std::size_t cameras = 0;
+    for (const auto& layer : layers)
+        if (layer.kind == LayerKind::Camera) {
+            ++cameras;
+            require(layer.id == activeCamera, "Camera must be the explicit output camera.");
+        }
+    require(cameras <= 1 && ((cameras == 0) == (activeCamera == 0)),
+            "The bounded output profile supports one active camera.");
     for (const auto& l : layers) {
+        if (l.parent)
+            require(layer(l.parent).kind != LayerKind::Camera,
+                    "Artwork cannot be parented to the output camera.");
         std::set<Id> chain{l.id};
         Id parent = l.parent;
         while (parent) {
             require(chain.insert(parent).second, "Layer hierarchy contains a cycle.");
             parent = layer(parent).parent;
+        }
+        if (l.kind == LayerKind::Character)
+            require(l.parent == 0, "Character root cannot have a parent.");
+        if (l.kind == LayerKind::Part || l.kind == LayerKind::Peg) {
+            Id ancestor = l.parent;
+            while (ancestor && layer(ancestor).kind != LayerKind::Character)
+                ancestor = layer(ancestor).parent;
+            require(ancestor != 0, "Part or peg must belong to a character.");
+        }
+    }
+    for (const auto& root : layers) {
+        if (root.kind != LayerKind::Character)
+            continue;
+        std::set<std::string> names;
+        for (const auto& view : root.views) {
+            id(view.id);
+            require(!view.name.empty() && view.name.size() <= 128 && names.insert(view.name).second &&
+                        view.choices.size() <= 2000,
+                    "Invalid or duplicate character view set.");
+            std::set<Id> parts;
+            for (const auto& choice : view.choices) {
+                const auto& target = layer(choice.part);
+                require(target.kind == LayerKind::Part && parts.insert(choice.part).second,
+                        "View set contains a missing or duplicate part.");
+                Id ancestor = target.parent;
+                while (ancestor && ancestor != root.id)
+                    ancestor = layer(ancestor).parent;
+                require(ancestor == root.id &&
+                            std::any_of(target.variants.begin(), target.variants.end(),
+                                        [&](const Substitution& variant) {
+                                            return variant.drawing == choice.drawing;
+                                        }),
+                        "View set references a part or substitution outside its character.");
+            }
         }
     }
     for (const auto& m : markers)

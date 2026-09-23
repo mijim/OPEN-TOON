@@ -1,21 +1,36 @@
 # Experimental releases
 
-## 0.2.0-experimental.11 — macOS and Linux distributables
+## 0.2.0-experimental.15 — orthographic output camera
 
-- Adds the OPEN-TOON logo with a white background to the application package and README.
-- Publishes an ad-hoc-signed macOS 15+ Apple Silicon ZIP.
-- Publishes an Ubuntu 24.04-built Linux x86_64 AppImage.
-- Links direct downloads and the project website from the README.
-- Changes packaging and presentation only; document format 3 and editor capabilities
-  are unchanged from experimental.10.
+- Add 20 bounded camera behaviors: direct pan/rotate/zoom, constrained gestures,
+  animated framing, guides, selected-camera Properties, safe undo/deletion and
+  identical preview, reopened and PNG output. See [HM-13 acceptance](HM13-ACCEPTANCE.md).
+- Save one explicit output camera in format 7. Format-6 projects migrate with a
+  source-version backup; invalid and singular camera framing is rejected.
+- Close the bounded HM-04 graph contract with native timed playback/scrubbing,
+  fuller alpha/color checks and repeated animated original-art cost measurements.
+  This does not complete the wider P10 node-compositor phase.
+- macOS locked build: 99/99 CTest entries and the native input/composition/camera
+  smoke pass. Source only; no new dependency or Windows/Linux build qualification.
 
-The macOS package passed 65/65 CTest entries, the native mouse/synthetic-pen,
-selection, authoring, motion-path and animation smoke journeys, and a second smoke
-run after extraction outside the workspace. Its nested signatures and bundle icon
-were verified. The Linux workflow builds from the matching `main` commit and runs
-the same CTest suite headlessly before publishing. These are experimental previews,
-not a supported 1.0 release; macOS Intel, physical tablets, broader Linux distributions,
-Windows packaging, notarization and clean-machine qualification remain open.
+P06 and P10 remain in progress. HM-03 artist-led rigid-character acceptance,
+deformation, audio and editable node topology remain on the Harmony Moment path.
+
+## 0.2.0-experimental.14 — speculative compositor preview
+
+- The linear-sRGB canvas prepares its next frame on one background worker from an
+  immutable scene snapshot. Current-frame cache misses remain accurate during scrubbing.
+- The one-slot pending queue coalesces repeated requests, cancels superseded work,
+  rejects stale publication and skips frames that exceed the preview memory budget.
+- The original 19-part Clockwork Hello artwork now has exact alpha-coverage and
+  Display/Write/reopened-pixel checks, plus a 1080p compositor cost baseline.
+- macOS: 95 CTest entries and native UI smoke pass. No new dependency or project
+  format change; source only. See [HM-04 evidence](HM04-GRAPH-KERNEL.md) and the
+  [benchmark](COMPOSITOR-BENCHMARK.md).
+
+HM-04 and P10 remain partial. Timed native playback/scrubbing, denser animated
+scenes and fuller color charts are still required before the graph contract is
+accepted. Linux/Windows builds and binary publication are deferred.
 
 ## 0.2.0-experimental.10 — vector authoring and animation patterns
 

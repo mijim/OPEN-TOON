@@ -26,7 +26,7 @@ Create and execute scripts with explicit output, errors and scene context.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## AUT-002 — Script actions in the UI
 
@@ -36,7 +36,7 @@ Assign scripts to identifiable buttons and actions.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## AUT-003 — Scene and node API
 
@@ -46,7 +46,7 @@ Expose queries and commands for layers, attributes, drawings and connections.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## AUT-004 — Python integration
 
@@ -56,7 +56,7 @@ Support external automation through a versioned API and error contracts.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## AUT-005 — Sandbox and execution context
 
@@ -66,7 +66,7 @@ Separate script testing and execution policies from the document.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## AUT-006 — CLI conversion tools
 
@@ -76,4 +76,4 @@ Expose validation, conversion and rendering as commands with structured results.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.

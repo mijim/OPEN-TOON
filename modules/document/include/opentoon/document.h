@@ -28,6 +28,7 @@ struct Color {
     double r = 0, g = 0, b = 0, a = 1;
     auto operator<=>(const Color&) const = default;
 };
+enum class CompositionProfile : std::uint8_t { LegacyQt, LinearSrgb };
 struct Swatch {
     Id id = 0;
     std::string name;
@@ -87,6 +88,23 @@ struct Keyframe {
     std::map<std::string, BezierEase> easing;
     auto operator<=>(const Keyframe&) const = default;
 };
+enum class LayerKind : std::uint8_t { Drawing, Character, Peg, Part, Camera };
+struct Substitution {
+    Id drawing = 0;
+    std::string name;
+    auto operator<=>(const Substitution&) const = default;
+};
+struct ViewChoice {
+    Id part = 0;
+    Id drawing = 0;
+    auto operator<=>(const ViewChoice&) const = default;
+};
+struct CharacterView {
+    Id id = 0;
+    std::string name;
+    std::vector<ViewChoice> choices;
+    auto operator<=>(const CharacterView&) const = default;
+};
 struct Layer {
     Id id = 0;
     std::string name;
@@ -95,6 +113,10 @@ struct Layer {
     Transform transform;
     std::vector<Exposure> exposures;
     std::vector<Keyframe> keys;
+    LayerKind kind = LayerKind::Drawing;
+    std::string role;
+    std::vector<Substitution> variants;
+    std::vector<CharacterView> views;
     auto operator<=>(const Layer&) const = default;
 };
 struct Marker {
@@ -103,12 +125,14 @@ struct Marker {
     auto operator<=>(const Marker&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 3;
+    static constexpr int formatVersion = 7;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;
     FrameRate rate;
     Color background{1, 1, 1, 1};
+    CompositionProfile composition = CompositionProfile::LegacyQt;
+    Id activeCamera = 0;
     Id nextId = 1;
     std::vector<Layer> layers;
     std::map<Id, Drawing> drawings;

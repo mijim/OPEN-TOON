@@ -103,7 +103,7 @@ Dependency-only longest chains under the lower/upper estimates (unlimited staffi
 
 ## HM-00
 
-**Reference shot and foundation decisions** — `planned`; owner `architecture`, work package `P00-W2`.
+**Reference shot and foundation decisions** — `complete`; owner `architecture`, work package `P00-W2`.
 
 Freeze the bounded character-shot profile, failure fixtures and only the contracts needed by its next consumers. Audit current code instead of restarting all feasibility work.
 
@@ -114,7 +114,7 @@ Freeze the bounded character-shot profile, failure fixtures and only the contrac
 **Acceptance:**
 
 - Record a redistributable 20-second 1080p/24fps character shot, a 24000/1001 variant and a ten-minute audio drift fixture with explicit budgets.
-- Approve IDs/space/time/color/migration and command-ownership contracts, plus a saved-scene success rubric reviewed by an animator; record hardware rather than infer performance.
+- Approve IDs/space/time/color/migration and command-ownership contracts, plus a saved-scene success rubric artistically reviewed by the project owner; record hardware rather than infer performance. Independent working-shot animator validation remains HM-15.
 
 **Explicitly outside this slice:**
 
@@ -131,7 +131,7 @@ Freeze the bounded character-shot profile, failure fixtures and only the contrac
 
 ## HM-01
 
-**Persistent rig properties and typed document contracts** — `planned`; owner `document/application/storage`, work package `P01-W2`.
+**Persistent rig properties and typed document contracts** — `complete`; owner `document/application/storage`, work package `P01-W2`.
 
 Expose stable typed part/peg/property addresses over the existing full-pose evaluator and Session commands. Preserve the current transform-key representation through a compatibility adapter; introduce discrete or specialized tracks only with their actual character/deformer consumers. Define rest/authored/evaluated ownership and transactional persistence. Character/deformer/audio/node payloads are added by their owning slices, not empty schemas in advance.
 
@@ -162,7 +162,7 @@ Expose stable typed part/peg/property addresses over the existing full-pose eval
 
 ## HM-02
 
-**Registered artwork intake** — `planned`; owner `interchange/drawing`, work package `P02-W3`.
+**Registered artwork intake** — `complete`; owner `interchange/drawing`, work package `P02-W3`.
 
 Qualify existing drawing and still-image import; add ordered PNG sequence intake and registered part intake with explicit sequence-versus-parts choice, missing-frame reports and asset bounds. Existing vector/raster tools supply original artwork.
 
@@ -191,7 +191,7 @@ Qualify existing drawing and still-image import; add ordered PNG sequence intake
 
 ## HM-03
 
-**Character identity, pegs and substitution sets** — `planned`; owner `rigging/document`, work package `P08-W1`.
+**Character identity, pegs and substitution sets** — `in_progress`; owner `rigging/document`, work package `P08-W1`.
 
 Create a character root and stable part roles; keep separate transform hierarchy and render order. Add preserve-world reparenting, rest pivots, named thumbnail substitutions, held selector tracks and coordinated variant sets.
 
@@ -222,7 +222,7 @@ Create a character root and stable part roles; keep separate transform hierarchy
 
 ## HM-04
 
-**Shared evaluation and typed graph kernel** — `planned`; owner `animation/compositing/render`, work package `P10-W1`.
+**Shared evaluation and typed graph kernel** — `complete`; owner `animation/compositing/render`, work package `P10-W1`.
 
 Extract the existing ordered painter into a shared evaluation boundary with typed image/transform/matte inputs, DAG validation, revision invalidation and explicit Display/Write targets. Register operators only with consumers. Use a restricted linear-sRGB premultiplied composition profile and preserve legacy scene appearance through an explicit legacy profile.
 
@@ -485,7 +485,7 @@ Expose a small editable node graph: Drawing, Peg/Transform, ordered Composite, O
 
 ## HM-13
 
-**Output camera and framing** — `planned`; owner `camera/animation`, work package `P06-W3`.
+**Output camera and framing** — `complete`; owner `camera/animation`, work package `P06-W3`.
 
 Add an explicit active orthographic output camera with animated pan/zoom/rotation and nonrendering framing guides. Separate camera edits from canvas navigation; retain drawing-local coordinates.
 

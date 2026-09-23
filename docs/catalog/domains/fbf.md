@@ -26,7 +26,11 @@ Create and navigate drawings with continuous tool and exposure state.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## FBF-002 — Rough, tie-down and cleanup
 
@@ -36,7 +40,7 @@ Organize drawing stages through layers, marks and visibility.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FBF-003 — Previous and next onion skin
 
@@ -46,7 +50,11 @@ Show neighboring drawings with configurable range, opacity and visual distinctio
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## FBF-004 — Advanced onion skin
 
@@ -56,7 +64,7 @@ Select specific drawings, distinguish frames from unique drawings and compare la
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FBF-005 — Onion skin across layers
 
@@ -66,7 +74,7 @@ Compare references from other layers using visibility rules.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FBF-006 — Shift and trace
 
@@ -76,7 +84,7 @@ Temporarily move and rotate reference drawings for tracing.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FBF-007 — Drawing desk
 
@@ -86,7 +94,7 @@ Arrange reference drawings independently of their timeline exposure.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FBF-008 — Flip and short playback
 
@@ -96,7 +104,11 @@ Alternate poses and play a short segment without losing the selection.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## FBF-009 — Drawing marks
 
@@ -106,7 +118,7 @@ Mark drawings as keys, breakdowns or custom categories.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FBF-010 — Generate Color Art from lines
 
@@ -116,7 +128,7 @@ Build paint boundaries from Line Art using defined tolerances.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FBF-011 — Generate matte
 
@@ -126,7 +138,7 @@ Produce reference silhouettes from drawings.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FBF-012 — Registration and alignment crosses
 
@@ -136,4 +148,4 @@ Use alignment marks to register drawings.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.

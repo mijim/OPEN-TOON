@@ -1,4 +1,6 @@
 #include "scene_renderer.h"
+#include "graph_renderer.h"
+#include "opentoon/drawing_selection.h"
 #include <QPainterPath>
 #include <cmath>
 #include <stdexcept>
@@ -73,6 +75,64 @@ QTransform SceneRenderer::worldTransform(const Document& d, const Layer& layer, 
     }
     return result;
 }
+QTransform SceneRenderer::cameraTransform(const Document& document, Frame frame) {
+    if (!document.activeCamera)
+        return {};
+    const auto pose = evaluateTransform(document.layer(document.activeCamera), frame);
+    QTransform transform;
+    transform.translate(document.width / 2.0, document.height / 2.0);
+    transform.rotate(-pose.rotation);
+    transform.scale(pose.scaleX, pose.scaleY);
+    transform.translate(-pose.x, -pose.y);
+    return transform;
+}
+QRect SceneRenderer::layerInkBounds(const Document& document, const Layer& layer, Frame frame,
+                                    QSize size, RenderOptions options) {
+    const QRect canvas(QPoint(0, 0), size);
+    if (options.onionSkin)
+        return canvas; // Ghost drawings can differ from the current exposure.
+    const auto* source = options.previewDrawing && options.previewLayer == layer.id
+                             ? options.previewDrawing
+                             : document.drawingAt(layer.id, frame);
+    if (!source)
+        return {};
+    QRectF local;
+    bool hasInk = false;
+    auto include = [&](QRectF rect) {
+        if (rect.isEmpty())
+            return;
+        local = hasInk ? local.united(rect) : rect;
+        hasInk = true;
+    };
+    if (source->image)
+        include(QRectF(0, 0, source->image->width, source->image->height));
+    if (source->raster)
+        for (const auto& [position, tile] : source->raster->tiles) {
+            (void)tile;
+            include(QRectF(position.first * 64, position.second * 64, 64, 64)
+                        .intersected(QRectF(0, 0, source->raster->width, source->raster->height)));
+        }
+    for (const auto& stroke : source->strokes)
+        if (const auto bounds = strokeBounds(stroke))
+            include(QRectF(bounds->x, bounds->y, bounds->width, bounds->height));
+    if (!hasInk)
+        return {};
+    auto transform = worldTransform(document, layer, frame);
+    if (!options.ignoreCamera)
+        transform = transform * cameraTransform(document, frame);
+    const auto transformed = transform.mapRect(local);
+    const auto sx = double(size.width()) / document.width;
+    const auto sy = double(size.height()) / document.height;
+    const QRectF output(transformed.x() * sx, transformed.y() * sy,
+                        transformed.width() * sx, transformed.height() * sy);
+    if (!std::isfinite(output.x()) || !std::isfinite(output.y()) ||
+        !std::isfinite(output.width()) || !std::isfinite(output.height()))
+        return canvas;
+    const auto clipped = output.intersected(QRectF(canvas));
+    if (clipped.isEmpty())
+        return {};
+    return clipped.toAlignedRect().adjusted(-4, -4, 4, 4).intersected(canvas);
+}
 void SceneRenderer::paintStroke(QPainter& painter, const Stroke& s, const std::vector<Swatch>& palette,
                                 double opacity) {
     if (s.points.empty())
@@ -122,13 +182,28 @@ void SceneRenderer::paintStroke(QPainter& painter, const Stroke& s, const std::v
     painter.restore();
 }
 void SceneRenderer::paint(QPainter& painter, const Document& d, Frame frame, RenderOptions options) {
+    if (d.composition == CompositionProfile::LinearSrgb) {
+        painter.save();
+        painter.setClipRect(QRectF(0, 0, d.width, d.height));
+        painter.drawImage(QPointF(0, 0),
+                          GraphRenderer::render(CompositionGraph::orderedLayers(d), d, frame,
+                                                {d.width, d.height}, options, GraphTarget::Display));
+        painter.restore();
+        return;
+    }
     painter.save();
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setClipRect(QRectF(0, 0, d.width, d.height));
     if (options.background)
         painter.fillRect(QRectF(0, 0, d.width, d.height), qtColor(d.background));
-    bool solo = std::any_of(d.layers.begin(), d.layers.end(), [](const Layer& l) { return l.solo; });
+    if (!options.ignoreCamera)
+        painter.setWorldTransform(cameraTransform(d, frame), true);
+    bool solo = std::any_of(d.layers.begin(), d.layers.end(), [](const Layer& l) {
+        return l.kind != LayerKind::Camera && l.solo;
+    });
     for (const auto& l : d.layers) {
+        if (l.kind == LayerKind::Camera)
+            continue;
         if (!l.visible || (options.isolatedLayer && l.id != options.isolatedLayer))
             continue;
         double opacity = evaluateTransform(l, frame).opacity;
@@ -177,10 +252,15 @@ void SceneRenderer::paint(QPainter& painter, const Document& d, Frame frame, Ren
     painter.restore();
 }
 QImage SceneRenderer::render(const Document& d, Frame frame, QSize size, RenderOptions options) {
+    if (options.cancelled && options.cancelled())
+        throw RenderCancelled();
     if (size.isEmpty())
         size = QSize(d.width, d.height);
     if (size.width() > 8192 || size.height() > 8192 || size.width() <= 0 || size.height() <= 0)
         throw std::invalid_argument("Invalid render dimensions.");
+    if (d.composition == CompositionProfile::LinearSrgb)
+        return GraphRenderer::render(CompositionGraph::orderedLayers(d), d, frame, size,
+                                     options, GraphTarget::Write);
     QImage result(size, QImage::Format_ARGB32_Premultiplied);
     if (result.isNull())
         throw std::runtime_error("Unable to allocate render surface.");
@@ -188,6 +268,9 @@ QImage SceneRenderer::render(const Document& d, Frame frame, QSize size, RenderO
     QPainter painter(&result);
     painter.scale(double(size.width()) / d.width, double(size.height()) / d.height);
     paint(painter, d, frame, options);
+    painter.end();
+    if (options.cancelled && options.cancelled())
+        throw RenderCancelled();
     return result;
 }
 } // namespace opentoon

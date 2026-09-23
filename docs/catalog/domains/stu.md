@@ -26,7 +26,7 @@ Organize scenes within production structures and assignments.
 
 **Scope:** `studio_extension` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## STU-002 — Shared scene access
 
@@ -36,7 +36,7 @@ Open and save scenes on shared storage through a defined service.
 
 **Scope:** `studio_extension` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## STU-003 — Scene locks
 
@@ -46,7 +46,7 @@ Coordinate write rights and lock release.
 
 **Scope:** `studio_extension` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## STU-004 — Drawing locks
 
@@ -56,7 +56,7 @@ Allow painting on authorized drawings while other roles work on the scene.
 
 **Scope:** `studio_extension` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## STU-005 — Delivery versions and merging
 
@@ -66,7 +66,7 @@ Manage revisions and detect divergence when reintegrating a scene.
 
 **Scope:** `studio_extension` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## STU-006 — Remote checkout
 
@@ -76,7 +76,7 @@ Package scenes for offline work and reintegrate changes.
 
 **Scope:** `studio_extension` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## STU-007 — Render and vectorization queues
 
@@ -86,7 +86,7 @@ Distribute jobs with status, retry and monitoring.
 
 **Scope:** `studio_extension` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## STU-008 — Paint and Scan roles
 
@@ -96,4 +96,4 @@ Provide task-limited workspaces for production painting and scanning.
 
 **Scope:** `studio_extension` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.

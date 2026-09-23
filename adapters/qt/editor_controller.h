@@ -6,6 +6,7 @@
 #include "opentoon/vector_edit.h"
 #include <QColor>
 #include <QElapsedTimer>
+#include <QHash>
 #include <QObject>
 #include <QTimer>
 #include <QUrl>
@@ -25,6 +26,7 @@ class EditorController final : public QObject {
     Q_PROPERTY(QVariantList selectedLayers READ selectedLayers NOTIFY rangeChanged)
     Q_PROPERTY(QVariantList markers READ markers NOTIFY changed)
     Q_PROPERTY(bool hasClipboard READ hasClipboard NOTIFY rangeChanged)
+    Q_PROPERTY(bool hasCopiedTransform READ hasCopiedTransform NOTIFY poseClipboardChanged)
     Q_PROPERTY(QString sceneName READ sceneName NOTIFY changed)
     Q_PROPERTY(QString projectPath READ projectPath NOTIFY changed)
     Q_PROPERTY(QString status READ status NOTIFY statusChanged)
@@ -32,12 +34,21 @@ class EditorController final : public QObject {
     Q_PROPERTY(bool canUndo READ canUndo NOTIFY changed)
     Q_PROPERTY(bool canRedo READ canRedo NOTIFY changed)
     Q_PROPERTY(QVariantList layers READ layers NOTIFY changed)
+    Q_PROPERTY(QVariantList substitutions READ substitutions NOTIFY changed)
+    Q_PROPERTY(int selectedSubstitution READ selectedSubstitution NOTIFY frameChanged)
+    Q_PROPERTY(int characterId READ characterId NOTIFY changed)
+    Q_PROPERTY(QVariantList characterViews READ characterViews NOTIFY changed)
+    Q_PROPERTY(int selectedView READ selectedView NOTIFY viewSelectionChanged)
+    Q_PROPERTY(qulonglong documentRevision READ documentRevision NOTIFY changed)
     Q_PROPERTY(QVariantList palette READ palette NOTIFY changed)
     Q_PROPERTY(QVariantList revisions READ revisions NOTIFY changed)
     Q_PROPERTY(int frame READ frame WRITE setFrame NOTIFY frameChanged)
     Q_PROPERTY(int duration READ duration NOTIFY changed)
     Q_PROPERTY(int sceneWidth READ sceneWidth NOTIFY changed)
     Q_PROPERTY(int sceneHeight READ sceneHeight NOTIFY changed)
+    Q_PROPERTY(int compositionProfile READ compositionProfile NOTIFY changed)
+    Q_PROPERTY(int activeCamera READ activeCamera NOTIFY changed)
+    Q_PROPERTY(double cameraZoom READ cameraZoom NOTIFY frameChanged)
     Q_PROPERTY(double fps READ fps NOTIFY changed)
     Q_PROPERTY(int fpsNumerator READ fpsNumerator NOTIFY changed)
     Q_PROPERTY(int fpsDenominator READ fpsDenominator NOTIFY changed)
@@ -59,6 +70,7 @@ class EditorController final : public QObject {
     explicit EditorController(QObject* parent = nullptr);
     ~EditorController() override;
     const opentoon::Document& document() const { return session_.document(); }
+    std::shared_ptr<const opentoon::Document> snapshot() const { return session_.snapshot(); }
     std::uint64_t sceneGeneration() const { return sceneGeneration_; }
     bool animateMode() const { return animateMode_; }
     bool autoKey() const { return autoKey_; }
@@ -107,11 +119,27 @@ class EditorController final : public QObject {
     bool canUndo() const { return session_.canUndo(); }
     bool canRedo() const { return session_.canRedo(); }
     QVariantList layers() const;
+    QVariantList substitutions() const;
+    int selectedSubstitution() const;
+    int characterId() const;
+    QVariantList characterViews() const;
+    int selectedView() const;
+    qulonglong documentRevision() const { return session_.revision(); }
+    Q_INVOKABLE QString substitutionThumbnail(int drawing) const;
+    Q_INVOKABLE void selectView(int view);
     QVariantList palette() const;
     QVariantList revisions() const;
     QVariantMap transform() const;
     int frame() const { return frame_; }
     int duration() const { return document().duration; }
+    int compositionProfile() const { return static_cast<int>(document().composition); }
+    int activeCamera() const { return int(document().activeCamera); }
+    double cameraZoom() const;
+    Q_INVOKABLE void setCompositionProfile(int profile);
+    Q_INVOKABLE void addCamera();
+    Q_INVOKABLE void resetCameraPose();
+    Q_INVOKABLE void setCameraZoom(double zoom);
+    bool commitCameraPose(const opentoon::Transform&);
     int sceneWidth() const { return document().width; }
     int sceneHeight() const { return document().height; }
     int fpsNumerator() const { return document().rate.numerator; }
@@ -170,6 +198,32 @@ class EditorController final : public QObject {
     Q_INVOKABLE void toggleLayer(int, QString);
     Q_INVOKABLE void moveLayer(int);
     Q_INVOKABLE void setParent(int);
+    Q_INVOKABLE void makeCharacter();
+    Q_INVOKABLE void attachUnparentedDrawings();
+    Q_INVOKABLE void addPeg();
+    Q_INVOKABLE void deleteRigBranch();
+    Q_INVOKABLE void detachPart();
+    Q_INVOKABLE void dissolvePeg();
+    Q_INVOKABLE void setPartRole(QString);
+    Q_INVOKABLE void setRestPivot(double x, double y);
+    Q_INVOKABLE void centerRestPivot();
+    Q_INVOKABLE void createSubstitution(bool duplicate = false);
+    Q_INVOKABLE void renameSubstitution(int drawing, QString name);
+    Q_INVOKABLE void selectSubstitution(int drawing);
+    Q_INVOKABLE void removeSubstitution(int drawing);
+    Q_INVOKABLE void moveSubstitution(int drawing, int direction);
+    Q_INVOKABLE void stepSubstitution(int direction);
+    Q_INVOKABLE void captureCharacterView();
+    Q_INVOKABLE void applyCharacterView();
+    Q_INVOKABLE void applyCharacterViewToRange();
+    Q_INVOKABLE void updateCharacterView();
+    Q_INVOKABLE void updateSelectedPartInView();
+    Q_INVOKABLE void renameCharacterView(QString name);
+    Q_INVOKABLE void duplicateCharacterView();
+    Q_INVOKABLE void removeCharacterView();
+    Q_INVOKABLE void moveCharacterView(int direction);
+    Q_INVOKABLE void stepCharacterView(int direction);
+    Q_INVOKABLE void duplicateCharacter();
     Q_INVOKABLE void newDrawing(bool duplicate = false);
     Q_INVOKABLE void holdDrawing(int);
     Q_INVOKABLE void clearExposure();
@@ -180,6 +234,10 @@ class EditorController final : public QObject {
     Q_INVOKABLE void setSwatchColor(int, QColor);
     Q_INVOKABLE void setScene(QString, int, int, int, int, int);
     Q_INVOKABLE void setTransform(QString, double);
+    bool hasCopiedTransform() const { return transformClipboard_.has_value(); }
+    Q_INVOKABLE void copyTransformPose();
+    Q_INVOKABLE bool pasteTransformPose(int mode);
+    Q_INVOKABLE bool resetTransformPose();
     bool commitPose(const opentoon::Transform&);
     bool setPoseKeyPosition(int frame, double x, double y);
     Q_INVOKABLE bool movePoseKey(int source, int destination);
@@ -190,6 +248,8 @@ class EditorController final : public QObject {
     Q_INVOKABLE void deleteKey();
     Q_INVOKABLE void togglePlayback();
     Q_INVOKABLE void importImage(QUrl);
+    Q_INVOKABLE bool importParts(QVariantList urls);
+    Q_INVOKABLE bool importImageSequence(QVariantList urls);
     Q_INVOKABLE void exportFrames(QUrl);
     Q_INVOKABLE void cancelExport();
     Q_INVOKABLE void recover();
@@ -197,6 +257,8 @@ class EditorController final : public QObject {
     Q_INVOKABLE void report(QString message);
   signals:
     void keySelectionChanged();
+    void poseClipboardChanged();
+    void viewSelectionChanged();
     void animationModeChanged();
     void rangeChanged();
     void changed();
@@ -209,11 +271,16 @@ class EditorController final : public QObject {
     void recoveryChanged();
 
   private:
+    bool importImageBatch(QVariantList urls, bool sequence);
     opentoon::Session session_;
     std::vector<opentoon::Frame> poseSelection_;
     opentoon::Id poseSelectionLayer_ = 0;
     int poseSelectionAnchor_ = -1;
     opentoon::KeyBlock poseClipboard_;
+    std::optional<opentoon::Transform> transformClipboard_;
+    opentoon::Id selectedView_ = 0;
+    mutable std::uint64_t thumbnailRevision_ = 0;
+    mutable QHash<qulonglong, QString> thumbnailCache_;
     void reconcilePoseSelection();
     void setPoseSelection(std::vector<opentoon::Frame>);
     bool retimePoseSelection(int first, int last, bool duplicate);

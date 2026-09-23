@@ -24,9 +24,13 @@ Separate model parts while preserving registration and palettes.
 
 **Initial acceptance:** The pieces visually reconstruct the original character at rest.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM03-RIG-FOUNDATION.md](../../../docs/implementation/HM03-RIG-FOUNDATION.md) — registered 19-part artwork reconstructs a rigid character.
+
+**Remaining scope:** Registered imported parts reconstruct the rigid reference. General character breakdown and artist-led acceptance remain open.
 
 ## RIG-002 — Transform hierarchies
 
@@ -36,7 +40,11 @@ Build parent-child chains with separate drawings and pegs.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## RIG-003 — Permanent and temporary pivots
 
@@ -46,7 +54,11 @@ Edit the rotation center with an explicit scope distinction.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## RIG-004 — Z order and depth adjustment
 
@@ -56,7 +68,7 @@ Control part overlap with fine depth adjustments.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## RIG-005 — Joints and Auto Patch
 
@@ -66,7 +78,7 @@ Resolve joints and hide lines between overlapping parts.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## RIG-006 — Drawing substitutions
 
@@ -74,9 +86,13 @@ Swap mouths, hands or views of a part while retaining animation.
 
 **Initial acceptance:** Changing a mouth does not alter the head transform.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM03-RIG-FOUNDATION.md](../../../docs/implementation/HM03-RIG-FOUNDATION.md) — named held Part substitutions preserve transform and reopen.
+
+**Remaining scope:** Named Part substitutions work. Full production substitution workflow and artist-led acceptance remain open.
 
 ## RIG-007 — Multiple substitutions
 
@@ -84,9 +100,13 @@ Switch coordinated variants across several character elements.
 
 **Initial acceptance:** Changing a view replaces the assigned parts in one transaction.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM03-RIG-FOUNDATION.md](../../../docs/implementation/HM03-RIG-FOUNDATION.md) — named coordinated view sets switch several Parts atomically.
+
+**Remaining scope:** Coordinated rigid Part views work. Broader multi-substitution controls and artist-led acceptance remain open.
 
 ## RIG-008 — Hierarchy navigation
 
@@ -96,7 +116,7 @@ Select a parent, child or chain without manually finding every node.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## RIG-009 — Inverse kinematics
 
@@ -106,7 +126,7 @@ Solve joints from a target with configurable limits.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## RIG-010 — Nails and IK constraints
 
@@ -116,7 +136,7 @@ Pin points while manipulating other parts.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## RIG-011 — Constraint keyframes
 
@@ -126,7 +146,7 @@ Animate constraint states and control transitions.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## RIG-012 — Copy poses
 
@@ -136,7 +156,7 @@ Save and transfer poses using stable part mappings.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## RIG-013 — Breakdown Assistant
 
@@ -146,7 +166,7 @@ Blend neighboring poses by percentage and selected attributes.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## RIG-014 — Rig guides and conventions
 
@@ -156,7 +176,7 @@ Identify controls, guides and names without including them in the render.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## RIG-015 — Quick Rig
 
@@ -166,4 +186,4 @@ Build an editable character rig from explicitly assigned parts and artist-placed
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.

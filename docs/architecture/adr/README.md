@@ -67,4 +67,24 @@ arrangement, group styles, cleanup, guides and batch key patterns.
 
 See [ADR-022](022-character-first-delivery.md) for the character-first delivery DAG,
 property/evaluation/binding foundations and progressive rigging complexity. Planning
-is accepted; the new runtime contracts remain unimplemented.
+is accepted; a bounded property-address adapter is underway while rig, binding and
+evaluation contracts remain to be delivered.
+
+See [ADR-023](023-harmony-foundation-contracts.md) for the HM-00 identity, space,
+time, color, migration and command boundaries. Its engineering contract is accepted;
+the project owner accepted the reference-art rubric.
+
+See [ADR-024](024-typed-layer-properties.md) for the typed HM-01 transform-address
+adapter, explicit property sources and compact layer-pose transfer semantics.
+
+See [ADR-025](025-character-rig-format-four.md) for typed character layers,
+format-4 persistence, source-version migration backups and rigid substitutions.
+
+See [ADR-026](026-character-view-sets.md) for format-5 coordinated character
+views, independent hierarchy copying and renderer-backed substitution tiles.
+
+See [ADR-027](027-typed-composition-profile.md) for the opt-in format-6
+composition profile, typed graph kernel and bounded alpha behavior.
+
+See [ADR-028](028-output-camera.md) for format-7 orthographic output framing,
+direct camera gestures and the preview/export coordinate boundary.

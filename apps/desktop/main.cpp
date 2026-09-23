@@ -1,4 +1,5 @@
 #include "authoring_smoke.h"
+#include "camera_smoke.h"
 #include "canvas_item.h"
 #include "editor_controller.h"
 #include "key_block_smoke.h"
@@ -433,6 +434,44 @@ int main(int argc, char** argv) {
                                     vectorSelectionSmoke(editor, *canvas, *window);
                                     authoringSmoke(editor, *canvas, *window);
                                     motionPathSmoke(editor, *canvas, *window);
+                                    const auto beforeComposition = editor.document();
+                                    editor.setCompositionProfile(1);
+                                    QCoreApplication::processEvents();
+                                    if (window->grabWindow().isNull())
+                                        throw std::runtime_error("Linear canvas preview failed.");
+                                    const int nextPreview = (editor.frame() + 1) % editor.duration();
+                                    QElapsedTimer previewClock;
+                                    previewClock.start();
+                                    while (!canvas->hasPreparedFrame(nextPreview) &&
+                                           previewClock.elapsed() < 2000)
+                                        QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+                                    if (!canvas->hasPreparedFrame(nextPreview))
+                                        throw std::runtime_error("Background canvas preview was not published.");
+                                    editor.setFrame(nextPreview);
+                                    if (window->grabWindow().isNull())
+                                        throw std::runtime_error("Prepared frame was not displayed.");
+                                    const int playbackStart = editor.frame();
+                                    editor.togglePlayback();
+                                    QElapsedTimer playbackClock;
+                                    playbackClock.start();
+                                    while (playbackClock.elapsed() < 150)
+                                        QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+                                    editor.togglePlayback();
+                                    if (editor.frame() == playbackStart)
+                                        throw std::runtime_error("Timed canvas playback did not advance.");
+                                    editor.setFrame(0);
+                                    editor.setFrame(editor.duration() - 1);
+                                    if (window->grabWindow().isNull())
+                                        throw std::runtime_error("Rapid scrub preview failed.");
+                                    editor.undo();
+                                    if (editor.document() != beforeComposition)
+                                        throw std::runtime_error("Composition profile undo failed.");
+                                    cameraSmoke(editor, *canvas, *window);
+                                    std::cout << "Composition smoke passed: linear canvas preview, "
+                                                 "background next-frame publication, playback, scrub "
+                                                 "and undo.\n";
+                                    std::cout << "Camera smoke passed: direct pan/rotate/zoom, atomic undo, "
+                                                 "guides, viewport isolation and save/reopen.\n";
                                     QTimer::singleShot(150, &app, [&, window] {
                                         auto image = window->grabWindow();
                                         std::cout << "Visual animation smoke passed: thin picking, cursor "

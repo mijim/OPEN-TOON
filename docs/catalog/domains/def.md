@@ -26,7 +26,7 @@ Articulate a drawing through a chain of joints and influences.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## DEF-002 — Game bones
 
@@ -36,7 +36,7 @@ Represent runtime-oriented skeletons with documented export limits.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## DEF-003 — Curve deformation
 
@@ -46,7 +46,7 @@ Control shape through curve segments and tangents.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## DEF-004 — Envelope deformation
 
@@ -56,7 +56,7 @@ Deform a silhouette through a closed envelope.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## DEF-005 — Free-form deformation
 
@@ -66,7 +66,7 @@ Deform interior regions with a mesh and internal controls.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## DEF-006 — Shape-aware deformation
 
@@ -76,7 +76,7 @@ Adapt weights to the shape using point, bone and cage controls.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## DEF-007 — Weighted deformation
 
@@ -86,7 +86,7 @@ Combine curve, point and peg influences in a deformation field.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## DEF-008 — Rest-pose editing
 
@@ -96,7 +96,7 @@ Separate bind/rest pose from animated state and update it explicitly.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## DEF-009 — Influence regions
 
@@ -106,7 +106,7 @@ Configure elliptical or shape-based regions and falloff radii.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## DEF-010 — Multiple-pose rigs
 
@@ -116,7 +116,7 @@ Assign deformation chains to compatible substitutions.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## DEF-011 — Kinematic output
 
@@ -126,7 +126,7 @@ Attach other elements to the evaluated result of a deformer.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## DEF-012 — Point kinematic output
 
@@ -136,7 +136,7 @@ Sample positions on a deformed curve to control other objects.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## DEF-013 — Convert deformation to drawings
 
@@ -146,7 +146,7 @@ Bake evaluated deformation into editable drawings.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## DEF-014 — Envelope generation
 
@@ -156,7 +156,7 @@ Derive initial controls from drawing geometry with subsequent cleanup.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## DEF-015 — Deformation visibility and quality
 
@@ -166,4 +166,4 @@ Toggle controls and preview quality without changing the final result.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.

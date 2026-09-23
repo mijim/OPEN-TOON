@@ -26,7 +26,11 @@ Play at the scene frame rate with range, loop and performance status.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## OUT-002 — Quality-controlled preview
 
@@ -36,7 +40,7 @@ Separate fast preview from final evaluation and show active simplifications.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## OUT-003 — Preview timeout
 
@@ -46,7 +50,7 @@ Limit interactive work and flag recoverable incomplete results.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## OUT-004 — Image sequences
 
@@ -56,7 +60,11 @@ Export range, name, numeric padding, resolution and alpha.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## OUT-005 — Video with audio
 
@@ -66,7 +74,7 @@ Render and encode using platform-available codec profiles.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## OUT-006 — Multiple outputs
 
@@ -76,7 +84,7 @@ Configure outputs with independent resolutions and formats.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## OUT-007 — Batch rendering
 
@@ -86,7 +94,7 @@ Run jobs outside the UI with logs, exit codes and retry support.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## OUT-008 — Output crop and scale
 
@@ -96,7 +104,7 @@ Crop and resize in output nodes using a defined filter.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## OUT-009 — PSD layout and layers
 
@@ -106,7 +114,7 @@ Export layouts while preserving layers supported by the profile.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## OUT-010 — After Effects interchange
 
@@ -116,7 +124,7 @@ Document profile-based export of data and per-layer renders.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## OUT-011 — GIF and lightweight output
 
@@ -126,7 +134,7 @@ Generate preview animations with explicit palette, loop and format limits.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## OUT-012 — Sequence player
 
@@ -136,7 +144,7 @@ Play rendered results with audio without opening the full editor.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## OUT-013 — Output precision and color
 
@@ -146,4 +154,4 @@ Choose bit depth, alpha and color space per output.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.

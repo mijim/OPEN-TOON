@@ -26,7 +26,11 @@ Reference colors using stable identifiers separate from RGBA values.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## COL-002 — Create and edit swatches
 
@@ -36,7 +40,11 @@ Manage solid swatches, names, opacity and duplicates.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## COL-003 — Region fill
 
@@ -46,7 +54,7 @@ Paint closed regions using a defined tolerance.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## COL-004 — Paint lines and areas
 
@@ -56,7 +64,11 @@ Recolor outlines and fills independently.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## COL-005 — Gap closing
 
@@ -66,7 +78,7 @@ Resolve small discontinuities to support filling without joining arbitrary areas
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## COL-006 — Multi-drawing painting
 
@@ -76,7 +88,7 @@ Apply paint operations to selected drawings or a time range.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## COL-007 — Gradients and textures
 
@@ -86,7 +98,7 @@ Use gradient and texture fills with independent transforms.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## COL-008 — Color model
 
@@ -96,7 +108,7 @@ Compare and sample a project-associated color reference.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## COL-009 — Palette lists
 
@@ -106,7 +118,7 @@ Resolve scene, element and production palettes in an explicit order.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## COL-010 — Palette clones and variants
 
@@ -116,7 +128,7 @@ Share identities between color variations without manual repainting.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## COL-011 — Import and export palettes
 
@@ -126,7 +138,7 @@ Transfer palettes with texture resources and conflict rules.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## COL-012 — Recover colors
 
@@ -136,7 +148,7 @@ Restore or reassign colors whose resources are unavailable.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## COL-013 — Palette optimization
 
@@ -146,7 +158,7 @@ Detect redundant or unused swatches while respecting existing revisions.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## COL-014 — Color spaces
 
@@ -154,9 +166,13 @@ Distinguish input interpretation, compositing, display and output.
 
 **Initial acceptance:** A reference chart completes the pipeline with measured error.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — opt-in linear-sRGB premultiplied compositing and alpha/color charts.
+
+**Remaining scope:** The bounded sRGB input/compositing profile works. Managed display/output transforms and production color error targets remain open.
 
 ## COL-015 — Studio color configurations
 
@@ -166,4 +182,4 @@ Support a shared, validated color configuration.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.

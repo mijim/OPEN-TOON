@@ -26,7 +26,7 @@ Move, split, group and reset panels without losing the document.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## UI-002 — Saved workspaces
 
@@ -36,7 +36,7 @@ Save and switch layouts for drawing, animation, rigging and compositing.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## UI-003 — Customizable toolbars
 
@@ -46,7 +46,7 @@ Show relevant tools and allow frequently used actions to be reordered.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## UI-004 — Configurable shortcuts
 
@@ -56,7 +56,7 @@ Assign contextual shortcuts with conflict detection and command search.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## UI-005 — Persistent preferences
 
@@ -66,7 +66,7 @@ Separate personal preferences, document settings and temporary values.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## UI-006 — View zoom, pan and rotation
 
@@ -76,7 +76,11 @@ Navigate the canvas without changing geometry or keyframes.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — docs/implementation/HM13-ACCEPTANCE.md; viewport navigation remains independent of output camera.
+
+**Remaining scope:** Canvas navigation is view-only. Full navigation/preferences acceptance remains open.
 
 ## UI-007 — Mirror view
 
@@ -86,7 +90,11 @@ Mirror the displayed drawing for inspection without reflecting stored data.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## UI-008 — Camera and drawing views
 
@@ -94,9 +102,13 @@ Distinguish isolated drawing editing from the composited scene result.
 
 **Initial acceptance:** The selected drawing can be edited without baking effects into its data.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM13-ACCEPTANCE.md](../../../docs/implementation/HM13-ACCEPTANCE.md) — separate camera-stage editing and projected drawing view.
+
+**Remaining scope:** Camera-stage and projected artwork views work. Full isolated drawing/compositing view management remains open.
 
 ## UI-009 — Contextual inspector
 
@@ -106,7 +118,11 @@ Show editable attributes, animation state and units for the current selection.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## UI-010 — Tablet input
 
@@ -116,4 +132,8 @@ Use pressure and sensitivity settings, with visible fallback when the device lac
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.

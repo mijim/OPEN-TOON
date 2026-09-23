@@ -13,6 +13,15 @@ OPEN-TOON currently supports an offline vector and raster animation workflow. It
 
 The built-in bouncing-ball example provides 24 distinct drawings exposed on twos. It contains only project-generated geometry and may be reused under the repository license.
 
+**View → Composition** selects **Legacy appearance** or **Linear sRGB**. The first
+keeps the established Qt scene appearance and is the default for old projects.
+Linear sRGB composites drawing layers in linear light and can look brighter at
+semi-transparent overlaps. The choice is saved with the project, is undoable,
+and applies to canvas preview and PNG export. Current composition is 8-bit CPU
+rendering. Unchanged linear frames are reused while you pan, zoom or rotate the
+view; editing or switching scenes refreshes them. Node topology cannot yet be
+edited in the UI.
+
 ## Drawing and view controls
 
 - **Pencil:** sampled vector centerline with round segments and pressure-weighted width.
@@ -35,7 +44,25 @@ The four art categories are Underlay, Color, Line and Overlay. Their drawing ord
 
 Click a swatch to select it. Double-click to edit its color; all strokes referencing that ID update. The document retains color IDs across save/reopen. Palette import, variants, gradients and managed color are pending.
 
-The inspector edits position, rotation, scale, opacity and pivot. Add transform keys with Linear, Hold or Smooth interpolation. If a layer already has keys, editing a transform inserts or updates a key at the current frame. Parent layers apply inherited transforms and opacity. Reparenting does **not** preserve the world-space pose automatically. There is no camera, curve editor, IK or deformer yet.
+The inspector edits position, rotation, scale, opacity and pivot. Add transform keys with Linear, Hold or Smooth interpolation. If a layer already has keys, editing a transform inserts or updates a key at the current frame. Parent layers apply inherited transforms and opacity. Character parts and pegs preserve the visible image when reparented within one character, provided the result has no shear or singular transform and the moved layer and its ancestors are not animated. Curves can be edited in the main workspace. IK and deformation remain pending.
+
+**Scene → Add output camera** creates one orthographic camera. Choose the Camera
+tool to see the shot frame: drag inside it to pan, drag the round top handle to
+rotate, or drag a corner to zoom. Shift constrains pan to one axis or rotation
+to 15-degree increments. The compact camera bar and selected-camera Properties
+show zoom and pose; **Reset** restores the scene-center frame. **Guides** shows
+the frame and safe area over normal artwork editing. Camera moves at later
+frames create keys and can be edited in Curves. Camera framing affects preview
+and PNG export; viewport pan, zoom and fit only change how you inspect the shot.
+The camera is single-output for now; multiplane and perspective are pending.
+
+To assemble a rigid character, import registered PNG parts and select one layer in the layer list. In its Properties panel, open **Rig → Make character from layer**. That layer becomes a Part below a new Character root. Select another imported drawing layer and choose the Character or a Peg as its parent; the drawing becomes a Part while retaining its visible placement. **Rig → Add parent peg** inserts a transform parent over the selected Part or Peg. Edit the Part role in Properties. **Center rest pivot on drawing** places its saved pivot at the local artwork center while retaining its position; do this before animating the layer. Precise on-canvas pivot placement is pending.
+
+**Rig → Attach unparented drawings** adds every exposed, unlocked root drawing to the selected character as a separate Part in one undoable step. It leaves unexposed guide layers alone and keeps registered artwork in place. In the layer menu, **Duplicate rig branch** copies a selected Part or Peg with its descendants and independent drawing identities; **Clone branch with linked artwork** keeps the same drawing resources while giving the new layers their own timing and view choices. **Rig → Delete selected rig branch** removes a Part or Peg subtree and its saved view choices. **Detach selected part** returns a Part to a root Drawing layer; **Dissolve peg, keep children** removes an unanimated Peg while preserving supported child rest poses. Animated or nonrepresentable cases report an error instead of changing the scene.
+
+Each Part shows its named substitutions as thumbnail tiles in Properties. **+ Blank** starts a new drawing, **Duplicate** copies the currently exposed drawing, and clicking a tile chooses an option at the playhead through the current held interval. The chevrons step through options; arrows reorder them. Rename or remove the selected option in the same panel. A Character view set captures the current choice of every Part. Use **+ Capture**, **Apply** and **Update** to switch coordinated drawings at the playhead without changing transforms; view sets can also be renamed, duplicated or removed. **Rig → Duplicate full character** makes an independent hierarchy and artwork copy. These edits undo, save and reopen with the rest of the rig. View sets contain drawing choices only; masked transform poses and reusable linked rig assets remain future work.
+
+**Apply range** places the selected view across the selected half-open timeline range while preserving the exposures before and after it. **Set this part** updates just the selected Part's choice in the selected view from the current frame. Arrow controls beside the view selector step through or reorder view sets. Navigation changes selection only; applying a view is the explicit document edit.
 
 ## Saving and recovery
 
@@ -43,7 +70,7 @@ Each manual save appends a complete revision. Scene history can restore a saved 
 
 Every 60 seconds, a modified document is saved to a recovery file. On a later launch, recovery can open that snapshot as an unsaved scene. Save it under a chosen name. Autosave runs from an immutable snapshot in a worker, so newer edits stay unsaved until the next save. Manual saves remain synchronous. Recovery from operating-system power loss and multiple simultaneous application instances has not been qualified.
 
-Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and total decoded media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening version 1/2 projects remains supported. Format 3 adds channel Bézier easing; the first save of an older schema creates a `.pre-v3.bak` copy before upgrading. The old editor requires that backup to reopen the original format.
+Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and total decoded media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening formats 1–6 remains supported. Format 3 added channel Bézier easing, format 4 added typed character layers and named substitutions, format 5 added character view sets, format 6 saves the composition profile, and format 7 adds the output camera. The first save of an older schema creates a backup named for its source version, such as `.pre-v6.bak`, before upgrading. Older editors require that backup to reopen the original format.
 
 **Scene → Compact project history** retains the chosen number of newest saved revisions and removes unreachable media, after creating a full `.pre-compact.bak` backup. Save pending edits first. This is an explicit operation and is not part of autosave.
 
@@ -59,7 +86,26 @@ Use **Edit → Scene marker** to label the current frame; an empty name removes 
 
 PNG export evaluates an immutable snapshot, so later edits do not change the running export. Cancel stops between frames. `manifest.json` records the rational frame rate, frame count and completion/cancellation/failure state. A cancelled or failed directory contains partial output and must not be treated as a complete sequence.
 
-Image import loads a single image up to 4096 × 4096, subject to scene memory/save limits. Image sequences, layered PSD, audio, video output, lip sync, deformation, node effects, OCIO, reusable rig libraries and production installers are still pending. Consult the [phase status](STATUS.md) for the complete boundary.
+**Scene → Import image** loads one image up to 4096 × 4096. Tagged images are
+converted to sRGB; untagged colors are interpreted as sRGB. If the scene has no
+layers, creating the layer and importing its drawing are one undoable action.
+For character artwork,
+**Import registered PNG parts** creates one layer per selected file; every PNG must
+have an alpha channel and the same canvas size. Their shared canvas origin is
+preserved, with no automatic crop or orientation transform. Parts are ordered by
+filename. Transparent PNGs with a non-sRGB color profile are rejected; untagged
+PNGs are interpreted as sRGB and reported in the status bar.
+
+**Import PNG sequence** creates one layer with a separate one-frame drawing for each
+numbered file. Files need a common prefix and number width, such as `walk_0001.png`
+and `walk_0003.png`. Import begins at the current frame; missing numbers leave empty
+frames, which the status bar counts. Both batch modes have a 4096 × 4096 pixel/file
+limit, a 256 MiB decoded-media limit and an undoable all-or-nothing commit. Cancel
+the file chooser to leave the document untouched. The project format also enforces
+its overall scene media limit. Parts currently share a centered layer offset; there
+is no automatic character-role assignment; use the Rig controls after import. Layered PSD, audio, video
+output, lip sync, deformation, node effects, OCIO, reusable rig libraries and
+production installers remain pending. Consult the [phase status](STATUS.md).
 
 ## Animation edits and curves
 
@@ -68,6 +114,19 @@ keys retain their poses; the canvas continues to display the evaluated animation
 Choose **Animate** to edit the current key. Enable **Auto key** to create a full-pose
 key when editing an unkeyed frame, or press **Add key** explicitly. With Auto key off,
 unkeyed edits are rejected. The inspector labels keyed, interpolated and held poses.
+
+The selected layer's **Pose** menu has ten actions: copy its current transform;
+paste all transform channels, only position, rotation, scale, opacity or pivot;
+paste a horizontally or vertically mirrored transform; and reset. Copy takes the
+rest transform in Setup or the evaluated transform at the playhead in Animate.
+Pasting in Setup edits the target layer's rest transform and leaves its existing
+keys alone. Pasting in Animate explicitly creates or updates one full-pose key,
+even with Auto key off; a first later-frame paste anchors the unchanged rest pose
+at frame zero. Mirrored paste negates the corresponding scale around the target
+pivot. Reset means identity transform in Setup, or the target layer's rest pose in
+Animate. Each paste/reset is one undo step. The copied transform stays available
+when changing scenes in the same window; it contains values, not artwork or rig
+references. Locked layers reject paste/reset.
 
 **‹ Key / Key ›** navigate the selected layer. **Curves** selects the integrated function editor in the bottom workspace.
 Choose a channel, click the graph to scrub, or drag a key to adjust its frame and

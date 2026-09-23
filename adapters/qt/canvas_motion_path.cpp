@@ -40,7 +40,7 @@ QPointF CanvasItem::motionPathPosition(int frame) const {
     if (!editor_ || !editor_->selectedLayer() || !motionReferenceValid_)
         return {};
     const auto& doc = posePreview_ ? *posePreview_ : editor_->document();
-    return (SceneRenderer::worldTransform(doc, doc.layer(editor_->selectedLayer()), frame) * viewTransform())
+    return (SceneRenderer::worldTransform(doc, doc.layer(editor_->selectedLayer()), frame) * contentTransform())
         .map(motionReference_);
 }
 std::vector<CanvasItem::MotionSample> CanvasItem::motionSamples(const Document& doc,
@@ -57,7 +57,7 @@ std::vector<CanvasItem::MotionSample> CanvasItem::motionSamples(const Document& 
         if (key.frame > start)
             frames.insert(key.frame - 1);
     }
-    const auto view = viewTransform();
+    const auto view = contentTransform();
     std::vector<MotionSample> samples;
     samples.reserve(frames.size());
     for (auto frame : frames)
@@ -123,7 +123,7 @@ void CanvasItem::beginMotionPath(QPointF point) {
     if (layer.parent)
         parent = SceneRenderer::worldTransform(doc, doc.layer(layer.parent), frame);
     bool invertible = false;
-    motionParentInverse_ = (parent * viewTransform()).inverted(&invertible);
+    motionParentInverse_ = (parent * contentTransform()).inverted(&invertible);
     if (!invertible) {
         editor_->report("Cannot move a path key through a zero-scale parent transform.");
         return;
@@ -183,7 +183,7 @@ void CanvasItem::paintMotionPath(QPainter* painter, const Document& doc, const Q
         editing ? motionReference_
                 : QPointF(region_.x + region_.width / 2.0, region_.y + region_.height / 2.0);
     const auto samples = motionSamples(doc, reference);
-    const auto view = viewTransform();
+    const auto view = contentTransform();
     painter->save();
     painter->setWorldTransform(itemTransform);
     QPolygonF path;

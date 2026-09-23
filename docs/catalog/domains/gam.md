@@ -26,7 +26,7 @@ Pack frames with pivot, size and timing metadata.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## GAM-002 — Runtime skeleton and animation
 
@@ -36,7 +36,7 @@ Export a rig profile compatible with a target runtime.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## GAM-003 — Effect baking
 
@@ -46,7 +46,7 @@ Convert unsupported parts into images or precomposed groups.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## GAM-004 — Accessory anchors
 
@@ -56,7 +56,7 @@ Export attachment points and animated transforms.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## GAM-005 — Collisions and metadata
 
@@ -66,7 +66,7 @@ Attach collision regions and game data to exports.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## GAM-006 — Runtime palette variants
 
@@ -76,7 +76,7 @@ Represent compatible variants or generate an atlas per variant.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## GAM-007 — Legacy HTML output
 
@@ -86,4 +86,4 @@ Record EaselJS export as a historical compatibility option.
 
 **Scope:** `legacy_candidate` · **Level:** `legacy` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.

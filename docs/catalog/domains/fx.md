@@ -26,7 +26,7 @@ Combine images using documented blending and alpha equations.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FX-002 — Animated transparency
 
@@ -36,7 +36,7 @@ Control alpha independently of RGB.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FX-003 — Gaussian and box blur
 
@@ -46,7 +46,7 @@ Filter by radius with explicit edge extension.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FX-004 — Directional, radial and zoom blur
 
@@ -56,7 +56,7 @@ Apply blur with animatable center, direction and length.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FX-005 — Bokeh and variable blur
 
@@ -66,7 +66,7 @@ Control blur using shapes and spatial maps.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FX-006 — Glow and bloom
 
@@ -76,7 +76,7 @@ Generate light halos while preserving HDR when enabled.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FX-007 — Shadows, tones and highlights
 
@@ -86,7 +86,7 @@ Create 2D shading from silhouettes and mattes.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FX-008 — Color curves and levels
 
@@ -96,7 +96,7 @@ Adjust channels through animatable curves and ranges.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FX-009 — Color override
 
@@ -106,7 +106,7 @@ Replace swatches and textures by identity on selected branches.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FX-010 — Palette fades
 
@@ -116,7 +116,7 @@ Interpolate palette or swatch colors over time.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FX-011 — Texture transforms
 
@@ -126,7 +126,7 @@ Animate fill coordinates without moving geometry.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FX-012 — Sequence textures
 
@@ -136,7 +136,7 @@ Replace a texture with frames from an external sequence.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FX-013 — Animated matte
 
@@ -146,7 +146,7 @@ Edit animatable contours with inner and outer feathering.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FX-014 — Channels and keying
 
@@ -156,7 +156,7 @@ Select, swap and extract mattes from image channels.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FX-015 — Generators
 
@@ -166,7 +166,7 @@ Create solid color, gradients, grids and noise as image sources.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FX-016 — Distortion and turbulence
 
@@ -176,7 +176,7 @@ Deform sampling coordinates using maps and parameters.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FX-017 — Sharpening and antiflicker
 
@@ -186,7 +186,7 @@ Provide detail and visual-stability filters within bounded ranges.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FX-018 — Light shading and normals
 
@@ -196,7 +196,7 @@ Light artwork using normals or auxiliary volumes.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FX-019 — Surface shading and cast shadows
 
@@ -206,7 +206,7 @@ Define surfaces and elevation for shadows and occlusion.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## FX-020 — OpenFX
 
@@ -216,4 +216,4 @@ Host a declared subset of the standard with compatible plugins.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.

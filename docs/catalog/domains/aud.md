@@ -26,7 +26,7 @@ Decode supported formats while preserving the original sample and metadata.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## AUD-002 — Waveform
 
@@ -36,7 +36,7 @@ Display amplitude at different timeline zoom levels.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## AUD-003 — Trim and place clips
 
@@ -46,7 +46,7 @@ Move clip start, adjust in/out points and repeat clips nondestructively.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## AUD-004 — Track mixing
 
@@ -56,7 +56,7 @@ Control volume and play multiple synchronized tracks.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## AUD-005 — Scrubbing
 
@@ -66,7 +66,7 @@ Play audio fragments while traversing frames, including continuous scrubbing.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## AUD-006 — Lip-sync detection
 
@@ -76,7 +76,7 @@ Derive candidate phonemes or visemes from audio with editable results.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## AUD-007 — Mouth mapping
 
@@ -86,7 +86,7 @@ Associate detected labels with character drawings.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## AUD-008 — Manual lip-sync correction
 
@@ -96,7 +96,7 @@ Edit mouth drawings and duration independently of the detector.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## AUD-009 — Audio library
 
@@ -106,7 +106,7 @@ Find, preview and reuse scene audio without unnecessary duplication.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## AUD-010 — Export mix
 
@@ -116,4 +116,4 @@ Export audio by range and synchronize it with rendering.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.

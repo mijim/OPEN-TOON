@@ -26,7 +26,11 @@ Animate translation, rotation, scale, skew and opacity with consistent units.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — docs/architecture/adr/016-visual-animation-and-bezier.md; bounded visual-editing subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## ANI-002 — Setup and animate modes
 
@@ -36,7 +40,11 @@ Separate rest-state changes from keyframe insertion or editing.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — docs/architecture/adr/016-visual-animation-and-bezier.md; bounded visual-editing subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## ANI-003 — Pegs
 
@@ -44,9 +52,13 @@ Use transform nodes independent of graphic content.
 
 **Initial acceptance:** Moving a peg transforms all its children without changing their drawings.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM03-RIG-FOUNDATION.md](../../../docs/implementation/HM03-RIG-FOUNDATION.md) — independent parent Peg transforms move child artwork.
+
+**Remaining scope:** Rigid pegs work. The full animation/rigging interactions and production acceptance remain open.
 
 ## ANI-004 — Interpolated and held keys
 
@@ -56,7 +68,11 @@ Support continuous segments and controlled pose changes.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/architecture/adr/021-vector-authoring-and-key-patterns.md](../../../docs/architecture/adr/021-vector-authoring-and-key-patterns.md) — Batch full-pose Linear/Step/Smooth interpolation on one layer; independent channel keys pending..
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## ANI-005 — Autokey and key editing
 
@@ -66,7 +82,11 @@ Create keys per property or property set without accidental keys.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — docs/architecture/adr/016-visual-animation-and-bezier.md; bounded visual-editing subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## ANI-006 — Function editor
 
@@ -76,7 +96,11 @@ Edit curves with visible tangents, ranges, values and units.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — docs/architecture/adr/016-visual-animation-and-bezier.md; docs/architecture/adr/017-combined-motion-and-point-editing.md; bounded visual-editing subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## ANI-007 — Easing and velocity
 
@@ -86,7 +110,11 @@ Control acceleration and deceleration through curves and presets.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/architecture/adr/021-vector-authoring-and-key-patterns.md](../../../docs/architecture/adr/021-vector-authoring-and-key-patterns.md) — Batch outgoing easing/overshoot presets across full-pose channels; independent spatial velocity pending..
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## ANI-008 — Motion paths and spatial velocity
 
@@ -96,7 +124,11 @@ Separate the path shape from temporal progress along it.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — docs/architecture/adr/019-canvas-motion-path-editing.md; canvas pose-position edits on an evaluated trajectory only; independent spatial geometry and velocity remain unimplemented.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## ANI-009 — Multi-key editing
 
@@ -106,7 +138,11 @@ Move, scale and copy key blocks between compatible tracks.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/architecture/adr/021-vector-authoring-and-key-patterns.md](../../../docs/architecture/adr/021-vector-authoring-and-key-patterns.md) — Sparse key-block repeat with preserved poses/easing, duration extension and collision rejection; channel masks and cross-layer batching pending..
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## ANI-010 — Copy motion
 
@@ -116,7 +152,11 @@ Transfer animation between objects with explicit pivot and unit rules.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — docs/architecture/adr/018-pose-key-block-editing.md; single-layer full-pose block operations in local units only; catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## ANI-011 — Expressions
 
@@ -126,7 +166,7 @@ Evaluate attribute relationships with cycle detection and visible errors.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## ANI-012 — Manual motion capture
 
@@ -136,7 +176,7 @@ Record a gesture path as editable time-based data.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## ANI-013 — Animatable numeric editor
 
@@ -146,4 +186,8 @@ Edit values and navigate keys directly from the inspector.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.

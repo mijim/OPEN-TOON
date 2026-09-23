@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "as_of": "2026-09-20",
-  "note": "Proposed objectives, not measured OPEN-TOON performance. B1 is defined in the quality and spikes document.",
+  "as_of": "2026-09-23",
+  "note": "Full-project quality objectives. partial_evidence marks bounded verification only; it does not close the complete requirement or release gate.",
   "requirements": [
     {
       "id": "NFR-001",
@@ -11,7 +11,8 @@
       "domains": [
         "PRJ"
       ],
-      "status": "proposed_not_measured"
+      "status": "partial_evidence",
+      "implementation_evidence": "tests/storage_tests.cpp; fault injection and abrupt-save recovery on the current SQLite protocol"
     },
     {
       "id": "NFR-002",
@@ -21,7 +22,8 @@
       "domains": [
         "PRJ"
       ],
-      "status": "proposed_not_measured"
+      "status": "partial_evidence",
+      "implementation_evidence": "tests/export_tests.cpp; immutable background recovery snapshot; configurable interval and measured work-loss gate remain open"
     },
     {
       "id": "NFR-003",
@@ -33,7 +35,8 @@
         "LYR",
         "VEC"
       ],
-      "status": "proposed_not_measured"
+      "status": "partial_evidence",
+      "implementation_evidence": "tests/document_tests.cpp; transactional undo/redo invariants on current editing operations"
     },
     {
       "id": "NFR-004",
@@ -91,7 +94,8 @@
         "TIM",
         "LYR"
       ],
-      "status": "proposed_not_measured"
+      "status": "partial_evidence",
+      "implementation_evidence": "docs/implementation/STATUS.md; virtualized timeline cells; allocation benchmark for the full target remains open"
     },
     {
       "id": "NFR-009",
@@ -113,7 +117,8 @@
         "OUT",
         "IMP"
       ],
-      "status": "proposed_not_measured"
+      "status": "partial_evidence",
+      "implementation_evidence": "tests/render_tests.cpp; cancellation inside linear frame evaluation; import/package coverage remains open"
     },
     {
       "id": "NFR-011",
@@ -135,7 +140,8 @@
         "PAR",
         "OUT"
       ],
-      "status": "proposed_not_measured"
+      "status": "partial_evidence",
+      "implementation_evidence": "tests/harmony_reference_tests.cpp; repeated CPU render equality on bounded artwork; wider backend determinism remains open"
     },
     {
       "id": "NFR-013",
@@ -146,7 +152,8 @@
         "UI",
         "PRJ"
       ],
-      "status": "proposed_not_measured"
+      "status": "partial_evidence",
+      "implementation_evidence": "docs/implementation/status.json; historical source CI matrix; current release and device matrix remain open"
     },
     {
       "id": "NFR-014",
@@ -188,7 +195,8 @@
       "domains": [
         "PRJ"
       ],
-      "status": "proposed_not_measured"
+      "status": "partial_evidence",
+      "implementation_evidence": "tests/storage_tests.cpp; versioned migration and source backup fixtures through format 6; full published-format gate remains open"
     },
     {
       "id": "NFR-018",
@@ -199,7 +207,8 @@
         "IMP",
         "PRJ"
       ],
-      "status": "proposed_not_measured"
+      "status": "partial_evidence",
+      "implementation_evidence": "tests/storage_tests.cpp; corrupt resources, schema limits and cycle rejection; parser fuzzing remains open"
     },
     {
       "id": "NFR-019",
@@ -209,7 +218,8 @@
       "domains": [
         "PRJ"
       ],
-      "status": "proposed_not_measured"
+      "status": "partial_evidence",
+      "implementation_evidence": "docs/implementation/MACOS-PREVIEW.md; historical experimental.10 local package inventory; current binary SBOM gate remains open"
     },
     {
       "id": "NFR-020",
@@ -250,7 +260,8 @@
       "domains": [
         "PRJ"
       ],
-      "status": "proposed_not_measured"
+      "status": "partial_evidence",
+      "implementation_evidence": "CMakeLists.txt; Qt-free document/application targets and core tests; full target-boundary CI audit remains open"
     },
     {
       "id": "NFR-024",
@@ -260,7 +271,8 @@
       "domains": [
         "PRJ"
       ],
-      "status": "proposed_not_measured"
+      "status": "partial_evidence",
+      "implementation_evidence": "scripts/validate_docs.py; generated catalog/roadmap and cross-record status checks; full editorial audit remains open"
     },
     {
       "id": "NFR-025",
@@ -271,7 +283,8 @@
         "IMP",
         "OUT"
       ],
-      "status": "proposed_not_measured"
+      "status": "partial_evidence",
+      "implementation_evidence": "docs/implementation/USER-GUIDE.md; explicit PNG color interpretation and batch loss rules; general interchange reports remain open"
     },
     {
       "id": "NFR-026",
@@ -282,7 +295,8 @@
         "PRJ",
         "STU"
       ],
-      "status": "proposed_not_measured"
+      "status": "partial_evidence",
+      "implementation_evidence": "tests/render_tests.cpp; revision-keyed render publication rejection; all async command adapters remain open"
     },
     {
       "id": "NFR-027",
@@ -295,7 +309,8 @@
         "AUT",
         "LIB"
       ],
-      "status": "proposed_not_measured"
+      "status": "partial_evidence",
+      "implementation_evidence": "docs/design/02-language-policy.md; translated first-party docs and English UI; exhaustive string and asset audit remains open"
     }
   ]
 }

@@ -35,6 +35,8 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
               {"duration", d.duration},
               {"rate", {d.rate.numerator, d.rate.denominator}},
               {"background", color(d.background)},
+              {"composition", static_cast<int>(d.composition)},
+              {"activeCamera", d.activeCamera},
               {"nextId", d.nextId},
               {"layers", Json::array()},
               {"drawings", Json::array()},
@@ -93,11 +95,23 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
                   {"locked", l.locked},
                   {"solo", l.solo},
                   {"parent", l.parent},
+                  {"kind", static_cast<int>(l.kind)},
+                  {"role", l.role},
+                  {"variants", Json::array()},
+                  {"views", Json::array()},
                   {"transform", transform(l.transform)},
                   {"exposures", Json::array()},
                   {"keys", Json::array()}};
         for (auto e : l.exposures)
             x["exposures"].push_back({e.start, e.end, e.drawing});
+        for (const auto& variant : l.variants)
+            x["variants"].push_back({{"drawing", variant.drawing}, {"name", variant.name}});
+        for (const auto& view : l.views) {
+            Json choices = Json::array();
+            for (const auto& choice : view.choices)
+                choices.push_back({choice.part, choice.drawing});
+            x["views"].push_back({{"id", view.id}, {"name", view.name}, {"choices", choices}});
+        }
         for (const auto& k : l.keys) {
             Json ease = Json::object();
             for (const auto& [channel, e] : k.easing)
@@ -134,6 +148,10 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
     d.rate = {j.at("rate").at(0), j.at("rate").at(1)};
     d.nextId = j.at("nextId");
     d.background = readColor(j.at("background"));
+    if (j.at("version").get<int>() >= 6)
+        d.composition = static_cast<CompositionProfile>(j.at("composition").get<int>());
+    if (j.at("version").get<int>() >= 7)
+        d.activeCamera = j.at("activeCamera").get<Id>();
     limit(j.at("palette"), 65536);
     limit(j.at("drawings"), 50000);
     limit(j.at("layers"), 2000);
@@ -225,6 +243,25 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
         l.locked = x.at("locked");
         l.solo = x.at("solo");
         l.parent = x.at("parent");
+        if (j.at("version").get<int>() >= 4) {
+            l.kind = static_cast<LayerKind>(x.at("kind").get<int>());
+            l.role = x.at("role").get<std::string>();
+            limit(x.at("variants"), 10000);
+            for (const auto& variant : x.at("variants"))
+                l.variants.push_back({variant.at("drawing"), variant.at("name")});
+        }
+        if (j.at("version").get<int>() >= 5) {
+            limit(x.at("views"), 1000);
+            for (const auto& view : x.at("views")) {
+                CharacterView entry;
+                entry.id = view.at("id");
+                entry.name = view.at("name");
+                limit(view.at("choices"), 2000);
+                for (const auto& choice : view.at("choices"))
+                    entry.choices.push_back({choice.at(0), choice.at(1)});
+                l.views.push_back(std::move(entry));
+            }
+        }
         l.transform = readTransform(x.at("transform"));
         limit(x.at("exposures"), 1000000);
         limit(x.at("keys"), 1000000);

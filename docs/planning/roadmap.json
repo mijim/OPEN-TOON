@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "as_of": "2026-09-21",
+  "as_of": "2026-09-23",
   "status": "active_execution_plan",
   "product_language": "en",
   "implementation_status": "experimental_partial",
@@ -786,7 +786,7 @@
     {
       "id": "P10",
       "title": "Node compositor and managed color",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [
         "P01"
       ],
@@ -799,7 +799,7 @@
         {
           "id": "P10-W1",
           "description": "Promote the early ordered compositor to a typed acyclic graph with groups, switches, viewer/output nodes and dirty propagation; migrate old projects.",
-          "status": "planned"
+          "status": "in_progress"
         },
         {
           "id": "P10-W2",
@@ -4484,7 +4484,7 @@
       "owner_phase": "P00",
       "work_package": "P00-W2",
       "owner_module": "architecture",
-      "status": "planned",
+      "status": "complete",
       "effort_engineer_weeks": [
         1,
         2
@@ -4497,7 +4497,7 @@
       "scope": "Freeze the bounded character-shot profile, failure fixtures and only the contracts needed by its next consumers. Audit current code instead of restarting all feasibility work.",
       "acceptance": [
         "Record a redistributable 20-second 1080p/24fps character shot, a 24000/1001 variant and a ten-minute audio drift fixture with explicit budgets.",
-        "Approve IDs/space/time/color/migration and command-ownership contracts, plus a saved-scene success rubric reviewed by an animator; record hardware rather than infer performance."
+        "Approve IDs/space/time/color/migration and command-ownership contracts, plus a saved-scene success rubric artistically reviewed by the project owner; record hardware rather than infer performance. Independent working-shot animator validation remains HM-15."
       ],
       "excluded": [
         "No blanket renderer rewrite, OpenToonz fork, full tablet matrix, docking framework or fill-topology gate."
@@ -4507,7 +4507,12 @@
         "modules/document/include/opentoon/document.h"
       ],
       "library_ids": [],
-      "completion_evidence": []
+      "completion_evidence": [
+        "docs/implementation/HM00-REVIEW.md",
+        "docs/architecture/adr/023-harmony-foundation-contracts.md",
+        "tests/harmony_reference_tests.cpp",
+        "tests/fixtures/harmony-moment/README.md"
+      ]
     },
     {
       "id": "HM-01",
@@ -4515,7 +4520,7 @@
       "owner_phase": "P01",
       "work_package": "P01-W2",
       "owner_module": "document/application/storage",
-      "status": "planned",
+      "status": "complete",
       "effort_engineer_weeks": [
         3,
         6
@@ -4561,7 +4566,13 @@
         "LIB-JSON",
         "LIB-ZSTD"
       ],
-      "completion_evidence": []
+      "completion_evidence": [
+        "docs/implementation/HM01-RIG-PROPERTIES.md",
+        "docs/architecture/adr/025-character-rig-format-four.md",
+        "tests/storage_tests.cpp",
+        "tests/document_tests.cpp",
+        "tests/rigging_tests.cpp"
+      ]
     },
     {
       "id": "HM-02",
@@ -4569,7 +4580,7 @@
       "owner_phase": "P02",
       "work_package": "P02-W3",
       "owner_module": "interchange/drawing",
-      "status": "planned",
+      "status": "complete",
       "effort_engineer_weeks": [
         1,
         3
@@ -4606,7 +4617,12 @@
         "LIB-QT",
         "LIB-MYPAINT"
       ],
-      "completion_evidence": []
+      "completion_evidence": [
+        "docs/implementation/HM02-ARTWORK-INTAKE.md",
+        "tests/export_tests.cpp",
+        "tests/harmony_reference_tests.cpp",
+        "docs/implementation/USER-GUIDE.md"
+      ]
     },
     {
       "id": "HM-03",
@@ -4614,7 +4630,7 @@
       "owner_phase": "P08",
       "work_package": "P08-W1",
       "owner_module": "rigging/document",
-      "status": "planned",
+      "status": "in_progress",
       "effort_engineer_weeks": [
         3,
         6
@@ -4667,7 +4683,7 @@
       "owner_phase": "P10",
       "work_package": "P10-W1",
       "owner_module": "animation/compositing/render",
-      "status": "planned",
+      "status": "complete",
       "effort_engineer_weeks": [
         3,
         6
@@ -4702,7 +4718,18 @@
       "library_ids": [
         "LIB-QT"
       ],
-      "completion_evidence": []
+      "completion_evidence": [
+        "docs/implementation/HM04-GRAPH-KERNEL.md",
+        "docs/architecture/adr/027-typed-composition-profile.md",
+        "tests/composition_graph_tests.cpp",
+        "tests/render_tests.cpp",
+        "tests/harmony_reference_tests.cpp",
+        "tests/storage_tests.cpp",
+        "adapters/render/preview_render_queue.cpp",
+        "apps/desktop/compositor_benchmark.cpp",
+        "docs/implementation/COMPOSITOR-BENCHMARK.md",
+        "docs/implementation/HM04-ACCEPTANCE.md"
+      ]
     },
     {
       "id": "HM-05",
@@ -5067,7 +5094,7 @@
       "owner_phase": "P06",
       "work_package": "P06-W3",
       "owner_module": "camera/animation",
-      "status": "planned",
+      "status": "complete",
       "effort_engineer_weeks": [
         2,
         4
@@ -5099,7 +5126,13 @@
         "adapters/qt/canvas_item.cpp"
       ],
       "library_ids": [],
-      "completion_evidence": []
+      "completion_evidence": [
+        "docs/implementation/HM13-ACCEPTANCE.md",
+        "docs/architecture/adr/028-output-camera.md",
+        "tests/render_tests.cpp",
+        "tests/export_tests.cpp",
+        "apps/desktop/camera_smoke.cpp"
+      ]
     },
     {
       "id": "HM-14",
@@ -5204,7 +5237,7 @@
   ],
   "execution_policy": {
     "primary_objective": "HM: reliable character animation Harmony Moment",
-    "current_instruction": "Planning only: do not implement new application capabilities in this revision.",
+    "current_instruction": "HM-00, HM-01, HM-02, bounded HM-04 and HM-13 are accepted. HM-03 rigid-character workflow still needs artist-led acceptance; this blocks HM-05 deformers and HM-12 nodes. HM-10 audio is independently eligible now, with HM-03 review and HM-05 binding feasibility the next critical-path tasks.",
     "phase_dependency_semantics": "Phase depends_on constrains full epic completion, not entry into an implementation slice. Only the explicit delivery-slice contract DAG gates the Harmony Moment. Domain dependencies are scope relationships, not all-features barriers.",
     "entry_rule": "Start a slice only when each required contract has accepted evidence. Baseline reuse is partial and must be qualified; planned is not ready. Independent spikes may run without claiming their consumer ready.",
     "wip_limit": 2,

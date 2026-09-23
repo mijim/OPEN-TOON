@@ -54,6 +54,11 @@ QCursor toolCursor(const QString& tool) {
         p.drawLine(28, 19, 21, 18);
     } else if (tool == "Animate") {
         p.drawPolygon(QPolygonF{QPointF(13, 20), QPointF(20, 13), QPointF(27, 20), QPointF(20, 27)});
+    } else if (tool == "Camera") {
+        p.drawRect(12, 14, 16, 12);
+        p.drawLine(17, 14, 20, 11);
+        p.drawLine(20, 11, 23, 14);
+        p.drawEllipse(QPointF(20, 20), 3, 3);
     } else if (tool.startsWith("Raster")) {
         p.drawEllipse(13, 13, 14, 14);
         if (tool == "Raster soft")
@@ -101,6 +106,14 @@ void CanvasItem::updateCursor(QPointF point) {
         return;
     }
     const auto tool = editor_->tool();
+    if (tool == "Camera") {
+        const int hit = cameraHandle_ >= 0 ? cameraHandle_ : cameraHandleAt(point);
+        setCursor(hit == 4 ? toolCursor("Rotate")
+                  : hit >= 0 && hit <= 3 ? Qt::SizeFDiagCursor
+                  : hit == 5 ? (cameraHandle_ >= 0 ? Qt::ClosedHandCursor : Qt::OpenHandCursor)
+                             : toolCursor("Camera"));
+        return;
+    }
     if (tool == "Animate" && motionPathEditing_) {
         if (motionKey_ >= 0)
             setCursor(Qt::ClosedHandCursor);

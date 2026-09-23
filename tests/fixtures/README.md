@@ -7,3 +7,6 @@ file unchanged: migration tests must exercise a file from the old application,
 not a legacy document synthesized by the current serializer.
 
 Original fixture and code: GPL-3.0-or-later.
+
+The [Harmony Moment reference input](harmony-moment/README.md) is separately
+generated from original artwork code; it is a target fixture, not a legacy project.

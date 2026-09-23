@@ -26,7 +26,7 @@ Show selectable widgets bound to rig attributes with limits.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## CTL-002 — Pose slider
 
@@ -36,7 +36,7 @@ Generate a one-dimensional control from compatible poses.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## CTL-003 — Pose grid
 
@@ -46,7 +46,7 @@ Create a two-dimensional control over organized pose samples.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## CTL-004 — Function wizard
 
@@ -56,7 +56,7 @@ Connect controls to attributes, activation and visibility without writing every 
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## CTL-005 — Character dashboard
 
@@ -66,7 +66,7 @@ Group identifiable controls for character manipulation.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## CTL-006 — Scripted controller
 
@@ -76,7 +76,7 @@ Expose events and attributes for validated custom controls.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## CTL-007 — Deformer on deformer
 
@@ -86,7 +86,7 @@ Compose controls acting on another deformation structure.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## CTL-008 — Portable controllers
 
@@ -96,4 +96,4 @@ Include dependencies and bindings when saving a rig template.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.

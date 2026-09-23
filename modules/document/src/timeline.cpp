@@ -93,8 +93,16 @@ void pasteRange(Document& d, const std::vector<Id>& layers, Frame at, const Expo
         auto& layer = d.layer(layers[i]);
         if (exposures) {
             expose(layer, at, at + clip.duration, 0);
-            for (auto e : clip.tracks[i].exposures)
-                expose(layer, at + e.start, at + e.end, drawingId(e.drawing));
+            for (auto e : clip.tracks[i].exposures) {
+                const Id target = drawingId(e.drawing);
+                if (layer.kind == LayerKind::Part &&
+                    std::none_of(layer.variants.begin(), layer.variants.end(),
+                                 [target](const auto& variant) { return variant.drawing == target; }))
+                    layer.variants.push_back({target, d.drawings.at(target).name.empty()
+                                                          ? "Drawing " + std::to_string(target)
+                                                          : d.drawings.at(target).name.substr(0, 128)});
+                expose(layer, at + e.start, at + e.end, target);
+            }
         }
         if (keys) {
             std::erase_if(layer.keys,

@@ -26,7 +26,7 @@ Isolate AI features so the entire core editor works without them.
 
 **Scope:** `optional_extension` · **Level:** `optional` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## AIX-002 — AI masks
 
@@ -36,7 +36,7 @@ Create, modify and delete masks with controlled expansion.
 
 **Scope:** `optional_extension` · **Level:** `optional` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## AIX-003 — Assisted erasing
 
@@ -46,7 +46,7 @@ Propose removal of masked content without destroying the original.
 
 **Scope:** `optional_extension` · **Level:** `optional` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## AIX-004 — Image expansion
 
@@ -56,7 +56,7 @@ Generate content beyond image boundaries while keeping the original identifiable
 
 **Scope:** `optional_extension` · **Level:** `optional` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## AIX-005 — Resolution enhancement
 
@@ -66,7 +66,7 @@ Propose higher-resolution images or textures as variants.
 
 **Scope:** `optional_extension` · **Level:** `optional` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## AIX-006 — Generative fill
 
@@ -76,4 +76,4 @@ Generate text-guided content within a region with manual acceptance.
 
 **Scope:** `optional_extension` · **Level:** `optional` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.

@@ -32,6 +32,17 @@ Proposed typography: Geist Sans for UI and Geist Mono for timecode, frames and a
 
 Base spacing is 4 px, with a 4/8/12/16/24 scale. Control corner radii are 4–6 px, without oversized cards or decorative shadows. Rows are 28–32 px in compact mode and 36–40 px in comfortable mode. Interactive targets are at least 24×24 logical pixels where appropriate, expandable for pen/touch; icons may be smaller inside them.
 
+## Tool iconography
+
+The compact tool strip uses original 22 × 22 monochrome line drawings inside 34 × 28
+buttons. A cursor arrow, transform handles with a pose diamond, dashed marquee,
+freehand lasso, endpoint-marked line, pencil, bristled raster brush, eraser, shape
+outlines, pouring color and editable curve nodes express the actual actions. Do not
+use font glyphs whose appearance changes across operating systems. The selected
+tool reverses icon contrast against its light button background; tooltips and Qt
+accessibility names retain the full English tool name and shortcut. The illustration
+never replaces hover, pressed, focus or unavailable feedback.
+
 ## Layout
 
 ```text

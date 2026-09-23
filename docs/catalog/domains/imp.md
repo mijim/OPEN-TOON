@@ -26,7 +26,11 @@ Import still images or sequences with explicit alpha, ordering and exposure.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## IMP-002 — Layered PSD
 
@@ -36,7 +40,7 @@ Read hierarchy, opacity and supported modes while reporting losses.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## IMP-003 — PSD layout
 
@@ -46,7 +50,7 @@ Reuse layout composition and positions at a known scale.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## IMP-004 — External vectors
 
@@ -56,7 +60,7 @@ Convert compatible vector formats while preserving supported curves, fills and t
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## IMP-005 — Reference video
 
@@ -66,7 +70,7 @@ Import video for reference or frame extraction with an explicit clock.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## IMP-006 — Link external image
 
@@ -76,7 +80,7 @@ Retain a link and allow content updates from disk.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## IMP-007 — Scanning
 
@@ -86,7 +90,7 @@ Acquire drawings with resolution, registration and numbering order.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## IMP-008 — Vectorization
 
@@ -96,7 +100,7 @@ Convert scans to strokes or regions using repeatable parameters.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## IMP-009 — Legacy FLA and SWF
 
@@ -106,7 +110,7 @@ Document assisted conversion and limits of older formats.
 
 **Scope:** `legacy_candidate` · **Level:** `legacy` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## IMP-010 — Editorial interchange
 
@@ -116,4 +120,4 @@ Receive layouts or animatics as scenes with timing and resources.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.

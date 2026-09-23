@@ -26,7 +26,7 @@ Organize assets in folders with search, previews and refresh.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## LIB-002 — Scene and rig templates
 
@@ -36,7 +36,7 @@ Save selections with required drawings, palettes, nodes and animation.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## LIB-003 — Reusable symbols
 
@@ -46,7 +46,7 @@ Encapsulate elements with their own content and transforms.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## LIB-004 — Import templates
 
@@ -56,7 +56,7 @@ Apply copy, linking and conflict rules when reusing assets.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## LIB-005 — Paste special
 
@@ -66,7 +66,7 @@ Choose whether to import animation, drawings, palettes or structure.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## LIB-006 — Library thumbnails
 
@@ -76,7 +76,7 @@ Generate refreshable previews without blocking editing.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## LIB-007 — Template editing
 
@@ -86,4 +86,4 @@ Edit a library resource while distinguishing its source from instances.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.

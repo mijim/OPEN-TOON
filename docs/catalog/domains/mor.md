@@ -26,7 +26,7 @@ Generate in-betweens between compatible vector drawings.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## MOR-002 — Compatibility rules
 
@@ -36,7 +36,7 @@ Diagnose region and color incompatibilities before interpolation.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## MOR-003 — Correspondence hints
 
@@ -46,7 +46,7 @@ Let artists guide matching points, contours or lines.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## MOR-004 — Intermediate morph keys
 
@@ -56,7 +56,7 @@ Turn an intermediate result into a key drawing for additional detail.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## MOR-005 — Morph timing and easing
 
@@ -66,7 +66,7 @@ Separate temporal progress from geometric correspondence.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## MOR-006 — Holes and transparency
 
@@ -76,4 +76,4 @@ Resolve interior regions and alpha under visible rules.
 
 **Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.

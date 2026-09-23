@@ -2,9 +2,11 @@
 #include "project_store.h"
 #include "scene_renderer.h"
 #include <QCoreApplication>
+#include <QColorSpace>
 #include <QDir>
 #include <QElapsedTimer>
 #include <QFile>
+#include <QImage>
 #include <QGuiApplication>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -14,7 +16,15 @@
 #include <QThread>
 #include <catch2/catch_session.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <cstring>
 namespace {
+const QString partFixture = QStringLiteral(OPENTOON_SOURCE_DIR "/tests/fixtures/harmony-moment/parts/");
+QVariantList paths(std::initializer_list<QString> values) {
+    QVariantList result;
+    for (const auto& value : values)
+        result.push_back(QUrl::fromLocalFile(value));
+    return result;
+}
 void waitForExport(EditorController& editor) {
     QElapsedTimer timeout;
     timeout.start();
@@ -30,6 +40,272 @@ QJsonObject manifest(const QDir& root, QString folder) {
     return QJsonDocument::fromJson(file.readAll()).object();
 }
 } // namespace
+TEST_CASE("Registered PNG parts preserve a shared canvas and undo as one edit") {
+    EditorController editor;
+    editor.newScene();
+    editor.setFrame(7);
+    const auto before = editor.document();
+    const auto originalPalette = before.palette;
+    REQUIRE(editor.importParts(paths({partFixture + "hand_right__open.png",
+                                      partFixture + "torso__base.png",
+                                      partFixture + "head__front.png"})));
+    const auto imported = editor.document();
+    REQUIRE(imported.layers.size() == before.layers.size() + 3);
+    REQUIRE(imported.drawings.size() == before.drawings.size() + 3);
+    REQUIRE(imported.palette == originalPalette);
+    REQUIRE(imported.layers[before.layers.size()].name == "hand_right__open");
+    REQUIRE(imported.layers[before.layers.size() + 1].name == "head__front");
+    REQUIRE(imported.layers[before.layers.size() + 2].name == "torso__base");
+    for (std::size_t index = before.layers.size(); index < imported.layers.size(); ++index) {
+        const auto& layer = imported.layers[index];
+        REQUIRE(layer.transform.x == 832);
+        REQUIRE(layer.transform.y == 412);
+        REQUIRE(layer.exposures.size() == 1);
+        REQUIRE(layer.exposures.front().start == 7);
+        REQUIRE(layer.exposures.front().end == imported.duration);
+        const auto& asset = *imported.drawings.at(layer.exposures.front().drawing).image;
+        REQUIRE(asset.width == 256);
+        const auto source = QImage(partFixture + QString::fromStdString(layer.name) + ".png")
+                                .convertToFormat(QImage::Format_RGBA8888);
+        REQUIRE_FALSE(source.isNull());
+        for (int y = 0; y < source.height(); ++y)
+            REQUIRE(std::memcmp(asset.rgba.data() + y * asset.width * 4,
+                                source.constScanLine(y), asset.width * 4) == 0);
+    }
+    const auto rendered = opentoon::SceneRenderer::render(imported, 7);
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto project = QUrl::fromLocalFile(directory.filePath("registered-parts.otoon"));
+    REQUIRE(editor.saveProject(project));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(project));
+    REQUIRE(reopened.document() == imported);
+    REQUIRE(opentoon::SceneRenderer::render(reopened.document(), 7) == rendered);
+    editor.undo();
+    REQUIRE(editor.document() == before);
+    editor.redo();
+    REQUIRE(editor.document() == imported);
+}
+TEST_CASE("Composition profile edits are undoable and persist through project save") {
+    EditorController editor;
+    editor.newScene();
+    REQUIRE(editor.compositionProfile() == 0);
+    editor.setCompositionProfile(1);
+    REQUIRE(editor.compositionProfile() == 1);
+    editor.undo();
+    REQUIRE(editor.compositionProfile() == 0);
+    editor.redo();
+    REQUIRE(editor.compositionProfile() == 1);
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto path = std::filesystem::path(directory.filePath("composition.otoon").toStdString());
+    REQUIRE(opentoon::ProjectStore::save(path, editor.document()) > 0);
+    REQUIRE(opentoon::ProjectStore::load(path).document.composition ==
+            opentoon::CompositionProfile::LinearSrgb);
+}
+
+TEST_CASE("Character inspector actions build a saved rigid rig with held substitutions") {
+    EditorController editor;
+    editor.newScene();
+    REQUIRE(editor.importParts(paths({partFixture + "torso__base.png", partFixture + "head__front.png"})));
+    const auto head = editor.selectedLayer();
+    const auto body = int(editor.document().layers[1].id);
+    const auto before = opentoon::SceneRenderer::render(editor.document(), 0, {320, 180});
+    editor.makeCharacter();
+    REQUIRE(editor.document().layer(head).kind == opentoon::LayerKind::Part);
+    const auto character = editor.document().layer(head).parent;
+    editor.addPeg();
+    REQUIRE(editor.document().layer(head).parent != character);
+    editor.setPartRole("Head");
+    editor.centerRestPivot();
+    REQUIRE(editor.document().layer(head).transform.pivotX == 128);
+    REQUIRE(editor.document().layer(head).transform.pivotY == 128);
+    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 0, {320, 180}) == before);
+    editor.setSelectedLayer(body);
+    editor.setParent(int(character));
+    REQUIRE(editor.document().layer(body).kind == opentoon::LayerKind::Part);
+    REQUIRE(editor.substitutions().size() == 1);
+    const auto original = editor.selectedSubstitution();
+    editor.createSubstitution(true);
+    const auto open = editor.selectedSubstitution();
+    REQUIRE(open != original);
+    editor.renameSubstitution(open, "Turned head");
+    REQUIRE(editor.substitutions().back().toMap().value("name").toString() == "Turned head");
+    editor.setFrame(12);
+    editor.selectSubstitution(original);
+    REQUIRE(editor.selectedSubstitution() == original);
+    REQUIRE(editor.document().drawingAt(body, 11)->id == open);
+    editor.removeSubstitution(original);
+    REQUIRE(editor.selectedSubstitution() == open);
+    const auto rigged = editor.document();
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto project = QUrl::fromLocalFile(directory.filePath("rig.otoon"));
+    REQUIRE(editor.saveProject(project));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(project));
+    REQUIRE(reopened.document() == rigged);
+    REQUIRE(opentoon::SceneRenderer::render(reopened.document(), 0, {320, 180}) ==
+            opentoon::SceneRenderer::render(rigged, 0, {320, 180}));
+    editor.undo();
+    REQUIRE(editor.document() != rigged);
+    editor.redo();
+    REQUIRE(editor.document() == rigged);
+}
+
+TEST_CASE("Inspector view sets and thumbnail chooser survive duplicate save and reopen") {
+    EditorController editor;
+    editor.newScene();
+    REQUIRE(editor.importParts(paths({partFixture + "torso__base.png", partFixture + "head__front.png"})));
+    const int head = editor.selectedLayer();
+    const int body = int(editor.document().layers[1].id);
+    editor.makeCharacter();
+    const int root = editor.characterId();
+    editor.setSelectedLayer(body);
+    editor.setParent(root);
+    const int original = editor.selectedSubstitution();
+    REQUIRE(editor.substitutionThumbnail(original).startsWith("data:image/png;base64,"));
+    editor.createSubstitution(true);
+    const int alternative = editor.selectedSubstitution();
+    editor.moveSubstitution(alternative, -1);
+    REQUIRE(editor.substitutions().front().toMap().value("id").toInt() == alternative);
+    editor.stepSubstitution(1);
+    REQUIRE(editor.selectedSubstitution() == original);
+    editor.captureCharacterView();
+    const int view = editor.selectedView();
+    REQUIRE(view > 0);
+    REQUIRE(editor.characterViews().size() == 1);
+    editor.renameCharacterView("Front");
+    editor.duplicateCharacterView();
+    REQUIRE(editor.characterViews().size() == 2);
+    editor.removeCharacterView();
+    REQUIRE(editor.characterViews().size() == 1);
+    editor.selectView(view);
+    editor.applyCharacterView();
+    REQUIRE(editor.document().drawingAt(body, 0)->id == opentoon::Id(original));
+    editor.setSelectedLayer(head);
+    editor.duplicateCharacter();
+    REQUIRE(editor.document().layer(editor.selectedLayer()).kind == opentoon::LayerKind::Character);
+    REQUIRE(editor.document().layer(editor.selectedLayer()).views.size() == 1);
+    const auto snapshot = editor.document();
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto project = QUrl::fromLocalFile(directory.filePath("views.otoon"));
+    REQUIRE(editor.saveProject(project));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(project));
+    REQUIRE(reopened.document() == snapshot);
+    editor.undo();
+    REQUIRE(editor.document() != snapshot);
+    editor.redo();
+    REQUIRE(editor.document() == snapshot);
+}
+
+TEST_CASE("Inspector rig branch and view-range commands stay undoable and saveable") {
+    EditorController editor;
+    editor.newScene();
+    REQUIRE(editor.importParts(paths({partFixture + "torso__base.png", partFixture + "head__front.png"})));
+    editor.makeCharacter();
+    const int root = editor.characterId();
+    editor.attachUnparentedDrawings();
+    REQUIRE(editor.document().layer(root).kind == opentoon::LayerKind::Character);
+    editor.captureCharacterView();
+    REQUIRE(editor.characterViews().size() == 1);
+    const int part = editor.selectedLayer();
+    editor.createSubstitution(true);
+    editor.updateSelectedPartInView();
+    editor.duplicateLayer(false);
+    const int copy = editor.selectedLayer();
+    REQUIRE(copy != part);
+    REQUIRE(editor.document().layer(root).views.front().choices.size() == 3);
+    editor.addPeg();
+    const int peg = int(editor.document().layer(copy).parent);
+    editor.setSelectedLayer(peg);
+    editor.duplicateLayer(false);
+    REQUIRE(editor.document().layer(editor.selectedLayer()).kind == opentoon::LayerKind::Peg);
+    editor.deleteRigBranch();
+    REQUIRE(editor.document().layer(root).views.front().choices.size() == 3);
+    editor.setSelectedLayer(part);
+    editor.captureCharacterView();
+    REQUIRE(editor.characterViews().size() == 2);
+    editor.moveCharacterView(-1);
+    editor.stepCharacterView(1);
+    editor.selectTimelineRange(4, 8, 0, 0);
+    editor.applyCharacterViewToRange();
+    const auto snapshot = editor.document();
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto project = QUrl::fromLocalFile(directory.filePath("rig-branch.otoon"));
+    REQUIRE(editor.saveProject(project));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(project));
+    REQUIRE(reopened.document() == snapshot);
+    editor.undo();
+    REQUIRE(editor.document() != snapshot);
+    editor.redo();
+    REQUIRE(editor.document() == snapshot);
+}
+
+TEST_CASE("Rejected registered part batch leaves the scene and selection intact") {
+    EditorController editor;
+    editor.newScene();
+    const auto before = editor.document();
+    const auto selected = editor.selectedLayer();
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto corrupt = directory.filePath("broken.png");
+    QFile invalid(corrupt);
+    REQUIRE(invalid.open(QIODevice::WriteOnly));
+    REQUIRE(invalid.write("not a PNG") == 9);
+    invalid.close();
+    REQUIRE_FALSE(editor.importParts(paths({partFixture + "torso__base.png", corrupt})));
+    REQUIRE(editor.document() == before);
+    REQUIRE(editor.selectedLayer() == selected);
+    QImage mismatched(16, 16, QImage::Format_RGBA8888);
+    mismatched.fill(Qt::transparent);
+    const auto wrongSize = directory.filePath("wrong-size.png");
+    REQUIRE(mismatched.save(wrongSize));
+    REQUIRE_FALSE(editor.importParts(paths({partFixture + "torso__base.png", wrongSize})));
+    REQUIRE(editor.document() == before);
+    REQUIRE(editor.selectedLayer() == selected);
+}
+
+TEST_CASE("Numbered PNG sequence orders frames, reports gaps and round-trips") {
+    EditorController editor;
+    editor.newScene();
+    editor.setFrame(47);
+    const auto before = editor.document();
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto first = directory.filePath("walk_0001.png");
+    const auto third = directory.filePath("walk_0003.png");
+    REQUIRE(QFile::copy(partFixture + "torso__base.png", first));
+    REQUIRE(QFile::copy(partFixture + "head__front.png", third));
+    REQUIRE(editor.importImageSequence(paths({third, first})));
+    const auto imported = editor.document();
+    REQUIRE(imported.duration == 50);
+    REQUIRE(imported.layers.size() == before.layers.size() + 1);
+    const auto& layer = imported.layers.back();
+    REQUIRE(layer.name == "walk_");
+    REQUIRE(layer.exposures.size() == 2);
+    REQUIRE(layer.exposures[0].start == 47);
+    REQUIRE(layer.exposures[0].end == 48);
+    REQUIRE(layer.exposures[1].start == 49);
+    REQUIRE(layer.exposures[1].end == 50);
+    REQUIRE_FALSE(imported.drawingAt(layer.id, 48));
+    REQUIRE(editor.status().contains("1 missing frame"));
+    const auto project = QUrl::fromLocalFile(directory.filePath("sequence.otoon"));
+    REQUIRE(editor.saveProject(project));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(project));
+    REQUIRE(reopened.document() == imported);
+    REQUIRE(opentoon::SceneRenderer::render(reopened.document(), 49) ==
+            opentoon::SceneRenderer::render(imported, 49));
+    editor.undo();
+    REQUIRE(editor.document() == before);
+    REQUIRE_FALSE(editor.importImageSequence(paths({first, first})));
+    REQUIRE(editor.document() == before);
+}
 TEST_CASE("Asynchronous export uses one snapshot and publishes complete rational-time metadata") {
     QTemporaryDir temporary;
     REQUIRE(temporary.isValid());
@@ -55,6 +331,42 @@ TEST_CASE("Asynchronous export uses one snapshot and publishes complete rational
     auto actual =
         QImage(output.filePath("frame_000001.png")).convertToFormat(QImage::Format_ARGB32_Premultiplied);
     REQUIRE(actual == opentoon::SceneRenderer::render(snapshot, 0));
+}
+TEST_CASE("Animated output camera matches reopened preview and exported PNG frames") {
+    QTemporaryDir temporary;
+    REQUIRE(temporary.isValid());
+    EditorController editor;
+    editor.newScene();
+    editor.setScene("Camera export", 64, 64, 48, 24, 1);
+    editor.commitStroke({{12, 14, 1}, {26, 34, 1}});
+    editor.addCamera();
+    REQUIRE(editor.activeCamera() > 0);
+    editor.setTransform("x", 40);
+    editor.setFrame(24);
+    editor.setTransform("x", 24);
+    const auto snapshot = editor.document();
+    REQUIRE(snapshot.layer(snapshot.activeCamera).keys.size() >= 2);
+    const auto before = opentoon::SceneRenderer::render(snapshot, 0);
+    const auto after = opentoon::SceneRenderer::render(snapshot, 24);
+    REQUIRE(before != after);
+    const auto project = QUrl::fromLocalFile(temporary.filePath("camera.otoon"));
+    REQUIRE(editor.saveProject(project));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(project));
+    REQUIRE(reopened.document() == snapshot);
+    REQUIRE(opentoon::SceneRenderer::render(reopened.document(), 0) == before);
+    REQUIRE(opentoon::SceneRenderer::render(reopened.document(), 24) == after);
+    editor.exportFrames(QUrl::fromLocalFile(temporary.path()));
+    waitForExport(editor);
+    QDir root(temporary.path());
+    const auto folders = root.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    REQUIRE(folders.size() == 1);
+    QDir output(root.filePath(folders.front()));
+    REQUIRE(manifest(root, folders.front())["status"].toString() == "complete");
+    REQUIRE(QImage(output.filePath("frame_000001.png"))
+                .convertToFormat(QImage::Format_ARGB32_Premultiplied) == before);
+    REQUIRE(QImage(output.filePath("frame_000025.png"))
+                .convertToFormat(QImage::Format_ARGB32_Premultiplied) == after);
 }
 TEST_CASE("Cancellation publishes an explicitly partial export and the next job can complete") {
     QTemporaryDir temporary;
@@ -305,4 +617,124 @@ TEST_CASE("Motion-path position commands preserve easing and pixels through undo
     REQUIRE(editor.document() == locked);
     REQUIRE_FALSE(editor.setPoseKeyPosition(999, 0, 0));
     REQUIRE(editor.document() == locked);
+}
+
+TEST_CASE("Layer pose menu copies full and masked transforms without changing other channels") {
+    EditorController editor;
+    editor.newScene();
+    REQUIRE_FALSE(editor.pasteTransformPose(0));
+    editor.setTransform("x", 80);
+    editor.setTransform("y", 40);
+    editor.setTransform("rotation", 15);
+    editor.setTransform("scaleX", 1.5);
+    editor.setTransform("scaleY", .8);
+    editor.setTransform("opacity", .7);
+    editor.setTransform("pivotX", 5);
+    editor.setTransform("pivotY", 7);
+    const auto copied = editor.document().layer(editor.selectedLayer()).transform;
+    editor.copyTransformPose();
+    REQUIRE(editor.hasCopiedTransform());
+    editor.addLayer();
+    const auto target = editor.selectedLayer();
+    const auto baseline = editor.document();
+    for (int mode = 0; mode <= 7; ++mode) {
+        REQUIRE(editor.pasteTransformPose(mode));
+        const auto& pose = editor.document().layer(target).transform;
+        REQUIRE(pose.x == (mode == 0 || mode == 1 || mode >= 6 ? copied.x : 0));
+        REQUIRE(pose.y == (mode == 0 || mode == 1 || mode >= 6 ? copied.y : 0));
+        REQUIRE(pose.rotation == (mode == 0 || mode == 2 || mode >= 6 ? copied.rotation : 0));
+        REQUIRE(pose.scaleX == (mode == 6 ? -copied.scaleX :
+                                mode == 0 || mode == 3 || mode == 7 ? copied.scaleX : 1));
+        REQUIRE(pose.scaleY == (mode == 7 ? -copied.scaleY :
+                                mode == 0 || mode == 3 || mode == 6 ? copied.scaleY : 1));
+        REQUIRE(pose.opacity == (mode == 0 || mode == 4 || mode >= 6 ? copied.opacity : 1));
+        REQUIRE(pose.pivotX == (mode == 0 || mode == 5 || mode >= 6 ? copied.pivotX : 0));
+        REQUIRE(pose.pivotY == (mode == 0 || mode == 5 || mode >= 6 ? copied.pivotY : 0));
+        editor.undo();
+        REQUIRE(editor.document() == baseline);
+    }
+    REQUIRE_FALSE(editor.pasteTransformPose(8));
+    REQUIRE(editor.document() == baseline);
+    REQUIRE(editor.pasteTransformPose(0));
+    REQUIRE(editor.resetTransformPose());
+    REQUIRE(editor.document() == baseline);
+    editor.toggleLayer(target, "locked");
+    const auto locked = editor.document();
+    REQUIRE_FALSE(editor.pasteTransformPose(0));
+    REQUIRE_FALSE(editor.resetTransformPose());
+    REQUIRE(editor.document() == locked);
+}
+
+TEST_CASE("Explicit pose paste creates a later key, preserves rest and reopens identically") {
+    EditorController editor;
+    editor.newScene();
+    editor.setTransform("x", 100);
+    editor.setTransform("scaleX", -1);
+    editor.copyTransformPose();
+    editor.addLayer();
+    const auto target = editor.selectedLayer();
+    editor.setFrame(12);
+    editor.setAnimateMode(true);
+    editor.setAutoKey(false);
+    const auto before = editor.document();
+    REQUIRE(editor.pasteTransformPose(0));
+    const auto pasted = editor.document();
+    REQUIRE(pasted.layer(target).transform.x == 0);
+    REQUIRE(pasted.layer(target).keys.size() == 2);
+    REQUIRE(pasted.layer(target).keys[0].frame == 0);
+    REQUIRE(pasted.layer(target).keys[0].value.x == 0);
+    REQUIRE(pasted.layer(target).keys[1].frame == 12);
+    REQUIRE(pasted.layer(target).keys[1].value.x == 100);
+    REQUIRE(pasted.layer(target).keys[1].value.scaleX == -1);
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    auto project = QUrl::fromLocalFile(directory.filePath("copied-pose.otoon"));
+    REQUIRE(editor.saveProject(project));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(project));
+    REQUIRE(reopened.document() == pasted);
+    editor.undo();
+    REQUIRE(editor.document() == before);
+    REQUIRE(editor.resetTransformPose());
+    REQUIRE(editor.document() != before);
+    REQUIRE(editor.document().layer(target).keys.back().value == before.layer(target).transform);
+}
+
+TEST_CASE("Single image import creates its layer atomically and converts tagged color to sRGB") {
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    QImage source(2, 2, QImage::Format_RGBA8888);
+    source.fill(QColor(220, 45, 120, 180));
+    source.setColorSpace(QColorSpace(QColorSpace::DisplayP3));
+    const auto imagePath = directory.filePath("wide-gamut.png");
+    REQUIRE(source.save(imagePath));
+    auto expected = QImage(imagePath).convertedToColorSpace(QColorSpace(QColorSpace::SRgb))
+                                    .convertToFormat(QImage::Format_RGBA8888);
+    REQUIRE_FALSE(expected.isNull());
+    EditorController editor;
+    editor.newScene();
+    editor.removeLayer();
+    const auto empty = editor.document();
+    REQUIRE(empty.layers.empty());
+    editor.importImage(QUrl::fromLocalFile(directory.filePath("missing.png")));
+    REQUIRE(editor.document() == empty);
+    editor.importImage(QUrl::fromLocalFile(imagePath));
+    const auto imported = editor.document();
+    REQUIRE(imported.layers.size() == 1);
+    REQUIRE(imported.drawings.size() == 1);
+    REQUIRE(imported.palette == empty.palette);
+    const auto& asset = *imported.drawings.begin()->second.image;
+    REQUIRE(asset.width == 2);
+    REQUIRE(asset.height == 2);
+    for (int row = 0; row < 2; ++row)
+        REQUIRE(std::memcmp(asset.rgba.data() + row * 8, expected.constScanLine(row), 8) == 0);
+    const auto project = QUrl::fromLocalFile(directory.filePath("imported.otoon"));
+    REQUIRE(editor.saveProject(project));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(project));
+    REQUIRE(reopened.document() == imported);
+    editor.undo();
+    REQUIRE(editor.document() == empty);
+    editor.redo();
+    REQUIRE(editor.document() == imported);
 }

@@ -254,6 +254,18 @@ ApplicationWindow {
                 onTriggered: imageDialog.open()
             }
             Action {
+                text: "Import registered PNG parts…"
+                onTriggered: partsDialog.open()
+            }
+            Action {
+                text: "Import PNG sequence…"
+                onTriggered: sequenceDialog.open()
+            }
+            Action {
+                text: editor.activeCamera ? "Edit output camera" : "Add output camera"
+                onTriggered: { editor.addCamera(); root.inspectorMode = "layer"; canvas.clearRegion(); }
+            }
+            Action {
                 text: "Export PNG sequence…"
                 enabled: !editor.exporting
                 onTriggered: exportDialog.open()
@@ -349,6 +361,21 @@ ApplicationWindow {
         }
         Menu {
             title: "View"
+            Menu {
+                title: "Composition"
+                Action {
+                    text: "Legacy appearance"
+                    checkable: true
+                    checked: editor.compositionProfile === 0
+                    onTriggered: editor.setCompositionProfile(0)
+                }
+                Action {
+                    text: "Linear sRGB"
+                    checkable: true
+                    checked: editor.compositionProfile === 1
+                    onTriggered: editor.setCompositionProfile(1)
+                }
+            }
             Action {
                 text: "Fit canvas"
                 onTriggered: canvas.fit()
@@ -495,13 +522,13 @@ ApplicationWindow {
                     Accessible.name: "Raster brush preset"
                 }
                 Text {
-                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate"
+                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate" && editor.tool !== "Camera"
                     text: "Size"
                     color: "#858585"
                     font.pixelSize: 11
                 }
                 Slider {
-                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate"
+                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate" && editor.tool !== "Camera"
                     from: 0.5
                     to: 100
                     value: editor.brushSize
@@ -510,7 +537,7 @@ ApplicationWindow {
                     Accessible.name: "Brush size"
                 }
                 Text {
-                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate"
+                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate" && editor.tool !== "Camera"
                     text: editor.brushSize.toFixed(1) + " px"
                     color: "#aaaaaa"
                     Layout.preferredWidth: 58
@@ -540,6 +567,28 @@ ApplicationWindow {
                     visible: editor.tool === "Edit points"
                     text: "Drag points · Double-click a segment to add · Delete removes the selected point"
                     color: "#bbbbbb"
+                }
+                Label {
+                    visible: editor.tool === "Camera"
+                    text: "Drag frame to pan · corners to zoom · circle to rotate · Shift constrains"
+                    color: "#bbbbbb"
+                }
+                Label {
+                    visible: editor.tool === "Camera"
+                    text: editor.cameraZoom.toFixed(2) + "×"
+                    color: "#dddddd"
+                }
+                C.ToolButton {
+                    visible: editor.tool === "Camera"
+                    text: "Reset frame"
+                    hint: "Return this camera key to full-scene framing"
+                    onClicked: editor.resetCameraPose()
+                }
+                C.ToolButton {
+                    visible: editor.activeCamera > 0
+                    text: canvas.cameraGuidesVisible ? "Guides on" : "Guides"
+                    hint: "Show non-exported safe-frame guides"
+                    onClicked: canvas.cameraGuidesVisible = !canvas.cameraGuidesVisible
                 }
                 C.ToolButton {
                     text: "Guides ▾"
@@ -705,54 +754,45 @@ ApplicationWindow {
                             model: [
                                 {
                                     name: "Select",
-                                    icon: "↖",
                                     key: "V"
                                 },
                                 {
                                     name: "Animate",
-                                    icon: "◇",
                                     key: "A"
                                 },
+                                { name: "Camera", key: "" },
                                 {
                                     name: "Marquee",
-                                    icon: "▧",
                                     key: "M"
                                 },
-                                { name: "Lasso", icon: "♧", key: "L" },
-                                { name: "Line", icon: "╲", key: "" },
+                                { name: "Lasso", key: "L" },
+                                { name: "Line", key: "" },
                                 {
                                     name: "Pencil",
-                                    icon: "╱",
                                     key: "B"
                                 },
                                 {
                                     name: "Raster ink",
-                                    icon: "◉",
                                     key: ""
                                 },
                                 {
                                     name: "Eraser",
-                                    icon: "▱",
                                     key: "E"
                                 },
                                 {
                                     name: "Rectangle",
-                                    icon: "□",
                                     key: ""
                                 },
                                 {
                                     name: "Ellipse",
-                                    icon: "○",
                                     key: ""
                                 },
                                 {
                                     name: "Recolor",
-                                    icon: "◒",
                                     key: ""
                                 },
                                 {
                                     name: "Edit points",
-                                    icon: "⌘",
                                     key: ""
                                 }
                             ]
@@ -760,9 +800,9 @@ ApplicationWindow {
                                 required property var modelData
                                 width: 34
                                 height: 28
-                                text: modelData.icon
-                                font.pixelSize: 18
+                                toolIcon: modelData.name
                                 active: editor.tool === modelData.name
+                                enabled: modelData.name !== "Camera" || editor.activeCamera > 0
                                 hint: modelData.name + (modelData.key ? " · " + modelData.key : "")
                                 onClicked: editor.tool = modelData.name
                             }
@@ -845,8 +885,10 @@ ApplicationWindow {
                             controller: editor
                         }
                         ColumnLayout {
+                            id: layerInspector
                             visible: root.inspectorMode === "layer" && canvas.objectProperties.kind === "none"
                             Layout.fillWidth: true
+                            property var rigLayer: editor.layers.find(l => l.id === editor.selectedLayer)
                             Label {
                                 Layout.leftMargin: 16
                                 text: "Layer · " + (editor.layers.find(l => l.id === editor.selectedLayer)?.name || "")
@@ -857,7 +899,7 @@ ApplicationWindow {
                                 Layout.leftMargin: 16
                                 C.CompactComboBox {
                                     model: ["Setup", "Animate"]
-                                    enabled: editor.tool !== "Animate"
+                                    enabled: editor.tool !== "Animate" && editor.tool !== "Camera"
                                     currentIndex: editor.animateMode ? 1 : 0
                                     onActivated: editor.animateMode = currentIndex === 1
                                     Accessible.name: "Animation edit mode"
@@ -865,8 +907,8 @@ ApplicationWindow {
                                 }
                                 C.CompactCheckBox {
                                     text: editor.tool === "Animate" ? "Gesture keys" : "Auto key"
-                                    checked: editor.tool === "Animate" || editor.autoKey
-                                    enabled: editor.tool !== "Animate" && editor.animateMode
+                                    checked: editor.tool === "Animate" || editor.tool === "Camera" || editor.autoKey
+                                    enabled: editor.tool !== "Animate" && editor.tool !== "Camera" && editor.animateMode
                                     onToggled: editor.autoKey = checked
                                 }
                             }
@@ -896,6 +938,28 @@ ApplicationWindow {
                                     text: "Curves"
                                     onClicked: root.showCurves = true
                                 }
+                                C.ToolButton {
+                                    text: "Pose ▾"
+                                    visible: layerInspector.rigLayer?.kind !== 4
+                                    hint: "Copy, paste or reset the selected layer transform"
+                                    onClicked: layerPoseMenu.open()
+                                    Menu {
+                                        id: layerPoseMenu
+                                        MenuItem { text: "Copy pose"; onTriggered: editor.copyTransformPose() }
+                                        MenuSeparator {}
+                                        MenuItem { text: "Paste full pose"; enabled: editor.hasCopiedTransform; onTriggered: editor.pasteTransformPose(0) }
+                                        MenuItem { text: "Paste position"; enabled: editor.hasCopiedTransform; onTriggered: editor.pasteTransformPose(1) }
+                                        MenuItem { text: "Paste rotation"; enabled: editor.hasCopiedTransform; onTriggered: editor.pasteTransformPose(2) }
+                                        MenuItem { text: "Paste scale"; enabled: editor.hasCopiedTransform; onTriggered: editor.pasteTransformPose(3) }
+                                        MenuItem { text: "Paste opacity"; enabled: editor.hasCopiedTransform; onTriggered: editor.pasteTransformPose(4) }
+                                        MenuItem { text: "Paste pivot"; enabled: editor.hasCopiedTransform; onTriggered: editor.pasteTransformPose(5) }
+                                        MenuSeparator {}
+                                        MenuItem { text: "Paste mirrored horizontally"; enabled: editor.hasCopiedTransform; onTriggered: editor.pasteTransformPose(6) }
+                                        MenuItem { text: "Paste mirrored vertically"; enabled: editor.hasCopiedTransform; onTriggered: editor.pasteTransformPose(7) }
+                                        MenuSeparator {}
+                                        MenuItem { text: editor.animateMode ? "Reset to setup pose" : "Reset setup transform"; onTriggered: editor.resetTransformPose() }
+                                    }
+                                }
                             }
                             GridLayout {
                                 Layout.leftMargin: 16
@@ -905,7 +969,12 @@ ApplicationWindow {
                                 columnSpacing: 8
                                 rowSpacing: 8
                                 Repeater {
-                                    model: [
+                                    model: layerInspector.rigLayer?.kind === 4 ? [
+                                        { key: "x", name: "Center X · px" },
+                                        { key: "y", name: "Center Y · px" },
+                                        { key: "rotation", name: "Rotation °" },
+                                        { key: "zoom", name: "Zoom · ratio" }
+                                    ] : [
                                         {
                                             key: "x",
                                             name: "Position X"
@@ -953,10 +1022,12 @@ ApplicationWindow {
                                             Layout.preferredWidth: 96
                                             number: {
                                                 const f = editor.frame;
-                                                return Number(editor.transform[modelData.key] || 0);
+                                                return modelData.key === "zoom" ? editor.cameraZoom :
+                                                    Number(editor.transform[modelData.key] || 0);
                                             }
                                             label: modelData.name
-                                            onCommitted: value => editor.setTransform(modelData.key, value)
+                                            onCommitted: value => modelData.key === "zoom" ?
+                                                editor.setCameraZoom(value) : editor.setTransform(modelData.key, value)
                                         }
                                     }
                                 }
@@ -980,14 +1051,36 @@ ApplicationWindow {
                                 Layout.rightMargin: 16
                                 Layout.fillWidth: true
                                 implicitHeight: 30
-                                model: [
-                                    {
-                                        id: 0,
-                                        name: "No parent"
+                                enabled: layerInspector.rigLayer?.kind !== 1 && layerInspector.rigLayer?.kind !== 4
+                                model: {
+                                    const layers = editor.layers;
+                                    const selected = layerInspector.rigLayer;
+                                    if (!selected)
+                                        return [];
+                                    if (selected.kind !== 2 && selected.kind !== 3)
+                                        return [{id: 0, name: "No parent"}].concat(layers.filter(l => l.id !== selected.id && l.kind !== 4));
+                                    function ancestor(id) {
+                                        let node = layers.find(l => l.id === id);
+                                        let depth = 0;
+                                        while (node && node.parent && depth++ < layers.length)
+                                            node = layers.find(l => l.id === node.parent);
+                                        return node?.id || 0;
                                     }
-                                ].concat(editor.layers.filter(function (l) {
-                                    return l.id !== editor.selectedLayer;
-                                }))
+                                    function beneath(candidate, id) {
+                                        let node = candidate;
+                                        let depth = 0;
+                                        while (node && node.parent && depth++ < layers.length) {
+                                            if (node.parent === id)
+                                                return true;
+                                            node = layers.find(l => l.id === node.parent);
+                                        }
+                                        return false;
+                                    }
+                                    const rootId = ancestor(selected.id);
+                                    return layers.filter(l => (l.kind === 1 || l.kind === 2) &&
+                                                           l.id !== selected.id && ancestor(l.id) === rootId &&
+                                                           !beneath(l, selected.id));
+                                }
                                 currentIndex: {
                                     const selected = editor.layers.find(function (l) {
                                         return l.id === editor.selectedLayer;
@@ -1000,6 +1093,275 @@ ApplicationWindow {
                                 valueRole: "id"
                                 onActivated: editor.setParent(currentValue)
                                 Accessible.name: "Parent layer"
+                            }
+                            RowLayout {
+                                Layout.leftMargin: 12
+                                Layout.rightMargin: 16
+                                Layout.fillWidth: true
+                                C.ToolButton {
+                                    text: "Rig ▾"
+                                    hint: "Character and peg actions"
+                                    onClicked: rigMenu.open()
+                                    Menu {
+                                        id: rigMenu
+                                        MenuItem {
+                                            text: "Make character from layer"
+                                            enabled: layerInspector.rigLayer?.kind === 0
+                                            onTriggered: editor.makeCharacter()
+                                        }
+                                        MenuItem {
+                                            text: "Attach unparented drawings"
+                                            enabled: editor.characterId > 0
+                                            onTriggered: editor.attachUnparentedDrawings()
+                                        }
+                                        MenuItem {
+                                            text: "Add parent peg"
+                                            enabled: layerInspector.rigLayer?.kind === 2 || layerInspector.rigLayer?.kind === 3
+                                            onTriggered: editor.addPeg()
+                                        }
+                                        MenuItem {
+                                            text: "Center rest pivot on drawing"
+                                            enabled: layerInspector.rigLayer?.kind === 0 || layerInspector.rigLayer?.kind === 3
+                                            onTriggered: editor.centerRestPivot()
+                                        }
+                                        MenuItem {
+                                            text: "Duplicate full character"
+                                            enabled: editor.characterId > 0
+                                            onTriggered: editor.duplicateCharacter()
+                                        }
+                                        MenuItem {
+                                            text: "Detach selected part"
+                                            enabled: layerInspector.rigLayer?.kind === 3
+                                            onTriggered: editor.detachPart()
+                                        }
+                                        MenuItem {
+                                            text: "Dissolve peg, keep children"
+                                            enabled: layerInspector.rigLayer?.kind === 2
+                                            onTriggered: editor.dissolvePeg()
+                                        }
+                                        MenuItem {
+                                            text: "Delete selected rig branch"
+                                            enabled: layerInspector.rigLayer?.kind === 2 || layerInspector.rigLayer?.kind === 3
+                                            onTriggered: editor.deleteRigBranch()
+                                        }
+                                    }
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    text: ({0: "Drawing", 1: "Character", 2: "Peg", 3: "Part", 4: "Camera"})[layerInspector.rigLayer?.kind ?? 0]
+                                    color: "#999999"
+                                    font.pixelSize: 11
+                                    horizontalAlignment: Text.AlignRight
+                                }
+                            }
+                            ColumnLayout {
+                                visible: layerInspector.rigLayer?.kind === 3
+                                Layout.leftMargin: 16
+                                Layout.rightMargin: 16
+                                Layout.fillWidth: true
+                                spacing: 6
+                                Label { text: "Part role"; color: "#999999"; font.pixelSize: 10 }
+                                C.CompactTextField {
+                                    Layout.fillWidth: true
+                                    text: layerInspector.rigLayer?.role || ""
+                                    placeholderText: "e.g. Left hand"
+                                    onEditingFinished: editor.setPartRole(text)
+                                    Accessible.name: "Character part role"
+                                }
+                                Label { text: "Substitution at current frame"; color: "#999999"; font.pixelSize: 10 }
+                                ListView {
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: 76
+                                    clip: true
+                                    orientation: ListView.Horizontal
+                                    spacing: 4
+                                    model: editor.substitutions
+                                    delegate: Rectangle {
+                                        required property var modelData
+                                        width: 62
+                                        height: 72
+                                        radius: 3
+                                        color: modelData.id === editor.selectedSubstitution ? "#363636" : "#181818"
+                                        border.color: modelData.id === editor.selectedSubstitution ? "#dedede" : "#303030"
+                                        Column {
+                                            anchors.centerIn: parent
+                                            spacing: 2
+                                            Rectangle {
+                                                width: 54
+                                                height: 54
+                                                color: "#eeeeee"
+                                                Image {
+                                                    anchors.fill: parent
+                                                    anchors.margins: 1
+                                                    fillMode: Image.PreserveAspectFit
+                                                    source: {
+                                                        const revision = editor.documentRevision;
+                                                        return editor.substitutionThumbnail(modelData.id);
+                                                    }
+                                                    asynchronous: false
+                                                }
+                                            }
+                                            Text {
+                                                width: 54
+                                                text: modelData.name
+                                                color: "#dddddd"
+                                                font.pixelSize: 9
+                                                horizontalAlignment: Text.AlignHCenter
+                                                elide: Text.ElideRight
+                                            }
+                                        }
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: editor.selectSubstitution(modelData.id)
+                                        }
+                                        Accessible.name: "Substitution " + modelData.name
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    C.CompactButton { text: "+ Blank"; onClicked: editor.createSubstitution(false) }
+                                    C.CompactButton { text: "Duplicate"; onClicked: editor.createSubstitution(true) }
+                                    C.CompactButton {
+                                        text: "Remove"
+                                        enabled: editor.selectedSubstitution > 0
+                                        onClicked: editor.removeSubstitution(editor.selectedSubstitution)
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    C.CompactButton {
+                                        text: "‹"
+                                        Accessible.name: "Previous substitution"
+                                        ToolTip.text: "Choose previous substitution at the playhead"
+                                        ToolTip.visible: hovered
+                                        onClicked: editor.stepSubstitution(-1)
+                                    }
+                                    C.CompactButton {
+                                        text: "›"
+                                        Accessible.name: "Next substitution"
+                                        ToolTip.text: "Choose next substitution at the playhead"
+                                        ToolTip.visible: hovered
+                                        onClicked: editor.stepSubstitution(1)
+                                    }
+                                    Item { Layout.fillWidth: true }
+                                    C.CompactButton {
+                                        text: "←"
+                                        enabled: editor.selectedSubstitution > 0
+                                        Accessible.name: "Move substitution earlier in gallery"
+                                        ToolTip.text: "Move selected substitution earlier in the gallery"
+                                        ToolTip.visible: hovered
+                                        onClicked: editor.moveSubstitution(editor.selectedSubstitution, -1)
+                                    }
+                                    C.CompactButton {
+                                        text: "→"
+                                        enabled: editor.selectedSubstitution > 0
+                                        Accessible.name: "Move substitution later in gallery"
+                                        ToolTip.text: "Move selected substitution later in the gallery"
+                                        ToolTip.visible: hovered
+                                        onClicked: editor.moveSubstitution(editor.selectedSubstitution, 1)
+                                    }
+                                }
+                                C.CompactTextField {
+                                    Layout.fillWidth: true
+                                    text: editor.substitutions.find(s => s.id === editor.selectedSubstitution)?.name || ""
+                                    placeholderText: "Rename selected substitution"
+                                    enabled: editor.selectedSubstitution > 0
+                                    onEditingFinished: editor.renameSubstitution(editor.selectedSubstitution, text)
+                                    Accessible.name: "Substitution name"
+                                }
+                            }
+                            ColumnLayout {
+                                visible: editor.characterId > 0
+                                Layout.leftMargin: 16
+                                Layout.rightMargin: 16
+                                Layout.fillWidth: true
+                                spacing: 6
+                                Label { text: "Character views"; color: "#999999"; font.pixelSize: 10 }
+                                C.CompactComboBox {
+                                    Layout.fillWidth: true
+                                    model: editor.characterViews
+                                    textRole: "name"
+                                    valueRole: "id"
+                                    currentIndex: model.findIndex(v => v.id === editor.selectedView)
+                                    onActivated: editor.selectView(currentValue)
+                                    Accessible.name: "Selected character view set"
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    C.CompactButton {
+                                        text: "‹"
+                                        enabled: editor.characterViews.length > 1
+                                        Accessible.name: "Previous character view"
+                                        onClicked: editor.stepCharacterView(-1)
+                                    }
+                                    C.CompactButton {
+                                        text: "›"
+                                        enabled: editor.characterViews.length > 1
+                                        Accessible.name: "Next character view"
+                                        onClicked: editor.stepCharacterView(1)
+                                    }
+                                    Item { Layout.fillWidth: true }
+                                    C.CompactButton {
+                                        text: "←"
+                                        enabled: editor.selectedView > 0
+                                        Accessible.name: "Move character view earlier"
+                                        onClicked: editor.moveCharacterView(-1)
+                                    }
+                                    C.CompactButton {
+                                        text: "→"
+                                        enabled: editor.selectedView > 0
+                                        Accessible.name: "Move character view later"
+                                        onClicked: editor.moveCharacterView(1)
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    C.CompactButton { text: "+ Capture"; onClicked: editor.captureCharacterView() }
+                                    C.CompactButton {
+                                        text: "Apply"
+                                        enabled: editor.selectedView > 0
+                                        onClicked: editor.applyCharacterView()
+                                    }
+                                    C.CompactButton {
+                                        text: "Update"
+                                        enabled: editor.selectedView > 0
+                                        onClicked: editor.updateCharacterView()
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    C.CompactButton {
+                                        text: "Apply range"
+                                        enabled: editor.selectedView > 0
+                                        onClicked: editor.applyCharacterViewToRange()
+                                    }
+                                    C.CompactButton {
+                                        text: "Set this part"
+                                        enabled: editor.selectedView > 0 && layerInspector.rigLayer?.kind === 3
+                                        onClicked: editor.updateSelectedPartInView()
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    C.CompactButton {
+                                        text: "Duplicate"
+                                        enabled: editor.selectedView > 0
+                                        onClicked: editor.duplicateCharacterView()
+                                    }
+                                    C.CompactButton {
+                                        text: "Remove"
+                                        enabled: editor.selectedView > 0
+                                        onClicked: editor.removeCharacterView()
+                                    }
+                                }
+                                C.CompactTextField {
+                                    Layout.fillWidth: true
+                                    text: editor.characterViews.find(v => v.id === editor.selectedView)?.name || ""
+                                    placeholderText: "View set name"
+                                    enabled: editor.selectedView > 0
+                                    onEditingFinished: editor.renameCharacterView(text)
+                                    Accessible.name: "Character view set name"
+                                }
                             }
                         }
                         Rectangle {
@@ -1331,11 +1693,13 @@ ApplicationWindow {
                         Menu {
                             id: layerMenu
                             Action {
-                                text: "Duplicate layer"
+                                text: layerInspector.rigLayer?.kind === 2 || layerInspector.rigLayer?.kind === 3 ?
+                                      "Duplicate rig branch" : "Duplicate layer"
                                 onTriggered: editor.duplicateLayer(false)
                             }
                             Action {
-                                text: "Clone linked drawings"
+                                text: layerInspector.rigLayer?.kind === 2 || layerInspector.rigLayer?.kind === 3 ?
+                                      "Clone branch with linked artwork" : "Clone linked drawings"
                                 onTriggered: editor.duplicateLayer(true)
                             }
                             Action {
@@ -1369,6 +1733,7 @@ ApplicationWindow {
                                 spacing: 2
                                 C.ToolButton {
                                     text: modelData.visible ? "◉" : "○"
+                                    visible: modelData.kind !== 4
                                     implicitWidth: 24
                                     hint: "Toggle visibility"
                                     onClicked: editor.toggleLayer(modelData.id, "visible")
@@ -1395,6 +1760,7 @@ ApplicationWindow {
                                 }
                                 C.ToolButton {
                                     text: "S"
+                                    visible: modelData.kind !== 4
                                     active: modelData.solo
                                     implicitWidth: 24
                                     hint: "Solo layer"
@@ -1817,6 +2183,20 @@ ApplicationWindow {
         title: "Import image"
         nameFilters: ["Images (*.png *.jpg *.jpeg *.bmp *.webp)"]
         onAccepted: editor.importImage(selectedFile)
+    }
+    FileDialog {
+        id: partsDialog
+        title: "Import registered PNG parts · same canvas size"
+        fileMode: FileDialog.OpenFiles
+        nameFilters: ["PNG images (*.png)"]
+        onAccepted: editor.importParts(selectedFiles)
+    }
+    FileDialog {
+        id: sequenceDialog
+        title: "Import numbered PNG sequence · gaps stay empty"
+        fileMode: FileDialog.OpenFiles
+        nameFilters: ["PNG images (*.png)"]
+        onAccepted: editor.importImageSequence(selectedFiles)
     }
     FolderDialog {
         id: exportDialog

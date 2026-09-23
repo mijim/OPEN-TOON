@@ -24,9 +24,13 @@ Create drawing, sound and transform layers with type-specific attributes.
 
 **Initial acceptance:** The inspector prevents assigning audio samples to a vector layer.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — typed Drawing, Character, Peg, Part and Camera layers; sound layer remains open.
+
+**Remaining scope:** Typed visual and transform layers work. Sound layers and their type-specific inspector validation remain open.
 
 ## LYR-002 — Reorder and rename layers
 
@@ -36,7 +40,11 @@ Change ordering and labels while retaining stable identifiers.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## LYR-003 — Visibility, lock and solo
 
@@ -46,7 +54,11 @@ Separate editing visibility, locking and temporary isolation.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## LYR-004 — Layer groups
 
@@ -56,7 +68,7 @@ Group and ungroup layers while preserving relationships that affect the result.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## LYR-005 — Duplicate or clone
 
@@ -66,7 +78,11 @@ Distinguish a deep copy from an instance sharing drawings or functions.
 
 **Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## LYR-006 — Exposure synchronization
 
@@ -76,7 +92,7 @@ Allow linked tracks to share a drawing sequence.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## LYR-007 — Element management
 
@@ -84,9 +100,13 @@ Identify used and unexposed drawings; renumber without losing references.
 
 **Initial acceptance:** Clearing a cell does not delete its now-unexposed drawing.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — clearing an exposure retains its independently stored drawing.
+
+**Remaining scope:** Exposure clearing preserves source drawings. Used/unexposed drawing management and safe renumbering remain open.
 
 ## LYR-008 — Line, Color, Overlay and Underlay Art
 
@@ -96,7 +116,11 @@ Store four ordered art sublayers per drawing.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## LYR-009 — Art layer manager
 
@@ -106,7 +130,7 @@ Move, swap, duplicate and consolidate art sublayers across drawing ranges.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## LYR-010 — Sheet annotations
 
@@ -116,7 +140,7 @@ Add text or drawing annotations independently of the final render.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
 
 ## LYR-011 — Multi-layer property editing
 
@@ -126,4 +150,4 @@ Apply shared attributes to a compatible selection of layers.
 
 **Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
 
-**Evidence:** `proposal`.
+**Specification source:** `proposal`.
