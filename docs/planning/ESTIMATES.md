@@ -1,5 +1,7 @@
 # Effort, staffing and uncertainty
 
+**Reference — estimation assumptions, not the active execution queue.** For current work, start at [NOW](NOW.md).
+
 These are planning judgments, not delivery dates or measured velocity. The editor
 exists, but the team has not demonstrated a complete deformable-character workflow.
 One engineer-week means five focused working days; it is not a calendar week at full

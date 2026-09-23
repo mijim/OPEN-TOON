@@ -12,17 +12,37 @@ Implementation proceeds under these contracts; bounded HM-04 composition and
 HM-13 output-camera contracts are accepted. HM-03 rigid-character work remains
 open for artist-led acceptance.
 
-## Start here
+## Start here — one execution route
 
-1. [Harmony Moment delivery plan](HARMONY-MOMENT.md): generated scope, hard contract
-   dependencies, acceptance profile, 16 slices and remaining effort.
-2. [Reorientation rationale](REORIENTATION.md): current code audit, dependency changes,
-   tradeoffs, intended differentiation and primary references.
-3. [Next tasks](FIRST-STEPS.md): executable order and permitted parallel work.
-4. [Full phase roadmap](PHASES.md): preserved long-term ownership and exit criteria.
-5. [Dependency register](LIBRARIES.md), [execution rules](EXECUTION.md) and
-   [estimation assumptions](ESTIMATES.md).
-6. [Implementation evidence](../implementation/status.json): what actually works.
+1. [NOW](NOW.md): current objective, active contract, next task and stop rule.
+2. [Implementation status](../implementation/STATUS.md) and [machine-readable evidence](../implementation/status.json): what actually works and what has been accepted.
+3. [FIRST-STEPS](FIRST-STEPS.md), then `python3 scripts/roadmap.py slice HM-03` or the [specific generated slice](HARMONY-MOMENT.md): recommended execution order, hard prerequisites and observable acceptance.
+4. [Full phase roadmap](PHASES.md): preserved P00–P22 ownership and exit criteria. Then consult [execution rules](EXECUTION.md), [dependency register](LIBRARIES.md), [estimation assumptions](ESTIMATES.md) and [reorientation rationale](REORIENTATION.md) as needed.
+
+The generated Harmony Moment view contains all HM-00–HM-15 contracts; its list is not itself a ready-work queue. Use `python3 scripts/roadmap.py next` and verify accepted prerequisite evidence before beginning a slice.
+
+## What each status means
+
+| Term | Meaning |
+|---|---|
+| Full roadmap P00–P22 | All 23 phase ownership areas and complete exit criteria, including long-term scope; phase numbers are not execution order. |
+| Delivery plan HM-00–HM-15 | Sixteen bounded contracts for the immediate character-shot milestone, connected by `requires` dependencies. |
+| Contract accepted | The bounded slice acceptance has recorded evidence, so its specific contract can satisfy a consumer prerequisite; the owning phase can still be open. |
+| Working subset | Real implemented behavior with partial catalog coverage; it does not imply an accepted slice or a completed feature/phase. |
+| Phase complete | Every phase exit criterion has passed with evidence. No phase currently meets this bar. |
+| Historical backlog | Preserved BOOT/BASE/FILM planning IDs in [FOUNDATION-BACKLOG.md](FOUNDATION-BACKLOG.md); useful context, not the active queue. |
+| Evidence and verification | Actual behavior, acceptance records and test/artistic results in [implementation status](../implementation/STATUS.md), [status.json](../implementation/status.json) and linked records; a plan, button or test that mirrors implementation is insufficient. |
+
+`planned` describes a contract's recorded state, not readiness. A consumer cannot start until every hard prerequisite contract has accepted evidence. With one implementer, follow the recommended order in FIRST-STEPS; at most two bounded slices may be active when separate owners exist.
+
+## Document roles
+
+| Role | Documents | Editing rule |
+|---|---|---|
+| Canonical plan/catalog | `roadmap.json`, `libraries.json`, `node-assignments.json` and `docs/catalog/{features,domains,node-reference,nonfunctional}.json` | Source of IDs, scope, dependencies, assignments and estimates. |
+| Generated views | `HARMONY-MOMENT.md`, `PHASES.md`, `phases/*.md`, `LIBRARIES.md` and catalog domain views | Regenerate using the existing roadmap/catalog render scripts; do not edit by hand. |
+| Current execution/evidence guides | [NOW](NOW.md), [FIRST-STEPS](FIRST-STEPS.md), [STATUS](../implementation/STATUS.md) and [status.json](../implementation/status.json) | Explain the current path and record verified behavior; reconcile with canonical records. |
+| Historical or reference | [FOUNDATION-BACKLOG](FOUNDATION-BACKLOG.md), [REORIENTATION](REORIENTATION.md), [ESTIMATES](ESTIMATES.md) | Retain past tasks, decision rationale and assumptions; they do not override `roadmap.py next`. |
 
 Canonical records: [roadmap.json](roadmap.json), [libraries.json](libraries.json),
 [node-assignments.json](node-assignments.json) and the [feature catalog](../catalog/features.json).

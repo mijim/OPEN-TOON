@@ -18,11 +18,15 @@
 | Distribution | Experimental.11 macOS arm64 ZIP and Linux x86_64 AppImage | Limited profiles; unsigned/not notarized and not supported 1.0 |
 | Development roadmap | Harmony Moment: 16 contract-gated slices; 23 retained phases, 70 work packages, 283 capabilities | Prepared; estimates subject to evidence |
 
-## Reading routes
+## One route for current work
+
+[NOW — current execution entry](planning/NOW.md) → [implementation status and evidence](implementation/STATUS.md) → [FIRST-STEPS — task order](planning/FIRST-STEPS.md) → [the specific HM slice](planning/HARMONY-MOMENT.md) → [full roadmap and references](planning/README.md). Run `python3 scripts/roadmap.py next` and inspect the slice's prerequisites before starting. The full P00–P22 phases own long-term completion; HM-00–HM-15 are bounded delivery contracts. [The planning guide](planning/README.md) explains the status terms and which documents are canonical, generated or historical.
+
+## Reference reading routes
 
 **Use or build the application:** [build](implementation/BUILD.md) → [user guide](implementation/USER-GUIDE.md) → [status](implementation/STATUS.md) → [status audit](implementation/STATUS-AUDIT.md) → [machine-readable evidence](implementation/status.json).
 
-**Planning:** [Harmony Moment](planning/HARMONY-MOMENT.md) → [dependency rationale](planning/REORIENTATION.md) → [roadmap](planning/README.md) → [phase table](planning/PHASES.md) → [first backlog](planning/FIRST-STEPS.md) → [execution rules](planning/EXECUTION.md) → [estimates](planning/ESTIMATES.md).
+**Planning reference:** [full phase roadmap](planning/PHASES.md) → [Harmony Moment contract detail](planning/HARMONY-MOMENT.md) → [execution rules](planning/EXECUTION.md) → [estimates](planning/ESTIMATES.md) → [reorientation rationale](planning/REORIENTATION.md). The [historical foundation backlog](planning/FOUNDATION-BACKLOG.md) is not the active queue.
 
 **Dependencies:** [open-source register](planning/LIBRARIES.md), including upstream sources, intended use, benchmark gates, licensing investigations and fallback choices. Actual experimental dependency adoption is recorded in [implementation dependencies](implementation/DEPENDENCIES.md).
 
@@ -36,6 +40,7 @@
 
 | Need | Query or document |
 |---|---|
+| Current operational entry and status | [NOW](planning/NOW.md) → [STATUS](implementation/STATUS.md) |
 | Where a feature completes | `python3 scripts/roadmap.py feature DEF-005` |
 | Current bounded delivery contract | `python3 scripts/roadmap.py slice HM-05` |
 | Ready slices after prerequisite evidence | `python3 scripts/roadmap.py next` |

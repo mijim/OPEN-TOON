@@ -1,5 +1,7 @@
 # Character-first roadmap reorientation
 
+**Reference — decision rationale snapshot, not the active execution queue.** For current work, start at [NOW](NOW.md).
+
 Decision date: 2026-09-21. Baseline: source `9dcac48` / application
 `0.2.0-experimental.10`. This revision changes planning and its validation tools only.
 Application implementation, dependency locks, file format and completion evidence are unchanged.

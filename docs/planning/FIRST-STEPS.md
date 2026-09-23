@@ -1,5 +1,7 @@
 # Next implementation tasks — character-first
 
+**Current execution guide.** Begin at [NOW](NOW.md), read [implementation status](../implementation/STATUS.md), run `python3 scripts/roadmap.py next`, then inspect `python3 scripts/roadmap.py slice HM-03` (or the chosen eligible slice). Review its scope, feature requirements and acceptance, and verify every `requires` contract has accepted evidence before starting. `planned` does not mean ready; an unaccepted dependency blocks its consumer. An accepted bounded contract does not complete its owning phase. Keep at most two bounded slices active with separate owners; with one implementer, follow the recommended priority below.
+
 HM-00 reference assets, foundation contracts and owner artistic review are
 accepted. The bounded HM-02 artwork-intake contract is complete; HM-01 typed
 property work is accepted; HM-03 rigid character work is underway. Use
