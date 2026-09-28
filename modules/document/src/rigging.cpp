@@ -55,24 +55,33 @@ Transform decompose(Matrix m, Transform previous) {
     previous.y = m.y - previous.pivotY + m.c * previous.pivotX + m.d * previous.pivotY;
     return previous;
 }
-Matrix ancestry(const Document& document, Id parent) {
+Matrix ancestry(const Document& document, Id parent, Id stop = 0) {
     Matrix result;
-    while (parent) {
+    while (parent && parent != stop) {
         const auto& node = document.layer(parent);
-        require(node.keys.empty(), "Reparenting under animated ancestors is not supported yet.");
+        require(node.keys.empty(), "Cannot preserve motion across differently animated branches.");
         result = compose(matrix(node.transform), result);
         parent = node.parent;
     }
     return result;
 }
-double ancestryOpacity(const Document& document, Id parent) {
+double ancestryOpacity(const Document& document, Id parent, Id stop = 0) {
     double result = 1;
-    while (parent) {
+    while (parent && parent != stop) {
         const auto& node = document.layer(parent);
         result *= node.transform.opacity;
         parent = node.parent;
     }
     return result;
+}
+Id commonAncestor(const Document& document, Id a, Id b) {
+    std::set<Id> ancestors;
+    for (Id current = a; current; current = document.layer(current).parent)
+        ancestors.insert(current);
+    for (Id current = b; current; current = document.layer(current).parent)
+        if (ancestors.contains(current))
+            return current;
+    return 0;
 }
 Layer& part(Document& document, Id id) {
     auto& layer = document.layer(id);
@@ -267,19 +276,20 @@ void reparentPreservingWorld(Document& document, Id childId, Id newParent) {
     require(oldRoot == newRoot, "Move parts only within their character.");
     if (child.parent == newParent)
         return;
-    const Matrix oldSpace = ancestry(document, child.parent);
-    const Matrix newSpace = inverse(ancestry(document, newParent));
-    const double oldOpacity = ancestryOpacity(document, child.parent);
-    const double newOpacity = ancestryOpacity(document, newParent);
+    // Motion above the shared ancestor cancels exactly. Only the branches whose
+    // parentage changes must have a stable rest transform.
+    const Id shared = commonAncestor(document, child.parent, newParent);
+    const Matrix oldSpace = ancestry(document, child.parent, shared);
+    const Matrix newSpace = inverse(ancestry(document, newParent, shared));
+    const double oldOpacity = ancestryOpacity(document, child.parent, shared);
+    const double newOpacity = ancestryOpacity(document, newParent, shared);
     require(newOpacity > 1e-10, "Cannot preserve opacity below a transparent parent.");
-    auto convert = [&](Transform& pose) {
-        const auto desired = compose(newSpace, compose(oldSpace, matrix(pose)));
-        pose = decompose(desired, pose);
-        pose.opacity *= oldOpacity / newOpacity;
-        require(std::isfinite(pose.opacity) && pose.opacity >= 0 && pose.opacity <= 1,
-                "Reparenting cannot preserve opacity under this parent.");
-    };
-    convert(child.transform);
+    auto converted = decompose(compose(newSpace, compose(oldSpace, matrix(child.transform))),
+                               child.transform);
+    converted.opacity *= oldOpacity / newOpacity;
+    require(std::isfinite(converted.opacity) && converted.opacity >= 0 && converted.opacity <= 1,
+            "Reparenting cannot preserve opacity under this parent.");
+    child.transform = converted;
     child.parent = newParent;
 }
 void setPivotPreservingArtwork(Document& document, Id layerId, double x, double y) {

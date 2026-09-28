@@ -44,7 +44,7 @@ The four art categories are Underlay, Color, Line and Overlay. Their drawing ord
 
 Click a swatch to select it. Double-click to edit its color; all strokes referencing that ID update. The document retains color IDs across save/reopen. Palette import, variants, gradients and managed color are pending.
 
-The inspector edits position, rotation, scale, opacity and pivot. Add transform keys with Linear, Hold or Smooth interpolation. If a layer already has keys, editing a transform inserts or updates a key at the current frame. Parent layers apply inherited transforms and opacity. Character parts and pegs preserve the visible image when reparented within one character, provided the result has no shear or singular transform and the moved layer and its ancestors are not animated. Curves can be edited in the main workspace. IK and deformation remain pending.
+The inspector edits position, rotation, scale, opacity and pivot. Add transform keys with Linear, Hold or Smooth interpolation. If a layer already has keys, editing a transform inserts or updates a key at the current frame. Parent layers apply inherited transforms and opacity. Character parts and pegs preserve the visible image when reparented within one character, provided the result has no shear or singular transform and the moved layer and the branches whose parentage changes are not animated. Motion above their shared ancestor is preserved. Curves can be edited in the main workspace. IK and deformation remain pending.
 
 **Scene → Add output camera** creates one orthographic camera. Choose the Camera
 tool to see the shot frame: drag inside it to pan, drag the round top handle to

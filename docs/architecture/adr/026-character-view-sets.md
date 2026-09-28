@@ -1,7 +1,8 @@
 # ADR-026 — Character view sets and format-5 persistence
 
 Status: accepted for the bounded HM-03 rigid character workflow, 2026-09-23.
-Extends [ADR-025](025-character-rig-format-four.md); HM-03 acceptance remains open.
+Extends [ADR-025](025-character-rig-format-four.md); the bounded HM-03 contract
+was accepted on 2026-09-28 with [workflow evidence](../../implementation/HM03-ACCEPTANCE.md).
 
 ## Decision
 

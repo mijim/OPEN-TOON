@@ -8,9 +8,9 @@ workflow milestone before full P11/1.0, not a claim of Harmony parity.
 The roadmap retains **23 phases**, **70 work packages**, **283 capabilities** and
 specification ownership for **193 node/family entries**. RIG-015 adds Quick Rig to
 the previous 282 requirements. No old feature was removed or declared complete.
-Implementation proceeds under these contracts; bounded HM-04 composition and
-HM-13 output-camera contracts are accepted. HM-03 rigid-character work remains
-open for artist-led acceptance.
+Implementation proceeds under these contracts; bounded HM-03 rigid character,
+HM-04 composition and HM-13 output-camera contracts are accepted. HM-05 rest
+binding and deformation rendering is next on the critical path.
 
 ## Start here — one execution route
 
@@ -86,9 +86,10 @@ detail over the same model. No scripting prerequisite or irreversible simplified
 HM-00's reproducible reference assets and foundation contract were accepted with
 [owner artistic review](../implementation/HM00-REVIEW.md). The bounded
 [HM-02 artwork-intake contract](../implementation/HM02-ARTWORK-INTAKE.md) is also
-accepted. HM-01's bounded property contract is accepted. HM-03 now has typed persistent
-characters, substitutions and coordinated view sets, but its full rigid-character
-acceptance gate remains open. [HM-04](../implementation/HM04-ACCEPTANCE.md)
+accepted. HM-01's bounded property contract is accepted. HM-03 has typed persistent
+characters, substitutions and coordinated view sets with
+[owner-delegated bounded acceptance](../implementation/HM03-ACCEPTANCE.md).
+[HM-04](../implementation/HM04-ACCEPTANCE.md)
 and [HM-13](../implementation/HM13-ACCEPTANCE.md) are accepted bounded contracts;
 their owning full phases remain open. The second-animator working-shot review
 remains an HM-15 gate.

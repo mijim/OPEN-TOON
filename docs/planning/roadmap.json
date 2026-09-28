@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "as_of": "2026-09-23",
+  "as_of": "2026-09-28",
   "status": "active_execution_plan",
   "product_language": "en",
   "implementation_status": "experimental_partial",
@@ -4630,7 +4630,7 @@
       "owner_phase": "P08",
       "work_package": "P08-W1",
       "owner_module": "rigging/document",
-      "status": "in_progress",
+      "status": "complete",
       "effort_engineer_weeks": [
         3,
         6
@@ -4675,7 +4675,16 @@
         "modules/document/src/timeline.cpp"
       ],
       "library_ids": [],
-      "completion_evidence": []
+      "completion_evidence": [
+        "docs/implementation/HM03-ACCEPTANCE.md",
+        "docs/implementation/HM03-RIG-FOUNDATION.md",
+        "docs/architecture/adr/025-character-rig-format-four.md",
+        "tests/rigging_tests.cpp",
+        "tests/harmony_reference_tests.cpp",
+        "tests/export_tests.cpp",
+        "docs/implementation/hm03-front.png",
+        "docs/implementation/hm03-three-quarter.png"
+      ]
     },
     {
       "id": "HM-04",
@@ -5237,7 +5246,7 @@
   ],
   "execution_policy": {
     "primary_objective": "HM: reliable character animation Harmony Moment",
-    "current_instruction": "HM-00, HM-01, HM-02, bounded HM-04 and HM-13 are accepted. HM-03 rigid-character workflow still needs artist-led acceptance; this blocks HM-05 deformers and HM-12 nodes. HM-10 audio is independently eligible now, with HM-03 review and HM-05 binding feasibility the next critical-path tasks.",
+    "current_instruction": "HM-00, HM-01, HM-02, bounded HM-03, HM-04 and HM-13 are accepted. HM-05 rest binding and deformation rendering is the next critical-path contract. HM-07 controls, HM-10 audio and HM-12 nodes are also eligible, but one implementer follows HM-05 first. Full P08 and all other owning phases remain open.",
     "phase_dependency_semantics": "Phase depends_on constrains full epic completion, not entry into an implementation slice. Only the explicit delivery-slice contract DAG gates the Harmony Moment. Domain dependencies are scope relationships, not all-features barriers.",
     "entry_rule": "Start a slice only when each required contract has accepted evidence. Baseline reuse is partial and must be qualified; planned is not ready. Independent spikes may run without claiming their consumer ready.",
     "wip_limit": 2,

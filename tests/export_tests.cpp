@@ -1,4 +1,5 @@
 #include "editor_controller.h"
+#include "opentoon/rigging.h"
 #include "project_store.h"
 #include "scene_renderer.h"
 #include <QCoreApplication>
@@ -8,6 +9,7 @@
 #include <QFile>
 #include <QImage>
 #include <QGuiApplication>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QSettings>
@@ -16,7 +18,9 @@
 #include <QThread>
 #include <catch2/catch_session.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <algorithm>
 #include <cstring>
+#include <map>
 namespace {
 const QString partFixture = QStringLiteral(OPENTOON_SOURCE_DIR "/tests/fixtures/harmony-moment/parts/");
 QVariantList paths(std::initializer_list<QString> values) {
@@ -244,6 +248,184 @@ TEST_CASE("Inspector rig branch and view-range commands stay undoable and saveab
     REQUIRE(editor.document() != snapshot);
     editor.redo();
     REQUIRE(editor.document() == snapshot);
+}
+
+TEST_CASE("Nineteen imported parts complete the inspector view and substitution journey") {
+    QFile specification(QStringLiteral(OPENTOON_SOURCE_DIR "/tests/fixtures/harmony-moment/shot.json"));
+    REQUIRE(specification.open(QIODevice::ReadOnly));
+    const auto shot = QJsonDocument::fromJson(specification.readAll()).object();
+    const auto centers = shot.value("reference_centers_px").toObject();
+    const auto roles = shot.value("part_roles").toArray();
+    EditorController editor;
+    editor.newScene();
+    editor.setScene("Clockwork Hello review", 1920, 1080, 480, 24, 1);
+    QVariantList imports;
+    std::map<std::string, int> partIds;
+    for (const auto& value : roles) {
+        const QString role = value.toString();
+        const QString variant = role == "mouth" ? "front__rest" :
+                                (role == "head" || role == "hair" || role == "eyes") ? "front" :
+                                role.startsWith("hand_") ? "open" : "base";
+        imports.push_back(QUrl::fromLocalFile(partFixture + role + "__" + variant + ".png"));
+    }
+    REQUIRE(imports.size() == 19);
+    REQUIRE(editor.importParts(imports));
+    for (const auto& layer : editor.document().layers)
+        for (const auto& value : roles) {
+            const auto role = value.toString().toStdString();
+            if (layer.name.starts_with(role + "__"))
+                partIds.emplace(role, int(layer.id));
+        }
+    REQUIRE(partIds.size() == 19);
+    editor.setSelectedLayer(partIds.at("torso"));
+    editor.makeCharacter();
+    const int root = editor.characterId();
+    REQUIRE(root > 0);
+    editor.attachUnparentedDrawings();
+    for (const auto& [role, id] : partIds) {
+        editor.setSelectedLayer(id);
+        editor.setPartRole(QString::fromStdString(role));
+        const auto center = centers.value(QString::fromStdString(role)).toArray();
+        REQUIRE(center.size() == 2);
+        editor.setTransform("x", center[0].toDouble() - 128);
+        editor.setTransform("y", center[1].toDouble() - 128);
+        REQUIRE(editor.document().layer(id).kind == opentoon::LayerKind::Part);
+        REQUIRE(opentoon::characterFor(editor.document(), id) == opentoon::Id(root));
+        REQUIRE(editor.document().drawingAt(id, 0));
+    }
+    // Import order follows filenames. The shot's intended stacking is an artist
+    // operation, so exercise the same adjacent layer moves exposed by the UI.
+    const auto paintOrder = shot.value("reference_paint_order").toArray();
+    REQUIRE(paintOrder.size() == 19);
+    for (int target = 0; target < paintOrder.size(); ++target) {
+        const int id = partIds.at(paintOrder[target].toString().toStdString());
+        while (true) {
+            const auto& layers = editor.document().layers;
+            const auto current = std::find_if(layers.begin(), layers.end(),
+                                              [id](const auto& layer) { return layer.id == opentoon::Id(id); });
+            REQUIRE(current != layers.end());
+            const int position = int(std::distance(layers.begin(), current));
+            if (position == target + 1)
+                break;
+            editor.setSelectedLayer(id);
+            editor.moveLayer(position > target + 1 ? -1 : 1);
+        }
+    }
+    for (const auto& [role, id] : partIds)
+        REQUIRE(editor.document().drawingAt(id, 0));
+    editor.setSelectedLayer(partIds.at("upper_arm_right"));
+    editor.addPeg();
+    const int armPeg = int(editor.document().layer(partIds.at("upper_arm_right")).parent);
+    editor.setSelectedLayer(partIds.at("hand_right"));
+    editor.setParent(armPeg);
+    REQUIRE(editor.document().layer(partIds.at("hand_right")).parent == opentoon::Id(armPeg));
+    editor.setSelectedLayer(armPeg);
+    editor.addKey();
+    editor.setFrame(120);
+    editor.addKey();
+    editor.setFrame(0);
+    const auto pegKeys = editor.document().layer(armPeg).keys;
+    REQUIRE(pegKeys.size() == 2);
+    editor.setSelectedLayer(root);
+    editor.captureCharacterView();
+    const int front = editor.selectedView();
+    editor.renameCharacterView("Front");
+    REQUIRE(editor.document().layer(root).views.front().choices.size() == 19);
+    const auto reference = QImage(QStringLiteral(OPENTOON_SOURCE_DIR "/tests/fixtures/harmony-moment/reference_0000.png"))
+                               .convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    REQUIRE_FALSE(reference.isNull());
+    const auto assembled = opentoon::SceneRenderer::render(editor.document(), 0);
+    if (qEnvironmentVariableIsSet("OPENTOON_HM03_REVIEW_DIR")) {
+        QDir output(qEnvironmentVariable("OPENTOON_HM03_REVIEW_DIR"));
+        REQUIRE(assembled.save(output.filePath("hm03-assembled.png")));
+    }
+    REQUIRE(assembled.size() == reference.size());
+    REQUIRE(assembled.format() == reference.format());
+    int mismatches = 0;
+    for (int y = 0; y < assembled.height(); ++y)
+        for (int x = 0; x < assembled.width(); ++x)
+            if (assembled.pixel(x, y) != reference.pixel(x, y))
+                ++mismatches;
+    REQUIRE(mismatches == 0);
+    const auto frontImage = opentoon::SceneRenderer::render(editor.document(), 0, {480, 270});
+
+    editor.setFrame(120);
+    for (const auto& [role, filename] : std::vector<std::pair<std::string, QString>>{
+             {"head", "head__three_quarter.png"}, {"hair", "hair__three_quarter.png"},
+             {"eyes", "eyes__three_quarter.png"}, {"mouth", "mouth__three_quarter__ah.png"}}) {
+        editor.setSelectedLayer(partIds.at(role));
+        editor.createSubstitution(false);
+        editor.importImage(QUrl::fromLocalFile(partFixture + filename));
+        REQUIRE(editor.substitutions().size() == 2);
+        REQUIRE(editor.substitutionThumbnail(editor.selectedSubstitution()).startsWith("data:image/png;base64,"));
+    }
+    editor.setSelectedLayer(root);
+    editor.captureCharacterView();
+    const int turned = editor.selectedView();
+    editor.renameCharacterView("Three-quarter");
+    REQUIRE(editor.document().layer(root).views.size() == 2);
+    const auto turnedImage = opentoon::SceneRenderer::render(editor.document(), 120, {480, 270});
+    REQUIRE(turnedImage != frontImage);
+
+    editor.setFrame(240);
+    editor.setSelectedLayer(partIds.at("hand_right"));
+    editor.createSubstitution(false);
+    editor.importImage(QUrl::fromLocalFile(partFixture + "hand_right__point.png"));
+    const int pointedHand = editor.selectedSubstitution();
+    REQUIRE(editor.document().drawingAt(partIds.at("hand_right"), 240)->id == opentoon::Id(pointedHand));
+    editor.setSelectedLayer(root);
+    editor.selectView(front);
+    editor.setFrame(300);
+    editor.applyCharacterView();
+    REQUIRE(editor.document().drawingAt(partIds.at("mouth"), 300)->id ==
+            editor.document().drawingAt(partIds.at("mouth"), 0)->id);
+    REQUIRE(editor.document().drawingAt(partIds.at("hand_right"), 300)->id ==
+            editor.document().drawingAt(partIds.at("hand_right"), 0)->id);
+    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 300, {480, 270}) == frontImage);
+    editor.selectView(turned);
+    editor.setFrame(360);
+    editor.applyCharacterView();
+    REQUIRE(editor.document().drawingAt(partIds.at("mouth"), 360)->id ==
+            editor.document().drawingAt(partIds.at("mouth"), 120)->id);
+    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 360, {480, 270}) == turnedImage);
+    REQUIRE(editor.document().layer(armPeg).keys == pegKeys);
+    const auto rigged = editor.document();
+    editor.undo();
+    REQUIRE(editor.document() != rigged);
+    editor.redo();
+    REQUIRE(editor.document() == rigged);
+
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto project = QUrl::fromLocalFile(directory.filePath("character-review.otoon"));
+    REQUIRE(editor.saveProject(project));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(project));
+    REQUIRE(reopened.document() == rigged);
+    REQUIRE(opentoon::SceneRenderer::render(reopened.document(), 360, {480, 270}) == turnedImage);
+    reopened.setSelectedLayer(root);
+    reopened.duplicateCharacter();
+    const auto clone = opentoon::Id(reopened.selectedLayer());
+    REQUIRE(clone != opentoon::Id(root));
+    REQUIRE(reopened.document().layer(clone).views.size() == 2);
+    const auto originalMouth = reopened.document().drawingAt(partIds.at("mouth"), 360)->id;
+    const auto& cloneChoices = reopened.document().layer(clone).views.back().choices;
+    const auto copiedMouth = std::find_if(cloneChoices.begin(), cloneChoices.end(),
+                                          [&](const opentoon::ViewChoice& choice) {
+                                              return reopened.document().layer(choice.part).role == "mouth";
+                                          });
+    REQUIRE(copiedMouth != cloneChoices.end());
+    const auto copiedMouthId = copiedMouth->part;
+    reopened.setSelectedLayer(int(copiedMouthId));
+    reopened.setFrame(360);
+    reopened.createSubstitution(true);
+    REQUIRE(reopened.document().drawingAt(partIds.at("mouth"), 360)->id == originalMouth);
+    REQUIRE(reopened.document().drawingAt(copiedMouthId, 360)->id != originalMouth);
+    if (qEnvironmentVariableIsSet("OPENTOON_HM03_REVIEW_DIR")) {
+        QDir output(qEnvironmentVariable("OPENTOON_HM03_REVIEW_DIR"));
+        REQUIRE(frontImage.save(output.filePath("hm03-front.png")));
+        REQUIRE(turnedImage.save(output.filePath("hm03-three-quarter.png")));
+    }
 }
 
 TEST_CASE("Rejected registered part batch leaves the scene and selection intact") {
