@@ -41,9 +41,10 @@ int main(int argc, char** argv) {
         std::cout << OPENTOON_VERSION << '\n';
         return 0;
     }
-    if (args.contains("--smoke-test")) {
+    if (args.contains("--smoke-test") || args.contains("--hm06-benchmark")) {
         QStandardPaths::setTestModeEnabled(true);
-        QCoreApplication::setApplicationName("OPEN-TOON-smoke");
+        QCoreApplication::setApplicationName(args.contains("--smoke-test")
+                                                 ? "OPEN-TOON-smoke" : "OPEN-TOON-benchmark");
     }
     try {
         if (args.contains("--render-demo")) {
@@ -96,6 +97,27 @@ int main(int argc, char** argv) {
         engine.loadFromModule("OpenToon", "Main");
         if (args.contains("--demo"))
             editor.loadDemo();
+        if (args.contains("--hm06-benchmark")) {
+            const int index = args.indexOf("--hm06-benchmark");
+            if (index + 1 >= args.size())
+                throw std::runtime_error("Usage: open-toon --hm06-benchmark PROJECT");
+            const QString project = args[index + 1];
+            QTimer::singleShot(1200, &app, [&, project] {
+                try {
+                    if (engine.rootObjects().isEmpty())
+                        throw std::runtime_error("No QML window for HM-06 benchmark.");
+                    auto* window = qobject_cast<QQuickWindow*>(engine.rootObjects().first());
+                    auto* canvas = window->findChild<CanvasItem*>("drawingCanvas");
+                    if (!canvas || canvas->height() < 200)
+                        throw std::runtime_error("HM-06 benchmark canvas is not usable.");
+                    meshInteractionBenchmark(editor, *canvas, *window, project);
+                    app.exit(0);
+                } catch (const std::exception& error) {
+                    std::cerr << error.what() << '\n';
+                    app.exit(1);
+                }
+            });
+        }
         if (args.contains("--smoke-test")) {
             QTimer::singleShot(1200, &app, [&] {
                 try {

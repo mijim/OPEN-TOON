@@ -38,6 +38,9 @@ Evaluation occurs after document pose keys and before camera/layer image
 composition. Immutable render snapshots carry the authored keys; revision
 cache keys already cover new document edits. Independent Part duplication
 copies weights and keys, while linked artwork may have a separate deformer.
+The canvas mesh grid samples the same evaluated pose as artwork, including
+the temporary drag preview; the rest grid remains available only for static
+mesh setup.
 Scene-wide frame insertion/removal and selected-range Clear include deformer
 keys. Same-Part range copy/paste, move and stretch preserve the keyed bone or
 curve identity and exact pose endpoints. A cross-scene or different-Part key

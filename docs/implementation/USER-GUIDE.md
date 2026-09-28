@@ -81,7 +81,8 @@ current frame to record an animated pose. Escape cancels a drag. **Rest key**
 records the original shape at the playhead without deleting other keys;
 **Remove control** removes the deformer and leaves the rest mesh. One Part
 substitution can have one control type; another substitution may use its own.
-Static vertices cannot be edited while a control is attached.
+The mesh grid follows the rendered pose while a control moves. Static vertices
+cannot be edited while a control is attached.
 Insert/remove frames and Clear include bone/curve keys. Copy/paste, move and
 stretch of a range within the same Part transfer its substitution keys.
 Cross-scene and different-Part deformer-key paste report that a portable rig

@@ -64,8 +64,8 @@
     {
       "id": "P09",
       "status": "in_progress",
-      "available": "Accepted bounded HM-05 format-8 per-substitution rest meshes and UVs; direct mouse editing, alpha-bounded image grids, editable vector source through a bounded raster proxy, static pose/reset, undo and matching preview/output rendering. Format-9 keyed two-segment bone or cubic curve per substitution, saved weights/controls, direct canvas drag with cancellation, Rest key, undo and preview/output parity. Same-Part range copy/paste, move and stretch now transfer keyed deformer poses.",
-      "remaining": "Complete HM-06 extreme-bend and seam quality, influence tuning, control-to-preview p95/memory budgets and shot review; then portable cross-Part key transfer, constraints, multiple-pose rig breadth and full phase qualification."
+      "available": "Accepted bounded HM-05 format-8 per-substitution rest meshes and UVs; direct mouse editing, alpha-bounded image grids, editable vector source through a bounded raster proxy, static pose/reset, undo and matching preview/output rendering. Format-9 keyed two-segment bone or cubic curve per substitution, saved weights/controls, direct canvas drag with cancellation, posed mesh grid, Rest key, undo and preview/output parity. Same-Part range copy/paste, move and stretch transfer keyed deformer poses. Native 19-part subset p95 and process peak memory pass the proposed limits on the measured M1 Pro profile.",
+      "remaining": "Complete HM-06 extreme-bend and seam quality, influence tuning and full-shot interaction/memory budgets and artistic review; then portable cross-Part key transfer, constraints, multiple-pose rig breadth and full phase qualification."
     },
     {
       "id": "P10",
@@ -161,7 +161,8 @@
         "mesh mouse pose/rest drag, preview, undo/redo, unsafe rebind rejection, reset and save/reopen",
         "bone joint and curve tangent mouse drags, cancellable previews, rest key, undo and format-9 reopen",
         "mirrored rotated and zoomed curve-control drag with undo",
-        "same-Part deformer key paste and move through the native timeline controller with atomic undo"
+        "same-Part deformer key paste and move through the native timeline controller with atomic undo",
+        "19-part native bone-control input-to-frameSwapped samples, preview image change and unchanged authored document"
       ],
       "limits": "Synthetic mouse/tablet events on macOS; no physical tablet available. Window-layout flush required for occluded native smoke instances."
     },
@@ -361,10 +362,13 @@
         "tests/mesh_render_tests.cpp",
         "tests/storage_tests.cpp",
         "apps/desktop/mesh_smoke.cpp",
-        "docs/implementation/hm06-bone-curve-detail.png"
+        "docs/implementation/hm06-bone-curve-detail.png",
+        "docs/implementation/HM06-INTERACTION.md",
+        "docs/implementation/hm06-bone-extreme.png",
+        "docs/implementation/hm06-interaction-ui.png"
       ],
-      "scope": "Format-9 per-substitution two-segment bone and cubic curve keys, rest-preserving evaluation, direct mouse handles, undo/cancellation/reopen, original assembled 19-part pixels and three-run 3.25 ms/frame 1080p renderer measurement. Scene frame insertion/removal and selected-range Clear maintain deformer keys. Same-Part range copy/paste, move and stretch retain exact keyed poses.",
-      "limitations": "HM-06 is not accepted: extreme-bend seams/quality, p95 control-to-preview, memory, influence tuning and full shot artist workflow remain to be qualified. Cross-scene and different-Part deformer-key paste reject until portable rig binding transfer is implemented. Independent drawing paste of a bound Part rejects until mesh clone semantics are defined."
+      "scope": "Format-9 per-substitution two-segment bone and cubic curve keys, rest-preserving evaluation, posed canvas grid, direct mouse handles, undo/cancellation/reopen, original assembled 19-part pixels and three-run 3.25 ms/frame 1080p renderer measurement. Scene frame insertion/removal and selected-range Clear maintain deformer keys; same-Part range copy/paste, move and stretch retain exact keyed poses. A manually coordinated 70-degree three-Part arm pose reopens identically. Four native 19-part subset benchmark runs measured p95 input-to-frameSwapped at 16.0-22.5 ms and process peak resident memory below 272 MB on M1 Pro.",
+      "limitations": "HM-06 is not accepted: the 70-degree elbow still bulges; influence tuning, complete-shot interaction/memory budgets and artist workflow remain. Cross-scene and different-Part deformer-key paste reject until portable rig binding transfer is implemented. Independent drawing paste of a bound Part rejects until mesh clone semantics are defined."
     }
   },
   "ownership": {

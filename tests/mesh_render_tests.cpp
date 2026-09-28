@@ -3,6 +3,7 @@
 #include "opentoon/rigging.h"
 #include "mesh_warp.h"
 #include "graph_renderer.h"
+#include "project_store.h"
 #include "scene_renderer.h"
 #include "serialization.h"
 #include <catch2/catch_test_macros.hpp>
@@ -13,6 +14,7 @@
 #include <chrono>
 #include <cstdio>
 #include <cstring>
+#include <filesystem>
 
 using namespace opentoon;
 
@@ -387,6 +389,8 @@ TEST_CASE("Nineteen Harmony parts keep rest pixels and bounded posed render cost
     const auto armPart = partFor("upper_arm_left"), torsoPart = partFor("torso");
     const auto armDrawing = document.layer(armPart).exposures.front().drawing;
     const auto torsoDrawing = document.layer(torsoPart).exposures.front().drawing;
+    removeMeshBinding(document, armPart, armDrawing);
+    bindRegularImageMesh(document, armPart, armDrawing, 4, 4);
     const auto& armMesh = *meshBindingFor(document.layer(armPart), armDrawing);
     const auto armFirst = armMesh.vertices.front().rest;
     const auto armLast = armMesh.vertices.back().rest;
@@ -421,6 +425,37 @@ TEST_CASE("Nineteen Harmony parts keep rest pixels and bounded posed render cost
     REQUIRE(animated.copy(760, 250, 400, 500).save("hm06-bone-curve-detail.png"));
     const auto reopenedAnimated = deserializeDocument(serializeDocument(document));
     REQUIRE(SceneRenderer::render(reopenedAnimated, 12) == animated);
+    auto stronger = document;
+    recordBonePose(stronger, armPart, armDrawing, 24, 0, 70);
+    for (const auto& role : {"lower_arm_left", "hand_left"}) {
+        const Id follower = partFor(role);
+        const Id followerDrawing = stronger.layer(follower).exposures.front().drawing;
+        removeMeshBinding(stronger, follower, followerDrawing);
+        bindRegularImageMesh(stronger, follower, followerDrawing, 4, 4);
+        auto joints = meshBindingFor(stronger.layer(armPart), armDrawing)->bone->restJoints;
+        const auto& armTransform = stronger.layer(armPart).transform;
+        const auto& followerTransform = stronger.layer(follower).transform;
+        for (auto& joint : joints) {
+            joint.x += armTransform.x - followerTransform.x;
+            joint.y += armTransform.y - followerTransform.y;
+        }
+        bindBoneChain(stronger, follower, followerDrawing, joints,
+                      meshBindingFor(stronger.layer(armPart), armDrawing)->bone->elbowTransition);
+        recordBonePose(stronger, follower, followerDrawing, 12, 0, 12);
+        recordBonePose(stronger, follower, followerDrawing, 24, 0, 70);
+    }
+    stronger.validate();
+    REQUIRE(SceneRenderer::render(stronger, 0) == baseline);
+    const auto strongerImage = SceneRenderer::render(stronger, 24);
+    REQUIRE(strongerImage != animated);
+    REQUIRE(strongerImage.save("hm06-bone-extreme.png"));
+    REQUIRE(strongerImage.copy(760, 250, 400, 500).save("hm06-bone-extreme-detail.png"));
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(stronger)), 24) ==
+            strongerImage);
+    if (qEnvironmentVariableIsSet("OPENTOON_HM06_BENCH_PROJECT")) {
+        const auto output = qEnvironmentVariable("OPENTOON_HM06_BENCH_PROJECT");
+        REQUIRE(ProjectStore::save(std::filesystem::path(output.toStdString()), document) > 0);
+    }
     const auto animatedStart = std::chrono::steady_clock::now();
     for (int run = 0; run < 3; ++run)
         REQUIRE(SceneRenderer::render(document, 12) == animated);

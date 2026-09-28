@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cmath>
 #include <numbers>
+#include <optional>
 
 using namespace opentoon;
 namespace {
@@ -104,6 +105,11 @@ void CanvasItem::paintMesh(QPainter* painter, const Document& document,
     const auto* binding = selectedMesh(document);
     if (!binding)
         return;
+    const auto evaluated = (binding->bone || binding->curve)
+        ? std::optional<MeshBinding>(evaluateMeshBinding(*binding, editor_->frame()))
+        : std::nullopt;
+    if (evaluated)
+        binding = &*evaluated;
     const auto transform = selectionWorld();
     auto at = [&](int row, int column) {
         const auto& vertex = binding->vertices[std::size_t(row) * (binding->columns + 1) + column];

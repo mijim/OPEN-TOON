@@ -5,12 +5,22 @@
 #include "opentoon/timeline.h"
 #include "scene_renderer.h"
 #include <QCoreApplication>
+#include <QElapsedTimer>
+#include <QEventLoop>
 #include <QImage>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QMouseEvent>
 #include <QQuickWindow>
 #include <QTemporaryDir>
+#include <QTimer>
 #include <QUrl>
+#include <algorithm>
+#include <cmath>
+#include <iostream>
 #include <stdexcept>
+#include <sys/resource.h>
+#include <vector>
 
 using namespace opentoon;
 
@@ -193,4 +203,93 @@ void meshSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& windo
     editor.undo();
     if (editor.document() != beforePaste)
         throw std::runtime_error("Timeline deformer move did not undo atomically.");
+}
+
+void meshInteractionBenchmark(EditorController& editor, CanvasItem& canvas,
+                              QQuickWindow& window, const QString& project) {
+    if (!editor.openProject(QUrl::fromLocalFile(project)))
+        throw std::runtime_error("Cannot open the HM-06 benchmark project: " +
+                                 editor.status().toStdString());
+    Id arm = 0;
+    for (const auto& layer : editor.document().layers)
+        if (layer.name == "upper_arm_left")
+            arm = layer.id;
+    if (!arm)
+        throw std::runtime_error("HM-06 benchmark project has no original arm Part.");
+    editor.setSelectedLayer(int(arm));
+    editor.setFrame(12);
+    editor.setTool("Mesh");
+    canvas.setCameraGuidesVisible(false);
+    canvas.fit();
+    if (editor.selectedMeshDeformer() != 1 || editor.document().layers.size() != 20)
+        throw std::runtime_error("HM-06 benchmark requires the bound 19-part scene.");
+    const auto original = editor.document();
+    QCoreApplication::processEvents();
+    const auto before = window.grabWindow();
+    if (before.isNull())
+        throw std::runtime_error("HM-06 benchmark could not capture its initial canvas.");
+    const QPointF tip = canvas.meshControlPosition(2);
+    auto send = [&](QEvent::Type type, QPointF local, Qt::MouseButton button,
+                    Qt::MouseButtons held) {
+        const auto scene = canvas.mapToScene(local);
+        QMouseEvent event(type, scene, window.mapToGlobal(scene.toPoint()), button, held,
+                          Qt::NoModifier);
+        QCoreApplication::sendEvent(&window, &event);
+    };
+    send(QEvent::MouseButtonPress, tip, Qt::LeftButton, Qt::LeftButton);
+    std::vector<double> samples;
+    samples.reserve(40);
+    for (int index = 0; index < 45; ++index) {
+        QCoreApplication::processEvents();
+        QEventLoop loop;
+        QTimer timeout;
+        timeout.setSingleShot(true);
+        bool presented = false;
+        const auto connection = QObject::connect(&window, &QQuickWindow::frameSwapped,
+                                                  &loop, [&] {
+            presented = true;
+            loop.quit();
+        }, Qt::QueuedConnection);
+        QObject::connect(&timeout, &QTimer::timeout, &loop, &QEventLoop::quit);
+        QElapsedTimer timer;
+        timer.start();
+        const auto target = tip + (index % 2 ? QPointF(-5, 6) : QPointF(-3, 4));
+        send(QEvent::MouseMove, target, Qt::NoButton, Qt::LeftButton);
+        timeout.start(3000);
+        if (!presented)
+            loop.exec();
+        QObject::disconnect(connection);
+        if (!presented)
+            throw std::runtime_error("HM-06 preview did not present a frame after mouse input.");
+        if (index >= 5)
+            samples.push_back(timer.nsecsElapsed() / 1e6);
+    }
+    const auto during = window.grabWindow();
+    if (during.isNull() || during == before ||
+        !during.save("build/hm06-interaction-ui.png"))
+        throw std::runtime_error("HM-06 preview did not visibly change after arm drag.");
+    canvas.cancelGesture();
+    if (editor.document() != original)
+        throw std::runtime_error("HM-06 preview benchmark changed the authored document.");
+    std::sort(samples.begin(), samples.end());
+    struct rusage usage {};
+    if (getrusage(RUSAGE_SELF, &usage) != 0)
+        throw std::runtime_error("HM-06 benchmark could not read process memory.");
+#ifdef __APPLE__
+    const auto peakBytes = qint64(usage.ru_maxrss);
+#else
+    const auto peakBytes = qint64(usage.ru_maxrss) * 1024;
+#endif
+    const QJsonObject report{{"profile", "native Qt Quick input-to-frameSwapped"},
+                             {"documentParts", 19},
+                             {"sceneWidth", editor.sceneWidth()},
+                             {"sceneHeight", editor.sceneHeight()},
+                             {"canvasWidth", canvas.width()},
+                             {"canvasHeight", canvas.height()},
+                             {"devicePixelRatio", window.devicePixelRatio()},
+                             {"sampleCount", int(samples.size())},
+                             {"medianMs", samples[samples.size() / 2]},
+                             {"p95Ms", samples[std::size_t(std::ceil(samples.size() * .95)) - 1]},
+                             {"peakProcessResidentBytes", peakBytes}};
+    std::cout << QJsonDocument(report).toJson(QJsonDocument::Compact).constData() << '\n';
 }

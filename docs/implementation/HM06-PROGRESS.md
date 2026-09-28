@@ -18,7 +18,8 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   document command/undo path; invalid input rejects before publication.
 - Properties offers Bone chain and Curve on a selected bound Part. The Mesh
   tool drags joints or curve controls directly on canvas with a cancellable
-  temporary preview. Static vertex editing is unavailable while a deformer
+  temporary preview. Its grid now follows the evaluated pose during animation
+  and preview. Static vertex editing is unavailable while a deformer
   is attached. Switching substitutions resolves the matching chain.
 - Format 9 persists controls, weights and keys. The first save of format 8
   preserves a source-version `.pre-v8.bak` before upgrading.
@@ -38,7 +39,10 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   `tests/mesh_render_tests.cpp` covers saved preview/Display/Write pixels,
   separate substitution chains, and the original 19-part scene. The assembled
   frame-zero scene is byte-identical to `reference_0000.png`; an animated arm
-  and torso reopen to identical frame-12 pixels.
+  and torso reopen to identical frame-12 pixels. A manually coordinated 70°
+  pose of upper arm, lower arm and hand keeps rest pixels unchanged and
+  reopens identically. The [extreme pose](hm06-bone-extreme.png) still shows an
+  elbow bulge that blocks artistic acceptance.
 - The native `--smoke-test` drags a bone tip and curve tangent, checks
   temporary preview isolation, cancellation, undo/redo, Rest key, same-Part
   timeline key paste/move and project reopen on a checker Part. A
@@ -48,14 +52,19 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   elbow overlap and larger bends still need correction and artistic acceptance.
 - The macOS optimized build passes 121/121 CTest entries and native smoke.
   On Apple M1 Pro, three earlier local 1920×1080 renders of the assembled
-  19-part scene with one bone and one curve averaged 3.25 ms/frame. This is renderer
-  cost, not measured control-to-preview p95 or full shot memory. No new
-  dependency or license was added; Eigen remains a candidate.
+  19-part scene with one bone and one curve averaged 3.25 ms/frame. This is
+  renderer cost, separate from native input-to-present latency and full-shot
+  memory. No new dependency or license was added; Eigen remains a candidate.
+- The [native interaction measurement](HM06-INTERACTION.md) on the same M1 Pro
+  used 40 input-to-`frameSwapped` samples in each of four runs of the 19-part
+  subset. p95 was 16.0–22.5 ms and process peak resident memory was below
+  272 MB. The current subset meets the proposed 50 ms/2 GiB limits on this
+  host; the complete B4 shot remains unmeasured.
 
 ## Remaining acceptance
 
-Measure control-to-preview p95 and resident memory against the HM proposed
-budgets; improve and inspect extreme bends, influence tuning, joint seams and
+Measure the complete B4 shot against the HM proposed budgets; improve and
+inspect extreme bends, influence tuning, joint seams and
 texture behavior on the reference shot. Qualify additional poses and source
 profiles, native interaction under zoom/rotation and an artist workflow. The
 current two-segment/cubic profile does not provide envelope, IK, deformer
