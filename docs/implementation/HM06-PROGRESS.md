@@ -111,7 +111,7 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   through undo. The inspected [original-art detail](hm06-bone-curve-detail.png)
   shows the bounded arm/torso deformation after the rotation correction.
   Additional elbow shapes and larger bends still need artistic acceptance.
-- The macOS optimized build passes 126/126 CTest entries, the continuous-limb
+- The macOS optimized build passes 127/127 CTest entries, the continuous-limb
   Python fixture test and native smoke. A 40-frame native drag measurement on
   the 15-artwork-Part continuous rig gave p95 input-to-`frameSwapped` 17.26 ms
   and peak process resident memory 274 MB on Apple M1 Pro before attachments.
@@ -129,6 +129,13 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   subset with the latest redraw. p95 was 14.90–16.76 ms and process
   peak resident memory was below 273 MB. The current subset meets the proposed
   50 ms/2 GiB limits on this host; the complete B4 shot remains unmeasured.
+  A [20-second deformation workload](HM06-INTERACTION.md#twenty-second-deformation-workload-2026-09-29)
+  retimes the linked character to 480 frames, checks all preview frames and
+  selected full-resolution/reopened frames, and measures three native drag
+  runs. Its p95 was 17.12–18.28 ms and peak resident memory stayed below
+  278 MB; one 480-frame headless 1080p run averaged 5.07 ms/frame. This
+  synthetic timing workload does not yet include audio, mattes, animated
+  camera or published controls.
 
 ## Remaining acceptance
 

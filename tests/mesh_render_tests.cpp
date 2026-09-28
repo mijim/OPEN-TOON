@@ -3,6 +3,7 @@
 #include "opentoon/deformer.h"
 #include "opentoon/rigging.h"
 #include "opentoon/session.h"
+#include "opentoon/timeline.h"
 #include "mesh_warp.h"
 #include "graph_renderer.h"
 #include "project_store.h"
@@ -833,5 +834,54 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
     if (qEnvironmentVariableIsSet("OPENTOON_HM06_CONTINUOUS_PROJECT")) {
         const auto output = qEnvironmentVariable("OPENTOON_HM06_CONTINUOUS_PROJECT");
         REQUIRE(ProjectStore::save(std::filesystem::path(output.toStdString()), document) > 0);
+    }
+}
+
+TEST_CASE("Full-length continuous toon retimes linked limbs and coordinated views") {
+    const auto shortScene = ProjectStore::load(std::filesystem::path(
+        OPENTOON_SOURCE_DIR "/examples/clockwork-continuous.otoon")).document;
+    REQUIRE(shortScene.duration == 48);
+    auto fullScene = shortScene;
+    fullScene.name = "Clockwork Hello — 20-second deformation study";
+    std::vector<Id> tracks;
+    tracks.reserve(fullScene.layers.size());
+    for (const auto& layer : fullScene.layers)
+        tracks.push_back(layer.id);
+    REQUIRE_NOTHROW(retimeRange(fullScene, tracks, 0, 48, 480));
+    fullScene.validate();
+    REQUIRE(fullScene.duration == 480);
+    REQUIRE(std::count_if(fullScene.layers.begin(), fullScene.layers.end(),
+                          [](const Layer& layer) { return layer.followParentBoneTip; }) == 4);
+    for (const Frame frame : {0, 120, 240, 300, 360, 400, 440}) {
+        INFO(frame);
+        REQUIRE(SceneRenderer::render(fullScene, frame) ==
+                SceneRenderer::render(shortScene, frame / 10));
+    }
+    const bool fullResolution = qEnvironmentVariableIsSet("OPENTOON_HM06_FULL_RENDER");
+    const QSize renderSize = fullResolution ? QSize{} : QSize(480, 270);
+    const QSize expectedSize = fullResolution ? QSize(1920, 1080) : renderSize;
+    const auto renderStart = std::chrono::steady_clock::now();
+    for (Frame frame = 0; frame < fullScene.duration; ++frame) {
+        const auto preview = SceneRenderer::render(fullScene, frame, renderSize);
+        REQUIRE(preview.size() == expectedSize);
+    }
+    if (fullResolution) {
+        const auto elapsed = std::chrono::duration<double, std::milli>(
+            std::chrono::steady_clock::now() - renderStart).count();
+        std::fprintf(stderr, "HM-06 480-frame 1920x1080 deformation study: %.2f ms/frame\n",
+                     elapsed / fullScene.duration);
+    }
+    QTemporaryDir temporary;
+    REQUIRE(temporary.isValid());
+    const auto path = std::filesystem::path((temporary.path() + "/long-study.otoon").toStdString());
+    REQUIRE(ProjectStore::save(path, fullScene) > 0);
+    const auto reopened = ProjectStore::load(path).document;
+    REQUIRE(reopened == fullScene);
+    for (const Frame frame : {0, 120, 240, 300, 360, 400, 440, 479})
+        REQUIRE(SceneRenderer::render(reopened, frame) ==
+                SceneRenderer::render(fullScene, frame));
+    if (qEnvironmentVariableIsSet("OPENTOON_HM06_LONG_PROJECT")) {
+        const auto output = qEnvironmentVariable("OPENTOON_HM06_LONG_PROJECT");
+        REQUIRE(ProjectStore::save(std::filesystem::path(output.toStdString()), reopened) > 0);
     }
 }

@@ -65,3 +65,41 @@ OPENTOON_HM06_CONTINUOUS_PROJECT="$PWD/build/hm06-continuous.otoon" \
 build/desktop/open-toon.app/Contents/MacOS/open-toon \
   --hm06-benchmark "$PWD/build/hm06-continuous.otoon"
 ```
+
+## Twenty-second deformation workload, 2026-09-29
+
+The editable 48-frame continuous rig was retimed through the application's
+range operation to 480 frames at 24 fps. The test checks all 480 frames at
+480 × 270 preview size, selected full-resolution frames against the original
+timing, saved/reopened equivalence and preservation of the four bone-tip
+links. One optional 480-frame 1920 × 1080 renderer run averaged 5.07 ms/frame
+on this host. That number measures headless render throughput, not input
+latency.
+
+The native Qt Quick drag benchmark opened the saved 480-frame project at a
+1140 × 491 logical-pixel canvas, device pixel ratio 2. It used five warmup
+drags followed by 40 input-to-`frameSwapped` samples per run:
+
+| Run | Median | p95 | Peak resident bytes |
+|---|---:|---:|---:|
+| 1 | 16.59 ms | 17.61 ms | 277,692,416 |
+| 2 | 16.57 ms | 18.28 ms | 276,643,840 |
+| 3 | 16.65 ms | 17.12 ms | 276,987,904 |
+
+This exercises the complete scene duration and the same bound 15-part rig,
+but its original 48-frame pose sequence is stretched. It has no audio,
+animated camera, mattes or published animator controls. The measurements
+therefore qualify this deformation workload only; they do not close the full
+B4/HM shot budget or artistic acceptance.
+
+Reproduce from the repository root with the optimized macOS build:
+
+```sh
+OPENTOON_HM06_LONG_PROJECT="$PWD/build/desktop/hm06-long-study.otoon" \
+  build/desktop/opentoon_render_tests \
+  'Full-length continuous toon retimes linked limbs and coordinated views'
+OPENTOON_HM06_FULL_RENDER=1 build/desktop/opentoon_render_tests \
+  'Full-length continuous toon retimes linked limbs and coordinated views'
+build/desktop/open-toon.app/Contents/MacOS/open-toon \
+  --hm06-benchmark "$PWD/build/desktop/hm06-long-study.otoon"
+```
