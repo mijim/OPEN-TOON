@@ -99,9 +99,6 @@ void EditorController::moveTimelineRange(int destination, bool insert) {
     if (edit("Move selected range", [&](Document& d) {
             const auto ids = validRangeLayers();
             const auto clip = copyRange(d, ids, rangeStart_, std::min(rangeEnd_, duration()));
-            if (std::any_of(clip.tracks.begin(), clip.tracks.end(),
-                            [](const auto& track) { return track.containsDeformerKeys; }))
-                throw std::invalid_argument("Moving a range with deformer keys is not supported yet.");
             clearRange(d, ids, rangeStart_, std::min(rangeEnd_, duration()), true);
             pasteRange(d, ids, destination, clip, PasteContent::All, insert);
         })) {

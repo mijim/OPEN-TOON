@@ -46,6 +46,12 @@ TEST_CASE("Two-segment bone keys retain elbow connection, rest and undo") {
     REQUIRE(posed.vertices[7].pose == MeshPoint{8, 8});
     REQUIRE(std::abs(posed.vertices[9].pose.x - (8 + 8 * std::cos(std::numbers::pi / 6))) < 1e-9);
     REQUIRE(std::abs(posed.vertices[9].pose.y - 12) < 1e-9);
+    const auto middleWeight = binding.bone->distalWeights[2];
+    REQUIRE(middleWeight > 0);
+    REQUIRE(middleWeight < 1);
+    const auto middleRadius = std::hypot(posed.vertices[2].pose.x - 8,
+                                          posed.vertices[2].pose.y - 8);
+    REQUIRE(std::abs(middleRadius - 8) < 1e-9);
     const auto middle = evaluateMeshBinding(binding, 6);
     REQUIRE(middle.vertices[9].pose.y > 8);
     REQUIRE(middle.vertices[9].pose.y < posed.vertices[9].pose.y);
@@ -101,7 +107,7 @@ TEST_CASE("Deformer binding rejects invalid controls and protected static edits 
     fixture.document.validate();
 }
 
-TEST_CASE("Frame insertion removal and Clear keep deformer keys synchronized") {
+TEST_CASE("Deformer keys survive frame edits and same-Part range transfer") {
     PartFixture fixture;
     bindBoneChain(fixture.document, fixture.part, fixture.drawing,
                   {{{0, 8}, {8, 8}, {16, 8}}}, 3);
@@ -116,10 +122,46 @@ TEST_CASE("Frame insertion removal and Clear keep deformer keys synchronized") {
     recordCurvePose(fixture.document, fixture.part, side, 16, curved);
     const auto before = fixture.document;
     auto clip = copyRange(fixture.document, {fixture.part}, 10, 17);
-    REQUIRE(clip.tracks.front().containsDeformerKeys);
+    REQUIRE(clip.tracks.front().deformerKeys.size() == 2);
+    REQUIRE(clip.tracks.front().boundDrawings.size() == 1);
     REQUIRE_THROWS(pasteRange(fixture.document, {fixture.part}, 20, clip,
-                              PasteContent::All, true));
-    REQUIRE_THROWS(retimeRange(fixture.document, {fixture.part}, 10, 17, 10));
+                              PasteContent::IndependentDrawings));
+    auto pasted = before;
+    pasteRange(pasted, {fixture.part}, 20, clip, PasteContent::All, true);
+    REQUIRE(meshBindingFor(pasted.layer(fixture.part), fixture.drawing)->bone->keys.back().frame == 22);
+    REQUIRE(meshBindingFor(pasted.layer(fixture.part), side)->curve->keys.back().frame == 26);
+    REQUIRE(evaluateMeshBinding(*meshBindingFor(pasted.layer(fixture.part), fixture.drawing), 22).vertices ==
+            evaluateMeshBinding(*meshBindingFor(before.layer(fixture.part), fixture.drawing), 12).vertices);
+    REQUIRE(evaluateMeshBinding(*meshBindingFor(pasted.layer(fixture.part), side), 26).vertices ==
+            evaluateMeshBinding(*meshBindingFor(before.layer(fixture.part), side), 16).vertices);
+    pasted.validate();
+    auto retimed = before;
+    retimeRange(retimed, {fixture.part}, 10, 17, 10);
+    REQUIRE(meshBindingFor(retimed.layer(fixture.part), fixture.drawing)->bone->keys.back().frame == 13);
+    REQUIRE(meshBindingFor(retimed.layer(fixture.part), side)->curve->keys.back().frame == 19);
+    REQUIRE(evaluateMeshBinding(*meshBindingFor(retimed.layer(fixture.part), fixture.drawing), 13).vertices ==
+            evaluateMeshBinding(*meshBindingFor(before.layer(fixture.part), fixture.drawing), 12).vertices);
+    retimed.validate();
+    auto moved = before;
+    clearRange(moved, {fixture.part}, 10, 17, true);
+    pasteRange(moved, {fixture.part}, 25, clip, PasteContent::All);
+    REQUIRE(meshBindingFor(moved.layer(fixture.part), fixture.drawing)->bone->keys.back().frame == 27);
+    REQUIRE(meshBindingFor(moved.layer(fixture.part), side)->curve->keys.back().frame == 31);
+    REQUIRE(evaluateMeshBinding(*meshBindingFor(moved.layer(fixture.part), side), 31).vertices ==
+            evaluateMeshBinding(*meshBindingFor(before.layer(fixture.part), side), 16).vertices);
+    moved.validate();
+    REQUIRE_THROWS(pasteRange(fixture.document, {fixture.part}, 20, clip,
+                              PasteContent::Keys, true, false));
+    auto rebound = before;
+    removeMeshDeformer(rebound, fixture.part, fixture.drawing);
+    bindBoneChain(rebound, fixture.part, fixture.drawing,
+                  {{{0, 6}, {8, 6}, {16, 6}}}, 3);
+    const auto reboundBefore = rebound;
+    REQUIRE_THROWS(pasteRange(rebound, {fixture.part}, 20, clip, PasteContent::Keys));
+    REQUIRE(rebound == reboundBefore);
+    auto collision = before;
+    recordBonePose(collision, fixture.part, fixture.drawing, 13, 0, 21);
+    REQUIRE_THROWS(retimeRange(collision, {fixture.part}, 10, 17, 1));
     REQUIRE(fixture.document == before);
     insertFrames(fixture.document, 10, 3);
     const auto& inserted = fixture.document.layer(fixture.part);

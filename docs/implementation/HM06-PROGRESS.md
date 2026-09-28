@@ -8,7 +8,8 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
 
 - The selected substitution retains its rest mesh and UVs. Bone joints,
   a saved elbow transition and normalized per-vertex distal weights produce
-  connected forward-kinematic poses. Curve controls retain a fixed rest
+  connected forward-kinematic poses. Influence rotates around the posed elbow
+  to preserve distance at intermediate weights. Curve controls retain a fixed rest
   parameter per vertex and move the mesh by the posed-minus-rest cubic field.
 - Both profiles save frame keys, sample linear/held/smooth interpolation and
   evaluate through the same preview and output renderer. A later first key
@@ -23,27 +24,31 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   preserves a source-version `.pre-v8.bak` before upgrading.
 - Insert/remove frames shift or remove deformer keys with the scene clock.
   Clear removes them from the selected Part/range and remains atomic with
-  exposures and layer pose keys. Range paste/move/stretch with deformer keys
-  explicitly rejects until those clipboard operations can transfer the full
-  binding safely.
+  exposures and layer pose keys. Same-Part range paste/move/stretch transfers
+  each substitution's keyed poses and rejects retiming collisions. Cross-scene
+  and different-Part deformer-key pastes reject before mutation until rig
+  binding transfer is available. Independent drawing paste of a bound Part
+  also rejects to avoid silently dropping its mesh.
 
 ## Verification
 
 - `tests/deformer_tests.cpp` covers connected joints, interpolation, rest,
-  undo, invalid geometry/weights, rejected folds and serialization.
+  undo, invalid geometry/weights, rejected folds, serialization and range
+  transfer with exact evaluated endpoints.
   `tests/mesh_render_tests.cpp` covers saved preview/Display/Write pixels,
   separate substitution chains, and the original 19-part scene. The assembled
   frame-zero scene is byte-identical to `reference_0000.png`; an animated arm
   and torso reopen to identical frame-12 pixels.
 - The native `--smoke-test` drags a bone tip and curve tangent, checks
-  temporary preview isolation, cancellation, undo/redo, Rest key and project
-  reopen on a checker Part. A mirrored/rotated/zoomed control drag also
+  temporary preview isolation, cancellation, undo/redo, Rest key, same-Part
+  timeline key paste/move and project reopen on a checker Part. A
+  mirrored/rotated/zoomed control drag also
   round-trips through undo. The inspected [original-art detail](hm06-bone-curve-detail.png)
-  shows the bounded arm/torso deformation. It reveals a noticeable taper at
-  the elbow; larger bends and seam behavior still need correction/acceptance.
+  shows the bounded arm/torso deformation after the rotation correction. The
+  elbow overlap and larger bends still need correction and artistic acceptance.
 - The macOS optimized build passes 121/121 CTest entries and native smoke.
-  On Apple M1 Pro, three local 1920×1080 renders of the assembled 19-part
-  scene with one bone and one curve averaged 3.25 ms/frame. This is renderer
+  On Apple M1 Pro, three earlier local 1920×1080 renders of the assembled
+  19-part scene with one bone and one curve averaged 3.25 ms/frame. This is renderer
   cost, not measured control-to-preview p95 or full shot memory. No new
   dependency or license was added; Eigen remains a candidate.
 

@@ -338,11 +338,8 @@ MeshBinding evaluateMeshBinding(const MeshBinding& binding, Frame frame) {
         const auto posedElbow = add(joints[0], rotate(sub(joints[1], joints[0]), angles[0]));
         for (std::size_t i = 0; i < evaluated.vertices.size(); ++i) {
             const auto rest = evaluated.vertices[i].rest;
-            const auto proximal = add(joints[0], rotate(sub(rest, joints[0]), angles[0]));
-            const auto distal = add(posedElbow,
-                                    rotate(sub(rest, joints[1]), angles[0] + angles[1]));
-            evaluated.vertices[i].pose = add(mul(proximal, 1 - bone.distalWeights[i]),
-                                              mul(distal, bone.distalWeights[i]));
+            const auto angle = angles[0] + bone.distalWeights[i] * angles[1];
+            evaluated.vertices[i].pose = add(posedElbow, rotate(sub(rest, joints[1]), angle));
         }
     } else if (binding.curve) {
         const auto& curve = *binding.curve;

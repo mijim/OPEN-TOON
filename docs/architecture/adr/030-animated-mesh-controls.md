@@ -16,9 +16,11 @@ rejected while one is attached.
 The bone profile stores three rest joints, one elbow transition radius,
 per-vertex distal weights and keyed two-angle poses. The root joint stays at
 its drawing-local rest coordinate for this subset; Part/Peg transforms move
-the whole chain. Each posed bone preserves its rest length. A vertex blends
-the two rigid segment transforms by its saved weight. The elbow joint maps to
-one point under both transforms. Zero-length segments, out-of-range weights
+the whole chain. Each posed bone preserves its rest length. A vertex uses its
+saved weight to interpolate segment rotation around the shared posed elbow,
+preserving its rest distance from that joint and reducing mid-influence
+pinching. The elbow joint maps to one point for every weight. Zero-length
+segments, out-of-range weights
 and nonfinite angles reject at the document boundary.
 
 The curve profile stores four rest cubic controls, a fixed per-vertex curve
@@ -37,8 +39,11 @@ composition. Immutable render snapshots carry the authored keys; revision
 cache keys already cover new document edits. Independent Part duplication
 copies weights and keys, while linked artwork may have a separate deformer.
 Scene-wide frame insertion/removal and selected-range Clear include deformer
-keys. Clipboard paste, range move and stretch reject when those keys are in
-scope until full per-substitution key transfer is implemented.
+keys. Same-Part range copy/paste, move and stretch preserve the keyed bone or
+curve identity and exact pose endpoints. A cross-scene or different-Part key
+paste rejects before mutation until portable rig binding transfer exists.
+Independent drawing paste also rejects a bound Part because cloning its source
+without a matching mesh would change the rendered result.
 
 No external numerical library is needed for this bounded two-segment/cubic
 evaluation. Eigen stays a candidate for heavier constrained solvers; adoption

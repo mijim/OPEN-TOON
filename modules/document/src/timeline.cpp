@@ -1,5 +1,6 @@
 #include "opentoon/timeline.h"
 #include "opentoon/deformer.h"
+#include "opentoon/deformation.h"
 #include <set>
 #include <stdexcept>
 namespace opentoon {
@@ -28,10 +29,15 @@ ExposureClipboard copyRange(const Document& d, const std::vector<Id>& layers, Fr
     for (auto id : layers) {
         const auto& layer = d.layer(id);
         ClipboardTrack track;
+        track.sourceLayer = id;
         for (auto exposure : layer.exposures) {
             if (exposure.end <= start || exposure.start >= end)
                 continue;
             result.drawings.emplace(exposure.drawing, d.drawings.at(exposure.drawing));
+            if (meshBindingFor(layer, exposure.drawing) &&
+                std::find(track.boundDrawings.begin(), track.boundDrawings.end(),
+                          exposure.drawing) == track.boundDrawings.end())
+                track.boundDrawings.push_back(exposure.drawing);
             exposure.start = std::max(exposure.start, start) - start;
             exposure.end = std::min(exposure.end, end) - start;
             track.exposures.push_back(exposure);
@@ -41,7 +47,31 @@ ExposureClipboard copyRange(const Document& d, const std::vector<Id>& layers, Fr
                 key.frame -= start;
                 track.keys.push_back(key);
             }
-        track.containsDeformerKeys = hasDeformerKeys(layer, start, end);
+        for (const auto& binding : layer.bindings) {
+            DeformerClipboardKeys copied;
+            copied.drawing = binding.drawing;
+            if (binding.bone) {
+                copied.boneBasis = BoneChain{binding.bone->restJoints,
+                                             binding.bone->elbowTransition,
+                                             binding.bone->distalWeights, {}};
+                for (auto key : binding.bone->keys)
+                    if (key.frame >= start && key.frame < end) {
+                        key.frame -= start;
+                        copied.bone.push_back(key);
+                    }
+            }
+            if (binding.curve) {
+                copied.curveBasis = CurveDeformer{binding.curve->restControls,
+                                                   binding.curve->coordinates, {}};
+                for (auto key : binding.curve->keys)
+                    if (key.frame >= start && key.frame < end) {
+                        key.frame -= start;
+                        copied.curve.push_back(key);
+                    }
+            }
+            if (!copied.bone.empty() || !copied.curve.empty())
+                track.deformerKeys.push_back(std::move(copied));
+        }
         result.tracks.push_back(std::move(track));
     }
     return result;
@@ -53,13 +83,49 @@ void pasteRange(Document& d, const std::vector<Id>& layers, Frame at, const Expo
         throw std::invalid_argument("Clipboard range does not fit the selected layers or scene limits.");
     range(d, layers, std::min(at, d.duration - 1), std::min(at, d.duration - 1) + 1, true);
     const bool keys = content == PasteContent::Keys || content == PasteContent::All;
-    if (keys && std::any_of(clip.tracks.begin(), clip.tracks.end(),
-                            [](const auto& track) { return track.containsDeformerKeys; }))
-        throw std::invalid_argument("Pasting a range with deformer keys is not supported yet.");
+    const bool exposures = content != PasteContent::Keys;
+    if (exposures)
+        for (std::size_t index = 0; index < layers.size(); ++index) {
+            const auto& track = clip.tracks[index];
+            if (track.boundDrawings.empty())
+                continue;
+            const auto& layer = d.layer(layers[index]);
+            if (content == PasteContent::IndependentDrawings || !allowLinkedDrawings ||
+                layers[index] != track.sourceLayer ||
+                std::any_of(track.boundDrawings.begin(), track.boundDrawings.end(),
+                            [&](Id drawing) {
+                                return !d.drawings.contains(drawing) ||
+                                       !meshBindingFor(layer, drawing);
+                            }))
+                throw std::invalid_argument(
+                    "Copy a bound Part through its rig; this range cannot clone mesh bindings.");
+        }
+    if (keys)
+        for (std::size_t index = 0; index < layers.size(); ++index) {
+            const auto& track = clip.tracks[index];
+            if (track.deformerKeys.empty())
+                continue;
+            if (!allowLinkedDrawings || layers[index] != track.sourceLayer)
+                throw std::invalid_argument(
+                    "Paste deformer keys into their original Part; cross-scene transfer needs a rig copy.");
+            const auto& layer = d.layer(layers[index]);
+            for (const auto& copied : track.deformerKeys) {
+                const auto* binding = meshBindingFor(layer, copied.drawing);
+                if (!binding || (!copied.bone.empty() && !binding->bone) ||
+                    (!copied.curve.empty() && !binding->curve) ||
+                    (copied.boneBasis &&
+                     (binding->bone->restJoints != copied.boneBasis->restJoints ||
+                      binding->bone->elbowTransition != copied.boneBasis->elbowTransition ||
+                      binding->bone->distalWeights != copied.boneBasis->distalWeights)) ||
+                    (copied.curveBasis &&
+                     (binding->curve->restControls != copied.curveBasis->restControls ||
+                      binding->curve->coordinates != copied.curveBasis->coordinates)))
+                    throw std::invalid_argument("Destination Part no longer has the copied deformer.");
+            }
+        }
     if (insert)
         insertFrames(d, at, clip.duration);
     d.duration = std::max(d.duration, at + clip.duration);
-    const bool exposures = content != PasteContent::Keys;
     std::map<Id, Id> drawings, colors;
     auto drawingId = [&](Id source) {
         if (auto found = drawings.find(source); found != drawings.end())
@@ -117,6 +183,36 @@ void pasteRange(Document& d, const std::vector<Id>& layers, Frame at, const Expo
                 layer.keys.push_back(key);
             }
             std::sort(layer.keys.begin(), layer.keys.end(), [](auto a, auto b) { return a.frame < b.frame; });
+            for (auto& binding : layer.bindings) {
+                if (binding.bone)
+                    std::erase_if(binding.bone->keys, [&](const auto& key) {
+                        return key.frame >= at && key.frame < at + clip.duration;
+                    });
+                if (binding.curve)
+                    std::erase_if(binding.curve->keys, [&](const auto& key) {
+                        return key.frame >= at && key.frame < at + clip.duration;
+                    });
+            }
+            for (const auto& copied : clip.tracks[i].deformerKeys) {
+                auto destination = std::find_if(layer.bindings.begin(), layer.bindings.end(),
+                                                [&](const auto& binding) {
+                                                    return binding.drawing == copied.drawing;
+                                                });
+                for (auto key : copied.bone) {
+                    key.frame += at;
+                    destination->bone->keys.push_back(key);
+                }
+                for (auto key : copied.curve) {
+                    key.frame += at;
+                    destination->curve->keys.push_back(key);
+                }
+                if (destination->bone)
+                    std::sort(destination->bone->keys.begin(), destination->bone->keys.end(),
+                              [](const auto& a, const auto& b) { return a.frame < b.frame; });
+                if (destination->curve)
+                    std::sort(destination->curve->keys.begin(), destination->curve->keys.end(),
+                              [](const auto& a, const auto& b) { return a.frame < b.frame; });
+            }
         }
     }
 }
@@ -150,9 +246,6 @@ void repeatRange(Document& d, const std::vector<Id>& layers, Frame start, Frame 
 }
 void retimeRange(Document& d, const std::vector<Id>& layers, Frame start, Frame end, Frame newLength) {
     range(d, layers, start, end, true);
-    for (const auto id : layers)
-        if (hasDeformerKeys(d.layer(id), start, end))
-            throw std::invalid_argument("Retiming a range with deformer keys is not supported yet.");
     if (newLength < 1 || newLength > 1000000 || std::int64_t(start) + newLength > 1000000)
         throw std::invalid_argument("Invalid retimed range length.");
     auto clip = copyRange(d, layers, start, end);
@@ -171,6 +264,20 @@ void retimeRange(Document& d, const std::vector<Id>& layers, Frame start, Frame 
             if (key.frame <= previous)
                 throw std::invalid_argument("Retiming would merge keys. Choose a longer range.");
             previous = key.frame;
+        }
+        for (auto& copied : track.deformerKeys) {
+            auto scaleKeys = [&](auto& keys) {
+                Frame last = -1;
+                for (auto& key : keys) {
+                    key.frame = std::min(newLength - 1, scaled(key.frame, oldLength, newLength));
+                    if (key.frame <= last)
+                        throw std::invalid_argument(
+                            "Retiming would merge deformer keys. Choose a longer range.");
+                    last = key.frame;
+                }
+            };
+            scaleKeys(copied.bone);
+            scaleKeys(copied.curve);
         }
     }
     clip.duration = newLength;

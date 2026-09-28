@@ -2,6 +2,7 @@
 #include "canvas_item.h"
 #include "editor_controller.h"
 #include "opentoon/deformation.h"
+#include "opentoon/timeline.h"
 #include "scene_renderer.h"
 #include <QCoreApplication>
 #include <QImage>
@@ -166,4 +167,30 @@ void meshSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& windo
     canvas.setMirrored(false);
     canvas.setRotationAngle(0);
     canvas.fit();
+    int partRow = -1;
+    for (std::size_t index = 0; index < editor.document().layers.size(); ++index)
+        if (editor.document().layers[index].id == part)
+            partRow = int(editor.document().layers.size() - 1 - index);
+    if (partRow < 0)
+        throw std::runtime_error("Timeline lost the animated Part.");
+    editor.selectTimelineRange(24, 24, partRow, partRow);
+    editor.copyTimelineRange();
+    const auto beforePaste = editor.document();
+    editor.setFrame(30);
+    editor.pasteTimelineRange(int(PasteContent::Keys));
+    const auto* pasted = meshBindingFor(editor.document().layer(part), drawing);
+    if (!pasted || !pasted->curve || pasted->curve->keys.back().frame != 30)
+        throw std::runtime_error("Timeline key paste lost the curve pose: " +
+                                 editor.status().toStdString());
+    editor.undo();
+    if (editor.document() != beforePaste)
+        throw std::runtime_error("Timeline deformer paste did not undo atomically.");
+    editor.moveTimelineRange(30, false);
+    const auto* moved = meshBindingFor(editor.document().layer(part), drawing);
+    if (!moved || !moved->curve || moved->curve->keys.back().frame != 30)
+        throw std::runtime_error("Timeline range move lost the curve pose: " +
+                                 editor.status().toStdString());
+    editor.undo();
+    if (editor.document() != beforePaste)
+        throw std::runtime_error("Timeline deformer move did not undo atomically.");
 }
