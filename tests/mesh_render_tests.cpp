@@ -493,6 +493,7 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
                             "arm_left", "hand_left", "arm_right", "hand_right",
                             "pelvis", "torso", "neck", "head", "hair", "eyes", "mouth"};
     auto document = makeDocument();
+    document.name = "Clockwork Hello — continuous rig study";
     document.width = 1920;
     document.height = 1080;
     document.background = {1, 1, 1, 1};
@@ -709,7 +710,7 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
     auto alternateBinding = *meshBindingFor(switched.layer(linkedArm), sourceDrawing);
     alternateBinding.drawing = alternateDrawing;
     switched.layer(linkedArm).bindings.push_back(std::move(alternateBinding));
-    recordBonePose(switched, linkedArm, alternateDrawing, 36, 0, 0);
+    recordBonePose(switched, linkedArm, alternateDrawing, 36, 0, 30);
     switched.validate();
     const auto switchedFrame = SceneRenderer::render(switched, 36);
     REQUIRE(switchedFrame != SceneRenderer::render(document, 36));
@@ -717,6 +718,84 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
     REQUIRE(switchedConnected == switchedInk);
     REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(switched)), 36) ==
             switchedFrame);
+    auto expressive = switched;
+    const Id frontView = captureCharacterView(expressive, root, 0, "Front");
+    const auto replaceWithPartArt = [&](QString role, QString name, QString imageName) {
+        const Id drawing = createSubstitution(expressive, partIds.value(role), 30, false,
+                                              name.toStdString());
+        const QImage source(QStringLiteral(OPENTOON_SOURCE_DIR
+            "/tests/fixtures/harmony-moment/parts/") + imageName + ".png");
+        REQUIRE_FALSE(source.isNull());
+        const auto image = source.convertToFormat(QImage::Format_RGBA8888);
+        std::vector<std::uint8_t> pixels;
+        pixels.reserve(std::size_t(image.width()) * image.height() * 4);
+        for (int y = 0; y < image.height(); ++y) {
+            const auto* row = image.constScanLine(y);
+            pixels.insert(pixels.end(), row, row + image.width() * 4);
+        }
+        expressive.drawings.at(drawing).image =
+            ImageAsset{image.width(), image.height(), std::move(pixels)};
+        return drawing;
+    };
+    const Id fistHand = replaceWithPartArt("hand_left", "Fist", "hand_left__fist");
+    replaceWithPartArt("head", "Three-quarter", "head__three_quarter");
+    replaceWithPartArt("hair", "Three-quarter", "hair__three_quarter");
+    replaceWithPartArt("eyes", "Three-quarter", "eyes__three_quarter");
+    replaceWithPartArt("mouth", "Three-quarter Ah", "mouth__three_quarter__ah");
+    const Id sideView = captureCharacterView(expressive, root, 36, "Three-quarter fist");
+    REQUIRE(sideView != frontView);
+    REQUIRE(expressive.drawingAt(linkedHand, 36)->id == fistHand);
+    REQUIRE(expressive.layer(linkedHand).followParentBoneTip);
+    expressive.validate();
+    const auto& restSource = expressive.layer(linkedArm);
+    const auto& restBone = *meshBindingFor(restSource,
+        expressive.drawingAt(linkedArm, 0)->id)->bone;
+    const auto restTipScene = SceneRenderer::worldTransform(expressive, restSource, 0)
+        .map(QPointF(restBone.restJoints[2].x, restBone.restJoints[2].y));
+    const auto handAnchor = SceneRenderer::worldTransform(expressive,
+        expressive.layer(linkedHand), 0).inverted().map(restTipScene);
+    const auto handTracksActiveTip = [&](const Document& scene, Frame frame) {
+        const auto& source = scene.layer(linkedArm);
+        const auto& bone = *meshBindingFor(source,
+            scene.drawingAt(linkedArm, frame)->id)->bone;
+        const auto tip = sampleBoneJoints(bone, frame)[2];
+        const auto expected = SceneRenderer::worldTransform(scene, source, frame)
+            .map(QPointF(tip.x, tip.y));
+        const auto actual = SceneRenderer::worldTransform(scene,
+            scene.layer(linkedHand), frame).map(handAnchor);
+        REQUIRE(std::hypot(expected.x() - actual.x(),
+                           expected.y() - actual.y()) < 1e-8);
+    };
+    for (const Frame frame : {0, 24, 30, 36})
+        handTracksActiveTip(expressive, frame);
+    const auto expressiveFrame = SceneRenderer::render(expressive, 36);
+    REQUIRE(expressiveFrame != switchedFrame);
+    const auto [expressiveConnected, expressiveInk] = connectedInk(expressiveFrame);
+    REQUIRE(expressiveConnected == expressiveInk);
+    REQUIRE(expressiveFrame.save("hm06-continuous-pose-switch.png"));
+    Session viewSession;
+    viewSession.replace(expressive);
+    REQUIRE(viewSession.apply("Return to front", [&](Document& candidate) {
+        applyCharacterViewRange(candidate, root, frontView, 40, candidate.duration);
+    }));
+    REQUIRE(viewSession.document().drawingAt(linkedHand, 36)->id == fistHand);
+    REQUIRE(viewSession.document().drawingAt(linkedHand, 44)->id != fistHand);
+    handTracksActiveTip(viewSession.document(), 44);
+    const auto returnedFrame = SceneRenderer::render(viewSession.document(), 44);
+    REQUIRE(returnedFrame != expressiveFrame);
+    REQUIRE(viewSession.undo());
+    REQUIRE(SceneRenderer::render(viewSession.document(), 36) == expressiveFrame);
+    REQUIRE(viewSession.redo());
+    const auto viewProject = std::filesystem::path((savedProject.path() +
+                                                   "/expressive.otoon").toStdString());
+    REQUIRE(ProjectStore::save(viewProject, viewSession.document()) > 0);
+    const auto reopenedView = ProjectStore::load(viewProject).document;
+    REQUIRE(reopenedView == viewSession.document());
+    REQUIRE(SceneRenderer::render(reopenedView, 36) == expressiveFrame);
+    REQUIRE(SceneRenderer::render(reopenedView, 44) == returnedFrame);
+    const auto bundledExample = ProjectStore::load(std::filesystem::path(
+        OPENTOON_SOURCE_DIR "/examples/clockwork-continuous.otoon")).document;
+    REQUIRE(bundledExample == reopenedView);
     auto folded = document;
     const Id foldedArm = partIds.value("arm_left");
     const Id foldedDrawing = folded.layer(foldedArm).exposures.front().drawing;
@@ -750,5 +829,9 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
     if (qEnvironmentVariableIsSet("OPENTOON_HM06_CONTINUOUS_PROJECT")) {
         const auto output = qEnvironmentVariable("OPENTOON_HM06_CONTINUOUS_PROJECT");
         REQUIRE(ProjectStore::save(std::filesystem::path(output.toStdString()), document) > 0);
+    }
+    if (qEnvironmentVariableIsSet("OPENTOON_HM06_VIEW_PROJECT")) {
+        const auto output = qEnvironmentVariable("OPENTOON_HM06_VIEW_PROJECT");
+        REQUIRE(ProjectStore::save(std::filesystem::path(output.toStdString()), reopenedView) > 0);
     }
 }

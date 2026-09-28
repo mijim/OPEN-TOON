@@ -74,6 +74,14 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   position. Detach/attach undo and redo, SQLite save/reopen, compatible source
   substitution switching and atomic rejection of source bone removal or an
   unbound substitution also pass.
+  An [openable 48-frame rig study](../../examples/clockwork-continuous.otoon)
+  combines the continuous limbs and links with a changed sleeve binding, fist
+  substitution and coordinated face view. A saved Front view returns at frame
+  40. The [frame-36 capture](hm06-continuous-pose-switch.png), frame-44 render,
+  undo/redo and reopened project are covered by the native image test; the
+  saved example is compared with the constructed test document. The Qt Quick
+  smoke test opens that exact project, selects its linked hand, changes frames
+  across the view switch and presents the canvas.
   Retuning one posed arm's radius from 65 to 55 pixels preserves rest pixels,
   changes the bend, keeps the assembled silhouette connected and reopens to
   identical output.

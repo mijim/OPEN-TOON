@@ -5,6 +5,7 @@
 #include "opentoon/timeline.h"
 #include "scene_renderer.h"
 #include <QCoreApplication>
+#include <QDir>
 #include <QElapsedTimer>
 #include <QEventLoop>
 #include <QImage>
@@ -317,6 +318,33 @@ void meshSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& windo
     editor.undo();
     if (editor.document() != beforePaste)
         throw std::runtime_error("Timeline deformer move did not undo atomically.");
+    const auto example = QDir::current().filePath("examples/clockwork-continuous.otoon");
+    if (!editor.openProject(QUrl::fromLocalFile(example)))
+        throw std::runtime_error("Native editor could not open the continuous rig example: " +
+                                 editor.status().toStdString());
+    Id linkedHand = 0;
+    int links = 0;
+    for (const auto& layer : editor.document().layers) {
+        links += layer.followParentBoneTip ? 1 : 0;
+        if (layer.role == "hand_left")
+            linkedHand = layer.id;
+    }
+    if (links != 4 || !linkedHand || editor.document().layers.size() != 16)
+        throw std::runtime_error("Continuous rig example lost its character hierarchy.");
+    editor.setSelectedLayer(int(linkedHand));
+    if (!editor.selectedFollowsBoneTip())
+        throw std::runtime_error("Native inspector lost the example hand attachment.");
+    editor.setFrame(36);
+    const auto sideHand = editor.selectedSubstitution();
+    editor.setFrame(44);
+    if (!sideHand || sideHand == editor.selectedSubstitution() ||
+        SceneRenderer::render(editor.document(), 36) ==
+            SceneRenderer::render(editor.document(), 44))
+        throw std::runtime_error("Continuous rig example did not switch view and hand artwork.");
+    canvas.fit();
+    QCoreApplication::processEvents();
+    if (window.grabWindow().isNull())
+        throw std::runtime_error("Native canvas did not display the continuous rig example.");
 }
 
 void meshInteractionBenchmark(EditorController& editor, CanvasItem& canvas,

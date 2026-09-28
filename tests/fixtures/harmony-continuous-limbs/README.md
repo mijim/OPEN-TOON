@@ -30,6 +30,14 @@ binding retains the link; removing the source bone or exposing an unbound
 substitution rejects atomically. This is a representative rig-quality
 check, not final owner approval or a complete production shot.
 
+The [openable example project](../../../examples/clockwork-continuous.otoon)
+also exercises a separately bound sleeve drawing, linked fist substitution,
+coordinated face view and return to Front. The native test compares that saved
+project with its constructed document and rendered frames 36 and 44.
+The native Qt Quick smoke test opens the same project and displays it.
+
 ![Four bent continuous limbs](../../../docs/implementation/hm06-continuous-limbs.png)
 
 ![Four continuous limbs at 90 degrees](../../../docs/implementation/hm06-continuous-limbs-90.png)
+
+![Continuous rig with a changed face view and fist](../../../docs/implementation/hm06-continuous-pose-switch.png)
