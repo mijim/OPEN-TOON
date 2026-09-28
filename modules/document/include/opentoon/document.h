@@ -151,6 +151,11 @@ struct MeshBinding {
     std::optional<CurveDeformer> curve;
     auto operator<=>(const MeshBinding&) const = default;
 };
+struct BoneTipAnchor {
+    MeshPoint tip;
+    MeshPoint distalAxis;
+    auto operator<=>(const BoneTipAnchor&) const = default;
+};
 struct Layer {
     Id id = 0;
     std::string name;
@@ -164,7 +169,7 @@ struct Layer {
     std::vector<Substitution> variants;
     std::vector<CharacterView> views;
     std::vector<MeshBinding> bindings;
-    bool followParentBoneTip = false;
+    std::optional<BoneTipAnchor> boneTipAnchor;
     auto operator<=>(const Layer&) const = default;
 };
 struct Marker {
@@ -173,7 +178,7 @@ struct Marker {
     auto operator<=>(const Marker&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 10;
+    static constexpr int formatVersion = 11;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;

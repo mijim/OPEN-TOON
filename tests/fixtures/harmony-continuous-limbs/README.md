@@ -35,6 +35,11 @@ also exercises a separately bound sleeve drawing, linked fist substitution,
 coordinated face view and return to Front. The native test compares that saved
 project with its constructed document and rendered frames 36 and 44.
 The native Qt Quick smoke test opens the same project and displays it.
+The checked-in `format10-linked.otoon` is a frozen copy of the original
+linked study before explicit rest anchors were added. The storage test loads
+its four links, upgrades a copy to format 11 and reads the `.pre-v10.bak`
+backup. The current example uses format 11; source images and joint
+registration are unchanged.
 
 ![Four bent continuous limbs](../../../docs/implementation/hm06-continuous-limbs.png)
 

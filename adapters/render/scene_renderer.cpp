@@ -22,21 +22,19 @@ QTransform localTransform(Transform t) {
     m.translate(-t.pivotX, -t.pivotY);
     return m;
 }
-QTransform boneTipTransform(const Document& document, const Layer& source, Frame frame) {
+QTransform boneTipTransform(const Document& document, const Layer& source,
+                            const BoneTipAnchor& anchor, Frame frame) {
     const auto* drawing = document.drawingAt(source.id, frame);
     const auto* binding = drawing ? meshBindingFor(source, drawing->id) : nullptr;
-    const auto* baselineDrawing = document.drawingAt(source.id, 0);
-    const auto* baseline = baselineDrawing ? meshBindingFor(source, baselineDrawing->id) : nullptr;
-    if (!binding || !binding->bone || !baseline || !baseline->bone)
+    if (!binding || !binding->bone)
         throw std::runtime_error("Bone tip attachment has no active source bone.");
     const auto& bone = *binding->bone;
-    const auto& baselineJoints = baseline->bone->restJoints;
-    const auto rest = baselineJoints[2];
+    const auto rest = anchor.tip;
     const auto posed = sampleBoneJoints(bone, frame)[2];
     const auto angles = sampleBoneAngles(bone, frame);
     const auto& joints = bone.restJoints;
-    const double baselineDirection = std::atan2(rest.y - baselineJoints[1].y,
-                                                rest.x - baselineJoints[1].x);
+    const double baselineDirection = std::atan2(anchor.distalAxis.y,
+                                                anchor.distalAxis.x);
     const double activeDirection = std::atan2(joints[2].y - joints[1].y,
                                               joints[2].x - joints[1].x);
     const double radians = activeDirection - baselineDirection +
@@ -129,8 +127,8 @@ QTransform SceneRenderer::worldTransform(const Document& d, const Layer& layer, 
     std::size_t depth = 0;
     while (parent && depth++ < d.layers.size()) {
         const auto& p = d.layer(parent);
-        if (child->followParentBoneTip)
-            result = result * boneTipTransform(d, p, frame);
+        if (child->boneTipAnchor)
+            result = result * boneTipTransform(d, p, *child->boneTipAnchor, frame);
         result = result * localTransform(evaluateTransform(p, frame));
         child = &p;
         parent = p.parent;

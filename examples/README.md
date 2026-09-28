@@ -4,7 +4,8 @@ Open [Clockwork Hello — continuous rig study](clockwork-continuous.otoon) with
 **Scene → Open** in the current source build of the desktop app. The 48-frame scene contains 15 original
 artwork Parts. Each arm and leg is one deforming image with a middle elbow or
 knee joint. Four saved bone-tip links keep the hands and feet attached without
-separate position keys.
+separate position keys. The format-11 links retain their original rest anchors
+when the source drawing exposed at frame zero changes.
 
 Scrub frames 0–24 to see the four limb bends. At frame 30, the left sleeve
 switches to a separately bound substitution, the left hand changes to a fist,

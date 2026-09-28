@@ -72,7 +72,7 @@ anatomical rest joints; a separately pivoted upper/lower image pair does not
 exercise continuous elbow/knee deformation. The original 19-part fixture
 remains useful for registered intake and substitutions. A 15-artwork-Part
 working rig combines each upper/lower limb pair into four single images. The
-separate hands and feet use the bounded format-10 parent bone-tip link defined
+separate hands and feet use the bounded format-11 parent bone-tip anchor defined
 in [ADR-031](031-bone-tip-attachment.md). Broader attachment and IK work
 remains in HM-09.
 Scene-wide frame insertion/removal and selected-range Clear include deformer

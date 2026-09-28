@@ -262,10 +262,16 @@ void Document::validate() const {
         if (l.parent)
             require(layer(l.parent).kind != LayerKind::Camera,
                     "Artwork cannot be parented to the output camera.");
-        if (l.followParentBoneTip) {
+        if (l.boneTipAnchor) {
             require(l.kind == LayerKind::Part && l.parent &&
                         layer(l.parent).kind == LayerKind::Part,
                     "Bone tip attachment needs a parent Part.");
+            const auto& anchor = *l.boneTipAnchor;
+            require(bounded(anchor.tip.x, 1e6) && bounded(anchor.tip.y, 1e6) &&
+                        bounded(anchor.distalAxis.x, 1e6) &&
+                        bounded(anchor.distalAxis.y, 1e6) &&
+                        std::hypot(anchor.distalAxis.x, anchor.distalAxis.y) > 1e-6,
+                    "Bone tip attachment has an invalid rest anchor.");
             const auto& source = layer(l.parent);
             Frame covered = 0;
             for (const auto& exposure : source.exposures) {

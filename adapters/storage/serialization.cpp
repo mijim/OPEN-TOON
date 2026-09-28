@@ -1,4 +1,5 @@
 #include "serialization.h"
+#include "opentoon/deformation.h"
 #include <nlohmann/json.hpp>
 #include <stdexcept>
 namespace opentoon {
@@ -101,7 +102,6 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
                   {"locked", l.locked},
                   {"solo", l.solo},
                   {"parent", l.parent},
-                  {"followParentBoneTip", l.followParentBoneTip},
                   {"kind", static_cast<int>(l.kind)},
                   {"role", l.role},
                   {"variants", Json::array()},
@@ -110,6 +110,11 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
                   {"transform", transform(l.transform)},
                   {"exposures", Json::array()},
                   {"keys", Json::array()}};
+        if (l.boneTipAnchor)
+            x["boneTipAnchor"] = {{"tip", meshPoint(l.boneTipAnchor->tip)},
+                                  {"distalAxis", meshPoint(l.boneTipAnchor->distalAxis)}};
+        else
+            x["boneTipAnchor"] = nullptr;
         for (auto e : l.exposures)
             x["exposures"].push_back({e.start, e.end, e.drawing});
         for (const auto& variant : l.variants)
@@ -289,6 +294,7 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
         if (!d.drawings.emplace(drawing.id, std::move(drawing)).second)
             throw std::runtime_error("Duplicate drawing identity.");
     }
+    std::vector<Id> legacyLinked;
     for (const auto& x : j.at("layers")) {
         Layer l;
         l.id = x.at("id");
@@ -297,8 +303,15 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
         l.locked = x.at("locked");
         l.solo = x.at("solo");
         l.parent = x.at("parent");
-        if (j.at("version").get<int>() >= 10)
-            l.followParentBoneTip = x.at("followParentBoneTip").get<bool>();
+        if (j.at("version").get<int>() >= 11) {
+            const auto& anchor = x.at("boneTipAnchor");
+            if (!anchor.is_null())
+                l.boneTipAnchor = BoneTipAnchor{readMeshPoint(anchor.at("tip")),
+                                                 readMeshPoint(anchor.at("distalAxis"))};
+        } else if (j.at("version").get<int>() == 10 &&
+                   x.at("followParentBoneTip").get<bool>()) {
+            legacyLinked.push_back(l.id);
+        }
         if (j.at("version").get<int>() >= 4) {
             l.kind = static_cast<LayerKind>(x.at("kind").get<int>());
             l.role = x.at("role").get<std::string>();
@@ -404,6 +417,17 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
             l.keys.push_back(std::move(key));
         }
         d.layers.push_back(std::move(l));
+    }
+    for (const Id childId : legacyLinked) {
+        auto& child = d.layer(childId);
+        const auto& source = d.layer(child.parent);
+        const auto* drawing = d.drawingAt(source.id, 0);
+        const auto* binding = drawing ? meshBindingFor(source, drawing->id) : nullptr;
+        if (!binding || !binding->bone)
+            throw std::runtime_error("Legacy bone tip attachment has no rest source bone.");
+        const auto& joints = binding->bone->restJoints;
+        child.boneTipAnchor = BoneTipAnchor{
+            joints[2], {joints[2].x - joints[1].x, joints[2].y - joints[1].y}};
     }
     for (const auto& m : j.at("markers"))
         d.markers.push_back({m.at(0), m.at(1)});

@@ -325,7 +325,7 @@ void meshSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& windo
     Id linkedHand = 0;
     int links = 0;
     for (const auto& layer : editor.document().layers) {
-        links += layer.followParentBoneTip ? 1 : 0;
+        links += layer.boneTipAnchor ? 1 : 0;
         if (layer.role == "hand_left")
             linkedHand = layer.id;
     }

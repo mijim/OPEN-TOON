@@ -727,7 +727,7 @@ bool EditorController::selectedCanFollowBoneTip() const {
     if (layer.kind != LayerKind::Part || layer.locked || !layer.parent ||
         document().layer(layer.parent).kind != LayerKind::Part)
         return false;
-    if (layer.followParentBoneTip)
+    if (layer.boneTipAnchor)
         return true;
     const auto& source = document().layer(layer.parent);
     if (source.locked || !layer.keys.empty())
@@ -746,7 +746,7 @@ bool EditorController::selectedCanFollowBoneTip() const {
     return covered == document().duration;
 }
 bool EditorController::selectedFollowsBoneTip() const {
-    return layer_ && document().layer(layer_).followParentBoneTip;
+    return layer_ && document().layer(layer_).boneTipAnchor.has_value();
 }
 bool EditorController::toggleSelectedBoneTipAttachment() {
     if (!selectedCanFollowBoneTip())
@@ -754,7 +754,7 @@ bool EditorController::toggleSelectedBoneTipAttachment() {
     return edit(selectedFollowsBoneTip() ? "Detach from bone tip" : "Follow parent bone tip",
                 [&](Document& d) {
                     const auto& child = d.layer(layer_);
-                    if (child.followParentBoneTip)
+                    if (child.boneTipAnchor)
                         opentoon::detachPartFromBoneTip(d, layer_);
                     else
                         opentoon::attachPartToBoneTip(d, layer_, child.parent);

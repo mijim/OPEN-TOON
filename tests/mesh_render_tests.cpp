@@ -640,7 +640,7 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
     REQUIRE(bentConnected == bentInk);
     const Id linkedHand = partIds.value("hand_left");
     const Id linkedArm = partIds.value("arm_left");
-    REQUIRE(document.layer(linkedHand).followParentBoneTip);
+    REQUIRE(document.layer(linkedHand).boneTipAnchor);
     REQUIRE(document.layer(linkedHand).parent == linkedArm);
     auto duplicated = document;
     const Id duplicateRoot = duplicateCharacter(duplicated, root, 300, 0);
@@ -652,7 +652,7 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
                                                        characterFor(duplicated, layer.id) == duplicateRoot;
                                             });
     REQUIRE(duplicateHand != duplicated.layers.end());
-    REQUIRE(duplicateHand->followParentBoneTip);
+    REQUIRE(duplicateHand->boneTipAnchor);
     REQUIRE(duplicateHand->parent != linkedArm);
     REQUIRE(duplicated.layer(duplicateHand->parent).role == "arm_left");
     auto unlinked = document;
@@ -799,6 +799,25 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
     REQUIRE(reopenedRetargeted == shiftedWrist);
     REQUIRE(SceneRenderer::render(reopenedRetargeted, 36) ==
             SceneRenderer::render(shiftedWrist, 36));
+    auto initialVariant = shiftedWrist;
+    expose(initialVariant.layer(linkedArm), 0, 30, alternateDrawing);
+    initialVariant.validate();
+    REQUIRE(initialVariant.layer(linkedHand).boneTipAnchor ==
+            shiftedWrist.layer(linkedHand).boneTipAnchor);
+    const auto& initialBone = *meshBindingFor(initialVariant.layer(linkedArm),
+        initialVariant.drawingAt(linkedArm, 0)->id)->bone;
+    const auto initialJoints = sampleBoneJoints(initialBone, 0);
+    const auto initialExpected = SceneRenderer::worldTransform(initialVariant,
+        initialVariant.layer(linkedArm), 0).map(
+            QPointF(initialJoints[2].x, initialJoints[2].y));
+    const auto initialActual = SceneRenderer::worldTransform(initialVariant,
+        initialVariant.layer(linkedHand), 0).map(childAnchor);
+    REQUIRE(std::hypot(initialExpected.x() - initialActual.x(),
+                       initialExpected.y() - initialActual.y()) < 1e-8);
+    const auto initialProject = std::filesystem::path((savedProject.path() +
+                                                      "/initial-variant.otoon").toStdString());
+    REQUIRE(ProjectStore::save(initialProject, initialVariant) > 0);
+    REQUIRE(ProjectStore::load(initialProject).document == initialVariant);
     auto expressive = switched;
     const Id frontView = captureCharacterView(expressive, root, 0, "Front");
     const auto replaceWithPartArt = [&](QString role, QString name, QString imageName) {
@@ -826,7 +845,7 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
     const Id sideView = captureCharacterView(expressive, root, 36, "Three-quarter fist");
     REQUIRE(sideView != frontView);
     REQUIRE(expressive.drawingAt(linkedHand, 36)->id == fistHand);
-    REQUIRE(expressive.layer(linkedHand).followParentBoneTip);
+    REQUIRE(expressive.layer(linkedHand).boneTipAnchor);
     expressive.validate();
     const auto& restSource = expressive.layer(linkedArm);
     const auto& restBone = *meshBindingFor(restSource,
@@ -931,7 +950,7 @@ TEST_CASE("Full-length continuous toon retimes linked limbs and coordinated view
     fullScene.validate();
     REQUIRE(fullScene.duration == 480);
     REQUIRE(std::count_if(fullScene.layers.begin(), fullScene.layers.end(),
-                          [](const Layer& layer) { return layer.followParentBoneTip; }) == 4);
+                          [](const Layer& layer) { return layer.boneTipAnchor.has_value(); }) == 4);
     for (const Frame frame : {0, 120, 240, 300, 360, 400, 440}) {
         INFO(frame);
         REQUIRE(SceneRenderer::render(fullScene, frame) ==

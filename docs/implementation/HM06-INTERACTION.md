@@ -64,6 +64,12 @@ direction calculation stayed within the proposed limits on this host. The
 earlier single run is retained as historical evidence, not a controlled
 before/after speed comparison.
 
+With the anchor saved explicitly in format 11, three more 40-sample runs on
+the current example measured p95 18.00, 18.22 and 18.45 ms. Peak resident
+memory was 277,200,896, 278,052,864 and 279,216,128 bytes. All remain below
+the proposed subset limits. These runs are not a controlled comparison with
+the preceding format-10 measurements; host load and frame scheduling vary.
+
 Reproduce after building the render tests and desktop app:
 
 ```sh

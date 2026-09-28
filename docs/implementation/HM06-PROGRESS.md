@@ -1,6 +1,6 @@
 # HM-06 animated deformation progress
 
-HM-06 is in progress on macOS 15.5 arm64. The current format-10 subset animates
+HM-06 is in progress on macOS 15.5 arm64. The current format-11 subset animates
 one two-segment bone chain or one cubic curve per bound Part substitution and
 links a child Part to its parent's evaluated bone tip. It
 does not yet satisfy the full HM-06 interaction and artistic quality gate.
@@ -38,9 +38,11 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   handle. The dashed circle previews the influenced area. Changes recalculate
   weights, keep authored angle keys/rest pixels and reject folded existing
   poses atomically.
-- Format 9 persists controls, weights and keys; format 10 adds one optional
-  parent bone-tip link per child Part. The first save of an older project
-  preserves its source-version backup, including `.pre-v9.bak` for format 9.
+- Format 9 persists controls, weights and keys; format 10 introduced one
+  parent bone-tip link per child Part. Format 11 saves the link's rest tip and
+  distal axis at attachment time, so changing the source's initial view cannot
+  redefine the anchor. The first save of an older project preserves its
+  source-version backup, including `.pre-v10.bak` for format 10.
   The link requires a direct parent Part with a bound two-segment bone on every
   exposed source drawing and rest at frame zero. Parent selection and a Rig
   menu action bind or unbind it through undoable document commands.
@@ -78,7 +80,10 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   places the linked hand on the active evaluated tip, including its distal
   direction. The previous per-variant rest anchor missed that tip by 14.42 px
   in the regression case. The corrected mapping passes command undo/redo,
-  serialization and SQLite reopen without a schema change.
+  serialization and SQLite reopen. Format 11 additionally preserves the
+  attachment-time anchor when an alternate source drawing is exposed at frame
+  zero; the format-10 migration and readable backup are covered by a real
+  linked-project fixture.
   An [openable 48-frame rig study](../../examples/clockwork-continuous.otoon)
   combines the continuous limbs and links with a changed sleeve binding, fist
   substitution and coordinated face view. A saved Front view returns at frame
@@ -116,14 +121,16 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   through undo. The inspected [original-art detail](hm06-bone-curve-detail.png)
   shows the bounded arm/torso deformation after the rotation correction.
   Additional elbow shapes and larger bends still need artistic acceptance.
-- The macOS optimized build passes 127/127 CTest entries, the continuous-limb
+- The macOS optimized build passes 128/128 CTest entries, the continuous-limb
   Python fixture test and native smoke. A 40-frame native drag measurement on
   the 15-artwork-Part continuous rig gave p95 input-to-`frameSwapped` 17.26 ms
   and peak process resident memory 274 MB on Apple M1 Pro before attachments.
   A fresh 40-sample native run of the format-10 linked rig measured p95
   17.18 ms and peak process resident memory 275 MB. After the variant-anchor
   correction, three native runs measured p95 17.86–18.15 ms and peak resident
-  memory below 279 MB. The earlier measurements were single runs;
+  memory below 279 MB. With the anchor saved in format 11, three runs measured
+  p95 18.00–18.45 ms and peak resident memory below 280 MB. The earlier
+  measurements were single runs;
   repeatability and the complete B4 shot budget remain open.
   On Apple M1 Pro, three earlier local 1920×1080 renders of the assembled
   19-part scene with one bone and one curve averaged 3.25 ms/frame. After the

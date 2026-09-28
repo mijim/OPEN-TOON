@@ -4,6 +4,7 @@
 #include "opentoon/deformation.h"
 #include "opentoon/deformer.h"
 #include <catch2/catch_test_macros.hpp>
+#include <algorithm>
 #include <chrono>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -131,7 +132,7 @@ TEST_CASE("Future database versions are rejected before saving and missing loads
     {
         std::fstream stream(p.file, std::ios::binary | std::ios::in | std::ios::out);
         stream.seekp(60);
-        const char futureVersion[] = {0, 0, 0, 11};
+        const char futureVersion[] = {0, 0, 0, char(Document::formatVersion + 1)};
         stream.write(futureVersion, 4);
     }
     auto size = std::filesystem::file_size(p.file);
@@ -499,7 +500,7 @@ TEST_CASE("Format nine scene migrates to bone tip links with a readable backup")
     auto oldJson = nlohmann::json::parse(serializeDocument(original));
     oldJson["version"] = 9;
     for (auto& layer : oldJson["layers"])
-        layer.erase("followParentBoneTip");
+        layer.erase("boneTipAnchor");
     {
         FixtureDatabase db(project.file);
         db.replaceDocument(oldJson.dump());
@@ -513,6 +514,35 @@ TEST_CASE("Format nine scene migrates to bone tip links with a readable backup")
     auto backup = project.file;
     backup += ".pre-v9.bak";
     REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+}
+
+TEST_CASE("Format ten linked rig migrates explicit rest anchors with a readable backup") {
+    TemporaryProject project;
+    std::filesystem::copy_file(std::filesystem::path(OPENTOON_SOURCE_DIR) /
+        "tests/fixtures/harmony-continuous-limbs/format10-linked.otoon", project.file);
+    {
+        FixtureDatabase legacy(project.file);
+        REQUIRE(legacy.count("PRAGMA user_version") == 10);
+    }
+    const auto original = ProjectStore::load(project.file);
+    REQUIRE(std::count_if(original.document.layers.begin(), original.document.layers.end(),
+        [](const Layer& layer) { return layer.boneTipAnchor.has_value(); }) == 4);
+    auto invalid = original.document;
+    auto linked = std::find_if(invalid.layers.begin(), invalid.layers.end(),
+        [](const Layer& layer) { return layer.boneTipAnchor.has_value(); });
+    REQUIRE(linked != invalid.layers.end());
+    linked->boneTipAnchor->distalAxis = {0, 0};
+    REQUIRE_THROWS_AS(invalid.validate(), std::invalid_argument);
+    auto changed = original.document;
+    changed.name = "Upgraded continuous rig";
+    REQUIRE(ProjectStore::save(project.file, changed, "Store stable anchors",
+                               original.revision) > original.revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v10.bak";
+    REQUIRE(ProjectStore::load(backup).document == original.document);
     FixtureDatabase current(project.file);
     REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
 }

@@ -108,7 +108,8 @@ drawing and substitutions remain independent. The source limb needs a bound
 two-segment bone on every exposed drawing and rest at frame zero. Attach before
 adding transform keys to the child. If a source substitution uses a different
 rest wrist or ankle, the child follows that variant's evaluated endpoint and
-direction. The same Rig action detaches it; detach
+direction, even when that variant is later selected at frame zero. The same
+Rig action detaches it; detach
 before reparenting. Curve attachments, IK and automatic limb setup remain open.
 
 Insert/remove frames and Clear include bone/curve keys. Copy/paste, move and
@@ -131,7 +132,7 @@ Each manual save appends a complete revision. Scene history can restore a saved 
 
 Every 60 seconds, a modified document is saved to a recovery file. On a later launch, recovery can open that snapshot as an unsaved scene. Save it under a chosen name. Autosave runs from an immutable snapshot in a worker, so newer edits stay unsaved until the next save. Manual saves remain synchronous. Recovery from operating-system power loss and multiple simultaneous application instances has not been qualified.
 
-Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and total decoded media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening formats 1–9 remains supported. Format 3 added channel Bézier easing, format 4 added typed character layers and named substitutions, format 5 added character view sets, format 6 saves the composition profile, format 7 added the output camera, format 8 saves mesh bindings, format 9 saves bone/curve controls and animation keys, and format 10 saves parent bone-tip links. The first save of an older schema creates a backup named for its source version, such as `.pre-v9.bak`, before upgrading. Older editors require that backup to reopen the original format.
+Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and total decoded media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening formats 1–10 remains supported. Format 3 added channel Bézier easing, format 4 added typed character layers and named substitutions, format 5 added character view sets, format 6 saves the composition profile, format 7 added the output camera, format 8 saves mesh bindings, format 9 saves bone/curve controls and animation keys, format 10 introduced parent bone-tip links, and format 11 saves their rest tip and distal direction at attachment time. The first save of an older schema creates a backup named for its source version, such as `.pre-v9.bak`, before upgrading. Older editors require that backup to reopen the original format.
 
 **Scene → Compact project history** retains the chosen number of newest saved revisions and removes unreachable media, after creating a full `.pre-compact.bak` backup. Save pending edits first. This is an explicit operation and is not part of autosave.
 

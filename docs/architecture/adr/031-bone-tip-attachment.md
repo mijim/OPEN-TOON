@@ -7,7 +7,9 @@ and portable templates remain HM-09 work.
 
 ## Contract
 
-Format 10 adds `followParentBoneTip` to a Part. A linked Part must be a direct
+Format 10 introduced a saved `followParentBoneTip` flag. Format 11 replaces it
+with an optional child-Part `boneTipAnchor` containing the source-local rest
+tip and distal-axis vector captured when the link is made. A linked Part must be a direct
 child of a Part whose exposed drawing has a two-segment bone binding at every
 frame. Every exposed source substitution must have its own binding. The source
 must evaluate to rest at frame zero, so enabling a link preserves the assembled
@@ -16,7 +18,7 @@ made; later keys are offsets in the moving tip space. The link stores no second
 source ID: the validated parent identity is authoritative.
 
 Evaluation samples the active source substitution's bone chain at the scene
-frame. The source's frame-zero rest tip is the stable child anchor. Evaluation
+frame. The stored rest tip is the stable child anchor. Evaluation
 maps that anchor to the active substitution's evaluated tip and rotates by the
 change in distal rest direction plus the active shoulder and elbow angles. A
 substitution with a differently placed or oriented wrist therefore moves and
@@ -36,14 +38,18 @@ publication. Removing a required source bone or exposing an unbound variant is
 also rejected by document validation. A linked child must be unlinked before
 reparenting or detaching it.
 
-This evaluator correction adds no stored field or schema version. A saved
-format-10 rig whose source variants have different rest tips may render its
-follower at a corrected position after update; the prior mapping did not keep
-that follower on the active bone endpoint. Undo/redo, SQLite reopen and
-source-variant rest-joint retargeting are covered by the continuous-limb test.
+The explicit anchor stays unchanged when the source substitution at frame zero
+changes. That change previously redefined an inferred anchor and detached the
+follower from the new endpoint. Format-11 serialization stores the two bounded
+points and rejects missing, nonfinite or zero-length axes. Format-10 loading
+infers an anchor once from the source drawing currently exposed at frame zero;
+the original attachment-time source is not recoverable from an old flag alone.
+The first save preserves a `.pre-v10.bak` copy. Undo/redo, SQLite reopen,
+frame-zero substitution switching and source-variant rest-joint retargeting
+are covered by the continuous-limb and migration tests.
 
-Formats 1–9 load with the link disabled. The first save of a format-9 project
-preserves a `.pre-v9.bak` source copy before writing format 10. The 15-artwork
+Formats 1–9 load with the link disabled. The first save of an older project
+preserves a source-version backup before writing format 11. The 15-artwork
 Part fixture now uses four saved links rather than duplicated hand/foot
 position keys. Native interaction, per-frame endpoint, variant, recovery and
 render checks are recorded in `docs/implementation/HM06-PROGRESS.md`.
