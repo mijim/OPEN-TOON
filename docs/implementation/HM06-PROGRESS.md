@@ -21,6 +21,11 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   is attached. Switching substitutions resolves the matching chain.
 - Format 9 persists controls, weights and keys. The first save of format 8
   preserves a source-version `.pre-v8.bak` before upgrading.
+- Insert/remove frames shift or remove deformer keys with the scene clock.
+  Clear removes them from the selected Part/range and remains atomic with
+  exposures and layer pose keys. Range paste/move/stretch with deformer keys
+  explicitly rejects until those clipboard operations can transfer the full
+  binding safely.
 
 ## Verification
 
@@ -32,10 +37,11 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   and torso reopen to identical frame-12 pixels.
 - The native `--smoke-test` drags a bone tip and curve tangent, checks
   temporary preview isolation, cancellation, undo/redo, Rest key and project
-  reopen on a checker Part. The inspected [original-art detail](hm06-bone-curve-detail.png)
+  reopen on a checker Part. A mirrored/rotated/zoomed control drag also
+  round-trips through undo. The inspected [original-art detail](hm06-bone-curve-detail.png)
   shows the bounded arm/torso deformation. It reveals a noticeable taper at
   the elbow; larger bends and seam behavior still need correction/acceptance.
-- The macOS optimized build passes 120/120 CTest entries and native smoke.
+- The macOS optimized build passes 121/121 CTest entries and native smoke.
   On Apple M1 Pro, three local 1920×1080 renders of the assembled 19-part
   scene with one bone and one curve averaged 3.25 ms/frame. This is renderer
   cost, not measured control-to-preview p95 or full shot memory. No new

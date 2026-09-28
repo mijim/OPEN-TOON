@@ -232,9 +232,10 @@ void CanvasItem::previewMeshControl(QPointF position) {
         posePreview_ = std::move(candidate);
         previewValid_ = true;
         meshControlMoved_ = true;
-    } catch (const std::exception&) {
+    } catch (const std::exception& error) {
         posePreview_.reset();
         previewValid_ = false;
+        editor_->report(error.what());
     }
     update();
 }

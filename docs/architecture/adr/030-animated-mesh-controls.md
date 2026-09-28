@@ -36,6 +36,9 @@ Evaluation occurs after document pose keys and before camera/layer image
 composition. Immutable render snapshots carry the authored keys; revision
 cache keys already cover new document edits. Independent Part duplication
 copies weights and keys, while linked artwork may have a separate deformer.
+Scene-wide frame insertion/removal and selected-range Clear include deformer
+keys. Clipboard paste, range move and stretch reject when those keys are in
+scope until full per-substitution key transfer is implemented.
 
 No external numerical library is needed for this bounded two-segment/cubic
 evaluation. Eigen stays a candidate for heavier constrained solvers; adoption

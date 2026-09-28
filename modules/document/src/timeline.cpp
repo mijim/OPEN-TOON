@@ -1,4 +1,5 @@
 #include "opentoon/timeline.h"
+#include "opentoon/deformer.h"
 #include <set>
 #include <stdexcept>
 namespace opentoon {
@@ -40,6 +41,7 @@ ExposureClipboard copyRange(const Document& d, const std::vector<Id>& layers, Fr
                 key.frame -= start;
                 track.keys.push_back(key);
             }
+        track.containsDeformerKeys = hasDeformerKeys(layer, start, end);
         result.tracks.push_back(std::move(track));
     }
     return result;
@@ -50,11 +52,14 @@ void pasteRange(Document& d, const std::vector<Id>& layers, Frame at, const Expo
         at > d.duration || std::int64_t(at) + clip.duration > 1000000)
         throw std::invalid_argument("Clipboard range does not fit the selected layers or scene limits.");
     range(d, layers, std::min(at, d.duration - 1), std::min(at, d.duration - 1) + 1, true);
+    const bool keys = content == PasteContent::Keys || content == PasteContent::All;
+    if (keys && std::any_of(clip.tracks.begin(), clip.tracks.end(),
+                            [](const auto& track) { return track.containsDeformerKeys; }))
+        throw std::invalid_argument("Pasting a range with deformer keys is not supported yet.");
     if (insert)
         insertFrames(d, at, clip.duration);
     d.duration = std::max(d.duration, at + clip.duration);
     const bool exposures = content != PasteContent::Keys;
-    const bool keys = content == PasteContent::Keys || content == PasteContent::All;
     std::map<Id, Id> drawings, colors;
     auto drawingId = [&](Id source) {
         if (auto found = drawings.find(source); found != drawings.end())
@@ -122,6 +127,17 @@ void clearRange(Document& d, const std::vector<Id>& layers, Frame start, Frame e
         expose(layer, start, end, 0);
         if (keys)
             std::erase_if(layer.keys, [&](auto k) { return k.frame >= start && k.frame < end; });
+        if (keys)
+            for (auto& binding : layer.bindings) {
+                if (binding.bone)
+                    std::erase_if(binding.bone->keys, [&](const auto& key) {
+                        return key.frame >= start && key.frame < end;
+                    });
+                if (binding.curve)
+                    std::erase_if(binding.curve->keys, [&](const auto& key) {
+                        return key.frame >= start && key.frame < end;
+                    });
+            }
     }
 }
 void repeatRange(Document& d, const std::vector<Id>& layers, Frame start, Frame end, int repeats) {
@@ -134,6 +150,9 @@ void repeatRange(Document& d, const std::vector<Id>& layers, Frame start, Frame 
 }
 void retimeRange(Document& d, const std::vector<Id>& layers, Frame start, Frame end, Frame newLength) {
     range(d, layers, start, end, true);
+    for (const auto id : layers)
+        if (hasDeformerKeys(d.layer(id), start, end))
+            throw std::invalid_argument("Retiming a range with deformer keys is not supported yet.");
     if (newLength < 1 || newLength > 1000000 || std::int64_t(start) + newLength > 1000000)
         throw std::invalid_argument("Invalid retimed range length.");
     auto clip = copyRange(d, layers, start, end);

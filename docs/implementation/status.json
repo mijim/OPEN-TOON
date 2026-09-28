@@ -84,7 +84,7 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 120,
+      "count": 121,
       "command": "ctest --test-dir build/desktop --output-on-failure --parallel 4"
     },
     "native_input_workflow": {
@@ -159,7 +159,8 @@
         "direct camera pan/rotate/zoom, locked-camera rejection, undo/redo and save/reopen",
         "camera guides and viewport navigation leave output pixels unchanged",
         "mesh mouse pose/rest drag, preview, undo/redo, unsafe rebind rejection, reset and save/reopen",
-        "bone joint and curve tangent mouse drags, cancellable previews, rest key, undo and format-9 reopen"
+        "bone joint and curve tangent mouse drags, cancellable previews, rest key, undo and format-9 reopen",
+        "mirrored rotated and zoomed curve-control drag with undo"
       ],
       "limits": "Synthetic mouse/tablet events on macOS; no physical tablet available. Window-layout flush required for occluded native smoke instances."
     },
@@ -245,7 +246,7 @@
         "animated orthographic camera matches reopened preview and two exported PNG frames"
       ]
     },
-    "total_local_ctest_entries": 120,
+    "total_local_ctest_entries": 121,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -361,8 +362,8 @@
         "apps/desktop/mesh_smoke.cpp",
         "docs/implementation/hm06-bone-curve-detail.png"
       ],
-      "scope": "Format-9 per-substitution two-segment bone and cubic curve keys, rest-preserving evaluation, direct mouse handles, undo/cancellation/reopen, original assembled 19-part pixels and three-run 3.25 ms/frame 1080p renderer measurement.",
-      "limitations": "HM-06 is not accepted: extreme-bend seams/quality, p95 control-to-preview, memory, influence tuning and full shot artist workflow remain to be qualified."
+      "scope": "Format-9 per-substitution two-segment bone and cubic curve keys, rest-preserving evaluation, direct mouse handles, undo/cancellation/reopen, original assembled 19-part pixels and three-run 3.25 ms/frame 1080p renderer measurement. Scene frame insertion/removal and selected-range Clear maintain deformer keys.",
+      "limitations": "HM-06 is not accepted: extreme-bend seams/quality, p95 control-to-preview, memory, influence tuning and full shot artist workflow remain to be qualified. Range paste/move/stretch with deformer keys currently rejects explicitly."
     }
   },
   "ownership": {

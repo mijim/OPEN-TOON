@@ -2,6 +2,7 @@
 #include "opentoon/deformation.h"
 #include "opentoon/rigging.h"
 #include "opentoon/session.h"
+#include "opentoon/timeline.h"
 #include "serialization.h"
 #include <catch2/catch_test_macros.hpp>
 #include <cmath>
@@ -98,4 +99,43 @@ TEST_CASE("Deformer binding rejects invalid controls and protected static edits 
     removeMeshDeformer(fixture.document, fixture.part, fixture.drawing);
     REQUIRE_FALSE(meshBindingFor(fixture.document.layer(fixture.part), fixture.drawing)->bone);
     fixture.document.validate();
+}
+
+TEST_CASE("Frame insertion removal and Clear keep deformer keys synchronized") {
+    PartFixture fixture;
+    bindBoneChain(fixture.document, fixture.part, fixture.drawing,
+                  {{{0, 8}, {8, 8}, {16, 8}}}, 3);
+    recordBonePose(fixture.document, fixture.part, fixture.drawing, 12, 0, 20);
+    const Id side = createSubstitution(fixture.document, fixture.part, 0, true, "Side");
+    bindRegularImageMesh(fixture.document, fixture.part, side, 4, 2);
+    const std::array<MeshPoint, 4> straight{{{0, 8}, {16.0 / 3, 8},
+                                            {32.0 / 3, 8}, {16, 8}}};
+    bindCurveDeformer(fixture.document, fixture.part, side, straight);
+    auto curved = straight;
+    curved[1].y += 2;
+    recordCurvePose(fixture.document, fixture.part, side, 16, curved);
+    const auto before = fixture.document;
+    auto clip = copyRange(fixture.document, {fixture.part}, 10, 17);
+    REQUIRE(clip.tracks.front().containsDeformerKeys);
+    REQUIRE_THROWS(pasteRange(fixture.document, {fixture.part}, 20, clip,
+                              PasteContent::All, true));
+    REQUIRE_THROWS(retimeRange(fixture.document, {fixture.part}, 10, 17, 10));
+    REQUIRE(fixture.document == before);
+    insertFrames(fixture.document, 10, 3);
+    const auto& inserted = fixture.document.layer(fixture.part);
+    REQUIRE(meshBindingFor(inserted, fixture.drawing)->bone->keys.back().frame == 15);
+    REQUIRE(meshBindingFor(inserted, side)->curve->keys.back().frame == 19);
+    removeFrames(fixture.document, 14, 2);
+    const auto& removed = fixture.document.layer(fixture.part);
+    REQUIRE(meshBindingFor(removed, fixture.drawing)->bone->keys.size() == 1);
+    REQUIRE(meshBindingFor(removed, side)->curve->keys.back().frame == 17);
+    fixture.document.validate();
+    Session session;
+    session.replace(fixture.document);
+    REQUIRE(session.apply("Clear deformation", [&](Document& document) {
+        clearRange(document, {fixture.part}, 16, 18, true);
+    }));
+    REQUIRE(meshBindingFor(session.document().layer(fixture.part), side)->curve->keys.size() == 1);
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == fixture.document);
 }

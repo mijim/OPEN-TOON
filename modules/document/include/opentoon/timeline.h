@@ -5,6 +5,7 @@ enum class PasteContent { Exposures, IndependentDrawings, Keys, All };
 struct ClipboardTrack {
     std::vector<Exposure> exposures;
     std::vector<Keyframe> keys;
+    bool containsDeformerKeys = false;
 };
 struct ExposureClipboard {
     Frame duration = 0;

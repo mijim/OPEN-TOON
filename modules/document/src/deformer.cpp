@@ -290,6 +290,20 @@ void removeMeshDeformer(Document& document, Id part, Id drawing) {
     target.curve.reset();
 }
 
+bool hasDeformerKeys(const Layer& layer, Frame start, Frame end) {
+    for (const auto& binding : layer.bindings) {
+        auto contains = [start, end](const auto& keys) {
+            return std::any_of(keys.begin(), keys.end(), [start, end](const auto& key) {
+                return key.frame >= start && key.frame < end;
+            });
+        };
+        if ((binding.bone && contains(binding.bone->keys)) ||
+            (binding.curve && contains(binding.curve->keys)))
+            return true;
+    }
+    return false;
+}
+
 std::array<double, 2> sampleBoneAngles(const BoneChain& bone, Frame frame) {
     return sampled<BonePoseKey, std::array<double, 2>>(
             bone.keys, frame, {0, 0},

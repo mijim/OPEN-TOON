@@ -82,6 +82,9 @@ records the original shape at the playhead without deleting other keys;
 **Remove control** removes the deformer and leaves the rest mesh. One Part
 substitution can have one control type; another substitution may use its own.
 Static vertices cannot be edited while a control is attached.
+Insert/remove frames and Clear include bone/curve keys. Copy/paste, move and
+stretch of a range containing those keys currently report an unsupported
+operation; adjust deformer keys at the destination frame directly.
 
 Image grids start at visible alpha bounds; vector drawings
 remain editable and use a scene-resolution raster proxy. Raster-tile and mixed

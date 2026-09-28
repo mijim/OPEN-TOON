@@ -13,6 +13,7 @@ void recordCurvePose(Document&, Id part, Id drawing, Frame frame,
                      std::array<MeshPoint, 4> controls,
                      Interpolation interpolation = Interpolation::Linear);
 void removeMeshDeformer(Document&, Id part, Id drawing);
+[[nodiscard]] bool hasDeformerKeys(const Layer&, Frame start, Frame end);
 [[nodiscard]] std::array<double, 2> sampleBoneAngles(const BoneChain&, Frame frame);
 [[nodiscard]] std::array<MeshPoint, 4> sampleCurveControls(const CurveDeformer&, Frame frame);
 [[nodiscard]] MeshBinding evaluateMeshBinding(const MeshBinding&, Frame frame);

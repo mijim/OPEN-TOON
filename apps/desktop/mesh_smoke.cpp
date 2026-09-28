@@ -153,4 +153,17 @@ void meshSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& windo
     editor.undo();
     if (SceneRenderer::render(editor.document(), 24) != curvePixels)
         throw std::runtime_error("Rest key did not undo without deleting prior animation.");
+    canvas.setZoom(0.75);
+    canvas.setMirrored(true);
+    canvas.setRotationAngle(15);
+    const auto transformedTangent = canvas.meshControlPosition(1);
+    drag(transformedTangent, transformedTangent + QPointF(0, -8));
+    if (SceneRenderer::render(editor.document(), 24) == curvePixels)
+        throw std::runtime_error("Mirrored and rotated curve drag missed its control.");
+    editor.undo();
+    if (SceneRenderer::render(editor.document(), 24) != curvePixels)
+        throw std::runtime_error("Transformed curve drag did not undo.");
+    canvas.setMirrored(false);
+    canvas.setRotationAngle(0);
+    canvas.fit();
 }

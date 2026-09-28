@@ -364,6 +364,16 @@ void insertFrames(Document& d, Frame at, Frame count) {
         for (auto& k : l.keys)
             if (k.frame >= at)
                 k.frame += count;
+        for (auto& binding : l.bindings) {
+            if (binding.bone)
+                for (auto& key : binding.bone->keys)
+                    if (key.frame >= at)
+                        key.frame += count;
+            if (binding.curve)
+                for (auto& key : binding.curve->keys)
+                    if (key.frame >= at)
+                        key.frame += count;
+        }
     }
     for (auto& m : d.markers)
         if (m.frame >= at)
@@ -386,6 +396,22 @@ void removeFrames(Document& d, Frame at, Frame count) {
         std::erase_if(l.keys, [=](auto k) { return k.frame >= at && k.frame < end; });
         for (auto& k : l.keys)
             k.frame = collapse(k.frame);
+        for (auto& binding : l.bindings) {
+            if (binding.bone) {
+                std::erase_if(binding.bone->keys, [=](const auto& key) {
+                    return key.frame >= at && key.frame < end;
+                });
+                for (auto& key : binding.bone->keys)
+                    key.frame = collapse(key.frame);
+            }
+            if (binding.curve) {
+                std::erase_if(binding.curve->keys, [=](const auto& key) {
+                    return key.frame >= at && key.frame < end;
+                });
+                for (auto& key : binding.curve->keys)
+                    key.frame = collapse(key.frame);
+            }
+        }
     }
     std::erase_if(d.markers, [=](const auto& m) { return m.frame >= at && m.frame < end; });
     for (auto& m : d.markers)
