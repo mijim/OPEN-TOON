@@ -604,11 +604,10 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
                                  joints[2].toArray()[0].toDouble() - followerTransform.x,
                                  joints[2].toArray()[1].toDouble() - followerTransform.y);
         auto pose = document.layer(follower).transform;
-        const double radians = key.angle * std::numbers::pi / 180.0;
-        const double dx = local[2].x - local[1].x;
-        const double dy = local[2].y - local[1].y;
-        pose.x += std::cos(radians) * dx - std::sin(radians) * dy - dx;
-        pose.y += std::sin(radians) * dx + std::cos(radians) * dy - dy;
+        const auto* binding = meshBindingFor(document.layer(part), drawing);
+        const auto endpoint = sampleBoneJoints(*binding->bone, 24)[2];
+        pose.x += endpoint.x - local[2].x;
+        pose.y += endpoint.y - local[2].y;
         pose.rotation = key.angle;
         recordPose(document.layer(follower), 24, pose);
     }
@@ -642,19 +641,17 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
     auto extreme = document;
     for (const auto& key : keys) {
         INFO(key.role.toStdString());
-        const auto config = limbs.value(key.role).toObject();
-        const auto joints = config.value("joints_scene_px").toArray();
         const Id part = partIds.value(key.role);
         const Id drawing = extreme.layer(part).exposures.front().drawing;
         const double angle = key.angle < 0 ? -90 : 90;
         REQUIRE_NOTHROW(recordBonePose(extreme, part, drawing, 36, 0, angle));
         const Id follower = partIds.value(key.follower);
-        const double dx = joints[2].toArray()[0].toDouble() - joints[1].toArray()[0].toDouble();
-        const double dy = joints[2].toArray()[1].toDouble() - joints[1].toArray()[1].toDouble();
-        const double radians = angle * std::numbers::pi / 180;
+        const auto* binding = meshBindingFor(extreme.layer(part), drawing);
+        const auto endpoint = sampleBoneJoints(*binding->bone, 36)[2];
+        const auto& restEndpoint = binding->bone->restJoints[2];
         auto pose = extreme.layer(follower).transform;
-        pose.x += std::cos(radians) * dx - std::sin(radians) * dy - dx;
-        pose.y += std::sin(radians) * dx + std::cos(radians) * dy - dy;
+        pose.x += endpoint.x - restEndpoint.x;
+        pose.y += endpoint.y - restEndpoint.y;
         pose.rotation = angle;
         recordPose(extreme.layer(follower), 36, pose);
     }

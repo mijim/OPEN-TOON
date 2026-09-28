@@ -11,6 +11,10 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   connected forward-kinematic poses. Influence rotates around the posed elbow
   to preserve distance at intermediate weights. Curve controls retain a fixed rest
   parameter per vertex and move the mesh by the posed-minus-rest cubic field.
+  The evaluated bone joints are now exposed by the domain evaluator and used
+  by the canvas controls. The continuous-limb fixture places keyed hands/feet
+  from those evaluated endpoints. Automatic persistent attachments still
+  belong to HM-09.
 - Both profiles save frame keys, sample linear/held/smooth interpolation and
   evaluate through the same preview and output renderer. A later first key
   anchors rest at frame zero. "Rest key" records rest at the current frame

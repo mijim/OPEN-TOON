@@ -46,6 +46,12 @@ TEST_CASE("Two-segment bone keys retain elbow connection, rest and undo") {
     REQUIRE(posed.vertices[7].pose == MeshPoint{8, 8});
     REQUIRE(std::abs(posed.vertices[9].pose.x - (8 + 8 * std::cos(std::numbers::pi / 6))) < 1e-9);
     REQUIRE(std::abs(posed.vertices[9].pose.y - 12) < 1e-9);
+    const auto jointsAtRest = sampleBoneJoints(*binding.bone, 0);
+    REQUIRE(jointsAtRest == binding.bone->restJoints);
+    const auto jointsAtBend = sampleBoneJoints(*binding.bone, 12);
+    REQUIRE(jointsAtBend[1] == MeshPoint{8, 8});
+    REQUIRE(std::abs(jointsAtBend[2].x - posed.vertices[9].pose.x) < 1e-9);
+    REQUIRE(std::abs(jointsAtBend[2].y - posed.vertices[9].pose.y) < 1e-9);
     const auto middleWeight = binding.bone->distalWeights[2];
     REQUIRE(middleWeight > 0);
     REQUIRE(middleWeight < 1);

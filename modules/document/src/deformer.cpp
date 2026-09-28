@@ -369,6 +369,15 @@ std::array<double, 2> sampleBoneAngles(const BoneChain& bone, Frame frame) {
             });
 }
 
+std::array<MeshPoint, 3> sampleBoneJoints(const BoneChain& bone, Frame frame) {
+    const auto angles = sampleBoneAngles(bone, frame);
+    auto joints = bone.restJoints;
+    joints[1] = add(joints[0], rotate(sub(joints[1], joints[0]), angles[0]));
+    joints[2] = add(joints[1], rotate(sub(bone.restJoints[2], bone.restJoints[1]),
+                                     angles[0] + angles[1]));
+    return joints;
+}
+
 std::array<MeshPoint, 4> sampleCurveControls(const CurveDeformer& curve, Frame frame) {
     return sampled<CurvePoseKey, std::array<MeshPoint, 4>>(
             curve.keys, frame, curve.restControls,

@@ -12,23 +12,6 @@
 
 using namespace opentoon;
 namespace {
-MeshPoint rotatePoint(MeshPoint point, double angle) {
-    const double radians = angle * std::numbers::pi / 180;
-    return {point.x * std::cos(radians) - point.y * std::sin(radians),
-            point.x * std::sin(radians) + point.y * std::cos(radians)};
-}
-std::array<MeshPoint, 3> posedJoints(const BoneChain& bone, Frame frame) {
-    const auto angles = sampleBoneAngles(bone, frame);
-    auto joints = bone.restJoints;
-    const auto proximal = rotatePoint({bone.restJoints[1].x - joints[0].x,
-                                       bone.restJoints[1].y - joints[0].y}, angles[0]);
-    joints[1] = {joints[0].x + proximal.x, joints[0].y + proximal.y};
-    const auto distal = rotatePoint({bone.restJoints[2].x - bone.restJoints[1].x,
-                                     bone.restJoints[2].y - bone.restJoints[1].y},
-                                    angles[0] + angles[1]);
-    joints[2] = {joints[1].x + distal.x, joints[1].y + distal.y};
-    return joints;
-}
 MeshPoint influenceHandle(const BoneChain& bone) {
     const auto& joints = bone.restJoints;
     const double dx = joints[1].x - joints[0].x;
@@ -66,7 +49,7 @@ QPointF CanvasItem::meshControlPosition(int index) const {
     MeshPoint point;
     if (binding->bone && index < 3)
         point = meshRestEditing_ ? binding->bone->restJoints[index]
-                                 : posedJoints(*binding->bone, editor_->frame())[index];
+                                 : sampleBoneJoints(*binding->bone, editor_->frame())[index];
     else if (binding->curve && index < 4)
         point = meshRestEditing_ ? binding->curve->restControls[index]
                                  : sampleCurveControls(*binding->curve, editor_->frame())[index];
@@ -157,7 +140,7 @@ void CanvasItem::paintMesh(QPainter* painter, const Document& document,
             }
     if (binding->bone) {
         const auto joints = meshRestEditing_ ? binding->bone->restJoints
-                                             : posedJoints(*binding->bone, editor_->frame());
+                                             : sampleBoneJoints(*binding->bone, editor_->frame());
         if (meshRestEditing_) {
             const auto& bone = *binding->bone;
             const QPointF elbow = transform.map(QPointF(joints[1].x, joints[1].y));
@@ -280,7 +263,7 @@ void CanvasItem::previewMeshControl(QPointF position) {
                 meshPreviewPoint_ = {point.x, point.y};
             } else {
                 const auto& rest = source->bone->restJoints;
-                const auto joints = posedJoints(*source->bone, editor_->frame());
+                const auto joints = sampleBoneJoints(*source->bone, editor_->frame());
                 const auto origin = meshControl_ == 1 ? rest[0] : joints[1];
                 const auto start = meshControl_ == 1 ? rest[1] : rest[2];
                 const auto prior = meshControl_ == 1 ? rest[0] : rest[1];

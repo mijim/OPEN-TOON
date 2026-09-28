@@ -18,7 +18,8 @@ or pixels from them are included.
 registered joint coverage and one connected alpha silhouette for each limb.
 `tests/mesh_render_tests.cpp` bends all four limbs as separate **single meshes**
 inside a 15-artwork-Part character, follows hands/feet at their endpoints,
-and checks rest pixels and reopened frame-24 output. The render test also
+using the domain bone-joint evaluator for their authored keys, and checks rest
+pixels and reopened frame-24 output. The render test also
 checks that every nonwhite character pixel belongs to one connected silhouette
 in both rest and bent frames. A separate 90° stress pose checks the connected
 assembled silhouette at every integer frame from rest to frame 36, rest pixel
