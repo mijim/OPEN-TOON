@@ -12,6 +12,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QRect>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QTemporaryDir>
@@ -348,6 +349,22 @@ TEST_CASE("Nineteen imported parts complete the inspector view and substitution 
                 ++mismatches;
     REQUIRE(mismatches == 0);
     const auto frontImage = opentoon::SceneRenderer::render(editor.document(), 0, {480, 270});
+    const auto localizedChange = [&](const QImage& before, const QImage& after,
+                                     const QString& role) {
+        REQUIRE(before.size() == after.size());
+        const auto center = centers.value(role).toArray();
+        REQUIRE(center.size() == 2);
+        const QRect registered(int(center[0].toDouble()) - 128,
+                               int(center[1].toDouble()) - 128, 256, 256);
+        int changed = 0;
+        for (int y = 0; y < before.height(); ++y)
+            for (int x = 0; x < before.width(); ++x)
+                if (before.pixel(x, y) != after.pixel(x, y)) {
+                    REQUIRE(registered.contains(x, y));
+                    ++changed;
+                }
+        REQUIRE(changed > 0);
+    };
 
     editor.setFrame(120);
     for (const auto& [role, filename] : std::vector<std::pair<std::string, QString>>{
@@ -373,6 +390,8 @@ TEST_CASE("Nineteen imported parts complete the inspector view and substitution 
     editor.importImage(QUrl::fromLocalFile(partFixture + "hand_right__point.png"));
     const int pointedHand = editor.selectedSubstitution();
     REQUIRE(editor.document().drawingAt(partIds.at("hand_right"), 240)->id == opentoon::Id(pointedHand));
+    localizedChange(opentoon::SceneRenderer::render(editor.document(), 120),
+                    opentoon::SceneRenderer::render(editor.document(), 240), "hand_right");
     editor.setSelectedLayer(root);
     editor.selectView(front);
     editor.setFrame(300);
@@ -389,6 +408,79 @@ TEST_CASE("Nineteen imported parts complete the inspector view and substitution 
             editor.document().drawingAt(partIds.at("mouth"), 120)->id);
     REQUIRE(opentoon::SceneRenderer::render(editor.document(), 360, {480, 270}) == turnedImage);
     REQUIRE(editor.document().layer(armPeg).keys == pegKeys);
+
+    // Exercise every supplied mouth drawing, both coordinated views and all
+    // hand choices through the same controller actions available to the artist.
+    const auto mouth = partIds.at("mouth");
+    for (const QString& viewName : {QStringLiteral("three_quarter"), QStringLiteral("front")}) {
+        if (viewName == "front") {
+            editor.setSelectedLayer(root);
+            editor.selectView(front);
+            editor.setFrame(400);
+            editor.applyCharacterView();
+            REQUIRE(opentoon::SceneRenderer::render(editor.document(), 400, {480, 270}) == frontImage);
+        }
+        int frame = viewName == "front" ? 401 : 380;
+        for (const QString& choice : {QStringLiteral("rest"), QStringLiteral("mbp"),
+                                      QStringLiteral("fv"), QStringLiteral("ee"),
+                                      QStringLiteral("ah"), QStringLiteral("oh"),
+                                      QStringLiteral("l"), QStringLiteral("wide")}) {
+            if (viewName == "front" && choice == "rest")
+                continue;
+            if (viewName == "three_quarter" && choice == "ah")
+                continue;
+            editor.setFrame(frame++);
+            editor.setSelectedLayer(mouth);
+            const auto beforeChoice = opentoon::SceneRenderer::render(editor.document(), editor.frame());
+            editor.createSubstitution(false);
+            editor.importImage(QUrl::fromLocalFile(partFixture + "mouth__" + viewName + "__" + choice + ".png"));
+            REQUIRE(editor.document().drawingAt(mouth, editor.frame())->id ==
+                    opentoon::Id(editor.selectedSubstitution()));
+            const auto afterChoice = opentoon::SceneRenderer::render(editor.document(), editor.frame());
+            localizedChange(beforeChoice, afterChoice, "mouth");
+            const auto changed = editor.document();
+            editor.undo();
+            editor.undo();
+            REQUIRE(opentoon::SceneRenderer::render(editor.document(), editor.frame()) == beforeChoice);
+            editor.redo();
+            editor.redo();
+            REQUIRE(editor.document() == changed);
+            REQUIRE(opentoon::SceneRenderer::render(editor.document(), editor.frame()) == afterChoice);
+        }
+    }
+    editor.setSelectedLayer(root);
+    editor.selectView(turned);
+    editor.setFrame(419);
+    editor.applyCharacterView();
+    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 419, {480, 270}) == turnedImage);
+    for (const QString& role : {QStringLiteral("hand_right"), QStringLiteral("hand_left")}) {
+        const int hand = partIds.at(role.toStdString());
+        for (const QString& choice : {QStringLiteral("fist"), QStringLiteral("point")}) {
+            const int frame = role == "hand_right" ? (choice == "fist" ? 420 : 421)
+                                                     : (choice == "fist" ? 423 : 424);
+            editor.setFrame(frame);
+            editor.setSelectedLayer(hand);
+            const auto beforeChoice = opentoon::SceneRenderer::render(editor.document(), frame);
+            if (role == "hand_right" && choice == "point")
+                editor.selectSubstitution(pointedHand);
+            else {
+                editor.createSubstitution(false);
+                editor.importImage(QUrl::fromLocalFile(partFixture + role + "__" + choice + ".png"));
+            }
+            localizedChange(beforeChoice, opentoon::SceneRenderer::render(editor.document(), frame), role);
+        }
+        editor.setFrame(role == "hand_right" ? 422 : 425);
+        editor.setSelectedLayer(hand);
+        const auto beforeOpen = opentoon::SceneRenderer::render(editor.document(), editor.frame());
+        editor.selectSubstitution(editor.document().drawingAt(hand, 0)->id);
+        localizedChange(beforeOpen, opentoon::SceneRenderer::render(editor.document(), editor.frame()), role);
+    }
+    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 425, {480, 270}) == turnedImage);
+    editor.setSelectedLayer(root);
+    editor.selectView(turned);
+    editor.setFrame(440);
+    editor.applyCharacterView();
+    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 440, {480, 270}) == turnedImage);
     const auto rigged = editor.document();
     editor.undo();
     REQUIRE(editor.document() != rigged);
@@ -403,6 +495,8 @@ TEST_CASE("Nineteen imported parts complete the inspector view and substitution 
     REQUIRE(reopened.openProject(project));
     REQUIRE(reopened.document() == rigged);
     REQUIRE(opentoon::SceneRenderer::render(reopened.document(), 360, {480, 270}) == turnedImage);
+    REQUIRE(opentoon::SceneRenderer::render(reopened.document(), 300, {480, 270}) == frontImage);
+    REQUIRE(opentoon::SceneRenderer::render(reopened.document(), 440, {480, 270}) == turnedImage);
     reopened.setSelectedLayer(root);
     reopened.duplicateCharacter();
     const auto clone = opentoon::Id(reopened.selectedLayer());

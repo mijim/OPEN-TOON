@@ -19,6 +19,18 @@ IDs agree with the tested document state. The inspected images are
 [`hm03-front.png`](hm03-front.png) and
 [`hm03-three-quarter.png`](hm03-three-quarter.png).
 
+The owner asked the implementer to repeat this check with tests on 2026-09-28.
+The inspector journey now uses all 41 supplied PNGs, cycling all eight mouth
+choices in each face view and all three choices for both hands. Full-resolution
+pixel checks ensure each variant changes pixels only inside that Part's
+registered 256×256 area.
+Every mouth import is undone and redone through its two user actions (create
+substitution, then import image). The front and three-quarter views return to
+their earlier pixels after intervening mouth and hand edits, and saved/reopened
+frames 300, 360 and 440 retain the same output. No part displacement or blocked
+step appeared in the tested controller journey; menu clicking and the separate
+HM-15 animator review remain outside this bounded check.
+
 `tests/rigging_tests.cpp` also renders every frame of a 48-frame character-root
 move before and after a reparent inside its shared moving branch. It checks
 mirrored nonuniform scale preservation, and atomic rejection of singular,
@@ -26,7 +38,8 @@ sheared, differently animated and opacity-impossible cases. Existing view
 tests reject missing members before changing any part. The native
 `--smoke-test` passed on macOS for QML canvas input, timeline and animation
 actions, though it does not itself click every Rig menu item. The full
-102-entry CTest suite and `scripts/validate_docs.py` passed after this block.
+121-entry CTest suite, native macOS smoke and `scripts/validate_docs.py` passed
+after the repeated block.
 
 The workflow still requires an artist to choose correct paint order and rest
 placement. Reparenting between differently animated branches, animated child
