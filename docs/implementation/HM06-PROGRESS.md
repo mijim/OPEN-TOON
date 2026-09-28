@@ -82,6 +82,9 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   saved example is compared with the constructed test document. The Qt Quick
   smoke test opens that exact project, selects its linked hand, changes frames
   across the view switch and presents the canvas.
+  A source-art correction removed a stray point behind the ear in the
+  three-quarter head drawing; the example and affected reference stills were
+  regenerated without changing their registration or substitution identities.
   Retuning one posed arm's radius from 65 to 55 pixels preserves rest pixels,
   changes the bend, keeps the assembled silhouette connected and reopens to
   identical output.

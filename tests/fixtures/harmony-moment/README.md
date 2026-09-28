@@ -30,6 +30,11 @@ simpler expressive face, continuous sleeve edges, tapered trousers and
 integrated hand shapes. Those third-party reference images were used only for
 visual direction and are not included in the fixture or copied into its
 artwork. Visual approval of this candidate remains open.
+The 2026-09-29 three-quarter contour revision removes an unintended point
+behind the visible ear. It changes only that head substitution and the three
+reference poses that expose it; the registered dimensions and drawing IDs are
+unchanged. The continuous-rig example and its frame-36 capture were regenerated
+from the corrected source.
 `--previews` renders five full-resolution reference poses for visual review; they
 are external acceptance targets, not frames from the OPEN-TOON evaluator.
 

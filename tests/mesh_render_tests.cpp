@@ -793,6 +793,10 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
     REQUIRE(reopenedView == viewSession.document());
     REQUIRE(SceneRenderer::render(reopenedView, 36) == expressiveFrame);
     REQUIRE(SceneRenderer::render(reopenedView, 44) == returnedFrame);
+    if (qEnvironmentVariableIsSet("OPENTOON_HM06_VIEW_PROJECT")) {
+        const auto output = qEnvironmentVariable("OPENTOON_HM06_VIEW_PROJECT");
+        REQUIRE(ProjectStore::save(std::filesystem::path(output.toStdString()), reopenedView) > 0);
+    }
     const auto bundledExample = ProjectStore::load(std::filesystem::path(
         OPENTOON_SOURCE_DIR "/examples/clockwork-continuous.otoon")).document;
     REQUIRE(bundledExample == reopenedView);
@@ -829,9 +833,5 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
     if (qEnvironmentVariableIsSet("OPENTOON_HM06_CONTINUOUS_PROJECT")) {
         const auto output = qEnvironmentVariable("OPENTOON_HM06_CONTINUOUS_PROJECT");
         REQUIRE(ProjectStore::save(std::filesystem::path(output.toStdString()), document) > 0);
-    }
-    if (qEnvironmentVariableIsSet("OPENTOON_HM06_VIEW_PROJECT")) {
-        const auto output = qEnvironmentVariable("OPENTOON_HM06_VIEW_PROJECT");
-        REQUIRE(ProjectStore::save(std::filesystem::path(output.toStdString()), reopenedView) > 0);
     }
 }
