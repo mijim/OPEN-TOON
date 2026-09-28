@@ -22,7 +22,9 @@ and checks rest pixels and reopened frame-24 output. The render test also
 checks that every nonwhite character pixel belongs to one connected silhouette
 in both rest and bent frames. A separate 90° stress pose checks the connected
 assembled silhouette at every integer frame from rest to frame 36, rest pixel
-stability and identical reopened output. This is a representative rig-quality
+stability and identical reopened output. The source art omits drawn creases at
+the elbow and knee; a too-tight 55 px transition must reject a folding 90° key
+without modifying the document. This is a representative rig-quality
 check, not final owner approval or a complete production shot.
 
 ![Four bent continuous limbs](../../../docs/implementation/hm06-continuous-limbs.png)

@@ -631,6 +631,14 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
             tunedFrame);
     REQUIRE(bent.save("hm06-continuous-limbs.png"));
     REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 24) == bent);
+    auto folded = document;
+    const Id foldedArm = partIds.value("arm_left");
+    const Id foldedDrawing = folded.layer(foldedArm).exposures.front().drawing;
+    setBoneElbowTransition(folded, foldedArm, foldedDrawing, 55);
+    const auto beforeRejectedBend = serializeDocument(folded);
+    REQUIRE_THROWS_AS(recordBonePose(folded, foldedArm, foldedDrawing, 36, 0, 90),
+                      std::invalid_argument);
+    REQUIRE(serializeDocument(folded) == beforeRejectedBend);
     auto extreme = document;
     for (const auto& key : keys) {
         INFO(key.role.toStdString());
@@ -639,7 +647,6 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
         const Id part = partIds.value(key.role);
         const Id drawing = extreme.layer(part).exposures.front().drawing;
         const double angle = key.angle < 0 ? -90 : 90;
-        REQUIRE_NOTHROW(setBoneElbowTransition(extreme, part, drawing, 90));
         REQUIRE_NOTHROW(recordBonePose(extreme, part, drawing, 36, 0, angle));
         const Id follower = partIds.value(key.follower);
         const double dx = joints[2].toArray()[0].toDouble() - joints[1].toArray()[0].toDouble();

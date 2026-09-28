@@ -69,8 +69,12 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   A separate [90° stress pose](hm06-continuous-limbs-90.png) bends all four
   continuous limbs around their middle joints. The assembled silhouette stays
   connected at every integer frame from rest through frame 36, with no render
-  failure; rest pixels and reopened frame-36 pixels are identical. This is a
-  deformation stress image, not a polished animation pose. The candidate has
+  failure; rest pixels and reopened frame-36 pixels are identical. The source
+  redraw removes elbow and knee crease strokes that made one-piece limbs read
+  like separate artwork. The 65 px transition accepts this 90° pose; reducing
+  it to 55 px folds the mesh and rejects the new key without changing the
+  document. This is a deformation stress image, not a polished animation pose.
+  The candidate has
   no elbow or knee image seam; owner visual approval is still open.
 - The native `--smoke-test` drags a bone tip and curve tangent, checks
   temporary preview isolation, cancellation, undo/redo, bone and curve rest-control
