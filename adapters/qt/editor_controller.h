@@ -223,6 +223,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE void moveSubstitution(int drawing, int direction);
     Q_INVOKABLE void stepSubstitution(int direction);
     Q_INVOKABLE bool bindSelectedMesh(int columns = 2, int rows = 2);
+    Q_INVOKABLE bool bindSelectedContourMesh(int columns = 2, int rows = 2);
     int selectedMeshDeformer() const;
     int selectedMeshColumns() const;
     int selectedMeshRows() const;

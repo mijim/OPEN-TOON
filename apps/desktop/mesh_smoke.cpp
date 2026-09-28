@@ -108,7 +108,18 @@ void meshSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& windo
         throw std::runtime_error("Removing the mesh did not restore source artwork pixels.");
 
     editor.holdDrawing(editor.duration());
-    if (!editor.bindSelectedMesh(6, 16) || editor.selectedMeshColumns() != 6 ||
+    const auto beforeContour = editor.document();
+    if (!editor.bindSelectedContourMesh(6, 16) || editor.selectedMeshColumns() != 6 ||
+        editor.selectedMeshRows() != 16)
+        throw std::runtime_error("Contour mesh could not be bound through the editor.");
+    const auto contourBound = editor.document();
+    editor.undo();
+    if (editor.document() != beforeContour)
+        throw std::runtime_error("Contour mesh binding did not undo atomically.");
+    editor.redo();
+    if (editor.document() != contourBound)
+        throw std::runtime_error("Contour mesh binding did not redo identically.");
+    if (editor.selectedMeshColumns() != 6 ||
         editor.selectedMeshRows() != 16 || !editor.bindSelectedBone() ||
         editor.selectedMeshDeformer() != 1)
         throw std::runtime_error("Bone chain could not be bound through the editor.");

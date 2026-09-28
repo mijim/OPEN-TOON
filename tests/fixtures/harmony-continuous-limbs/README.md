@@ -25,7 +25,10 @@ in both rest and bent frames. A separate 90° stress pose checks the connected
 assembled silhouette at every integer frame from rest to frame 36, rest pixel
 stability and identical reopened output. The source art omits drawn creases at
 the elbow and knee; a too-tight 55 px transition must reject a folding 90° key
-without modifying the document. A source substitution with its own bone
+on the regular rectangular grid without modifying the document. Contour
+binding follows source alpha instead of transparent corners; its 55 px 90°
+stress pose covers every opaque source pixel, keeps the full character
+connected and survives save/reopen. A source substitution with its own bone
 binding retains the link; removing the source bone or exposing an unbound
 substitution rejects atomically. This is a representative rig-quality
 check, not final owner approval or a complete production shot.
@@ -44,5 +47,7 @@ registration are unchanged.
 ![Four bent continuous limbs](../../../docs/implementation/hm06-continuous-limbs.png)
 
 ![Four continuous limbs at 90 degrees](../../../docs/implementation/hm06-continuous-limbs-90.png)
+
+![Four continuous limbs with contour meshes at 90 degrees](../../../docs/implementation/hm06-contour-bend-90.png)
 
 ![Continuous rig with a changed face view and fist](../../../docs/implementation/hm06-continuous-pose-switch.png)

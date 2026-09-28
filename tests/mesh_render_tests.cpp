@@ -908,6 +908,62 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
     REQUIRE_THROWS_AS(recordBonePose(folded, foldedArm, foldedDrawing, 36, 0, 90),
                       std::invalid_argument);
     REQUIRE(serializeDocument(folded) == beforeRejectedBend);
+    auto contoured = document;
+    for (const auto& key : keys) {
+        INFO(key.role.toStdString());
+        const Id part = partIds.value(key.role);
+        const Id drawing = contoured.layer(part).exposures.front().drawing;
+        const Id follower = partIds.value(key.follower);
+        const auto originalBone = *meshBindingFor(contoured.layer(part), drawing)->bone;
+        detachPartFromBoneTip(contoured, follower);
+        removeMeshDeformer(contoured, part, drawing);
+        bindContourImageMesh(contoured, part, drawing, 6, 16);
+        const auto& contour = *meshBindingFor(contoured.layer(part), drawing);
+        const auto& sourceImage = *contoured.drawings.at(drawing).image;
+        const double top = contour.vertices.front().rest.y;
+        const double bottom = contour.vertices.back().rest.y;
+        bool coversSourceAlpha = true;
+        for (int y = 0; y < sourceImage.height; ++y)
+            for (int x = 0; x < sourceImage.width; ++x) {
+                if (!sourceImage.rgba[(std::size_t(y) * sourceImage.width + x) * 4 + 3])
+                    continue;
+                const double rowPosition = (y + 0.5 - top) * contour.rows / (bottom - top);
+                const int row = std::clamp(int(std::floor(rowPosition)), 0, contour.rows - 1);
+                const double t = std::clamp(rowPosition - row, 0.0, 1.0);
+                const auto index = std::size_t(row) * (contour.columns + 1);
+                const double left = std::lerp(contour.vertices[index].rest.x,
+                                              contour.vertices[index + contour.columns + 1].rest.x, t);
+                const double right = std::lerp(contour.vertices[index + contour.columns].rest.x,
+                                               contour.vertices[index + 2 * contour.columns + 1].rest.x, t);
+                coversSourceAlpha &= x + 0.5 >= left && x + 0.5 <= right;
+            }
+        REQUIRE(coversSourceAlpha);
+        if (part == foldedArm)
+            REQUIRE(meshBindingFor(contoured.layer(part), drawing)->vertices[7 * 7].rest.x >
+                    meshBindingFor(document.layer(part), drawing)->vertices[7 * 7].rest.x);
+        bindBoneChain(contoured, part, drawing, originalBone.restJoints, 55);
+        recordBonePose(contoured, part, drawing, 24, 0, key.angle);
+        REQUIRE_NOTHROW(recordBonePose(contoured, part, drawing, 36, 0,
+                                      key.angle < 0 ? -90 : 90));
+        attachPartToBoneTip(contoured, follower, part);
+    }
+    contoured.validate();
+    const auto beforeUnsafeRebind = serializeDocument(contoured);
+    REQUIRE_THROWS_AS(bindContourImageMesh(contoured, foldedArm, foldedDrawing, 6, 16),
+                      std::invalid_argument);
+    REQUIRE(serializeDocument(contoured) == beforeUnsafeRebind);
+    REQUIRE(SceneRenderer::render(contoured, 0) == rest);
+    const auto contourFrame = SceneRenderer::render(contoured, 36);
+    const auto [contourConnected, contourInk] = connectedInk(contourFrame);
+    REQUIRE(contourConnected == contourInk);
+    REQUIRE(contourFrame != SceneRenderer::render(document, 36));
+    REQUIRE(contourFrame.save("hm06-contour-bend-90.png"));
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(contoured)), 36) ==
+            contourFrame);
+    const auto contourPath = std::filesystem::path((savedProject.path() +
+                                                   "/contour.otoon").toStdString());
+    REQUIRE(ProjectStore::save(contourPath, contoured) > 0);
+    REQUIRE(SceneRenderer::render(ProjectStore::load(contourPath).document, 36) == contourFrame);
     auto extreme = document;
     for (const auto& key : keys) {
         INFO(key.role.toStdString());

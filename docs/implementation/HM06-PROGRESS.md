@@ -108,7 +108,15 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   redraw removes elbow and knee crease strokes that made one-piece limbs read
   like separate artwork. The 65 px transition accepts this 90° pose; reducing
   it to 55 px folds the mesh and rejects the new key without changing the
-  document. This is a deformation stress image, not a polished animation pose.
+  document on the regular rectangular grid. An explicit **Contour** bind now
+  fits each mesh row to the image alpha with a one-cell lookahead and one-pixel
+  margin. The [contour 90° stress pose](hm06-contour-bend-90.png) bends all four
+  one-piece limbs at 55 px without a folded triangle. Rest rendering is
+  byte-identical; a source-alpha coverage check protects every opaque texel,
+  the posed character remains connected, and serialized and reopened frame-36
+  pixels match. The native editor smoke also binds, undoes and redoes the
+  contour profile. This is a deformation stress image, not a polished animation
+  pose; shoulder/hip integration and knee volume still need artistic refinement.
   The candidate has no elbow or knee image seam; owner visual approval is still
   open.
 - The native `--smoke-test` drags a bone tip and curve tangent, checks

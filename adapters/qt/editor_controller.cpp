@@ -141,7 +141,8 @@ QVariantList EditorController::substitutions() const {
         return result;
     for (const auto& substitution : selected.variants)
         result.push_back(QVariantMap{{"id", int(substitution.drawing)},
-                                     {"name", QString::fromStdString(substitution.name)}});
+                                     {"name", QString::fromStdString(substitution.name)},
+                                     {"image", document().drawings.at(substitution.drawing).image.has_value()}});
     return result;
 }
 int EditorController::selectedSubstitution() const {
@@ -1030,6 +1031,12 @@ bool EditorController::bindSelectedMesh(int columns, int rows) {
             opentoon::bindRegularImageMesh(d, layer_, drawing, columns, rows);
         else
             opentoon::bindRegularVectorMesh(d, layer_, drawing, columns, rows);
+    });
+}
+bool EditorController::bindSelectedContourMesh(int columns, int rows) {
+    const Id drawing = selectedSubstitution();
+    return layer_ && drawing && edit("Bind contour mesh", [&](Document& d) {
+        opentoon::bindContourImageMesh(d, layer_, drawing, columns, rows);
     });
 }
 bool EditorController::moveSelectedMeshVertex(int vertex, double x, double y, bool rest) {

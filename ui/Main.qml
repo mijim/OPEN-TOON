@@ -1309,6 +1309,14 @@ ApplicationWindow {
                                         enabled: editor.selectedSubstitution > 0
                                         onClicked: { if (editor.bindSelectedMesh(root.meshBindColumns, root.meshBindRows)) { canvas.meshRestEditing = false; editor.tool = "Mesh"; } }
                                     }
+                                    C.CompactButton {
+                                        text: "Contour"
+                                        visible: editor.substitutions.find(s => s.id === editor.selectedSubstitution)?.image === true
+                                        Accessible.name: "Bind contour mesh to image substitution"
+                                        ToolTip.text: "Fit the mesh rows to the image silhouette"
+                                        ToolTip.visible: hovered
+                                        onClicked: { if (editor.bindSelectedContourMesh(root.meshBindColumns, root.meshBindRows)) { canvas.meshRestEditing = false; editor.tool = "Mesh"; } }
+                                    }
                                 }
                                 RowLayout {
                                     Layout.fillWidth: true

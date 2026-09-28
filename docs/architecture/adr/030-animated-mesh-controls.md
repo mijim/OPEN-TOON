@@ -41,6 +41,15 @@ mesh grid can be bound with one to 32 cells on each axis through Properties;
 the saved topology is displayed there and cannot be silently replaced while
 a deformer is attached.
 
+Image-only substitutions may alternatively bind a contour grid. Each row
+tracks the nontransparent scanline extent in a one-cell vertical neighborhood,
+with a one-pixel margin. Adjacent row extents both cover source alpha between
+them, so the existing rectangular-cell UV warp retains the artwork without a
+new mesh format. This profile reduces transparent corner area at elbows and
+knees while preserving the regular grid for images that need it. Rebinding
+still rejects an authored pose or deformer, and triangle orientation checks
+still reject genuine folds.
+
 The curve profile stores four rest cubic controls, a fixed per-vertex curve
 parameter and keyed four-point posed controls. Each vertex receives the
 posed-minus-rest cubic displacement at its saved parameter. Moving a tangent
