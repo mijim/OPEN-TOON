@@ -67,12 +67,14 @@ Each Part shows its named substitutions as thumbnail tiles in Properties. **+ Bl
 ## Mesh binding and animated controls
 
 Select a Part with an exposed image-only or vector-only drawing. In its
-Properties, choose **Bind 2×2** or **Bind 4×4**. The Mesh tool appears with
-handles over that Part. **Pose vertices** lets you drag a handle to preview
+Properties, choose a mesh grid from 1 to 32 columns and rows, then select
+**Bind**. A tall continuous sleeve or trouser leg can use 6 × 16. The Mesh
+tool appears with handles over that Part. **Pose vertices** lets you drag a handle to preview
 the warp; **Rest vertices** edits the saved bind shape after resetting any
 pose. **Reset pose** returns the handles to rest, and **Remove** returns the
 Part to its unbound artwork. Each completed drag is one undo step. Switching
-substitutions loads that drawing's own binding.
+substitutions loads that drawing's own binding. Properties shows the saved grid
+resolution of the selected substitution.
 
 The vertex pose is a saved static preview that applies at every frame. Reset
 it before choosing **Bone chain** or **Curve**. These bounded controls use the
@@ -83,6 +85,16 @@ records the original shape at the playhead without deleting other keys;
 substitution can have one control type; another substitution may use its own.
 The mesh grid follows the rendered pose while a control moves. Static vertices
 cannot be edited while a control is attached.
+
+Use **Rest joints** or **Rest curve** to place the saved control geometry on
+canvas. **Pose joints** or **Pose curve** returns to animation editing.
+**Elbow influence (px)** adjusts how far the bend blends into either segment;
+the existing keys and rest artwork stay in place. A value that folds the mesh
+is rejected. To avoid a visible cut at the elbow or knee, use one continuous
+image and mesh for the whole limb. Hands and feet may remain separate for
+substitutions; the current editor does not yet attach them automatically to
+the deformed endpoint.
+
 Insert/remove frames and Clear include bone/curve keys. Copy/paste, move and
 stretch of a range within the same Part transfer its substitution keys.
 Cross-scene and different-Part deformer-key paste report that a portable rig

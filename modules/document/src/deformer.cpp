@@ -247,6 +247,16 @@ void moveBoneRestJoint(Document& document, Id part, Id drawing, int joint, MeshP
     binding(document, part, drawing) = std::move(candidate);
 }
 
+void setBoneElbowTransition(Document& document, Id part, Id drawing, double radius) {
+    editable(document, part, drawing);
+    auto candidate = binding(document, part, drawing);
+    require(candidate.bone.has_value(), "Selected Part has no bone chain.");
+    candidate.bone->elbowTransition = radius;
+    candidate.bone->distalWeights = boneWeights(candidate, *candidate.bone);
+    validateMeshDeformer(document, candidate);
+    binding(document, part, drawing) = std::move(candidate);
+}
+
 void recordBonePose(Document& document, Id part, Id drawing, Frame frame,
                     double shoulderAngle, double elbowAngle, Interpolation interpolation) {
     editable(document, part, drawing);

@@ -857,6 +857,29 @@ int EditorController::selectedMeshDeformer() const {
     const auto* mesh = opentoon::meshBindingFor(document().layer(layer_), selectedSubstitution());
     return mesh->bone ? 1 : mesh->curve ? 2 : 0;
 }
+int EditorController::selectedMeshColumns() const {
+    if (!selectedMeshBound())
+        return 0;
+    return opentoon::meshBindingFor(document().layer(layer_), selectedSubstitution())->columns;
+}
+int EditorController::selectedMeshRows() const {
+    if (!selectedMeshBound())
+        return 0;
+    return opentoon::meshBindingFor(document().layer(layer_), selectedSubstitution())->rows;
+}
+double EditorController::selectedBoneTransition() const {
+    if (selectedMeshDeformer() != 1)
+        return 0;
+    return opentoon::meshBindingFor(document().layer(layer_), selectedSubstitution())->bone->elbowTransition;
+}
+double EditorController::selectedBoneMaxTransition() const {
+    if (selectedMeshDeformer() != 1)
+        return 0;
+    const auto& joints = opentoon::meshBindingFor(document().layer(layer_),
+                                                  selectedSubstitution())->bone->restJoints;
+    return std::hypot(joints[1].x - joints[0].x, joints[1].y - joints[0].y) +
+           std::hypot(joints[2].x - joints[1].x, joints[2].y - joints[1].y);
+}
 bool EditorController::bindSelectedBone() {
     const Id drawing = selectedSubstitution();
     if (!layer_ || !drawing || !selectedMeshBound())
@@ -873,8 +896,11 @@ bool EditorController::bindSelectedBone() {
         const std::array<opentoon::MeshPoint, 3> joints = horizontal
             ? std::array<opentoon::MeshPoint, 3>{{{minX, middleY}, {middleX, middleY}, {maxX, middleY}}}
             : std::array<opentoon::MeshPoint, 3>{{{middleX, minY}, {middleX, middleY}, {middleX, maxY}}};
-        opentoon::bindBoneChain(d, layer_, drawing, joints,
-                                std::max(0.01, (horizontal ? maxX - minX : maxY - minY) * 0.15));
+        const double axis = horizontal ? maxX - minX : maxY - minY;
+        const double cross = horizontal ? maxY - minY : maxX - minX;
+        const double transition = std::min(axis,
+            std::max(0.01, std::max(axis * 0.15, cross * 0.5)));
+        opentoon::bindBoneChain(d, layer_, drawing, joints, transition);
     });
 }
 bool EditorController::bindSelectedCurve() {
@@ -911,6 +937,12 @@ bool EditorController::moveSelectedBoneRestJoint(int joint, double x, double y) 
     const Id drawing = selectedSubstitution();
     return layer_ && drawing && edit("Move bone rest joint", [&](Document& d) {
         opentoon::moveBoneRestJoint(d, layer_, drawing, joint, {x, y});
+    });
+}
+bool EditorController::setSelectedBoneTransition(double radius) {
+    const Id drawing = selectedSubstitution();
+    return layer_ && drawing && edit("Set elbow transition", [&](Document& d) {
+        opentoon::setBoneElbowTransition(d, layer_, drawing, radius);
     });
 }
 bool EditorController::moveSelectedCurveControl(int control, double x, double y) {

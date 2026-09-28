@@ -22,8 +22,14 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   and preview. Rest controls mode moves bone root, elbow or tip, or any cubic
   control, in the saved setup and validates existing poses before atomic
   publication. Bone moves recalculate weights; curve moves preserve keyed
-  offsets from rest and recalculate vertex parameters. Static vertex editing is unavailable while a deformer is
-  attached. Switching substitutions resolves the matching chain.
+  offsets from rest and recalculate vertex parameters. Static vertex editing
+  is unavailable while a deformer is attached. Switching substitutions
+  resolves the matching chain.
+- Properties now lets the animator choose a 1–32-cell mesh grid per axis, so
+  the 6 × 16 continuous-limb topology used by the render fixture is buildable
+  from the app. The saved grid dimensions are shown after binding. The elbow
+  influence radius is editable in pixels; changes recalculate weights, keep
+  authored angle keys/rest pixels and reject folded existing poses atomically.
 - Format 9 persists controls, weights and keys. The first save of format 8
   preserves a source-version `.pre-v8.bak` before upgrading.
 - Insert/remove frames shift or remove deformer keys with the scene clock.
@@ -37,8 +43,8 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
 ## Verification
 
 - `tests/deformer_tests.cpp` covers connected joints, interpolation, rest,
-  undo, invalid geometry/weights, rejected folds, serialization and range
-  transfer with exact evaluated endpoints.
+  undo, influence-radius retargeting, invalid geometry/weights, rejected folds,
+  serialization and range transfer with exact evaluated endpoints.
   `tests/mesh_render_tests.cpp` covers saved preview/Display/Write pixels,
   separate substitution chains, and the original 19-part scene. The assembled
   frame-zero scene is byte-identical to `reference_0000.png`; an animated arm
@@ -52,6 +58,9 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   is one image and one bound mesh, with an elbow or knee as its middle joint.
   The test bends all four limbs, follows separate hand/foot substitutions,
   and checks unchanged rest pixels and identical reopened frame-24 output.
+  Retuning one posed arm's radius from 65 to 55 pixels preserves rest pixels,
+  changes the bend, keeps the assembled silhouette connected and reopens to
+  identical output.
   A deterministic asset test checks that each source limb is one connected
   alpha silhouette and covers all three registered joints. The render test
   also checks one connected character silhouette at rest and in the bent pose.
@@ -59,12 +68,13 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   has no elbow or knee image seam; owner visual approval is still open.
 - The native `--smoke-test` drags a bone tip and curve tangent, checks
   temporary preview isolation, cancellation, undo/redo, bone and curve rest-control
-  retarget, Rest key, same-Part timeline key paste/move and project reopen on
+  retarget, a 6 × 16 mesh grid, elbow influence tuning, Rest key, same-Part
+  timeline key paste/move and project reopen on
   a checker Part. A mirrored, rotated and zoomed control drag also round-trips
   through undo. The inspected [original-art detail](hm06-bone-curve-detail.png)
   shows the bounded arm/torso deformation after the rotation correction.
   Additional elbow shapes and larger bends still need artistic acceptance.
-- The macOS optimized build passes 124/124 CTest entries, the continuous-limb
+- The macOS optimized build passes 125/125 CTest entries, the continuous-limb
   Python fixture test and native smoke. A 40-frame native drag measurement on
   the 15-artwork-Part continuous rig gave p95 input-to-`frameSwapped` 17.26 ms
   and peak process resident memory 274 MB on Apple M1 Pro (one run; broader

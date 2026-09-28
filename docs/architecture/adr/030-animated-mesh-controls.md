@@ -27,6 +27,15 @@ from the unchanged rest mesh, validates existing keyed and intermediate poses,
 then publishes the new chain atomically. A rejected move leaves the previous
 binding, keys and pixels intact. The root remains fixed while posing; Rest
 joints mode changes its stored setup position without changing rest artwork.
+The elbow transition radius is editable in drawing-local pixels through an
+undoable use case. Changing it recomputes normalized vertex weights while
+leaving rest UVs and authored angle keys intact; existing keys and sampled
+intermediate poses must still pass fold and proxy checks. The initial radius
+considers both chain length and cross-section width so a fine grid on a broad
+image does not start with a needlessly narrow blend. The selected substitution's
+mesh grid can be bound with one to 32 cells on each axis through Properties;
+the saved topology is displayed there and cannot be silently replaced while
+a deformer is attached.
 
 The curve profile stores four rest cubic controls, a fixed per-vertex curve
 parameter and keyed four-point posed controls. Each vertex receives the

@@ -618,6 +618,17 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
     REQUIRE(bent != rest);
     const auto [bentConnected, bentInk] = connectedInk(bent);
     REQUIRE(bentConnected == bentInk);
+    auto tuned = document;
+    const Id tunedArm = partIds.value("arm_left");
+    const Id tunedDrawing = tuned.layer(tunedArm).exposures.front().drawing;
+    setBoneElbowTransition(tuned, tunedArm, tunedDrawing, 55);
+    REQUIRE(SceneRenderer::render(tuned, 0) == rest);
+    const auto tunedFrame = SceneRenderer::render(tuned, 24);
+    REQUIRE(tunedFrame != bent);
+    const auto [tunedConnected, tunedInk] = connectedInk(tunedFrame);
+    REQUIRE(tunedConnected == tunedInk);
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(tuned)), 24) ==
+            tunedFrame);
     REQUIRE(bent.save("hm06-continuous-limbs.png"));
     REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 24) == bent);
     if (qEnvironmentVariableIsSet("OPENTOON_HM06_CONTINUOUS_PROJECT")) {

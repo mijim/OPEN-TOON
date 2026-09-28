@@ -107,7 +107,8 @@ void meshSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& windo
         throw std::runtime_error("Removing the mesh did not restore source artwork pixels.");
 
     editor.holdDrawing(editor.duration());
-    if (!editor.bindSelectedMesh(4, 2) || !editor.bindSelectedBone() ||
+    if (!editor.bindSelectedMesh(6, 16) || editor.selectedMeshColumns() != 6 ||
+        editor.selectedMeshRows() != 16 || !editor.bindSelectedBone() ||
         editor.selectedMeshDeformer() != 1)
         throw std::runtime_error("Bone chain could not be bound through the editor.");
     canvas.setMeshRestEditing(false);
@@ -132,6 +133,25 @@ void meshSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& windo
     editor.redo();
     if (SceneRenderer::render(editor.document(), 12) != bonePixels)
         throw std::runtime_error("Bone redo changed the rendered frame.");
+    const auto beforeRadius = editor.document();
+    const double oldRadius = editor.selectedBoneTransition();
+    if (editor.selectedBoneMaxTransition() <= oldRadius ||
+        !editor.setSelectedBoneTransition(oldRadius * 1.5) ||
+        editor.selectedBoneTransition() <= oldRadius)
+        throw std::runtime_error("Elbow influence could not be edited through the editor: " +
+                                 editor.status().toStdString());
+    const auto radiusPixels = SceneRenderer::render(editor.document(), 12);
+    if (radiusPixels == bonePixels ||
+        SceneRenderer::render(editor.document(), 0) !=
+            SceneRenderer::render(beforeRadius, 0))
+        throw std::runtime_error("Elbow influence did not change the bend safely.");
+    editor.undo();
+    if (editor.document() != beforeRadius)
+        throw std::runtime_error("Elbow influence did not undo atomically.");
+    editor.redo();
+    if (SceneRenderer::render(editor.document(), 12) != radiusPixels)
+        throw std::runtime_error("Elbow influence did not redo identically.");
+    editor.undo();
     canvas.setMeshRestEditing(true);
     const auto restElbow = canvas.meshControlPosition(1);
     const auto beforeRestEdit = editor.document();

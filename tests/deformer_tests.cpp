@@ -96,6 +96,39 @@ TEST_CASE("Bone rest joints can be retargeted without changing rest pixels or co
     REQUIRE(session.document() == valid);
 }
 
+TEST_CASE("Bone influence radius retargets existing bends atomically and survives reopen") {
+    PartFixture fixture;
+    bindBoneChain(fixture.document, fixture.part, fixture.drawing,
+                  {{{0, 8}, {8, 8}, {16, 8}}}, 3);
+    recordBonePose(fixture.document, fixture.part, fixture.drawing, 12, 0, 30);
+    Session session;
+    session.replace(fixture.document);
+    const auto before = *meshBindingFor(session.document().layer(fixture.part), fixture.drawing);
+    REQUIRE(session.apply("Widen elbow influence", [&](Document& document) {
+        setBoneElbowTransition(document, fixture.part, fixture.drawing, 5);
+    }));
+    const auto& adjusted = *meshBindingFor(session.document().layer(fixture.part), fixture.drawing);
+    REQUIRE(adjusted.bone->elbowTransition == 5);
+    REQUIRE(adjusted.bone->distalWeights != before.bone->distalWeights);
+    REQUIRE(adjusted.bone->keys == before.bone->keys);
+    REQUIRE(adjusted.vertices == before.vertices);
+    REQUIRE(evaluateMeshBinding(adjusted, 0).vertices == before.vertices);
+    REQUIRE(evaluateMeshBinding(adjusted, 12).vertices !=
+            evaluateMeshBinding(before, 12).vertices);
+    const auto valid = session.document();
+    for (double radius : {0.0, 17.0, std::numeric_limits<double>::quiet_NaN()}) {
+        REQUIRE_THROWS(session.apply("Invalid radius", [&](Document& document) {
+            setBoneElbowTransition(document, fixture.part, fixture.drawing, radius);
+        }));
+        REQUIRE(session.document() == valid);
+    }
+    REQUIRE(deserializeDocument(serializeDocument(valid)) == valid);
+    REQUIRE(session.undo());
+    REQUIRE(*meshBindingFor(session.document().layer(fixture.part), fixture.drawing) == before);
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == valid);
+}
+
 TEST_CASE("Cubic curve tangent keys move a field continuously without altering rest") {
     PartFixture fixture;
     const std::array<MeshPoint, 4> straight{{{0, 8}, {16.0 / 3, 8},
