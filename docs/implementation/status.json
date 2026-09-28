@@ -322,7 +322,7 @@
         "docs/implementation/COMPOSITOR-BENCHMARK.md",
         "docs/implementation/HM04-ACCEPTANCE.md"
       ],
-      "scope": "Typed graph rejection, alpha/matte, distinct Display/Write, undoable format-6 profile and format-5 migration backup; revision-keyed 96 MiB canvas cache, immutable speculative next-frame worker, stale-ticket rejection, cancellation, hierarchy-aware invalidation and conservative ink regions. Native playback/scrub and expanded alpha/color charts pass. Animated original 19-part artwork measures 39.19 ms/frame median for linear composition at 1080p on the M1 Pro development host.",
+      "scope": "Typed graph rejection, alpha/matte, distinct Display/Write, undoable format-6 profile and format-5 migration backup; revision-keyed 96 MiB canvas cache, immutable speculative next-frame worker, stale-ticket rejection, cancellation, hierarchy-aware invalidation and conservative ink regions. Native playback/scrub and expanded alpha/color charts pass. Animated prior 19-part artwork measured 39.19 ms/frame median for linear composition at 1080p on the M1 Pro development host; the revised toon artwork measured 37.82-38.60 ms/frame in a three-run follow-up.",
       "limitations": "HM-04 is accepted as a bounded contract; P10 remains open. No persisted user-editable graph, useful effects set, full ROI scheduling, production-scene real-time guarantee or current cross-platform qualification."
     },
     "output_camera": {
@@ -349,7 +349,7 @@
         "apps/desktop/mesh_smoke.cpp",
         "docs/implementation/hm05-mesh-ui.png"
       ],
-      "scope": "Format-8 per-substitution rest/pose/UV mesh, alpha-bounded registered image and bounded editable-vector proxy, mouse bind/drag/reset/remove, atomic failure, migration, renderer output and 19-part workload. Optimized 19-part posed scene measured 4.79 ms/frame on M1 Pro.",
+      "scope": "Format-8 per-substitution rest/pose/UV mesh, alpha-bounded registered image and bounded editable-vector proxy, mouse bind/drag/reset/remove, atomic failure, migration, renderer output and 19-part workload. Optimized 19-part posed scene measured 4.79 ms/frame on M1 Pro with prior art and 6.56-6.88 ms/frame with the revised toon artwork.",
       "limitations": "The accepted HM-05 contract covers static mesh behavior. HM-06 animated bone/curve qualification is tracked separately; raster-tile/mixed-media binding, larger production workload and cross-platform qualification remain open."
     },
     "deformation_animated": {
@@ -367,7 +367,7 @@
         "docs/implementation/hm06-bone-extreme.png",
         "docs/implementation/hm06-interaction-ui.png"
       ],
-      "scope": "Format-9 per-substitution two-segment bone and cubic curve keys, rest-preserving evaluation, posed canvas grid, direct mouse handles, undo/cancellation/reopen, original assembled 19-part pixels and three-run 3.25 ms/frame 1080p renderer measurement. Scene frame insertion/removal and selected-range Clear maintain deformer keys; same-Part range copy/paste, move and stretch retain exact keyed poses. A manually coordinated 70-degree three-Part arm pose reopens identically. Four native 19-part subset benchmark runs measured p95 input-to-frameSwapped at 16.0-22.5 ms and process peak resident memory below 272 MB on M1 Pro.",
+      "scope": "Format-9 per-substitution two-segment bone and cubic curve keys, rest-preserving evaluation, posed canvas grid, direct mouse handles, undo/cancellation/reopen, original assembled 19-part pixels and four-run 3.30 ms/frame 1080p renderer measurement with revised toon artwork. Scene frame insertion/removal and selected-range Clear maintain deformer keys; same-Part range copy/paste, move and stretch retain exact keyed poses. A manually coordinated 70-degree three-Part arm pose reopens identically. Four native 19-part subset benchmark runs measured p95 input-to-frameSwapped at 15.71-17.91 ms and process peak resident memory below 273 MB on M1 Pro.",
       "limitations": "HM-06 is not accepted: the 70-degree elbow still bulges; influence tuning, complete-shot interaction/memory budgets and artist workflow remain. Cross-scene and different-Part deformer-key paste reject until portable rig binding transfer is implemented. Independent drawing paste of a bound Part rejects until mesh clone semantics are defined."
     }
   },

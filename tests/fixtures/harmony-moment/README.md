@@ -18,6 +18,13 @@ artist-approved dialogue recording is required to judge actual lip-sync quality.
 The 41 source PNGs are also checked in under `parts/` so import and render tests
 can use real encoded images without generating them at build time. The test verifies
 that each checked-in asset exactly matches the generator.
+The 2026-09-28 art revision replaces the earlier geometric placeholder with an
+original color toon character: a shaped face, asymmetric hair, expressive eyes,
+tailored jacket, cuffed sleeves, distinct hand silhouettes and shoes. The
+registered 256×256 canvases, 19 part roles, 41 variant names, timing and license
+remain stable. The owner's visual direction is still being refined; this art
+revision is a stronger deformation and substitution fixture, not a claim of
+final production character approval.
 `--previews` renders five full-resolution reference poses for visual review; they
 are external acceptance targets, not frames from the OPEN-TOON evaluator.
 

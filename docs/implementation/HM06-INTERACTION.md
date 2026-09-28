@@ -2,7 +2,7 @@
 
 Measured on 2026-09-28 with the optimized `build/desktop` build on macOS
 15.5 (24F74), Apple M1 Pro, 16 GiB RAM. The saved source project comes from
-the original 19-part, 1920×1080 Harmony Moment fixture. One upper-arm Part
+the revised 19-part, 1920×1080 Harmony Moment toon fixture. One upper-arm Part
 has a keyed bone chain and the torso has a keyed curve. The native Qt Quick
 window displayed a 1140×491 canvas at device pixel ratio 2.
 
@@ -15,10 +15,10 @@ The [captured preview](hm06-interaction-ui.png) shows the actual native window.
 
 | Run | Median | p95 | Peak resident bytes |
 |---|---:|---:|---:|
-| 1 | 8.40 ms | 22.46 ms | 271,335,424 |
-| 2 | 8.40 ms | 15.99 ms | 270,860,288 |
-| 3 | 8.32 ms | 16.71 ms | 270,909,440 |
-| 4 | 8.74 ms | 16.23 ms | 270,893,056 |
+| 1 | 8.58 ms | 16.45 ms | 271,532,032 |
+| 2 | 15.37 ms | 17.91 ms | 270,974,976 |
+| 3 | 8.46 ms | 15.71 ms | 272,187,392 |
+| 4 | 10.25 ms | 16.34 ms | 272,007,168 |
 
 The measured subset is below the proposed 50 ms p95 and 2 GiB resident limits
 on this host. `frameSwapped` measures application presentation, not display

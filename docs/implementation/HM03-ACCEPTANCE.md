@@ -18,6 +18,9 @@ their saved/reopened pixels, undo/redo and independently duplicated character
 IDs agree with the tested document state. The inspected images are
 [`hm03-front.png`](hm03-front.png) and
 [`hm03-three-quarter.png`](hm03-three-quarter.png).
+These captures were regenerated at full scene resolution after the 2026-09-28
+art revision; the registered assembly, view choices and undo/reopen checks
+passed again with the replacement toon artwork.
 
 The owner asked the implementer to repeat this check with tests on 2026-09-28.
 The inspector journey now uses all 41 supplied PNGs, cycling all eight mouth

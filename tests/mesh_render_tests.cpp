@@ -422,7 +422,7 @@ TEST_CASE("Nineteen Harmony parts keep rest pixels and bounded posed render cost
     const auto animated = SceneRenderer::render(document, 12);
     REQUIRE(animated != baseline);
     REQUIRE(animated.save("hm06-bone-curve.png"));
-    REQUIRE(animated.copy(760, 250, 400, 500).save("hm06-bone-curve-detail.png"));
+    REQUIRE(animated.copy(700, 350, 520, 500).save("hm06-bone-curve-detail.png"));
     const auto reopenedAnimated = deserializeDocument(serializeDocument(document));
     REQUIRE(SceneRenderer::render(reopenedAnimated, 12) == animated);
     auto stronger = document;

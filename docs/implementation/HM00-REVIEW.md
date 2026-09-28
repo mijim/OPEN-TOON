@@ -6,6 +6,15 @@ esta bien por mi parte.” The approval covers the proposed character design, fi
 reference stills and six-beat scripted target. It releases the HM-00 reference
 gate for the dependent engineering slices.
 
+On 2026-09-28 the owner judged the original geometric character too crude for
+deformation review. Its design approval does not apply to the replacement art.
+The original 19-part/41-image asset set and five reference stills were redrawn
+as a more expressive color toon while retaining the accepted shot, timing,
+registration and provenance contract. Technical reference tests pass on the
+replacement; visual approval of the new design remains open. The earlier
+acceptance records the historical HM-00 rubric decision rather than an artistic
+endorsement of this later revision.
+
 The reproducible input, original-art provenance and exact time variants are
 documented in [the fixture guide](../../tests/fixtures/harmony-moment/README.md).
 The [foundation ADR](../architecture/adr/023-harmony-foundation-contracts.md)

@@ -517,8 +517,10 @@ TEST_CASE("Nineteen imported parts complete the inspector view and substitution 
     REQUIRE(reopened.document().drawingAt(copiedMouthId, 360)->id != originalMouth);
     if (qEnvironmentVariableIsSet("OPENTOON_HM03_REVIEW_DIR")) {
         QDir output(qEnvironmentVariable("OPENTOON_HM03_REVIEW_DIR"));
-        REQUIRE(frontImage.save(output.filePath("hm03-front.png")));
-        REQUIRE(turnedImage.save(output.filePath("hm03-three-quarter.png")));
+        REQUIRE(opentoon::SceneRenderer::render(editor.document(), 0)
+                    .save(output.filePath("hm03-front.png")));
+        REQUIRE(opentoon::SceneRenderer::render(editor.document(), 120)
+                    .save(output.filePath("hm03-three-quarter.png")));
     }
 }
 

@@ -52,13 +52,15 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   elbow overlap and larger bends still need correction and artistic acceptance.
 - The macOS optimized build passes 121/121 CTest entries and native smoke.
   On Apple M1 Pro, three earlier local 1920×1080 renders of the assembled
-  19-part scene with one bone and one curve averaged 3.25 ms/frame. This is
+  19-part scene with one bone and one curve averaged 3.25 ms/frame. After the
+  fixture's toon-art revision, four runs averaged 3.30 ms/frame (3.04–3.56).
+  This is
   renderer cost, separate from native input-to-present latency and full-shot
   memory. No new dependency or license was added; Eigen remains a candidate.
 - The [native interaction measurement](HM06-INTERACTION.md) on the same M1 Pro
   used 40 input-to-`frameSwapped` samples in each of four runs of the 19-part
-  subset. p95 was 16.0–22.5 ms and process peak resident memory was below
-  272 MB. The current subset meets the proposed 50 ms/2 GiB limits on this
+  subset with the revised toon artwork. p95 was 15.71–17.91 ms and process
+  peak resident memory was below 273 MB. The current subset meets the proposed 50 ms/2 GiB limits on this
   host; the complete B4 shot remains unmeasured.
 
 ## Remaining acceptance
