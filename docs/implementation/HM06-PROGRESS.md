@@ -1,7 +1,8 @@
 # HM-06 animated deformation progress
 
-HM-06 is in progress on macOS 15.5 arm64. The current format-9 subset animates
-one two-segment bone chain or one cubic curve per bound Part substitution. It
+HM-06 is in progress on macOS 15.5 arm64. The current format-10 subset animates
+one two-segment bone chain or one cubic curve per bound Part substitution and
+links a child Part to its parent's evaluated bone tip. It
 does not yet satisfy the full HM-06 interaction and artistic quality gate.
 
 ## Working subset
@@ -12,9 +13,10 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   to preserve distance at intermediate weights. Curve controls retain a fixed rest
   parameter per vertex and move the mesh by the posed-minus-rest cubic field.
   The evaluated bone joints are now exposed by the domain evaluator and used
-  by the canvas controls. The continuous-limb fixture places keyed hands/feet
-  from those evaluated endpoints. Automatic persistent attachments still
-  belong to HM-09.
+  by the canvas controls and the bounded child-Part attachment evaluator. The
+  continuous-limb fixture now follows hand/foot substitutions with saved links,
+  without duplicating endpoint motion keys. Broader attachments, IK and portable
+  rig templates remain HM-09 work.
 - Both profiles save frame keys, sample linear/held/smooth interpolation and
   evaluate through the same preview and output renderer. A later first key
   anchors rest at frame zero. "Rest key" records rest at the current frame
@@ -36,8 +38,12 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   handle. The dashed circle previews the influenced area. Changes recalculate
   weights, keep authored angle keys/rest pixels and reject folded existing
   poses atomically.
-- Format 9 persists controls, weights and keys. The first save of format 8
-  preserves a source-version `.pre-v8.bak` before upgrading.
+- Format 9 persists controls, weights and keys; format 10 adds one optional
+  parent bone-tip link per child Part. The first save of an older project
+  preserves its source-version backup, including `.pre-v9.bak` for format 9.
+  The link requires a direct parent Part with a bound two-segment bone on every
+  exposed source drawing and rest at frame zero. Parent selection and a Rig
+  menu action bind or unbind it through undoable document commands.
 - Insert/remove frames shift or remove deformer keys with the scene clock.
   Clear removes them from the selected Part/range and remains atomic with
   exposures and layer pose keys. Same-Part range paste/move/stretch transfers
@@ -62,8 +68,12 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   continuity correction is exercised by an additional
   [15-artwork-Part rig](hm06-continuous-limbs.png): each complete arm and leg
   is one image and one bound mesh, with an elbow or knee as its middle joint.
-  The test bends all four limbs, follows separate hand/foot substitutions,
-  and checks unchanged rest pixels and identical reopened frame-24 output.
+  The test bends all four limbs, follows separate hand/foot substitutions with
+  four saved links, and checks unchanged rest pixels and identical reopened
+  frame-24 output. Per-frame joint coordinates match the follower's world
+  position. Detach/attach undo and redo, SQLite save/reopen, compatible source
+  substitution switching and atomic rejection of source bone removal or an
+  unbound substitution also pass.
   Retuning one posed arm's radius from 65 to 55 pixels preserves rest pixels,
   changes the bend, keeps the assembled silhouette connected and reopens to
   identical output.
@@ -78,22 +88,25 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   like separate artwork. The 65 px transition accepts this 90° pose; reducing
   it to 55 px folds the mesh and rejects the new key without changing the
   document. This is a deformation stress image, not a polished animation pose.
-  The candidate has
-  no elbow or knee image seam; owner visual approval is still open.
+  The candidate has no elbow or knee image seam; owner visual approval is still
+  open.
 - The native `--smoke-test` drags a bone tip and curve tangent, checks
   temporary preview isolation, cancellation, undo/redo, bone and curve rest-control
   retarget, a 6 × 16 mesh grid, numeric and on-canvas elbow influence tuning,
   cancelled preview/undo/redo, Rest key, same-Part
   timeline key paste/move and project reopen on
-  a checker Part. A mirrored, rotated and zoomed control drag also round-trips
+  a checker Part. A second checker Part links through the editor, undoes,
+  redoes and reopens with its parent bone-tip link. A mirrored, rotated and zoomed control drag also round-trips
   through undo. The inspected [original-art detail](hm06-bone-curve-detail.png)
   shows the bounded arm/torso deformation after the rotation correction.
   Additional elbow shapes and larger bends still need artistic acceptance.
-- The macOS optimized build passes 125/125 CTest entries, the continuous-limb
+- The macOS optimized build passes 126/126 CTest entries, the continuous-limb
   Python fixture test and native smoke. A 40-frame native drag measurement on
   the 15-artwork-Part continuous rig gave p95 input-to-`frameSwapped` 17.26 ms
-  and peak process resident memory 274 MB on Apple M1 Pro (one run; broader
-  repeatability and full-shot budget remain open).
+  and peak process resident memory 274 MB on Apple M1 Pro before attachments.
+  A fresh 40-sample native run of the format-10 linked rig measured p95
+  17.18 ms and peak process resident memory 275 MB. Both are single runs;
+  repeatability and the complete B4 shot budget remain open.
   On Apple M1 Pro, three earlier local 1920×1080 renders of the assembled
   19-part scene with one bone and one curve averaged 3.25 ms/frame. After the
   latest independent toon redraw, four runs averaged 3.18 ms/frame

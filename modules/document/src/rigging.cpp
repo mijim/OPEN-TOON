@@ -1,4 +1,5 @@
 #include "opentoon/rigging.h"
+#include "opentoon/deformation.h"
 #include <algorithm>
 #include <cmath>
 #include <numbers>
@@ -260,10 +261,12 @@ void reparentPreservingWorld(Document& document, Id childId, Id newParent) {
     auto& child = document.layer(childId);
     require(!child.locked && (child.kind == LayerKind::Part || child.kind == LayerKind::Peg),
             "Select an unlocked character part or peg.");
+    require(!child.followParentBoneTip, "Detach the bone tip before reparenting this part.");
     require(child.keys.empty(), "Reparent before animating this part or peg.");
     const auto& parent = document.layer(newParent);
-    require(parent.kind == LayerKind::Character || parent.kind == LayerKind::Peg,
-            "Parts and pegs require a character root or peg parent.");
+    require(parent.kind == LayerKind::Character || parent.kind == LayerKind::Peg ||
+                (child.kind == LayerKind::Part && parent.kind == LayerKind::Part),
+            "A peg requires a character root or peg; a Part may also use a Part parent.");
     require(childId != newParent, "A layer cannot parent itself.");
     Id oldRoot = childId;
     while (document.layer(oldRoot).parent)
@@ -291,6 +294,33 @@ void reparentPreservingWorld(Document& document, Id childId, Id newParent) {
             "Reparenting cannot preserve opacity under this parent.");
     child.transform = converted;
     child.parent = newParent;
+}
+void attachPartToBoneTip(Document& document, Id childId, Id sourceId) {
+    auto& child = part(document, childId);
+    const auto& source = part(document, sourceId);
+    require(!child.followParentBoneTip, "This part already follows a bone tip.");
+    require(childId != sourceId, "A part cannot follow its own bone tip.");
+    require(child.keys.empty(), "Attach the part before animating its local transform.");
+    Frame covered = 0;
+    for (const auto& exposure : source.exposures) {
+        const auto* binding = meshBindingFor(source, exposure.drawing);
+        require(exposure.start == covered && binding && binding->bone,
+                "Source Part needs a bound bone throughout the scene.");
+        const auto& keys = binding->bone->keys;
+        require(keys.empty() || keys.front().frame != 0 ||
+                    (keys.front().shoulderAngle == 0 && keys.front().elbowAngle == 0),
+                "Source bone must be at rest on frame zero.");
+        covered = exposure.end;
+    }
+    require(covered == document.duration,
+            "Source Part needs a bound bone throughout the scene.");
+    reparentPreservingWorld(document, childId, sourceId);
+    child.followParentBoneTip = true;
+}
+void detachPartFromBoneTip(Document& document, Id childId) {
+    auto& child = part(document, childId);
+    require(child.followParentBoneTip, "This part has no bone tip attachment.");
+    child.followParentBoneTip = false;
 }
 void setPivotPreservingArtwork(Document& document, Id layerId, double x, double y) {
     auto& layer = document.layer(layerId);
@@ -599,6 +629,7 @@ void removeRigBranch(Document& document, Id branchId) {
 }
 void detachPart(Document& document, Id partId) {
     auto& layer = part(document, partId);
+    require(!layer.followParentBoneTip, "Detach the bone tip before detaching this Part.");
     require(layer.keys.empty(), "Detach a part before animating it.");
     require(layer.bindings.empty(), "Remove this part's mesh bindings before detaching it.");
     require(std::none_of(document.layers.begin(), document.layers.end(),

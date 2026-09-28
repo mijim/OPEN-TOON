@@ -101,6 +101,7 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
                   {"locked", l.locked},
                   {"solo", l.solo},
                   {"parent", l.parent},
+                  {"followParentBoneTip", l.followParentBoneTip},
                   {"kind", static_cast<int>(l.kind)},
                   {"role", l.role},
                   {"variants", Json::array()},
@@ -296,6 +297,8 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
         l.locked = x.at("locked");
         l.solo = x.at("solo");
         l.parent = x.at("parent");
+        if (j.at("version").get<int>() >= 10)
+            l.followParentBoneTip = x.at("followParentBoneTip").get<bool>();
         if (j.at("version").get<int>() >= 4) {
             l.kind = static_cast<LayerKind>(x.at("kind").get<int>());
             l.role = x.at("role").get<std::string>();

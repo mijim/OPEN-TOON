@@ -44,7 +44,7 @@ The four art categories are Underlay, Color, Line and Overlay. Their drawing ord
 
 Click a swatch to select it. Double-click to edit its color; all strokes referencing that ID update. The document retains color IDs across save/reopen. Palette import, variants, gradients and managed color are pending.
 
-The inspector edits position, rotation, scale, opacity and pivot. Add transform keys with Linear, Hold or Smooth interpolation. If a layer already has keys, editing a transform inserts or updates a key at the current frame. Parent layers apply inherited transforms and opacity. Character parts and pegs preserve the visible image when reparented within one character, provided the result has no shear or singular transform and the moved layer and the branches whose parentage changes are not animated. Motion above their shared ancestor is preserved. Curves can be edited in the main workspace. IK and animated bone/curve deformation remain pending.
+The inspector edits position, rotation, scale, opacity and pivot. Add transform keys with Linear, Hold or Smooth interpolation. If a layer already has keys, editing a transform inserts or updates a key at the current frame. Parent layers apply inherited transforms and opacity. Character parts and pegs preserve the visible image when reparented within one character, provided the result has no shear or singular transform and the moved layer and the branches whose parentage changes are not animated. Motion above their shared ancestor is preserved. Curves can be edited in the main workspace. IK remains pending.
 
 **Scene → Add output camera** creates one orthographic camera. Choose the Camera
 tool to see the shot frame: drag inside it to pan, drag the round top handle to
@@ -94,8 +94,15 @@ is rejected. In **Rest joints**, the dashed circle and square handle at the
 elbow show the same radius. Drag the square to tune it on canvas; Escape
 cancels. To avoid a visible cut at the elbow or knee, use one continuous
 image and mesh for the whole limb. Hands and feet may remain separate for
-substitutions; the current editor does not yet attach them automatically to
-the deformed endpoint.
+substitutions.
+
+To keep a hand or foot attached while its one-piece limb bends, select the
+hand/foot Part. In **Parent**, choose the bone-bound limb Part, then choose
+**Rig → Follow parent bone tip**. The link is saved and undoable; the child's
+drawing and substitutions remain independent. The source limb needs a bound
+two-segment bone on every exposed drawing and rest at frame zero. Attach before
+adding transform keys to the child. The same Rig action detaches it; detach
+before reparenting. Curve attachments, IK and automatic limb setup remain open.
 
 Insert/remove frames and Clear include bone/curve keys. Copy/paste, move and
 stretch of a range within the same Part transfer its substitution keys.
@@ -117,7 +124,7 @@ Each manual save appends a complete revision. Scene history can restore a saved 
 
 Every 60 seconds, a modified document is saved to a recovery file. On a later launch, recovery can open that snapshot as an unsaved scene. Save it under a chosen name. Autosave runs from an immutable snapshot in a worker, so newer edits stay unsaved until the next save. Manual saves remain synchronous. Recovery from operating-system power loss and multiple simultaneous application instances has not been qualified.
 
-Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and total decoded media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening formats 1–8 remains supported. Format 3 added channel Bézier easing, format 4 added typed character layers and named substitutions, format 5 added character view sets, format 6 saves the composition profile, format 7 added the output camera, format 8 saves mesh bindings, and format 9 saves bone/curve controls and animation keys. The first save of an older schema creates a backup named for its source version, such as `.pre-v8.bak`, before upgrading. Older editors require that backup to reopen the original format.
+Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and total decoded media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening formats 1–9 remains supported. Format 3 added channel Bézier easing, format 4 added typed character layers and named substitutions, format 5 added character view sets, format 6 saves the composition profile, format 7 added the output camera, format 8 saves mesh bindings, format 9 saves bone/curve controls and animation keys, and format 10 saves parent bone-tip links. The first save of an older schema creates a backup named for its source version, such as `.pre-v9.bak`, before upgrading. Older editors require that backup to reopen the original format.
 
 **Scene → Compact project history** retains the chosen number of newest saved revisions and removes unreachable media, after creating a full `.pre-compact.bak` backup. Save pending edits first. This is an explicit operation and is not part of autosave.
 

@@ -1079,7 +1079,8 @@ ApplicationWindow {
                                         return false;
                                     }
                                     const rootId = ancestor(selected.id);
-                                    return layers.filter(l => (l.kind === 1 || l.kind === 2) &&
+                                    return layers.filter(l => (l.kind === 1 || l.kind === 2 ||
+                                                               (selected.kind === 3 && l.kind === 3)) &&
                                                            l.id !== selected.id && ancestor(l.id) === rootId &&
                                                            !beneath(l, selected.id));
                                 }
@@ -1120,6 +1121,13 @@ ApplicationWindow {
                                             text: "Add parent peg"
                                             enabled: layerInspector.rigLayer?.kind === 2 || layerInspector.rigLayer?.kind === 3
                                             onTriggered: editor.addPeg()
+                                        }
+                                        MenuItem {
+                                            text: "Follow parent bone tip"
+                                            enabled: editor.selectedCanFollowBoneTip
+                                            checkable: true
+                                            checked: editor.selectedFollowsBoneTip
+                                            onTriggered: editor.toggleSelectedBoneTipAttachment()
                                         }
                                         MenuItem {
                                             text: "Center rest pivot on drawing"

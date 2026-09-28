@@ -140,9 +140,13 @@ Attach other elements to the evaluated result of a deformer.
 
 **Initial acceptance:** An accessory follows the end of a deformed arm.
 
-**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM06-PROGRESS.md](../../../docs/implementation/HM06-PROGRESS.md) — tests/mesh_render_tests.cpp; apps/desktop/mesh_smoke.cpp.
+
+**Remaining scope:** A child Part can follow its parent Part's two-segment bone tip through the active bound substitution. The link persists, undoes and reopens; broader deformer attachments and guided rig controls remain open.
 
 ## DEF-012 — Point kinematic output
 

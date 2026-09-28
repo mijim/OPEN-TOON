@@ -164,6 +164,7 @@ struct Layer {
     std::vector<Substitution> variants;
     std::vector<CharacterView> views;
     std::vector<MeshBinding> bindings;
+    bool followParentBoneTip = false;
     auto operator<=>(const Layer&) const = default;
 };
 struct Marker {
@@ -172,7 +173,7 @@ struct Marker {
     auto operator<=>(const Marker&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 9;
+    static constexpr int formatVersion = 10;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;

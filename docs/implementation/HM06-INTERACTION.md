@@ -47,7 +47,14 @@ where both arms and both legs are full-length single-image meshes. On the same
 Apple M1 Pro and macOS 15.5 host, 40 samples gave median 16.44 ms, p95 17.26 ms,
 and peak resident memory 274,071,552 bytes. The measured canvas was 1140 × 491
 logical pixels at device pixel ratio 2. This is a separate workload from the
-19-part measurements above and remains a subset of the complete shot.
+19-part measurements above and remains a subset of the complete shot. This
+first measurement predates the saved bone-tip links.
+
+After format 10 added four parent bone-tip links for the hands and feet, one
+40-sample run on the same host measured median 16.38 ms, p95 17.18 ms and peak
+resident memory 275,398,656 bytes. The linked 15-part subset meets the proposed
+50 ms/2 GiB limits on this host. A complete shot and repeated-run variance
+remain unmeasured.
 
 Reproduce after building the render tests and desktop app:
 

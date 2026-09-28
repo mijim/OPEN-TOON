@@ -94,3 +94,6 @@ meshes, bounded image/vector proxies and the HM-05 texture-warp path.
 
 See [ADR-030](030-animated-mesh-controls.md) for the in-progress format-9
 bone/curve animation contract, local weights and ephemeral pose evaluation.
+
+See [ADR-031](031-bone-tip-attachment.md) for the bounded format-10 parent
+bone-tip link, evaluation order, validation and migration boundary.

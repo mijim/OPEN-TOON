@@ -64,7 +64,7 @@
     {
       "id": "P09",
       "status": "in_progress",
-      "available": "Accepted bounded HM-05 format-8 per-substitution rest meshes and UVs; direct mouse editing, alpha-bounded image grids, editable vector source through a bounded raster proxy, static pose/reset, undo and matching preview/output rendering. Format-9 keyed two-segment bone or cubic curve per substitution, saved weights/controls, direct canvas drag with cancellation, posed mesh grid, Rest key, undo and preview/output parity. Same-Part range copy/paste, move and stretch transfer keyed deformer poses. Native 19-part subset p95 and process peak memory pass the proposed limits on the measured M1 Pro profile.",
+      "available": "Accepted bounded HM-05 format-8 per-substitution rest meshes and UVs; direct mouse editing, alpha-bounded image grids, editable vector source through a bounded raster proxy, static pose/reset, undo and matching preview/output rendering. Format-9 keyed two-segment bone or cubic curve per substitution, saved weights/controls, direct canvas drag with cancellation, posed mesh grid, Rest key, undo and preview/output parity. Format 10 adds a saved child-Part link to its direct parent's evaluated bone tip. Same-Part range copy/paste, move and stretch transfer keyed deformer poses. Native linked 15-part and unlinked 19-part subset p95 and process peak memory pass the proposed limits on the measured M1 Pro profile.",
       "remaining": "Complete HM-06 extreme-bend and seam quality, influence tuning and full-shot interaction/memory budgets and artistic review; then portable cross-Part key transfer, constraints, multiple-pose rig breadth and full phase qualification."
     },
     {
@@ -358,6 +358,7 @@
       "evidence": [
         "docs/implementation/HM06-PROGRESS.md",
         "docs/architecture/adr/030-animated-mesh-controls.md",
+        "docs/architecture/adr/031-bone-tip-attachment.md",
         "tests/deformer_tests.cpp",
         "tests/mesh_render_tests.cpp",
         "tests/storage_tests.cpp",
@@ -371,8 +372,8 @@
         "tests/fixtures/harmony-continuous-limbs/rig.json",
         "tests/test_harmony_continuous_limbs.py"
       ],
-      "scope": "Format-9 per-substitution two-segment bone and cubic curve keys, rest-preserving evaluation, posed canvas grid, direct mouse handles including bone and curve rest-control placement, undo/cancellation/reopen, original assembled 19-part pixels and four-run 3.18 ms/frame 1080p renderer measurement with the latest toon artwork. Properties exposes 1-32 mesh cells per axis and an undoable elbow influence radius; the radius also has an on-canvas rest-mode handle with isolated preview and cancellation. Existing keys are revalidated before weight changes. Scene frame insertion/removal and selected-range Clear maintain deformer keys; same-Part range copy/paste, move and stretch retain exact keyed poses. A separate 15-artwork-Part candidate uses four continuous arm/leg images, one mesh and middle elbow/knee joint per limb; its four posed limbs retain rest pixels and reopen identically. One native 15-part run measured p95 input-to-frameSwapped at 17.26 ms and peak process resident memory at 274 MB on M1 Pro. Four native 19-part subset runs measured p95 at 14.90-16.76 ms and peak resident memory below 273 MB.",
-      "limitations": "HM-06 is not accepted: continuous limb bends and source alpha have been inspected, but owner art approval, broader influence/artifact review, complete-shot interaction/memory budgets and artist workflow remain. Hands/feet in the candidate use explicitly authored follower poses; declarative evaluated-endpoint attachment remains HM-09. Cross-scene and different-Part deformer-key paste reject until portable rig binding transfer is implemented. Independent drawing paste of a bound Part rejects until mesh clone semantics are defined."
+      "scope": "Format-9 per-substitution two-segment bone and cubic curve keys, rest-preserving evaluation, posed canvas grid, direct mouse handles including bone and curve rest-control placement, undo/cancellation/reopen, original assembled 19-part pixels and four-run 3.18 ms/frame 1080p renderer measurement with the latest toon artwork. Format 10 adds a saved parent bone-tip link for a child Part, used by the continuous-limb candidate's hands and feet without duplicate follower motion keys. Properties exposes 1-32 mesh cells per axis and an undoable elbow influence radius; the radius also has an on-canvas rest-mode handle with isolated preview and cancellation. Existing keys are revalidated before weight changes. Scene frame insertion/removal and selected-range Clear maintain deformer keys; same-Part range copy/paste, move and stretch retain exact keyed poses. A separate 15-artwork-Part candidate uses four continuous arm/leg images, one mesh and middle elbow/knee joint per limb; its four posed limbs retain rest pixels and reopen identically. One native linked 15-part run measured p95 input-to-frameSwapped 17.18 ms and peak resident memory 275 MB on M1 Pro; four earlier 19-part subset runs measured p95 14.90-16.76 ms and memory below 273 MB. Complete-shot budgets remain open.",
+      "limitations": "HM-06 is not accepted: continuous limb bends and source alpha have been inspected, but owner art approval, broader influence/artifact review, linked complete-shot interaction/memory budgets and artist workflow remain. The bounded link requires a direct child Part, an active two-segment parent bone throughout the scene and rest at frame zero; arbitrary deformer attachments, IK and portable templates remain HM-09. Cross-scene and different-Part deformer-key paste reject until portable rig binding transfer is implemented. Independent drawing paste of a bound Part rejects until mesh clone semantics are defined."
     }
   },
   "ownership": {
@@ -397,6 +398,6 @@
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
     "state": "HM-00_through_HM-05_and_HM-13_complete__HM-06_in_progress",
-    "note": "HM-06 format-9 bone/curve controls are a working subset; complete quality and interaction evidence before accepting the contract. HM-07, HM-10 and HM-12 remain independently eligible; P09 and full DEF features remain open."
+    "note": "HM-06 format-10 bone/curve controls and bounded bone-tip attachment are a working subset; complete quality and interaction evidence before accepting the contract. HM-07, HM-10 and HM-12 remain independently eligible; P09 and full DEF features remain open."
   }
 }

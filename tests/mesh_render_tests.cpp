@@ -2,6 +2,7 @@
 #include "opentoon/deformation.h"
 #include "opentoon/deformer.h"
 #include "opentoon/rigging.h"
+#include "opentoon/session.h"
 #include "mesh_warp.h"
 #include "graph_renderer.h"
 #include "project_store.h"
@@ -12,6 +13,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QTemporaryDir>
+#include <algorithm>
 #include <chrono>
 #include <cstdio>
 #include <cstring>
@@ -603,20 +606,82 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
         setPivotPreservingArtwork(document, follower,
                                  joints[2].toArray()[0].toDouble() - followerTransform.x,
                                  joints[2].toArray()[1].toDouble() - followerTransform.y);
-        auto pose = document.layer(follower).transform;
-        const auto* binding = meshBindingFor(document.layer(part), drawing);
-        const auto endpoint = sampleBoneJoints(*binding->bone, 24)[2];
-        pose.x += endpoint.x - local[2].x;
-        pose.y += endpoint.y - local[2].y;
-        pose.rotation = key.angle;
-        recordPose(document.layer(follower), 24, pose);
+        attachPartToBoneTip(document, follower, part);
     }
     document.validate();
+    for (const auto& key : keys) {
+        const Id part = partIds.value(key.role);
+        const Id follower = partIds.value(key.follower);
+        REQUIRE(document.layer(follower).keys.empty());
+        const auto& source = document.layer(part);
+        const auto& bone = *meshBindingFor(source, source.exposures.front().drawing)->bone;
+        const auto restTip = bone.restJoints[2];
+        const auto restScene = SceneRenderer::worldTransform(document, source, 0)
+                                   .map(QPointF(restTip.x, restTip.y));
+        const auto followerLocal = SceneRenderer::worldTransform(document,
+                                                                 document.layer(follower), 0)
+                                       .inverted().map(restScene);
+        for (Frame frame = 0; frame <= 24; ++frame) {
+            const auto tip = sampleBoneJoints(bone, frame)[2];
+            const auto expected = SceneRenderer::worldTransform(document, source, frame)
+                                      .map(QPointF(tip.x, tip.y));
+            const auto actual = SceneRenderer::worldTransform(document,
+                                                               document.layer(follower), frame)
+                                    .map(followerLocal);
+            REQUIRE(std::hypot(expected.x() - actual.x(), expected.y() - actual.y()) < 1e-8);
+        }
+    }
     REQUIRE(SceneRenderer::render(document, 0) == rest);
     const auto bent = SceneRenderer::render(document, 24);
     REQUIRE(bent != rest);
     const auto [bentConnected, bentInk] = connectedInk(bent);
     REQUIRE(bentConnected == bentInk);
+    const Id linkedHand = partIds.value("hand_left");
+    const Id linkedArm = partIds.value("arm_left");
+    REQUIRE(document.layer(linkedHand).followParentBoneTip);
+    REQUIRE(document.layer(linkedHand).parent == linkedArm);
+    auto duplicated = document;
+    const Id duplicateRoot = duplicateCharacter(duplicated, root, 300, 0);
+    duplicated.validate();
+    const auto duplicateHand = std::find_if(duplicated.layers.begin(), duplicated.layers.end(),
+                                            [&](const Layer& layer) {
+                                                return layer.kind == LayerKind::Part &&
+                                                       layer.role == "hand_left" &&
+                                                       characterFor(duplicated, layer.id) == duplicateRoot;
+                                            });
+    REQUIRE(duplicateHand != duplicated.layers.end());
+    REQUIRE(duplicateHand->followParentBoneTip);
+    REQUIRE(duplicateHand->parent != linkedArm);
+    REQUIRE(duplicated.layer(duplicateHand->parent).role == "arm_left");
+    auto unlinked = document;
+    detachPartFromBoneTip(unlinked, linkedHand);
+    Session attachmentSession;
+    attachmentSession.replace(unlinked);
+    const auto unlinkedPixels = SceneRenderer::render(attachmentSession.document(), 24);
+    REQUIRE(unlinkedPixels != bent);
+    REQUIRE(attachmentSession.apply("Follow arm tip", [&](Document& candidate) {
+        attachPartToBoneTip(candidate, linkedHand, linkedArm);
+    }));
+    REQUIRE(SceneRenderer::render(attachmentSession.document(), 0) == rest);
+    REQUIRE(SceneRenderer::render(attachmentSession.document(), 24) == bent);
+    REQUIRE(attachmentSession.undo());
+    REQUIRE(SceneRenderer::render(attachmentSession.document(), 24) == unlinkedPixels);
+    REQUIRE(attachmentSession.redo());
+    REQUIRE(SceneRenderer::render(attachmentSession.document(), 24) == bent);
+    const auto attachedState = attachmentSession.document();
+    REQUIRE_THROWS(attachmentSession.apply("Remove attached source bone", [&](Document& candidate) {
+        removeMeshDeformer(candidate, linkedArm,
+                           candidate.layer(linkedArm).exposures.front().drawing);
+    }));
+    REQUIRE(attachmentSession.document() == attachedState);
+    REQUIRE_THROWS(attachmentSession.apply("Reparent attached hand", [&](Document& candidate) {
+        reparentPreservingWorld(candidate, linkedHand, root);
+    }));
+    REQUIRE(attachmentSession.document() == attachedState);
+    REQUIRE_THROWS(attachmentSession.apply("Expose unbound arm substitution", [&](Document& candidate) {
+        createSubstitution(candidate, linkedArm, 30, true, "Unbound");
+    }));
+    REQUIRE(attachmentSession.document() == attachedState);
     auto tuned = document;
     const Id tunedArm = partIds.value("arm_left");
     const Id tunedDrawing = tuned.layer(tunedArm).exposures.front().drawing;
@@ -630,6 +695,28 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
             tunedFrame);
     REQUIRE(bent.save("hm06-continuous-limbs.png"));
     REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 24) == bent);
+    QTemporaryDir savedProject;
+    REQUIRE(savedProject.isValid());
+    const auto savedPath = std::filesystem::path((savedProject.path() + "/continuous.otoon").toStdString());
+    REQUIRE(ProjectStore::save(savedPath, document) > 0);
+    const auto reopened = ProjectStore::load(savedPath).document;
+    REQUIRE(reopened == document);
+    REQUIRE(SceneRenderer::render(reopened, 24) == bent);
+    auto switched = document;
+    const Id sourceDrawing = switched.layer(linkedArm).exposures.front().drawing;
+    const Id alternateDrawing = createSubstitution(switched, linkedArm, 30, true,
+                                                   "Alternate sleeve");
+    auto alternateBinding = *meshBindingFor(switched.layer(linkedArm), sourceDrawing);
+    alternateBinding.drawing = alternateDrawing;
+    switched.layer(linkedArm).bindings.push_back(std::move(alternateBinding));
+    recordBonePose(switched, linkedArm, alternateDrawing, 36, 0, 0);
+    switched.validate();
+    const auto switchedFrame = SceneRenderer::render(switched, 36);
+    REQUIRE(switchedFrame != SceneRenderer::render(document, 36));
+    const auto [switchedConnected, switchedInk] = connectedInk(switchedFrame);
+    REQUIRE(switchedConnected == switchedInk);
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(switched)), 36) ==
+            switchedFrame);
     auto folded = document;
     const Id foldedArm = partIds.value("arm_left");
     const Id foldedDrawing = folded.layer(foldedArm).exposures.front().drawing;
@@ -645,15 +732,6 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
         const Id drawing = extreme.layer(part).exposures.front().drawing;
         const double angle = key.angle < 0 ? -90 : 90;
         REQUIRE_NOTHROW(recordBonePose(extreme, part, drawing, 36, 0, angle));
-        const Id follower = partIds.value(key.follower);
-        const auto* binding = meshBindingFor(extreme.layer(part), drawing);
-        const auto endpoint = sampleBoneJoints(*binding->bone, 36)[2];
-        const auto& restEndpoint = binding->bone->restJoints[2];
-        auto pose = extreme.layer(follower).transform;
-        pose.x += endpoint.x - restEndpoint.x;
-        pose.y += endpoint.y - restEndpoint.y;
-        pose.rotation = angle;
-        recordPose(extreme.layer(follower), 36, pose);
     }
     extreme.validate();
     REQUIRE(SceneRenderer::render(extreme, 0) == rest);

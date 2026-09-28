@@ -6,6 +6,7 @@
 #include "opentoon/drawing_selection.h"
 #include <QPainterPath>
 #include <cmath>
+#include <numbers>
 #include <stdexcept>
 #include <unordered_map>
 namespace opentoon {
@@ -20,6 +21,21 @@ QTransform localTransform(Transform t) {
     m.scale(t.scaleX, t.scaleY);
     m.translate(-t.pivotX, -t.pivotY);
     return m;
+}
+QTransform boneTipTransform(const Document& document, const Layer& source, Frame frame) {
+    const auto* drawing = document.drawingAt(source.id, frame);
+    const auto* binding = drawing ? meshBindingFor(source, drawing->id) : nullptr;
+    if (!binding || !binding->bone)
+        throw std::runtime_error("Bone tip attachment has no active source bone.");
+    const auto& bone = *binding->bone;
+    const auto rest = bone.restJoints[2];
+    const auto posed = sampleBoneJoints(bone, frame)[2];
+    const auto angles = sampleBoneAngles(bone, frame);
+    const double radians = (angles[0] + angles[1]) * std::numbers::pi / 180.0;
+    const double cosine = std::cos(radians), sine = std::sin(radians);
+    return QTransform(cosine, sine, -sine, cosine,
+                      posed.x - cosine * rest.x + sine * rest.y,
+                      posed.y - sine * rest.x - cosine * rest.y);
 }
 QImage rasterTile(const SharedBuffer<std::uint16_t>& tile) {
     struct Entry {
@@ -99,11 +115,15 @@ void drawing(QPainter& painter, const Drawing& d, const std::vector<Swatch>& pal
 } // namespace
 QTransform SceneRenderer::worldTransform(const Document& d, const Layer& layer, Frame frame) {
     QTransform result = localTransform(evaluateTransform(layer, frame));
-    Id parent = layer.parent;
+    const Layer* child = &layer;
+    Id parent = child->parent;
     std::size_t depth = 0;
     while (parent && depth++ < d.layers.size()) {
         const auto& p = d.layer(parent);
+        if (child->followParentBoneTip)
+            result = result * boneTipTransform(d, p, frame);
         result = result * localTransform(evaluateTransform(p, frame));
+        child = &p;
         parent = p.parent;
     }
     return result;

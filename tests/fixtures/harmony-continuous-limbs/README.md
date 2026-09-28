@@ -18,14 +18,16 @@ or pixels from them are included.
 registered joint coverage and one connected alpha silhouette for each limb.
 `tests/mesh_render_tests.cpp` bends all four limbs as separate **single meshes**
 inside a 15-artwork-Part character, follows hands/feet at their endpoints,
-using the domain bone-joint evaluator for their authored keys, and checks rest
-pixels and reopened frame-24 output. The render test also
+using four saved parent bone-tip links instead of authored follower position
+keys, and checks rest pixels and reopened frame-24 output. The render test also
 checks that every nonwhite character pixel belongs to one connected silhouette
 in both rest and bent frames. A separate 90° stress pose checks the connected
 assembled silhouette at every integer frame from rest to frame 36, rest pixel
 stability and identical reopened output. The source art omits drawn creases at
 the elbow and knee; a too-tight 55 px transition must reject a folding 90° key
-without modifying the document. This is a representative rig-quality
+without modifying the document. A source substitution with its own bone
+binding retains the link; removing the source bone or exposing an unbound
+substitution rejects atomically. This is a representative rig-quality
 check, not final owner approval or a complete production shot.
 
 ![Four bent continuous limbs](../../../docs/implementation/hm06-continuous-limbs.png)

@@ -208,6 +208,28 @@ void meshSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& windo
         editor.document() != boneSaved ||
         SceneRenderer::render(editor.document(), 12) != boneRetargetedPixels)
         throw std::runtime_error("Bone animation changed after project reopen.");
+    const Id character = editor.characterId();
+    editor.addLayer();
+    editor.importImage(QUrl::fromLocalFile(imagePath));
+    const Id follower = editor.selectedLayer();
+    editor.setParent(int(character));
+    editor.setParent(int(part));
+    if (!editor.selectedCanFollowBoneTip() ||
+        !editor.toggleSelectedBoneTipAttachment() || !editor.selectedFollowsBoneTip())
+        throw std::runtime_error("The editor could not attach a child Part to its parent bone tip: " +
+                                 editor.status().toStdString());
+    const auto attached = editor.document();
+    editor.undo();
+    if (editor.selectedFollowsBoneTip())
+        throw std::runtime_error("Bone tip attachment did not undo.");
+    editor.redo();
+    if (editor.document() != attached || !editor.selectedFollowsBoneTip())
+        throw std::runtime_error("Bone tip attachment did not redo.");
+    if (!editor.saveProject(project) || !editor.openProject(project) ||
+        editor.document() != attached || !editor.selectedFollowsBoneTip())
+        throw std::runtime_error("Bone tip attachment changed after project reopen.");
+    editor.setSelectedLayer(int(follower));
+    editor.deleteRigBranch();
     editor.setSelectedLayer(int(part));
     if (!editor.removeSelectedDeformer() || !editor.bindSelectedCurve() ||
         editor.selectedMeshDeformer() != 2)

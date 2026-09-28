@@ -262,6 +262,26 @@ void Document::validate() const {
         if (l.parent)
             require(layer(l.parent).kind != LayerKind::Camera,
                     "Artwork cannot be parented to the output camera.");
+        if (l.followParentBoneTip) {
+            require(l.kind == LayerKind::Part && l.parent &&
+                        layer(l.parent).kind == LayerKind::Part,
+                    "Bone tip attachment needs a parent Part.");
+            const auto& source = layer(l.parent);
+            Frame covered = 0;
+            for (const auto& exposure : source.exposures) {
+                const auto* binding = meshBindingFor(source, exposure.drawing);
+                require(exposure.start == covered && binding && binding->bone,
+                        "Bone tip attachment needs a bound bone throughout the scene.");
+                const auto& bone = *binding->bone;
+                require(bone.keys.empty() || bone.keys.front().frame != 0 ||
+                            (bone.keys.front().shoulderAngle == 0 &&
+                             bone.keys.front().elbowAngle == 0),
+                        "Bone tip attachment needs rest at frame zero.");
+                covered = exposure.end;
+            }
+            require(covered == duration,
+                    "Bone tip attachment needs a bound bone throughout the scene.");
+        }
         std::set<Id> chain{l.id};
         Id parent = l.parent;
         while (parent) {

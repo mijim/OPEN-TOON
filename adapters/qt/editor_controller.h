@@ -42,6 +42,8 @@ class EditorController final : public QObject {
     Q_PROPERTY(int selectedMeshRows READ selectedMeshRows NOTIFY frameChanged)
     Q_PROPERTY(double selectedBoneTransition READ selectedBoneTransition NOTIFY frameChanged)
     Q_PROPERTY(double selectedBoneMaxTransition READ selectedBoneMaxTransition NOTIFY frameChanged)
+    Q_PROPERTY(bool selectedCanFollowBoneTip READ selectedCanFollowBoneTip NOTIFY changed)
+    Q_PROPERTY(bool selectedFollowsBoneTip READ selectedFollowsBoneTip NOTIFY changed)
     Q_PROPERTY(int characterId READ characterId NOTIFY changed)
     Q_PROPERTY(QVariantList characterViews READ characterViews NOTIFY changed)
     Q_PROPERTY(int selectedView READ selectedView NOTIFY viewSelectionChanged)
@@ -226,6 +228,9 @@ class EditorController final : public QObject {
     int selectedMeshRows() const;
     double selectedBoneTransition() const;
     double selectedBoneMaxTransition() const;
+    bool selectedCanFollowBoneTip() const;
+    bool selectedFollowsBoneTip() const;
+    Q_INVOKABLE bool toggleSelectedBoneTipAttachment();
     Q_INVOKABLE bool bindSelectedBone();
     Q_INVOKABLE bool bindSelectedCurve();
     Q_INVOKABLE bool moveSelectedBoneRestJoint(int joint, double x, double y);
