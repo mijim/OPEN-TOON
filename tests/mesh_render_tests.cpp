@@ -631,6 +631,40 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
             tunedFrame);
     REQUIRE(bent.save("hm06-continuous-limbs.png"));
     REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 24) == bent);
+    auto extreme = document;
+    for (const auto& key : keys) {
+        INFO(key.role.toStdString());
+        const auto config = limbs.value(key.role).toObject();
+        const auto joints = config.value("joints_scene_px").toArray();
+        const Id part = partIds.value(key.role);
+        const Id drawing = extreme.layer(part).exposures.front().drawing;
+        const double angle = key.angle < 0 ? -90 : 90;
+        REQUIRE_NOTHROW(setBoneElbowTransition(extreme, part, drawing, 90));
+        REQUIRE_NOTHROW(recordBonePose(extreme, part, drawing, 36, 0, angle));
+        const Id follower = partIds.value(key.follower);
+        const double dx = joints[2].toArray()[0].toDouble() - joints[1].toArray()[0].toDouble();
+        const double dy = joints[2].toArray()[1].toDouble() - joints[1].toArray()[1].toDouble();
+        const double radians = angle * std::numbers::pi / 180;
+        auto pose = extreme.layer(follower).transform;
+        pose.x += std::cos(radians) * dx - std::sin(radians) * dy - dx;
+        pose.y += std::sin(radians) * dx + std::cos(radians) * dy - dy;
+        pose.rotation = angle;
+        recordPose(extreme.layer(follower), 36, pose);
+    }
+    extreme.validate();
+    REQUIRE(SceneRenderer::render(extreme, 0) == rest);
+    const auto extremeFrame = SceneRenderer::render(extreme, 36);
+    REQUIRE(extremeFrame.save("hm06-continuous-limbs-90.png"));
+    const auto [extremeConnected, extremeInk] = connectedInk(extremeFrame);
+    REQUIRE(extremeConnected == extremeInk);
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(extreme)), 36) ==
+            extremeFrame);
+    for (int frame = 1; frame < 36; ++frame) {
+        INFO(frame);
+        const auto sampled = SceneRenderer::render(extreme, frame);
+        const auto [connected, ink] = connectedInk(sampled);
+        REQUIRE(connected == ink);
+    }
     if (qEnvironmentVariableIsSet("OPENTOON_HM06_CONTINUOUS_PROJECT")) {
         const auto output = qEnvironmentVariable("OPENTOON_HM06_CONTINUOUS_PROJECT");
         REQUIRE(ProjectStore::save(std::filesystem::path(output.toStdString()), document) > 0);

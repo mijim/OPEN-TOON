@@ -367,6 +367,7 @@
         "docs/implementation/hm06-bone-extreme.png",
         "docs/implementation/hm06-interaction-ui.png",
         "docs/implementation/hm06-continuous-limbs.png",
+        "docs/implementation/hm06-continuous-limbs-90.png",
         "tests/fixtures/harmony-continuous-limbs/rig.json",
         "tests/test_harmony_continuous_limbs.py"
       ],

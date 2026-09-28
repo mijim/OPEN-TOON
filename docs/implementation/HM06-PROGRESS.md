@@ -66,8 +66,12 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   A deterministic asset test checks that each source limb is one connected
   alpha silhouette and covers all three registered joints. The render test
   also checks one connected character silhouette at rest and in the bent pose.
-  This candidate
-  has no elbow or knee image seam; owner visual approval is still open.
+  A separate [90° stress pose](hm06-continuous-limbs-90.png) bends all four
+  continuous limbs around their middle joints. The assembled silhouette stays
+  connected at every integer frame from rest through frame 36, with no render
+  failure; rest pixels and reopened frame-36 pixels are identical. This is a
+  deformation stress image, not a polished animation pose. The candidate has
+  no elbow or knee image seam; owner visual approval is still open.
 - The native `--smoke-test` drags a bone tip and curve tangent, checks
   temporary preview isolation, cancellation, undo/redo, bone and curve rest-control
   retarget, a 6 × 16 mesh grid, numeric and on-canvas elbow influence tuning,

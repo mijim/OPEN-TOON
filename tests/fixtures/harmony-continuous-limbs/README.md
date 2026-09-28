@@ -20,7 +20,11 @@ registered joint coverage and one connected alpha silhouette for each limb.
 inside a 15-artwork-Part character, follows hands/feet at their endpoints,
 and checks rest pixels and reopened frame-24 output. The render test also
 checks that every nonwhite character pixel belongs to one connected silhouette
-in both rest and bent frames. This is a representative rig-quality check,
-not final owner approval or a complete production shot.
+in both rest and bent frames. A separate 90° stress pose checks the connected
+assembled silhouette at every integer frame from rest to frame 36, rest pixel
+stability and identical reopened output. This is a representative rig-quality
+check, not final owner approval or a complete production shot.
 
 ![Four bent continuous limbs](../../../docs/implementation/hm06-continuous-limbs.png)
+
+![Four continuous limbs at 90 degrees](../../../docs/implementation/hm06-continuous-limbs-90.png)
