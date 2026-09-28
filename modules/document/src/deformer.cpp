@@ -82,6 +82,14 @@ CurveCoordinate coordinate(MeshPoint vertex, const std::array<MeshPoint, 4>& res
     }
     return {(left + right) / 2};
 }
+std::vector<CurveCoordinate> curveCoordinates(
+        const MeshBinding& binding, const std::array<MeshPoint, 4>& controls) {
+    std::vector<CurveCoordinate> coordinates;
+    coordinates.reserve(binding.vertices.size());
+    for (const auto& vertex : binding.vertices)
+        coordinates.push_back(coordinate(vertex.rest, controls));
+    return coordinates;
+}
 void editable(const Document& document, Id part, Id drawing) {
     const auto& layer = document.layer(part);
     require(layer.kind == LayerKind::Part && !layer.locked && meshBindingFor(layer, drawing),
@@ -272,9 +280,27 @@ void bindCurveDeformer(Document& document, Id part, Id drawing,
     curve.restControls = restControls;
     require(length(sub(restControls[3], restControls[0])) > 1e-6,
             "Curve rest endpoints coincide.");
-    for (const auto& vertex : candidate.vertices)
-        curve.coordinates.push_back(coordinate(vertex.rest, restControls));
+    curve.coordinates = curveCoordinates(candidate, restControls);
     candidate.curve = std::move(curve);
+    validateMeshDeformer(document, candidate);
+    binding(document, part, drawing) = std::move(candidate);
+}
+
+void moveCurveRestControl(Document& document, Id part, Id drawing,
+                          int control, MeshPoint position) {
+    editable(document, part, drawing);
+    require(control >= 0 && control < 4 && finite(position),
+            "Curve rest control is invalid.");
+    auto candidate = binding(document, part, drawing);
+    require(candidate.curve.has_value(), "Selected Part has no curve deformer.");
+    auto& curve = *candidate.curve;
+    const MeshPoint delta = sub(position, curve.restControls[std::size_t(control)]);
+    curve.restControls[std::size_t(control)] = position;
+    require(length(sub(curve.restControls[3], curve.restControls[0])) > 1e-6,
+            "Curve rest endpoints coincide.");
+    for (auto& key : curve.keys)
+        key.controls[std::size_t(control)] = add(key.controls[std::size_t(control)], delta);
+    curve.coordinates = curveCoordinates(candidate, curve.restControls);
     validateMeshDeformer(document, candidate);
     binding(document, part, drawing) = std::move(candidate);
 }

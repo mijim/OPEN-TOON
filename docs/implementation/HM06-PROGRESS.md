@@ -19,9 +19,10 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
 - Properties offers Bone chain and Curve on a selected bound Part. The Mesh
   tool drags joints or curve controls directly on canvas with a cancellable
   temporary preview. Its grid now follows the evaluated pose during animation
-  and preview. Rest joints mode moves root, elbow or tip in the saved setup,
-  recalculates vertex weights and validates existing poses before atomic
-  publication. Static vertex editing is unavailable while a deformer is
+  and preview. Rest controls mode moves bone root, elbow or tip, or any cubic
+  control, in the saved setup and validates existing poses before atomic
+  publication. Bone moves recalculate weights; curve moves preserve keyed
+  offsets from rest and recalculate vertex parameters. Static vertex editing is unavailable while a deformer is
   attached. Switching substitutions resolves the matching chain.
 - Format 9 persists controls, weights and keys. The first save of format 8
   preserves a source-version `.pre-v8.bak` before upgrading.
@@ -45,15 +46,29 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   deforming upper sleeve, and rigidly pivoted forearm/hand produce a 70°
   [extreme pose](hm06-bone-extreme.png) with unchanged rest pixels and identical
   reopened output. The earlier double-sleeve elbow bulge is absent in this
-  inspected pose; broader joint and artwork review remains open.
+  inspected pose; broader joint and artwork review remains open. The owner's
+  continuity correction is exercised by an additional
+  [15-artwork-Part rig](hm06-continuous-limbs.png): each complete arm and leg
+  is one image and one bound mesh, with an elbow or knee as its middle joint.
+  The test bends all four limbs, follows separate hand/foot substitutions,
+  and checks unchanged rest pixels and identical reopened frame-24 output.
+  A deterministic asset test checks that each source limb is one connected
+  alpha silhouette and covers all three registered joints. The render test
+  also checks one connected character silhouette at rest and in the bent pose.
+  This candidate
+  has no elbow or knee image seam; owner visual approval is still open.
 - The native `--smoke-test` drags a bone tip and curve tangent, checks
-  temporary preview isolation, cancellation, undo/redo, a bone rest-joint
+  temporary preview isolation, cancellation, undo/redo, bone and curve rest-control
   retarget, Rest key, same-Part timeline key paste/move and project reopen on
   a checker Part. A mirrored, rotated and zoomed control drag also round-trips
   through undo. The inspected [original-art detail](hm06-bone-curve-detail.png)
   shows the bounded arm/torso deformation after the rotation correction.
   Additional elbow shapes and larger bends still need artistic acceptance.
-- The macOS optimized build passes 122/122 CTest entries and native smoke.
+- The macOS optimized build passes 124/124 CTest entries, the continuous-limb
+  Python fixture test and native smoke. A 40-frame native drag measurement on
+  the 15-artwork-Part continuous rig gave p95 input-to-`frameSwapped` 17.26 ms
+  and peak process resident memory 274 MB on Apple M1 Pro (one run; broader
+  repeatability and full-shot budget remain open).
   On Apple M1 Pro, three earlier local 1920×1080 renders of the assembled
   19-part scene with one bone and one curve averaged 3.25 ms/frame. After the
   latest independent toon redraw, four runs averaged 3.18 ms/frame

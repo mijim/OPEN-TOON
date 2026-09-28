@@ -60,7 +60,8 @@ QPointF CanvasItem::meshControlPosition(int index) const {
         point = meshRestEditing_ ? binding->bone->restJoints[index]
                                  : posedJoints(*binding->bone, editor_->frame())[index];
     else if (binding->curve && index < 4)
-        point = sampleCurveControls(*binding->curve, editor_->frame())[index];
+        point = meshRestEditing_ ? binding->curve->restControls[index]
+                                 : sampleCurveControls(*binding->curve, editor_->frame())[index];
     else
         return {};
     return selectionWorld().map(QPointF(point.x, point.y));
@@ -114,7 +115,7 @@ void CanvasItem::paintMesh(QPainter* painter, const Document& document,
     const auto transform = selectionWorld();
     auto at = [&](int row, int column) {
         const auto& vertex = binding->vertices[std::size_t(row) * (binding->columns + 1) + column];
-        const auto point = meshRestEditing_ && !binding->curve ? vertex.rest : vertex.pose;
+        const auto point = meshRestEditing_ ? vertex.rest : vertex.pose;
         return transform.map(QPointF(point.x, point.y));
     };
     painter->save();
@@ -148,7 +149,8 @@ void CanvasItem::paintMesh(QPainter* painter, const Document& document,
             painter->drawEllipse(point, 5, 5);
         }
     } else if (binding->curve) {
-        const auto controls = sampleCurveControls(*binding->curve, editor_->frame());
+        const auto controls = meshRestEditing_ ? binding->curve->restControls
+                                               : sampleCurveControls(*binding->curve, editor_->frame());
         auto point = [&](int index) {
             return transform.map(QPointF(controls[index].x, controls[index].y));
         };
@@ -173,9 +175,12 @@ void CanvasItem::beginMesh(QPointF position) {
         const auto* binding = selectedMesh(editor_->document());
         meshPreviewAngles_ = binding->bone ? sampleBoneAngles(*binding->bone, editor_->frame())
                                            : std::array<double, 2>{};
-        meshPreviewPoint_ = binding->curve
-            ? sampleCurveControls(*binding->curve, editor_->frame())[meshControl_]
-            : meshRestEditing_ && binding->bone
+        if (binding->curve)
+            meshPreviewPoint_ = meshRestEditing_
+                ? binding->curve->restControls[meshControl_]
+                : sampleCurveControls(*binding->curve, editor_->frame())[meshControl_];
+        else
+            meshPreviewPoint_ = meshRestEditing_ && binding->bone
                 ? binding->bone->restJoints[meshControl_] : MeshPoint{};
         meshControlMoved_ = false;
         drawing_ = true;
@@ -239,9 +244,15 @@ void CanvasItem::previewMeshControl(QPointF position) {
                 meshPreviewAngles_ = angles;
             }
         } else if (source->curve) {
-            auto controls = sampleCurveControls(*source->curve, editor_->frame());
-            controls[meshControl_] = {point.x, point.y};
-            recordCurvePose(candidate, editor_->selectedLayer(), drawing, editor_->frame(), controls);
+            if (meshRestEditing_)
+                moveCurveRestControl(candidate, editor_->selectedLayer(), drawing,
+                                     meshControl_, {point.x, point.y});
+            else {
+                auto controls = sampleCurveControls(*source->curve, editor_->frame());
+                controls[meshControl_] = {point.x, point.y};
+                recordCurvePose(candidate, editor_->selectedLayer(), drawing,
+                                editor_->frame(), controls);
+            }
             meshPreviewPoint_ = {point.x, point.y};
         }
         posePreview_ = std::move(candidate);
@@ -268,6 +279,9 @@ void CanvasItem::commitMeshControl() {
             editor_->moveSelectedBoneRestJoint(control, meshPreviewPoint_.x, meshPreviewPoint_.y);
         else if (bone)
             editor_->recordSelectedBonePose(meshPreviewAngles_[0], meshPreviewAngles_[1]);
+        else if (meshRestEditing_)
+            editor_->moveSelectedCurveRestControl(control, meshPreviewPoint_.x,
+                                                   meshPreviewPoint_.y);
         else
             editor_->moveSelectedCurveControl(control, meshPreviewPoint_.x, meshPreviewPoint_.y);
     }

@@ -16,6 +16,7 @@
 #include <cstdio>
 #include <cstring>
 #include <filesystem>
+#include <numbers>
 
 using namespace opentoon;
 
@@ -472,4 +473,155 @@ TEST_CASE("Nineteen Harmony parts keep rest pixels and bounded posed render cost
                  "debug"
 #endif
     );
+}
+
+TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identically") {
+    QFile specification(QStringLiteral(OPENTOON_SOURCE_DIR
+        "/tests/fixtures/harmony-continuous-limbs/rig.json"));
+    REQUIRE(specification.open(QIODevice::ReadOnly));
+    const auto limbs = QJsonDocument::fromJson(specification.readAll()).object()
+                           .value("limbs").toObject();
+    QFile shotFile(QStringLiteral(OPENTOON_SOURCE_DIR
+        "/tests/fixtures/harmony-moment/shot.json"));
+    REQUIRE(shotFile.open(QIODevice::ReadOnly));
+    const auto shot = QJsonDocument::fromJson(shotFile.readAll()).object();
+    const auto centers = shot.value("reference_centers_px").toObject();
+    const QStringList order{"leg_left", "foot_left", "leg_right", "foot_right",
+                            "arm_left", "hand_left", "arm_right", "hand_right",
+                            "pelvis", "torso", "neck", "head", "hair", "eyes", "mouth"};
+    auto document = makeDocument();
+    document.width = 1920;
+    document.height = 1080;
+    document.background = {1, 1, 1, 1};
+    QHash<QString, Id> partIds;
+    for (const auto& role : order) {
+        const bool limb = limbs.contains(role);
+        const auto base = limb ? QStringLiteral(OPENTOON_SOURCE_DIR
+            "/tests/fixtures/harmony-continuous-limbs/parts/") :
+            QStringLiteral(OPENTOON_SOURCE_DIR "/tests/fixtures/harmony-moment/parts/");
+        const QString variant = role == "mouth" ? "front__rest" :
+                                (role == "head" || role == "hair" || role == "eyes") ? "front" :
+                                role.startsWith("hand_") ? "open" : "base";
+        const QImage source(base + role + "__" + variant + ".png");
+        REQUIRE_FALSE(source.isNull());
+        const auto image = source.convertToFormat(QImage::Format_RGBA8888);
+        Layer* layer = nullptr;
+        if (partIds.isEmpty())
+            layer = &document.layers.front();
+        else {
+            Layer added;
+            added.id = document.allocateId();
+            document.layers.push_back(added);
+            layer = &document.layers.back();
+        }
+        layer->name = role.toStdString();
+        const Id drawing = document.allocateId();
+        layer->exposures.push_back({0, document.duration, drawing});
+        Drawing created;
+        created.id = drawing;
+        created.image = ImageAsset{image.width(), image.height(), {}};
+        created.image->rgba.assign(image.constBits(), image.constBits() + image.sizeInBytes());
+        document.drawings.emplace(drawing, std::move(created));
+        const auto center = limb ? limbs.value(role).toObject().value("center_px").toArray() :
+                                   centers.value(role).toArray();
+        REQUIRE(center.size() == 2);
+        layer->transform.x = center[0].toDouble() - image.width() / 2;
+        layer->transform.y = center[1].toDouble() - image.height() / 2;
+        partIds.insert(role, layer->id);
+    }
+    const Id root = makeCharacter(document, partIds.value("leg_left"), "Clockwork Hello");
+    for (const auto& role : order)
+        if (role != "leg_left")
+            attachDrawingAsPart(document, partIds.value(role), root, role.toStdString());
+    document.validate();
+    REQUIRE(document.layers.size() == 16); // Fifteen artwork Parts plus the character peg.
+    const auto rest = SceneRenderer::render(document, 0);
+    auto connectedInk = [](const QImage& frame) {
+        const int width = frame.width(), height = frame.height();
+        std::vector<std::uint8_t> visited(std::size_t(width) * height);
+        int total = 0, largest = 0;
+        for (int y = 0; y < height; ++y)
+            for (int x = 0; x < width; ++x) {
+                if (frame.pixel(x, y) == qRgb(255, 255, 255))
+                    continue;
+                ++total;
+                const int start = y * width + x;
+                if (visited[std::size_t(start)])
+                    continue;
+                std::vector<int> pending{start};
+                visited[std::size_t(start)] = 1;
+                int size = 0;
+                while (!pending.empty()) {
+                    const int current = pending.back();
+                    pending.pop_back();
+                    ++size;
+                    const int cx = current % width, cy = current / width;
+                    for (int dy = -1; dy <= 1; ++dy)
+                        for (int dx = -1; dx <= 1; ++dx) {
+                            const int nx = cx + dx, ny = cy + dy;
+                            if (nx < 0 || nx >= width || ny < 0 || ny >= height)
+                                continue;
+                            const int next = ny * width + nx;
+                            if (!visited[std::size_t(next)] &&
+                                frame.pixel(nx, ny) != qRgb(255, 255, 255)) {
+                                visited[std::size_t(next)] = 1;
+                                pending.push_back(next);
+                            }
+                        }
+                }
+                largest = std::max(largest, size);
+            }
+        return std::pair{largest, total};
+    };
+    const auto [restConnected, restInk] = connectedInk(rest);
+    REQUIRE(restConnected == restInk);
+    struct LimbKey { QString role; double angle; QString follower; };
+    const std::array<LimbKey, 4> keys{{{"arm_left", 65, "hand_left"},
+                                      {"arm_right", -50, "hand_right"},
+                                      {"leg_left", 25, "foot_left"},
+                                      {"leg_right", -25, "foot_right"}}};
+    for (const auto& key : keys) {
+        INFO(key.role.toStdString());
+        const auto config = limbs.value(key.role).toObject();
+        const auto joints = config.value("joints_scene_px").toArray();
+        REQUIRE(joints.size() == 3);
+        const Id part = partIds.value(key.role);
+        const Id drawing = document.layer(part).exposures.front().drawing;
+        bindRegularImageMesh(document, part, drawing, 6, 16);
+        const auto transform = document.layer(part).transform;
+        std::array<MeshPoint, 3> local{};
+        for (int index = 0; index < 3; ++index) {
+            const auto point = joints[index].toArray();
+            local[index] = {point[0].toDouble() - transform.x,
+                            point[1].toDouble() - transform.y};
+        }
+        REQUIRE_NOTHROW(bindBoneChain(document, part, drawing, local,
+                                     config.value("transition_px").toDouble()));
+        REQUIRE_NOTHROW(recordBonePose(document, part, drawing, 24, 0, key.angle));
+        const Id follower = partIds.value(key.follower);
+        const auto followerTransform = document.layer(follower).transform;
+        setPivotPreservingArtwork(document, follower,
+                                 joints[2].toArray()[0].toDouble() - followerTransform.x,
+                                 joints[2].toArray()[1].toDouble() - followerTransform.y);
+        auto pose = document.layer(follower).transform;
+        const double radians = key.angle * std::numbers::pi / 180.0;
+        const double dx = local[2].x - local[1].x;
+        const double dy = local[2].y - local[1].y;
+        pose.x += std::cos(radians) * dx - std::sin(radians) * dy - dx;
+        pose.y += std::sin(radians) * dx + std::cos(radians) * dy - dy;
+        pose.rotation = key.angle;
+        recordPose(document.layer(follower), 24, pose);
+    }
+    document.validate();
+    REQUIRE(SceneRenderer::render(document, 0) == rest);
+    const auto bent = SceneRenderer::render(document, 24);
+    REQUIRE(bent != rest);
+    const auto [bentConnected, bentInk] = connectedInk(bent);
+    REQUIRE(bentConnected == bentInk);
+    REQUIRE(bent.save("hm06-continuous-limbs.png"));
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 24) == bent);
+    if (qEnvironmentVariableIsSet("OPENTOON_HM06_CONTINUOUS_PROJECT")) {
+        const auto output = qEnvironmentVariable("OPENTOON_HM06_CONTINUOUS_PROJECT");
+        REQUIRE(ProjectStore::save(std::filesystem::path(output.toStdString()), document) > 0);
+    }
 }

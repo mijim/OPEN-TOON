@@ -222,6 +222,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE bool bindSelectedCurve();
     Q_INVOKABLE bool moveSelectedBoneRestJoint(int joint, double x, double y);
     Q_INVOKABLE bool recordSelectedBonePose(double shoulder, double elbow);
+    Q_INVOKABLE bool moveSelectedCurveRestControl(int control, double x, double y);
     Q_INVOKABLE bool moveSelectedCurveControl(int control, double x, double y);
     Q_INVOKABLE bool resetSelectedDeformerPose();
     Q_INVOKABLE bool removeSelectedDeformer();

@@ -10,6 +10,7 @@ void recordBonePose(Document&, Id part, Id drawing, Frame frame, double shoulder
                     double elbowAngle, Interpolation interpolation = Interpolation::Linear);
 void bindCurveDeformer(Document&, Id part, Id drawing,
                        std::array<MeshPoint, 4> restControls);
+void moveCurveRestControl(Document&, Id part, Id drawing, int control, MeshPoint position);
 void recordCurvePose(Document&, Id part, Id drawing, Frame frame,
                      std::array<MeshPoint, 4> controls,
                      Interpolation interpolation = Interpolation::Linear);

@@ -49,19 +49,20 @@ TONGUE = (204, 98, 105, 255)
 class Canvas:
     """Opaque layered vector shapes on the registered transparent PNG canvas."""
 
-    def __init__(self) -> None:
-        self.pixels = bytearray(SIZE * SIZE * 4)
+    def __init__(self, size: int = SIZE) -> None:
+        self.size = size
+        self.pixels = bytearray(size * size * 4)
 
     def fill(self, bounds: tuple[float, float, float, float], hit, color: tuple[int, ...]) -> None:
         left = max(0, math.floor(bounds[0]))
         top = max(0, math.floor(bounds[1]))
-        right = min(SIZE, math.ceil(bounds[2]))
-        bottom = min(SIZE, math.ceil(bounds[3]))
+        right = min(self.size, math.ceil(bounds[2]))
+        bottom = min(self.size, math.ceil(bounds[3]))
         ink = bytes(color)
         for y in range(top, bottom):
             for x in range(left, right):
                 if hit(x + 0.5, y + 0.5):
-                    offset = (y * SIZE + x) * 4
+                    offset = (y * self.size + x) * 4
                     self.pixels[offset:offset + 4] = ink
 
     def ellipse(self, cx: float, cy: float, rx: float, ry: float, color: tuple[int, ...]) -> None:
@@ -145,8 +146,8 @@ class Canvas:
     def side_curve_shape(self, start: tuple[float, float], commands: list[tuple],
                          color: tuple[int, ...], border: float, right: bool) -> None:
         if right:
-            start = (SIZE - start[0], start[1])
-            commands = [tuple(SIZE - value if index % 2 else value
+            start = (self.size - start[0], start[1])
+            commands = [tuple(self.size - value if index % 2 else value
                               for index, value in enumerate(command))
                         for command in commands]
         self.curve_shape(start, commands, color, border)

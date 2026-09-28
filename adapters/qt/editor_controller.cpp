@@ -925,6 +925,12 @@ bool EditorController::moveSelectedCurveControl(int control, double x, double y)
             opentoon::recordCurvePose(d, layer_, drawing, frame_, controls);
         });
 }
+bool EditorController::moveSelectedCurveRestControl(int control, double x, double y) {
+    const Id drawing = selectedSubstitution();
+    return layer_ && drawing && edit("Move curve rest control", [&](Document& d) {
+        opentoon::moveCurveRestControl(d, layer_, drawing, control, {x, y});
+    });
+}
 bool EditorController::resetSelectedDeformerPose() {
     const Id drawing = selectedSubstitution();
     return layer_ && drawing && edit("Key deformer rest pose", [&](Document& d) {

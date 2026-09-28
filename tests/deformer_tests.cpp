@@ -116,6 +116,45 @@ TEST_CASE("Cubic curve tangent keys move a field continuously without altering r
     REQUIRE(deserializeDocument(serializeDocument(fixture.document)) == fixture.document);
 }
 
+TEST_CASE("Curve rest controls retarget keyed offsets without changing rest artwork") {
+    PartFixture fixture;
+    const std::array<MeshPoint, 4> straight{{{0, 8}, {16.0 / 3, 8},
+                                            {32.0 / 3, 8}, {16, 8}}};
+    bindCurveDeformer(fixture.document, fixture.part, fixture.drawing, straight);
+    auto lifted = straight;
+    lifted[1].y = 3;
+    recordCurvePose(fixture.document, fixture.part, fixture.drawing, 12, lifted);
+    Session session;
+    session.replace(fixture.document);
+    const auto before = *meshBindingFor(session.document().layer(fixture.part), fixture.drawing);
+    REQUIRE(session.apply("Move rest tangent", [&](Document& document) {
+        moveCurveRestControl(document, fixture.part, fixture.drawing, 1,
+                             {16.0 / 3, 9});
+    }));
+    const auto& adjusted = *meshBindingFor(session.document().layer(fixture.part), fixture.drawing);
+    REQUIRE(adjusted.vertices == before.vertices);
+    REQUIRE(adjusted.curve->restControls[1] == MeshPoint{16.0 / 3, 9});
+    REQUIRE(adjusted.curve->keys.front().controls == adjusted.curve->restControls);
+    REQUIRE(adjusted.curve->keys.back().controls[1].y == 4);
+    REQUIRE(evaluateMeshBinding(adjusted, 0).vertices == before.vertices);
+    REQUIRE(evaluateMeshBinding(adjusted, 12).vertices !=
+            evaluateMeshBinding(before, 12).vertices);
+    const auto valid = session.document();
+    REQUIRE_THROWS(session.apply("Collapse curve", [&](Document& document) {
+        moveCurveRestControl(document, fixture.part, fixture.drawing, 3, {0, 8});
+    }));
+    REQUIRE(session.document() == valid);
+    REQUIRE_THROWS(session.apply("Invalid control", [&](Document& document) {
+        moveCurveRestControl(document, fixture.part, fixture.drawing, 4, {8, 8});
+    }));
+    REQUIRE(session.document() == valid);
+    REQUIRE(deserializeDocument(serializeDocument(session.document())) == session.document());
+    REQUIRE(session.undo());
+    REQUIRE(*meshBindingFor(session.document().layer(fixture.part), fixture.drawing) == before);
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == valid);
+}
+
 TEST_CASE("Deformer binding rejects invalid controls and protected static edits atomically") {
     PartFixture fixture;
     const auto before = fixture.document;

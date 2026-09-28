@@ -1330,13 +1330,13 @@ ApplicationWindow {
                                 }
                                 RowLayout {
                                     Layout.fillWidth: true
-                                    visible: editor.selectedMeshDeformer === 1
+                                    visible: editor.selectedMeshDeformer > 0
                                     C.CompactButton {
-                                        text: "Pose joints"
+                                        text: editor.selectedMeshDeformer === 1 ? "Pose joints" : "Pose curve"
                                         onClicked: { canvas.meshRestEditing = false; editor.tool = "Mesh"; }
                                     }
                                     C.CompactButton {
-                                        text: "Rest joints"
+                                        text: editor.selectedMeshDeformer === 1 ? "Rest joints" : "Rest curve"
                                         onClicked: { canvas.meshRestEditing = true; editor.tool = "Mesh"; }
                                     }
                                 }
@@ -1344,9 +1344,9 @@ ApplicationWindow {
                                     Layout.fillWidth: true
                                     visible: editor.selectedMeshDeformer > 0
                                     Label {
-                                        text: canvas.meshRestEditing && editor.selectedMeshDeformer === 1
-                                              ? "Drag rest joints on canvas · Esc cancels"
-                                              : "Drag joints or curve points on canvas · Esc cancels"
+                                        text: canvas.meshRestEditing
+                                              ? "Drag rest controls on canvas · Esc cancels"
+                                              : "Drag pose controls on canvas · Esc cancels"
                                         color: "#999999"
                                         font.pixelSize: 10
                                         Layout.fillWidth: true

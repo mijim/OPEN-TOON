@@ -45,8 +45,22 @@ cache keys already cover new document edits. Independent Part duplication
 copies weights and keys, while linked artwork may have a separate deformer.
 The canvas mesh grid samples the same evaluated pose as artwork, including
 the temporary drag preview; the rest grid is available for static mesh setup
-and bone rest-joint placement. Curve rest controls are not yet directly
-editable after binding.
+and bone rest-joint placement. Curve rest controls are also directly editable
+after binding: changing one rest control shifts the corresponding authored
+control in every key by the same delta, preserving each key's offset from
+rest. Vertex parameters are recalculated from the unchanged rest mesh, and
+all keys and intermediate samples are validated before atomic publication.
+The drawing's frame-zero pixels remain unchanged. The native canvas drag uses
+an isolated preview and the same undoable command as other deformer edits.
+
+The profile binds one two-segment chain to one source image. A continuous arm
+or leg should therefore be authored as **one image and one mesh**, with three
+anatomical rest joints; a separately pivoted upper/lower image pair does not
+exercise continuous elbow/knee deformation. The original 19-part fixture
+remains useful for registered intake and substitutions. A 15-artwork-Part
+working rig combines each upper/lower limb pair into four single images. The
+separate hands and feet are explicitly keyed to follow evaluated endpoints in
+this fixture; declarative attachment remains HM-09 work.
 Scene-wide frame insertion/removal and selected-range Clear include deformer
 keys. Same-Part range copy/paste, move and stretch preserve the keyed bone or
 curve identity and exact pose endpoints. A cross-scene or different-Part key

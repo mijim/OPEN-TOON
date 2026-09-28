@@ -39,3 +39,22 @@ build/desktop/open-toon.app/Contents/MacOS/open-toon \
 The project and preview files under `build/` are generated test outputs. The
 benchmark emits one JSON record per run; repeat the last command to observe
 host variation.
+
+## Continuous-limb candidate, 2026-09-29
+
+The same native drag benchmark was run once on the 15-artwork-Part candidate,
+where both arms and both legs are full-length single-image meshes. On the same
+Apple M1 Pro and macOS 15.5 host, 40 samples gave median 16.44 ms, p95 17.26 ms,
+and peak resident memory 274,071,552 bytes. The measured canvas was 1140 × 491
+logical pixels at device pixel ratio 2. This is a separate workload from the
+19-part measurements above and remains a subset of the complete shot.
+
+Reproduce after building the render tests and desktop app:
+
+```sh
+OPENTOON_HM06_CONTINUOUS_PROJECT="$PWD/build/hm06-continuous.otoon" \
+  build/desktop/opentoon_render_tests \
+  'Continuous Harmony limbs bend as four single meshes and reopen identically'
+build/desktop/open-toon.app/Contents/MacOS/open-toon \
+  --hm06-benchmark "$PWD/build/hm06-continuous.otoon"
+```

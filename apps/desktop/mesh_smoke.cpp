@@ -183,6 +183,26 @@ void meshSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& windo
         throw std::runtime_error("Curve animation changed after project reopen.");
     editor.setSelectedLayer(int(part));
     editor.setFrame(24);
+    canvas.setMeshRestEditing(true);
+    const auto curveRestControl = canvas.meshControlPosition(2);
+    const auto beforeCurveRetarget = editor.document();
+    send(QEvent::MouseButtonPress, curveRestControl, Qt::LeftButton, Qt::LeftButton);
+    send(QEvent::MouseMove, curveRestControl + QPointF(0, 2), Qt::NoButton, Qt::LeftButton);
+    if (editor.document() != beforeCurveRetarget || window.grabWindow().isNull())
+        throw std::runtime_error("Curve rest-control preview changed the authored document.");
+    canvas.cancelGesture();
+    if (editor.document() != beforeCurveRetarget)
+        throw std::runtime_error("Cancelled curve rest-control drag changed the document.");
+    drag(curveRestControl, curveRestControl + QPointF(0, 2));
+    if (SceneRenderer::render(editor.document(), 24) == curvePixels ||
+        SceneRenderer::render(editor.document(), 0) !=
+            SceneRenderer::render(beforeCurveRetarget, 0))
+        throw std::runtime_error("Curve rest-control drag did not retarget the keyed pose safely: " +
+                                 editor.status().toStdString());
+    editor.undo();
+    if (editor.document() != beforeCurveRetarget)
+        throw std::runtime_error("Curve rest-control drag did not undo atomically.");
+    canvas.setMeshRestEditing(false);
     if (!editor.resetSelectedDeformerPose() ||
         SceneRenderer::render(editor.document(), 24) != SceneRenderer::render(curveRest, 24))
         throw std::runtime_error("Rest key did not recover original curve pixels.");
@@ -237,17 +257,18 @@ void meshInteractionBenchmark(EditorController& editor, CanvasItem& canvas,
                                  editor.status().toStdString());
     Id arm = 0;
     for (const auto& layer : editor.document().layers)
-        if (layer.name == "upper_arm_left")
+        if (layer.name == "upper_arm_left" || layer.name == "arm_left")
             arm = layer.id;
     if (!arm)
-        throw std::runtime_error("HM-06 benchmark project has no original arm Part.");
+        throw std::runtime_error("HM-06 benchmark project has no bound left arm Part.");
     editor.setSelectedLayer(int(arm));
     editor.setFrame(12);
     editor.setTool("Mesh");
     canvas.setCameraGuidesVisible(false);
     canvas.fit();
-    if (editor.selectedMeshDeformer() != 1 || editor.document().layers.size() != 20)
-        throw std::runtime_error("HM-06 benchmark requires the bound 19-part scene.");
+    const int partCount = int(editor.document().layers.size()) - 1;
+    if (editor.selectedMeshDeformer() != 1 || (partCount != 19 && partCount != 15))
+        throw std::runtime_error("HM-06 benchmark requires a bound Harmony scene.");
     const auto original = editor.document();
     QCoreApplication::processEvents();
     const auto before = window.grabWindow();
@@ -306,7 +327,7 @@ void meshInteractionBenchmark(EditorController& editor, CanvasItem& canvas,
     const auto peakBytes = qint64(usage.ru_maxrss) * 1024;
 #endif
     const QJsonObject report{{"profile", "native Qt Quick input-to-frameSwapped"},
-                             {"documentParts", 19},
+                             {"documentParts", partCount},
                              {"sceneWidth", editor.sceneWidth()},
                              {"sceneHeight", editor.sceneHeight()},
                              {"canvasWidth", canvas.width()},
