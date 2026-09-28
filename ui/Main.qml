@@ -522,13 +522,13 @@ ApplicationWindow {
                     Accessible.name: "Raster brush preset"
                 }
                 Text {
-                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate" && editor.tool !== "Camera"
+                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate" && editor.tool !== "Camera" && editor.tool !== "Mesh"
                     text: "Size"
                     color: "#858585"
                     font.pixelSize: 11
                 }
                 Slider {
-                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate" && editor.tool !== "Camera"
+                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate" && editor.tool !== "Camera" && editor.tool !== "Mesh"
                     from: 0.5
                     to: 100
                     value: editor.brushSize
@@ -537,7 +537,7 @@ ApplicationWindow {
                     Accessible.name: "Brush size"
                 }
                 Text {
-                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate" && editor.tool !== "Camera"
+                    visible: editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate" && editor.tool !== "Camera" && editor.tool !== "Mesh"
                     text: editor.brushSize.toFixed(1) + " px"
                     color: "#aaaaaa"
                     Layout.preferredWidth: 58
@@ -679,13 +679,13 @@ ApplicationWindow {
                 }
                 C.ToolButton {
                     text: "Fill shape"
-                    visible: !editor.tool.startsWith("Raster ") && editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate"
+                    visible: !editor.tool.startsWith("Raster ") && editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate" && editor.tool !== "Mesh"
                     active: editor.filled
                     onClicked: editor.filled = !editor.filled
                     hint: "Fill new rectangles and ellipses"
                 }
                 C.CompactComboBox {
-                    visible: !editor.tool.startsWith("Raster ") && editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate"
+                    visible: !editor.tool.startsWith("Raster ") && editor.tool !== "Marquee" && editor.tool !== "Lasso" && editor.tool !== "Select" && editor.tool !== "Animate" && editor.tool !== "Mesh"
                     model: ["Underlay Art", "Color Art", "Line Art", "Overlay Art"]
                     currentIndex: editor.artLayer
                     implicitHeight: 28
@@ -1268,6 +1268,42 @@ ApplicationWindow {
                                     enabled: editor.selectedSubstitution > 0
                                     onEditingFinished: editor.renameSubstitution(editor.selectedSubstitution, text)
                                     Accessible.name: "Substitution name"
+                                }
+                                Label { text: "Drawing mesh · current substitution"; color: "#999999"; font.pixelSize: 10 }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    C.CompactButton {
+                                        text: "Bind 2×2"
+                                        enabled: editor.selectedSubstitution > 0 && !editor.selectedMeshBound
+                                        onClicked: { if (editor.bindSelectedMesh(2, 2)) { canvas.meshRestEditing = false; editor.tool = "Mesh"; } }
+                                    }
+                                    C.CompactButton {
+                                        text: "Bind 4×4"
+                                        enabled: editor.selectedSubstitution > 0 && !editor.selectedMeshBound
+                                        onClicked: { if (editor.bindSelectedMesh(4, 4)) { canvas.meshRestEditing = false; editor.tool = "Mesh"; } }
+                                    }
+                                    Item { Layout.fillWidth: true }
+                                    C.CompactButton {
+                                        text: "Remove"
+                                        enabled: editor.selectedMeshBound
+                                        onClicked: editor.removeSelectedMesh()
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    visible: editor.selectedMeshBound
+                                    C.CompactButton {
+                                        text: "Pose vertices"
+                                        onClicked: { canvas.meshRestEditing = false; editor.tool = "Mesh"; }
+                                    }
+                                    C.CompactButton {
+                                        text: "Rest vertices"
+                                        onClicked: { canvas.meshRestEditing = true; editor.tool = "Mesh"; }
+                                    }
+                                    C.CompactButton {
+                                        text: "Reset pose"
+                                        onClicked: editor.resetSelectedMeshPose()
+                                    }
                                 }
                             }
                             ColumnLayout {

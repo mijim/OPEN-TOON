@@ -1,6 +1,6 @@
 # Documentation map
 
-**Updated: 2026-09-28.** The repository contains specifications, an execution roadmap and an experimental native editor. [Implementation status](implementation/STATUS.md) records the available subsets and open P00–P11 gates. HM-00, HM-01, HM-02, HM-03, HM-04 and HM-13 are accepted bounded contracts; HM-05 rest binding is the next critical-path slice.
+**Updated: 2026-09-28.** The repository contains specifications, an execution roadmap and an experimental native editor. [Implementation status](implementation/STATUS.md) records the available subsets and open P00–P11 gates. HM-00–HM-05 and HM-13 are accepted bounded contracts; HM-06 animated deformation is the next critical-path slice.
 
 ## Current decisions
 
@@ -11,7 +11,7 @@
 | Language | English across first-party UI, assets, code, help and documentation | User requirement; previous documentation translated |
 | Technology | C++20, Qt 6 and Qt Quick/QML | Accepted by user; risky integration paths need spikes |
 | Renderer | CPU QPainter reference adapter; Qt RHI/Skia comparison remains open | Experimental |
-| Storage | SQLite revisions with compressed, checksummed immutable media; format-7 output camera and source-version migration backups | See ADR-025–028 and recovery tests |
+| Storage | SQLite revisions with compressed, checksummed immutable media; format-8 mesh bindings and source-version migration backups | See ADR-025–029 and recovery tests |
 | Open-source reuse | Prefer proven libraries through tested adapters | User requirement; 30 library/tool entries evaluated in the roadmap |
 | Initial license | GPL-3.0-or-later for original contributions | Adopted |
 | Implementation | Experimental editor; partial catalog coverage | No complete phase or production release |
@@ -42,7 +42,7 @@
 |---|---|
 | Current operational entry and status | [NOW](planning/NOW.md) → [STATUS](implementation/STATUS.md) |
 | Where a feature completes | `python3 scripts/roadmap.py feature DEF-005` |
-| Current bounded delivery contract | `python3 scripts/roadmap.py slice HM-05` |
+| Current bounded delivery contract | `python3 scripts/roadmap.py slice HM-06` |
 | Ready slices after prerequisite evidence | `python3 scripts/roadmap.py next` |
 | Phase outcome, dependencies and gates | `python3 scripts/roadmap.py phase P13` |
 | Exact feature behavior | `python3 scripts/catalog.py show DEF-005` |

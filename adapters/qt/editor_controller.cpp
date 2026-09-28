@@ -2,6 +2,7 @@
 #include "opentoon/animation.h"
 #include "opentoon/property_address.h"
 #include "opentoon/rigging.h"
+#include "opentoon/deformation.h"
 #include "project_store.h"
 #include "image_batch_importer.h"
 #include "scene_renderer.h"
@@ -396,7 +397,7 @@ void EditorController::setTool(QString value) {
         report("Add an output camera before choosing Camera.");
         return;
     }
-    if (QStringList{"Animate", "Camera", "Pencil", "Eraser", "Select", "Marquee", "Lasso", "Line", "Rectangle",
+    if (QStringList{"Animate", "Camera", "Mesh", "Pencil", "Eraser", "Select", "Marquee", "Lasso", "Line", "Rectangle",
                     "Ellipse", "Recolor", "Edit points", "Raster ink", "Raster soft", "Raster dry",
                     "Raster smudge", "Raster eraser"}
             .contains(value)) {
@@ -843,6 +844,41 @@ void EditorController::stepSubstitution(int direction) {
         edit("Step substitution", [&](Document& d) {
             opentoon::stepSubstitution(d, layer_, frame_, direction);
         });
+}
+bool EditorController::selectedMeshBound() const {
+    if (!layer_ || document().layer(layer_).kind != LayerKind::Part)
+        return false;
+    return opentoon::meshBindingFor(document().layer(layer_), selectedSubstitution()) != nullptr;
+}
+bool EditorController::bindSelectedMesh(int columns, int rows) {
+    const Id drawing = selectedSubstitution();
+    return layer_ && drawing && edit("Bind drawing mesh", [&](Document& d) {
+        if (d.drawings.at(drawing).image)
+            opentoon::bindRegularImageMesh(d, layer_, drawing, columns, rows);
+        else
+            opentoon::bindRegularVectorMesh(d, layer_, drawing, columns, rows);
+    });
+}
+bool EditorController::moveSelectedMeshVertex(int vertex, double x, double y, bool rest) {
+    const Id drawing = selectedSubstitution();
+    return layer_ && drawing && vertex >= 0 && edit(rest ? "Edit mesh rest" : "Pose mesh", [&](Document& d) {
+        if (rest)
+            opentoon::moveMeshRestVertex(d, layer_, drawing, std::size_t(vertex), {x, y});
+        else
+            opentoon::moveMeshPoseVertex(d, layer_, drawing, std::size_t(vertex), {x, y});
+    });
+}
+bool EditorController::resetSelectedMeshPose() {
+    const Id drawing = selectedSubstitution();
+    return layer_ && drawing && edit("Reset mesh pose", [&](Document& d) {
+        opentoon::resetMeshPose(d, layer_, drawing);
+    });
+}
+bool EditorController::removeSelectedMesh() {
+    const Id drawing = selectedSubstitution();
+    return layer_ && drawing && edit("Remove mesh binding", [&](Document& d) {
+        opentoon::removeMeshBinding(d, layer_, drawing);
+    });
 }
 void EditorController::captureCharacterView() {
     const int root = characterId();

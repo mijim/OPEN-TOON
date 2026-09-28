@@ -36,6 +36,7 @@ class EditorController final : public QObject {
     Q_PROPERTY(QVariantList layers READ layers NOTIFY changed)
     Q_PROPERTY(QVariantList substitutions READ substitutions NOTIFY changed)
     Q_PROPERTY(int selectedSubstitution READ selectedSubstitution NOTIFY frameChanged)
+    Q_PROPERTY(bool selectedMeshBound READ selectedMeshBound NOTIFY frameChanged)
     Q_PROPERTY(int characterId READ characterId NOTIFY changed)
     Q_PROPERTY(QVariantList characterViews READ characterViews NOTIFY changed)
     Q_PROPERTY(int selectedView READ selectedView NOTIFY viewSelectionChanged)
@@ -121,6 +122,7 @@ class EditorController final : public QObject {
     QVariantList layers() const;
     QVariantList substitutions() const;
     int selectedSubstitution() const;
+    bool selectedMeshBound() const;
     int characterId() const;
     QVariantList characterViews() const;
     int selectedView() const;
@@ -213,6 +215,10 @@ class EditorController final : public QObject {
     Q_INVOKABLE void removeSubstitution(int drawing);
     Q_INVOKABLE void moveSubstitution(int drawing, int direction);
     Q_INVOKABLE void stepSubstitution(int direction);
+    Q_INVOKABLE bool bindSelectedMesh(int columns = 2, int rows = 2);
+    Q_INVOKABLE bool moveSelectedMeshVertex(int vertex, double x, double y, bool rest = false);
+    Q_INVOKABLE bool resetSelectedMeshPose();
+    Q_INVOKABLE bool removeSelectedMesh();
     Q_INVOKABLE void captureCharacterView();
     Q_INVOKABLE void applyCharacterView();
     Q_INVOKABLE void applyCharacterViewToRange();

@@ -44,7 +44,7 @@ The four art categories are Underlay, Color, Line and Overlay. Their drawing ord
 
 Click a swatch to select it. Double-click to edit its color; all strokes referencing that ID update. The document retains color IDs across save/reopen. Palette import, variants, gradients and managed color are pending.
 
-The inspector edits position, rotation, scale, opacity and pivot. Add transform keys with Linear, Hold or Smooth interpolation. If a layer already has keys, editing a transform inserts or updates a key at the current frame. Parent layers apply inherited transforms and opacity. Character parts and pegs preserve the visible image when reparented within one character, provided the result has no shear or singular transform and the moved layer and the branches whose parentage changes are not animated. Motion above their shared ancestor is preserved. Curves can be edited in the main workspace. IK and deformation remain pending.
+The inspector edits position, rotation, scale, opacity and pivot. Add transform keys with Linear, Hold or Smooth interpolation. If a layer already has keys, editing a transform inserts or updates a key at the current frame. Parent layers apply inherited transforms and opacity. Character parts and pegs preserve the visible image when reparented within one character, provided the result has no shear or singular transform and the moved layer and the branches whose parentage changes are not animated. Motion above their shared ancestor is preserved. Curves can be edited in the main workspace. IK and animated bone/curve deformation remain pending.
 
 **Scene → Add output camera** creates one orthographic camera. Choose the Camera
 tool to see the shot frame: drag inside it to pan, drag the round top handle to
@@ -64,13 +64,31 @@ Each Part shows its named substitutions as thumbnail tiles in Properties. **+ Bl
 
 **Apply range** places the selected view across the selected half-open timeline range while preserving the exposures before and after it. **Set this part** updates just the selected Part's choice in the selected view from the current frame. Arrow controls beside the view selector step through or reorder view sets. Navigation changes selection only; applying a view is the explicit document edit.
 
+## Static mesh binding preview
+
+Select a Part with an exposed image-only or vector-only drawing. In its
+Properties, choose **Bind 2×2** or **Bind 4×4**. The Mesh tool appears with
+handles over that Part. **Pose vertices** lets you drag a handle to preview
+the warp; **Rest vertices** edits the saved bind shape after resetting any
+pose. **Reset pose** returns the handles to rest, and **Remove** returns the
+Part to its unbound artwork. Each completed drag is one undo step. Switching
+substitutions loads that drawing's own binding.
+
+The mesh pose is a saved static preview: it applies at every frame for that
+substitution. Animated bone/curve controls and influence weights belong to a
+later contract. Image grids start at visible alpha bounds; vector drawings
+remain editable and use a scene-resolution raster proxy. Raster-tile and mixed
+media drawings cannot bind yet. Mesh proxies are limited to 4096 pixels per
+axis. If a binding no longer matches its source, the edit is rejected; remove
+the binding before deleting its substitution or detaching the Part.
+
 ## Saving and recovery
 
 Each manual save appends a complete revision. Scene history can restore a saved revision as an undoable edit. A stale writer is rejected if another writer changed the revision on disk; save a separate copy or reopen to resolve it.
 
 Every 60 seconds, a modified document is saved to a recovery file. On a later launch, recovery can open that snapshot as an unsaved scene. Save it under a chosen name. Autosave runs from an immutable snapshot in a worker, so newer edits stay unsaved until the next save. Manual saves remain synchronous. Recovery from operating-system power loss and multiple simultaneous application instances has not been qualified.
 
-Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and total decoded media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening formats 1–6 remains supported. Format 3 added channel Bézier easing, format 4 added typed character layers and named substitutions, format 5 added character view sets, format 6 saves the composition profile, and format 7 adds the output camera. The first save of an older schema creates a backup named for its source version, such as `.pre-v6.bak`, before upgrading. Older editors require that backup to reopen the original format.
+Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and total decoded media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening formats 1–7 remains supported. Format 3 added channel Bézier easing, format 4 added typed character layers and named substitutions, format 5 added character view sets, format 6 saves the composition profile, format 7 added the output camera, and format 8 saves mesh bindings. The first save of an older schema creates a backup named for its source version, such as `.pre-v7.bak`, before upgrading. Older editors require that backup to reopen the original format.
 
 **Scene → Compact project history** retains the chosen number of newest saved revisions and removes unreachable media, after creating a full `.pre-compact.bak` backup. Save pending edits first. This is an explicit operation and is not part of autosave.
 
@@ -104,7 +122,7 @@ limit, a 256 MiB decoded-media limit and an undoable all-or-nothing commit. Canc
 the file chooser to leave the document untouched. The project format also enforces
 its overall scene media limit. Parts currently share a centered layer offset; there
 is no automatic character-role assignment; use the Rig controls after import. Layered PSD, audio, video
-output, lip sync, deformation, node effects, OCIO, reusable rig libraries and
+output, lip sync, animated deformers, node effects, OCIO, reusable rig libraries and
 production installers remain pending. Consult the [phase status](STATUS.md).
 
 ## Animation edits and curves

@@ -99,6 +99,7 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
                   {"role", l.role},
                   {"variants", Json::array()},
                   {"views", Json::array()},
+                  {"bindings", Json::array()},
                   {"transform", transform(l.transform)},
                   {"exposures", Json::array()},
                   {"keys", Json::array()}};
@@ -111,6 +112,18 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
             for (const auto& choice : view.choices)
                 choices.push_back({choice.part, choice.drawing});
             x["views"].push_back({{"id", view.id}, {"name", view.name}, {"choices", choices}});
+        }
+        for (const auto& binding : l.bindings) {
+            Json vertices = Json::array();
+            for (const auto& vertex : binding.vertices)
+                vertices.push_back({vertex.rest.x, vertex.rest.y, vertex.pose.x,
+                                    vertex.pose.y, vertex.uv.x, vertex.uv.y});
+            x["bindings"].push_back({{"drawing", binding.drawing},
+                                      {"sourceWidth", binding.sourceWidth},
+                                      {"sourceHeight", binding.sourceHeight},
+                                      {"columns", binding.columns},
+                                      {"rows", binding.rows},
+                                      {"vertices", std::move(vertices)}});
         }
         for (const auto& k : l.keys) {
             Json ease = Json::object();
@@ -260,6 +273,26 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
                 for (const auto& choice : view.at("choices"))
                     entry.choices.push_back({choice.at(0), choice.at(1)});
                 l.views.push_back(std::move(entry));
+            }
+        }
+        if (j.at("version").get<int>() >= 8) {
+            limit(x.at("bindings"), 256);
+            for (const auto& item : x.at("bindings")) {
+                MeshBinding binding;
+                binding.drawing = item.at("drawing");
+                binding.sourceWidth = item.at("sourceWidth");
+                binding.sourceHeight = item.at("sourceHeight");
+                binding.columns = item.at("columns");
+                binding.rows = item.at("rows");
+                limit(item.at("vertices"), 1089);
+                for (const auto& value : item.at("vertices")) {
+                    if (!value.is_array() || value.size() != 6)
+                        throw std::runtime_error("Invalid mesh vertex encoding.");
+                    binding.vertices.push_back({{value.at(0), value.at(1)},
+                                                {value.at(2), value.at(3)},
+                                                {value.at(4), value.at(5)}});
+                }
+                l.bindings.push_back(std::move(binding));
             }
         }
         l.transform = readTransform(x.at("transform"));

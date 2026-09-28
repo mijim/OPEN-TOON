@@ -2855,7 +2855,7 @@
         "Resetting returns to the rest pose without deleting keys."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "deformation",
@@ -2863,7 +2863,8 @@
         "RIG"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "Format-8 per-substitution rest and static pose preview are editable, resettable and undoable. Animated deformer state and reset-with-keys acceptance remain HM-06 work.",
+      "implementation_evidence": "docs/implementation/HM05-ACCEPTANCE.md; tests/mesh_render_tests.cpp; apps/desktop/mesh_smoke.cpp"
     },
     {
       "id": "DEF-009",
@@ -2988,7 +2989,7 @@
         "Hiding controls does not disable the deformer."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "deformation",
@@ -2996,7 +2997,8 @@
         "RIG"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "Mesh handles can be hidden by leaving Mesh mode while the static warp persists in output. Preview-quality controls and animated deformer quality remain open.",
+      "implementation_evidence": "docs/implementation/HM05-ACCEPTANCE.md; tests/mesh_render_tests.cpp; apps/desktop/mesh_smoke.cpp"
     },
     {
       "id": "CTL-001",

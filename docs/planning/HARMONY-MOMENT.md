@@ -251,7 +251,7 @@ Extract the existing ordered painter into a shared evaluation boundary with type
 
 ## HM-05
 
-**Rest binding and deformation rendering feasibility** — `planned`; owner `deformation/render`, work package `P09-W1`.
+**Rest binding and deformation rendering feasibility** — `complete`; owner `deformation/render`, work package `P09-W1`.
 
 Prove the complete bind-to-render route before authoring tools: rest mesh/UVs, editable bind controls and per-substitution binding compatibility. Start with bounded regular meshes over alpha artwork; compare tessellation only if the fixture requires it. Retain editable source vectors and use an explicitly resolution-limited render proxy where needed.
 

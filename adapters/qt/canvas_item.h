@@ -16,6 +16,7 @@ class CanvasItem : public QQuickPaintedItem {
     Q_PROPERTY(QString regionInfo READ regionInfo NOTIFY regionChanged)
     Q_PROPERTY(EditorController* editor READ editor WRITE setEditor NOTIFY editorChanged)
     Q_PROPERTY(bool motionPathEditing READ motionPathEditing WRITE setMotionPathEditing NOTIFY viewChanged)
+    Q_PROPERTY(bool meshRestEditing READ meshRestEditing WRITE setMeshRestEditing NOTIFY viewChanged)
     Q_PROPERTY(bool hasVectorClipboard READ hasVectorClipboard NOTIFY regionChanged)
     Q_PROPERTY(bool gridVisible READ gridVisible WRITE setGridVisible NOTIFY viewChanged)
     Q_PROPERTY(bool snapToGrid READ snapToGrid WRITE setSnapToGrid NOTIFY viewChanged)
@@ -54,6 +55,8 @@ class CanvasItem : public QQuickPaintedItem {
     void setEditor(EditorController*);
     bool motionPathEditing() const { return motionPathEditing_; }
     void setMotionPathEditing(bool);
+    bool meshRestEditing() const { return meshRestEditing_; }
+    void setMeshRestEditing(bool value) { meshRestEditing_ = value; emit viewChanged(); update(); }
     Q_INVOKABLE QPointF motionPathPosition(int frame) const;
     double zoom() const { return zoom_; }
     void setZoom(double);
@@ -69,6 +72,7 @@ class CanvasItem : public QQuickPaintedItem {
     Q_INVOKABLE void capture(QString path);
     bool hasPreparedFrame(int frame);
     Q_INVOKABLE QPointF cameraHandlePosition(int index) const;
+    Q_INVOKABLE QPointF meshVertexPosition(int index) const;
   signals:
     void regionChanged();
     void editorChanged();
@@ -88,6 +92,15 @@ class CanvasItem : public QQuickPaintedItem {
     bool eventFilter(QObject*, QEvent*) override;
 
   private:
+    const opentoon::MeshBinding* selectedMesh(const opentoon::Document&) const;
+    int meshVertexAt(QPointF) const;
+    void paintMesh(QPainter*, const opentoon::Document&, const QTransform& itemTransform);
+    void beginMesh(QPointF);
+    void previewMesh(QPointF);
+    void commitMesh();
+    bool meshRestEditing_ = false;
+    int meshVertex_ = -1;
+    opentoon::MeshPoint meshPreviewPoint_;
     struct MotionSample {
         opentoon::Frame frame;
         QPointF position;

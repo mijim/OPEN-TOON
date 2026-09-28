@@ -1,5 +1,7 @@
 #include "scene_renderer.h"
+#include "mesh_warp.h"
 #include "graph_renderer.h"
+#include "opentoon/deformation.h"
 #include "opentoon/drawing_selection.h"
 #include <QPainterPath>
 #include <cmath>
@@ -42,11 +44,36 @@ QImage rasterTile(const SharedBuffer<std::uint16_t>& tile) {
     cache.emplace(tile.data(), Entry{tile, image});
     return image;
 }
-void drawing(QPainter& painter, const Drawing& d, const std::vector<Swatch>& palette) {
+void drawing(QPainter& painter, const Drawing& d, const std::vector<Swatch>& palette,
+             const MeshBinding* binding, const std::function<bool()>& cancelled) {
+    if (binding && !d.image && !d.strokes.empty()) {
+        QImage proxy(binding->sourceWidth, binding->sourceHeight, QImage::Format_RGBA8888);
+        if (proxy.isNull())
+            throw std::runtime_error("Unable to allocate vector mesh proxy.");
+        proxy.fill(Qt::transparent);
+        {
+            QPainter source(&proxy);
+            source.setRenderHint(QPainter::Antialiasing);
+            for (int art = 0; art < 4; ++art)
+                for (const auto& stroke : d.strokes)
+                    if (stroke.artLayer == art)
+                        SceneRenderer::paintStroke(source, stroke, palette);
+        }
+        ImageAsset image{binding->sourceWidth, binding->sourceHeight, {}};
+        image.rgba.assign(proxy.constBits(), proxy.constBits() + proxy.sizeInBytes());
+        const auto warped = warpMeshImage(image, *binding, cancelled);
+        painter.drawImage(QPointF(warped.origin), warped.pixels);
+        return;
+    }
     if (d.image) {
         const auto& im = *d.image;
-        QImage image(im.rgba.data(), im.width, im.height, im.width * 4, QImage::Format_RGBA8888);
-        painter.drawImage(QPointF(0, 0), image);
+        if (binding) {
+            const auto warped = warpMeshImage(im, *binding, cancelled);
+            painter.drawImage(QPointF(warped.origin), warped.pixels);
+        } else {
+            QImage image(im.rgba.data(), im.width, im.height, im.width * 4, QImage::Format_RGBA8888);
+            painter.drawImage(QPointF(0, 0), image);
+        }
     }
     if (d.raster) {
         painter.save();
@@ -104,7 +131,19 @@ QRect SceneRenderer::layerInkBounds(const Document& document, const Layer& layer
         local = hasInk ? local.united(rect) : rect;
         hasInk = true;
     };
-    if (source->image)
+    const auto* binding = meshBindingFor(layer, source->id);
+    if (binding) {
+        double minX = binding->vertices.front().pose.x;
+        double minY = binding->vertices.front().pose.y;
+        double maxX = minX, maxY = minY;
+        for (const auto& vertex : binding->vertices) {
+            minX = std::min(minX, vertex.pose.x);
+            minY = std::min(minY, vertex.pose.y);
+            maxX = std::max(maxX, vertex.pose.x);
+            maxY = std::max(maxY, vertex.pose.y);
+        }
+        include(QRectF(minX, minY, maxX - minX, maxY - minY));
+    } else if (source->image)
         include(QRectF(0, 0, source->image->width, source->image->height));
     if (source->raster)
         for (const auto& [position, tile] : source->raster->tiles) {
@@ -112,9 +151,10 @@ QRect SceneRenderer::layerInkBounds(const Document& document, const Layer& layer
             include(QRectF(position.first * 64, position.second * 64, 64, 64)
                         .intersected(QRectF(0, 0, source->raster->width, source->raster->height)));
         }
-    for (const auto& stroke : source->strokes)
-        if (const auto bounds = strokeBounds(stroke))
-            include(QRectF(bounds->x, bounds->y, bounds->width, bounds->height));
+    if (!binding)
+        for (const auto& stroke : source->strokes)
+            if (const auto bounds = strokeBounds(stroke))
+                include(QRectF(bounds->x, bounds->y, bounds->width, bounds->height));
     if (!hasInk)
         return {};
     auto transform = worldTransform(document, layer, frame);
@@ -237,7 +277,8 @@ void SceneRenderer::paint(QPainter& painter, const Document& d, Frame frame, Ren
                     shown.push_back(ghost->id);
                     ++count;
                     painter.setOpacity(opacity * 0.15 / (count));
-                    drawing(painter, *ghost, d.palette);
+                    drawing(painter, *ghost, d.palette,
+                            meshBindingFor(l, ghost->id), options.cancelled);
                 }
             }
             painter.setOpacity(opacity);
@@ -246,7 +287,8 @@ void SceneRenderer::paint(QPainter& painter, const Document& d, Frame frame, Ren
                                   ? options.previewDrawing
                                   : d.drawingAt(l.id, frame);
         if (current)
-            drawing(painter, *current, d.palette);
+            drawing(painter, *current, d.palette,
+                    meshBindingFor(l, current->id), options.cancelled);
         painter.restore();
     }
     painter.restore();

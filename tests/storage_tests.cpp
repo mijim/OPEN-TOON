@@ -1,6 +1,7 @@
 #include "project_store.h"
 #include "serialization.h"
 #include "opentoon/rigging.h"
+#include "opentoon/deformation.h"
 #include <catch2/catch_test_macros.hpp>
 #include <chrono>
 #include <fstream>
@@ -60,7 +61,7 @@ TEST_CASE("Saving a stale revision cannot overwrite another writer") {
 }
 TEST_CASE("Unknown versions and excessive nesting do not enter the document model") {
     auto text = serializeDocument(makeDocument());
-    auto position = text.find("\"version\":7");
+    auto position = text.find("\"version\":8");
     REQUIRE(position != std::string::npos);
     text.replace(position, 11, "\"version\":9");
     REQUIRE_THROWS(deserializeDocument(text));
@@ -276,7 +277,7 @@ TEST_CASE("Schema two upgrades preserve an original backup and protect Bezier me
     }
     {
         FixtureDatabase db(p.file);
-        REQUIRE(db.count("PRAGMA user_version") == 7);
+        REQUIRE(db.count("PRAGMA user_version") == 8);
     }
 }
 TEST_CASE("Format three scene migrates through typed characters with an original backup") {
@@ -322,7 +323,7 @@ TEST_CASE("Format three scene migrates through typed characters with an original
     REQUIRE(ProjectStore::load(p.file).document == upgraded);
     REQUIRE(ProjectStore::load(backup).document == legacy);
     FixtureDatabase current(p.file);
-    REQUIRE(current.count("PRAGMA user_version") == 7);
+    REQUIRE(current.count("PRAGMA user_version") == 8);
 }
 TEST_CASE("Format four character scene migrates to view sets with a preserved backup") {
     TemporaryProject p;
@@ -359,7 +360,7 @@ TEST_CASE("Format four character scene migrates to view sets with a preserved ba
     REQUIRE(ProjectStore::load(p.file).document == upgraded);
     REQUIRE(ProjectStore::load(backup).document == legacy);
     FixtureDatabase current(p.file);
-    REQUIRE(current.count("PRAGMA user_version") == 7);
+    REQUIRE(current.count("PRAGMA user_version") == 8);
 }
 TEST_CASE("Format five scenes default to legacy appearance and migrate with a backup") {
     TemporaryProject project;
@@ -389,7 +390,7 @@ TEST_CASE("Format five scenes default to legacy appearance and migrate with a ba
     REQUIRE(ProjectStore::save(project.file, next, "Linear composition", revision) > revision);
     REQUIRE(ProjectStore::load(project.file).document == next);
     FixtureDatabase current(project.file);
-    REQUIRE(current.count("PRAGMA user_version") == 7);
+    REQUIRE(current.count("PRAGMA user_version") == 8);
 }
 TEST_CASE("Format six scene gains an output camera with a readable original backup") {
     TemporaryProject project;
@@ -419,5 +420,41 @@ TEST_CASE("Format six scene gains an output camera with a readable original back
     backup += ".pre-v6.bak";
     REQUIRE(ProjectStore::load(backup).document == original);
     FixtureDatabase current(project.file);
-    REQUIRE(current.count("PRAGMA user_version") == 7);
+    REQUIRE(current.count("PRAGMA user_version") == 8);
+}
+
+TEST_CASE("Format seven mesh binding migration preserves the original project") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    const Id part = original.layers.front().id;
+    makeCharacter(original, part, "Hero");
+    const Id drawing = createSubstitution(original, part, 0, false, "Front");
+    original.drawings.at(drawing).image =
+        ImageAsset{16, 16, std::vector<std::uint8_t>(16 * 16 * 4, 255)};
+    const auto revision = ProjectStore::save(project.file, original);
+    auto oldJson = nlohmann::json::parse(serializeDocument(original));
+    oldJson["version"] = 7;
+    for (auto& layer : oldJson["layers"])
+        layer.erase("bindings");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(oldJson.dump());
+        db.execute("PRAGMA user_version=7");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto next = original;
+    bindRegularImageMesh(next, part, drawing, 2, 2);
+    REQUIRE_THROWS(ProjectStore::save(project.file, next, "Rejected migration", revision,
+                                      [](ProjectStore::SavePoint point) {
+                                          if (point == ProjectStore::SavePoint::BeforeTransaction)
+                                              throw std::runtime_error("Injected migration failure");
+                                      }));
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    REQUIRE(ProjectStore::save(project.file, next, "Bind mesh", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == next);
+    auto backup = project.file;
+    backup += ".pre-v7.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == 8);
 }

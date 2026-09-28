@@ -4,6 +4,7 @@
 #include "editor_controller.h"
 #include "key_block_smoke.h"
 #include "motion_path_smoke.h"
+#include "mesh_smoke.h"
 #include "project_store.h"
 #include "scene_renderer.h"
 #include "serialization.h"
@@ -467,11 +468,14 @@ int main(int argc, char** argv) {
                                     if (editor.document() != beforeComposition)
                                         throw std::runtime_error("Composition profile undo failed.");
                                     cameraSmoke(editor, *canvas, *window);
+                                    meshSmoke(editor, *canvas, *window);
                                     std::cout << "Composition smoke passed: linear canvas preview, "
                                                  "background next-frame publication, playback, scrub "
                                                  "and undo.\n";
                                     std::cout << "Camera smoke passed: direct pan/rotate/zoom, atomic undo, "
                                                  "guides, viewport isolation and save/reopen.\n";
+                                    std::cout << "Mesh smoke passed: mouse pose/rest drag, preview, "
+                                                 "undo/redo, unsafe rebind, reset and save/reopen.\n";
                                     QTimer::singleShot(150, &app, [&, window] {
                                         auto image = window->grabWindow();
                                         std::cout << "Visual animation smoke passed: thin picking, cursor "

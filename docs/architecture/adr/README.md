@@ -88,3 +88,6 @@ composition profile, typed graph kernel and bounded alpha behavior.
 
 See [ADR-028](028-output-camera.md) for format-7 orthographic output framing,
 direct camera gestures and the preview/export coordinate boundary.
+
+See [ADR-029](029-rest-mesh-binding.md) for format-8 per-substitution rest
+meshes, bounded image/vector proxies and the HM-05 texture-warp path.

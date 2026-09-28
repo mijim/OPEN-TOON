@@ -114,6 +114,11 @@ void CanvasItem::updateCursor(QPointF point) {
                              : toolCursor("Camera"));
         return;
     }
+    if (tool == "Mesh") {
+        setCursor(meshVertex_ >= 0 ? Qt::ClosedHandCursor :
+                  meshVertexAt(point) >= 0 ? Qt::OpenHandCursor : Qt::ArrowCursor);
+        return;
+    }
     if (tool == "Animate" && motionPathEditing_) {
         if (motionKey_ >= 0)
             setCursor(Qt::ClosedHandCursor);
