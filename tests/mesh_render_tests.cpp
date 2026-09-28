@@ -1,4 +1,5 @@
 #include "opentoon/deformation.h"
+#include "opentoon/deformer.h"
 #include "opentoon/rigging.h"
 #include "mesh_warp.h"
 #include "graph_renderer.h"
@@ -11,6 +12,7 @@
 #include <QJsonObject>
 #include <chrono>
 #include <cstdio>
+#include <cstring>
 
 using namespace opentoon;
 
@@ -157,6 +159,66 @@ TEST_CASE("Switching substitutions selects only that drawing's mesh binding") {
             front);
 }
 
+TEST_CASE("Keyed bone and curve poses use the same saved pixels in preview and output") {
+    MeshScene fixture;
+    bindRegularImageMesh(fixture.document, fixture.part, fixture.drawing, 4, 4);
+    const auto rest = SceneRenderer::render(fixture.document, 0);
+    bindBoneChain(fixture.document, fixture.part, fixture.drawing,
+                  {{{0, 8}, {8, 8}, {16, 8}}}, 3);
+    recordBonePose(fixture.document, fixture.part, fixture.drawing, 12, 0, 30);
+    REQUIRE(SceneRenderer::render(fixture.document, 0) == rest);
+    const auto boneFrame = SceneRenderer::render(fixture.document, 12);
+    REQUIRE(boneFrame != rest);
+    const auto reopenedBone = deserializeDocument(serializeDocument(fixture.document));
+    REQUIRE(SceneRenderer::render(reopenedBone, 12) == boneFrame);
+    fixture.document.composition = CompositionProfile::LinearSrgb;
+    const auto graph = CompositionGraph::orderedLayers(fixture.document);
+    REQUIRE(GraphRenderer::render(graph, fixture.document, 12, {}, {}, GraphTarget::Display) ==
+            GraphRenderer::render(graph, fixture.document, 12, {}, {}, GraphTarget::Write));
+    removeMeshDeformer(fixture.document, fixture.part, fixture.drawing);
+    const std::array<MeshPoint, 4> straight{{{0, 8}, {16.0 / 3, 8},
+                                            {32.0 / 3, 8}, {16, 8}}};
+    bindCurveDeformer(fixture.document, fixture.part, fixture.drawing, straight);
+    auto bent = straight;
+    bent[1].y = 4;
+    bent[2].y = 11;
+    recordCurvePose(fixture.document, fixture.part, fixture.drawing, 12, bent);
+    REQUIRE(SceneRenderer::render(fixture.document, 0) == rest);
+    const auto curveFrame = SceneRenderer::render(fixture.document, 12);
+    REQUIRE(curveFrame != rest);
+    REQUIRE(curveFrame != boneFrame);
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(fixture.document)), 12) ==
+            curveFrame);
+}
+
+TEST_CASE("Animated mesh controls stay with their substitution through switching and reopen") {
+    MeshScene fixture;
+    bindRegularImageMesh(fixture.document, fixture.part, fixture.drawing, 4, 2);
+    bindBoneChain(fixture.document, fixture.part, fixture.drawing,
+                  {{{0, 8}, {8, 8}, {16, 8}}}, 3);
+    recordBonePose(fixture.document, fixture.part, fixture.drawing, 0, 0, 20);
+    const auto front = SceneRenderer::render(fixture.document, 0);
+    const Id side = createSubstitution(fixture.document, fixture.part, 0, true, "Side");
+    bindRegularImageMesh(fixture.document, fixture.part, side, 4, 2);
+    const std::array<MeshPoint, 4> straight{{{0, 8}, {16.0 / 3, 8},
+                                            {32.0 / 3, 8}, {16, 8}}};
+    bindCurveDeformer(fixture.document, fixture.part, side, straight);
+    auto curved = straight;
+    curved[1].y += 3;
+    recordCurvePose(fixture.document, fixture.part, side, 0, curved);
+    fixture.document.validate();
+    const auto sideFrame = SceneRenderer::render(fixture.document, 0);
+    REQUIRE(sideFrame != front);
+    REQUIRE(meshBindingFor(fixture.document.layer(fixture.part), fixture.drawing)->bone.has_value());
+    REQUIRE(meshBindingFor(fixture.document.layer(fixture.part), side)->curve.has_value());
+    selectSubstitution(fixture.document, fixture.part, 0, fixture.drawing);
+    REQUIRE(SceneRenderer::render(fixture.document, 0) == front);
+    auto reopened = deserializeDocument(serializeDocument(fixture.document));
+    REQUIRE(SceneRenderer::render(reopened, 0) == front);
+    selectSubstitution(reopened, fixture.part, 0, side);
+    REQUIRE(SceneRenderer::render(reopened, 0) == sideFrame);
+}
+
 TEST_CASE("Mesh edges have contiguous coverage and transparent texels do not leak color") {
     MeshScene fixture;
     bindRegularImageMesh(fixture.document, fixture.part, fixture.drawing, 2, 2);
@@ -221,12 +283,13 @@ TEST_CASE("Nineteen Harmony parts keep rest pixels and bounded posed render cost
     QFile specification(QStringLiteral(OPENTOON_SOURCE_DIR "/tests/fixtures/harmony-moment/shot.json"));
     REQUIRE(specification.open(QIODevice::ReadOnly));
     const auto shot = QJsonDocument::fromJson(specification.readAll()).object();
-    const auto roles = shot.value("part_roles").toArray();
+    const auto roles = shot.value("reference_paint_order").toArray();
+    const auto centers = shot.value("reference_centers_px").toObject();
     REQUIRE(roles.size() == 19);
     auto document = makeDocument();
     document.width = 1920;
     document.height = 1080;
-    document.background = {0, 0, 0, 0};
+    document.background = {1, 1, 1, 1};
     std::vector<Id> parts;
     for (int index = 0; index < roles.size(); ++index) {
         const QString role = roles[index].toString();
@@ -253,6 +316,10 @@ TEST_CASE("Nineteen Harmony parts keep rest pixels and bounded posed render cost
         created.id = drawing;
         document.drawings.emplace(drawing, std::move(created));
         layer->name = role.toStdString();
+        const auto center = centers.value(role).toArray();
+        REQUIRE(center.size() == 2);
+        layer->transform.x = center[0].toDouble() - 128;
+        layer->transform.y = center[1].toDouble() - 128;
         auto& artwork = document.drawings.at(drawing);
         artwork.image = ImageAsset{image.width(), image.height(), {}};
         artwork.image->rgba.assign(image.constBits(), image.constBits() + image.sizeInBytes());
@@ -263,6 +330,22 @@ TEST_CASE("Nineteen Harmony parts keep rest pixels and bounded posed render cost
         attachDrawingAsPart(document, parts[index], root, roles[int(index)].toString().toStdString());
     document.validate();
     const auto baseline = SceneRenderer::render(document, 0);
+    const auto reference = QImage(QStringLiteral(OPENTOON_SOURCE_DIR
+        "/tests/fixtures/harmony-moment/reference_0000.png"))
+        .convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    REQUIRE(baseline.size() == reference.size());
+    for (int y = 0; y < baseline.height(); ++y)
+        if (std::memcmp(baseline.constScanLine(y), reference.constScanLine(y),
+                        baseline.width() * 4) != 0) {
+            for (int x = 0; x < baseline.width(); ++x)
+                if (baseline.pixel(x, y) != reference.pixel(x, y)) {
+                    std::fprintf(stderr, "First reference difference at %d,%d: %08x versus %08x\n",
+                                 x, y, baseline.pixel(x, y), reference.pixel(x, y));
+                    break;
+                }
+            FAIL("Original character pixels differ from reference");
+        }
+    REQUIRE(SceneRenderer::render(document, 12) == baseline);
     for (const Id part : parts) {
         const Id drawing = document.layer(part).exposures.front().drawing;
         bindRegularImageMesh(document, part, drawing, 2, 2);
@@ -290,4 +373,65 @@ TEST_CASE("Nineteen Harmony parts keep rest pixels and bounded posed render cost
     );
     const auto reopened = deserializeDocument(serializeDocument(document));
     REQUIRE(SceneRenderer::render(reopened, 0) == SceneRenderer::render(document, 0));
+
+    for (const Id part : parts) {
+        const Id drawing = document.layer(part).exposures.front().drawing;
+        resetMeshPose(document, part, drawing);
+    }
+    auto partFor = [&](const QString& role) {
+        for (int index = 0; index < roles.size(); ++index)
+            if (roles[index].toString() == role)
+                return parts[std::size_t(index)];
+        throw std::runtime_error("Missing original character part");
+    };
+    const auto armPart = partFor("upper_arm_left"), torsoPart = partFor("torso");
+    const auto armDrawing = document.layer(armPart).exposures.front().drawing;
+    const auto torsoDrawing = document.layer(torsoPart).exposures.front().drawing;
+    const auto& armMesh = *meshBindingFor(document.layer(armPart), armDrawing);
+    const auto armFirst = armMesh.vertices.front().rest;
+    const auto armLast = armMesh.vertices.back().rest;
+    const bool horizontal = armLast.x - armFirst.x >= armLast.y - armFirst.y;
+    const MeshPoint rootJoint = horizontal ? MeshPoint{armFirst.x, (armFirst.y + armLast.y) / 2}
+                                           : MeshPoint{(armFirst.x + armLast.x) / 2, armFirst.y};
+    const MeshPoint tipJoint = horizontal ? MeshPoint{armLast.x, rootJoint.y}
+                                          : MeshPoint{rootJoint.x, armLast.y};
+    const MeshPoint elbowJoint{(rootJoint.x + tipJoint.x) / 2,
+                               (rootJoint.y + tipJoint.y) / 2};
+    bindBoneChain(document, armPart, armDrawing, {rootJoint, elbowJoint, tipJoint},
+                  std::max(1.0, (horizontal ? tipJoint.x - rootJoint.x
+                                             : tipJoint.y - rootJoint.y) * 0.15));
+    recordBonePose(document, armPart, armDrawing, 12, 0, 12);
+    const auto& torsoMesh = *meshBindingFor(document.layer(torsoPart), torsoDrawing);
+    const auto torsoFirst = torsoMesh.vertices.front().rest;
+    const auto torsoLast = torsoMesh.vertices.back().rest;
+    const double centerX = (torsoFirst.x + torsoLast.x) / 2;
+    std::array<MeshPoint, 4> torsoControls{};
+    for (int index = 0; index < 4; ++index)
+        torsoControls[index] = {centerX, torsoFirst.y + (torsoLast.y - torsoFirst.y) * index / 3};
+    bindCurveDeformer(document, torsoPart, torsoDrawing, torsoControls);
+    auto curved = torsoControls;
+    curved[1].x += 4;
+    curved[2].x += 4;
+    recordCurvePose(document, torsoPart, torsoDrawing, 12, curved);
+    document.validate();
+    REQUIRE(SceneRenderer::render(document, 0) == baseline);
+    const auto animated = SceneRenderer::render(document, 12);
+    REQUIRE(animated != baseline);
+    REQUIRE(animated.save("hm06-bone-curve.png"));
+    REQUIRE(animated.copy(760, 250, 400, 500).save("hm06-bone-curve-detail.png"));
+    const auto reopenedAnimated = deserializeDocument(serializeDocument(document));
+    REQUIRE(SceneRenderer::render(reopenedAnimated, 12) == animated);
+    const auto animatedStart = std::chrono::steady_clock::now();
+    for (int run = 0; run < 3; ++run)
+        REQUIRE(SceneRenderer::render(document, 12) == animated);
+    const auto animatedElapsed = std::chrono::duration<double, std::milli>(
+        std::chrono::steady_clock::now() - animatedStart).count() / 3;
+    std::fprintf(stderr, "HM-06 Harmony 19 parts with bone and curve 1920x1080: %.2f ms per frame (%s)\n",
+                 animatedElapsed,
+#ifdef NDEBUG
+                 "release"
+#else
+                 "debug"
+#endif
+    );
 }

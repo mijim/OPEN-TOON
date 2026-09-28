@@ -24,6 +24,12 @@ void limit(const Json& j, std::size_t max) {
     if (!j.is_array() || j.size() > max)
         throw std::runtime_error("Invalid array or resource limit exceeded.");
 }
+Json meshPoint(MeshPoint point) { return {point.x, point.y}; }
+MeshPoint readMeshPoint(const Json& value) {
+    if (!value.is_array() || value.size() != 2)
+        throw std::runtime_error("Invalid deformer point encoding.");
+    return {value.at(0), value.at(1)};
+}
 } // namespace
 std::string serializeDocument(const Document& d, ResourceWriter write) {
     d.validate();
@@ -118,12 +124,46 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
             for (const auto& vertex : binding.vertices)
                 vertices.push_back({vertex.rest.x, vertex.rest.y, vertex.pose.x,
                                     vertex.pose.y, vertex.uv.x, vertex.uv.y});
-            x["bindings"].push_back({{"drawing", binding.drawing},
-                                      {"sourceWidth", binding.sourceWidth},
-                                      {"sourceHeight", binding.sourceHeight},
-                                      {"columns", binding.columns},
-                                      {"rows", binding.rows},
-                                      {"vertices", std::move(vertices)}});
+            Json entry = {{"drawing", binding.drawing},
+                          {"sourceWidth", binding.sourceWidth},
+                          {"sourceHeight", binding.sourceHeight},
+                          {"columns", binding.columns},
+                          {"rows", binding.rows},
+                          {"vertices", std::move(vertices)}};
+            if (binding.bone) {
+                const auto& bone = *binding.bone;
+                Json joints = Json::array(), keys = Json::array();
+                for (auto joint : bone.restJoints)
+                    joints.push_back(meshPoint(joint));
+                for (const auto& key : bone.keys)
+                    keys.push_back({{"frame", key.frame},
+                                    {"shoulder", key.shoulderAngle},
+                                    {"elbow", key.elbowAngle},
+                                    {"interpolation", static_cast<int>(key.interpolation)}});
+                entry["bone"] = {{"restJoints", std::move(joints)},
+                                 {"elbowTransition", bone.elbowTransition},
+                                 {"distalWeights", bone.distalWeights},
+                                 {"keys", std::move(keys)}};
+            }
+            if (binding.curve) {
+                const auto& curve = *binding.curve;
+                Json rest = Json::array(), coordinates = Json::array(), keys = Json::array();
+                for (auto point : curve.restControls)
+                    rest.push_back(meshPoint(point));
+                for (const auto& value : curve.coordinates)
+                    coordinates.push_back(value.t);
+                for (const auto& key : curve.keys) {
+                    Json controls = Json::array();
+                    for (auto point : key.controls)
+                        controls.push_back(meshPoint(point));
+                    keys.push_back({{"frame", key.frame}, {"controls", std::move(controls)},
+                                    {"interpolation", static_cast<int>(key.interpolation)}});
+                }
+                entry["curve"] = {{"restControls", std::move(rest)},
+                                  {"coordinates", std::move(coordinates)},
+                                  {"keys", std::move(keys)}};
+            }
+            x["bindings"].push_back(std::move(entry));
         }
         for (const auto& k : l.keys) {
             Json ease = Json::object();
@@ -291,6 +331,50 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
                     binding.vertices.push_back({{value.at(0), value.at(1)},
                                                 {value.at(2), value.at(3)},
                                                 {value.at(4), value.at(5)}});
+                }
+                if (j.at("version").get<int>() >= 9 && item.contains("bone")) {
+                    const auto& source = item.at("bone");
+                    BoneChain bone;
+                    limit(source.at("restJoints"), 3);
+                    if (source.at("restJoints").size() != 3)
+                        throw std::runtime_error("Bone chain needs three rest joints.");
+                    for (std::size_t i = 0; i < 3; ++i)
+                        bone.restJoints[i] = readMeshPoint(source.at("restJoints").at(i));
+                    bone.elbowTransition = source.at("elbowTransition");
+                    limit(source.at("distalWeights"), 1089);
+                    bone.distalWeights = source.at("distalWeights").get<std::vector<double>>();
+                    limit(source.at("keys"), 10000);
+                    for (const auto& key : source.at("keys"))
+                        bone.keys.push_back({key.at("frame"), key.at("shoulder"),
+                                             key.at("elbow"),
+                                             static_cast<Interpolation>(key.at("interpolation").get<int>())});
+                    binding.bone = std::move(bone);
+                }
+                if (j.at("version").get<int>() >= 9 && item.contains("curve")) {
+                    const auto& source = item.at("curve");
+                    CurveDeformer curve;
+                    limit(source.at("restControls"), 4);
+                    if (source.at("restControls").size() != 4)
+                        throw std::runtime_error("Curve needs four rest controls.");
+                    for (std::size_t i = 0; i < 4; ++i)
+                        curve.restControls[i] = readMeshPoint(source.at("restControls").at(i));
+                    limit(source.at("coordinates"), 1089);
+                    for (const auto& value : source.at("coordinates"))
+                        curve.coordinates.push_back({value.get<double>()});
+                    limit(source.at("keys"), 10000);
+                    for (const auto& key : source.at("keys")) {
+                        CurvePoseKey pose;
+                        pose.frame = key.at("frame");
+                        pose.interpolation =
+                            static_cast<Interpolation>(key.at("interpolation").get<int>());
+                        limit(key.at("controls"), 4);
+                        if (key.at("controls").size() != 4)
+                            throw std::runtime_error("Curve key needs four controls.");
+                        for (std::size_t i = 0; i < 4; ++i)
+                            pose.controls[i] = readMeshPoint(key.at("controls").at(i));
+                        curve.keys.push_back(std::move(pose));
+                    }
+                    binding.curve = std::move(curve);
                 }
                 l.bindings.push_back(std::move(binding));
             }

@@ -64,7 +64,7 @@ Each Part shows its named substitutions as thumbnail tiles in Properties. **+ Bl
 
 **Apply range** places the selected view across the selected half-open timeline range while preserving the exposures before and after it. **Set this part** updates just the selected Part's choice in the selected view from the current frame. Arrow controls beside the view selector step through or reorder view sets. Navigation changes selection only; applying a view is the explicit document edit.
 
-## Static mesh binding preview
+## Mesh binding and animated controls
 
 Select a Part with an exposed image-only or vector-only drawing. In its
 Properties, choose **Bind 2×2** or **Bind 4×4**. The Mesh tool appears with
@@ -74,13 +74,22 @@ pose. **Reset pose** returns the handles to rest, and **Remove** returns the
 Part to its unbound artwork. Each completed drag is one undo step. Switching
 substitutions loads that drawing's own binding.
 
-The mesh pose is a saved static preview: it applies at every frame for that
-substitution. Animated bone/curve controls and influence weights belong to a
-later contract. Image grids start at visible alpha bounds; vector drawings
+The vertex pose is a saved static preview that applies at every frame. Reset
+it before choosing **Bone chain** or **Curve**. These bounded controls use the
+selected drawing's mesh: drag a bone joint or curve point on canvas at the
+current frame to record an animated pose. Escape cancels a drag. **Rest key**
+records the original shape at the playhead without deleting other keys;
+**Remove control** removes the deformer and leaves the rest mesh. One Part
+substitution can have one control type; another substitution may use its own.
+Static vertices cannot be edited while a control is attached.
+
+Image grids start at visible alpha bounds; vector drawings
 remain editable and use a scene-resolution raster proxy. Raster-tile and mixed
 media drawings cannot bind yet. Mesh proxies are limited to 4096 pixels per
 axis. If a binding no longer matches its source, the edit is rejected; remove
-the binding before deleting its substitution or detaching the Part.
+the binding before deleting its substitution or detaching the Part. The
+animated control profile is still being qualified for extreme bends and the
+complete character shot.
 
 ## Saving and recovery
 
@@ -88,7 +97,7 @@ Each manual save appends a complete revision. Scene history can restore a saved 
 
 Every 60 seconds, a modified document is saved to a recovery file. On a later launch, recovery can open that snapshot as an unsaved scene. Save it under a chosen name. Autosave runs from an immutable snapshot in a worker, so newer edits stay unsaved until the next save. Manual saves remain synchronous. Recovery from operating-system power loss and multiple simultaneous application instances has not been qualified.
 
-Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and total decoded media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening formats 1–7 remains supported. Format 3 added channel Bézier easing, format 4 added typed character layers and named substitutions, format 5 added character view sets, format 6 saves the composition profile, format 7 added the output camera, and format 8 saves mesh bindings. The first save of an older schema creates a backup named for its source version, such as `.pre-v7.bak`, before upgrading. Older editors require that backup to reopen the original format.
+Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and total decoded media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening formats 1–8 remains supported. Format 3 added channel Bézier easing, format 4 added typed character layers and named substitutions, format 5 added character view sets, format 6 saves the composition profile, format 7 added the output camera, format 8 saves mesh bindings, and format 9 saves bone/curve controls and animation keys. The first save of an older schema creates a backup named for its source version, such as `.pre-v8.bak`, before upgrading. Older editors require that backup to reopen the original format.
 
 **Scene → Compact project history** retains the chosen number of newest saved revisions and removes unreachable media, after creating a full `.pre-compact.bak` backup. Save pending edits first. This is an explicit operation and is not part of autosave.
 

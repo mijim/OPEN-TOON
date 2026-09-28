@@ -281,7 +281,7 @@ Prove the complete bind-to-render route before authoring tools: rest mesh/UVs, e
 
 ## HM-06
 
-**Bone and curve deformers** — `planned`; owner `deformation/animation`, work package `P09-W1`.
+**Bone and curve deformers** — `in_progress`; owner `deformation/animation`, work package `P09-W1`.
 
 Deliver editable bone chains and curve chains with defined local/rest spaces, stable weights, predictable joint/tangent behavior and saved animated properties. Controls drag on canvas with cancellable previews; variant changes resolve their own binding.
 

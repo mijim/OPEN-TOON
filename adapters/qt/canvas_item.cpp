@@ -512,6 +512,10 @@ void CanvasItem::move(QPointF position, double pressure) {
             previewCamera(position);
             return;
         }
+        if (meshControl_ >= 0) {
+            previewMeshControl(position);
+            return;
+        }
         if (meshVertex_ >= 0) {
             previewMesh(position);
             return;
@@ -621,6 +625,10 @@ void CanvasItem::end() {
         commitCamera();
         return;
     }
+    if (meshControl_ >= 0) {
+        commitMeshControl();
+        return;
+    }
     if (meshVertex_ >= 0) {
         commitMesh();
         return;
@@ -694,6 +702,8 @@ void CanvasItem::end() {
 void CanvasItem::cancelGesture() {
     cameraHandle_ = -1;
     meshVertex_ = -1;
+    meshControl_ = -1;
+    meshControlMoved_ = false;
     motionKey_ = -1;
     marqueeOperation_ = 0;
     posePreview_.reset();

@@ -94,4 +94,63 @@ void meshSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& windo
         throw std::runtime_error("Removing the mesh left its binding active.");
     if (SceneRenderer::render(editor.document(), 0) != originalPixels)
         throw std::runtime_error("Removing the mesh did not restore source artwork pixels.");
+
+    editor.holdDrawing(editor.duration());
+    if (!editor.bindSelectedMesh(4, 2) || !editor.bindSelectedBone() ||
+        editor.selectedMeshDeformer() != 1)
+        throw std::runtime_error("Bone chain could not be bound through the editor.");
+    canvas.setMeshRestEditing(false);
+    editor.setFrame(12);
+    const auto boneRest = editor.document();
+    const auto boneRestPixels = SceneRenderer::render(boneRest, 12);
+    const auto tip = canvas.meshControlPosition(2);
+    send(QEvent::MouseButtonPress, tip, Qt::LeftButton, Qt::LeftButton);
+    send(QEvent::MouseMove, tip + QPointF(-8, 16), Qt::NoButton, Qt::LeftButton);
+    if (editor.document() != boneRest || window.grabWindow().isNull())
+        throw std::runtime_error("Bone drag did not keep an isolated live preview.");
+    send(QEvent::MouseButtonRelease, tip + QPointF(-8, 16), Qt::LeftButton, Qt::NoButton);
+    const auto bonePixels = SceneRenderer::render(editor.document(), 12);
+    if (bonePixels == boneRestPixels)
+        throw std::runtime_error("Bone drag did not change the rendered frame: " +
+                                 editor.status().toStdString());
+    if (!window.grabWindow().save("build/mesh-deformer-ui-smoke.png"))
+        throw std::runtime_error("Bone control UI screenshot failed.");
+    editor.undo();
+    if (editor.document() != boneRest)
+        throw std::runtime_error("Bone drag did not undo atomically.");
+    editor.redo();
+    if (SceneRenderer::render(editor.document(), 12) != bonePixels)
+        throw std::runtime_error("Bone redo changed the rendered frame.");
+    const auto boneSaved = editor.document();
+    if (!editor.saveProject(project) || !editor.openProject(project) ||
+        editor.document() != boneSaved || SceneRenderer::render(editor.document(), 12) != bonePixels)
+        throw std::runtime_error("Bone animation changed after project reopen.");
+    editor.setSelectedLayer(int(part));
+    if (!editor.removeSelectedDeformer() || !editor.bindSelectedCurve() ||
+        editor.selectedMeshDeformer() != 2)
+        throw std::runtime_error("Curve control could not replace the bone chain.");
+    editor.setFrame(24);
+    const auto curveRest = editor.document();
+    const auto tangent = canvas.meshControlPosition(1);
+    send(QEvent::MouseButtonPress, tangent, Qt::LeftButton, Qt::LeftButton);
+    send(QEvent::MouseMove, tangent + QPointF(0, -12), Qt::NoButton, Qt::LeftButton);
+    canvas.cancelGesture();
+    if (editor.document() != curveRest)
+        throw std::runtime_error("Cancelled curve drag changed the document.");
+    drag(tangent, tangent + QPointF(0, -12));
+    const auto curvePixels = SceneRenderer::render(editor.document(), 24);
+    if (curvePixels == SceneRenderer::render(curveRest, 24))
+        throw std::runtime_error("Curve tangent drag did not deform the rendered frame.");
+    const auto curveSaved = editor.document();
+    if (!editor.saveProject(project) || !editor.openProject(project) ||
+        editor.document() != curveSaved || SceneRenderer::render(editor.document(), 24) != curvePixels)
+        throw std::runtime_error("Curve animation changed after project reopen.");
+    editor.setSelectedLayer(int(part));
+    editor.setFrame(24);
+    if (!editor.resetSelectedDeformerPose() ||
+        SceneRenderer::render(editor.document(), 24) != SceneRenderer::render(curveRest, 24))
+        throw std::runtime_error("Rest key did not recover original curve pixels.");
+    editor.undo();
+    if (SceneRenderer::render(editor.document(), 24) != curvePixels)
+        throw std::runtime_error("Rest key did not undo without deleting prior animation.");
 }

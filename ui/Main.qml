@@ -1294,15 +1294,53 @@ ApplicationWindow {
                                     visible: editor.selectedMeshBound
                                     C.CompactButton {
                                         text: "Pose vertices"
+                                        enabled: editor.selectedMeshDeformer === 0
                                         onClicked: { canvas.meshRestEditing = false; editor.tool = "Mesh"; }
                                     }
                                     C.CompactButton {
                                         text: "Rest vertices"
+                                        enabled: editor.selectedMeshDeformer === 0
                                         onClicked: { canvas.meshRestEditing = true; editor.tool = "Mesh"; }
                                     }
                                     C.CompactButton {
                                         text: "Reset pose"
+                                        enabled: editor.selectedMeshDeformer === 0
                                         onClicked: editor.resetSelectedMeshPose()
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    visible: editor.selectedMeshBound
+                                    C.CompactButton {
+                                        text: "Bone chain"
+                                        enabled: editor.selectedMeshDeformer === 0
+                                        onClicked: { if (editor.bindSelectedBone()) { canvas.meshRestEditing = false; editor.tool = "Mesh"; } }
+                                    }
+                                    C.CompactButton {
+                                        text: "Curve"
+                                        enabled: editor.selectedMeshDeformer === 0
+                                        onClicked: { if (editor.bindSelectedCurve()) { canvas.meshRestEditing = false; editor.tool = "Mesh"; } }
+                                    }
+                                    Item { Layout.fillWidth: true }
+                                    C.CompactButton {
+                                        text: "Remove control"
+                                        enabled: editor.selectedMeshDeformer > 0
+                                        onClicked: editor.removeSelectedDeformer()
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    visible: editor.selectedMeshDeformer > 0
+                                    Label {
+                                        text: "Drag joints or curve points on canvas · Esc cancels"
+                                        color: "#999999"
+                                        font.pixelSize: 10
+                                        Layout.fillWidth: true
+                                        wrapMode: Text.Wrap
+                                    }
+                                    C.CompactButton {
+                                        text: "Rest key"
+                                        onClicked: editor.resetSelectedDeformerPose()
                                     }
                                 }
                             }

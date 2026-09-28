@@ -474,8 +474,8 @@ int main(int argc, char** argv) {
                                                  "and undo.\n";
                                     std::cout << "Camera smoke passed: direct pan/rotate/zoom, atomic undo, "
                                                  "guides, viewport isolation and save/reopen.\n";
-                                    std::cout << "Mesh smoke passed: mouse pose/rest drag, preview, "
-                                                 "undo/redo, unsafe rebind, reset and save/reopen.\n";
+                                    std::cout << "Mesh smoke passed: vertex, bone and curve mouse drags, "
+                                                 "cancellable preview, undo/redo, rest key and reopen.\n";
                                     QTimer::singleShot(150, &app, [&, window] {
                                         auto image = window->grabWindow();
                                         std::cout << "Visual animation smoke passed: thin picking, cursor "

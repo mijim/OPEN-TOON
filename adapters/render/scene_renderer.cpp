@@ -2,6 +2,7 @@
 #include "mesh_warp.h"
 #include "graph_renderer.h"
 #include "opentoon/deformation.h"
+#include "opentoon/deformer.h"
 #include "opentoon/drawing_selection.h"
 #include <QPainterPath>
 #include <cmath>
@@ -45,7 +46,12 @@ QImage rasterTile(const SharedBuffer<std::uint16_t>& tile) {
     return image;
 }
 void drawing(QPainter& painter, const Drawing& d, const std::vector<Swatch>& palette,
-             const MeshBinding* binding, const std::function<bool()>& cancelled) {
+             const MeshBinding* binding, Frame frame, const std::function<bool()>& cancelled) {
+    std::optional<MeshBinding> evaluated;
+    if (binding && (binding->bone || binding->curve)) {
+        evaluated = evaluateMeshBinding(*binding, frame);
+        binding = &*evaluated;
+    }
     if (binding && !d.image && !d.strokes.empty()) {
         QImage proxy(binding->sourceWidth, binding->sourceHeight, QImage::Format_RGBA8888);
         if (proxy.isNull())
@@ -132,6 +138,11 @@ QRect SceneRenderer::layerInkBounds(const Document& document, const Layer& layer
         hasInk = true;
     };
     const auto* binding = meshBindingFor(layer, source->id);
+    std::optional<MeshBinding> evaluated;
+    if (binding && (binding->bone || binding->curve)) {
+        evaluated = evaluateMeshBinding(*binding, frame);
+        binding = &*evaluated;
+    }
     if (binding) {
         double minX = binding->vertices.front().pose.x;
         double minY = binding->vertices.front().pose.y;
@@ -278,7 +289,7 @@ void SceneRenderer::paint(QPainter& painter, const Document& d, Frame frame, Ren
                     ++count;
                     painter.setOpacity(opacity * 0.15 / (count));
                     drawing(painter, *ghost, d.palette,
-                            meshBindingFor(l, ghost->id), options.cancelled);
+                            meshBindingFor(l, ghost->id), f, options.cancelled);
                 }
             }
             painter.setOpacity(opacity);
@@ -288,7 +299,7 @@ void SceneRenderer::paint(QPainter& painter, const Document& d, Frame frame, Ren
                                   : d.drawingAt(l.id, frame);
         if (current)
             drawing(painter, *current, d.palette,
-                    meshBindingFor(l, current->id), options.cancelled);
+                    meshBindingFor(l, current->id), frame, options.cancelled);
         painter.restore();
     }
     painter.restore();

@@ -73,6 +73,7 @@ class CanvasItem : public QQuickPaintedItem {
     bool hasPreparedFrame(int frame);
     Q_INVOKABLE QPointF cameraHandlePosition(int index) const;
     Q_INVOKABLE QPointF meshVertexPosition(int index) const;
+    Q_INVOKABLE QPointF meshControlPosition(int index) const;
   signals:
     void regionChanged();
     void editorChanged();
@@ -94,13 +95,19 @@ class CanvasItem : public QQuickPaintedItem {
   private:
     const opentoon::MeshBinding* selectedMesh(const opentoon::Document&) const;
     int meshVertexAt(QPointF) const;
+    int meshControlAt(QPointF) const;
     void paintMesh(QPainter*, const opentoon::Document&, const QTransform& itemTransform);
     void beginMesh(QPointF);
     void previewMesh(QPointF);
     void commitMesh();
+    void previewMeshControl(QPointF);
+    void commitMeshControl();
     bool meshRestEditing_ = false;
     int meshVertex_ = -1;
+    int meshControl_ = -1;
+    bool meshControlMoved_ = false;
     opentoon::MeshPoint meshPreviewPoint_;
+    std::array<double, 2> meshPreviewAngles_{};
     struct MotionSample {
         opentoon::Frame frame;
         QPointF position;

@@ -1,4 +1,5 @@
 #include "opentoon/deformation.h"
+#include "opentoon/deformer.h"
 #include "opentoon/drawing_selection.h"
 #include <algorithm>
 #include <cmath>
@@ -76,8 +77,8 @@ void installGrid(Document& document, Layer& part, Id drawing, int columns, int r
                                 return binding.drawing == drawing;
                             });
     if (old != part.bindings.end()) {
-        require(!posed(*old),
-                "Rebinding would discard an edited mesh pose; reset or remove it first.");
+        require(!posed(*old) && !old->bone && !old->curve,
+                "Rebinding would discard a mesh pose or deformer animation; reset/remove it first.");
         *old = std::move(next);
     } else
         part.bindings.push_back(std::move(next));
@@ -140,6 +141,7 @@ void validateMeshBinding(const Document& document, const Layer& part, const Mesh
     require(std::ceil(maxX) - std::floor(minX) <= 4096 &&
                 std::ceil(maxY) - std::floor(minY) <= 4096,
             "Mesh pose exceeds its 4096-pixel render proxy.");
+    validateMeshDeformer(document, binding);
 }
 
 void bindRegularImageMesh(Document& document, Id partId, Id drawing, int columns, int rows) {
@@ -188,6 +190,8 @@ void moveMeshRestVertex(Document& document, Id partId, Id drawing, std::size_t i
                         MeshPoint position) {
     auto& part = editablePart(document, partId);
     auto candidate = bindingFor(part, drawing);
+    require(!candidate.bone && !candidate.curve,
+            "Remove the deformer before editing mesh rest vertices.");
     require(index < candidate.vertices.size(), "Mesh vertex does not exist.");
     require(!posed(candidate), "Reset the mesh pose before editing its rest shape.");
     candidate.vertices[index].rest = position;
@@ -200,6 +204,8 @@ void moveMeshPoseVertex(Document& document, Id partId, Id drawing, std::size_t i
                         MeshPoint position) {
     auto& part = editablePart(document, partId);
     auto candidate = bindingFor(part, drawing);
+    require(!candidate.bone && !candidate.curve,
+            "Remove the deformer before editing static mesh pose vertices.");
     require(index < candidate.vertices.size(), "Mesh vertex does not exist.");
     candidate.vertices[index].pose = position;
     validateMeshBinding(document, part, candidate);
@@ -209,6 +215,8 @@ void moveMeshPoseVertex(Document& document, Id partId, Id drawing, std::size_t i
 void resetMeshPose(Document& document, Id partId, Id drawing) {
     auto& part = editablePart(document, partId);
     auto& binding = bindingFor(part, drawing);
+    require(!binding.bone && !binding.curve,
+            "Animated deformer keys need their own reset command.");
     for (auto& vertex : binding.vertices)
         vertex.pose = vertex.rest;
 }

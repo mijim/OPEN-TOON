@@ -6,9 +6,9 @@ Read in order: **this page → [implementation status](../implementation/STATUS.
 
 The immediate objective is a complete, reliable character-animation **Harmony Moment**, from artwork intake through rigging, deformation, controls, animation and audio, composition and camera to preview, save/reopen and export. This is a bounded workflow milestone; the full P00–P22 roadmap remains intact.
 
-**Active critical-path slice: [HM-06](HARMONY-MOMENT.md#hm-06).** HM-05 has accepted bounded [rest/UV and renderer evidence](../implementation/HM05-ACCEPTANCE.md). The next task is to define saved animated bone and curve controls, stable weights and the evaluated pose path over that representation. Prove bent-arm and curved-torso behavior, reset, substitution switching, undo/reopen and shot-level quality/cost before accepting the slice.
+**Active critical-path slice: [HM-06](HARMONY-MOMENT.md#hm-06).** HM-05 has accepted bounded [rest/UV and renderer evidence](../implementation/HM05-ACCEPTANCE.md). The [working HM-06 subset](../implementation/HM06-PROGRESS.md) now saves bone/curve controls, weights and keys, supports canvas drags and passes original-art rendering/reopen checks. Next, resolve extreme-bend seams and measure control-to-preview latency and memory on the reference shot before accepting the slice.
 
-**Current gate:** HM-05 provides static mesh preview and measured texture warp. HM-06 still needs animated bone/curve evaluation, influence behavior and quality evidence. HM-07 controls, HM-10 audio and HM-12 nodes are independently eligible; with one implementer, follow the [recommended priority](FIRST-STEPS.md) and work HM-06 first.
+**Current gate:** HM-06 has animated bone/curve evaluation and bounded per-substitution binding; extreme bends, influence tuning and artistic interaction quality remain unaccepted. HM-07 controls, HM-10 audio and HM-12 nodes are independently eligible; with one implementer, follow the [recommended priority](FIRST-STEPS.md) and finish HM-06 first.
 
 **Accepted HM-03 evidence:** the owner delegated review to the implementer. The original 19-part import/assembly/view journey, reference-pixel comparison, saved/reopened substitutions, independent copy, undo, negative/nonuniform reparenting and visual screenshot inspection are recorded in [HM03-ACCEPTANCE](../implementation/HM03-ACCEPTANCE.md). This bounded contract does not complete P08 or the independent second-animator HM-15 review.
 
@@ -21,7 +21,7 @@ Statuses and hard prerequisites below come from `roadmap.json`; acceptance and p
 | [HM-03](HARMONY-MOMENT.md#hm-03) | Bounded contract accepted | HM-01, HM-02 accepted | P08 owning phase remains open. |
 | [HM-04](HARMONY-MOMENT.md#hm-04) | Bounded contract accepted | HM-01 accepted | P10 owning phase remains open. |
 | [HM-05](HARMONY-MOMENT.md#hm-05) | Bounded contract accepted | HM-03, HM-04 accepted | P09 owning phase remains open. |
-| [HM-06](HARMONY-MOMENT.md#hm-06) | Planned; eligible | HM-05 accepted | Next critical-path slice. |
+| [HM-06](HARMONY-MOMENT.md#hm-06) | In progress | HM-05 accepted | Extreme-bend quality and interaction budgets remain. |
 | [HM-07](HARMONY-MOMENT.md#hm-07) | Planned; eligible | HM-03, HM-04 accepted | Controls may follow HM-05 with one implementer. |
 | [HM-08](HARMONY-MOMENT.md#hm-08) | Planned | HM-03, HM-07 | Wait for both contracts. |
 | [HM-09](HARMONY-MOMENT.md#hm-09) | Planned | HM-06, HM-07, HM-08 | Wait for all three contracts. |

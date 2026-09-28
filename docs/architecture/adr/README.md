@@ -91,3 +91,6 @@ direct camera gestures and the preview/export coordinate boundary.
 
 See [ADR-029](029-rest-mesh-binding.md) for format-8 per-substitution rest
 meshes, bounded image/vector proxies and the HM-05 texture-warp path.
+
+See [ADR-030](030-animated-mesh-controls.md) for the in-progress format-9
+bone/curve animation contract, local weights and ephemeral pose evaluation.
