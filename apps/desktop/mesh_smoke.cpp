@@ -153,6 +153,33 @@ void meshSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& windo
         throw std::runtime_error("Elbow influence did not redo identically.");
     editor.undo();
     canvas.setMeshRestEditing(true);
+    if (!window.grabWindow().save("build/hm06-influence-handle.png"))
+        throw std::runtime_error("Influence-handle UI screenshot failed.");
+    const auto radiusHandle = canvas.meshInfluenceHandlePosition();
+    const auto elbowCenter = canvas.meshControlPosition(1);
+    const auto radiusTarget = elbowCenter + (radiusHandle - elbowCenter) * 1.25;
+    const auto beforeRadiusDrag = editor.document();
+    send(QEvent::MouseButtonPress, radiusHandle, Qt::LeftButton, Qt::LeftButton);
+    send(QEvent::MouseMove, radiusTarget, Qt::NoButton, Qt::LeftButton);
+    if (editor.document() != beforeRadiusDrag || window.grabWindow().isNull())
+        throw std::runtime_error("Influence handle did not keep an isolated live preview.");
+    canvas.cancelGesture();
+    if (editor.document() != beforeRadiusDrag)
+        throw std::runtime_error("Cancelled influence-handle drag changed the document.");
+    drag(radiusHandle, radiusTarget);
+    const auto handledPixels = SceneRenderer::render(editor.document(), 12);
+    if (editor.selectedBoneTransition() <= oldRadius || handledPixels == bonePixels ||
+        SceneRenderer::render(editor.document(), 0) !=
+            SceneRenderer::render(beforeRadiusDrag, 0))
+        throw std::runtime_error("Influence handle did not retarget the keyed bend safely: " +
+                                 editor.status().toStdString());
+    editor.undo();
+    if (editor.document() != beforeRadiusDrag)
+        throw std::runtime_error("Influence handle did not undo atomically.");
+    editor.redo();
+    if (SceneRenderer::render(editor.document(), 12) != handledPixels)
+        throw std::runtime_error("Influence-handle redo changed the rendered frame.");
+    editor.undo();
     const auto restElbow = canvas.meshControlPosition(1);
     const auto beforeRestEdit = editor.document();
     send(QEvent::MouseButtonPress, restElbow, Qt::LeftButton, Qt::LeftButton);

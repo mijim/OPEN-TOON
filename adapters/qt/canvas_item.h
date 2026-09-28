@@ -74,6 +74,7 @@ class CanvasItem : public QQuickPaintedItem {
     Q_INVOKABLE QPointF cameraHandlePosition(int index) const;
     Q_INVOKABLE QPointF meshVertexPosition(int index) const;
     Q_INVOKABLE QPointF meshControlPosition(int index) const;
+    Q_INVOKABLE QPointF meshInfluenceHandlePosition() const;
   signals:
     void regionChanged();
     void editorChanged();
@@ -108,6 +109,7 @@ class CanvasItem : public QQuickPaintedItem {
     bool meshControlMoved_ = false;
     opentoon::MeshPoint meshPreviewPoint_;
     std::array<double, 2> meshPreviewAngles_{};
+    double meshPreviewRadius_ = 0;
     struct MotionSample {
         opentoon::Frame frame;
         QPointF position;

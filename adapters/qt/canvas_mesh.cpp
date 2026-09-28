@@ -29,6 +29,14 @@ std::array<MeshPoint, 3> posedJoints(const BoneChain& bone, Frame frame) {
     joints[2] = {joints[1].x + distal.x, joints[1].y + distal.y};
     return joints;
 }
+MeshPoint influenceHandle(const BoneChain& bone) {
+    const auto& joints = bone.restJoints;
+    const double dx = joints[1].x - joints[0].x;
+    const double dy = joints[1].y - joints[0].y;
+    const double length = std::hypot(dx, dy);
+    return {joints[1].x - dy / length * bone.elbowTransition,
+            joints[1].y + dx / length * bone.elbowTransition};
+}
 } // namespace
 
 const MeshBinding* CanvasItem::selectedMesh(const Document& document) const {
@@ -67,6 +75,14 @@ QPointF CanvasItem::meshControlPosition(int index) const {
     return selectionWorld().map(QPointF(point.x, point.y));
 }
 
+QPointF CanvasItem::meshInfluenceHandlePosition() const {
+    const auto* binding = editor_ ? selectedMesh(editor_->document()) : nullptr;
+    if (!binding || !binding->bone)
+        return {};
+    const auto point = influenceHandle(*binding->bone);
+    return selectionWorld().map(QPointF(point.x, point.y));
+}
+
 int CanvasItem::meshControlAt(QPointF position) const {
     const auto* binding = editor_ ? selectedMesh(editor_->document()) : nullptr;
     if (!binding || (!binding->bone && !binding->curve))
@@ -76,6 +92,9 @@ int CanvasItem::meshControlAt(QPointF position) const {
     for (int index = end - 1; index >= first; --index)
         if (QLineF(position, meshControlPosition(index)).length() <= 10)
             return index;
+    if (binding->bone && meshRestEditing_ &&
+        QLineF(position, meshInfluenceHandlePosition()).length() <= 10)
+        return 3;
     return -1;
 }
 
@@ -139,6 +158,27 @@ void CanvasItem::paintMesh(QPainter* painter, const Document& document,
     if (binding->bone) {
         const auto joints = meshRestEditing_ ? binding->bone->restJoints
                                              : posedJoints(*binding->bone, editor_->frame());
+        if (meshRestEditing_) {
+            const auto& bone = *binding->bone;
+            const QPointF elbow = transform.map(QPointF(joints[1].x, joints[1].y));
+            const auto handle = influenceHandle(bone);
+            const QPointF radiusHandle = transform.map(QPointF(handle.x, handle.y));
+            QPainterPath influence;
+            for (int step = 0; step <= 48; ++step) {
+                const double angle = 2 * std::numbers::pi * step / 48;
+                const QPointF point = transform.map(QPointF(
+                    joints[1].x + std::cos(angle) * bone.elbowTransition,
+                    joints[1].y + std::sin(angle) * bone.elbowTransition));
+                if (step == 0) influence.moveTo(point); else influence.lineTo(point);
+            }
+            painter->setBrush(Qt::NoBrush);
+            painter->setPen(QPen(QColor("#999999"), 1, Qt::DashLine));
+            painter->drawPath(influence);
+            painter->drawLine(elbow, radiusHandle);
+            painter->setBrush(meshControl_ == 3 ? QColor("#ffffff") : QColor("#151515"));
+            painter->setPen(QPen(QColor("#ffffff"), 1));
+            painter->drawRect(QRectF(radiusHandle - QPointF(5, 5), QSizeF(10, 10)));
+        }
         painter->setPen(QPen(QColor("#ffffff"), 2));
         for (int index = 0; index < 2; ++index)
             painter->drawLine(transform.map(QPointF(joints[index].x, joints[index].y)),
@@ -179,6 +219,8 @@ void CanvasItem::beginMesh(QPointF position) {
             meshPreviewPoint_ = meshRestEditing_
                 ? binding->curve->restControls[meshControl_]
                 : sampleCurveControls(*binding->curve, editor_->frame())[meshControl_];
+        else if (binding->bone && meshControl_ == 3)
+            meshPreviewRadius_ = binding->bone->elbowTransition;
         else
             meshPreviewPoint_ = meshRestEditing_ && binding->bone
                 ? binding->bone->restJoints[meshControl_] : MeshPoint{};
@@ -222,7 +264,17 @@ void CanvasItem::previewMeshControl(QPointF position) {
     try {
         const Id drawing = editor_->selectedSubstitution();
         if (source->bone) {
-            if (meshRestEditing_) {
+            if (meshRestEditing_ && meshControl_ == 3) {
+                const auto& joints = source->bone->restJoints;
+                const double dx = joints[1].x - joints[0].x;
+                const double dy = joints[1].y - joints[0].y;
+                const double length = std::hypot(dx, dy);
+                const double radius = std::max(0.01,
+                    ((point.x - joints[1].x) * -dy +
+                     (point.y - joints[1].y) * dx) / length);
+                setBoneElbowTransition(candidate, editor_->selectedLayer(), drawing, radius);
+                meshPreviewRadius_ = radius;
+            } else if (meshRestEditing_) {
                 moveBoneRestJoint(candidate, editor_->selectedLayer(), drawing,
                                   meshControl_, {point.x, point.y});
                 meshPreviewPoint_ = {point.x, point.y};
@@ -275,7 +327,9 @@ void CanvasItem::commitMeshControl() {
     drawing_ = false;
     if (editor_ && control >= 0 && meshControlMoved_ && previewValid_) {
         QScopedValueRollback<bool> guard(committing_, true);
-        if (bone && meshRestEditing_)
+        if (bone && meshRestEditing_ && control == 3)
+            editor_->setSelectedBoneTransition(meshPreviewRadius_);
+        else if (bone && meshRestEditing_)
             editor_->moveSelectedBoneRestJoint(control, meshPreviewPoint_.x, meshPreviewPoint_.y);
         else if (bone)
             editor_->recordSelectedBonePose(meshPreviewAngles_[0], meshPreviewAngles_[1]);

@@ -28,7 +28,11 @@ then publishes the new chain atomically. A rejected move leaves the previous
 binding, keys and pixels intact. The root remains fixed while posing; Rest
 joints mode changes its stored setup position without changing rest artwork.
 The elbow transition radius is editable in drawing-local pixels through an
-undoable use case. Changing it recomputes normalized vertex weights while
+undoable use case. Rest joints mode draws a dashed influence circle and a
+square handle along the normal of the proximal segment. Dragging that handle
+projects the pointer into drawing-local space, previews on an isolated
+candidate and commits one undoable edit; Escape discards the preview. Changing
+the radius recomputes normalized vertex weights while
 leaving rest UVs and authored angle keys intact; existing keys and sampled
 intermediate poses must still pass fold and proxy checks. The initial radius
 considers both chain length and cross-section width so a fine grid on a broad

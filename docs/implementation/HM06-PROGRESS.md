@@ -28,8 +28,10 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
 - Properties now lets the animator choose a 1–32-cell mesh grid per axis, so
   the 6 × 16 continuous-limb topology used by the render fixture is buildable
   from the app. The saved grid dimensions are shown after binding. The elbow
-  influence radius is editable in pixels; changes recalculate weights, keep
-  authored angle keys/rest pixels and reject folded existing poses atomically.
+  influence radius is editable in pixels or by dragging its on-canvas rest
+  handle. The dashed circle previews the influenced area. Changes recalculate
+  weights, keep authored angle keys/rest pixels and reject folded existing
+  poses atomically.
 - Format 9 persists controls, weights and keys. The first save of format 8
   preserves a source-version `.pre-v8.bak` before upgrading.
 - Insert/remove frames shift or remove deformer keys with the scene clock.
@@ -68,7 +70,8 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   has no elbow or knee image seam; owner visual approval is still open.
 - The native `--smoke-test` drags a bone tip and curve tangent, checks
   temporary preview isolation, cancellation, undo/redo, bone and curve rest-control
-  retarget, a 6 × 16 mesh grid, elbow influence tuning, Rest key, same-Part
+  retarget, a 6 × 16 mesh grid, numeric and on-canvas elbow influence tuning,
+  cancelled preview/undo/redo, Rest key, same-Part
   timeline key paste/move and project reopen on
   a checker Part. A mirrored, rotated and zoomed control drag also round-trips
   through undo. The inspected [original-art detail](hm06-bone-curve-detail.png)

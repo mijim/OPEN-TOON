@@ -90,7 +90,9 @@ Use **Rest joints** or **Rest curve** to place the saved control geometry on
 canvas. **Pose joints** or **Pose curve** returns to animation editing.
 **Elbow influence (px)** adjusts how far the bend blends into either segment;
 the existing keys and rest artwork stay in place. A value that folds the mesh
-is rejected. To avoid a visible cut at the elbow or knee, use one continuous
+is rejected. In **Rest joints**, the dashed circle and square handle at the
+elbow show the same radius. Drag the square to tune it on canvas; Escape
+cancels. To avoid a visible cut at the elbow or knee, use one continuous
 image and mesh for the whole limb. Hands and feet may remain separate for
 substitutions; the current editor does not yet attach them automatically to
 the deformed endpoint.

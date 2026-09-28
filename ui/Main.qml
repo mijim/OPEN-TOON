@@ -1390,7 +1390,9 @@ ApplicationWindow {
                                     visible: editor.selectedMeshDeformer > 0
                                     Label {
                                         text: canvas.meshRestEditing
-                                              ? "Drag rest controls on canvas · Esc cancels"
+                                              ? (editor.selectedMeshDeformer === 1
+                                                 ? "Drag joints or influence handle · Esc cancels"
+                                                 : "Drag rest controls on canvas · Esc cancels")
                                               : "Drag pose controls on canvas · Esc cancels"
                                         color: "#999999"
                                         font.pixelSize: 10
