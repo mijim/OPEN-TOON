@@ -74,6 +74,11 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   position. Detach/attach undo and redo, SQLite save/reopen, compatible source
   substitution switching and atomic rejection of source bone removal or an
   unbound substitution also pass.
+  A retargeted alternate sleeve with a displaced and rotated rest wrist now
+  places the linked hand on the active evaluated tip, including its distal
+  direction. The previous per-variant rest anchor missed that tip by 14.42 px
+  in the regression case. The corrected mapping passes command undo/redo,
+  serialization and SQLite reopen without a schema change.
   An [openable 48-frame rig study](../../examples/clockwork-continuous.otoon)
   combines the continuous limbs and links with a changed sleeve binding, fist
   substitution and coordinated face view. A saved Front view returns at frame
@@ -116,7 +121,9 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   the 15-artwork-Part continuous rig gave p95 input-to-`frameSwapped` 17.26 ms
   and peak process resident memory 274 MB on Apple M1 Pro before attachments.
   A fresh 40-sample native run of the format-10 linked rig measured p95
-  17.18 ms and peak process resident memory 275 MB. Both are single runs;
+  17.18 ms and peak process resident memory 275 MB. After the variant-anchor
+  correction, three native runs measured p95 17.86–18.15 ms and peak resident
+  memory below 279 MB. The earlier measurements were single runs;
   repeatability and the complete B4 shot budget remain open.
   On Apple M1 Pro, three earlier local 1920×1080 renders of the assembled
   19-part scene with one bone and one curve averaged 3.25 ms/frame. After the

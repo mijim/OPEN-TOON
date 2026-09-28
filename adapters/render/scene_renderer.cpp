@@ -25,13 +25,22 @@ QTransform localTransform(Transform t) {
 QTransform boneTipTransform(const Document& document, const Layer& source, Frame frame) {
     const auto* drawing = document.drawingAt(source.id, frame);
     const auto* binding = drawing ? meshBindingFor(source, drawing->id) : nullptr;
-    if (!binding || !binding->bone)
+    const auto* baselineDrawing = document.drawingAt(source.id, 0);
+    const auto* baseline = baselineDrawing ? meshBindingFor(source, baselineDrawing->id) : nullptr;
+    if (!binding || !binding->bone || !baseline || !baseline->bone)
         throw std::runtime_error("Bone tip attachment has no active source bone.");
     const auto& bone = *binding->bone;
-    const auto rest = bone.restJoints[2];
+    const auto& baselineJoints = baseline->bone->restJoints;
+    const auto rest = baselineJoints[2];
     const auto posed = sampleBoneJoints(bone, frame)[2];
     const auto angles = sampleBoneAngles(bone, frame);
-    const double radians = (angles[0] + angles[1]) * std::numbers::pi / 180.0;
+    const auto& joints = bone.restJoints;
+    const double baselineDirection = std::atan2(rest.y - baselineJoints[1].y,
+                                                rest.x - baselineJoints[1].x);
+    const double activeDirection = std::atan2(joints[2].y - joints[1].y,
+                                              joints[2].x - joints[1].x);
+    const double radians = activeDirection - baselineDirection +
+                           (angles[0] + angles[1]) * std::numbers::pi / 180.0;
     const double cosine = std::cos(radians), sine = std::sin(radians);
     return QTransform(cosine, sine, -sine, cosine,
                       posed.x - cosine * rest.x + sine * rest.y,

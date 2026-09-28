@@ -16,8 +16,12 @@ made; later keys are offsets in the moving tip space. The link stores no second
 source ID: the validated parent identity is authoritative.
 
 Evaluation samples the active source substitution's bone chain at the scene
-frame. It maps the source-local rest tip to the source-local evaluated tip and
-rotates by the sum of shoulder and elbow angles. A child's own transform is
+frame. The source's frame-zero rest tip is the stable child anchor. Evaluation
+maps that anchor to the active substitution's evaluated tip and rotates by the
+change in distal rest direction plus the active shoulder and elbow angles. A
+substitution with a differently placed or oriented wrist therefore moves and
+turns the follower to its actual endpoint; the old per-variant rest anchor
+could leave a visible gap. A child's own transform is
 applied first, followed by that tip delta and then the parent's world transform.
 Descendants inherit the same mapping. The follower is transformed once; its
 pixels are not passed through the parent's mesh. Canvas picking, handles,
@@ -31,6 +35,12 @@ variant, non-rest source at frame zero or unsupported reparent rejects before
 publication. Removing a required source bone or exposing an unbound variant is
 also rejected by document validation. A linked child must be unlinked before
 reparenting or detaching it.
+
+This evaluator correction adds no stored field or schema version. A saved
+format-10 rig whose source variants have different rest tips may render its
+follower at a corrected position after update; the prior mapping did not keep
+that follower on the active bone endpoint. Undo/redo, SQLite reopen and
+source-variant rest-joint retargeting are covered by the continuous-limb test.
 
 Formats 1–9 load with the link disabled. The first save of a format-9 project
 preserves a `.pre-v9.bak` source copy before writing format 10. The 15-artwork

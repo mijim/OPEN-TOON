@@ -106,7 +106,9 @@ hand/foot Part. In **Parent**, choose the bone-bound limb Part, then choose
 **Rig → Follow parent bone tip**. The link is saved and undoable; the child's
 drawing and substitutions remain independent. The source limb needs a bound
 two-segment bone on every exposed drawing and rest at frame zero. Attach before
-adding transform keys to the child. The same Rig action detaches it; detach
+adding transform keys to the child. If a source substitution uses a different
+rest wrist or ankle, the child follows that variant's evaluated endpoint and
+direction. The same Rig action detaches it; detach
 before reparenting. Curve attachments, IK and automatic limb setup remain open.
 
 Insert/remove frames and Clear include bone/curve keys. Copy/paste, move and

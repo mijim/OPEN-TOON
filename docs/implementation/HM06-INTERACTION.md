@@ -56,6 +56,14 @@ resident memory 275,398,656 bytes. The linked 15-part subset meets the proposed
 50 ms/2 GiB limits on this host. A complete shot and repeated-run variance
 remain unmeasured.
 
+After correcting the link anchor for source substitutions with a different
+rest tip/direction, three 40-sample runs on the saved 48-frame example measured
+p95 17.86, 18.15 and 17.92 ms. Peak resident memory was 278,609,920,
+278,315,008 and 278,347,776 bytes. The extra frame-zero binding lookup and
+direction calculation stayed within the proposed limits on this host. The
+earlier single run is retained as historical evidence, not a controlled
+before/after speed comparison.
+
 Reproduce after building the render tests and desktop app:
 
 ```sh

@@ -719,6 +719,86 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
     REQUIRE(switchedConnected == switchedInk);
     REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(switched)), 36) ==
             switchedFrame);
+    auto shiftedWrist = switched;
+    const auto& baselineBone = *meshBindingFor(shiftedWrist.layer(linkedArm),
+        shiftedWrist.drawingAt(linkedArm, 0)->id)->bone;
+    const auto baselineTip = baselineBone.restJoints[2];
+    const auto baselineElbow = baselineBone.restJoints[1];
+    const double baselineLength = std::hypot(baselineTip.x - baselineElbow.x,
+                                             baselineTip.y - baselineElbow.y);
+    const auto baselineAxis = QPointF((baselineTip.x - baselineElbow.x) / baselineLength,
+                                       (baselineTip.y - baselineElbow.y) / baselineLength);
+    const auto sourceRestWorld = SceneRenderer::worldTransform(shiftedWrist,
+        shiftedWrist.layer(linkedArm), 0);
+    const auto childRestWorld = SceneRenderer::worldTransform(shiftedWrist,
+        shiftedWrist.layer(linkedHand), 0);
+    const auto childAnchor = childRestWorld.inverted().map(
+        sourceRestWorld.map(QPointF(baselineTip.x, baselineTip.y)));
+    const auto childAxisPoint = childRestWorld.inverted().map(sourceRestWorld.map(
+        QPointF(baselineTip.x + 10 * baselineAxis.x(),
+                baselineTip.y + 10 * baselineAxis.y())));
+    const auto activeRestTip = meshBindingFor(shiftedWrist.layer(linkedArm),
+        alternateDrawing)->bone->restJoints[2];
+    REQUIRE_NOTHROW(moveBoneRestJoint(shiftedWrist, linkedArm, alternateDrawing, 2,
+                                      {activeRestTip.x + 8, activeRestTip.y - 12}));
+    shiftedWrist.validate();
+    Session retargetSession;
+    retargetSession.replace(switched);
+    REQUIRE(retargetSession.apply("Retarget alternate wrist", [&](Document& candidate) {
+        moveBoneRestJoint(candidate, linkedArm, alternateDrawing, 2,
+                          {activeRestTip.x + 8, activeRestTip.y - 12});
+    }));
+    REQUIRE(retargetSession.document() == shiftedWrist);
+    REQUIRE(retargetSession.undo());
+    REQUIRE(retargetSession.document() == switched);
+    REQUIRE(retargetSession.redo());
+    REQUIRE(retargetSession.document() == shiftedWrist);
+    for (const Frame frame : {30, 36}) {
+        const auto& source = shiftedWrist.layer(linkedArm);
+        const auto& bone = *meshBindingFor(source,
+            shiftedWrist.drawingAt(linkedArm, frame)->id)->bone;
+        const auto joints = sampleBoneJoints(bone, frame);
+        const auto expectedTip = SceneRenderer::worldTransform(shiftedWrist, source, frame)
+            .map(QPointF(joints[2].x, joints[2].y));
+        const auto axisLength = std::hypot(joints[2].x - joints[1].x,
+                                           joints[2].y - joints[1].y);
+        const auto expectedAxisPoint = SceneRenderer::worldTransform(shiftedWrist, source, frame)
+            .map(QPointF(joints[2].x + 10 * (joints[2].x - joints[1].x) / axisLength,
+                         joints[2].y + 10 * (joints[2].y - joints[1].y) / axisLength));
+        const auto childWorld = SceneRenderer::worldTransform(shiftedWrist,
+            shiftedWrist.layer(linkedHand), frame);
+        const auto actualTip = childWorld.map(childAnchor);
+        const auto actualAxisPoint = childWorld.map(childAxisPoint);
+        REQUIRE(std::hypot(expectedTip.x() - actualTip.x(),
+                           expectedTip.y() - actualTip.y()) < 1e-8);
+        REQUIRE(std::hypot(expectedAxisPoint.x() - actualAxisPoint.x(),
+                           expectedAxisPoint.y() - actualAxisPoint.y()) < 1e-8);
+    }
+    auto mirroredWrist = shiftedWrist;
+    mirroredWrist.layer(root).transform.rotation = 25;
+    mirroredWrist.layer(root).transform.scaleX = -1;
+    mirroredWrist.validate();
+    for (const Frame frame : {30, 36}) {
+        const auto& source = mirroredWrist.layer(linkedArm);
+        const auto& bone = *meshBindingFor(source,
+            mirroredWrist.drawingAt(linkedArm, frame)->id)->bone;
+        const auto tip = sampleBoneJoints(bone, frame)[2];
+        const auto expected = SceneRenderer::worldTransform(mirroredWrist, source, frame)
+            .map(QPointF(tip.x, tip.y));
+        const auto actual = SceneRenderer::worldTransform(mirroredWrist,
+            mirroredWrist.layer(linkedHand), frame).map(childAnchor);
+        REQUIRE(std::hypot(expected.x() - actual.x(),
+                           expected.y() - actual.y()) < 1e-8);
+    }
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(shiftedWrist)), 36) ==
+            SceneRenderer::render(shiftedWrist, 36));
+    const auto retargetedPath = std::filesystem::path((savedProject.path() +
+                                                       "/shifted-wrist.otoon").toStdString());
+    REQUIRE(ProjectStore::save(retargetedPath, shiftedWrist) > 0);
+    const auto reopenedRetargeted = ProjectStore::load(retargetedPath).document;
+    REQUIRE(reopenedRetargeted == shiftedWrist);
+    REQUIRE(SceneRenderer::render(reopenedRetargeted, 36) ==
+            SceneRenderer::render(shiftedWrist, 36));
     auto expressive = switched;
     const Id frontView = captureCharacterView(expressive, root, 0, "Front");
     const auto replaceWithPartArt = [&](QString role, QString name, QString imageName) {
