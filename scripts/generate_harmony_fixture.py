@@ -27,23 +27,23 @@ def rgba_png(pixels: bytes) -> bytes:
             png_chunk(b'sRGB', b'\0') + png_chunk(b'IDAT', zlib.compress(rows, 9)) + png_chunk(b'IEND', b''))
 
 
-INK = (29, 35, 48, 255)
-COAT = (53, 91, 119, 255)
-COAT_LIGHT = (83, 129, 151, 255)
-COAT_DARK = (34, 67, 95, 255)
-SKIN = (226, 174, 136, 255)
-SKIN_LIGHT = (247, 205, 166, 255)
-SKIN_SHADE = (194, 128, 100, 255)
-CHEEK = (220, 151, 125, 255)
-HAIR = (57, 48, 55, 255)
-HAIR_LIGHT = (110, 84, 76, 255)
-SHIRT = (247, 240, 222, 255)
-TEAL = (52, 166, 155, 255)
-TEAL_DARK = (36, 125, 126, 255)
-PANTS = (42, 52, 73, 255)
-PANTS_LIGHT = (67, 80, 103, 255)
-MOUTH = (91, 47, 61, 255)
-TONGUE = (199, 103, 112, 255)
+INK = (34, 33, 43, 255)
+HOODIE = (43, 104, 110, 255)
+HOODIE_LIGHT = (77, 151, 151, 255)
+HOODIE_DARK = (28, 76, 86, 255)
+SKIN = (228, 173, 129, 255)
+SKIN_LIGHT = (247, 203, 160, 255)
+SKIN_SHADE = (192, 117, 89, 255)
+CHEEK = (222, 137, 112, 255)
+HAIR = (69, 48, 58, 255)
+HAIR_LIGHT = (124, 76, 75, 255)
+CREAM = (249, 228, 194, 255)
+ACCENT = (228, 103, 72, 255)
+ACCENT_DARK = (176, 67, 63, 255)
+PANTS = (43, 50, 62, 255)
+PANTS_LIGHT = (77, 88, 100, 255)
+MOUTH = (89, 48, 59, 255)
+TONGUE = (204, 98, 105, 255)
 
 
 class Canvas:
@@ -72,6 +72,9 @@ class Canvas:
                 radius: float, color: tuple[int, ...]) -> None:
         dx, dy = bx - ax, by - ay
         squared = dx * dx + dy * dy
+        if squared == 0:
+            self.ellipse(ax, ay, radius, radius, color)
+            return
 
         def hit(x: float, y: float) -> bool:
             fraction = ((x - ax) * dx + (y - ay) * dy) / squared
@@ -117,84 +120,148 @@ class Canvas:
         self.polygon(points, color)
         self.line(points + [points[0]], border / 2, INK)
 
+    def curve_shape(self, start: tuple[float, float], commands: list[tuple],
+                    color: tuple[int, ...], border: float = 0) -> None:
+        points = [start]
+        for command in commands:
+            if command[0] == 'L':
+                points.append((command[1], command[2]))
+                continue
+            anchor = points[-1]
+            control_a = (command[1], command[2])
+            control_b = (command[3], command[4])
+            end = (command[5], command[6])
+            for step in range(1, 9):
+                t = step / 8
+                u = 1 - t
+                points.append((u ** 3 * anchor[0] + 3 * u * u * t * control_a[0] +
+                               3 * u * t * t * control_b[0] + t ** 3 * end[0],
+                               u ** 3 * anchor[1] + 3 * u * u * t * control_a[1] +
+                               3 * u * t * t * control_b[1] + t ** 3 * end[1]))
+        self.polygon(points, color)
+        if border:
+            self.line(points + [points[0]], border / 2, INK)
+
+    def side_curve_shape(self, start: tuple[float, float], commands: list[tuple],
+                         color: tuple[int, ...], border: float, right: bool) -> None:
+        if right:
+            start = (SIZE - start[0], start[1])
+            commands = [tuple(SIZE - value if index % 2 else value
+                              for index, value in enumerate(command))
+                        for command in commands]
+        self.curve_shape(start, commands, color, border)
+
 
 def artwork(role: str, variant: str) -> bytes:
     art = Canvas()
     if role == 'torso':
-        art.outlined_polygon([(91, 37), (165, 37), (190, 56), (202, 96),
-                              (180, 123), (174, 217), (82, 217), (76, 123),
-                              (54, 96), (66, 56)], COAT)
-        art.polygon([(99, 40), (157, 40), (153, 200), (101, 200)], SHIRT)
-        art.polygon([(66, 60), (94, 45), (127, 86), (104, 119), (76, 94)], COAT_LIGHT)
-        art.polygon([(190, 60), (162, 45), (129, 86), (152, 119), (181, 94)], COAT_DARK)
-        art.line([(128, 89), (128, 206)], 2, INK)
-        art.polygon([(128, 86), (143, 104), (132, 133), (126, 133), (113, 104)], TEAL_DARK)
-        art.polygon([(128, 90), (138, 104), (129, 126), (125, 126), (118, 104)], TEAL)
-        for y in (146, 180):
-            art.ellipse(137, y, 4, 4, INK)
-            art.ellipse(136, y - 1, 1.5, 1.5, SHIRT)
-        art.line([(71, 169), (93, 171), (99, 181)], 2, COAT_DARK)
-        art.line([(185, 169), (163, 171), (157, 181)], 2, COAT_LIGHT)
-        art.line([(90, 210), (166, 210)], 2, INK)
+        art.curve_shape((83, 35), [('C', 65, 39, 61, 61, 55, 87),
+                                  ('L', 67, 112), ('L', 78, 205),
+                                  ('C', 100, 219, 155, 222, 181, 205),
+                                  ('L', 190, 110), ('L', 202, 88),
+                                  ('C', 198, 62, 186, 40, 169, 35),
+                                  ('C', 145, 24, 111, 31, 83, 35)], HOODIE, 4)
+        art.curve_shape((81, 41), [('C', 68, 57, 62, 81, 68, 102),
+                                  ('L', 87, 116), ('L', 98, 66),
+                                  ('L', 117, 44), ('L', 81, 41)], HOODIE_LIGHT)
+        art.curve_shape((168, 39), [('C', 190, 55, 196, 79, 187, 103),
+                                   ('L', 172, 110), ('L', 156, 61),
+                                   ('L', 139, 42), ('L', 168, 39)], HOODIE_DARK)
+        art.curve_shape((99, 43), [('C', 110, 67, 118, 80, 128, 80),
+                                  ('C', 138, 78, 151, 61, 158, 42),
+                                  ('L', 167, 51), ('C', 159, 82, 143, 102, 127, 105),
+                                  ('C', 109, 101, 93, 83, 89, 53), ('L', 99, 43)],
+                        HOODIE_DARK, 2)
+        art.curve_shape((109, 72), [('C', 119, 89, 135, 93, 148, 72),
+                                   ('L', 155, 82), ('C', 142, 110, 116, 110, 102, 83),
+                                   ('L', 109, 72)], HOODIE_LIGHT)
+        art.line([(113, 99), (110, 135)], 1.5, ACCENT)
+        art.line([(145, 99), (148, 133)], 1.5, ACCENT)
+        art.ellipse(110, 137, 2.5, 3, ACCENT_DARK)
+        art.ellipse(148, 135, 2.5, 3, ACCENT_DARK)
+        art.curve_shape((93, 161), [('C', 108, 154, 126, 168, 142, 165),
+                                   ('L', 165, 159), ('L', 159, 192),
+                                   ('C', 133, 201, 111, 195, 95, 188),
+                                   ('L', 93, 161)], HOODIE_LIGHT, 2)
+        art.line([(98, 163), (117, 174), (141, 174), (163, 160)], 1.6, HOODIE_DARK)
+        art.polygon([(153, 177), (165, 172), (163, 193), (148, 199)], HOODIE_DARK)
+        art.line([(82, 207), (113, 215), (154, 215), (181, 206)], 2.5, INK)
     elif role == 'pelvis':
-        art.outlined_polygon([(80, 73), (176, 73), (186, 119), (173, 163),
-                              (147, 179), (108, 179), (82, 163), (70, 119)], PANTS)
-        art.polygon([(78, 81), (178, 81), (181, 99), (75, 99)], COAT_DARK)
-        art.outlined_polygon([(118, 85), (138, 85), (138, 103), (118, 103)], TEAL, 2)
-        art.line([(127, 106), (127, 168)], 1.5, PANTS_LIGHT)
+        art.curve_shape((80, 77), [('L', 178, 77), ('L', 184, 121),
+                                  ('C', 174, 161, 157, 177, 135, 180),
+                                  ('L', 105, 177), ('C', 83, 160, 72, 128, 80, 77)],
+                        PANTS, 3)
+        art.polygon([(82, 77), (177, 77), (178, 93), (79, 94)], HOODIE_DARK)
+        art.line([(89, 96), (95, 149), (113, 171)], 2, PANTS_LIGHT)
+        art.line([(168, 99), (161, 153), (147, 172)], 2, PANTS_LIGHT)
+        art.line([(128, 100), (126, 145)], 1.5, INK)
     elif role == 'neck':
-        art.outlined_capsule(128, 91, 128, 160, 22, SKIN)
-        art.polygon([(108, 130), (128, 149), (148, 130), (142, 158), (114, 158)], SKIN_SHADE)
-        art.polygon([(100, 158), (127, 183), (113, 185), (92, 167)], SHIRT)
-        art.polygon([(156, 158), (129, 183), (143, 185), (164, 167)], SHIRT)
+        art.curve_shape((105, 92), [('L', 152, 92), ('L', 147, 171),
+                                   ('C', 133, 181, 120, 181, 107, 169),
+                                   ('L', 105, 92)], SKIN, 3)
+        art.polygon([(111, 129), (142, 147), (147, 164), (114, 164)], SKIN_SHADE)
+        art.polygon([(99, 160), (126, 183), (117, 188), (89, 169)], CREAM)
+        art.polygon([(155, 160), (132, 183), (142, 188), (166, 168)], CREAM)
     elif role == 'head':
         side = variant == 'three_quarter'
-        shift = 12 if side else 0
-        for ear in (64 + shift, 192 + shift):
-            art.outlined_ellipse(ear, 137, 15 if ear < 128 else 12, 22, SKIN_SHADE)
-            art.ellipse(ear, 137, 7, 13, SKIN)
+        shift = 11 if side else 0
+        art.outlined_ellipse(62 + shift, 137, 12, 21, SKIN, 3)
+        art.line([(57 + shift, 129), (65 + shift, 137), (59 + shift, 146)], 1.7, SKIN_SHADE)
         if side:
-            outline = [(135, 47), (171, 52), (196, 73), (209, 103), (207, 130),
-                       (223, 139), (211, 151), (204, 177), (180, 198),
-                       (149, 207), (112, 197), (84, 174), (72, 141),
-                       (73, 104), (91, 72), (111, 53)]
+            outline = [(110, 51), (151, 42), (181, 55), (199, 83),
+                       (205, 120), (220, 140), (206, 151), (193, 180),
+                       (160, 207), (126, 202), (96, 182), (78, 149),
+                       (76, 109), (88, 75)]
         else:
-            outline = [(128, 46), (164, 51), (190, 72), (202, 105), (200, 144),
-                       (186, 177), (162, 201), (129, 210), (94, 202),
-                       (70, 177), (56, 144), (55, 105), (67, 73), (92, 52)]
-        art.outlined_polygon(outline, SKIN, 4)
-        art.ellipse(104 + shift, 119, 21, 31, SKIN_LIGHT)
-        art.ellipse(175 + shift, 154, 12, 17, CHEEK)
-        art.ellipse(92 + shift, 154, 11, 6, CHEEK)
-        art.line([(143 + shift, 130), (149 + shift, 149), (144 + shift, 154)], 2, SKIN_SHADE)
-        art.ellipse(143 + shift, 156, 5, 3, SKIN_LIGHT)
-        art.line([(98 + shift, 188), (122 + shift, 196), (146 + shift, 194)], 1.5, SKIN_SHADE)
+            outline = [(114, 47), (151, 44), (181, 59), (197, 88),
+                       (200, 128), (192, 166), (171, 193), (139, 208),
+                       (105, 199), (78, 182), (59, 153), (56, 114),
+                       (69, 77), (91, 57)]
+        art.outlined_polygon(outline, SKIN, 3.5)
+        art.curve_shape((85 + shift, 87), [('C', 85 + shift, 69, 124 + shift, 61,
+                                           148 + shift, 68),
+                                          ('C', 117 + shift, 78, 107 + shift, 106,
+                                           94 + shift, 126), ('L', 85 + shift, 87)],
+                        SKIN_LIGHT)
+        art.ellipse(169 + shift, 151, 9, 7, CHEEK)
+        art.line([(134 + shift, 122), (147 + shift, 143),
+                  (155 + shift, 150), (144 + shift, 153)], 1.7, INK)
+        art.line([(106 + shift, 184), (128 + shift, 193),
+                  (149 + shift, 189)], 1.5, SKIN_SHADE)
+        art.outlined_ellipse(193 + shift, 134, 9, 17, SKIN, 2)
+        art.line([(194 + shift, 130), (189 + shift, 138)], 1.3, SKIN_SHADE)
     elif role == 'hair':
-        shift = 12 if variant == 'three_quarter' else 0
-        outline = [(53 + shift, 119), (52 + shift, 84), (68 + shift, 55),
-                   (97 + shift, 35), (139 + shift, 29), (182 + shift, 43),
-                   (204 + shift, 66), (209 + shift, 102), (194 + shift, 93),
-                   (187 + shift, 108), (172 + shift, 96), (149 + shift, 101),
-                   (126 + shift, 91), (103 + shift, 104), (75 + shift, 97),
-                   (64 + shift, 136)]
-        art.outlined_polygon(outline, HAIR, 4)
-        art.polygon([(67 + shift, 76), (97 + shift, 50), (139 + shift, 43),
-                     (128 + shift, 66), (101 + shift, 75)], HAIR_LIGHT)
-        art.line([(90 + shift, 52), (124 + shift, 42), (157 + shift, 46)], 2, SKIN_SHADE)
-        art.polygon([(160 + shift, 83), (183 + shift, 65), (201 + shift, 91),
-                     (192 + shift, 123), (181 + shift, 111)], HAIR)
+        shift = 11 if variant == 'three_quarter' else 0
+        art.curve_shape((56 + shift, 121),
+                        [('C', 43 + shift, 94, 54 + shift, 62, 84 + shift, 49),
+                         ('C', 111 + shift, 13, 158 + shift, 26, 178 + shift, 41),
+                         ('C', 205 + shift, 40, 213 + shift, 69, 208 + shift, 100),
+                         ('L', 193 + shift, 89), ('L', 188 + shift, 116),
+                         ('C', 166 + shift, 95, 163 + shift, 83, 137 + shift, 82),
+                         ('C', 125 + shift, 102, 107 + shift, 110, 83 + shift, 100),
+                         ('C', 79 + shift, 120, 70 + shift, 139, 59 + shift, 147),
+                         ('L', 56 + shift, 121)], HAIR, 4)
+        art.curve_shape((76 + shift, 75),
+                        [('C', 102 + shift, 39, 136 + shift, 40, 156 + shift, 46),
+                         ('C', 132 + shift, 48, 109 + shift, 61, 92 + shift, 89),
+                         ('L', 76 + shift, 75)], HAIR_LIGHT)
+        art.curve_shape((82 + shift, 102),
+                        [('C', 91 + shift, 109, 91 + shift, 124, 79 + shift, 133),
+                         ('L', 62 + shift, 137), ('C', 64 + shift, 118, 72 + shift, 107,
+                          82 + shift, 102)], HAIR)
+        art.line([(101 + shift, 57), (135 + shift, 39),
+                  (165 + shift, 44)], 1.7, HAIR_LIGHT)
     elif role == 'eyes':
         side = variant == 'three_quarter'
-        eyes = [(112, 123, 12, 15), (155, 123, 12, 15)] if not side else [
-            (125, 123, 9, 13), (170, 123, 11, 16)]
+        eyes = [(112, 126, 9, 8), (163, 125, 9, 9)] if not side else [
+            (124, 126, 7, 8), (175, 125, 9, 9)]
         for x, y, rx, ry in eyes:
-            art.line([(x - rx - 4, 99), (x, 95), (x + rx + 5, 100)], 3, HAIR)
-            art.outlined_ellipse(x, y, rx, ry, SHIRT, 2)
-            art.ellipse(x + (3 if side else 0), y + 2, rx * .48, ry * .69, TEAL_DARK)
-            art.ellipse(x + (3 if side else 0), y + 3, rx * .28, ry * .52, INK)
-            art.ellipse(x - 2 + (3 if side else 0), y - 4, 3, 3, SHIRT)
-        art.line([(90 if not side else 105, 145),
-                  (112 if not side else 126, 148)], 1.5, SKIN_SHADE)
+            art.outlined_ellipse(x, y, rx, ry, CREAM, 2)
+            art.ellipse(x + (2 if side else 0), y + 1, 3.5, 4.5, INK)
+            art.ellipse(x - 1 + (2 if side else 0), y - 2, 1.5, 1.5, CREAM)
+            art.line([(x - rx - 3, y - ry + 1), (x + rx + 2, y - ry + 1)], 1.7, INK)
+        art.line([(95 if not side else 108, 107), (117 if not side else 128, 103)], 3, HAIR)
+        art.line([(149 if not side else 161, 103), (177 if not side else 188, 106)], 3, HAIR)
     elif role == 'mouth':
         view, choice = variant.split('__')
         cx = 149 if view == 'three_quarter' else 128
@@ -210,7 +277,7 @@ def artwork(role: str, variant: str) -> bytes:
         elif choice == 'fv':
             art.outlined_ellipse(cx, cy, 22, 8, MOUTH, 2)
             art.polygon([(cx - 17, cy - 4), (cx + 16, cy - 4),
-                         (cx + 12, cy), (cx - 12, cy)], SHIRT)
+                         (cx + 12, cy), (cx - 12, cy)], CREAM)
         else:
             rx, ry = {'ee': (31, 9), 'ah': (24, 24), 'oh': (16, 20),
                       'l': (20, 13), 'wide': (34, 17)}[choice]
@@ -220,72 +287,138 @@ def artwork(role: str, variant: str) -> bytes:
                 art.polygon([(cx - rx * .71, cy - ry * .72),
                              (cx + rx * .71, cy - ry * .72),
                              (cx + rx * .56, cy - ry * .18),
-                             (cx - rx * .56, cy - ry * .18)], SHIRT)
+                             (cx - rx * .56, cy - ry * .18)], CREAM)
     elif role.startswith('hand_'):
-        sign = 1 if role.endswith('right') else -1
-        mirror = lambda x: 128 + sign * (x - 128)
-        art.outlined_capsule(128, 92, 128, 133, 15, SKIN)
-        art.outlined_ellipse(128, 146, 27, 27, SKIN)
+        right = role.endswith('right')
+        mirror = lambda x: SIZE - x if right else x
         if variant == 'open':
-            for x, length in ((109, 22), (121, 29), (134, 31), (146, 22)):
-                art.outlined_capsule(x, 157, x + sign * 2, 157 + length, 7, SKIN, 2)
-            art.outlined_capsule(mirror(146), 141, mirror(169), 153, 8, SKIN, 2)
-            art.line([(mirror(111), 141), (mirror(143), 143)], 1, SKIN_LIGHT)
+            points = [(112, 107), (144, 107), (148, 137), (151, 166),
+                      (149, 188), (143, 191), (138, 188), (136, 170),
+                      (135, 194), (128, 198), (122, 194), (121, 171),
+                      (119, 194), (112, 195), (106, 189), (105, 171),
+                      (102, 185), (95, 182), (94, 173), (101, 148),
+                      (80, 157), (71, 153), (72, 146), (99, 130)]
+            art.outlined_polygon([(mirror(x), y) for x, y in points], SKIN, 2)
+            for x in (108, 120, 134):
+                art.line([(mirror(x), 159), (mirror(x + 1), 181)], 1, SKIN_SHADE)
+            art.line([(mirror(105), 143), (mirror(118), 152)], 1.4, SKIN_SHADE)
         elif variant == 'fist':
-            art.outlined_ellipse(128, 162, 28, 24, SKIN)
-            for x in (111, 122, 133, 144):
-                art.line([(x, 150), (x + 2, 162)], 1.5, SKIN_SHADE)
-            art.outlined_capsule(mirror(149), 142, mirror(161), 159, 7, SKIN, 2)
+            points = [(111, 107), (145, 107), (153, 145), (152, 165),
+                      (145, 181), (117, 184), (103, 173), (100, 152),
+                      (108, 139)]
+            art.outlined_polygon([(mirror(x), y) for x, y in points], SKIN, 2.5)
+            art.line([(mirror(108), 151), (mirror(137), 150)], 1.5, INK)
+            for x in (112, 122, 132, 142):
+                art.line([(mirror(x), 151), (mirror(x + 2), 166)], 1.3, SKIN_SHADE)
         else:
-            art.outlined_capsule(mirror(143), 143, mirror(199), 125, 9, SKIN, 2)
-            for x in (113, 125, 137):
-                art.outlined_capsule(x, 151, x + 2, 169, 7, SKIN, 2)
-            art.outlined_capsule(mirror(145), 132, mirror(162), 153, 7, SKIN, 2)
-        art.polygon([(105, 99), (151, 99), (151, 112), (105, 112)], TEAL)
-        art.line([(105, 99), (151, 99)], 2, INK)
-        art.line([(105, 112), (151, 112)], 2, INK)
+            points = [(111, 107), (145, 107), (149, 138), (164, 131),
+                      (201, 122), (207, 128), (205, 135), (170, 150),
+                      (150, 162), (145, 180), (119, 182), (104, 171),
+                      (103, 149)]
+            art.outlined_polygon([(mirror(x), y) for x, y in points], SKIN, 2)
+            for x in (114, 126, 138):
+                art.line([(mirror(x), 152), (mirror(x + 2), 172)], 1.2, SKIN_SHADE)
+        cuff = [(105, 98), (151, 98), (151, 116), (105, 116)]
+        art.outlined_polygon([(mirror(x), y) for x, y in cuff], HOODIE_DARK, 2)
+        art.line([(mirror(109), 106), (mirror(148), 106)], 1.7, ACCENT)
     elif role.startswith('upper_arm_'):
         left = role.endswith('left')
-        start, end = ((145, 50), (115, 202)) if left else ((111, 50), (141, 202))
-        art.outlined_capsule(*start, *end, 28, COAT)
-        art.capsule(start[0] - (8 if left else -8), 70,
-                    end[0] - (8 if left else -8), 178, 6, COAT_LIGHT)
-        art.line([(start[0] - 19, 58), (start[0] + 19, 58)], 2, COAT_DARK)
-        art.line([(end[0] - 17, 190), (end[0] + 17, 190)], 2, COAT_DARK)
+        art.side_curve_shape((121, 44),
+                             [('C', 106, 41, 96, 58, 95, 79),
+                              ('L', 86, 145), ('C', 84, 165, 93, 183, 111, 186),
+                              ('C', 131, 190, 143, 169, 145, 150),
+                              ('L', 167, 82), ('C', 176, 60, 158, 45, 144, 43),
+                             ('L', 121, 44)], HOODIE, 0, not left)
+        edge = [(96, 77), (86, 145), (93, 172)]
+        other = [(166, 82), (145, 150), (139, 171)]
+        if not left:
+            edge = [(SIZE - x, y) for x, y in edge]
+            other = [(SIZE - x, y) for x, y in other]
+        art.line(edge, 2, INK)
+        art.line(other, 2, INK)
+        art.side_curve_shape((105, 66),
+                             [('C', 101, 97, 94, 135, 96, 155),
+                              ('C', 98, 162, 103, 166, 109, 166),
+                              ('L', 126, 65), ('L', 105, 66)],
+                             HOODIE_LIGHT, 0, not left)
+        art.line(([(99, 149), (119, 160), (138, 158)] if left else
+                  [(157, 149), (137, 160), (118, 158)]), 1.7, HOODIE_DARK)
     elif role.startswith('lower_arm_'):
         left = role.endswith('left')
-        start, end = ((142, 44), (121, 207)) if left else ((114, 44), (135, 207))
-        art.outlined_capsule(*start, *end, 25, COAT)
-        art.capsule(start[0] - (7 if left else -7), 58,
-                    end[0] - (7 if left else -7), 165, 5, COAT_LIGHT)
-        art.line([(end[0] - 20, 182), (end[0] + 20, 182)], 3, INK)
-        art.line([(end[0] - 19, 189), (end[0] + 19, 189)], 5, TEAL)
-        art.line([(end[0] - 19, 196), (end[0] + 19, 196)], 2, INK)
+        art.side_curve_shape((118, 39),
+                             [('C', 103, 41, 97, 58, 98, 78),
+                              ('L', 94, 165), ('C', 95, 184, 104, 199, 119, 207),
+                              ('L', 140, 207), ('C', 151, 193, 153, 177, 150, 158),
+                              ('L', 159, 82), ('C', 161, 55, 146, 38, 118, 39)],
+                             HOODIE, 0, not left)
+        edge = [(99, 57), (96, 111), (94, 165), (101, 190)]
+        other = [(155, 58), (153, 113), (151, 167), (145, 191)]
+        if not left:
+            edge = [(SIZE - x, y) for x, y in edge]
+            other = [(SIZE - x, y) for x, y in other]
+        art.line(edge, 2, INK)
+        art.line(other, 2, INK)
+        art.side_curve_shape((107, 59),
+                             [('C', 106, 96, 101, 136, 104, 170),
+                              ('L', 115, 181), ('L', 125, 64), ('L', 107, 59)],
+                             HOODIE_LIGHT, 0, not left)
+        cuff = [(96, 177), (151, 177), (149, 197), (102, 197)]
+        if not left:
+            cuff = [(SIZE - x, y) for x, y in cuff]
+        art.outlined_polygon(cuff, HOODIE_DARK, 2)
+        art.line(([(99, 185), (148, 185)] if left else
+                  [(157, 185), (108, 185)]), 2.2, ACCENT)
     elif role.startswith('upper_leg_'):
         left = role.endswith('left')
-        start, end = ((140, 37), (113, 211)) if left else ((116, 37), (143, 211))
-        art.outlined_capsule(*start, *end, 29, PANTS)
-        art.line([(start[0] - 8, 55), (end[0] - 8, 184)], 5, PANTS_LIGHT)
-        art.outlined_ellipse(end[0], 196, 21, 17, PANTS_LIGHT, 2)
+        art.side_curve_shape((120, 31),
+                             [('C', 103, 30, 91, 48, 94, 67),
+                              ('L', 86, 169), ('C', 84, 187, 91, 204, 104, 213),
+                              ('L', 129, 215), ('C', 137, 194, 144, 178, 145, 157),
+                              ('L', 161, 62), ('C', 165, 41, 148, 30, 120, 31)],
+                             PANTS, 0, not left)
+        edge = [(94, 63), (86, 169), (91, 196)]
+        other = [(160, 64), (145, 157), (136, 196)]
+        if not left:
+            edge = [(SIZE - x, y) for x, y in edge]
+            other = [(SIZE - x, y) for x, y in other]
+        art.line(edge, 2, INK)
+        art.line(other, 2, INK)
+        art.line(([(105, 69), (98, 173), (106, 199)] if left else
+                  [(151, 69), (158, 173), (150, 199)]), 2.5, PANTS_LIGHT)
+        art.line(([(95, 183), (119, 186), (131, 181)] if left else
+                  [(161, 183), (137, 186), (125, 181)]), 1.7, INK)
     elif role.startswith('lower_leg_'):
         left = role.endswith('left')
-        start, end = ((130, 39), (127, 208)) if left else ((126, 39), (129, 208))
-        art.outlined_capsule(*start, *end, 25, PANTS)
-        art.line([(start[0] - 7, 60), (end[0] - 7, 174)], 4, PANTS_LIGHT)
-        art.line([(end[0] - 21, 194), (end[0] + 21, 194)], 2, INK)
+        art.side_curve_shape((110, 38),
+                             [('C', 99, 39, 97, 60, 99, 80),
+                              ('L', 98, 181), ('C', 96, 203, 107, 213, 120, 215),
+                              ('L', 145, 214), ('C', 151, 200, 154, 182, 152, 160),
+                              ('L', 152, 74), ('C', 151, 53, 140, 38, 110, 38)],
+                             PANTS, 0, not left)
+        edge = [(99, 72), (98, 181), (102, 203)]
+        other = [(152, 74), (152, 160), (150, 201)]
+        if not left:
+            edge = [(SIZE - x, y) for x, y in edge]
+            other = [(SIZE - x, y) for x, y in other]
+        art.line(edge, 2, INK)
+        art.line(other, 2, INK)
+        art.line(([(111, 75), (109, 167), (113, 192)] if left else
+                  [(145, 75), (147, 167), (143, 192)]), 2.5, PANTS_LIGHT)
+        art.line(([(101, 192), (139, 196)] if left else
+                  [(155, 192), (117, 196)]), 1.5, INK)
     elif role.startswith('foot_'):
         left = role.endswith('left')
-        points = [(109, 115), (153, 115), (160, 141), (174, 153), (180, 171),
-                  (171, 179), (68, 179), (59, 168), (67, 152), (100, 140)]
+        points = [(108, 116), (153, 116), (159, 142), (173, 150), (183, 166),
+                  (177, 179), (68, 179), (60, 171), (69, 151), (98, 141)]
         if not left:
             points = [(256 - x, y) for x, y in points]
         art.outlined_polygon(points, INK)
         art.polygon([(min(x for x, _ in points) + 4, 164),
                      (max(x for x, _ in points) - 4, 164),
                      (max(x for x, _ in points) - 8, 176),
-                     (min(x for x, _ in points) + 8, 176)], SHIRT)
-        for y in (139, 147, 155):
-            art.line([(113 if left else 143, y), (140 if left else 116, y + 2)], 1.5, SHIRT)
+                     (min(x for x, _ in points) + 8, 176)], CREAM)
+        for y in (140, 148, 156):
+            art.line([(113 if left else 143, y), (139 if left else 117, y + 2)], 1.4, CREAM)
     else:
         raise ValueError(f'Unknown part role: {role}')
     return rgba_png(art.pixels)

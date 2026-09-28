@@ -62,6 +62,40 @@ TEST_CASE("Two-segment bone keys retain elbow connection, rest and undo") {
     REQUIRE(meshBindingFor(session.document().layer(fixture.part), fixture.drawing)->bone->keys.size() == 2);
 }
 
+TEST_CASE("Bone rest joints can be retargeted without changing rest pixels or corrupting keys") {
+    PartFixture fixture;
+    bindBoneChain(fixture.document, fixture.part, fixture.drawing,
+                  {{{0, 8}, {8, 8}, {16, 8}}}, 3);
+    recordBonePose(fixture.document, fixture.part, fixture.drawing, 12, 0, 30);
+    Session session;
+    session.replace(fixture.document);
+    const auto before = *meshBindingFor(session.document().layer(fixture.part), fixture.drawing);
+    const auto bentBefore = evaluateMeshBinding(before, 12);
+    REQUIRE(session.apply("Place elbow", [&](Document& document) {
+        moveBoneRestJoint(document, fixture.part, fixture.drawing, 1, {9, 8});
+    }));
+    const auto& adjusted = *meshBindingFor(session.document().layer(fixture.part), fixture.drawing);
+    REQUIRE(adjusted.vertices == before.vertices);
+    REQUIRE(adjusted.bone->restJoints[1] == MeshPoint{9, 8});
+    REQUIRE(adjusted.bone->distalWeights != before.bone->distalWeights);
+    REQUIRE(evaluateMeshBinding(adjusted, 0).vertices == before.vertices);
+    REQUIRE(evaluateMeshBinding(adjusted, 12).vertices != bentBefore.vertices);
+    const auto valid = session.document();
+    REQUIRE_THROWS(session.apply("Collapse bone", [&](Document& document) {
+        moveBoneRestJoint(document, fixture.part, fixture.drawing, 1, {0, 8});
+    }));
+    REQUIRE(session.document() == valid);
+    REQUIRE_THROWS(session.apply("Invalid joint", [&](Document& document) {
+        moveBoneRestJoint(document, fixture.part, fixture.drawing, 3, {8, 8});
+    }));
+    REQUIRE(session.document() == valid);
+    REQUIRE(deserializeDocument(serializeDocument(session.document())) == session.document());
+    REQUIRE(session.undo());
+    REQUIRE(*meshBindingFor(session.document().layer(fixture.part), fixture.drawing) == before);
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == valid);
+}
+
 TEST_CASE("Cubic curve tangent keys move a field continuously without altering rest") {
     PartFixture fixture;
     const std::array<MeshPoint, 4> straight{{{0, 8}, {16.0 / 3, 8},

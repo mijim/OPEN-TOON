@@ -15,6 +15,11 @@ replacement; visual approval of the new design remains open. The earlier
 acceptance records the historical HM-00 rubric decision rather than an artistic
 endorsement of this later revision.
 
+The owner then rejected that replacement as still too generic and supplied
+Toon Boom rig examples for visual direction. A second independent redraw uses
+a hoodie silhouette and softer part joins while retaining the same registered
+roles, variants and shot rubric. The owner has not yet approved this redraw.
+
 The reproducible input, original-art provenance and exact time variants are
 documented in [the fixture guide](../../tests/fixtures/harmony-moment/README.md).
 The [foundation ADR](../architecture/adr/023-harmony-foundation-contracts.md)

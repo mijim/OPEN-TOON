@@ -57,7 +57,8 @@ QPointF CanvasItem::meshControlPosition(int index) const {
         return {};
     MeshPoint point;
     if (binding->bone && index < 3)
-        point = posedJoints(*binding->bone, editor_->frame())[index];
+        point = meshRestEditing_ ? binding->bone->restJoints[index]
+                                 : posedJoints(*binding->bone, editor_->frame())[index];
     else if (binding->curve && index < 4)
         point = sampleCurveControls(*binding->curve, editor_->frame())[index];
     else
@@ -69,7 +70,7 @@ int CanvasItem::meshControlAt(QPointF position) const {
     const auto* binding = editor_ ? selectedMesh(editor_->document()) : nullptr;
     if (!binding || (!binding->bone && !binding->curve))
         return -1;
-    const int first = binding->bone ? 1 : 0;
+    const int first = binding->bone && !meshRestEditing_ ? 1 : 0;
     const int end = binding->bone ? 3 : 4;
     for (int index = end - 1; index >= first; --index)
         if (QLineF(position, meshControlPosition(index)).length() <= 10)
@@ -113,7 +114,7 @@ void CanvasItem::paintMesh(QPainter* painter, const Document& document,
     const auto transform = selectionWorld();
     auto at = [&](int row, int column) {
         const auto& vertex = binding->vertices[std::size_t(row) * (binding->columns + 1) + column];
-        const auto point = meshRestEditing_ ? vertex.rest : vertex.pose;
+        const auto point = meshRestEditing_ && !binding->curve ? vertex.rest : vertex.pose;
         return transform.map(QPointF(point.x, point.y));
     };
     painter->save();
@@ -135,7 +136,8 @@ void CanvasItem::paintMesh(QPainter* painter, const Document& document,
                 painter->drawRect(QRectF(point - QPointF(4, 4), QSizeF(8, 8)));
             }
     if (binding->bone) {
-        const auto joints = posedJoints(*binding->bone, editor_->frame());
+        const auto joints = meshRestEditing_ ? binding->bone->restJoints
+                                             : posedJoints(*binding->bone, editor_->frame());
         painter->setPen(QPen(QColor("#ffffff"), 2));
         for (int index = 0; index < 2; ++index)
             painter->drawLine(transform.map(QPointF(joints[index].x, joints[index].y)),
@@ -173,7 +175,8 @@ void CanvasItem::beginMesh(QPointF position) {
                                            : std::array<double, 2>{};
         meshPreviewPoint_ = binding->curve
             ? sampleCurveControls(*binding->curve, editor_->frame())[meshControl_]
-            : MeshPoint{};
+            : meshRestEditing_ && binding->bone
+                ? binding->bone->restJoints[meshControl_] : MeshPoint{};
         meshControlMoved_ = false;
         drawing_ = true;
         previewValid_ = true;
@@ -214,21 +217,27 @@ void CanvasItem::previewMeshControl(QPointF position) {
     try {
         const Id drawing = editor_->selectedSubstitution();
         if (source->bone) {
-            const auto& rest = source->bone->restJoints;
-            const auto joints = posedJoints(*source->bone, editor_->frame());
-            const auto origin = meshControl_ == 1 ? rest[0] : joints[1];
-            const auto start = meshControl_ == 1 ? rest[1] : rest[2];
-            const auto prior = meshControl_ == 1 ? rest[0] : rest[1];
-            const double direction = std::atan2(point.y - origin.y, point.x - origin.x);
-            const double restDirection = std::atan2(start.y - prior.y, start.x - prior.x);
-            auto angles = sampleBoneAngles(*source->bone, editor_->frame());
-            if (meshControl_ == 1)
-                angles[0] = (direction - restDirection) * 180 / std::numbers::pi;
-            else
-                angles[1] = (direction - restDirection) * 180 / std::numbers::pi - angles[0];
-            recordBonePose(candidate, editor_->selectedLayer(), drawing, editor_->frame(),
-                           angles[0], angles[1]);
-            meshPreviewAngles_ = angles;
+            if (meshRestEditing_) {
+                moveBoneRestJoint(candidate, editor_->selectedLayer(), drawing,
+                                  meshControl_, {point.x, point.y});
+                meshPreviewPoint_ = {point.x, point.y};
+            } else {
+                const auto& rest = source->bone->restJoints;
+                const auto joints = posedJoints(*source->bone, editor_->frame());
+                const auto origin = meshControl_ == 1 ? rest[0] : joints[1];
+                const auto start = meshControl_ == 1 ? rest[1] : rest[2];
+                const auto prior = meshControl_ == 1 ? rest[0] : rest[1];
+                const double direction = std::atan2(point.y - origin.y, point.x - origin.x);
+                const double restDirection = std::atan2(start.y - prior.y, start.x - prior.x);
+                auto angles = sampleBoneAngles(*source->bone, editor_->frame());
+                if (meshControl_ == 1)
+                    angles[0] = (direction - restDirection) * 180 / std::numbers::pi;
+                else
+                    angles[1] = (direction - restDirection) * 180 / std::numbers::pi - angles[0];
+                recordBonePose(candidate, editor_->selectedLayer(), drawing, editor_->frame(),
+                               angles[0], angles[1]);
+                meshPreviewAngles_ = angles;
+            }
         } else if (source->curve) {
             auto controls = sampleCurveControls(*source->curve, editor_->frame());
             controls[meshControl_] = {point.x, point.y};
@@ -255,7 +264,9 @@ void CanvasItem::commitMeshControl() {
     drawing_ = false;
     if (editor_ && control >= 0 && meshControlMoved_ && previewValid_) {
         QScopedValueRollback<bool> guard(committing_, true);
-        if (bone)
+        if (bone && meshRestEditing_)
+            editor_->moveSelectedBoneRestJoint(control, meshPreviewPoint_.x, meshPreviewPoint_.y);
+        else if (bone)
             editor_->recordSelectedBonePose(meshPreviewAngles_[0], meshPreviewAngles_[1]);
         else
             editor_->moveSelectedCurveControl(control, meshPreviewPoint_.x, meshPreviewPoint_.y);

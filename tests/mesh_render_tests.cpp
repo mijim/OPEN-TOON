@@ -1,3 +1,4 @@
+#include "opentoon/animation.h"
 #include "opentoon/deformation.h"
 #include "opentoon/deformer.h"
 #include "opentoon/rigging.h"
@@ -426,23 +427,25 @@ TEST_CASE("Nineteen Harmony parts keep rest pixels and bounded posed render cost
     const auto reopenedAnimated = deserializeDocument(serializeDocument(document));
     REQUIRE(SceneRenderer::render(reopenedAnimated, 12) == animated);
     auto stronger = document;
-    recordBonePose(stronger, armPart, armDrawing, 24, 0, 70);
+    const std::array<MeshPoint, 3> anatomicalArm{{{145, 50}, {112, 185}, {86, 330}}};
+    constexpr double anatomicalTransition = 60;
+    removeMeshBinding(stronger, armPart, armDrawing);
+    bindRegularImageMesh(stronger, armPart, armDrawing, 4, 4);
+    REQUIRE_NOTHROW(bindBoneChain(stronger, armPart, armDrawing, anatomicalArm, anatomicalTransition));
+    REQUIRE_NOTHROW(recordBonePose(stronger, armPart, armDrawing, 12, 0, 12));
+    REQUIRE_NOTHROW(recordBonePose(stronger, armPart, armDrawing, 24, 0, 70));
     for (const auto& role : {"lower_arm_left", "hand_left"}) {
         const Id follower = partFor(role);
-        const Id followerDrawing = stronger.layer(follower).exposures.front().drawing;
-        removeMeshBinding(stronger, follower, followerDrawing);
-        bindRegularImageMesh(stronger, follower, followerDrawing, 4, 4);
-        auto joints = meshBindingFor(stronger.layer(armPart), armDrawing)->bone->restJoints;
         const auto& armTransform = stronger.layer(armPart).transform;
         const auto& followerTransform = stronger.layer(follower).transform;
-        for (auto& joint : joints) {
-            joint.x += armTransform.x - followerTransform.x;
-            joint.y += armTransform.y - followerTransform.y;
-        }
-        bindBoneChain(stronger, follower, followerDrawing, joints,
-                      meshBindingFor(stronger.layer(armPart), armDrawing)->bone->elbowTransition);
-        recordBonePose(stronger, follower, followerDrawing, 12, 0, 12);
-        recordBonePose(stronger, follower, followerDrawing, 24, 0, 70);
+        setPivotPreservingArtwork(stronger, follower,
+                                 anatomicalArm[1].x + armTransform.x - followerTransform.x,
+                                 anatomicalArm[1].y + armTransform.y - followerTransform.y);
+        auto followerPose = stronger.layer(follower).transform;
+        followerPose.rotation = 12;
+        recordPose(stronger.layer(follower), 12, followerPose);
+        followerPose.rotation = 70;
+        recordPose(stronger.layer(follower), 24, followerPose);
     }
     stronger.validate();
     REQUIRE(SceneRenderer::render(stronger, 0) == baseline);

@@ -907,6 +907,12 @@ bool EditorController::recordSelectedBonePose(double shoulder, double elbow) {
         opentoon::recordBonePose(d, layer_, drawing, frame_, shoulder, elbow);
     });
 }
+bool EditorController::moveSelectedBoneRestJoint(int joint, double x, double y) {
+    const Id drawing = selectedSubstitution();
+    return layer_ && drawing && edit("Move bone rest joint", [&](Document& d) {
+        opentoon::moveBoneRestJoint(d, layer_, drawing, joint, {x, y});
+    });
+}
 bool EditorController::moveSelectedCurveControl(int control, double x, double y) {
     const Id drawing = selectedSubstitution();
     return layer_ && drawing && control >= 0 && control < 4 &&

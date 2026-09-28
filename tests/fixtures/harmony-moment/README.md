@@ -24,7 +24,12 @@ tailored jacket, cuffed sleeves, distinct hand silhouettes and shoes. The
 registered 256×256 canvases, 19 part roles, 41 variant names, timing and license
 remain stable. The owner's visual direction is still being refined; this art
 revision is a stronger deformation and substitution fixture, not a claim of
-final production character approval.
+final production character approval. After the owner supplied Toon Boom rig
+examples, the character was redrawn again with an original hoodie silhouette,
+simpler expressive face, continuous sleeve edges, tapered trousers and
+integrated hand shapes. Those third-party reference images were used only for
+visual direction and are not included in the fixture or copied into its
+artwork. Visual approval of this candidate remains open.
 `--previews` renders five full-resolution reference poses for visual review; they
 are external acceptance targets, not frames from the OPEN-TOON evaluator.
 

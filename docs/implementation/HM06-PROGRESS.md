@@ -19,8 +19,10 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
 - Properties offers Bone chain and Curve on a selected bound Part. The Mesh
   tool drags joints or curve controls directly on canvas with a cancellable
   temporary preview. Its grid now follows the evaluated pose during animation
-  and preview. Static vertex editing is unavailable while a deformer
-  is attached. Switching substitutions resolves the matching chain.
+  and preview. Rest joints mode moves root, elbow or tip in the saved setup,
+  recalculates vertex weights and validates existing poses before atomic
+  publication. Static vertex editing is unavailable while a deformer is
+  attached. Switching substitutions resolves the matching chain.
 - Format 9 persists controls, weights and keys. The first save of format 8
   preserves a source-version `.pre-v8.bak` before upgrading.
 - Insert/remove frames shift or remove deformer keys with the scene clock.
@@ -39,35 +41,36 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   `tests/mesh_render_tests.cpp` covers saved preview/Display/Write pixels,
   separate substitution chains, and the original 19-part scene. The assembled
   frame-zero scene is byte-identical to `reference_0000.png`; an animated arm
-  and torso reopen to identical frame-12 pixels. A manually coordinated 70°
-  pose of upper arm, lower arm and hand keeps rest pixels unchanged and
-  reopens identically. The [extreme pose](hm06-bone-extreme.png) still shows an
-  elbow bulge that blocks artistic acceptance.
+  and torso reopen to identical frame-12 pixels. A manually placed elbow,
+  deforming upper sleeve, and rigidly pivoted forearm/hand produce a 70°
+  [extreme pose](hm06-bone-extreme.png) with unchanged rest pixels and identical
+  reopened output. The earlier double-sleeve elbow bulge is absent in this
+  inspected pose; broader joint and artwork review remains open.
 - The native `--smoke-test` drags a bone tip and curve tangent, checks
-  temporary preview isolation, cancellation, undo/redo, Rest key, same-Part
-  timeline key paste/move and project reopen on a checker Part. A
-  mirrored/rotated/zoomed control drag also
-  round-trips through undo. The inspected [original-art detail](hm06-bone-curve-detail.png)
-  shows the bounded arm/torso deformation after the rotation correction. The
-  elbow overlap and larger bends still need correction and artistic acceptance.
-- The macOS optimized build passes 121/121 CTest entries and native smoke.
+  temporary preview isolation, cancellation, undo/redo, a bone rest-joint
+  retarget, Rest key, same-Part timeline key paste/move and project reopen on
+  a checker Part. A mirrored, rotated and zoomed control drag also round-trips
+  through undo. The inspected [original-art detail](hm06-bone-curve-detail.png)
+  shows the bounded arm/torso deformation after the rotation correction.
+  Additional elbow shapes and larger bends still need artistic acceptance.
+- The macOS optimized build passes 122/122 CTest entries and native smoke.
   On Apple M1 Pro, three earlier local 1920×1080 renders of the assembled
   19-part scene with one bone and one curve averaged 3.25 ms/frame. After the
-  fixture's toon-art revision, four runs averaged 3.30 ms/frame (3.04–3.56).
-  This is
-  renderer cost, separate from native input-to-present latency and full-shot
-  memory. No new dependency or license was added; Eigen remains a candidate.
+  latest independent toon redraw, four runs averaged 3.18 ms/frame
+  (3.09–3.26). This is renderer cost, separate from native input-to-present
+  latency and full-shot memory. No new dependency or license was added; Eigen
+  remains a candidate.
 - The [native interaction measurement](HM06-INTERACTION.md) on the same M1 Pro
   used 40 input-to-`frameSwapped` samples in each of four runs of the 19-part
-  subset with the revised toon artwork. p95 was 15.71–17.91 ms and process
-  peak resident memory was below 273 MB. The current subset meets the proposed 50 ms/2 GiB limits on this
-  host; the complete B4 shot remains unmeasured.
+  subset with the latest redraw. p95 was 14.90–16.76 ms and process
+  peak resident memory was below 273 MB. The current subset meets the proposed
+  50 ms/2 GiB limits on this host; the complete B4 shot remains unmeasured.
 
 ## Remaining acceptance
 
-Measure the complete B4 shot against the HM proposed budgets; improve and
-inspect extreme bends, influence tuning, joint seams and
-texture behavior on the reference shot. Qualify additional poses and source
+Measure the complete B4 shot against the HM proposed budgets; inspect extreme
+bends, influence tuning, joint seams and texture behavior on the reference
+shot. Qualify additional poses and source
 profiles, native interaction under zoom/rotation and an artist workflow. The
 current two-segment/cubic profile does not provide envelope, IK, deformer
 stacking or arbitrary shape-aware weights. P09 and full DEF catalog features

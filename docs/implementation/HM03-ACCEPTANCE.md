@@ -21,6 +21,8 @@ IDs agree with the tested document state. The inspected images are
 These captures were regenerated at full scene resolution after the 2026-09-28
 art revision; the registered assembly, view choices and undo/reopen checks
 passed again with the replacement toon artwork.
+The 19-part journey and full-resolution captures were repeated after the
+subsequent hoodie redraw; all 41 substitution imports and view returns passed.
 
 The owner asked the implementer to repeat this check with tests on 2026-09-28.
 The inspector journey now uses all 41 supplied PNGs, cycling all eight mouth
@@ -41,7 +43,7 @@ sheared, differently animated and opacity-impossible cases. Existing view
 tests reject missing members before changing any part. The native
 `--smoke-test` passed on macOS for QML canvas input, timeline and animation
 actions, though it does not itself click every Rig menu item. The full
-121-entry CTest suite, native macOS smoke and `scripts/validate_docs.py` passed
+122-entry CTest suite, native macOS smoke and `scripts/validate_docs.py` passed
 after the repeated block.
 
 The workflow still requires an artist to choose correct paint order and rest

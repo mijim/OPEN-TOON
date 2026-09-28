@@ -132,9 +132,34 @@ void meshSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& windo
     editor.redo();
     if (SceneRenderer::render(editor.document(), 12) != bonePixels)
         throw std::runtime_error("Bone redo changed the rendered frame.");
+    canvas.setMeshRestEditing(true);
+    const auto restElbow = canvas.meshControlPosition(1);
+    const auto beforeRestEdit = editor.document();
+    send(QEvent::MouseButtonPress, restElbow, Qt::LeftButton, Qt::LeftButton);
+    send(QEvent::MouseMove, restElbow + QPointF(0, 2), Qt::NoButton, Qt::LeftButton);
+    if (editor.document() != beforeRestEdit || window.grabWindow().isNull())
+        throw std::runtime_error("Bone rest-joint preview changed the authored document.");
+    canvas.cancelGesture();
+    if (editor.document() != beforeRestEdit)
+        throw std::runtime_error("Cancelled rest-joint drag changed the document.");
+    drag(restElbow, restElbow + QPointF(0, 2));
+    const auto boneRetargetedPixels = SceneRenderer::render(editor.document(), 12);
+    if (boneRetargetedPixels == bonePixels ||
+        SceneRenderer::render(editor.document(), 0) !=
+            SceneRenderer::render(beforeRestEdit, 0))
+        throw std::runtime_error("Rest joint drag did not retarget the keyed bone safely: " +
+                                 editor.status().toStdString());
+    editor.undo();
+    if (editor.document() != beforeRestEdit)
+        throw std::runtime_error("Rest joint drag did not undo atomically.");
+    editor.redo();
+    if (SceneRenderer::render(editor.document(), 12) != boneRetargetedPixels)
+        throw std::runtime_error("Rest joint redo changed the rendered frame.");
+    canvas.setMeshRestEditing(false);
     const auto boneSaved = editor.document();
     if (!editor.saveProject(project) || !editor.openProject(project) ||
-        editor.document() != boneSaved || SceneRenderer::render(editor.document(), 12) != bonePixels)
+        editor.document() != boneSaved ||
+        SceneRenderer::render(editor.document(), 12) != boneRetargetedPixels)
         throw std::runtime_error("Bone animation changed after project reopen.");
     editor.setSelectedLayer(int(part));
     if (!editor.removeSelectedDeformer() || !editor.bindSelectedCurve() ||

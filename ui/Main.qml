@@ -1330,9 +1330,23 @@ ApplicationWindow {
                                 }
                                 RowLayout {
                                     Layout.fillWidth: true
+                                    visible: editor.selectedMeshDeformer === 1
+                                    C.CompactButton {
+                                        text: "Pose joints"
+                                        onClicked: { canvas.meshRestEditing = false; editor.tool = "Mesh"; }
+                                    }
+                                    C.CompactButton {
+                                        text: "Rest joints"
+                                        onClicked: { canvas.meshRestEditing = true; editor.tool = "Mesh"; }
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
                                     visible: editor.selectedMeshDeformer > 0
                                     Label {
-                                        text: "Drag joints or curve points on canvas · Esc cancels"
+                                        text: canvas.meshRestEditing && editor.selectedMeshDeformer === 1
+                                              ? "Drag rest joints on canvas · Esc cancels"
+                                              : "Drag joints or curve points on canvas · Esc cancels"
                                         color: "#999999"
                                         font.pixelSize: 10
                                         Layout.fillWidth: true

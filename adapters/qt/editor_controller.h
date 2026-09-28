@@ -220,6 +220,7 @@ class EditorController final : public QObject {
     int selectedMeshDeformer() const;
     Q_INVOKABLE bool bindSelectedBone();
     Q_INVOKABLE bool bindSelectedCurve();
+    Q_INVOKABLE bool moveSelectedBoneRestJoint(int joint, double x, double y);
     Q_INVOKABLE bool recordSelectedBonePose(double shoulder, double elbow);
     Q_INVOKABLE bool moveSelectedCurveControl(int control, double x, double y);
     Q_INVOKABLE bool resetSelectedDeformerPose();

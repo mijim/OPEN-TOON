@@ -20,8 +20,13 @@ the whole chain. Each posed bone preserves its rest length. A vertex uses its
 saved weight to interpolate segment rotation around the shared posed elbow,
 preserving its rest distance from that joint and reducing mid-influence
 pinching. The elbow joint maps to one point for every weight. Zero-length
-segments, out-of-range weights
-and nonfinite angles reject at the document boundary.
+segments, out-of-range weights and nonfinite angles reject at the document
+boundary. In Rest joints mode, direct canvas drags may reposition any of the
+three drawing-local rest joints. The transaction recomputes distal weights
+from the unchanged rest mesh, validates existing keyed and intermediate poses,
+then publishes the new chain atomically. A rejected move leaves the previous
+binding, keys and pixels intact. The root remains fixed while posing; Rest
+joints mode changes its stored setup position without changing rest artwork.
 
 The curve profile stores four rest cubic controls, a fixed per-vertex curve
 parameter and keyed four-point posed controls. Each vertex receives the
@@ -39,8 +44,9 @@ composition. Immutable render snapshots carry the authored keys; revision
 cache keys already cover new document edits. Independent Part duplication
 copies weights and keys, while linked artwork may have a separate deformer.
 The canvas mesh grid samples the same evaluated pose as artwork, including
-the temporary drag preview; the rest grid remains available only for static
-mesh setup.
+the temporary drag preview; the rest grid is available for static mesh setup
+and bone rest-joint placement. Curve rest controls are not yet directly
+editable after binding.
 Scene-wide frame insertion/removal and selected-range Clear include deformer
 keys. Same-Part range copy/paste, move and stretch preserve the keyed bone or
 curve identity and exact pose endpoints. A cross-scene or different-Part key

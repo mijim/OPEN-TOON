@@ -32,6 +32,26 @@ double projection(MeshPoint p, MeshPoint a, MeshPoint b) {
 double distanceToSegment(MeshPoint p, MeshPoint a, MeshPoint b) {
     return length(sub(p, add(a, mul(sub(b, a), projection(p, a, b)))));
 }
+std::vector<double> boneWeights(const MeshBinding& binding, const BoneChain& bone) {
+    const auto& joints = bone.restJoints;
+    const double first = length(sub(joints[1], joints[0]));
+    const double second = length(sub(joints[2], joints[1]));
+    require(first > 1e-6 && second > 1e-6 && std::isfinite(bone.elbowTransition) &&
+                bone.elbowTransition > 0, "Bone chain has invalid rest geometry.");
+    std::vector<double> weights;
+    weights.reserve(binding.vertices.size());
+    for (const auto& vertex : binding.vertices) {
+        const auto position = vertex.rest;
+        const double a = distanceToSegment(position, joints[0], joints[1]);
+        const double b = distanceToSegment(position, joints[1], joints[2]);
+        const double arc = a <= b ? projection(position, joints[0], joints[1]) * first
+                                  : first + projection(position, joints[1], joints[2]) * second;
+        double weight = std::clamp((arc - first + bone.elbowTransition) /
+                                       (2 * bone.elbowTransition), 0.0, 1.0);
+        weights.push_back(weight * weight * (3 - 2 * weight));
+    }
+    return weights;
+}
 MeshPoint cubic(const std::array<MeshPoint, 4>& c, double t) {
     const double u = 1 - t;
     return add(add(mul(c[0], u * u * u), mul(c[1], 3 * u * u * t)),
@@ -201,23 +221,20 @@ void bindBoneChain(Document& document, Id part, Id drawing,
     BoneChain bone;
     bone.restJoints = restJoints;
     bone.elbowTransition = elbowTransition;
-    const double first = length(sub(restJoints[1], restJoints[0]));
-    const double second = length(sub(restJoints[2], restJoints[1]));
-    require(first > 1e-6 && second > 1e-6 && std::isfinite(elbowTransition) &&
-                elbowTransition > 0, "Bone chain has invalid rest geometry.");
-    bone.distalWeights.reserve(candidate.vertices.size());
-    for (const auto& vertex : candidate.vertices) {
-        const auto position = vertex.rest;
-        const double a = distanceToSegment(position, restJoints[0], restJoints[1]);
-        const double b = distanceToSegment(position, restJoints[1], restJoints[2]);
-        const double arc = a <= b ? projection(position, restJoints[0], restJoints[1]) * first
-                                  : first + projection(position, restJoints[1], restJoints[2]) * second;
-        double weight = std::clamp((arc - first + elbowTransition) /
-                                       (2 * elbowTransition), 0.0, 1.0);
-        weight = weight * weight * (3 - 2 * weight);
-        bone.distalWeights.push_back(weight);
-    }
+    bone.distalWeights = boneWeights(candidate, bone);
     candidate.bone = std::move(bone);
+    validateMeshDeformer(document, candidate);
+    binding(document, part, drawing) = std::move(candidate);
+}
+
+void moveBoneRestJoint(Document& document, Id part, Id drawing, int joint, MeshPoint position) {
+    editable(document, part, drawing);
+    require(joint >= 0 && joint < 3 && finite(position),
+            "Bone rest joint is invalid.");
+    auto candidate = binding(document, part, drawing);
+    require(candidate.bone.has_value(), "Selected Part has no bone chain.");
+    candidate.bone->restJoints[std::size_t(joint)] = position;
+    candidate.bone->distalWeights = boneWeights(candidate, *candidate.bone);
     validateMeshDeformer(document, candidate);
     binding(document, part, drawing) = std::move(candidate);
 }

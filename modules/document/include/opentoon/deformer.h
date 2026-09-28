@@ -5,6 +5,7 @@ namespace opentoon {
 void validateMeshDeformer(const Document&, const MeshBinding&);
 void bindBoneChain(Document&, Id part, Id drawing, std::array<MeshPoint, 3> restJoints,
                    double elbowTransition);
+void moveBoneRestJoint(Document&, Id part, Id drawing, int joint, MeshPoint position);
 void recordBonePose(Document&, Id part, Id drawing, Frame frame, double shoulderAngle,
                     double elbowAngle, Interpolation interpolation = Interpolation::Linear);
 void bindCurveDeformer(Document&, Id part, Id drawing,

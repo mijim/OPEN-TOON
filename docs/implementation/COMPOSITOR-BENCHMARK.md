@@ -62,3 +62,8 @@ of `--original-art` on the same M1 Pro host sampled animated frames 0, 120 and
 240. Direct legacy cost was 1.50, 2.06 and 1.78 ms/frame; linear-sRGB graph
 cost was 37.82, 37.94 and 38.60 ms/frame. This follow-up replaces the artwork
 profile, not the historical experimental.14 measurements or a full-shot budget.
+
+The later independently drawn hoodie revision was measured in three further
+optimized `build/desktop` process runs on the same host. Direct legacy cost
+was 1.62, 1.95 and 1.81 ms/frame; linear-sRGB graph cost was 37.40, 39.11
+and 38.19 ms/frame. This is a fixture change rather than a rendering speedup.
