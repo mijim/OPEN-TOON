@@ -143,6 +143,16 @@ is undoable and tested through native save/reopen.
   pose; the hood-to-sleeve seam and knee volume still need artistic refinement.
   The candidate has no elbow or knee image seam; owner visual approval is still
   open.
+  The later leg redraw replaces the two angular trouser silhouettes with
+  continuous cubic contours, a modestly fuller knee and a narrower ankle.
+  The first wider knee candidate folded the right contour mesh at 90° and
+  was rejected; the final contour passes the same 40 px transition and
+  rejects the unsafe 35 px case. Registered hip/knee/ankle joints and the
+  one-image, one-mesh limb ownership are unchanged. Both openable examples
+  and their representative captures were regenerated. The local macOS suite
+  passes 166/166 entries, the deterministic asset test and native HM-07
+  dashboard smoke (40 mouse-to-present samples, p95 18.02 ms). This is a
+  smaller silhouette correction; full artistic approval remains open.
 - The native `--smoke-test` drags a bone tip and curve tangent, checks
   temporary preview isolation, cancellation, undo/redo, bone and curve rest-control
   retarget, a 6 × 16 mesh grid, numeric and on-canvas elbow influence tuning,

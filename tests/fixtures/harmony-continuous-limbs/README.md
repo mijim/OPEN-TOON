@@ -7,8 +7,8 @@ rest joints. A fifth 512 × 512 image joins the trouser waist to both thighs
 without a horizontal edge across either leg. Hands, feet, face substitutions,
 torso and waist remain separately editable; their paint order covers the
 attachment overlaps. The rendered silhouette has no artwork boundary at the
-elbow or knee. Cubic sleeve contours round the outer shoulder without changing
-the registered joints. `rig.json` specifies scene-space registration and bone
+elbow or knee. Cubic sleeve and trouser contours round the outer shoulder and
+knee without changing the registered joints. `rig.json` specifies scene-space registration and bone
 transitions.
 
 Run `python3 scripts/generate_harmony_continuous_limbs.py` to regenerate the

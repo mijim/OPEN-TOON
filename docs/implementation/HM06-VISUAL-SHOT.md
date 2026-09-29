@@ -42,6 +42,10 @@ The [frame before the sleeve change](hm06-visual-shot-0299.png) and
 [the incoming sleeve frame](hm06-visual-shot-0300.png) are retained at
 1920 × 1080 for direct contour inspection. Their left shoulder, elbow,
 cuff and hand remain visually joined across the change.
+The later cubic trouser-contour correction regenerated this project and the
+five displayed stills without changing the 480-frame timing, bone joints or
+substitution decisions. All frames retain one connected silhouette and the
+saved example matches the constructed document in the 166-entry local suite.
 
 ## Local macOS measurements
 

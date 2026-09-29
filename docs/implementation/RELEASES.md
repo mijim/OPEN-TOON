@@ -1,5 +1,16 @@
 # Experimental releases
 
+## 0.2.0-experimental.25 — working source, continuous trouser contour
+
+- Redraw each leg as one cubic trouser silhouette with a smoother knee and
+  tapered ankle. Hip, knee and ankle registration and the central bone remain
+  unchanged; regenerated 48- and 480-frame examples stay editable.
+- The 90° regular and contour stress poses, 480-frame connectivity and
+  substitution/reopen checks pass. An overly wide knee candidate folded and
+  was rejected before this bounded redraw. The local macOS build passes 166
+  CTest entries, the deterministic asset test and native HM-07 smoke.
+- Source only; no new public binary or tag. Artistic acceptance remains open.
+
 ## 0.2.0-experimental.24 — working source, persistent cutter bypass
 
 - Save a reversible cutter bypass in format 20. It keeps the source and
