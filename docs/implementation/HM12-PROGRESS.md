@@ -10,7 +10,12 @@ The target retains its layer order. A source can mask more than one target;
 missing, self, hidden and chained sources are rejected. Removing a referenced
 source fails before modifying the document. Independent character copies
 remap bindings inside the copied branch; an external source blocks branch
-copy. See [ADR-039](../architecture/adr/039-layer-cutter-matte.md).
+copy. The resizable bottom workspace now has a Nodes tab showing the derived
+typed Drawing, Cutter, Apply matte, Composite, Display and Write nodes with
+numbered input references. Clicking a Drawing node selects its layer; the
+same panel can change composite order and assign or bypass its cutter. This
+is a focused presentation of document-owned operations, not arbitrary graph
+persistence. See [ADR-039](../architecture/adr/039-layer-cutter-matte.md).
 
 ## Verification
 
@@ -20,8 +25,12 @@ copy. See [ADR-039](../architecture/adr/039-layer-cutter-matte.md).
   source alpha to 64/255 output, source exclusion, display/write agreement,
   format-18 serialization and the unbound composite.
 - `--hm12-smoke` opens a saved fixture in native Qt Quick, finds the inspector
-  control, binds a matte, checks rendered pixels, saves and reopens, then
-  bypasses and undoes the change. The screenshot is a local test artifact.
+  and Nodes panel, binds a matte, checks rendered pixels, saves and reopens,
+  then bypasses and undoes the change. The screenshot is a local test artifact.
+- `tests/export_tests.cpp` checks that the presented graph changes with an
+  assignment and undo, including both output terminals. Rigging tests reject
+  referenced-source deletion and external-source branch copies atomically;
+  full character copies remap the source.
 
 ## Open contract
 

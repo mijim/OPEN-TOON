@@ -72,8 +72,15 @@ for sample-contiguous repeats.
   same adapter and samples its cursor every 8 ms. A two-second CoreAudio probe
   at 24 fps recorded 328 callbacks, zero callbacks over period, 0.043 ms
   maximum callback time and 142 final drift samples relative to the host
-  monotonic clock after a one-second baseline. Ten-minute host runs are
-  separate qualification work.
+  monotonic clock after a one-second baseline. Two ten-minute silent CoreAudio
+  runs on this M1 Pro measured, respectively, **24 fps:** 65,418 callbacks,
+  zero processing overruns, 0.209 ms maximum callback time, 569 final drift
+  samples, 778 maximum jitter samples and one skipped polled playhead frame;
+  **24000/1001 fps:** 65,417 callbacks, zero processing overruns, 0.238 ms
+  maximum callback time, 262 final drift samples, 565 maximum jitter samples
+  and two skipped polled frames. Each drift is relative to the host monotonic
+  clock after the first one-second baseline. These silent probes do not
+  measure speaker delivery time, audible sync or hardware underruns.
 - Local macOS `build/locked`: 154/154 CTest entries pass. The native
   `--hm10-smoke` loaded the Qt Quick audio timeline, checked its cue sample,
   captured and visually inspected `build/hm10-audio-smoke.png`, exported an
@@ -86,8 +93,8 @@ for sample-contiguous repeats.
 ## Open contract
 
 HM-10 remains incomplete. Device latency calibration, device-loss recovery,
-hardware underrun and dropped-frame traces, production-quality rate
+hardware underrun and presented-frame traces, production-quality rate
 conversion, hardware audible scrub quality and a full
-ten-minute audiovisual drift run are pending. The miniaudio adapter is adopted
+ten-minute audiovisual drift run with visual output are pending. The miniaudio adapter is adopted
 for this experimental desktop profile; hardware and cross-platform
 qualification remain open.

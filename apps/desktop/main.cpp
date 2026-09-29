@@ -150,6 +150,49 @@ int main(int argc, char** argv) {
                         throw std::runtime_error("Cutter matte inspector is unavailable.");
                     if (!editor.setLayerMatte(int(source.id)))
                         throw std::runtime_error("Cannot assign a cutter matte.");
+                    window->setProperty("showNodes", true);
+                    QCoreApplication::processEvents();
+                    auto* nodes = window->findChild<QQuickItem*>("compositionNodesPanel");
+                    auto* strip = window->findChild<QQuickItem*>("compositionNodeStrip");
+                    if (!nodes || !nodes->isVisible() || !strip || !strip->isVisible() ||
+                        editor.compositionNodes().size() != 8)
+                        throw std::runtime_error("Derived composition nodes are unavailable.");
+                    auto clickNode = [&](int graphId) {
+                        const auto findVisualItem = [](auto&& self, QQuickItem* parent,
+                                                       const QString& name) -> QQuickItem* {
+                            if (!parent)
+                                return nullptr;
+                            if (parent->objectName() == name)
+                                return parent;
+                            for (auto* child : parent->childItems())
+                                if (auto* match = self(self, child, name))
+                                    return match;
+                            return nullptr;
+                        };
+                        auto* card = findVisualItem(findVisualItem, window->contentItem(),
+                                                    QString("compositionNode%1").arg(graphId));
+                        if (!card || !card->isVisible())
+                            throw std::runtime_error("A composition node card is unavailable.");
+                        const auto point = card->mapToScene(QPointF(20, 20));
+                        QMouseEvent press(QEvent::MouseButtonPress, point,
+                                          window->mapToGlobal(point.toPoint()),
+                                          Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                        QMouseEvent release(QEvent::MouseButtonRelease, point,
+                                            window->mapToGlobal(point.toPoint()),
+                                            Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+                        QCoreApplication::sendEvent(window, &press);
+                        QCoreApplication::sendEvent(window, &release);
+                        QCoreApplication::processEvents();
+                    };
+                    clickNode(3);
+                    if (editor.selectedLayer() != int(source.id))
+                        throw std::runtime_error("Clicking a Drawing node did not select its layer.");
+                    QThread::msleep(450);
+                    QCoreApplication::processEvents();
+                    clickNode(2);
+                    if (editor.selectedLayer() != int(document.layers.front().id))
+                        throw std::runtime_error("Clicking the target node did not select its layer: " +
+                                                 std::to_string(editor.selectedLayer()));
                     const auto clipped = opentoon::SceneRenderer::render(editor.document(), 0);
                     if (qAlpha(clipped.pixel(0, 0)) != 64 || qBlue(clipped.pixel(0, 0)) != 0)
                         throw std::runtime_error("Cutter matte did not clip the image correctly.");
@@ -165,7 +208,7 @@ int main(int argc, char** argv) {
                     editor.undo();
                     if (opentoon::SceneRenderer::render(editor.document(), 0) != clipped)
                         throw std::runtime_error("Cutter matte bypass did not undo.");
-                    std::cout << "HM-12 native smoke passed: visible inspector, fractional matte, "
+                    std::cout << "HM-12 native smoke passed: inspector and clickable node strip, fractional matte, "
                                  "save/reopen, bypass/undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {

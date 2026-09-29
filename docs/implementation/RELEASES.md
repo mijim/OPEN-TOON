@@ -6,7 +6,8 @@
   assigns or bypasses a visible source with atomic undo; fractional alpha
   clips the target without painting the source into the final image.
 - The same typed graph evaluates preview and write output, with validation
-  for source references and character-copy remapping. HM-12 remains in
+  for source references and character-copy remapping. A resizable Nodes tab
+  exposes the derived graph and compact order/cutter edits. HM-12 remains in
   progress pending a general editable graph and joint recipes.
 - Local macOS tests and native smoke verify fractional pixels, save/reopen
   and bypass/undo. Source only; no new public binary or tag.

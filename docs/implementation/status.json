@@ -70,7 +70,7 @@
     {
       "id": "P10",
       "status": "in_progress",
-      "available": "Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. Format-18 Drawing/Part cutter matte bindings clip by fractional alpha through the shared graph, with compact inspector, reference validation, undo, save/reopen and character-copy remapping. A bounded revision cache reuses canvas frames and speculatively prepares the next frame from an immutable snapshot. Native playback/scrub, alpha/color charts and animated original artwork close bounded HM-04; orthographic camera output joins HM-13.",
+      "available": "Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. Format-18 Drawing/Part cutter matte bindings clip by fractional alpha through the shared graph, with compact inspector, resizable derived Nodes panel, order/cutter edits, reference validation, undo, save/reopen and character-copy remapping. A bounded revision cache reuses canvas frames and speculatively prepares the next frame from an immutable snapshot. Native playback/scrub, alpha/color charts and animated original artwork close bounded HM-04; orthographic camera output joins HM-13.",
       "remaining": "General editable node UI, Opacity and group ports, joint recipes, useful effects, full ROI scheduling, production-scale performance and later deformer integration."
     },
     {
@@ -430,17 +430,17 @@
     },
     "cutter_matte": {
       "status": "passed_subset",
-      "scope": "Format-18 Drawing/Part source binding, fractional alpha application, source exclusion, validated references, save/reopen, bypass and undo",
+      "scope": "Format-18 Drawing/Part source binding, fractional alpha application, source exclusion, validated references, derived Nodes panel, save/reopen, bypass and undo",
       "command": "build/locked/open-toon.app/Contents/MacOS/open-toon --hm12-smoke",
       "screenshot": "build/hm12-matte-smoke.png",
       "limits": "General node editor, group/ungroup, opacity nodes, arm/eye recipes and full 480-frame composition budgets remain open."
     },
     "pcm_audio_timing": {
       "status": "passed_subset",
-      "scope": "Format-16 original PCM16 WAV assets and format-17 repeated clips, clip placement/trim/gain and native waveform drag with undo, indexed sample-aligned timeline waveform with exact edge queries, invalid import rejection, undo/redo, save/reopen and format-15/16 backups; deterministic stereo offline mix, 44.1/48 kHz source alignment, exact-length WAV export after reopen and cancellation preservation; bounded miniaudio playback uses the same immutable mix, null-device seek/stop and native Qt Quick playhead smoke; native timeline traversal previews bounded 80 ms rational-sample scrub fragments without document changes; callback-period and skipped-playhead-frame diagnostics retained after preview stop; a two-second silent host probe reported 328 callbacks, zero processing overruns and 142 final drift samples",
+      "scope": "Format-16 original PCM16 WAV assets and format-17 repeated clips, clip placement/trim/gain and native waveform drag with undo, indexed sample-aligned timeline waveform with exact edge queries, invalid import rejection, undo/redo, save/reopen and format-15/16 backups; deterministic stereo offline mix, 44.1/48 kHz source alignment, exact-length WAV export after reopen and cancellation preservation; bounded miniaudio playback uses the same immutable mix, null-device seek/stop and native Qt Quick playhead smoke; native timeline traversal previews bounded 80 ms rational-sample scrub fragments without document changes; callback-period and skipped-playhead-frame diagnostics retained after preview stop; two silent ten-minute CoreAudio probes at 24 and 24000/1001 fps reported 65418/65417 callbacks, zero processing overruns, 569/262 final drift samples and one/two skipped polled frames",
       "command": "build/locked/open-toon.app/Contents/MacOS/open-toon --hm10-smoke",
       "screenshot": "build/hm10-audio-smoke.png",
-      "limits": "Hardware queue latency, underruns, device replacement and ten-minute audiovisual drift unqualified; hardware audible scrub quality, combined PNG/WAV delivery remain open. The callback counter measures processing deadlines, not hardware underruns; the playhead-skip counter does not measure presented frames."
+      "limits": "Hardware queue latency, underruns, device replacement and ten-minute audiovisual drift with displayed frames unqualified; hardware audible scrub quality, combined PNG/WAV delivery remain open. The callback counter measures processing deadlines, not hardware underruns; the playhead-skip counter does not measure presented frames."
     }
   },
   "ownership": {
@@ -465,6 +465,6 @@
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
     "state": "HM-00_through_HM-05_and_HM-13_complete__HM-06_HM-07_HM-10_parked_in_progress__HM-12_active_in_progress",
-    "note": "HM-06 and HM-07 are parked unaccepted subsets. HM-10 is parked after format-17 PCM audio, device preview, scrub, repeat and diagnostics; silent CoreAudio qualification is underway. The single implementer is advancing eligible HM-12 after format-18 cutter matte binding and native smoke. Full P07/P08/P09/P10 and feature acceptance remain open."
+    "note": "HM-06 and HM-07 are parked unaccepted subsets. HM-10 is parked after format-17 PCM audio, device preview, scrub, repeat and two silent ten-minute CoreAudio scheduling probes; audible hardware qualification remains. The single implementer is advancing eligible HM-12 after format-18 cutter mattes and a derived Nodes panel. Full P07/P08/P09/P10 and feature acceptance remain open."
   }
 }

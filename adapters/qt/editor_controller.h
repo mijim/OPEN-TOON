@@ -38,6 +38,7 @@ class EditorController final : public QObject {
     Q_PROPERTY(bool canUndo READ canUndo NOTIFY changed)
     Q_PROPERTY(bool canRedo READ canRedo NOTIFY changed)
     Q_PROPERTY(QVariantList layers READ layers NOTIFY changed)
+    Q_PROPERTY(QVariantList compositionNodes READ compositionNodes NOTIFY changed)
     Q_PROPERTY(QVariantList substitutions READ substitutions NOTIFY changed)
     Q_PROPERTY(QVariantList publishedCharacterSubstitutions READ publishedCharacterSubstitutions NOTIFY frameChanged)
     Q_PROPERTY(int selectedSubstitution READ selectedSubstitution NOTIFY frameChanged)
@@ -140,6 +141,7 @@ class EditorController final : public QObject {
     bool canUndo() const { return session_.canUndo(); }
     bool canRedo() const { return session_.canRedo(); }
     QVariantList layers() const;
+    QVariantList compositionNodes() const;
     QVariantList substitutions() const;
     QVariantList publishedCharacterSubstitutions() const;
     int selectedSubstitution() const;

@@ -28,6 +28,25 @@
 #include <algorithm>
 #include <cstring>
 #include <map>
+
+TEST_CASE("Composition node presentation follows cutter edits and undo") {
+    EditorController editor;
+    editor.newScene();
+    const auto target = editor.document().layers.front().id;
+    editor.addLayer();
+    const auto source = editor.selectedLayer();
+    editor.setSelectedLayer(int(target));
+    REQUIRE(editor.setLayerMatte(source));
+    const auto nodes = editor.compositionNodes();
+    REQUIRE(nodes.size() == 8);
+    REQUIRE(std::count_if(nodes.begin(), nodes.end(), [](const QVariant& item) {
+        return item.toMap().value("kind").toString() == "Apply matte";
+    }) == 1);
+    REQUIRE(nodes.back().toMap().value("kind").toString() == "Write");
+    REQUIRE(nodes.front().toMap().value("kind").toString() == "Background");
+    editor.undo();
+    REQUIRE(editor.compositionNodes().size() == 7);
+}
 namespace {
 const QString partFixture = QStringLiteral(OPENTOON_SOURCE_DIR "/tests/fixtures/harmony-moment/parts/");
 QVariantList paths(std::initializer_list<QString> values) {

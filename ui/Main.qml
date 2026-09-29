@@ -31,6 +31,7 @@ ApplicationWindow {
         onActivated: editor.tool = "Animate"
     }
     property bool showCurves: false
+    property bool showNodes: false
     property bool showTimingTools: false
     property int meshBindColumns: 4
     property int meshBindRows: 4
@@ -58,7 +59,7 @@ ApplicationWindow {
     readonly property bool drawingSelectionTool: ["Select", "Marquee", "Lasso"].includes(editor.tool)
     readonly property bool canvasEditingFocused: canvas.activeFocus && drawingSelectionTool
     property bool xsheet: false
-    readonly property bool keyWorkspaceFocused: (showCurves && curveEditor.activeFocus) || (!showCurves && keyEditing && timeline.activeFocus)
+    readonly property bool keyWorkspaceFocused: (showCurves && curveEditor.activeFocus) || (!showCurves && !showNodes && keyEditing && timeline.activeFocus)
     property bool keyEditing: editor.tool === "Animate"
     property int timelineCell: 22
     property int timelineRow: 34
@@ -1101,7 +1102,10 @@ ApplicationWindow {
                                 }
                                 C.ToolButton {
                                     text: "Curves"
-                                    onClicked: root.showCurves = true
+                                    onClicked: {
+                                        root.showNodes = false;
+                                        root.showCurves = true;
+                                    }
                                 }
                                 C.ToolButton {
                                     text: "Pose ▾"
@@ -2365,47 +2369,60 @@ ApplicationWindow {
                 spacing: 8
                 C.ToolButton {
                     text: "Timeline"
-                    active: !root.xsheet && !root.showCurves
+                    active: !root.xsheet && !root.showCurves && !root.showNodes
                     onClicked: {
                         root.showCurves = false;
+                        root.showNodes = false;
                         root.xsheet = false;
                     }
                 }
                 C.ToolButton {
                     text: "Xsheet"
-                    active: root.xsheet && !root.showCurves
+                    active: root.xsheet && !root.showCurves && !root.showNodes
                     onClicked: {
                         root.showCurves = false;
+                        root.showNodes = false;
                         root.xsheet = true;
                     }
                 }
                 C.ToolButton {
                     text: "Curves"
-                    active: root.showCurves
-                    onClicked: root.showCurves = true
+                    active: root.showCurves && !root.showNodes
+                    onClicked: {
+                        root.showNodes = false;
+                        root.showCurves = true;
+                    }
+                }
+                C.ToolButton {
+                    text: "Nodes"
+                    active: root.showNodes
+                    onClicked: {
+                        root.showCurves = false;
+                        root.showNodes = true;
+                    }
                 }
                 C.ToolButton {
                     text: "Timing tools"
                     active: root.showTimingTools
-                    visible: !root.showCurves
+                    visible: !root.showCurves && !root.showNodes
                     onClicked: root.showTimingTools = !root.showTimingTools
                 }
                 C.ToolButton {
                     text: editor.selectedPoseFrames.length > 1 ? "Keys · " + editor.selectedPoseFrames.length : "Keys"
-                    visible: !root.showCurves
+                    visible: !root.showCurves && !root.showNodes
                     active: root.keyEditing
                     hint: "Key mode: drag diamonds to move poses; double-click an empty cell to add a key. Turn off to select exposure ranges."
                     onClicked: root.keyEditing = !root.keyEditing
                 }
                 C.ToolButton {
                     text: "+ Key"
-                    visible: !root.showCurves
+                    visible: !root.showCurves && !root.showNodes
                     hint: "Add pose key at the current frame"
                     onClicked: editor.addKey()
                 }
                 C.ToolButton {
                     text: "−"
-                    visible: !root.showCurves && !root.xsheet
+                    visible: !root.showCurves && !root.showNodes && !root.xsheet
                     hint: "Narrow timeline frames"
                     enabled: root.timelineCell > 12
                     onClicked: {
@@ -2415,7 +2432,7 @@ ApplicationWindow {
                 }
                 C.ToolButton {
                     text: "+"
-                    visible: !root.showCurves && !root.xsheet
+                    visible: !root.showCurves && !root.showNodes && !root.xsheet
                     hint: "Widen timeline frames for easier key placement"
                     enabled: root.timelineCell < 72
                     onClicked: {
@@ -2475,7 +2492,7 @@ ApplicationWindow {
         }
         C.TimingTools {
             id: timingTools
-            visible: root.showTimingTools && !root.showCurves
+            visible: root.showTimingTools && !root.showCurves && !root.showNodes
             controller: editor
             Layout.fillWidth: true
             Layout.leftMargin: 10
@@ -2491,9 +2508,24 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.preferredHeight: root.effectiveBottomHeight
         }
+        C.CompositionNodes {
+            id: compositionNodes
+            objectName: "compositionNodesPanel"
+            visible: root.showNodes
+            controller: editor
+            Layout.fillWidth: true
+            Layout.preferredHeight: root.effectiveBottomHeight
+            Layout.minimumHeight: root.effectiveBottomHeight
+            Layout.maximumHeight: root.effectiveBottomHeight
+            onLayerChosen: layer => {
+                canvas.clearRegion();
+                root.inspectorMode = "layer";
+                editor.selectedLayer = layer;
+            }
+        }
         RowLayout {
             Layout.fillWidth: true
-            visible: !root.showCurves
+            visible: !root.showCurves && !root.showNodes
             Layout.preferredHeight: root.effectiveBottomHeight
             Layout.minimumHeight: root.effectiveBottomHeight
             Layout.maximumHeight: root.effectiveBottomHeight

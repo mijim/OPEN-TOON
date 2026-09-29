@@ -6,6 +6,7 @@
 #include "opentoon/deformation.h"
 #include "opentoon/deformer.h"
 #include "opentoon/audio.h"
+#include "opentoon/composition_graph.h"
 #include "project_store.h"
 #include "image_batch_importer.h"
 #include "scene_renderer.h"
@@ -163,6 +164,36 @@ QVariantList EditorController::layers() const {
                                      {"role", QString::fromStdString(it->role)},
                                      {"spans", spans},
                                      {"keys", keys}});
+    }
+    return result;
+}
+QVariantList EditorController::compositionNodes() const {
+    const auto graph = CompositionGraph::orderedLayers(document());
+    QVariantList result;
+    std::map<GraphNodeId, const GraphNode*> indexed;
+    for (const auto& node : graph.nodes)
+        indexed.emplace(node.id, &node);
+    for (const auto id : graph.topologicalOrder()) {
+        const auto* node = indexed.at(id);
+        QString kind;
+        switch (node->kind) {
+        case GraphNodeKind::Background: kind = "Background"; break;
+        case GraphNodeKind::LayerImage: kind = "Drawing"; break;
+        case GraphNodeKind::LayerTransform: kind = "Transform"; break;
+        case GraphNodeKind::Over: kind = "Composite"; break;
+        case GraphNodeKind::MatteFromImage: kind = "Cutter"; break;
+        case GraphNodeKind::ApplyMatte: kind = "Apply matte"; break;
+        case GraphNodeKind::DisplayOutput: kind = "Display"; break;
+        case GraphNodeKind::WriteOutput: kind = "Write"; break;
+        }
+        QVariantList inputs;
+        for (const auto& input : node->inputs)
+            inputs.push_back(QVariantMap{{"source", int(input.source)}, {"slot", int(input.slot)}});
+        const QString name = node->layer
+                                 ? QString::fromStdString(document().layer(node->layer).name)
+                                 : kind;
+        result.push_back(QVariantMap{{"id", int(id)}, {"kind", kind}, {"name", name},
+                                     {"layer", int(node->layer)}, {"inputs", inputs}});
     }
     return result;
 }
