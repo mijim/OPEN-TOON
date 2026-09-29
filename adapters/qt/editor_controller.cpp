@@ -164,6 +164,7 @@ QVariantList EditorController::layers() const {
                                      {"invertMatte", it->invertMatte},
                                      {"matteBypassed", it->matteBypassed},
                                      {"paintMatteSource", it->paintMatteSource},
+                                     {"opacityBypassed", it->opacityBypassed},
                                      {"kind", int(it->kind)},
                                      {"role", QString::fromStdString(it->role)},
                                      {"spans", spans},
@@ -185,6 +186,7 @@ QVariantList EditorController::compositionNodes() const {
         case GraphNodeKind::LayerImage: kind = "Drawing"; break;
         case GraphNodeKind::LayerTransform: kind = "Transform"; break;
         case GraphNodeKind::Opacity: kind = "Opacity"; break;
+        case GraphNodeKind::BypassOpacity: kind = "Bypassed opacity"; break;
         case GraphNodeKind::Over: kind = "Composite"; break;
         case GraphNodeKind::MatteFromImage: kind = "Cutter"; break;
         case GraphNodeKind::InvertMatte: kind = "Invert matte"; break;
@@ -1084,6 +1086,17 @@ bool EditorController::setMatteBypassed(bool bypassed) {
         if (target.locked || !target.matte)
             throw std::runtime_error("Select an unlocked layer with a cutter matte.");
         target.matteBypassed = bypassed;
+    });
+}
+bool EditorController::setOpacityBypassed(bool bypassed) {
+    if (!layer_)
+        return false;
+    return edit(bypassed ? "Bypass layer opacity" : "Enable layer opacity", [&](Document& d) {
+        auto& target = d.layer(layer_);
+        if (target.locked ||
+            (target.kind != LayerKind::Drawing && target.kind != LayerKind::Part))
+            throw std::runtime_error("Select an unlocked drawing or Part to bypass opacity.");
+        target.opacityBypassed = bypassed;
     });
 }
 bool EditorController::setMatteSourceVisible(bool visible) {

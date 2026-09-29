@@ -70,7 +70,7 @@
     {
       "id": "P10",
       "status": "in_progress",
-      "available": "Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. Format-18 Drawing/Part cutter matte bindings and format-19 inverted Outside coverage clip by fractional alpha through the shared graph, with compact inspector, resizable derived Nodes panel with clicked image/matte previews, order/cutter/opacity edits, format-20 persistent bypass and format-21 visible cutter-source painting, reference validation, undo, save/reopen and character-copy remapping. A bounded revision cache reuses canvas frames and speculatively prepares the next frame from an immutable snapshot. Native playback/scrub, alpha/color charts and animated original artwork close bounded HM-04; orthographic camera output joins HM-13.",
+      "available": "Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. Format-18 Drawing/Part cutter matte bindings and format-19 inverted Outside coverage clip by fractional alpha through the shared graph, with compact inspector, resizable derived Nodes panel with clicked image/matte previews, order/cutter/opacity edits, format-20 persistent cutter bypass, format-21 visible cutter-source painting and format-24 opacity bypass, reference validation, undo, save/reopen and character-copy remapping. A bounded revision cache reuses canvas frames and speculatively prepares the next frame from an immutable snapshot. Native playback/scrub, alpha/color charts and animated original artwork close bounded HM-04; orthographic camera output joins HM-13.",
       "remaining": "General editable node UI and group ports, joint recipes, useful effects, full ROI scheduling, production-scale performance and later deformer integration."
     },
     {
@@ -431,7 +431,7 @@
     },
     "cutter_matte": {
       "status": "passed_subset",
-      "scope": "Format-18 Drawing/Part source binding and format-19 inversion, fractional inside/outside alpha, source exclusion, validated references, derived Nodes panel with clicked image/matte previews and animated Opacity nodes, format-20 persistent bypass and format-21 visible cutter-source painting, save/reopen and undo",
+      "scope": "Format-18 Drawing/Part source binding and format-19 inversion, fractional inside/outside alpha, source exclusion, validated references, derived Nodes panel with clicked image/matte previews and animated Opacity nodes, format-20 persistent cutter bypass, format-21 visible cutter-source painting and format-24 opacity bypass, save/reopen and undo",
       "command": "build/locked/open-toon.app/Contents/MacOS/open-toon --hm12-smoke",
       "screenshot": "build/hm12-matte-smoke.png",
       "limits": "General node editor, general node bypass, group/ungroup, arm/eye recipes and full 480-frame composition budgets remain open."
@@ -462,7 +462,7 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.34",
+  "version": "0.2.0-experimental.35",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
@@ -473,6 +473,6 @@
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
     "state": "HM-00_through_HM-05_and_HM-13_complete__HM-06_HM-07_HM-10_parked_in_progress__HM-12_active_in_progress",
-    "note": "HM-06 and HM-07 are parked unaccepted subsets. HM-12 is parked after fractional cutters, saved bypass, visible cutter sources and clicked node previews; the general editable graph remains open. The single implementer is advancing eligible HM-10 after source-sample fades; hardware presentation and audible quality remain unqualified. Full P07/P08/P09/P10 and feature acceptance remain open."
+    "note": "HM-06 and HM-07 are parked unaccepted subsets. HM-10 is parked after saved clip mute and duplication; hardware presentation and audible quality remain unqualified. The single implementer is advancing eligible HM-12 after fractional cutters, saved bypasses, visible cutter sources and clicked node previews; the general editable graph remains open. Full P07/P08/P09/P10 and feature acceptance remain open."
   }
 }

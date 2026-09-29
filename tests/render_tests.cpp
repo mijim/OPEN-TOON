@@ -1,4 +1,5 @@
 #include "opentoon/animation.h"
+#include "opentoon/session.h"
 #include "scene_renderer.h"
 #include "graph_renderer.h"
 #include "revision_render_cache.h"
@@ -204,6 +205,92 @@ TEST_CASE("Layer opacity is a typed image node and attenuates fractional cutter 
     REQUIRE(SceneRenderer::render(reopened, 0) == inside);
     document.layers.front().invertMatte = true;
     REQUIRE(qAlpha(SceneRenderer::render(document, 0).pixel(0, 0)) == 56);
+}
+TEST_CASE("Bypassed opacity retains keyed values and changes both matte and output alpha") {
+    auto document = makeDocument();
+    document.width = document.height = 1;
+    document.background = {0, 0, 0, 0};
+    const Id targetId = document.layers.front().id;
+    auto& targetDrawing = document.editableDrawing(targetId, 0);
+    targetDrawing.image = ImageAsset{1, 1, {255, 0, 0, 128}};
+    document.layer(targetId).transform.opacity = .5;
+    Keyframe rest;
+    rest.frame = 0;
+    rest.value = document.layer(targetId).transform;
+    Keyframe key;
+    key.frame = 12;
+    key.value = document.layer(targetId).transform;
+    key.value.opacity = .25;
+    document.layer(targetId).keys = {rest, key};
+    Layer cutter = document.layer(targetId);
+    cutter.id = document.allocateId();
+    cutter.name = "Cutter";
+    cutter.keys.clear();
+    Drawing source = targetDrawing;
+    source.id = document.allocateId();
+    source.image = ImageAsset{1, 1, {0, 0, 255, 64}};
+    document.drawings.emplace(source.id, source);
+    for (auto& exposure : cutter.exposures)
+        exposure.drawing = source.id;
+    document.layers.push_back(cutter);
+    expose(document.layer(targetId), 0, document.duration, targetDrawing.id);
+    expose(document.layer(cutter.id), 0, document.duration, source.id);
+    document.layer(targetId).matte = cutter.id;
+    document.composition = CompositionProfile::LinearSrgb;
+    document.validate();
+    const auto baseline = SceneRenderer::render(document, 0);
+    REQUIRE(qAlpha(baseline.pixel(0, 0)) == 8);
+    Session session;
+    session.replace(document);
+    REQUIRE(session.apply("Bypass target opacity", [&](Document& d) {
+        d.layer(targetId).opacityBypassed = true;
+    }));
+    const auto targetBypassed = session.document();
+    REQUIRE(qAlpha(SceneRenderer::render(targetBypassed, 0).pixel(0, 0)) == 16);
+    REQUIRE(targetBypassed.layer(targetId).keys == document.layer(targetId).keys);
+    REQUIRE(session.apply("Bypass cutter opacity", [&](Document& d) {
+        d.layer(cutter.id).opacityBypassed = true;
+    }));
+    const auto bothBypassed = session.document();
+    const auto graph = CompositionGraph::orderedLayers(bothBypassed);
+    REQUIRE_NOTHROW(graph.validate(bothBypassed));
+    REQUIRE(std::count_if(graph.nodes.begin(), graph.nodes.end(), [](const GraphNode& node) {
+                return node.kind == GraphNodeKind::BypassOpacity;
+            }) == 2);
+    REQUIRE(std::count_if(graph.nodes.begin(), graph.nodes.end(), [](const GraphNode& node) {
+                return node.kind == GraphNodeKind::Opacity;
+            }) == 0);
+    const auto displayed = SceneRenderer::render(bothBypassed, 0);
+    REQUIRE(qAlpha(displayed.pixel(0, 0)) == 32);
+    REQUIRE(displayed == GraphRenderer::render(graph, bothBypassed, 0, {}, {},
+                                               GraphTarget::Write));
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(bothBypassed)), 0) ==
+            displayed);
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == targetBypassed);
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == document);
+    REQUIRE(session.redo());
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == bothBypassed);
+    REQUIRE(qAlpha(SceneRenderer::render(bothBypassed, 12).pixel(0, 0)) == 32);
+}
+TEST_CASE("Opacity bypass reaches legacy scenes without a matte") {
+    auto document = makeDocument();
+    document.width = document.height = 1;
+    document.background = {0, 0, 0, 0};
+    const Id layer = document.layers.front().id;
+    document.editableDrawing(layer, 0).image = ImageAsset{1, 1, {255, 0, 0, 128}};
+    document.layer(layer).transform.opacity = .5;
+    document.validate();
+    REQUIRE(std::abs(qAlpha(SceneRenderer::render(document, 0).pixel(0, 0)) - 64) <= 1);
+    document.layer(layer).opacityBypassed = true;
+    document.validate();
+    const auto graph = CompositionGraph::orderedLayers(document);
+    const auto display = SceneRenderer::render(document, 0);
+    REQUIRE(qAlpha(display.pixel(0, 0)) == 128);
+    REQUIRE(display == GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Write));
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == display);
 }
 TEST_CASE("Inverted cutter keeps target ink outside its source bounds") {
     auto document = makeDocument();

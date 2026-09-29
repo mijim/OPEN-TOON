@@ -203,10 +203,13 @@ QImage renderGraphTerminal(const CompositionGraph& graph, const Document& docume
     std::map<GraphNodeId, QRect> bounds;
     Document legacy = document;
     legacy.composition = CompositionProfile::LegacyQt;
-    for (auto& layer : legacy.layers)
+    for (auto& layer : legacy.layers) {
         layer.matte = 0; // Isolated source render must not re-enter the graph.
+        layer.opacityBypassed = false;
+    }
     for (const auto& node : graph.nodes)
-        if (node.kind == GraphNodeKind::Opacity) {
+        if (node.kind == GraphNodeKind::Opacity ||
+            node.kind == GraphNodeKind::BypassOpacity) {
             auto& layer = legacy.layer(node.layer);
             layer.transform.opacity = 1;
             for (auto& key : layer.keys)
@@ -265,6 +268,10 @@ QImage renderGraphTerminal(const CompositionGraph& graph, const Document& docume
             bound = opacity > 0 ? inputBounds(0) : QRect{};
             break;
         }
+        case GraphNodeKind::BypassOpacity:
+            image = input(0);
+            bound = inputBounds(0);
+            break;
         case GraphNodeKind::Over:
             image = over(input(0), input(1), document.composition, options, inputBounds(1));
             bound = inputBounds(0).united(inputBounds(1));

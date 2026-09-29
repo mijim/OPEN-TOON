@@ -221,6 +221,8 @@ void Document::validate() const {
                 "A bypassed cutter needs a matte source.");
         require(!l.paintMatteSource || l.kind == LayerKind::Drawing || l.kind == LayerKind::Part,
                 "Only a drawing or Part may paint while used as a cutter.");
+        require(!l.opacityBypassed || l.kind == LayerKind::Drawing || l.kind == LayerKind::Part,
+                "Only a drawing or Part may bypass its image opacity.");
         std::set<Id> variants;
         for (const auto& variant : l.variants)
             require(drawings.contains(variant.drawing) && variant.name.size() > 0 &&

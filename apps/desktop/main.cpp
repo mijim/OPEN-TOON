@@ -247,6 +247,13 @@ int main(int argc, char** argv) {
                         throw std::runtime_error("Drawing node preview has the wrong pixels.");
                     (void)window->grabWindow();
                     auto* displayedPreview = window->findChild<QQuickItem*>("compositionNodePreviewImage");
+                    QElapsedTimer previewWait;
+                    previewWait.start();
+                    while (displayedPreview && displayedPreview->property("status").toInt() != 1 &&
+                           previewWait.elapsed() < 1000) {
+                        QCoreApplication::processEvents();
+                        QThread::msleep(10);
+                    }
                     if (!displayedPreview || displayedPreview->property("status").toInt() != 1)
                         throw std::runtime_error("Drawing node preview did not appear in Qt Quick.");
                     clickNode(4);
@@ -282,9 +289,39 @@ int main(int argc, char** argv) {
                     if (qAlpha(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 112 ||
                         editor.compositionNodes().size() != 10)
                         throw std::runtime_error("Opacity node did not attenuate inverted cutter alpha.");
+                    QCoreApplication::processEvents();
+                    auto* bypassOpacity = window->findChild<QQuickItem*>("nodeBypassOpacity");
+                    if (!bypassOpacity || !bypassOpacity->isVisible())
+                        throw std::runtime_error("Node opacity bypass control is unavailable.");
+                    const auto bypassPoint = bypassOpacity->mapToScene(
+                        QPointF(bypassOpacity->width() / 2, bypassOpacity->height() / 2));
+                    QMouseEvent bypassPress(QEvent::MouseButtonPress, bypassPoint,
+                                            window->mapToGlobal(bypassPoint.toPoint()),
+                                            Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                    QMouseEvent bypassRelease(QEvent::MouseButtonRelease, bypassPoint,
+                                              window->mapToGlobal(bypassPoint.toPoint()),
+                                              Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+                    QCoreApplication::sendEvent(window, &bypassPress);
+                    QCoreApplication::sendEvent(window, &bypassRelease);
+                    QCoreApplication::processEvents();
+                    if (!editor.document().layer(source.id).opacityBypassed ||
+                        qAlpha(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 96)
+                        throw std::runtime_error("Clicking opacity bypass did not restore the original cutter alpha.");
                     editor.undo();
+                    if (qAlpha(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 112)
+                        throw std::runtime_error("Opacity bypass undo did not restore attenuation.");
+                    editor.redo();
+                    if (!editor.saveProject({}) || !editor.openProject(QUrl::fromLocalFile(path)) ||
+                        !editor.document().layer(source.id).opacityBypassed ||
+                        qAlpha(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 96)
+                        throw std::runtime_error("Opacity bypass changed after save and reopen.");
+                    editor.setSelectedLayer(int(source.id));
+                    if (!editor.setOpacityBypassed(false) ||
+                        qAlpha(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 112)
+                        throw std::runtime_error("Re-enabled opacity did not preserve its stored value.");
+                    editor.setTransform("opacity", 1);
                     if (opentoon::SceneRenderer::render(editor.document(), 0) != outside)
-                        throw std::runtime_error("Opacity node undo changed the cutter result.");
+                        throw std::runtime_error("Reset opacity did not restore cutter coverage.");
                     editor.setSelectedLayer(int(document.layers.front().id));
                     QCoreApplication::processEvents();
                     auto* bypassControl = window->findChild<QQuickItem*>("nodeBypassMatte");
@@ -331,7 +368,7 @@ int main(int argc, char** argv) {
                     editor.undo();
                     if (opentoon::SceneRenderer::render(editor.document(), 0) != outside)
                         throw std::runtime_error("Cutter matte removal did not undo.");
-                    std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity and fractional inside/outside matte, "
+                    std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass and fractional inside/outside matte, "
                                  "persistent bypass/re-enable, painted source, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {

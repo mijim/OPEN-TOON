@@ -115,6 +115,15 @@ Item {
                 label: "Selected drawing opacity 0–1"
                 onCommitted: value => root.controller.setTransform("opacity", value)
             }
+            CompactCheckBox {
+                objectName: "nodeBypassOpacity"
+                text: "Bypass opacity"
+                visible: root.selected && (root.selected.kind === 0 || root.selected.kind === 3)
+                enabled: visible && !root.selected?.locked
+                checked: root.selected?.opacityBypassed || false
+                onClicked: root.controller.setOpacityBypassed(checked)
+                Accessible.name: "Bypass selected drawing opacity"
+            }
         }
         Rectangle { Layout.fillWidth: true; height: 1; color: "#303030" }
         RowLayout {
@@ -146,6 +155,7 @@ Item {
                         color: modelData.id === root.previewNodeId ? "#292929" : "#181818"
                         border.color: modelData.kind === "Cutter" ||
                                       modelData.kind === "Opacity" ||
+                                      modelData.kind === "Bypassed opacity" ||
                                       modelData.kind === "Bypassed cutter" ||
                                       modelData.kind === "Invert matte" ||
                                       modelData.kind === "Apply matte"

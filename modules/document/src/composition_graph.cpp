@@ -13,6 +13,7 @@ GraphPortType outputType(GraphNodeKind kind) {
     case GraphNodeKind::Background:
     case GraphNodeKind::LayerImage:
     case GraphNodeKind::Opacity:
+    case GraphNodeKind::BypassOpacity:
     case GraphNodeKind::Over:
     case GraphNodeKind::ApplyMatte:
     case GraphNodeKind::BypassMatte:
@@ -34,6 +35,7 @@ std::vector<GraphPortType> inputTypes(GraphNodeKind kind) {
     case GraphNodeKind::LayerTransform:
         return {};
     case GraphNodeKind::Opacity:
+    case GraphNodeKind::BypassOpacity:
         return {GraphPortType::Image};
     case GraphNodeKind::Over:
         return {GraphPortType::Image, GraphPortType::Image};
@@ -71,7 +73,9 @@ CompositionGraph CompositionGraph::orderedLayers(const Document& document) {
             });
         if (hasOpacity) {
             sourceIds[layer.id] = next++;
-            graph.nodes.push_back({sourceIds[layer.id], GraphNodeKind::Opacity, layer.id,
+            graph.nodes.push_back({sourceIds[layer.id], layer.opacityBypassed
+                                                        ? GraphNodeKind::BypassOpacity
+                                                        : GraphNodeKind::Opacity, layer.id,
                                    {{imageNode, 0}}});
         }
         if (layer.matte)
@@ -123,9 +127,12 @@ void CompositionGraph::validate(const Document& document) const {
             throw std::invalid_argument("Duplicate or invalid compositor node ID.");
         (void)outputType(node.kind);
         if (node.kind == GraphNodeKind::LayerImage || node.kind == GraphNodeKind::LayerTransform ||
-            node.kind == GraphNodeKind::Opacity || node.kind == GraphNodeKind::BypassMatte) {
+            node.kind == GraphNodeKind::Opacity || node.kind == GraphNodeKind::BypassOpacity ||
+            node.kind == GraphNodeKind::BypassMatte) {
             const auto& layer = document.layer(node.layer);
-            if ((node.kind == GraphNodeKind::Opacity || node.kind == GraphNodeKind::BypassMatte) &&
+            if ((node.kind == GraphNodeKind::Opacity ||
+                 node.kind == GraphNodeKind::BypassOpacity ||
+                 node.kind == GraphNodeKind::BypassMatte) &&
                 layer.kind != LayerKind::Drawing && layer.kind != LayerKind::Part)
                 throw std::invalid_argument("This image node requires a drawing source.");
         }

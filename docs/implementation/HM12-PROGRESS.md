@@ -26,6 +26,12 @@ property. The cutter reads source alpha after opacity; target opacity is
 applied before its cutter. This preserves fractional alpha, shared Display
 and Write output, undo and saved transform keys without a new format field.
 See [ADR-043](../architecture/adr/043-typed-layer-opacity-node.md).
+Format 24 adds **Bypass opacity** beside that control. The selected Drawing or
+Part retains its setup opacity and keys while the typed node forwards its
+image unchanged. A cutter uses the same forwarded source image; Display and
+Write agree. The command undoes atomically and older projects default to
+enabled opacity. See
+[ADR-048](../architecture/adr/048-persistent-opacity-bypass.md).
 Format 20 adds a persistent **Bypass cutter** control in Properties and Nodes.
 Bypass keeps its source and Inside/Outside choice but shows the uncut target;
 the source remains reserved and does not paint. Re-enable restores the exact
@@ -85,10 +91,18 @@ preview. This is diagnostic navigation, not a persisted graph edit.
   rejects an unknown node. Native Qt Quick smoke clicks the Drawing and Cutter
   cards, checks source and grayscale matte PNG pixels, and confirms the Image
   actually loads in the panel.
-- Local macOS `build/locked`: 167/167 CTest entries and native HM-12 smoke pass.
+- A keyed target and fractional cutter-source render test checks opacity
+  bypass on either image and both together, including Display/Write,
+  undo/redo and save/reopen. A separate legacy scene without a matte checks
+  that bypass enters the graph and does not recursively render its source.
+  A format-23 migration retains a readable
+  `.pre-v23.bak`; native Qt Quick smoke clicks bypass, undoes, redoes and
+  reopens it.
+- Local macOS `build/locked`: full CTest and native HM-12 results are recorded
+  in the current release entry.
 
 ## Open contract
 
-The arbitrary editable node graph, general node bypass, broader transform
+The arbitrary editable node graph, general node bypass beyond opacity, broader transform
 presentation, group ports, group/ungroup and full arm/eye overlap recipe are pending. HM-12
 and its P10 owning phase remain open.

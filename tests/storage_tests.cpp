@@ -879,6 +879,34 @@ TEST_CASE("Format twenty-two audio clips default to unmuted with a readable back
     invalidCurrent["version"] = Document::formatVersion;
     REQUIRE_THROWS(deserializeDocument(invalidCurrent.dump()));
 }
+TEST_CASE("Format twenty-three layers default to enabled opacity with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    original.layers.front().transform.opacity = .5;
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 23;
+    for (auto& layer : legacy["layers"])
+        layer.erase("opacityBypassed");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=23");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    changed.layers.front().opacityBypassed = true;
+    REQUIRE(ProjectStore::save(project.file, changed, "Bypass opacity", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v23.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+    auto invalidCurrent = legacy;
+    invalidCurrent["version"] = Document::formatVersion;
+    REQUIRE_THROWS(deserializeDocument(invalidCurrent.dump()));
+}
 TEST_CASE("Format fifteen audio migration preserves a readable source backup") {
     TemporaryProject project;
     auto original = makeDocument();

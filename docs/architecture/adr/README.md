@@ -145,3 +145,6 @@ clip envelopes shared by device playback and PCM WAV output.
 
 See [ADR-047](047-per-clip-audio-mute.md) for format-23 saved clip muting
 shared by device playback, scrub and PCM WAV export.
+
+See [ADR-048](048-persistent-opacity-bypass.md) for format-24 Drawing/Part
+opacity bypass with preserved keys and shared Display/Write graph evaluation.

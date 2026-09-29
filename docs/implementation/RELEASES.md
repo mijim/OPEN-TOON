@@ -1,5 +1,15 @@
 # Experimental releases
 
+## 0.2.0-experimental.35 — working source, opacity node bypass
+
+- Bypass selected Drawing or Part opacity from Nodes while retaining its
+  setup value and animation keys. The typed graph forwards the unattenuated
+  image to cutters, Display and Write; undo and reopen preserve the choice.
+- Format 24 defaults older layers to enabled opacity and retains a readable
+  backup on first save. Render, migration, a legacy scene without a matte
+  and native Qt Quick checks pass.
+- Source only; no new public binary or tag. General editable nodes remain open.
+
 ## 0.2.0-experimental.34 — working source, saved clip mute
 
 - Mute or unmute individual audio clips without changing their WAV resource,
