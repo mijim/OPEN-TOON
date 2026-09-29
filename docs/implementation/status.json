@@ -64,7 +64,7 @@
     {
       "id": "P09",
       "status": "in_progress",
-      "available": "Accepted bounded HM-05 format-8 per-substitution rest meshes and UVs; direct mouse editing, alpha-bounded image grids, editable vector source through a bounded raster proxy, static pose/reset, undo and matching preview/output rendering. Format-9 keyed two-segment bone or cubic curve per substitution, saved weights/controls, direct canvas drag with cancellation, posed mesh grid, Rest key, undo and preview/output parity. Format 10 introduced a child-Part link to its direct parent's evaluated bone tip; format 11 saves the rest tip and distal axis at attachment time. Same-Part range copy/paste, move and stretch transfer keyed deformer poses. Native linked 15-part and unlinked 19-part subset p95 and process peak memory pass the proposed limits on the measured M1 Pro profile.",
+      "available": "Accepted bounded HM-05 format-8 per-substitution rest meshes and UVs; direct mouse editing, alpha-bounded image grids, editable vector source through a bounded raster proxy, static pose/reset, undo and matching preview/output rendering. Format-9 keyed two-segment bone or cubic curve per substitution, saved weights/controls, direct canvas drag with cancellation, posed mesh grid, Rest key, undo and preview/output parity. Format 10 introduced a child-Part link to its direct parent's evaluated bone tip; format 11 saves the rest tip and distal axis at attachment time. Same-Part range copy/paste, move and stretch transfer keyed deformer poses. Native linked 15-part and unlinked 19-part subset p95 and process peak memory pass the proposed limits on the measured M1 Pro profile. The owner-provided Milo 17-Part study has four continuous image limbs with contour meshes and middle-joint bones, linked hands/ankles, connected poses and native reopen evidence.",
       "remaining": "Complete HM-06 extreme-bend and seam quality, influence tuning and full-shot interaction/memory budgets and artistic review; then portable cross-Part key transfer, constraints, multiple-pose rig breadth and full phase qualification."
     },
     {
@@ -84,8 +84,8 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 166,
-      "command": "ctest --test-dir build/locked --output-on-failure -j6"
+      "count": 188,
+      "command": "ctest --test-dir build/locked --output-on-failure -j8"
     },
     "native_input_workflow": {
       "status": "passed",
@@ -248,7 +248,7 @@
         "animated orthographic camera matches reopened preview and two exported PNG frames"
       ]
     },
-    "total_local_ctest_entries": 166,
+    "total_local_ctest_entries": 188,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -449,6 +449,19 @@
       "command": "build/locked/open-toon.app/Contents/MacOS/open-toon --hm10-smoke",
       "screenshot": "build/hm10-audio-smoke.png",
       "limits": "Hardware queue latency, underruns, device replacement and ten-minute audiovisual drift with displayed frames unqualified; hardware audible scrub quality, sample-weighted fade waveform, combined PNG/WAV delivery remain open. The callback counter measures processing deadlines, not hardware underruns; the playhead-skip counter does not measure presented frames."
+    },
+    "milo_continuous_study": {
+      "status": "passed_subset",
+      "scope": "Original Milo SVG/21-piece source retained; 17-Part registered study with four complete arm/leg images, contour-bound two-segment bones and linked endpoints; rest/source color difference at most four levels, one connected character in all 48 preview frames and the full bent frame, exact rest return, saved/reopened pixels and native Qt Quick canvas presentation",
+      "project": "examples/milo-continuous.otoon",
+      "render_test": "Milo uses four continuous limb images with joined bent and reopened output",
+      "native_command": "build/locked/open-toon.app/Contents/MacOS/open-toon --open examples/milo-continuous.otoon --milo-smoke",
+      "artifacts": [
+        "docs/implementation/milo-rest.png",
+        "docs/implementation/milo-bent.png",
+        "docs/implementation/HM06-MILO.md"
+      ],
+      "limits": "Broader pose range, additional views and mouth/hand substitutions, owner artistic approval and a complete Milo audiovisual shot remain open."
     }
   },
   "ownership": {
@@ -462,17 +475,17 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.49",
+  "version": "0.2.0-experimental.50",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
-    "release_artifacts": "Historical experimental.11 macOS arm64 ZIP and Ubuntu-built Linux x86_64 AppImage; current experimental.49 work is source only",
+    "release_artifacts": "Historical experimental.11 macOS arm64 ZIP and Ubuntu-built Linux x86_64 AppImage; current experimental.50 work is source only",
     "cross_platform_builds": "Manual release workflow; broader Linux, Windows and device qualification remain open"
   },
   "planning_priority": {
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
     "state": "HM-00_through_HM-05_and_HM-13_complete__HM-06_HM-07_HM-10_HM-12_in_progress",
-    "note": "HM-06 and HM-07 are parked unaccepted subsets. HM-12 has resumed after the prior cutoff and now includes fractional cutters, saved bypasses, visible cutter sources, clicked node previews, direct Drawing-card order dragging, name/kind search, Normal/Multiply/Screen/Add blend modes, saved blend bypass and Alt-drag cutter binding and derived source/target node-owner selection and direct Alt-click bypass and alternate image/matte canvas Display routing and node-scoped cache; the general editable graph remains open. The original HM-06 toon and editable studies now use sampled edges and a two-view cap over the continuous-limb rig; artistic acceptance remains open. HM-10 is parked after exact 48 kHz clip splitting, saved clip solo, direct frame-edge trimming and stereo balance; hardware presentation and audible quality remain unqualified. Full P07/P08/P09/P10 and feature acceptance remain open."
+    "note": "HM-06 has resumed with Milo; HM-07 remains an unaccepted working subset. HM-12 has resumed after the prior cutoff and now includes fractional cutters, saved bypasses, visible cutter sources, clicked node previews, direct Drawing-card order dragging, name/kind search, Normal/Multiply/Screen/Add blend modes, saved blend bypass and Alt-drag cutter binding and derived source/target node-owner selection and direct Alt-click bypass and alternate image/matte canvas Display routing and node-scoped cache; the general editable graph remains open. The original HM-06 toon and editable studies now use sampled edges and a two-view cap over the continuous-limb rig; artistic acceptance remains open. HM-10 is parked after exact 48 kHz clip splitting, saved clip solo, direct frame-edge trimming and stereo balance; hardware presentation and audible quality remain unqualified. Full P07/P08/P09/P10 and feature acceptance remain open. The owner-provided Milo SVG/PNG source is now the character for new animation studies; its 17-Part continuous-limb example has four middle-joint bones, linked endpoints and tested save/reopen. Older Clockwork art remains regression coverage."
   }
 }

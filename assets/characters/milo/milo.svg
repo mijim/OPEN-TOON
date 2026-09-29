@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="800" height="1080" viewBox="0 0 800 1080" fill="none" stroke="#292620" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+  <title>Milo — three-quarter cut-out character</title>
+  <desc>A relaxed blond character with a sky-blue shirt, terracotta trousers and charcoal shoes. Transparent background. Named groups run from back to front. Original vector artwork, GPL-3.0-or-later. Suggested pivots are stored in parts.json; SVG groups are artwork, not a working skeleton.</desc>
+  <g id="arm-far-upper" inkscape:groupmode="layer" inkscape:label="01 Far upper arm">
+    <path fill="#EAC097" d="M489 382 C513 376 528 390 534 416 L554 503 Q558 528 540 536 Q522 540 515 516 L490 441 Q478 414 489 382Z"/>
+  </g>
+  <g id="arm-far-lower" inkscape:groupmode="layer" inkscape:label="02 Far forearm">
+    <path fill="#EAC097" stroke="none" d="M518 497 Q535 485 548 501 Q562 540 568 574 L576 605 L549 616 Q541 585 531 565 L518 527Z"/>
+    <path d="M548 501 Q560 548 568 574 L576 605 M549 616 Q541 585 531 565 L520 514"/>
+  </g>
+  <g id="hand-far" inkscape:groupmode="layer" inkscape:label="03 Far hand">
+    <path fill="#EAC097" d="M552 597 Q563 590 573 600 L580 618 Q597 633 593 639 Q589 643 577 631 L579 655 Q579 665 573 664 Q568 663 566 643 L565 671 Q561 678 557 671 L553 647 Q550 665 544 660 Q541 656 544 637 L546 615Z"/>
+    <path stroke="#EAC097" stroke-width="5" d="M553 603 L569 600"/>
+  </g>
+  <g id="leg-far-upper" inkscape:groupmode="layer" inkscape:label="04 Far thigh">
+    <path fill="#D96A42" d="M413 614 Q459 598 514 625 L507 706 L482 811 Q456 827 427 807 L402 703Z"/>
+  </g>
+  <g id="leg-far-lower" inkscape:groupmode="layer" inkscape:label="05 Far shin">
+    <path fill="#D96A42" stroke="none" d="M417 765 Q453 751 493 765 L478 919 Q454 933 434 919Z"/>
+    <path d="M417 765 L434 919 Q454 933 478 919 L493 765"/>
+  </g>
+  <g id="ankle-far" inkscape:groupmode="layer" inkscape:label="06 Far ankle">
+    <path fill="#EAC097" d="M439 925 L470 924 L470 963 Q455 974 439 961Z"/>
+  </g>
+  <g id="shoe-far" inkscape:groupmode="layer" inkscape:label="07 Far shoe">
+    <path fill="#333A3B" d="M437 953 Q453 960 469 951 Q481 965 502 975 Q518 984 512 995 Q505 1006 478 1000 L440 985 Q430 982 437 953Z"/>
+    <path stroke="#697374" stroke-width="3" d="M443 980 Q480 1000 506 991 M470 966 L482 970 M465 972 L477 977"/>
+  </g>
+  <g id="leg-near-upper" inkscape:groupmode="layer" inkscape:label="08 Near thigh">
+    <path fill="#E7794C" d="M305 615 Q351 598 423 628 L421 703 L394 813 Q364 829 328 809 L311 717Z"/>
+  </g>
+  <g id="leg-near-lower" inkscape:groupmode="layer" inkscape:label="09 Near shin">
+    <path fill="#E7794C" stroke="none" d="M320 765 Q360 750 405 765 L384 928 Q361 942 337 928Z"/>
+    <path d="M320 765 L337 928 Q361 942 384 928 L405 765"/>
+  </g>
+  <g id="ankle-near" inkscape:groupmode="layer" inkscape:label="10 Near ankle">
+    <path fill="#F0CBA4" d="M344 934 L376 933 L374 969 Q359 979 344 968Z"/>
+  </g>
+  <g id="shoe-near" inkscape:groupmode="layer" inkscape:label="11 Near shoe">
+    <path fill="#333A3B" d="M341 961 Q357 970 374 960 Q389 979 410 989 Q426 1001 416 1011 Q405 1020 382 1012 L345 993 Q335 987 341 961Z"/>
+    <path stroke="#697374" stroke-width="3" d="M347 989 Q387 1014 410 1006 M375 977 L387 982 M370 984 L382 989"/>
+  </g>
+  <g id="pelvis" inkscape:groupmode="layer" inkscape:label="12 Pelvis">
+    <path fill="#E7794C" stroke="none" d="M304 609 Q400 586 515 617 L506 671 Q472 704 416 716 L396 710 L312 702Z"/>
+    <path d="M305 639 Q306 680 316 701 M510 647 Q484 693 416 716 L421 698"/>
+    <path stroke="#AD4C31" stroke-width="2.8" d="M323 650 Q320 672 329 687 M485 651 Q479 671 461 678"/>
+  </g>
+  <g id="arm-near-upper" inkscape:groupmode="layer" inkscape:label="13 Near upper arm">
+    <path fill="#F0CBA4" d="M290 392 Q316 385 327 410 L309 475 L289 528 Q275 545 257 532 Q248 524 255 503 L274 423Z"/>
+  </g>
+  <g id="arm-near-lower" inkscape:groupmode="layer" inkscape:label="14 Near forearm">
+    <path fill="#F0CBA4" stroke="none" d="M256 507 Q276 494 291 514 Q284 551 272 579 L256 619 L232 610 L241 564Z"/>
+    <path d="M256 507 L241 564 L232 610 M291 514 Q281 560 272 579 L256 619"/>
+  </g>
+  <g id="hand-near" inkscape:groupmode="layer" inkscape:label="15 Near hand">
+    <path fill="#F0CBA4" d="M233 603 Q246 602 257 615 L254 634 L262 653 Q263 661 257 661 L246 646 L238 676 Q234 684 230 679 L232 653 L221 678 Q216 682 213 676 L223 650 L211 666 Q205 670 204 663 L215 640 Q208 651 203 648 Q199 645 205 637 L221 618Z"/>
+    <path stroke="#F0CBA4" stroke-width="5" d="M235 609 L251 616"/>
+    <path stroke-width="2.5" d="M241 632 Q232 630 228 640"/>
+  </g>
+  <g id="torso" inkscape:groupmode="layer" inkscape:label="16 Shirt and sleeves">
+    <path fill="#9ED3E5" d="M340 353 Q314 355 291 372 Q275 391 270 414 Q286 438 319 431 L325 410 L311 499 L297 628 Q402 669 524 630 L504 510 L494 426 Q513 429 529 416 Q522 387 502 372 Q481 358 463 359Z"/>
+    <path fill="#89BFD3" stroke="none" d="M493 428 L504 510 L524 630 Q509 635 494 637 Q482 568 484 508Z"/>
+    <path d="M319 431 Q326 404 317 387 M494 426 Q490 400 479 385"/>
+    <path stroke-width="2.8" d="M325 526 Q345 537 364 533 M488 528 Q497 527 504 522"/>
+  </g>
+  <g id="hair-back" inkscape:groupmode="layer" inkscape:label="17 Back hair">
+    <path fill="#F2D348" d="M344 297 Q307 324 284 300 Q264 281 271 249 Q293 252 293 216 Q290 154 314 119 Q337 84 363 109 L378 121 Q414 93 442 112 Q477 132 481 188 L492 246 Q500 273 516 276 Q504 303 476 301 L355 306Z"/>
+    <path stroke="#C4A635" stroke-width="2.6" d="M298 277 Q311 289 323 274 M479 224 Q478 267 493 282"/>
+  </g>
+  <g id="head" inkscape:groupmode="layer" inkscape:label="18 Head and neck">
+    <path fill="#F0CBA4" d="M347 205 Q399 186 459 214 L465 261 L480 387 Q486 438 456 459 Q437 473 414 464 Q367 443 344 394 Q332 369 336 344 L347 286 Q324 290 322 272 Q318 257 330 251 Q338 248 345 257Z"/>
+    <path fill="#E9BD91" stroke="none" d="M453 218 L465 261 L480 387 Q486 438 456 459 Q447 466 437 467 Q459 441 452 393Z"/>
+    <path stroke-width="2.7" d="M330 264 Q338 260 340 272 M336 270 L340 273"/>
+  </g>
+  <g id="face" inkscape:groupmode="layer" inkscape:label="19 Eyes brows and nose">
+    <path stroke-width="3" d="M362 222 Q372 218 382 222 M415 220 Q426 218 434 224"/>
+    <ellipse fill="#FFF9E8" cx="375" cy="246" rx="11" ry="12"/>
+    <ellipse fill="#FFF9E8" cx="425" cy="247" rx="10" ry="11"/>
+    <ellipse fill="#292620" stroke="none" cx="378" cy="247" rx="3.7" ry="4.5"/>
+    <ellipse fill="#292620" stroke="none" cx="428" cy="248" rx="3.5" ry="4.2"/>
+    <path fill="#F0CBA4" stroke-width="2.8" d="M400 244 Q401 265 411 280 Q415 294 400 296 Q392 296 391 290"/>
+  </g>
+  <g id="mouth" inkscape:groupmode="layer" inkscape:label="20 Neutral smile">
+    <path stroke-width="3" d="M385 315 Q404 321 422 314 M422 311 L424 316"/>
+    <path stroke="#D5A47C" stroke-width="2.5" d="M399 331 L410 332"/>
+  </g>
+  <g id="hair-front" inkscape:groupmode="layer" inkscape:label="21 Front hair">
+    <path fill="#F6DB50" d="M332 212 Q343 181 352 163 Q362 148 378 168 Q389 137 406 139 Q435 139 447 174 Q457 201 477 197 Q465 228 434 218 Q400 210 378 183 Q360 207 332 212Z"/>
+
+  </g>
+</svg>

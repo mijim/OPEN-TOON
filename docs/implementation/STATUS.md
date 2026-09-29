@@ -16,6 +16,9 @@ two-view toon now has sampled edges and headwear, while each arm and leg
 remains one connected drawing with its own middle-joint bone. The regenerated
 editable studies and reference stills pass the 480-frame connectivity sweep;
 owner artistic approval is still open.
+The owner's [Milo character](HM06-MILO.md) is now the source for new animation
+studies. Its saved 17-Part example bends four one-image limbs with middle-joint
+bones and linked endpoints, while retaining the older toon as regression art.
 [HM-07](HM07-PROGRESS.md) now has tested format-12 named masked poses and a
 format-15 published-control Animator dashboard and viewport panel with per-Part drawing choices and groups;
 compatible in-project pose transfer now maps unique roles and drawing names,
@@ -71,12 +74,12 @@ skipped polled playhead frames, respectively. These counters do not measure
 speaker underruns or actual
 presented-frame drops.
 
-The working source version is `0.2.0-experimental.49`; no new binary or source
+The working source version is `0.2.0-experimental.50`; no new binary or source
 tag has been published for it. The last locally qualified macOS preview and
 earlier binaries do not qualify these source changes.
 
-The owner resumed development after the earlier 10:30 CEST cutoff. The `.49`
-locked macOS build passes 187/187 CTest entries and native HM-12 pointer smoke,
+The owner resumed development after the earlier 10:30 CEST cutoff. The `.50`
+locked macOS build passes 188/188 CTest entries and native Milo smoke,
 including blend bypass, Alt-drag cutter binding, source/target owner selection, node-card bypass, image/matte Display routing and node-scoped cache. Other earlier native
 smokes and artistic checks are recorded in prior release entries. HM-12 remains an unfinished bounded
 contract; next work can continue its graph grouping/part-overlap behavior.

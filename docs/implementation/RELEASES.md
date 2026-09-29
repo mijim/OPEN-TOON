@@ -1,5 +1,16 @@
 # Experimental releases
 
+## 0.2.0-experimental.50 — working source, Milo continuous rig
+
+- Added the owner's Milo SVG/PNG artwork and a saved 17-Part animation study.
+  Each arm and leg is one image with a two-segment bone and its middle elbow
+  or knee joint; hands and ankles follow the evaluated tips.
+- Verified source/rest color agreement, a connected silhouette across all 48
+  frames, exact rest return, reopened bent pixels and native Qt Quick open,
+  frame change, save and reopen. The macOS suite passes 188/188 CTest entries.
+  The older Clockwork examples stay as
+  regression fixtures. Source only; no public binary or tag.
+
 ## 0.2.0-experimental.49 — working source, matte Display and node cache
 
 - Show source and inverse matte alpha as full-canvas grayscale without

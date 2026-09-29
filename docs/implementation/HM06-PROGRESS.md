@@ -9,6 +9,11 @@ The [twenty-second visual shot study](HM06-VISUAL-SHOT.md) now exercises the
 continuous rig with camera, face/hand/mouth substitutions and a torso curve
 over the agreed 480-frame timing. Audio, mattes and published controls remain
 in their owning slices; the study does not claim the complete Harmony Moment.
+The [Milo continuous rig study](HM06-MILO.md) is now the character for new
+animation work. Its user-provided SVG/PNG source remains intact; the saved
+17-Part example uses four one-image limbs, elbow/knee bones and linked hands
+and ankles. Rest, bent, return, native save/reopen and full-frame connectivity
+are checked. The earlier Clockwork fixtures remain regression coverage.
 The saved 48- and 480-frame studies now use alpha-following contour meshes
 for each continuous arm and leg. The same editable middle elbow/knee bones,
 keys, sleeve variants and attached hands/feet remain. A sharper 40 px elbow

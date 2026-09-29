@@ -10,6 +10,10 @@ phase number, to determine readiness. Two active slices maximum if owners exist;
 with one implementer use the recommended order below. Every delivered block must
 undo, save/reopen and exercise its real failure boundaries before consumers start.
 
+Use [Milo](../implementation/HM06-MILO.md) for new character-animation studies.
+The 17-Part example has four continuous arm/leg images and tested middle-joint
+bones. Preserve the older Clockwork fixtures for regression checks.
+
 ## Delivered contracts and immediate tickets
 
 | Order / ID | Concrete next task | Prerequisite | Observable acceptance | Parallel option |

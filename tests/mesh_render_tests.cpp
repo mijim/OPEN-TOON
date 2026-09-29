@@ -1320,3 +1320,161 @@ TEST_CASE("Twenty-second visual shot combines deformers views mouth hands and ca
         OPENTOON_SOURCE_DIR "/examples/clockwork-visual-shot.otoon")).document;
     REQUIRE(bundled == reopened);
 }
+
+TEST_CASE("Milo uses four continuous limb images with joined bent and reopened output") {
+    const QString sourceRoot = QStringLiteral(OPENTOON_SOURCE_DIR "/assets/characters/milo/");
+    QFile manifestFile(sourceRoot + "continuous-parts/manifest.json");
+    QFile rigFile(sourceRoot + "continuous-rig.json");
+    REQUIRE(manifestFile.open(QIODevice::ReadOnly));
+    REQUIRE(rigFile.open(QIODevice::ReadOnly));
+    const auto manifest = QJsonDocument::fromJson(manifestFile.readAll()).object();
+    const auto rig = QJsonDocument::fromJson(rigFile.readAll()).object();
+    const auto entries = manifest.value("parts").toArray();
+    const auto limbs = rig.value("limbs").toObject();
+    REQUIRE(entries.size() == 17);
+    REQUIRE(limbs.size() == 4);
+    auto document = makeDocument();
+    document.name = "Milo — continuous rig study";
+    document.width = 1920;
+    document.height = 1080;
+    document.duration = 48;
+    document.background = {1, 1, 1, 1};
+    QHash<QString, Id> ids;
+    for (const auto& entry : entries) {
+        const auto part = entry.toObject();
+        const auto role = part.value("id").toString();
+        const QImage source(sourceRoot + "continuous-parts/" + part.value("file").toString());
+        REQUIRE_FALSE(source.isNull());
+        const auto image = source.convertToFormat(QImage::Format_RGBA8888);
+        REQUIRE(image.size() == QSize(800, 1080));
+        Layer* layer = nullptr;
+        if (ids.isEmpty())
+            layer = &document.layers.front();
+        else {
+            Layer added;
+            added.id = document.allocateId();
+            document.layers.push_back(added);
+            layer = &document.layers.back();
+        }
+        layer->name = role.toStdString();
+        layer->transform.x = 560;
+        const Id drawing = document.allocateId();
+        layer->exposures.push_back({0, document.duration, drawing});
+        Drawing created;
+        created.id = drawing;
+        created.image = ImageAsset{800, 1080, {}};
+        created.image->rgba.assign(image.constBits(), image.constBits() + image.sizeInBytes());
+        document.drawings.emplace(drawing, std::move(created));
+        ids.insert(role, layer->id);
+    }
+    const auto firstRole = entries.at(0).toObject().value("id").toString();
+    const Id root = makeCharacter(document, ids.value(firstRole), "Milo");
+    setPartRole(document, ids.value(firstRole), firstRole.toStdString());
+    for (const auto& entry : entries) {
+        const auto role = entry.toObject().value("id").toString();
+        if (role != firstRole)
+            attachDrawingAsPart(document, ids.value(role), root, role.toStdString());
+    }
+    for (const auto& entry : entries) {
+        const auto part = entry.toObject();
+        const auto parent = part.value("parent").toString();
+        if (!parent.isEmpty())
+            reparentPreservingWorld(document, ids.value(part.value("id").toString()),
+                                    ids.value(parent));
+    }
+    document.validate();
+    const auto rest = SceneRenderer::render(document, 0);
+    REQUIRE(rest.size() == QSize(1920, 1080));
+    const QImage master(sourceRoot + "milo.png");
+    REQUIRE(master.size() == QSize(800, 1080));
+    int maxChannelDifference = 0;
+    for (int y = 0; y < master.height(); ++y)
+        for (int x = 0; x < master.width(); ++x) {
+            const QRgb reference = master.pixel(x, y);
+            const QRgb actual = rest.pixel(x + 560, y);
+            const int alpha = qAlpha(reference);
+            const auto overWhite = [alpha](int channel) {
+                return (channel * alpha + 255 * (255 - alpha) + 127) / 255;
+            };
+            maxChannelDifference = std::max({maxChannelDifference,
+                std::abs(qRed(actual) - overWhite(qRed(reference))),
+                std::abs(qGreen(actual) - overWhite(qGreen(reference))),
+                std::abs(qBlue(actual) - overWhite(qBlue(reference)))});
+        }
+    REQUIRE(maxChannelDifference <= 4);
+    const auto [restConnected, restInk] = connectedInk(rest);
+    REQUIRE(restInk > 100000);
+    REQUIRE(restConnected == restInk);
+    for (auto iterator = limbs.begin(); iterator != limbs.end(); ++iterator) {
+        const auto role = iterator.key();
+        const auto config = iterator.value().toObject();
+        const auto joints = config.value("joints_canvas_px").toArray();
+        const auto angles = rig.value("pose_angles_deg").toObject().value(role).toArray();
+        REQUIRE(joints.size() == 3);
+        REQUIRE(angles.size() == 2);
+        const Id part = ids.value(role);
+        const Id drawing = document.layer(part).exposures.front().drawing;
+        REQUIRE_NOTHROW(bindContourImageMesh(document, part, drawing, 6, 16));
+        std::array<MeshPoint, 3> local{};
+        for (int index = 0; index < 3; ++index) {
+            const auto point = joints[index].toArray();
+            local[index] = {point[0].toDouble(), point[1].toDouble()};
+        }
+        REQUIRE_NOTHROW(bindBoneChain(document, part, drawing, local,
+                                     config.value("elbow_transition_px").toDouble()));
+        const Id follower = ids.value(config.value("follower").toString());
+        const auto tip = joints[2].toArray();
+        setPivotPreservingArtwork(document, follower, tip[0].toDouble(), tip[1].toDouble());
+        attachPartToBoneTip(document, follower, part);
+        REQUIRE_NOTHROW(recordBonePose(document, part, drawing,
+                                      rig.value("pose_frame").toInt(),
+                                      angles[0].toDouble(), angles[1].toDouble()));
+        recordBonePose(document, part, drawing, 47, 0, 0);
+        REQUIRE(document.layer(follower).parent == part);
+        REQUIRE(document.layer(follower).boneTipAnchor.has_value());
+    }
+    document.validate();
+    REQUIRE(SceneRenderer::render(document, 0) == rest);
+    const auto bent = SceneRenderer::render(document, 24);
+    REQUIRE(bent != rest);
+    const auto [bentConnected, bentInk] = connectedInk(bent);
+    REQUIRE(bentConnected == bentInk);
+    REQUIRE(SceneRenderer::render(document, 47) == rest);
+    for (int frame = 1; frame < 47; ++frame) {
+        INFO("Milo frame " << frame);
+        const auto preview = SceneRenderer::render(document, frame, {480, 270});
+        const auto [largest, ink] = connectedInk(preview);
+        REQUIRE(ink > 5000);
+        REQUIRE(largest == ink);
+    }
+    Session poseSession;
+    poseSession.replace(document);
+    const Id nearArm = ids.value("arm-near");
+    const Id nearArmDrawing = document.layer(nearArm).exposures.front().drawing;
+    REQUIRE(poseSession.apply("Retune Milo elbow", [&](Document& candidate) {
+        recordBonePose(candidate, nearArm, nearArmDrawing, 24, 0, 38);
+    }));
+    const auto retuned = SceneRenderer::render(poseSession.document(), 24);
+    REQUIRE(retuned != bent);
+    REQUIRE(poseSession.undo());
+    REQUIRE(SceneRenderer::render(poseSession.document(), 24) == bent);
+    REQUIRE(poseSession.redo());
+    REQUIRE(SceneRenderer::render(poseSession.document(), 24) == retuned);
+    REQUIRE(rest.save("milo-rest.png"));
+    REQUIRE(bent.save("milo-bent.png"));
+    QTemporaryDir temporary;
+    REQUIRE(temporary.isValid());
+    const auto path = std::filesystem::path((temporary.path() + "/milo.otoon").toStdString());
+    REQUIRE(ProjectStore::save(path, document) > 0);
+    const auto reopened = ProjectStore::load(path).document;
+    REQUIRE(reopened == document);
+    REQUIRE(SceneRenderer::render(reopened, 24) == bent);
+    if (qEnvironmentVariableIsSet("OPENTOON_MILO_PROJECT")) {
+        const auto output = qEnvironmentVariable("OPENTOON_MILO_PROJECT");
+        REQUIRE(ProjectStore::save(std::filesystem::path(output.toStdString()), document) > 0);
+    } else {
+        const auto bundled = ProjectStore::load(std::filesystem::path(
+            OPENTOON_SOURCE_DIR "/examples/milo-continuous.otoon")).document;
+        REQUIRE(bundled == document);
+    }
+}

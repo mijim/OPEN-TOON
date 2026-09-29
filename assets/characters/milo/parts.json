@@ -1,0 +1,223 @@
+{
+  "name": "Milo",
+  "canvas": [
+    800,
+    1080
+  ],
+  "coordinates": "top-left origin; x right, y down",
+  "color_space": "sRGB",
+  "license": "GPL-3.0-or-later",
+  "note": "Manual setup guide. OPEN-TOON does not automatically consume this manifest. Groups are artwork, not bones. Check joint overlaps after posing.",
+  "parts": [
+    {
+      "id": "arm-far-upper",
+      "file": "png-parts/01-arm-far-upper.png",
+      "suggested_parent": "torso",
+      "pivot_canvas_px": [
+        502,
+        398
+      ],
+      "stack_back_to_front": 1
+    },
+    {
+      "id": "arm-far-lower",
+      "file": "png-parts/02-arm-far-lower.png",
+      "suggested_parent": "arm-far-upper",
+      "pivot_canvas_px": [
+        536,
+        516
+      ],
+      "stack_back_to_front": 2
+    },
+    {
+      "id": "hand-far",
+      "file": "png-parts/03-hand-far.png",
+      "suggested_parent": "arm-far-lower",
+      "pivot_canvas_px": [
+        558,
+        611
+      ],
+      "stack_back_to_front": 3
+    },
+    {
+      "id": "leg-far-upper",
+      "file": "png-parts/04-leg-far-upper.png",
+      "suggested_parent": "pelvis",
+      "pivot_canvas_px": [
+        456,
+        652
+      ],
+      "stack_back_to_front": 4
+    },
+    {
+      "id": "leg-far-lower",
+      "file": "png-parts/05-leg-far-lower.png",
+      "suggested_parent": "leg-far-upper",
+      "pivot_canvas_px": [
+        455,
+        788
+      ],
+      "stack_back_to_front": 5
+    },
+    {
+      "id": "ankle-far",
+      "file": "png-parts/06-ankle-far.png",
+      "suggested_parent": "leg-far-lower",
+      "pivot_canvas_px": [
+        454,
+        925
+      ],
+      "stack_back_to_front": 6
+    },
+    {
+      "id": "shoe-far",
+      "file": "png-parts/07-shoe-far.png",
+      "suggested_parent": "ankle-far",
+      "pivot_canvas_px": [
+        454,
+        962
+      ],
+      "stack_back_to_front": 7
+    },
+    {
+      "id": "leg-near-upper",
+      "file": "png-parts/08-leg-near-upper.png",
+      "suggested_parent": "pelvis",
+      "pivot_canvas_px": [
+        361,
+        652
+      ],
+      "stack_back_to_front": 8
+    },
+    {
+      "id": "leg-near-lower",
+      "file": "png-parts/09-leg-near-lower.png",
+      "suggested_parent": "leg-near-upper",
+      "pivot_canvas_px": [
+        362,
+        787
+      ],
+      "stack_back_to_front": 9
+    },
+    {
+      "id": "ankle-near",
+      "file": "png-parts/10-ankle-near.png",
+      "suggested_parent": "leg-near-lower",
+      "pivot_canvas_px": [
+        360,
+        934
+      ],
+      "stack_back_to_front": 10
+    },
+    {
+      "id": "shoe-near",
+      "file": "png-parts/11-shoe-near.png",
+      "suggested_parent": "ankle-near",
+      "pivot_canvas_px": [
+        359,
+        970
+      ],
+      "stack_back_to_front": 11
+    },
+    {
+      "id": "pelvis",
+      "file": "png-parts/12-pelvis.png",
+      "suggested_parent": "torso",
+      "pivot_canvas_px": [
+        410,
+        641
+      ],
+      "stack_back_to_front": 12
+    },
+    {
+      "id": "arm-near-upper",
+      "file": "png-parts/13-arm-near-upper.png",
+      "suggested_parent": "torso",
+      "pivot_canvas_px": [
+        298,
+        403
+      ],
+      "stack_back_to_front": 13
+    },
+    {
+      "id": "arm-near-lower",
+      "file": "png-parts/14-arm-near-lower.png",
+      "suggested_parent": "arm-near-upper",
+      "pivot_canvas_px": [
+        273,
+        516
+      ],
+      "stack_back_to_front": 14
+    },
+    {
+      "id": "hand-near",
+      "file": "png-parts/15-hand-near.png",
+      "suggested_parent": "arm-near-lower",
+      "pivot_canvas_px": [
+        242,
+        615
+      ],
+      "stack_back_to_front": 15
+    },
+    {
+      "id": "torso",
+      "file": "png-parts/16-torso.png",
+      "suggested_parent": null,
+      "pivot_canvas_px": [
+        409,
+        624
+      ],
+      "stack_back_to_front": 16
+    },
+    {
+      "id": "hair-back",
+      "file": "png-parts/17-hair-back.png",
+      "suggested_parent": "head",
+      "pivot_canvas_px": [
+        400,
+        374
+      ],
+      "stack_back_to_front": 17
+    },
+    {
+      "id": "head",
+      "file": "png-parts/18-head.png",
+      "suggested_parent": "torso",
+      "pivot_canvas_px": [
+        408,
+        425
+      ],
+      "stack_back_to_front": 18
+    },
+    {
+      "id": "face",
+      "file": "png-parts/19-face.png",
+      "suggested_parent": "head",
+      "pivot_canvas_px": [
+        408,
+        425
+      ],
+      "stack_back_to_front": 19
+    },
+    {
+      "id": "mouth",
+      "file": "png-parts/20-mouth.png",
+      "suggested_parent": "head",
+      "pivot_canvas_px": [
+        408,
+        425
+      ],
+      "stack_back_to_front": 20
+    },
+    {
+      "id": "hair-front",
+      "file": "png-parts/21-hair-front.png",
+      "suggested_parent": "head",
+      "pivot_canvas_px": [
+        400,
+        374
+      ],
+      "stack_back_to_front": 21
+    }
+  ]
+}

@@ -14,9 +14,11 @@ OPEN-TOON currently supports an offline vector and raster animation workflow. It
 The built-in bouncing-ball example provides 24 distinct drawings exposed on twos. It contains only project-generated geometry and may be reused under the repository license.
 
 For a character rig in the current source build, open the
-[continuous toon study](../../examples/clockwork-continuous.otoon) from
-**Scene → Open**. Its four complete limb meshes, linked hands and feet,
-face view change and hand substitution can be inspected across 48 frames.
+[Milo continuous study](../../examples/milo-continuous.otoon) from
+**Scene → Open**. Each complete arm and leg has one contour mesh with an
+elbow or knee bone. Frame 24 shows a four-limb bend, and frame 47 returns to
+rest. The earlier [Clockwork study](../../examples/clockwork-continuous.otoon)
+remains available for view and hand substitution regression checks.
 
 **View → Composition** selects **Legacy appearance** or **Linear sRGB**. The first
 keeps the established Qt scene appearance and is the default for old projects.

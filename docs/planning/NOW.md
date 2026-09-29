@@ -16,6 +16,12 @@ The immediate objective is a complete, reliable character-animation **Harmony Mo
 
 **Current gate:** HM-06 has animated bone/curve evaluation, bounded per-substitution binding, editable elbow influence and a refreshed original character fixture; broader extreme-bend quality and artistic interaction remain unaccepted. HM-07 and HM-10 remain working subsets. The owner resumed work after the earlier cutoff. Continue HM-12 graph grouping and part-overlap work after checking its current contract.
 
+**Current character:** use the owner's [Milo source and 17-Part continuous
+study](../implementation/HM06-MILO.md) for new animation work. All four
+arms/legs are single images with middle-joint bones and linked endpoints.
+Keep Clockwork projects as regression fixtures. Milo's broader artistic
+approval and complete animated shot are still open.
+
 **Accepted HM-03 evidence:** the owner delegated review to the implementer. The original 19-part import/assembly/view journey, reference-pixel comparison, saved/reopened substitutions, independent copy, undo, negative/nonuniform reparenting and visual screenshot inspection are recorded in [HM03-ACCEPTANCE](../implementation/HM03-ACCEPTANCE.md). This bounded contract does not complete P08 or the independent second-animator HM-15 review.
 
 ## Recorded dependency snapshot

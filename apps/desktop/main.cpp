@@ -54,7 +54,8 @@ int main(int argc, char** argv) {
     }
     if (args.contains("--smoke-test") || args.contains("--hm06-benchmark") ||
         args.contains("--hm07-smoke") || args.contains("--hm10-smoke") ||
-        args.contains("--hm12-smoke") || args.contains("--hm-integrated-smoke")) {
+        args.contains("--hm12-smoke") || args.contains("--hm-integrated-smoke") ||
+        args.contains("--milo-smoke")) {
         QStandardPaths::setTestModeEnabled(true);
         QCoreApplication::setApplicationName(args.contains("--smoke-test")
                                                  ? "OPEN-TOON-smoke"
@@ -64,6 +65,8 @@ int main(int argc, char** argv) {
                                                              ? "OPEN-TOON-hm10-smoke"
                                                        : args.contains("--hm12-smoke")
                                                              ? "OPEN-TOON-hm12-smoke"
+                                                       : args.contains("--milo-smoke")
+                                                             ? "OPEN-TOON-milo-smoke"
                                                        : args.contains("--hm-integrated-smoke")
                                                              ? "OPEN-TOON-integrated-smoke"
                                                              : "OPEN-TOON-benchmark");
@@ -127,6 +130,55 @@ int main(int argc, char** argv) {
         }
         if (args.contains("--demo"))
             editor.loadDemo();
+        if (args.contains("--milo-smoke")) {
+            QTimer::singleShot(1200, &app, [&] {
+                try {
+                    if (!args.contains("--open") || engine.rootObjects().isEmpty())
+                        throw std::runtime_error("Milo smoke requires --open PROJECT and a QML window.");
+                    auto* window = qobject_cast<QQuickWindow*>(engine.rootObjects().first());
+                    auto* canvas = window ? window->findChild<CanvasItem*>("drawingCanvas") : nullptr;
+                    if (!canvas || canvas->height() < 200)
+                        throw std::runtime_error("Milo canvas is unavailable.");
+                    const auto original = editor.document();
+                    if (original.name != "Milo — continuous rig study" ||
+                        original.layers.size() != 18 || original.duration != 48)
+                        throw std::runtime_error("Milo project identity or part count changed.");
+                    const auto deformed = std::count_if(original.layers.begin(), original.layers.end(),
+                        [](const opentoon::Layer& layer) {
+                            return std::any_of(layer.bindings.begin(), layer.bindings.end(),
+                                [](const opentoon::MeshBinding& binding) { return binding.bone.has_value(); });
+                        });
+                    if (deformed != 4)
+                        throw std::runtime_error("Milo's four continuous limb bones are missing.");
+                    const auto rest = opentoon::SceneRenderer::render(original, 0);
+                    const auto bent = opentoon::SceneRenderer::render(original, 24);
+                    if (rest == bent)
+                        throw std::runtime_error("Milo's elbow and knee pose did not render.");
+                    editor.setWorkspaceMode("Rig");
+                    editor.setFrame(24);
+                    QCoreApplication::processEvents();
+                    window->update();
+                    QCoreApplication::processEvents();
+                    const auto screenshot = window->grabWindow();
+                    if (screenshot.isNull())
+                        throw std::runtime_error("Milo's native canvas did not present.");
+                    QTemporaryDir temporary;
+                    if (!temporary.isValid() ||
+                        !editor.saveProject(QUrl::fromLocalFile(temporary.filePath("milo.otoon"))))
+                        throw std::runtime_error("Milo's native project save failed.");
+                    editor.newScene();
+                    if (!editor.openProject(QUrl::fromLocalFile(temporary.filePath("milo.otoon"))) ||
+                        editor.document() != original ||
+                        opentoon::SceneRenderer::render(editor.document(), 24) != bent)
+                        throw std::runtime_error("Milo's native reopen changed the bent pose.");
+                    std::cout << "Milo native smoke passed: 17 Parts, four continuous bones, frame 24, save/reopen.\n";
+                    app.exit(0);
+                } catch (const std::exception& error) {
+                    std::cerr << error.what() << '\n';
+                    app.exit(1);
+                }
+            });
+        }
         if (args.contains("--hm-integrated-smoke")) {
             QTimer::singleShot(1200, &app, [&] {
                 try {

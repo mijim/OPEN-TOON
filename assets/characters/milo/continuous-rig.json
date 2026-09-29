@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "name": "Milo",
+  "canvas": [800, 1080],
+  "scene": [1920, 1080],
+  "limbs": {
+    "arm-far": {"sources": ["arm-far-upper", "arm-far-lower"], "joints_canvas_px": [[502, 398], [536, 516], [558, 611]], "follower": "hand-far", "elbow_transition_px": 50},
+    "leg-far": {"sources": ["leg-far-upper", "leg-far-lower"], "joints_canvas_px": [[456, 652], [455, 788], [454, 925]], "follower": "ankle-far", "elbow_transition_px": 55},
+    "leg-near": {"sources": ["leg-near-upper", "leg-near-lower"], "joints_canvas_px": [[361, 652], [362, 787], [360, 934]], "follower": "ankle-near", "elbow_transition_px": 55},
+    "arm-near": {"sources": ["arm-near-upper", "arm-near-lower"], "joints_canvas_px": [[298, 403], [273, 516], [242, 615]], "follower": "hand-near", "elbow_transition_px": 50}
+  },
+  "pose_frame": 24,
+  "pose_angles_deg": {
+    "arm-far": [0, -26],
+    "leg-far": [0, -12],
+    "leg-near": [0, 12],
+    "arm-near": [0, 30]
+  }
+}
