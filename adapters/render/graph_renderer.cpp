@@ -279,6 +279,10 @@ QImage GraphRenderer::render(const CompositionGraph& graph, const Document& docu
             image = applyMatte(input(0), input(1), options);
             bound = inputBounds(0).intersected(inputBounds(1));
             break;
+        case GraphNodeKind::BypassMatte:
+            image = input(0);
+            bound = inputBounds(0);
+            break;
         case GraphNodeKind::DisplayOutput:
         case GraphNodeKind::WriteOutput:
             image = input(0);

@@ -70,7 +70,7 @@
     {
       "id": "P10",
       "status": "in_progress",
-      "available": "Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. Format-18 Drawing/Part cutter matte bindings and format-19 inverted Outside coverage clip by fractional alpha through the shared graph, with compact inspector, resizable derived Nodes panel, order/cutter/opacity edits, reference validation, undo, save/reopen and character-copy remapping. A bounded revision cache reuses canvas frames and speculatively prepares the next frame from an immutable snapshot. Native playback/scrub, alpha/color charts and animated original artwork close bounded HM-04; orthographic camera output joins HM-13.",
+      "available": "Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. Format-18 Drawing/Part cutter matte bindings and format-19 inverted Outside coverage clip by fractional alpha through the shared graph, with compact inspector, resizable derived Nodes panel, order/cutter/opacity edits, format-20 persistent bypass, reference validation, undo, save/reopen and character-copy remapping. A bounded revision cache reuses canvas frames and speculatively prepares the next frame from an immutable snapshot. Native playback/scrub, alpha/color charts and animated original artwork close bounded HM-04; orthographic camera output joins HM-13.",
       "remaining": "General editable node UI and group ports, joint recipes, useful effects, full ROI scheduling, production-scale performance and later deformer integration."
     },
     {
@@ -84,7 +84,7 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 165,
+      "count": 166,
       "command": "ctest --test-dir build/locked --output-on-failure -j6"
     },
     "native_input_workflow": {
@@ -248,7 +248,7 @@
         "animated orthographic camera matches reopened preview and two exported PNG frames"
       ]
     },
-    "total_local_ctest_entries": 165,
+    "total_local_ctest_entries": 166,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -430,10 +430,10 @@
     },
     "cutter_matte": {
       "status": "passed_subset",
-      "scope": "Format-18 Drawing/Part source binding and format-19 inversion, fractional inside/outside alpha, source exclusion, validated references, derived Nodes panel with animated Opacity nodes, save/reopen, bypass and undo",
+      "scope": "Format-18 Drawing/Part source binding and format-19 inversion, fractional inside/outside alpha, source exclusion, validated references, derived Nodes panel with animated Opacity nodes, format-20 persistent bypass, save/reopen and undo",
       "command": "build/locked/open-toon.app/Contents/MacOS/open-toon --hm12-smoke",
       "screenshot": "build/hm12-matte-smoke.png",
-      "limits": "General node editor, group/ungroup, arm/eye recipes and full 480-frame composition budgets remain open."
+      "limits": "General node editor, general node bypass, group/ungroup, arm/eye recipes and full 480-frame composition budgets remain open."
     },
     "pcm_audio_timing": {
       "status": "passed_subset",
@@ -454,7 +454,7 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.23",
+  "version": "0.2.0-experimental.24",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",

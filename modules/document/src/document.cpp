@@ -217,6 +217,8 @@ void Document::validate() const {
         }
         require(!l.invertMatte || l.matte,
                 "An inverted cutter needs a matte source.");
+        require(!l.matteBypassed || l.matte,
+                "A bypassed cutter needs a matte source.");
         std::set<Id> variants;
         for (const auto& variant : l.variants)
             require(drawings.contains(variant.drawing) && variant.name.size() > 0 &&

@@ -104,6 +104,14 @@ TEST_CASE("Saved cutter matte clips a layer without painting its source") {
     REQUIRE(GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Write) == expected);
     REQUIRE(deserializeDocument(serializeDocument(document)) == document);
     REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == expected);
+    document.layers.front().matteBypassed = true;
+    const auto uncut = SceneRenderer::render(document, 0);
+    REQUIRE(qAlpha(uncut.pixel(0, 0)) == 128);
+    REQUIRE(qBlue(uncut.pixel(0, 0)) == 0);
+    REQUIRE(GraphRenderer::render(CompositionGraph::orderedLayers(document), document, 0,
+                                  {}, {}, GraphTarget::Write) == uncut);
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == uncut);
+    document.layers.front().matteBypassed = false;
     document.drawings.at(sourceDrawing.id).image = ImageAsset{1, 1, {0, 0, 255, 64}};
     document.layers.front().invertMatte = true;
     document.validate();

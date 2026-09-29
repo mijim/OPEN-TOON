@@ -124,9 +124,9 @@ Temporarily bypass operators and reuse valid results.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — revision-aware preview cache and affected-descendant invalidation.
+**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — docs/implementation/HM12-PROGRESS.md; revision-aware preview cache, inactive cutter dependency isolation, undo and reopen.
 
-**Remaining scope:** Revision-aware cache and invalidation work. User-controlled node bypass remains open.
+**Remaining scope:** Revision-aware cache and a persistent cutter bypass work. General user-controlled node bypass remains open.
 
 ## NOD-010 — Notes and organization
 

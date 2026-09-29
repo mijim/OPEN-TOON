@@ -225,13 +225,33 @@ int main(int argc, char** argv) {
                     if (opentoon::SceneRenderer::render(editor.document(), 0) != outside)
                         throw std::runtime_error("Opacity node undo changed the cutter result.");
                     editor.setSelectedLayer(int(document.layers.front().id));
-                    if (!editor.setLayerMatte(0))
-                        throw std::runtime_error("Cannot bypass a cutter matte.");
+                    QCoreApplication::processEvents();
+                    auto* bypassControl = window->findChild<QQuickItem*>("nodeBypassMatte");
+                    if (!bypassControl || !bypassControl->isVisible() ||
+                        !editor.setMatteBypassed(true))
+                        throw std::runtime_error("Cannot bypass the saved cutter binding.");
+                    const auto bypassed = opentoon::SceneRenderer::render(editor.document(), 0);
+                    if (qAlpha(bypassed.pixel(0, 0)) != 128 || qBlue(bypassed.pixel(0, 0)) != 0 ||
+                        editor.compositionNodes().size() != 7)
+                        throw std::runtime_error("Bypassed cutter changed the target or painted its source.");
                     editor.undo();
                     if (opentoon::SceneRenderer::render(editor.document(), 0) != outside)
-                        throw std::runtime_error("Cutter matte bypass did not undo.");
+                        throw std::runtime_error("Cutter bypass undo did not restore coverage.");
+                    editor.redo();
+                    if (!editor.saveProject({}) || !editor.openProject(QUrl::fromLocalFile(path)) ||
+                        opentoon::SceneRenderer::render(editor.document(), 0) != bypassed)
+                        throw std::runtime_error("Cutter bypass changed after save and reopen.");
+                    editor.setSelectedLayer(int(document.layers.front().id));
+                    if (!editor.setMatteBypassed(false) ||
+                        opentoon::SceneRenderer::render(editor.document(), 0) != outside)
+                        throw std::runtime_error("Re-enabled cutter did not restore coverage.");
+                    if (!editor.setLayerMatte(0))
+                        throw std::runtime_error("Cannot remove a cutter matte.");
+                    editor.undo();
+                    if (opentoon::SceneRenderer::render(editor.document(), 0) != outside)
+                        throw std::runtime_error("Cutter matte removal did not undo.");
                     std::cout << "HM-12 native smoke passed: inspector and clickable node strip, opacity and fractional inside/outside matte, "
-                                 "save/reopen, bypass/undo.\n";
+                                 "persistent bypass/re-enable, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

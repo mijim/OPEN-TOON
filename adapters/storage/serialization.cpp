@@ -106,6 +106,7 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
                   {"parent", l.parent},
                   {"matte", l.matte},
                   {"invertMatte", l.invertMatte},
+                  {"matteBypassed", l.matteBypassed},
                   {"kind", static_cast<int>(l.kind)},
                   {"role", l.role},
                   {"variants", Json::array()},
@@ -366,6 +367,8 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
             l.matte = x.at("matte");
         if (j.at("version").get<int>() >= 19)
             l.invertMatte = x.at("invertMatte");
+        if (j.at("version").get<int>() >= 20)
+            l.matteBypassed = x.at("matteBypassed");
         if (j.at("version").get<int>() >= 11) {
             const auto& anchor = x.at("boneTipAnchor");
             if (!anchor.is_null())

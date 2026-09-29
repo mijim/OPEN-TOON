@@ -161,6 +161,7 @@ QVariantList EditorController::layers() const {
                                      {"parent", int(it->parent)},
                                      {"matte", int(it->matte)},
                                      {"invertMatte", it->invertMatte},
+                                     {"matteBypassed", it->matteBypassed},
                                      {"kind", int(it->kind)},
                                      {"role", QString::fromStdString(it->role)},
                                      {"spans", spans},
@@ -186,6 +187,7 @@ QVariantList EditorController::compositionNodes() const {
         case GraphNodeKind::MatteFromImage: kind = "Cutter"; break;
         case GraphNodeKind::InvertMatte: kind = "Invert matte"; break;
         case GraphNodeKind::ApplyMatte: kind = "Apply matte"; break;
+        case GraphNodeKind::BypassMatte: kind = "Bypassed cutter"; break;
         case GraphNodeKind::DisplayOutput: kind = "Display"; break;
         case GraphNodeKind::WriteOutput: kind = "Write"; break;
         }
@@ -1018,9 +1020,13 @@ bool EditorController::setLayerMatte(int sourceLayer) {
                 !source.visible || source.matte)
                 throw std::runtime_error("Choose a visible drawing or part without its own matte.");
         }
+        const Id oldMatte = target.matte;
         target.matte = Id(sourceLayer);
-        if (!sourceLayer)
+        if (!sourceLayer) {
             target.invertMatte = false;
+            target.matteBypassed = false;
+        } else if (Id(sourceLayer) != oldMatte)
+            target.matteBypassed = false;
     });
 }
 bool EditorController::setMatteInverted(bool inverted) {
@@ -1031,6 +1037,16 @@ bool EditorController::setMatteInverted(bool inverted) {
         if (target.locked || !target.matte)
             throw std::runtime_error("Select an unlocked layer with a cutter matte.");
         target.invertMatte = inverted;
+    });
+}
+bool EditorController::setMatteBypassed(bool bypassed) {
+    if (!layer_)
+        return false;
+    return edit(bypassed ? "Bypass cutter matte" : "Enable cutter matte", [&](Document& d) {
+        auto& target = d.layer(layer_);
+        if (target.locked || !target.matte)
+            throw std::runtime_error("Select an unlocked layer with a cutter matte.");
+        target.matteBypassed = bypassed;
     });
 }
 bool EditorController::selectedCanFollowBoneTip() const {

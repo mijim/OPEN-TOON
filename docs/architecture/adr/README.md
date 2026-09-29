@@ -133,3 +133,6 @@ PCM WAV export and exact rational sample boundaries.
 
 See [ADR-043](043-typed-layer-opacity-node.md) for the derived Image → Opacity
 node, its existing animated layer property and fractional cutter ordering.
+
+See [ADR-044](044-persistent-cutter-bypass.md) for format-20 cutter bypass,
+retained source references and inactive graph dependencies.

@@ -3609,8 +3609,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "Revision-aware cache and invalidation work. User-controlled node bypass remains open.",
-      "implementation_evidence": "docs/implementation/HM04-ACCEPTANCE.md; revision-aware preview cache and affected-descendant invalidation"
+      "notes": "Revision-aware cache and a persistent cutter bypass work. General user-controlled node bypass remains open.",
+      "implementation_evidence": "docs/implementation/HM04-ACCEPTANCE.md; docs/implementation/HM12-PROGRESS.md; revision-aware preview cache, inactive cutter dependency isolation, undo and reopen"
     },
     {
       "id": "NOD-010",

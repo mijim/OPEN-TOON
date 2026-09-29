@@ -1295,6 +1295,15 @@ ApplicationWindow {
                                 Layout.leftMargin: 16
                                 visible: layerInspector.rigLayer?.matte > 0
                                 enabled: visible && !layerInspector.rigLayer?.locked
+                                text: "Bypass cutter"
+                                checked: layerInspector.rigLayer?.matteBypassed || false
+                                onClicked: editor.setMatteBypassed(checked)
+                                Accessible.name: "Bypass cutter matte"
+                            }
+                            C.CompactCheckBox {
+                                Layout.leftMargin: 16
+                                visible: layerInspector.rigLayer?.matte > 0
+                                enabled: visible && !layerInspector.rigLayer?.locked
                                 text: "Use outside of cutter"
                                 checked: layerInspector.rigLayer?.invertMatte || false
                                 onClicked: editor.setMatteInverted(checked)

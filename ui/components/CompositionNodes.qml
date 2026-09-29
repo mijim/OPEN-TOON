@@ -58,6 +58,15 @@ Item {
                 Accessible.name: "Selected drawing cutter matte"
             }
             CompactCheckBox {
+                objectName: "nodeBypassMatte"
+                text: "Bypass"
+                visible: root.selected?.matte > 0
+                enabled: visible && !root.selected?.locked
+                checked: root.selected?.matteBypassed || false
+                onClicked: root.controller.setMatteBypassed(checked)
+                Accessible.name: "Bypass selected cutter matte"
+            }
+            CompactCheckBox {
                 objectName: "nodeInvertMatte"
                 text: "Outside"
                 visible: root.selected?.matte > 0
@@ -104,6 +113,7 @@ Item {
                                ? "#292929" : "#181818"
                         border.color: modelData.kind === "Cutter" ||
                                       modelData.kind === "Opacity" ||
+                                      modelData.kind === "Bypassed cutter" ||
                                       modelData.kind === "Invert matte" ||
                                       modelData.kind === "Apply matte"
                                       ? "#7b7b7b" : "#393939"

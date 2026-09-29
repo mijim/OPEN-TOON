@@ -1,5 +1,16 @@
 # Experimental releases
 
+## 0.2.0-experimental.24 — working source, persistent cutter bypass
+
+- Save a reversible cutter bypass in format 20. It keeps the source and
+  Inside/Outside setting, shows the uncut target and excludes inactive cutter
+  work from the output graph. Re-enabling restores the same fractional result.
+- Formats 1–19 default to enabled cutters; a first format-20 save preserves a
+  readable source-version backup. Native smoke verifies bypass, undo/redo,
+  save/reopen and re-enable. The local macOS build passes 166 CTest entries.
+- Source only; no new public binary or tag. General graph editing and joint
+  recipes remain open.
+
 ## 0.2.0-experimental.23 — working source, typed opacity composition
 
 - Show animated Drawing/Part opacity as a typed node in the derived composition

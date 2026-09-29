@@ -194,7 +194,7 @@ struct Layer {
     bool visible = true, locked = false, solo = false;
     Id parent = 0;
     Id matte = 0;
-    bool invertMatte = false;
+    bool invertMatte = false, matteBypassed = false;
     Transform transform;
     std::vector<Exposure> exposures;
     std::vector<Keyframe> keys;
@@ -231,7 +231,7 @@ struct AudioClip {
     auto operator<=>(const AudioClip&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 19;
+    static constexpr int formatVersion = 20;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;
