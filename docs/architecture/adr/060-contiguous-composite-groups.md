@@ -23,6 +23,11 @@ Character and rig-branch copies clone groups only when every member is inside
 the copied branch. Members receive the copied layer IDs and the group receives
 a new ID; partial groups reject copy or deletion. Removing a closed branch
 removes its contained groups in the same document command.
+The character dependency collector includes group IDs and matte source IDs
+alongside drawings and referenced swatches. An independent character copy
+rejects an external matte or partially owned group before allocating copied
+resources. This bounded closure supports later template manifests; it does not
+define portable template serialization or import.
 
 Format 32 extends Group output to choose between its input boundary and
 internal composite for saved bypass; see [ADR-061](061-persistent-composite-group-bypass.md).

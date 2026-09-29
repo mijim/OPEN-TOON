@@ -1,7 +1,16 @@
 #pragma once
 #include "opentoon/document.h"
+#include <set>
 
 namespace opentoon {
+struct CharacterDependencies {
+    std::set<Id> layers;
+    std::set<Id> drawings;
+    std::set<Id> swatches;
+    std::set<Id> compositeGroups;
+    std::set<Id> matteSources;
+};
+[[nodiscard]] CharacterDependencies collectCharacterDependencies(const Document&, Id character);
 // These operations mutate only a candidate Document owned by Session::apply.
 Id makeCharacter(Document&, Id drawingLayer, std::string name);
 [[nodiscard]] Id characterFor(const Document&, Id layer);

@@ -109,6 +109,52 @@ TEST_CASE("Character copies remap cutter mattes and branch edits protect source 
     REQUIRE(session.undo());
     REQUIRE(session.document() == baseline);
 }
+TEST_CASE("Character dependency collection closes drawings swatches groups and mattes") {
+    Session session;
+    const Id body = session.document().layers.front().id;
+    Id root = 0, cutter = 0, group = 0, artwork = 0;
+    REQUIRE(session.apply("Build character dependencies", [&](Document& d) {
+        artwork = d.editableDrawing(body, 0).id;
+        d.drawings.at(artwork).strokes.push_back(
+            {d.allocateId(), d.palette.front().id, 4, Shape::Stroke, false, 2,
+             {{0, 0}, {20, 20}}});
+        root = makeCharacter(d, body, "Actor");
+        Layer source;
+        source.id = d.allocateId();
+        cutter = source.id;
+        source.name = "Cutter";
+        d.layers.push_back(source);
+        (void)d.editableDrawing(cutter, 0);
+        attachDrawingAsPart(d, cutter, root, "Cutter");
+        d.layer(body).matte = cutter;
+        (void)captureCharacterView(d, root, 0, "Front");
+        group = d.allocateId();
+        d.compositeGroups.push_back({group, "Joint", {body, cutter}});
+    }));
+    const auto dependencies = collectCharacterDependencies(session.document(), root);
+    REQUIRE(dependencies.layers == std::set<Id>{root, body, cutter});
+    REQUIRE(dependencies.drawings.contains(artwork));
+    REQUIRE(dependencies.swatches.contains(session.document().palette.front().id));
+    REQUIRE(dependencies.compositeGroups == std::set<Id>{group});
+    REQUIRE(dependencies.matteSources == std::set<Id>{cutter});
+    const auto baseline = session.document();
+    REQUIRE(session.apply("Copy closed dependencies", [&](Document& d) {
+        (void)duplicateCharacter(d, root);
+    }));
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == baseline);
+    REQUIRE_THROWS(session.apply("Reject external cutter in independent copy", [&](Document& d) {
+        d.compositeGroups.clear();
+        d.layer(cutter).matte = 0;
+        Layer external;
+        external.id = d.allocateId();
+        external.name = "External cutter";
+        d.layers.push_back(external);
+        d.layer(body).matte = external.id;
+        (void)duplicateCharacter(d, root);
+    }));
+    REQUIRE(session.document() == baseline);
+}
 TEST_CASE("Rig copies and deletion keep composite groups dependency-closed") {
     Session session;
     const Id body = session.document().layers.front().id;

@@ -1,5 +1,16 @@
 # Experimental releases
 
+## 0.2.0-experimental.60 — working source, character dependency closure
+
+- A Qt-free character dependency collector inventories owned layers, drawing
+  substitutions and exposures, pose/view drawing choices, mesh-bound drawings,
+  referenced swatches, composite groups and matte sources.
+- Independent character duplication now rejects external cutter sources before
+  copying. Partial group boundaries still reject. A closed Part fixture checks
+  the inventory and atomic refusal; the locked macOS suite passes 199/199
+  CTest entries and HM-12 native smoke. This is a foundation for portable
+  templates; manifest export and import remain open. Source only.
+
 ## 0.2.0-experimental.59 — working source, independent composite group copy
 
 - The Nodes toolbar duplicates a selected contiguous Drawing/Part group in the

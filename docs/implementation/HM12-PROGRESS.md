@@ -94,8 +94,8 @@ group they fully own, assign a new group ID and remap its Drawing/Part members.
 The saved bypass state follows the copy, and existing internal cutter-source
 remapping remains intact. A branch deletion removes a fully contained group;
 copying or removing only part of one rejects atomically. This closes one
-in-project graph dependency path; a portable template dependency collector
-and general reusable subgraphs remain open.
+in-project graph dependency path; portable template manifests and general
+reusable subgraphs remain open.
 The Nodes **Duplicate** action copies a selected contiguous group beside its
 original with independent Drawing/Part artwork, fresh layer/group/stroke IDs
 and remapped internal cutter links. The saved bypass setting and member order
@@ -103,6 +103,12 @@ carry over. Copied Parts join their character's saved view sets. A cutter
 outside the group or a Part descendant outside its boundary rejects the copy
 before mutation. Published external ports, nested groups and portable
 templates remain open.
+A Qt-free collector now inventories a character's layers, exposed and variant
+drawings, view/pose choices, mesh-bound drawings, referenced swatches, composite
+groups and matte source IDs. It rejects a group crossing the character boundary
+and an external cutter before an independent character copy. This closes the
+current graph/matte reference boundary for copy; portable template manifests,
+import/remapping and media remain HM-09 work.
 Drawing and Part source cards now offer **Delete source…**. Protect references
 rejects a source used by a cutter or group. Disconnect references clears every
 external cutter user and intersecting group boundary before deleting the
@@ -250,6 +256,9 @@ preview. This is diagnostic navigation, not a persisted graph edit.
   internal cutter remapping, character view registration, saved bypass,
   serialization, ProjectStore reopen, atomic undo/redo and rejection of external dependencies.
   Native Qt Quick smoke clicks Duplicate and checks new selection and undo/redo.
+- A character dependency fixture inventories drawings, swatches, groups and
+  matte sources, then verifies a closed independent copy and atomic refusal of
+  an external cutter source.
 - Drawing and Part deletion fixtures verify Protect rejection, explicit
   disconnection of cutter users and group boundaries, locked-user refusal,
   changed pixels, atomic undo/redo and reopen. Native Qt Quick smoke clicks

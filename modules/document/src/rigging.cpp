@@ -191,6 +191,42 @@ Id characterFor(const Document& document, Id layerId) {
     }
     return 0;
 }
+CharacterDependencies collectCharacterDependencies(const Document& document, Id rootId) {
+    require(document.layer(rootId).kind == LayerKind::Character,
+            "Select a character to collect its dependencies.");
+    CharacterDependencies result;
+    for (const auto& layer : document.layers)
+        if (characterFor(document, layer.id) == rootId)
+            result.layers.insert(layer.id);
+    for (const auto& layer : document.layers) {
+        if (!result.layers.contains(layer.id))
+            continue;
+        require(!layer.matte || result.layers.contains(layer.matte),
+                "Character has a cutter source outside its dependency boundary.");
+        if (layer.matte)
+            result.matteSources.insert(layer.matte);
+        for (const auto& exposure : layer.exposures)
+            result.drawings.insert(exposure.drawing);
+        for (const auto& variant : layer.variants)
+            result.drawings.insert(variant.drawing);
+        for (const auto& binding : layer.bindings)
+            result.drawings.insert(binding.drawing);
+        for (const auto& view : layer.views)
+            for (const auto& choice : view.choices)
+                result.drawings.insert(choice.drawing);
+        for (const auto& pose : layer.poses)
+            for (const auto& part : pose.parts)
+                if (part.channels & PoseChannels::Drawing)
+                    result.drawings.insert(part.drawing);
+    }
+    for (const auto& group : closedCompositeGroups(document, result.layers))
+        result.compositeGroups.insert(group.id);
+    for (const Id drawing : result.drawings)
+        for (const auto& stroke : document.drawings.at(drawing).strokes)
+            if (stroke.swatch)
+                result.swatches.insert(stroke.swatch);
+    return result;
+}
 Id makeCharacter(Document& document, Id drawingLayer, std::string name) {
     auto& layer = document.layer(drawingLayer);
     require(layer.kind == LayerKind::Drawing && !layer.locked && layer.parent == 0,
@@ -562,10 +598,8 @@ Id duplicateCharacter(Document& document, Id rootId, double offsetX, double offs
     for (const auto& layer : document.layers)
         if (characterFor(document, layer.id) == rootId)
             original.push_back(layer);
-    std::set<Id> selected;
-    for (const auto& layer : original)
-        selected.insert(layer.id);
-    const auto groups = closedCompositeGroups(document, selected);
+    const auto dependencies = collectCharacterDependencies(document, rootId);
+    const auto groups = closedCompositeGroups(document, dependencies.layers);
     std::map<Id, Id> layers, drawings;
     for (const auto& layer : original)
         layers[layer.id] = document.allocateId();
