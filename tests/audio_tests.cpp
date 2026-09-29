@@ -17,15 +17,16 @@ void write32(std::vector<std::uint8_t>& out, std::uint32_t value) {
     write16(out, value & 65535);
     write16(out, value >> 16);
 }
-std::vector<std::uint8_t> wav(std::uint32_t samples, std::uint32_t cue) {
+std::vector<std::uint8_t> wav(std::uint32_t samples, std::uint32_t cue,
+                              std::uint32_t sampleRate = 48000) {
     std::vector<std::uint8_t> result{'R', 'I', 'F', 'F'};
     write32(result, 36 + samples * 2);
     result.insert(result.end(), {'W', 'A', 'V', 'E', 'f', 'm', 't', ' '});
     write32(result, 16);
     write16(result, 1);
     write16(result, 1);
-    write32(result, 48000);
-    write32(result, 96000);
+    write32(result, sampleRate);
+    write32(result, sampleRate * 2);
     write16(result, 2);
     write16(result, 16);
     result.insert(result.end(), {'d', 'a', 't', 'a'});
@@ -113,4 +114,30 @@ TEST_CASE("Rational audio cue positions remain exact across integer and fraction
         REQUIRE(last == direct);
         REQUIRE(last - rate.sampleAt(14385, 48000) <= 2002);
     }
+}
+TEST_CASE("Two placed clips mix at the same rational sample with rate conversion and stereo output") {
+    auto d = makeDocument();
+    const auto first = importPcm16Wav(d, "cue-48k", wav(48000, 2000), 0);
+    const auto second = importPcm16Wav(d, "cue-44k", wav(44100, 0, 44100), 1);
+    setAudioClipGain(d, first, 0.5);
+    setAudioClipGain(d, second, 0.5);
+    d.validate();
+    AudioMixPlan mix(d, 48000);
+    REQUIRE(mix.sceneSamples() == 96000);
+    const auto block = mix.renderBlock(1998, 5);
+    REQUIRE(block.size() == 10);
+    REQUIRE(block[2] == 0);
+    REQUIRE(block[3] == 0);
+    REQUIRE(block[4] == 32767);
+    REQUIRE(block[5] == 32767);
+    REQUIRE(block[6] > 0); // Interpolated 44.1 kHz source after its first sample.
+    REQUIRE(block[6] == block[7]);
+    REQUIRE_THROWS(mix.renderBlock(95999, 2));
+    auto fractional = d;
+    fractional.rate = {24000, 1001};
+    fractional.validate();
+    AudioMixPlan fractionalMix(fractional, 48000);
+    REQUIRE(fractionalMix.sceneSamples() == 96096);
+    const auto fractionalCue = fractionalMix.renderBlock(2002, 1);
+    REQUIRE(fractionalCue[0] > 16000);
 }

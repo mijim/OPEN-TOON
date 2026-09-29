@@ -127,4 +127,69 @@ double audioPeak(const AudioAsset& asset, std::uint64_t begin, std::uint64_t end
         }
     return double(peak) / 32768.0;
 }
+AudioMixPlan::AudioMixPlan(const Document& document, std::int32_t outputRate)
+    : frameRate_(document.rate), duration_(document.duration), outputRate_(outputRate) {
+    frameRate_.validate();
+    if (outputRate < 8000 || outputRate > 192000)
+        throw std::invalid_argument("Unsupported audio output sample rate.");
+    for (const auto& clip : document.audioClips) {
+        const auto asset = std::find_if(document.audioAssets.begin(), document.audioAssets.end(),
+                                        [&](const auto& value) { return value.id == clip.asset; });
+        if (asset == document.audioAssets.end())
+            throw std::invalid_argument("Audio clip references a missing source.");
+        const auto info = inspectPcm16Wav({asset->wav.data(), asset->wav.size()});
+        if (clip.inSample >= clip.outSample || clip.outSample > info.sampleFrames ||
+            clip.start < 0 || clip.start >= duration_ || !std::isfinite(clip.gain) ||
+            clip.gain < 0 || clip.gain > 4)
+            throw std::invalid_argument("Invalid audio clip in mix plan.");
+        sources_.push_back({&*asset, clip, info.dataOffset,
+                            frameRate_.sampleAt(clip.start, outputRate_)});
+    }
+}
+std::int64_t AudioMixPlan::sceneSamples() const {
+    return frameRate_.sampleAt(duration_, outputRate_);
+}
+std::vector<std::int16_t> AudioMixPlan::renderBlock(std::int64_t firstSample,
+                                                    std::size_t frameCount) const {
+    if (firstSample < 0 || frameCount > 65536 ||
+        std::uint64_t(firstSample) + frameCount > std::uint64_t(sceneSamples()))
+        throw std::invalid_argument("Audio render block is outside the scene.");
+    std::vector<double> mixed(frameCount * 2, 0);
+    for (const auto& source : sources_) {
+        const auto& asset = *source.asset;
+        const std::span bytes{asset.wav.data(), asset.wav.size()};
+        for (std::size_t index = 0; index < frameCount; ++index) {
+            const auto sceneSample = firstSample + std::int64_t(index);
+            if (sceneSample < source.startSample)
+                continue;
+            const auto relative = std::uint64_t(sceneSample - source.startSample);
+            const auto wholeSeconds = relative / outputRate_;
+            const auto remainder = relative % outputRate_;
+            const auto subsecond = remainder * std::uint64_t(asset.sampleRate);
+            const auto sourceFrame = source.clip.inSample +
+                                     wholeSeconds * std::uint64_t(asset.sampleRate) +
+                                     subsecond / outputRate_;
+            if (sourceFrame >= source.clip.outSample)
+                continue;
+            const auto nextFrame = std::min(sourceFrame + 1, source.clip.outSample - 1);
+            const double fraction = double(subsecond % outputRate_) / outputRate_;
+            auto read = [&](std::uint64_t frame, int channel) {
+                const auto at = source.dataOffset + (frame * asset.channels + channel) * 2;
+                const auto encoded = u16(bytes, at);
+                return double(encoded <= 32767 ? int(encoded) : int(encoded) - 65536) / 32768.0;
+            };
+            for (int channel = 0; channel < 2; ++channel) {
+                const int inputChannel = std::min(channel, asset.channels - 1);
+                const double a = read(sourceFrame, inputChannel);
+                const double b = read(nextFrame, inputChannel);
+                mixed[index * 2 + channel] += (a + (b - a) * fraction) * source.clip.gain;
+            }
+        }
+    }
+    std::vector<std::int16_t> output(mixed.size());
+    for (std::size_t i = 0; i < mixed.size(); ++i)
+        output[i] = std::int16_t(std::lround(std::clamp(mixed[i], -1.0,
+                                                         32767.0 / 32768.0) * 32768.0));
+    return output;
+}
 } // namespace opentoon

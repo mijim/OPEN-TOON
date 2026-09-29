@@ -9,6 +9,7 @@
 #include "project_store.h"
 #include "image_batch_importer.h"
 #include "scene_renderer.h"
+#include "audio_wav_writer.h"
 #include <QColorSpace>
 #include <QBuffer>
 #include <QDateTime>
@@ -1894,6 +1895,60 @@ bool EditorController::importImageBatch(QVariantList urls, bool sequence) {
                                 : QString("Imported %1 registered PNG parts.").arg(inputs.size());
     report(summary + (batch->hasUntaggedColor ? " Untagged PNGs were interpreted as sRGB." : ""));
     return true;
+}
+void EditorController::exportAudio(QUrl url) {
+    if (exporting_ || !url.isLocalFile())
+        return;
+    const auto destination = url.toLocalFile();
+    if (destination.isEmpty())
+        return;
+    if (exportThread_.joinable())
+        exportThread_.join();
+    exporting_ = true;
+    exportProgress_ = 0;
+    cancelExport_ = false;
+    emit exportChanged();
+    const auto snapshot = session_.snapshot();
+    exportThread_ = std::thread([this, snapshot, destination] {
+        QString error;
+        bool cancelled = false;
+        std::int64_t samples = 0;
+        try {
+            QSaveFile file(destination);
+            if (!file.open(QIODevice::WriteOnly))
+                throw std::runtime_error("Could not create the PCM WAV output.");
+            int lastPercent = -1;
+            const auto result = opentoon::writeAudioWav(*snapshot, file,
+                [this] { return cancelExport_.load(); },
+                [this, &lastPercent](double progress) {
+                    const int percent = int(progress * 100);
+                    if (percent != lastPercent) {
+                        lastPercent = percent;
+                        QMetaObject::invokeMethod(this, [this, progress] {
+                            exportProgress_ = progress;
+                            emit exportChanged();
+                        }, Qt::QueuedConnection);
+                    }
+                });
+            samples = result.sampleFrames;
+            if (cancelExport_)
+                throw opentoon::AudioExportCancelled();
+            if (!file.commit())
+                throw std::runtime_error("Could not commit the PCM WAV output.");
+        } catch (const opentoon::AudioExportCancelled&) {
+            cancelled = true;
+        } catch (const std::exception& e) {
+            error = QString::fromUtf8(e.what());
+        }
+        QMetaObject::invokeMethod(this, [this, destination, samples, cancelled, error] {
+            exporting_ = false;
+            emit exportChanged();
+            report(cancelled ? "Audio export cancelled." :
+                   error.isEmpty() ? QString("Exported %1 audio samples to %2")
+                                        .arg(samples).arg(destination)
+                                   : "Audio export failed: " + error);
+        }, Qt::QueuedConnection);
+    });
 }
 void EditorController::exportFrames(QUrl url) {
     if (exporting_)

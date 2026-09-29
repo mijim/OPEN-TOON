@@ -283,6 +283,11 @@ ApplicationWindow {
                 onTriggered: exportDialog.open()
             }
             Action {
+                text: "Export PCM WAV mix…"
+                enabled: !editor.exporting
+                onTriggered: audioExportDialog.open()
+            }
+            Action {
                 text: "Scene settings…"
                 onTriggered: settingsDialog.open()
             }
@@ -3041,6 +3046,14 @@ ApplicationWindow {
         id: exportDialog
         title: "Choose a folder for a new PNG sequence export"
         onAccepted: editor.exportFrames(selectedFolder)
+    }
+    FileDialog {
+        id: audioExportDialog
+        title: "Export PCM WAV mix"
+        fileMode: FileDialog.SaveFile
+        defaultSuffix: "wav"
+        nameFilters: ["PCM WAV audio (*.wav)"]
+        onAccepted: editor.exportAudio(selectedFile)
     }
     ColorDialog {
         id: colorDialog

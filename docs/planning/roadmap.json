@@ -576,7 +576,7 @@
         {
           "id": "P07-W3",
           "description": "Add video import, video/audio export, GIF and standalone playback; distinguish input decoding support from redistributable output codec profiles. Deliver manual viseme mapping/correction after character substitution contracts; evaluate automatic detection separately after manual editing works.",
-          "status": "planned"
+          "status": "in_progress"
         }
       ],
       "acceptance": [

@@ -147,11 +147,27 @@ int main(int argc, char** argv) {
                     QCoreApplication::processEvents();
                     if (!window->grabWindow().save("build/hm10-audio-smoke.png"))
                         throw std::runtime_error("Cannot capture the audio timeline.");
+                    const auto output = directory.filePath("mix.wav");
+                    editor.exportAudio(QUrl::fromLocalFile(output));
+                    QElapsedTimer timeout;
+                    timeout.start();
+                    while (editor.exporting() && timeout.elapsed() < 15000) {
+                        QCoreApplication::processEvents();
+                        QThread::msleep(1);
+                    }
+                    QFile rendered(output);
+                    if (editor.exporting() || !rendered.open(QIODevice::ReadOnly) ||
+                        rendered.size() != 44 + 96000 * 4)
+                        throw std::runtime_error("Native PCM WAV export length is incorrect.");
+                    const auto mix = rendered.readAll();
+                    if (quint8(mix[44 + 2002 * 4]) != 255 ||
+                        quint8(mix[44 + 2002 * 4 + 1]) != 127)
+                        throw std::runtime_error("Native PCM WAV cue shifted during export.");
                     editor.undo();
                     if (editor.document() != baseline)
                         throw std::runtime_error("WAV import did not undo atomically.");
                     std::cout << "HM-10 audio smoke passed: native PCM16 import, cue waveform, "
-                                 "timeline screenshot and atomic undo.\n";
+                                 "exact WAV mix export, timeline screenshot and atomic undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

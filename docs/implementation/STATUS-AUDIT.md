@@ -15,7 +15,7 @@ complete.
 | Nonfunctional requirements | 15 `partial_evidence`, 12 `proposed_not_measured`, 0 verified | Bounded checks do not satisfy full performance, device, accessibility or release gates. |
 | Open-source libraries | 9 experimentally adopted, 5 selected for plan, 16 candidates | Adopted flags match installed records; future candidates still need their consumer-specific evidence. |
 
-The current macOS system build has 147 passing CTest entries, including native
+The current macOS system build has 148 passing CTest entries, including native
 character-control and PCM16 audio integration. Native dashboard and audio
 timeline smoke checks pass. The last Windows/Linux CI evidence belongs to an
 earlier source commit. The experimental.10 arm64 package was verified locally

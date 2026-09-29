@@ -194,9 +194,11 @@ Import, move, trim, gain and removal are undoable and survive save/reopen.
 
 The format accepts up to 128 MiB per WAV, 512 MiB total audio, 64 assets and 1,000 clips. Clips
 start on whole scene frames, and source-sample trim uses a half-open interval.
-Unsupported or damaged files leave the project unchanged. Audio playback,
-scrubbing, mixing, repeat and sound export are not implemented yet; the
-waveform is a visual timing guide. [HM-10 progress](HM10-PROGRESS.md) records
+Unsupported or damaged files leave the project unchanged. **Scene → Export PCM
+WAV mix** writes a 48 kHz stereo mix from all placed clips. It runs in the
+background and can be cancelled without replacing an existing destination.
+Audio playback, scrubbing, real-time mixing and repeat are not implemented
+yet; the waveform is a visual timing guide. [HM-10 progress](HM10-PROGRESS.md) records
 the current test evidence and remaining work.
 
 ## Animation edits and curves

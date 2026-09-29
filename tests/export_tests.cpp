@@ -4,6 +4,8 @@
 #include "opentoon/audio.h"
 #include "project_store.h"
 #include "scene_renderer.h"
+#include "audio_wav_writer.h"
+#include <QBuffer>
 #include <QCoreApplication>
 #include <QColorSpace>
 #include <QDir>
@@ -16,6 +18,7 @@
 #include <QJsonObject>
 #include <QRect>
 #include <QSettings>
+#include <QSaveFile>
 #include <QStandardPaths>
 #include <QTemporaryDir>
 #include <QThread>
@@ -98,6 +101,72 @@ TEST_CASE("Editor imports a WAV cue, draws exact frame peaks, edits and reopens"
     editor.undo();
     REQUIRE(editor.document().audioClips.size() == 1);
     REQUIRE(before.audioAssets.empty());
+}
+TEST_CASE("PCM WAV mix export has exact rational length and cancellation keeps the destination") {
+    EditorController editor;
+    editor.newScene();
+    QBuffer output;
+    REQUIRE(output.open(QIODevice::ReadWrite));
+    const auto integerResult = opentoon::writeAudioWav(editor.document(), output);
+    REQUIRE(integerResult.sampleFrames == 96000);
+    REQUIRE(output.data().size() == 44 + 96000 * 4);
+    REQUIRE(output.data().left(4) == "RIFF");
+    REQUIRE(output.data().mid(8, 4) == "WAVE");
+    auto fractional = editor.document();
+    fractional.rate = {24000, 1001};
+    QBuffer fractionalOutput;
+    REQUIRE(fractionalOutput.open(QIODevice::ReadWrite));
+    const auto fractionalResult = opentoon::writeAudioWav(fractional, fractionalOutput);
+    REQUIRE(fractionalResult.sampleFrames == 96096);
+    REQUIRE(fractionalOutput.data().size() == 44 + 96096 * 4);
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto target = directory.filePath("existing.wav");
+    QFile prior(target);
+    REQUIRE(prior.open(QIODevice::WriteOnly));
+    REQUIRE(prior.write("keep", 4) == 4);
+    prior.close();
+    {
+        QSaveFile replacement(target);
+        REQUIRE(replacement.open(QIODevice::WriteOnly));
+        REQUIRE_THROWS_AS(opentoon::writeAudioWav(editor.document(), replacement,
+                                                  [] { return true; }),
+                          opentoon::AudioExportCancelled);
+    }
+    REQUIRE(prior.open(QIODevice::ReadOnly));
+    REQUIRE(prior.readAll() == "keep");
+}
+TEST_CASE("Editor exports a reopened PCM cue at its exact output sample") {
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto input = directory.filePath("cue.wav");
+    QFile source(input);
+    REQUIRE(source.open(QIODevice::WriteOnly));
+    REQUIRE(source.write(audioCueWav()) == 44 + 48000 * 2);
+    source.close();
+    EditorController editor;
+    editor.newScene();
+    REQUIRE(editor.importAudio(QUrl::fromLocalFile(input)));
+    const auto project = QUrl::fromLocalFile(directory.filePath("sound.otoon"));
+    REQUIRE(editor.saveProject(project));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(project));
+    const auto firstPath = directory.filePath("mix-one.wav");
+    const auto secondPath = directory.filePath("mix-two.wav");
+    editor.exportAudio(QUrl::fromLocalFile(firstPath));
+    waitForExport(editor);
+    reopened.exportAudio(QUrl::fromLocalFile(secondPath));
+    waitForExport(reopened);
+    QFile first(firstPath), second(secondPath);
+    REQUIRE(first.open(QIODevice::ReadOnly));
+    REQUIRE(second.open(QIODevice::ReadOnly));
+    const auto bytes = first.readAll();
+    REQUIRE(bytes == second.readAll());
+    REQUIRE(bytes.size() == 44 + 96000 * 4);
+    const auto atCue = 44 + 2002 * 4;
+    REQUIRE(quint8(bytes[atCue]) == 255);
+    REQUIRE(quint8(bytes[atCue + 1]) == 127);
+    REQUIRE(bytes.mid(atCue, 2) == bytes.mid(atCue + 2, 2));
 }
 TEST_CASE("Registered PNG parts preserve a shared canvas and undo as one edit") {
     EditorController editor;

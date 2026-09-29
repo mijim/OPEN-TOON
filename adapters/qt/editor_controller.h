@@ -310,6 +310,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE bool trimAudioClip(int clipId, int inSample, int outSample);
     Q_INVOKABLE bool setAudioClipGain(int clipId, double gain);
     Q_INVOKABLE bool removeAudioClip(int clipId);
+    Q_INVOKABLE void exportAudio(QUrl url);
     Q_INVOKABLE void setTransform(QString, double);
     bool hasCopiedTransform() const { return transformClipboard_.has_value(); }
     Q_INVOKABLE void copyTransformPose();

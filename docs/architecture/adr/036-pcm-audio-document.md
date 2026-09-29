@@ -35,15 +35,37 @@ The source WAV remains part of the project after a clip is removed, allowing
 future reuse. Media resources share immutable buffers across document undo
 snapshots. No callback or audio device is created by this format change.
 
+## Offline mix and delivery
+
+The headless `AudioMixPlan` borrows validated immutable source buffers from a
+document snapshot. Its output is 48 kHz stereo PCM16. For each output sample,
+the plan converts elapsed output samples to source-sample position with
+integer quotient/remainder arithmetic, uses linear interpolation between
+adjacent source samples, duplicates mono into both channels and sums every
+active clip after its linear gain. The final sum is clamped to PCM16. Each block
+is addressed by absolute output sample, so no floating-point clock is
+accumulated between blocks. Higher-quality sample-rate conversion remains a
+separate qualification need.
+
+The Qt media adapter writes a standard RIFF/WAVE header and blocks to a
+`QSaveFile` from an immutable scene snapshot. The exported sample count is
+`FrameRate::sampleAt(document.duration, 48000)`. A file beyond the RIFF 4 GiB
+limit is rejected. Cancellation discards the temporary file and preserves an
+older destination. Audio export shares the existing background export status
+and cancellation control with PNG export, so only one job runs at a time.
+
 ## Evidence and limits
 
 Domain tests reject malformed input without mutation, check exact source
 bytes and cue peaks, edit/undo/redo, save/reopen and rational frame mapping.
 The format-15 migration test verifies a readable `.pre-v15.bak` backup. The
 editor test imports a real WAV file, edits a clip, samples its waveform and
-reopens it. Native Qt Quick smoke inspects the audio row and control panel,
-captures `build/hm10-audio-smoke.png`, and undoes import.
+reopens it. Two-source tests cover overlapping clips, gain, 44.1-to-48 kHz
+linear conversion and stereo output. Editor export tests check exact 24 and
+24000/1001 lengths, cancellation preservation and byte-identical mixes after
+reopen. Native Qt Quick smoke inspects the audio row and control panel,
+captures `build/hm10-audio-smoke.png`, checks the exported cue, and undoes import.
 
-Playback, device time, rate conversion, mixing, scrubbing, waveform pyramids,
-repeat and audio export remain HM-10 work. The miniaudio package is not linked
-or claimed as adopted by this subset.
+Playback, device time, higher-quality rate conversion, real-time mixing,
+scrubbing, waveform pyramids and repeat remain HM-10 work. The miniaudio
+package is not linked or claimed as adopted by this subset.

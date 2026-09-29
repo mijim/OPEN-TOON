@@ -70,7 +70,7 @@ Control volume and play multiple synchronized tracks.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — saved clip gain control only, synchronized playback/mixing remains open.
+**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — saved clip gain and deterministic stereo offline mix of overlapping clips, device playback remains open.
 
 **Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
@@ -130,6 +130,10 @@ Export audio by range and synchronize it with rendering.
 
 **Initial acceptance:** Exported duration matches the rational scene range.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — exact-range 48 kHz stereo PCM16 WAV mix from immutable snapshot with cancellation, combined PNG/WAV delivery remains open.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
