@@ -24,8 +24,17 @@ Linear sRGB composites drawing layers in linear light and can look brighter at
 semi-transparent overlaps. The choice is saved with the project, is undoable,
 and applies to canvas preview and PNG export. Current composition is 8-bit CPU
 rendering. Unchanged linear frames are reused while you pan, zoom or rotate the
-view; editing or switching scenes refreshes them. Node topology cannot yet be
-edited in the UI.
+view; editing or switching scenes refreshes them. Open the bottom **Nodes**
+tab to inspect the derived graph. Click an image or matte card to see its
+output at the current frame; matte alpha appears as grayscale. Type a layer
+name or node kind in **Find node** to highlight and scroll to a match; press
+Enter or **Next** for the following match. Search does not edit the project. The tab can
+change drawing order, opacity, opacity bypass, Normal/Multiply/Screen/Add blend mode and cutter settings. Drag a Drawing card onto another to place it immediately above that target in composite order; the target card highlights during the drag. Locked drawings reject the move. Select a Drawing or Part,
+choose a visible source in **Cutter matte**, then use **Outside**, **Bypass**
+or **Paint cutter source** as needed. The last option keeps the source visible
+at its normal layer order while it masks the selected target; it is shared by
+other targets using that source. These edits undo and save. Arbitrary node
+creation, wiring and grouping remain open.
 
 ## Drawing and view controls
 
@@ -65,7 +74,13 @@ To assemble a rigid character, import registered PNG parts and select one layer 
 
 **Rig → Attach unparented drawings** adds every exposed, unlocked root drawing to the selected character as a separate Part in one undoable step. It leaves unexposed guide layers alone and keeps registered artwork in place. In the layer menu, **Duplicate rig branch** copies a selected Part or Peg with its descendants and independent drawing identities; **Clone branch with linked artwork** keeps the same drawing resources while giving the new layers their own timing and view choices. **Rig → Delete selected rig branch** removes a Part or Peg subtree and its saved view choices. **Detach selected part** returns a Part to a root Drawing layer; **Dissolve peg, keep children** removes an unanimated Peg while preserving supported child rest poses. Animated or nonrepresentable cases report an error instead of changing the scene.
 
-Each Part shows its named substitutions as thumbnail tiles in Properties. **+ Blank** starts a new drawing, **Duplicate** copies the currently exposed drawing, and clicking a tile chooses an option at the playhead through the current held interval. The chevrons step through options; arrows reorder them. Rename or remove the selected option in the same panel. A Character view set captures the current choice of every Part. Use **+ Capture**, **Apply** and **Update** to switch coordinated drawings at the playhead without changing transforms; view sets can also be renamed, duplicated or removed. **Rig → Duplicate full character** makes an independent hierarchy and artwork copy. These edits undo, save and reopen with the rest of the rig. View sets contain drawing choices only; masked transform poses and reusable linked rig assets remain future work.
+Each Part shows its named substitutions as thumbnail tiles in Properties. **+ Blank** starts a new drawing, **Duplicate** copies the currently exposed drawing, and clicking a tile chooses an option at the playhead through the current held interval. The chevrons step through options; arrows reorder them. Rename or remove the selected option in the same panel. A Character view set captures the current choice of every Part. Use **+ Capture**, **Apply** and **Update** to switch coordinated drawings at the playhead without changing transforms; view sets can also be renamed, duplicated or removed. **Rig → Duplicate full character** makes an independent hierarchy and artwork copy. These edits undo, save and reopen with the rest of the rig. View sets contain drawing choices only.
+
+**Character poses** in Properties save a named pose at the current frame. Choose **Selected part** or **All parts**, then choose which transform channels or drawing substitutions to include. **+ Capture** records the evaluated pose; **Apply** keys only the chosen numeric channels and changes only included drawings at the playhead. Other channels keep their current values. The **Blend** slider moves from the current pose to the saved pose; a drawing change occurs at 50%. Its drag is one undo step. Rename or remove a pose in the same section. **Mirror** creates a new pose by pairing `_left` and `_right` Part roles, reflecting masked X/rotation/pivot-X offsets from rest and matching included drawings by name. Capture, application and deletion each undo in one step and survive save/reopen. A locked target rejects application. With another Character in the project, choose it beside **Copy to** to transfer the selected pose. Both Characters need unique matching Part roles, matching local rest transforms and unique matching names for included drawing choices. New mirrored or copied poses are unpublished; incompatible mappings leave the project unchanged. Broader rig retargeting, general control bindings and templates are still in progress.
+
+To refine a saved pose, select a Part, choose its channel group, and press **Set this part**. This adds or replaces only that Part's captured entry at the current frame. **Remove part** removes its mapping when another Part remains. The entry list below the controls shows the mapped Parts and channel groups. These edits are undoable and reject an unexposed drawing or an empty final pose.
+
+Choose **Rig** or **Animator** in the top workspace selector. In Rig, use **Show in Animator** on a saved view, pose or selected drawing substitution to publish it. Set its **Control group** to organize published controls; `Main` is the default. Animator shows one published group at a time: view buttons, drawing choices grouped by Part, and the selected published pose's Apply/Blend controls. A compact floating panel in the camera viewport repeats the current group's published pose slider and drawing choices so you can use them beside the character. Dragging its slider changes only the saved pose mask, with one undo per gesture; a drawing choice changes only its Part at the playhead. Group switching and the panel are view state and do not enter exported frames. Changing workspace preserves the selected layer and frame; it does not change output artwork. The workspace choice is stored locally for this computer. Publication and group names are saved in the project and follow an independent character copy with new bindings. General typed widgets, driver conflicts and broader rig retargeting remain in progress.
 
 **Apply range** places the selected view across the selected half-open timeline range while preserving the exposures before and after it. **Set this part** updates just the selected Part's choice in the selected view from the current frame. Arrow controls beside the view selector step through or reorder view sets. Navigation changes selection only; applying a view is the explicit document edit.
 
@@ -139,7 +154,7 @@ Each manual save appends a complete revision. Scene history can restore a saved 
 
 Every 60 seconds, a modified document is saved to a recovery file. On a later launch, recovery can open that snapshot as an unsaved scene. Save it under a chosen name. Autosave runs from an immutable snapshot in a worker, so newer edits stay unsaved until the next save. Manual saves remain synchronous. Recovery from operating-system power loss and multiple simultaneous application instances has not been qualified.
 
-Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and total decoded media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening formats 1–10 remains supported. Format 3 added channel Bézier easing, format 4 added typed character layers and named substitutions, format 5 added character view sets, format 6 saves the composition profile, format 7 added the output camera, format 8 saves mesh bindings, format 9 saves bone/curve controls and animation keys, format 10 introduced parent bone-tip links, and format 11 saves their rest tip and distal direction at attachment time. The first save of an older schema creates a backup named for its source version, such as `.pre-v9.bak`, before upgrading. Older editors require that backup to reopen the original format.
+Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and decoded image media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening formats 1–27 remains supported. Format 3 added channel Bézier easing, format 4 added typed character layers and named substitutions, format 5 added character view sets, format 6 saves the composition profile, format 7 added the output camera, format 8 saves mesh bindings, format 9 saves bone/curve controls and animation keys, format 10 introduced parent bone-tip links, format 11 saves their rest tip and distal direction at attachment time, format 12 adds named masked character poses, format 13 adds publication flags for character poses and views, format 14 adds publication flags for drawing substitutions, format 15 adds published control groups, format 16 adds PCM16 WAV assets and placed clips, format 17 adds nondestructive clip repeats, format 18 adds cutter bindings, format 19 adds Outside coverage, format 20 adds cutter bypass, format 21 adds optional cutter-source painting, format 22 adds source-sample clip fades, format 23 adds per-clip mute, format 24 adds Drawing/Part opacity bypass, and format 25 adds Normal/Multiply/Screen layer blending, format 26 adds per-clip solo, format 27 adds per-clip stereo balance, and format 28 adds Add layer blending. The first save of an older schema creates a backup named for its source version, such as `.pre-v20.bak`, before upgrading. Older editors require that backup to reopen the original format.
 
 **Scene → Compact project history** retains the chosen number of newest saved revisions and removes unreachable media, after creating a full `.pre-compact.bak` backup. Save pending edits first. This is an explicit operation and is not part of autosave.
 
@@ -172,9 +187,65 @@ frames, which the status bar counts. Both batch modes have a 4096 × 4096 pixel/
 limit, a 256 MiB decoded-media limit and an undoable all-or-nothing commit. Cancel
 the file chooser to leave the document untouched. The project format also enforces
 its overall scene media limit. Parts currently share a centered layer offset; there
-is no automatic character-role assignment; use the Rig controls after import. Layered PSD, audio, video
+is no automatic character-role assignment; use the Rig controls after import. Layered PSD, audio playback, video
 output, lip sync, animated deformers, node effects, OCIO, reusable rig libraries and
 production installers remain pending. Consult the [phase status](STATUS.md).
+
+## Audio timing subset
+
+Choose **Scene → Import PCM16 WAV** to place a local mono or stereo 16-bit PCM
+file at the current frame. A separate row below the drawing layers shows its
+waveform; its exact peak index follows the timeline's frame width. Drag the
+waveform to move its clip by whole frames; release commits one undo step and
+Escape cancels. The Audio section in the right panel edits the clip's start
+frame, source in/out samples, linear gain and a repeat count from 1 to 64.
+Enter both sample endpoints and choose **Set** to trim. **Duplicate** creates
+another placement at the playhead with the same trim, gain, repeats and fades;
+both clips share the embedded source. **Remove clip**
+removes its placement while leaving the source available to its other copies.
+For a 48 kHz single-pass clip, drag the small middle handle at either waveform
+edge to trim by whole scene frames. The left handle keeps source time aligned
+while moving the clip start; the right handle changes the source out-sample.
+Escape cancels a drag. Other source rates and repeated clips use the numeric
+sample fields.
+**Split** at an interior playhead frame divides one 48 kHz, single-pass clip
+into two placements sharing the same WAV. The cut must leave samples on both
+sides and stay outside the fade intervals. At 48 kHz output the before/after
+mix is sample-identical; other source rates and repeated clips currently
+report an error. Playback at another device rate may differ near the cut.
+**Mute** removes that clip from playback, scrub and WAV export while keeping
+the placement and waveform visible in a dim state; **Unmute** restores it.
+**Solo** isolates that clip with any other soloed clips in playback, scrub and
+WAV export. Mute still silences a soloed clip. **Unsolo** restores the shared
+mix. Clips excluded by solo remain visible with dim waveforms.
+**Balance** ranges from -1 (left) through 0 (center) to +1 (right). It
+attenuates the opposite output channel without changing the original WAV;
+preview and WAV export use the saved setting.
+**Linear fades · source samples** sets fade-in and fade-out lengths across
+the whole repeated clip; a repeat boundary does not restart the envelope.
+The waveform shows source peaks and gain with fade guides over the clip;
+preview and WAV export apply the fades. Shortening a trim or repeat count
+clamps fades to fit. Drag the small upper handle at either guide to adjust
+that fade directly; Escape cancels and release makes one undoable edit.
+Import, duplication, split, mute, solo, move, trim, gain and removal are undoable and survive
+save/reopen.
+
+The format accepts up to 128 MiB per WAV, 512 MiB total audio, 64 assets and 1,000 clips. Clips
+start on whole scene frames, and source-sample trim uses a half-open interval.
+Repeats join the trimmed source interval in sample time without editing the
+original WAV.
+Unsupported or damaged files leave the project unchanged. **Scene → Export PCM
+WAV mix** writes a 48 kHz stereo mix from all placed clips. It runs in the
+background and can be cancelled without replacing an existing destination.
+**Play** previews the placed clips through the output device, follows its
+submitted sample cursor, and loops at the scene end. Clicking or dragging the
+playhead while playing seeks the audio. With playback stopped, press and drag
+across the timeline ruler or drawing rows to hear short fragments at each
+frame; release stops the sound. Editing stops playback so the next
+preview uses the new document. If the device cannot open, the visual preview
+continues silently and shows an error. Hardware scrub quality and device-loss
+recovery are still open. [HM-10 progress](HM10-PROGRESS.md) records
+the current test evidence and remaining work.
 
 ## Animation edits and curves
 

@@ -48,7 +48,9 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
               {"layers", Json::array()},
               {"drawings", Json::array()},
               {"palette", Json::array()},
-              {"markers", Json::array()}};
+              {"markers", Json::array()},
+              {"audioAssets", Json::array()},
+              {"audioClips", Json::array()}};
     for (auto s : d.palette)
         j["palette"].push_back({{"id", s.id}, {"name", s.name}, {"color", color(s.color)}});
     for (const auto& [id, drawing] : d.drawings) {
@@ -102,10 +104,17 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
                   {"locked", l.locked},
                   {"solo", l.solo},
                   {"parent", l.parent},
+                  {"matte", l.matte},
+                  {"invertMatte", l.invertMatte},
+                  {"matteBypassed", l.matteBypassed},
+                  {"paintMatteSource", l.paintMatteSource},
+                  {"opacityBypassed", l.opacityBypassed},
+                  {"blendMode", static_cast<int>(l.blendMode)},
                   {"kind", static_cast<int>(l.kind)},
                   {"role", l.role},
                   {"variants", Json::array()},
                   {"views", Json::array()},
+                  {"poses", Json::array()},
                   {"bindings", Json::array()},
                   {"transform", transform(l.transform)},
                   {"exposures", Json::array()},
@@ -118,12 +127,25 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
         for (auto e : l.exposures)
             x["exposures"].push_back({e.start, e.end, e.drawing});
         for (const auto& variant : l.variants)
-            x["variants"].push_back({{"drawing", variant.drawing}, {"name", variant.name}});
+            x["variants"].push_back({{"drawing", variant.drawing}, {"name", variant.name},
+                                      {"published", variant.published},
+                                      {"controlGroup", variant.controlGroup}});
         for (const auto& view : l.views) {
             Json choices = Json::array();
             for (const auto& choice : view.choices)
                 choices.push_back({choice.part, choice.drawing});
-            x["views"].push_back({{"id", view.id}, {"name", view.name}, {"choices", choices}});
+            x["views"].push_back({{"id", view.id}, {"name", view.name},
+                                  {"choices", choices}, {"published", view.published},
+                                  {"controlGroup", view.controlGroup}});
+        }
+        for (const auto& pose : l.poses) {
+            Json parts = Json::array();
+            for (const auto& part : pose.parts)
+                parts.push_back({{"part", part.part}, {"channels", part.channels},
+                                 {"transform", transform(part.transform)}, {"drawing", part.drawing}});
+            x["poses"].push_back({{"id", pose.id}, {"name", pose.name},
+                                  {"parts", parts}, {"published", pose.published},
+                                  {"controlGroup", pose.controlGroup}});
         }
         for (const auto& binding : l.bindings) {
             Json vertices = Json::array();
@@ -184,6 +206,25 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
     }
     for (const auto& m : d.markers)
         j["markers"].push_back({m.frame, m.name});
+    for (const auto& asset : d.audioAssets) {
+        Json entry = {{"id", asset.id}, {"name", asset.name},
+                      {"sampleRate", asset.sampleRate}, {"channels", asset.channels},
+                      {"sampleFrames", asset.sampleFrames}};
+        if (write)
+            entry["resource"] = write({asset.wav.data(), asset.wav.size()});
+        else
+            entry["wav"] = asset.wav.values();
+        j["audioAssets"].push_back(std::move(entry));
+    }
+    for (const auto& clip : d.audioClips)
+        j["audioClips"].push_back({{"id", clip.id}, {"asset", clip.asset},
+                                   {"start", clip.start}, {"inSample", clip.inSample},
+                                   {"outSample", clip.outSample}, {"gain", clip.gain},
+                                   {"repeats", clip.repeats},
+                                   {"fadeInSamples", clip.fadeInSamples},
+                                   {"fadeOutSamples", clip.fadeOutSamples},
+                                   {"muted", clip.muted}, {"solo", clip.solo},
+                                   {"balance", clip.balance}});
     return j.dump();
 }
 Document deserializeDocument(const std::string& text, ResourceReader read) {
@@ -215,6 +256,42 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
     limit(j.at("drawings"), 50000);
     limit(j.at("layers"), 2000);
     limit(j.at("markers"), 1000000);
+    if (j.at("version").get<int>() >= 16) {
+        limit(j.at("audioAssets"), 64);
+        limit(j.at("audioClips"), 1000);
+        std::size_t audioBytes = 0;
+        for (const auto& entry : j.at("audioAssets")) {
+            std::vector<std::uint8_t> bytes;
+            if (entry.contains("resource")) {
+                if (!read)
+                    throw std::runtime_error("An external audio resource resolver is required.");
+                bytes = read(entry.at("resource"));
+            } else
+                bytes = entry.at("wav").get<std::vector<std::uint8_t>>();
+            audioBytes += bytes.size();
+            if (bytes.size() > 128 * 1024 * 1024 || audioBytes > 512 * 1024 * 1024)
+                throw std::runtime_error("Audio asset exceeds the import budget.");
+            d.audioAssets.push_back({entry.at("id"), entry.at("name"),
+                                     entry.at("sampleRate"), entry.at("channels"),
+                                     entry.at("sampleFrames"), std::move(bytes)});
+        }
+        for (const auto& entry : j.at("audioClips"))
+            d.audioClips.push_back({entry.at("id"), entry.at("asset"),
+                                    entry.at("start"), entry.at("inSample"),
+                                    entry.at("outSample"), entry.at("gain"),
+                                    j.at("version").get<int>() >= 17
+                                        ? entry.at("repeats").get<int>() : 1,
+                                    j.at("version").get<int>() >= 22
+                                        ? entry.at("fadeInSamples").get<std::uint64_t>() : 0,
+                                    j.at("version").get<int>() >= 22
+                                        ? entry.at("fadeOutSamples").get<std::uint64_t>() : 0,
+                                    j.at("version").get<int>() >= 23
+                                        ? entry.at("muted").get<bool>() : false,
+                                    j.at("version").get<int>() >= 26
+                                        ? entry.at("solo").get<bool>() : false,
+                                    j.at("version").get<int>() >= 27
+                                        ? entry.at("balance").get<double>() : 0});
+    }
     for (const auto& s : j.at("palette"))
         d.palette.push_back({s.at("id"), s.at("name"), readColor(s.at("color"))});
     std::size_t points = 0, pixels = 0;
@@ -303,6 +380,22 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
         l.locked = x.at("locked");
         l.solo = x.at("solo");
         l.parent = x.at("parent");
+        if (j.at("version").get<int>() >= 18)
+            l.matte = x.at("matte");
+        if (j.at("version").get<int>() >= 19)
+            l.invertMatte = x.at("invertMatte");
+        if (j.at("version").get<int>() >= 20)
+            l.matteBypassed = x.at("matteBypassed");
+        if (j.at("version").get<int>() >= 21)
+            l.paintMatteSource = x.at("paintMatteSource");
+        if (j.at("version").get<int>() >= 24)
+            l.opacityBypassed = x.at("opacityBypassed");
+        if (j.at("version").get<int>() >= 25) {
+            const int mode = x.at("blendMode").get<int>();
+            if (j.at("version").get<int>() < 28 && mode > int(LayerBlendMode::Screen))
+                throw std::runtime_error("An older project contains an unsupported blend mode.");
+            l.blendMode = static_cast<LayerBlendMode>(mode);
+        }
         if (j.at("version").get<int>() >= 11) {
             const auto& anchor = x.at("boneTipAnchor");
             if (!anchor.is_null())
@@ -317,7 +410,10 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
             l.role = x.at("role").get<std::string>();
             limit(x.at("variants"), 10000);
             for (const auto& variant : x.at("variants"))
-                l.variants.push_back({variant.at("drawing"), variant.at("name")});
+                l.variants.push_back({variant.at("drawing"), variant.at("name"),
+                    j.at("version").get<int>() >= 14 ? variant.at("published").get<bool>() : false,
+                    j.at("version").get<int>() >= 15 ? variant.at("controlGroup").get<std::string>()
+                                                      : "Main"});
         }
         if (j.at("version").get<int>() >= 5) {
             limit(x.at("views"), 1000);
@@ -325,10 +421,31 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
                 CharacterView entry;
                 entry.id = view.at("id");
                 entry.name = view.at("name");
+                if (j.at("version").get<int>() >= 13)
+                    entry.published = view.at("published");
+                if (j.at("version").get<int>() >= 15)
+                    entry.controlGroup = view.at("controlGroup");
                 limit(view.at("choices"), 2000);
                 for (const auto& choice : view.at("choices"))
                     entry.choices.push_back({choice.at(0), choice.at(1)});
                 l.views.push_back(std::move(entry));
+            }
+        }
+        if (j.at("version").get<int>() >= 12) {
+            limit(x.at("poses"), 1000);
+            for (const auto& pose : x.at("poses")) {
+                CharacterPose entry;
+                entry.id = pose.at("id");
+                entry.name = pose.at("name");
+                if (j.at("version").get<int>() >= 13)
+                    entry.published = pose.at("published");
+                if (j.at("version").get<int>() >= 15)
+                    entry.controlGroup = pose.at("controlGroup");
+                limit(pose.at("parts"), 2000);
+                for (const auto& part : pose.at("parts"))
+                    entry.parts.push_back({part.at("part"), part.at("channels"),
+                                           readTransform(part.at("transform")), part.at("drawing")});
+                l.poses.push_back(std::move(entry));
             }
         }
         if (j.at("version").get<int>() >= 8) {

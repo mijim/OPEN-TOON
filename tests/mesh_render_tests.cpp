@@ -379,17 +379,22 @@ TEST_CASE("Nineteen Harmony parts keep rest pixels and bounded posed render cost
         "/tests/fixtures/harmony-moment/reference_0000.png"))
         .convertToFormat(QImage::Format_ARGB32_Premultiplied);
     REQUIRE(baseline.size() == reference.size());
+    int edgePixels = 0, maxDifference = 0;
     for (int y = 0; y < baseline.height(); ++y)
-        if (std::memcmp(baseline.constScanLine(y), reference.constScanLine(y),
-                        baseline.width() * 4) != 0) {
-            for (int x = 0; x < baseline.width(); ++x)
-                if (baseline.pixel(x, y) != reference.pixel(x, y)) {
-                    std::fprintf(stderr, "First reference difference at %d,%d: %08x versus %08x\n",
-                                 x, y, baseline.pixel(x, y), reference.pixel(x, y));
-                    break;
-                }
-            FAIL("Original character pixels differ from reference");
+        for (int x = 0; x < baseline.width(); ++x) {
+            const auto rendered = baseline.pixel(x, y);
+            const auto sampled = reference.pixel(x, y);
+            const int difference = std::max({std::abs(qRed(rendered) - qRed(sampled)),
+                                             std::abs(qGreen(rendered) - qGreen(sampled)),
+                                             std::abs(qBlue(rendered) - qBlue(sampled)),
+                                             std::abs(qAlpha(rendered) - qAlpha(sampled))});
+            edgePixels += difference > 0;
+            maxDifference = std::max(maxDifference, difference);
         }
+    INFO("Independent antialiased reference differs at " << edgePixels
+         << " pixels, maximum channel difference " << maxDifference);
+    REQUIRE(maxDifference <= 2);
+    REQUIRE(edgePixels < 20000);
     REQUIRE(SceneRenderer::render(document, 12) == baseline);
     for (const Id part : parts) {
         const Id drawing = document.layer(part).exposures.front().drawing;
@@ -896,13 +901,40 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
     REQUIRE(reopenedView == viewSession.document());
     REQUIRE(SceneRenderer::render(reopenedView, 36) == expressiveFrame);
     REQUIRE(SceneRenderer::render(reopenedView, 44) == returnedFrame);
+    auto polishedView = reopenedView;
+    for (const auto& key : keys) {
+        const Id part = partIds.value(key.role);
+        const Id follower = partIds.value(key.follower);
+        detachPartFromBoneTip(polishedView, follower);
+        std::vector<std::pair<Id, BoneChain>> controls;
+        for (const auto& binding : polishedView.layer(part).bindings)
+            if (binding.bone)
+                controls.emplace_back(binding.drawing, *binding.bone);
+        REQUIRE_FALSE(controls.empty());
+        for (const auto& [drawing, originalBone] : controls) {
+            removeMeshDeformer(polishedView, part, drawing);
+            bindContourImageMesh(polishedView, part, drawing, 6, 16);
+            bindBoneChain(polishedView, part, drawing, originalBone.restJoints, 40);
+            for (const auto& pose : originalBone.keys)
+                recordBonePose(polishedView, part, drawing, pose.frame,
+                               pose.shoulderAngle, pose.elbowAngle,
+                               pose.interpolation);
+        }
+        attachPartToBoneTip(polishedView, follower, part);
+    }
+    polishedView.validate();
+    REQUIRE(SceneRenderer::render(polishedView, 0) == rest);
+    for (const Frame frame : {24, 36, 44}) {
+        const auto [connected, ink] = connectedInk(SceneRenderer::render(polishedView, frame));
+        REQUIRE(connected == ink);
+    }
     if (qEnvironmentVariableIsSet("OPENTOON_HM06_VIEW_PROJECT")) {
         const auto output = qEnvironmentVariable("OPENTOON_HM06_VIEW_PROJECT");
-        REQUIRE(ProjectStore::save(std::filesystem::path(output.toStdString()), reopenedView) > 0);
+        REQUIRE(ProjectStore::save(std::filesystem::path(output.toStdString()), polishedView) > 0);
     }
     const auto bundledExample = ProjectStore::load(std::filesystem::path(
         OPENTOON_SOURCE_DIR "/examples/clockwork-continuous.otoon")).document;
-    REQUIRE(bundledExample == reopenedView);
+    REQUIRE(bundledExample == polishedView);
     auto folded = document;
     const Id foldedArm = partIds.value("arm_left");
     const Id foldedDrawing = folded.layer(foldedArm).exposures.front().drawing;
@@ -960,6 +992,7 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
                       std::invalid_argument);
     REQUIRE(overlySharp == contoured);
     REQUIRE(SceneRenderer::render(contoured, 0) == rest);
+    REQUIRE(SceneRenderer::render(contoured, 24).save("hm06-contour-bend-24.png"));
     const auto contourFrame = SceneRenderer::render(contoured, 36);
     const auto [contourConnected, contourInk] = connectedInk(contourFrame);
     REQUIRE(contourConnected == contourInk);

@@ -1,5 +1,6 @@
 #pragma once
 #include "opentoon/drawing_selection.h"
+#include "opentoon/audio.h"
 #include "opentoon/key_block.h"
 #include "opentoon/session.h"
 #include "opentoon/timeline.h"
@@ -12,7 +13,10 @@
 #include <QUrl>
 #include <QVariantList>
 #include <atomic>
+#include <map>
+#include <memory>
 #include <thread>
+namespace opentoon { class AudioDevice; }
 class EditorController final : public QObject {
     Q_OBJECT
     Q_PROPERTY(bool animateMode READ animateMode WRITE setAnimateMode NOTIFY animationModeChanged)
@@ -34,7 +38,9 @@ class EditorController final : public QObject {
     Q_PROPERTY(bool canUndo READ canUndo NOTIFY changed)
     Q_PROPERTY(bool canRedo READ canRedo NOTIFY changed)
     Q_PROPERTY(QVariantList layers READ layers NOTIFY changed)
+    Q_PROPERTY(QVariantList compositionNodes READ compositionNodes NOTIFY changed)
     Q_PROPERTY(QVariantList substitutions READ substitutions NOTIFY changed)
+    Q_PROPERTY(QVariantList publishedCharacterSubstitutions READ publishedCharacterSubstitutions NOTIFY frameChanged)
     Q_PROPERTY(int selectedSubstitution READ selectedSubstitution NOTIFY frameChanged)
     Q_PROPERTY(bool selectedMeshBound READ selectedMeshBound NOTIFY frameChanged)
     Q_PROPERTY(int selectedMeshDeformer READ selectedMeshDeformer NOTIFY frameChanged)
@@ -48,6 +54,13 @@ class EditorController final : public QObject {
     Q_PROPERTY(int characterId READ characterId NOTIFY changed)
     Q_PROPERTY(QVariantList characterViews READ characterViews NOTIFY changed)
     Q_PROPERTY(int selectedView READ selectedView NOTIFY viewSelectionChanged)
+    Q_PROPERTY(QVariantList characterPoses READ characterPoses NOTIFY changed)
+    Q_PROPERTY(QVariantList audioClips READ audioClips NOTIFY changed)
+    Q_PROPERTY(QVariantList characterControlGroups READ characterControlGroups NOTIFY changed)
+    Q_PROPERTY(QString selectedControlGroup READ selectedControlGroup WRITE setSelectedControlGroup NOTIFY controlGroupChanged)
+    Q_PROPERTY(QVariantList poseTransferTargets READ poseTransferTargets NOTIFY changed)
+    Q_PROPERTY(int selectedCharacterPose READ selectedCharacterPose NOTIFY poseSelectionChanged)
+    Q_PROPERTY(QString workspaceMode READ workspaceMode WRITE setWorkspaceMode NOTIFY workspaceModeChanged)
     Q_PROPERTY(qulonglong documentRevision READ documentRevision NOTIFY changed)
     Q_PROPERTY(QVariantList palette READ palette NOTIFY changed)
     Q_PROPERTY(QVariantList revisions READ revisions NOTIFY changed)
@@ -128,7 +141,10 @@ class EditorController final : public QObject {
     bool canUndo() const { return session_.canUndo(); }
     bool canRedo() const { return session_.canRedo(); }
     QVariantList layers() const;
+    QVariantList compositionNodes() const;
+    Q_INVOKABLE QString compositionNodePreview(int nodeId) const;
     QVariantList substitutions() const;
+    QVariantList publishedCharacterSubstitutions() const;
     int selectedSubstitution() const;
     bool selectedMeshBound() const;
     int characterId() const;
@@ -137,6 +153,17 @@ class EditorController final : public QObject {
     qulonglong documentRevision() const { return session_.revision(); }
     Q_INVOKABLE QString substitutionThumbnail(int drawing) const;
     Q_INVOKABLE void selectView(int view);
+    QVariantList characterPoses() const;
+    QVariantList audioClips() const;
+    Q_INVOKABLE QVariantList audioWaveform(int clipId, int firstFrame, int frameCount) const;
+    QVariantList characterControlGroups() const;
+    QString selectedControlGroup() const;
+    void setSelectedControlGroup(QString group);
+    QVariantList poseTransferTargets() const;
+    int selectedCharacterPose() const;
+    Q_INVOKABLE void selectCharacterPose(int pose);
+    QString workspaceMode() const { return workspaceMode_; }
+    void setWorkspaceMode(QString mode);
     QVariantList palette() const;
     QVariantList revisions() const;
     QVariantMap transform() const;
@@ -207,7 +234,14 @@ class EditorController final : public QObject {
     Q_INVOKABLE void renameLayer(int, QString);
     Q_INVOKABLE void toggleLayer(int, QString);
     Q_INVOKABLE void moveLayer(int);
+    Q_INVOKABLE bool moveDrawingAfter(int sourceLayer, int targetLayer);
     Q_INVOKABLE void setParent(int);
+    Q_INVOKABLE bool setLayerMatte(int sourceLayer);
+    Q_INVOKABLE bool setMatteInverted(bool inverted);
+    Q_INVOKABLE bool setMatteBypassed(bool bypassed);
+    Q_INVOKABLE bool setOpacityBypassed(bool bypassed);
+    Q_INVOKABLE bool setLayerBlendMode(int mode);
+    Q_INVOKABLE bool setMatteSourceVisible(bool visible);
     Q_INVOKABLE void makeCharacter();
     Q_INVOKABLE void attachUnparentedDrawings();
     Q_INVOKABLE void addPeg();
@@ -219,6 +253,9 @@ class EditorController final : public QObject {
     Q_INVOKABLE void centerRestPivot();
     Q_INVOKABLE void createSubstitution(bool duplicate = false);
     Q_INVOKABLE void renameSubstitution(int drawing, QString name);
+    Q_INVOKABLE void setSelectedSubstitutionPublished(bool published);
+    Q_INVOKABLE void setSelectedSubstitutionControlGroup(QString group);
+    Q_INVOKABLE bool applyPublishedSubstitution(int part, int drawing);
     Q_INVOKABLE void selectSubstitution(int drawing);
     Q_INVOKABLE void removeSubstitution(int drawing);
     Q_INVOKABLE void moveSubstitution(int drawing, int direction);
@@ -257,6 +294,21 @@ class EditorController final : public QObject {
     Q_INVOKABLE void removeCharacterView();
     Q_INVOKABLE void moveCharacterView(int direction);
     Q_INVOKABLE void stepCharacterView(int direction);
+    Q_INVOKABLE void captureSelectedCharacterPose(int channels, bool allParts);
+    Q_INVOKABLE void applySelectedCharacterPose();
+    Q_INVOKABLE void renameSelectedCharacterPose(QString name);
+    Q_INVOKABLE void removeSelectedCharacterPose();
+    Q_INVOKABLE void setSelectedCharacterPosePublished(bool published);
+    Q_INVOKABLE void setSelectedViewPublished(bool published);
+    Q_INVOKABLE void setSelectedCharacterPoseControlGroup(QString group);
+    Q_INVOKABLE void setSelectedViewControlGroup(QString group);
+    Q_INVOKABLE void setSelectedPartInCharacterPose(int channels);
+    Q_INVOKABLE void removeSelectedPartFromCharacterPose();
+    Q_INVOKABLE bool transferSelectedCharacterPose(int targetCharacter);
+    Q_INVOKABLE bool mirrorSelectedCharacterPose();
+    Q_INVOKABLE void beginSelectedCharacterPoseBlend();
+    Q_INVOKABLE bool updateSelectedCharacterPoseBlend(double amount);
+    Q_INVOKABLE void endSelectedCharacterPoseBlend();
     Q_INVOKABLE void duplicateCharacter();
     Q_INVOKABLE void newDrawing(bool duplicate = false);
     Q_INVOKABLE void holdDrawing(int);
@@ -267,6 +319,21 @@ class EditorController final : public QObject {
     Q_INVOKABLE void addSwatch(QColor);
     Q_INVOKABLE void setSwatchColor(int, QColor);
     Q_INVOKABLE void setScene(QString, int, int, int, int, int);
+    Q_INVOKABLE bool importAudio(QUrl url);
+    Q_INVOKABLE bool moveAudioClip(int clipId, int start);
+    Q_INVOKABLE bool duplicateAudioClip(int clipId, int start);
+    Q_INVOKABLE bool splitAudioClip(int clipId, int frame);
+    Q_INVOKABLE bool trimAudioClip(int clipId, int inSample, int outSample);
+    Q_INVOKABLE bool trimAudioClipAtFrame(int clipId, int frame, bool leftEdge);
+    Q_INVOKABLE bool setAudioClipGain(int clipId, double gain);
+    Q_INVOKABLE bool setAudioClipRepeats(int clipId, int repeats);
+    Q_INVOKABLE bool setAudioClipFades(int clipId, int fadeInSamples, int fadeOutSamples);
+    Q_INVOKABLE bool setAudioClipMuted(int clipId, bool muted);
+    Q_INVOKABLE bool setAudioClipSolo(int clipId, bool solo);
+    Q_INVOKABLE bool setAudioClipBalance(int clipId, double balance);
+    Q_INVOKABLE bool removeAudioClip(int clipId);
+    Q_INVOKABLE void exportAudio(QUrl url);
+    Q_INVOKABLE void exportAudioRange(QUrl url, int start, int end);
     Q_INVOKABLE void setTransform(QString, double);
     bool hasCopiedTransform() const { return transformClipboard_.has_value(); }
     Q_INVOKABLE void copyTransformPose();
@@ -281,6 +348,10 @@ class EditorController final : public QObject {
     Q_INVOKABLE void addKey(int interpolation = 0);
     Q_INVOKABLE void deleteKey();
     Q_INVOKABLE void togglePlayback();
+    Q_INVOKABLE QVariantMap playbackDiagnostics() const;
+    Q_INVOKABLE void beginAudioScrub();
+    Q_INVOKABLE void endAudioScrub();
+    bool audioScrubbing() const;
     Q_INVOKABLE void importImage(QUrl);
     Q_INVOKABLE bool importParts(QVariantList urls);
     Q_INVOKABLE bool importImageSequence(QVariantList urls);
@@ -293,6 +364,9 @@ class EditorController final : public QObject {
     void keySelectionChanged();
     void poseClipboardChanged();
     void viewSelectionChanged();
+    void poseSelectionChanged();
+    void workspaceModeChanged();
+    void controlGroupChanged();
     void animationModeChanged();
     void rangeChanged();
     void changed();
@@ -313,6 +387,14 @@ class EditorController final : public QObject {
     opentoon::KeyBlock poseClipboard_;
     std::optional<opentoon::Transform> transformClipboard_;
     opentoon::Id selectedView_ = 0;
+    opentoon::Id selectedCharacterPose_ = 0;
+    QString workspaceMode_ = "Rig";
+    QString selectedControlGroup_ = "Main";
+    std::uint64_t poseBlendSerial_ = 0;
+    std::uint64_t poseBlendGesture_ = 0;
+    opentoon::Id poseBlendRoot_ = 0;
+    opentoon::Id poseBlendPose_ = 0;
+    opentoon::Frame poseBlendFrame_ = 0;
     mutable std::uint64_t thumbnailRevision_ = 0;
     mutable QHash<qulonglong, QString> thumbnailCache_;
     void reconcilePoseSelection();
@@ -332,6 +414,11 @@ class EditorController final : public QObject {
     QTimer playTimer_, autosaveTimer_;
     QElapsedTimer playClock_;
     int playStart_ = 0;
+    std::unique_ptr<opentoon::AudioDevice> audioDevice_;
+    std::unique_ptr<opentoon::AudioDevice> scrubDevice_;
+    std::uint64_t playbackCallbacks_ = 0, playbackProcessingOverruns_ = 0;
+    std::uint64_t playbackMaximumCallbackNanoseconds_ = 0, skippedPlayheadFrames_ = 0;
+    mutable std::map<opentoon::Id, opentoon::AudioPeakIndex> audioPeakCache_;
     std::int64_t diskRevision_ = -1;
     bool exporting_ = false;
     double exportProgress_ = 0;

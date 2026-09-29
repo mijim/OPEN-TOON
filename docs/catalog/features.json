@@ -207,7 +207,7 @@
         "Switching workspaces preserves the selection and current frame."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "workspace",
@@ -215,7 +215,8 @@
         "PRJ"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; grouped published pose/view/drawing dashboard and compact viewport controls, full catalog acceptance open"
     },
     {
       "id": "UI-003",
@@ -2639,7 +2640,7 @@
         "Applying a pose does not overwrite properties outside its set."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "rigging",
@@ -2648,7 +2649,8 @@
         "VEC"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; masked capture/apply, compatible in-project role/drawing transfer and paired-role mirror, broader retargeting acceptance open"
     },
     {
       "id": "RIG-013",
@@ -3013,7 +3015,7 @@
         "Dragging a widget changes only its linked attributes."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "advanced",
       "owner_module": "controllers",
@@ -3022,7 +3024,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; bounded viewport pose slider and published Part drawing choices, general typed bindings and control placement remain open"
     },
     {
       "id": "CTL-002",
@@ -3033,7 +3036,7 @@
         "At each sample position, the controller reproduces the captured pose exactly."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "advanced",
       "owner_module": "controllers",
@@ -3042,7 +3045,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; bounded published pose/view dashboard subset, full catalog acceptance open"
     },
     {
       "id": "CTL-003",
@@ -3073,7 +3077,7 @@
         "A switch can show a control set without altering the render."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "advanced",
       "owner_module": "controllers",
@@ -3082,7 +3086,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; named groups filter published pose/view/drawing controls in Animator, general binding wizard remains open"
     },
     {
       "id": "CTL-005",
@@ -3093,7 +3098,7 @@
         "Duplicating the character creates independent bindings."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "advanced",
       "owner_module": "controllers",
@@ -3102,7 +3107,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; grouped published pose/view/drawing dashboard and compact viewport controls, full catalog acceptance open"
     },
     {
       "id": "CTL-006",
@@ -3430,7 +3436,7 @@
         "Deleting a node reconnects only according to the chosen option."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "compositor-graph",
@@ -3439,7 +3445,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The derived graph offers clickable image/matte previews, name/kind search and direct Drawing-card reordering of saved composite order. Arbitrary node creation, wiring, deletion and layout remain open.",
+      "implementation_evidence": "docs/implementation/HM12-PROGRESS.md; native Drawing-card drag, typed search/navigation, pixel order, undo/reopen and invalid-target checks"
     },
     {
       "id": "NOD-002",
@@ -3520,8 +3527,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "Ordered Over and alpha composition work. Depth modes and broader compositing operators remain open.",
-      "implementation_evidence": "docs/implementation/HM04-ACCEPTANCE.md; ordered premultiplied Over and alpha-chart evidence"
+      "notes": "Ordered Over, alpha, visible cutter-source painting, derived animated Opacity and saved Normal/Multiply/Screen/Add layer blending work. Depth modes and broader compositing operators remain open.",
+      "implementation_evidence": "docs/implementation/HM04-ACCEPTANCE.md; docs/implementation/HM12-PROGRESS.md; ordered premultiplied Over, fractional Multiply/Screen/Add blends, alpha charts and keyed opacity/cutter/source-paint evidence"
     },
     {
       "id": "NOD-006",
@@ -3541,8 +3548,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "Internal alpha mattes work. Editable cutters, inversion controls and wider matte operators remain open.",
-      "implementation_evidence": "docs/implementation/HM04-ACCEPTANCE.md; internal alpha-matte extraction and multiplication"
+      "notes": "Editable Drawing/Part cutters, fractional inside/outside inversion and optional source painting work; wider matte operators remain open.",
+      "implementation_evidence": "docs/implementation/HM04-ACCEPTANCE.md; docs/implementation/HM12-PROGRESS.md; fractional source alpha, inversion, opacity, visible source, undo and reopen"
     },
     {
       "id": "NOD-007",
@@ -3603,8 +3610,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "Revision-aware cache and invalidation work. User-controlled node bypass remains open.",
-      "implementation_evidence": "docs/implementation/HM04-ACCEPTANCE.md; revision-aware preview cache and affected-descendant invalidation"
+      "notes": "Revision-aware cache and persistent cutter and layer-opacity bypass work. General user-controlled node bypass remains open.",
+      "implementation_evidence": "docs/implementation/HM04-ACCEPTANCE.md; docs/implementation/HM12-PROGRESS.md; revision-aware preview cache, inactive cutter dependency isolation, keyed opacity bypass, undo and reopen"
     },
     {
       "id": "NOD-010",
@@ -4175,7 +4182,7 @@
         "An incompatible file reports an error without leaving an empty track."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "audio",
@@ -4184,7 +4191,8 @@
         "RIG"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM10-PROGRESS.md; bounded mono/stereo PCM16 WAV import preserves original bytes and rejects incompatible input atomically"
     },
     {
       "id": "AUD-002",
@@ -4195,7 +4203,7 @@
         "The reference peak aligns with its audio sample."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "audio",
@@ -4204,7 +4212,8 @@
         "RIG"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM10-PROGRESS.md; exact-edge 256-sample peak tree answers rational per-frame timeline queries across zoom levels and reuses immutable assets"
     },
     {
       "id": "AUD-003",
@@ -4215,7 +4224,7 @@
         "Trimming and undoing restores the complete audio."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "audio",
@@ -4224,7 +4233,8 @@
         "RIG"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM10-PROGRESS.md; format-17 1–64 sample-contiguous repeats of the nondestructively trimmed source, format-22 source-sample fade clamping, frame placement, native waveform drag, direct 48 kHz frame-edge trim, asset-sharing duplication and exact 48 kHz single-pass splitting at the playhead, atomic undo and format-16/21 migration"
     },
     {
       "id": "AUD-004",
@@ -4235,7 +4245,7 @@
         "Aligned tracks mix without a time offset."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "audio",
@@ -4244,7 +4254,8 @@
         "RIG"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM10-PROGRESS.md; saved clip gain, source-sample fades and per-clip mute, solo and balance in deterministic stereo mix drive offline WAV and bounded miniaudio preview; hardware sync remains open"
     },
     {
       "id": "AUD-005",
@@ -4255,7 +4266,7 @@
         "Dragging to the marked frame plays the expected fragment."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "audio",
@@ -4264,7 +4275,8 @@
         "RIG"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM10-PROGRESS.md; mouse timeline traversal requests bounded 80 ms fragments at exact rational frame samples through miniaudio, null-backend and native event tests pass; audible hardware quality remains unqualified"
     },
     {
       "id": "AUD-006",
@@ -4355,7 +4367,7 @@
         "Exported duration matches the rational scene range."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "audio",
@@ -4364,7 +4376,8 @@
         "RIG"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM10-PROGRESS.md; exact 48 kHz stereo PCM16 WAV mix from an immutable snapshot for full scene or selected half-open frame range, with rational sample boundaries, cancellation and source preservation; synchronized PNG/WAV delivery remains open"
     },
     {
       "id": "IMP-001",

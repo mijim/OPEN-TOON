@@ -24,9 +24,13 @@ Create, move, connect, search and delete nodes while navigating the graph.
 
 **Initial acceptance:** Deleting a node reconnects only according to the chosen option.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM12-PROGRESS.md](../../../docs/implementation/HM12-PROGRESS.md) — native Drawing-card drag, typed search/navigation, pixel order, undo/reopen and invalid-target checks.
+
+**Remaining scope:** The derived graph offers clickable image/matte previews, name/kind search and direct Drawing-card reordering of saved composite order. Arbitrary node creation, wiring, deletion and layout remain open.
 
 ## NOD-002 — Typed ports
 
@@ -72,9 +76,9 @@ Combine inputs while preserving order, alpha and depth according to the mode.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — ordered premultiplied Over and alpha-chart evidence.
+**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — docs/implementation/HM12-PROGRESS.md; ordered premultiplied Over, fractional Multiply/Screen/Add blends, alpha charts and keyed opacity/cutter/source-paint evidence.
 
-**Remaining scope:** Ordered Over and alpha composition work. Depth modes and broader compositing operators remain open.
+**Remaining scope:** Ordered Over, alpha, visible cutter-source painting, derived animated Opacity and saved Normal/Multiply/Screen/Add layer blending work. Depth modes and broader compositing operators remain open.
 
 ## NOD-006 — Masks and cutters
 
@@ -86,9 +90,9 @@ Clip by matte with defined inversion and alpha handling.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — internal alpha-matte extraction and multiplication.
+**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — docs/implementation/HM12-PROGRESS.md; fractional source alpha, inversion, opacity, visible source, undo and reopen.
 
-**Remaining scope:** Internal alpha mattes work. Editable cutters, inversion controls and wider matte operators remain open.
+**Remaining scope:** Editable Drawing/Part cutters, fractional inside/outside inversion and optional source painting work; wider matte operators remain open.
 
 ## NOD-007 — Switches
 
@@ -124,9 +128,9 @@ Temporarily bypass operators and reuse valid results.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — revision-aware preview cache and affected-descendant invalidation.
+**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — docs/implementation/HM12-PROGRESS.md; revision-aware preview cache, inactive cutter dependency isolation, keyed opacity bypass, undo and reopen.
 
-**Remaining scope:** Revision-aware cache and invalidation work. User-controlled node bypass remains open.
+**Remaining scope:** Revision-aware cache and persistent cutter and layer-opacity bypass work. General user-controlled node bypass remains open.
 
 ## NOD-010 — Notes and organization
 

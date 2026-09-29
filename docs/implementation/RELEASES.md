@@ -1,5 +1,311 @@
 # Experimental releases
 
+## 0.2.0-experimental.44 — working source, node navigation
+
+- Search the derived Nodes graph by layer name or node kind. Matching cards
+  highlight, the view scrolls to the current result, and Next or Enter cycles
+  through matches. Search changes only view state.
+- Native Qt Quick smoke types a query, finds Write in a narrower window,
+  then clicks Next across three Drawing results without altering pixels.
+  Source only; no new public binary or tag.
+
+## 0.2.0-experimental.43 — working source, direct node drawing order
+
+- Drag a Drawing card onto another in Nodes to place it immediately above
+  the target in composite order. The drop target highlights; one document
+  command supports undo/redo and saved order. Locked drawings reject it.
+- A three-color pixel fixture checks stacking, invalid targets, undo and
+  reopen. Native Qt Quick smoke sends the actual pointer drag across cards
+  and verifies the rendered output. Source only; no new public binary or tag.
+
+## 0.2.0-experimental.42 — working source, additive layer blend
+
+- Add saved Add blending for Drawing and Part layers in Nodes. Fractional
+  alpha, cutters and painted sources use the same Display/Write graph under
+  Legacy and Linear sRGB composition.
+- Format 28 preserves older modes with a readable backup. Pixel, migration,
+  undo/reopen and native popup-click tests pass; the original 1080p Add study
+  measured 50.93 ms/frame in Legacy and 45.22 ms/frame in Linear sRGB on the
+  M1 Pro across three frames.
+- Source only; no new public binary or tag. General graph editing remains open.
+
+## 0.2.0-experimental.41 — working source, per-clip stereo balance
+
+- Set a clip's left/right balance from the Audio inspector. Center retains
+  historical output; the opposite channel is attenuated toward either end.
+- Format 27 loads older clips centered and retains a readable backup on
+  first save. Exact PCM, invalid-input, copy, undo/reopen, migration and
+  native Qt Quick input checks pass on macOS.
+- Source only; no new public binary or tag. Hardware presentation and
+  broader device quality remain HM-10 gates.
+
+## 0.2.0-experimental.40 — working source, direct frame-aligned audio trim
+
+- Drag the middle handles at either end of a 48 kHz single-pass clip to trim
+  at scene frames. The left edge keeps scene and source positions aligned;
+  the right edge changes the source out-sample. Escape cancels and release
+  commits one undoable edit.
+- Rational 24 and 24000/1001 fps tests compare surviving PCM exactly and
+  check rollback, undo/redo and reopen. Native Qt Quick smoke drags both
+  edges and checks the resulting source samples.
+- Source only; no new public binary or tag. Other source rates and repeated
+  clips continue to use numeric trim.
+
+## 0.2.0-experimental.39 — working source, per-clip audio solo
+
+- Isolate one or more audio placements from the Audio panel. Mute still wins;
+  all other clip waveforms remain visible and dim when a solo is active.
+- Format 26 persists solo state and loads earlier clips unsoloed with a
+  readable source backup. Domain, migration and native Qt Quick tests check
+  exact mix selection, undo and reopen.
+- Source only; no new public binary or tag. HM-10 hardware presentation
+  qualification remains open.
+
+## 0.2.0-experimental.38 — working source, refined connected toon
+
+- Redraw the original character's front and three-quarter headwear, and use
+  2 × 2 coverage sampling for the registered PNG artwork and its independent
+  reference composites. The source retains 19 intake roles and 41 drawing
+  names; the editable rig retains four continuous single-artwork limbs with
+  elbow and knee bones.
+- Regenerate the three editable studies and visual evidence. The 480-frame
+  connectivity sweep, independent reference comparison with bounded
+  compositor-rounding tolerance, 179 CTest entries, deterministic source-art
+  checks and native Animator/integrated-shot smokes pass on macOS.
+- Source only; no new public binary or tag. Owner artistic approval and
+  broader extreme-bend review remain open.
+
+## 0.2.0-experimental.37 — working source, exact 48 kHz clip split
+
+- Split a single-pass 48 kHz clip at an interior scene frame. The two clips
+  share the original WAV and preserve the exact canonical 48 kHz PCM mix,
+  gain, mute and outer fades with one undo step.
+- Domain tests compare complete PCM at 24 and 24000/1001 fps, reject
+  unsupported cuts, and reopen the saved project. Native Qt Quick smoke
+  clicks the button and verifies its PCM result and undo. The 179-entry
+  macOS CTest suite passes.
+- Source only; no new public binary or tag. Other source rates and playback
+  resampling continuity at the cut remain unqualified.
+
+## 0.2.0-experimental.36 — working source, layer blend modes
+
+- Add saved Normal, Multiply and Screen blending for Drawing and Part layers
+  in Nodes. Fractional alpha, cutters and source painting pass through the
+  same Display/Write graph under Legacy or Linear sRGB composition.
+- Format 25 loads earlier layers as Normal and preserves a readable backup.
+  178 CTest entries, render/undo/migration tests and a native popup click
+  with save/reopen pass. The original 1080p blend study averaged 49.36 ms
+  per Legacy frame and 43.59 ms per Linear sRGB frame on the M1 Pro.
+- Source only; no new public binary or tag. Broader node editing remains open.
+
+## 0.2.0-experimental.35 — working source, opacity node bypass
+
+- Bypass selected Drawing or Part opacity from Nodes while retaining its
+  setup value and animation keys. The typed graph forwards the unattenuated
+  image to cutters, Display and Write; undo and reopen preserve the choice.
+- Format 24 defaults older layers to enabled opacity and retains a readable
+  backup on first save. Render, migration, a legacy scene without a matte
+  and native Qt Quick checks pass.
+- Source only; no new public binary or tag. General editable nodes remain open.
+
+## 0.2.0-experimental.34 — working source, saved clip mute
+
+- Mute or unmute individual audio clips without changing their WAV resource,
+  placement, trim, gain, repeats or fades. The timeline retains a dim labeled
+  waveform. Device preview, scrub and both WAV exports share the saved mix.
+- Format 23 defaults older clips to unmuted and keeps a readable backup on
+  first save. Exact mix, undo/redo, migration, native click and 173 CTest
+  entries pass on macOS.
+- Source only; no new public binary or tag. Hardware recovery remains open.
+
+## 0.2.0-experimental.33 — working source, contour-bound continuous toon
+
+- Rebind all four continuous arms/legs and the alternate sleeve in the saved
+  rig and 20-second studies to alpha-following meshes with a 40 px joint
+  transition. The elbow and knee silhouette stays joined at the bend.
+- Regenerate the editable examples and representative stills. A 480-frame
+  connectivity sweep, 171 CTest entries, native HM-07 and integrated-shot
+  smokes, and current visual-shot input/render measurements pass on macOS.
+- Source only; no new public binary or tag. Artistic approval remains open.
+
+## 0.2.0-experimental.32 — working source, reusable audio clip placement
+
+- Duplicate a clip at the playhead without copying its embedded WAV. The new
+  placement retains trim, gain, repeats and fades and can be edited separately.
+- Exact PCM cues, one-step undo/redo, invalid-input rollback, save/reopen and
+  a native Qt Quick button click pass. The macOS suite passes 171 CTest entries.
+- Source only; no new public binary or tag. HM-10 hardware qualification remains open.
+
+## 0.2.0-experimental.31 — working source, integrated shot study
+
+- Add an original 20-second editable project joining the continuous four-limb
+  toon, nine timed mouth changes, a visible head source cutter for the eyes,
+  output camera and a synthetic PCM cue track with sample-based fades.
+- An integration test checks exact audio/mouth cue positions, matte graph,
+  unchanged WAV bytes, 480-frame length, rendered frames and save/reopen. The
+  170-entry macOS suite and native Qt Quick open/screenshot smoke pass.
+- Source only; no new public binary or tag. Synthetic cues are timing signals,
+  and full audiovisual/artistic qualification remains open.
+
+## 0.2.0-experimental.30 — working source, direct audio fade handles
+
+- Drag the upper fade guide handles on a waveform row to preview and commit
+  source-sample fade lengths. Escape cancels; release creates one undo step.
+- Native Qt Quick mouse gestures check both handles, exact sample changes,
+  undo/redo and cancellation. The 169-entry macOS suite and audio smoke pass.
+- Source only; no new public binary or tag. Hardware audible quality remains
+  unqualified.
+
+## 0.2.0-experimental.29 — working source, audio fade guides
+
+- Draw the saved fade-in and fade-out endpoints over a clip's timeline row,
+  including the full repeated length. The source-peak waveform remains visible.
+- Native Qt Quick smoke compares the timeline row before and after setting
+  fades; the screenshot was inspected alongside the 169-entry macOS suite.
+- Source only; no new public binary or tag. The guides are a visual envelope;
+  source peaks do not yet include sample-weighted fade amplitude.
+
+## 0.2.0-experimental.28 — working source, source-sample audio fades
+
+- Set linear fade-in and fade-out durations on a repeated clip in source
+  samples. The immutable mixer applies them to device preview and full or
+  selected-range PCM WAV output without changing the original WAV.
+- Format 22 migrates older clips to zero fades and keeps a readable backup.
+  Exact PCM, undo/redo, trim clamping, 169 CTest entries and native HM-10
+  smoke pass on macOS.
+- Source only; no new public binary or tag. Audible hardware quality remains
+  unqualified; the next source build adds the visible fade guides.
+
+## 0.2.0-experimental.27 — working source, node output preview
+
+- Click a derived image or matte node to inspect its evaluated output at the
+  current frame. Matte alpha appears as grayscale; the selected preview
+  follows edits and frame changes without changing the document.
+- Renderer pixel checks and native Qt Quick card clicks verify Drawing,
+  Cutter and Apply matte previews. The local macOS suite passes 167 CTest
+  entries and HM-12 smoke.
+- Source only; no new public binary or tag. General editable nodes remain open.
+
+## 0.2.0-experimental.26 — working source, visible cutter source
+
+- Keep a Drawing or Part cutter visible at its ordered paint position while
+  its fractional alpha masks a target. The choice is saved in format 21,
+  undoable and available in Properties and Nodes; older projects default off.
+- Render/graph, format-20 migration with readable backup and native Qt Quick
+  smoke cover pixels, bypass, undo/redo and reopen. The local macOS build
+  passes 167 CTest entries.
+- Source only; no new public binary or tag. General graph editing and joint
+  recipes remain open.
+
+## 0.2.0-experimental.25 — working source, continuous trouser contour
+
+- Redraw each leg as one cubic trouser silhouette with a smoother knee and
+  tapered ankle. Hip, knee and ankle registration and the central bone remain
+  unchanged; regenerated 48- and 480-frame examples stay editable.
+- The 90° regular and contour stress poses, 480-frame connectivity and
+  substitution/reopen checks pass. An overly wide knee candidate folded and
+  was rejected before this bounded redraw. The local macOS build passes 166
+  CTest entries, the deterministic asset test and native HM-07 smoke.
+- Source only; no new public binary or tag. Artistic acceptance remains open.
+
+## 0.2.0-experimental.24 — working source, persistent cutter bypass
+
+- Save a reversible cutter bypass in format 20. It keeps the source and
+  Inside/Outside setting, shows the uncut target and excludes inactive cutter
+  work from the output graph. Re-enabling restores the same fractional result.
+- Formats 1–19 default to enabled cutters; a first format-20 save preserves a
+  readable source-version backup. Native smoke verifies bypass, undo/redo,
+  save/reopen and re-enable. The local macOS build passes 166 CTest entries.
+- Source only; no new public binary or tag. General graph editing and joint
+  recipes remain open.
+
+## 0.2.0-experimental.23 — working source, typed opacity composition
+
+- Show animated Drawing/Part opacity as a typed node in the derived composition
+  graph and edit the existing property from the Nodes panel. Fractional cutter
+  alpha follows source opacity before Inside or Outside coverage.
+- A one-pixel keyed fixture checks Display/Write, undo and save/reopen; native
+  HM-12 smoke checks opacity editing and a real project startup with `--open`.
+  Missing startup projects fail with a clear error.
+- The local macOS build passes 165 CTest entries. Source only; no new public
+  binary or tag. General editable nodes and part-overlap recipes remain open.
+
+## 0.2.0-experimental.22 — working source, band-limited upsampling
+
+- Use the same bounded 32-tap, 1,024-phase rate-conversion kernel for
+  upsampling as for downsampling. Equal-rate PCM keeps its direct sample path.
+- An 8-to-48 kHz 3 kHz tone retains 0.560 RMS; split and whole output blocks
+  match. The existing 96-to-48 kHz anti-alias and callback-period checks pass.
+- The local macOS build passes 164 CTest entries and native audio smoke.
+  Source only; no new public binary or tag. Broader rate-ratio and hardware
+  presentation qualification remain open.
+
+## 0.2.0-experimental.21 — working source, selected audio range
+
+- Export a selected half-open frame interval to PCM WAV. Its sample count
+  follows the exact scene rate, and its PCM payload matches the same slice
+  of a full-scene mix, including at 24000/1001 fps.
+- The native audio smoke checks a cue in a two-frame range. Invalid ranges
+  fail before writing; cancellation retains the earlier destination.
+- The local macOS build passes 163 CTest entries. Source only; no new public
+  binary or tag. Full synchronized PNG/WAV delivery remains open.
+
+## 0.2.0-experimental.20 — working source, anti-alias audio downsampling
+
+- Precompute a bounded 32-tap, 1,024-phase low-pass table for each unique
+  source rate above the 48 kHz output rate. Preview and WAV export share
+  this deterministic path; original WAV assets and saved format 19 stay
+  unchanged.
+- A 96-to-48 kHz signal test suppresses a 30 kHz source while preserving a
+  1 kHz tone. Repeated cues and split output blocks match; two simultaneous
+  96 kHz tracks fit the local callback period. HM-10 hardware presentation
+  and broader rate-quality gates remain open.
+- Source only; no new public binary or tag.
+
+## 0.2.0-experimental.19 — working source, outside cutters
+
+- Save an inverted cutter choice in format 19. Inside and outside coverage
+  preserve fractional alpha, share the typed display/write graph and remain
+  undoable in the inspector and Nodes workspace.
+- Formats 1–18 load with inside coverage; a first current-format save keeps
+  a readable source-version backup. Native smoke checks pixel values,
+  save/reopen and bypass/undo. HM-12 remains in progress.
+- Source only; no new public binary or tag.
+
+## 0.2.0-experimental.18 — working source, cutter mattes
+
+- Save a Drawing or Part cutter matte binding in format 18. The inspector
+  assigns or bypasses a visible source with atomic undo; fractional alpha
+  clips the target without painting the source into the final image.
+- The same typed graph evaluates preview and write output, with validation
+  for source references and character-copy remapping. A resizable Nodes tab
+  exposes the derived graph and compact order/cutter edits. HM-12 remains in
+  progress pending a general editable graph and joint recipes.
+- Local macOS tests and native smoke verify fractional pixels, save/reopen
+  and bypass/undo. Source only; no new public binary or tag.
+
+## 0.2.0-experimental.17 — working source, audio repeats and device preview
+
+- Save 1–64 sample-contiguous repeats per trimmed clip in format 17, with
+  format-16 migration and a readable source-version backup.
+- Preview audio through miniaudio, scrub frame fragments, drag clips in the
+  native timeline, reuse exact indexed waveform peaks and export the same
+  mix to PCM WAV. HM-10 remains in progress pending hardware synchronization
+  and audible-quality qualification.
+- The local macOS locked source build passes 154 CTest entries and native
+  HM-10 input/export smoke. This working source version has no new binary or
+  source tag.
+
+## 0.2.0-experimental.16 — source milestone, audio timing subset
+
+- Save original mono/stereo PCM16 WAV assets and undoable scene clips in format 16.
+- Draw sample-aligned waveform rows, edit clip frame position, source trim
+  and gain, and export a deterministic 48 kHz stereo WAV mix. Device playback,
+  real-time mixing and scrub remain open HM-10 work.
+- Keep format-15 migration backups and reject invalid WAV input atomically.
+  The macOS locked source build passes 148 CTest entries and native audio smoke.
+- Source only; no new public binary or cross-platform qualification.
+
 ## 0.2.0-experimental.15 — orthographic output camera
 
 - Add 20 bounded camera behaviors: direct pan/rotate/zoom, constrained gestures,

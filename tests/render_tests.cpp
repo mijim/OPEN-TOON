@@ -1,4 +1,5 @@
 #include "opentoon/animation.h"
+#include "opentoon/session.h"
 #include "scene_renderer.h"
 #include "graph_renderer.h"
 #include "revision_render_cache.h"
@@ -77,6 +78,316 @@ TEST_CASE("Linear composition preserves transparent alpha and agrees across outp
     document.layers.front().visible = false;
     document.layers.back().visible = false;
     REQUIRE(qRgba(0, 0, 0, 0) == SceneRenderer::render(document, 0).pixel(0, 0));
+}
+TEST_CASE("Saved cutter matte clips a layer without painting its source") {
+    auto document = makeDocument();
+    document.width = document.height = 1;
+    document.background = {0, 0, 0, 0};
+    auto& targetDrawing = document.editableDrawing(document.layers.front().id, 0);
+    targetDrawing.image = ImageAsset{1, 1, {255, 0, 0, 128}};
+    Layer source = document.layers.front();
+    source.id = document.allocateId();
+    source.name = "Cutter";
+    Drawing sourceDrawing = targetDrawing;
+    sourceDrawing.id = document.allocateId();
+    sourceDrawing.image = ImageAsset{1, 1, {0, 0, 255, 128}};
+    document.drawings.emplace(sourceDrawing.id, sourceDrawing);
+    for (auto& exposure : source.exposures)
+        exposure.drawing = sourceDrawing.id;
+    document.layers.push_back(source);
+    document.layers.front().matte = source.id;
+    document.validate();
+    const auto graph = CompositionGraph::orderedLayers(document);
+    REQUIRE_NOTHROW(graph.validate(document));
+    const auto sourceNode = std::find_if(graph.nodes.begin(), graph.nodes.end(), [&](const auto& node) {
+        return node.kind == GraphNodeKind::LayerImage && node.layer == source.id;
+    });
+    const auto matteNode = std::find_if(graph.nodes.begin(), graph.nodes.end(), [](const auto& node) {
+        return node.kind == GraphNodeKind::MatteFromImage;
+    });
+    const auto appliedNode = std::find_if(graph.nodes.begin(), graph.nodes.end(), [](const auto& node) {
+        return node.kind == GraphNodeKind::ApplyMatte;
+    });
+    REQUIRE(sourceNode != graph.nodes.end());
+    REQUIRE(matteNode != graph.nodes.end());
+    REQUIRE(appliedNode != graph.nodes.end());
+    const auto sourcePreview = GraphRenderer::renderNode(graph, document, 0, sourceNode->id,
+                                                          QSize(1, 1));
+    const auto mattePreview = GraphRenderer::renderNode(graph, document, 0, matteNode->id,
+                                                         QSize(1, 1));
+    const auto appliedPreview = GraphRenderer::renderNode(graph, document, 0, appliedNode->id,
+                                                           QSize(1, 1));
+    REQUIRE(qBlue(sourcePreview.pixel(0, 0)) == 128);
+    REQUIRE(qAlpha(sourcePreview.pixel(0, 0)) == 128);
+    REQUIRE(qAlpha(mattePreview.pixel(0, 0)) == 128);
+    REQUIRE(qAlpha(appliedPreview.pixel(0, 0)) == 64);
+    REQUIRE_THROWS(GraphRenderer::renderNode(graph, document, 0, 999999, QSize(1, 1)));
+    const auto expected = SceneRenderer::render(document, 0);
+    REQUIRE(qAlpha(expected.pixel(0, 0)) == 64);
+    REQUIRE(qBlue(expected.pixel(0, 0)) == 0);
+    REQUIRE(GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Write) == expected);
+    REQUIRE(deserializeDocument(serializeDocument(document)) == document);
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == expected);
+    document.layers.back().paintMatteSource = true;
+    const auto paintedSource = SceneRenderer::render(document, 0);
+    REQUIRE(qAlpha(paintedSource.pixel(0, 0)) == 160);
+    REQUIRE(qBlue(paintedSource.pixel(0, 0)) > 0);
+    REQUIRE(GraphRenderer::render(CompositionGraph::orderedLayers(document), document, 0,
+                                  {}, {}, GraphTarget::Write) == paintedSource);
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == paintedSource);
+    document.layers.back().paintMatteSource = false;
+    REQUIRE(SceneRenderer::render(document, 0) == expected);
+    document.layers.front().matteBypassed = true;
+    const auto uncut = SceneRenderer::render(document, 0);
+    REQUIRE(qAlpha(uncut.pixel(0, 0)) == 128);
+    REQUIRE(qBlue(uncut.pixel(0, 0)) == 0);
+    REQUIRE(GraphRenderer::render(CompositionGraph::orderedLayers(document), document, 0,
+                                  {}, {}, GraphTarget::Write) == uncut);
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == uncut);
+    document.layers.front().matteBypassed = false;
+    document.drawings.at(sourceDrawing.id).image = ImageAsset{1, 1, {0, 0, 255, 64}};
+    document.layers.front().invertMatte = true;
+    document.validate();
+    const auto inverted = SceneRenderer::render(document, 0);
+    REQUIRE(qAlpha(inverted.pixel(0, 0)) == 96);
+    REQUIRE(qBlue(inverted.pixel(0, 0)) == 0);
+    REQUIRE(GraphRenderer::render(CompositionGraph::orderedLayers(document), document, 0,
+                                  {}, {}, GraphTarget::Write) == inverted);
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == inverted);
+    document.layers.front().matte = 0;
+    document.layers.front().invertMatte = false;
+    REQUIRE(qAlpha(SceneRenderer::render(document, 0).pixel(0, 0)) > 128);
+    document.layers.front().matte = source.id;
+    document.layers.back().visible = false;
+    REQUIRE_THROWS(document.validate());
+}
+TEST_CASE("Layer opacity is a typed image node and attenuates fractional cutter alpha") {
+    auto document = makeDocument();
+    document.width = document.height = 1;
+    document.background = {0, 0, 0, 0};
+    auto& target = document.editableDrawing(document.layers.front().id, 0);
+    target.image = ImageAsset{1, 1, {255, 0, 0, 128}};
+    auto& layer = document.layers.front();
+    layer.transform.opacity = .5;
+    Keyframe first, second;
+    first.frame = 0;
+    first.value = layer.transform;
+    second.frame = 12;
+    second.value = layer.transform;
+    second.value.opacity = 1;
+    layer.keys = {first, second};
+    Layer cutter = layer;
+    cutter.id = document.allocateId();
+    cutter.name = "Cutter";
+    cutter.keys.clear();
+    Drawing cutterDrawing = target;
+    cutterDrawing.id = document.allocateId();
+    cutterDrawing.image = ImageAsset{1, 1, {0, 0, 255, 64}};
+    document.drawings.emplace(cutterDrawing.id, cutterDrawing);
+    for (auto& exposure : cutter.exposures)
+        exposure.drawing = cutterDrawing.id;
+    layer.matte = cutter.id;
+    document.layers.push_back(cutter);
+    expose(document.layers.front(), 0, document.duration, target.id);
+    expose(document.layers.back(), 0, document.duration, cutterDrawing.id);
+    document.composition = CompositionProfile::LinearSrgb;
+    document.validate();
+    const auto graph = CompositionGraph::orderedLayers(document);
+    REQUIRE(std::count_if(graph.nodes.begin(), graph.nodes.end(), [](const GraphNode& node) {
+                return node.kind == GraphNodeKind::Opacity;
+            }) == 2);
+    const auto inside = GraphRenderer::render(graph, document, 0, {});
+    REQUIRE(qAlpha(inside.pixel(0, 0)) == 8);
+    REQUIRE(inside == GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Write));
+    REQUIRE(inside == SceneRenderer::render(document, 0));
+    REQUIRE(qAlpha(SceneRenderer::render(document, 12).pixel(0, 0)) == 16);
+    const auto reopened = deserializeDocument(serializeDocument(document));
+    REQUIRE(SceneRenderer::render(reopened, 0) == inside);
+    document.layers.front().invertMatte = true;
+    REQUIRE(qAlpha(SceneRenderer::render(document, 0).pixel(0, 0)) == 56);
+}
+TEST_CASE("Bypassed opacity retains keyed values and changes both matte and output alpha") {
+    auto document = makeDocument();
+    document.width = document.height = 1;
+    document.background = {0, 0, 0, 0};
+    const Id targetId = document.layers.front().id;
+    auto& targetDrawing = document.editableDrawing(targetId, 0);
+    targetDrawing.image = ImageAsset{1, 1, {255, 0, 0, 128}};
+    document.layer(targetId).transform.opacity = .5;
+    Keyframe rest;
+    rest.frame = 0;
+    rest.value = document.layer(targetId).transform;
+    Keyframe key;
+    key.frame = 12;
+    key.value = document.layer(targetId).transform;
+    key.value.opacity = .25;
+    document.layer(targetId).keys = {rest, key};
+    Layer cutter = document.layer(targetId);
+    cutter.id = document.allocateId();
+    cutter.name = "Cutter";
+    cutter.keys.clear();
+    Drawing source = targetDrawing;
+    source.id = document.allocateId();
+    source.image = ImageAsset{1, 1, {0, 0, 255, 64}};
+    document.drawings.emplace(source.id, source);
+    for (auto& exposure : cutter.exposures)
+        exposure.drawing = source.id;
+    document.layers.push_back(cutter);
+    expose(document.layer(targetId), 0, document.duration, targetDrawing.id);
+    expose(document.layer(cutter.id), 0, document.duration, source.id);
+    document.layer(targetId).matte = cutter.id;
+    document.composition = CompositionProfile::LinearSrgb;
+    document.validate();
+    const auto baseline = SceneRenderer::render(document, 0);
+    REQUIRE(qAlpha(baseline.pixel(0, 0)) == 8);
+    Session session;
+    session.replace(document);
+    REQUIRE(session.apply("Bypass target opacity", [&](Document& d) {
+        d.layer(targetId).opacityBypassed = true;
+    }));
+    const auto targetBypassed = session.document();
+    REQUIRE(qAlpha(SceneRenderer::render(targetBypassed, 0).pixel(0, 0)) == 16);
+    REQUIRE(targetBypassed.layer(targetId).keys == document.layer(targetId).keys);
+    REQUIRE(session.apply("Bypass cutter opacity", [&](Document& d) {
+        d.layer(cutter.id).opacityBypassed = true;
+    }));
+    const auto bothBypassed = session.document();
+    const auto graph = CompositionGraph::orderedLayers(bothBypassed);
+    REQUIRE_NOTHROW(graph.validate(bothBypassed));
+    REQUIRE(std::count_if(graph.nodes.begin(), graph.nodes.end(), [](const GraphNode& node) {
+                return node.kind == GraphNodeKind::BypassOpacity;
+            }) == 2);
+    REQUIRE(std::count_if(graph.nodes.begin(), graph.nodes.end(), [](const GraphNode& node) {
+                return node.kind == GraphNodeKind::Opacity;
+            }) == 0);
+    const auto displayed = SceneRenderer::render(bothBypassed, 0);
+    REQUIRE(qAlpha(displayed.pixel(0, 0)) == 32);
+    REQUIRE(displayed == GraphRenderer::render(graph, bothBypassed, 0, {}, {},
+                                               GraphTarget::Write));
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(bothBypassed)), 0) ==
+            displayed);
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == targetBypassed);
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == document);
+    REQUIRE(session.redo());
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == bothBypassed);
+    REQUIRE(qAlpha(SceneRenderer::render(bothBypassed, 12).pixel(0, 0)) == 32);
+}
+TEST_CASE("Opacity bypass reaches legacy scenes without a matte") {
+    auto document = makeDocument();
+    document.width = document.height = 1;
+    document.background = {0, 0, 0, 0};
+    const Id layer = document.layers.front().id;
+    document.editableDrawing(layer, 0).image = ImageAsset{1, 1, {255, 0, 0, 128}};
+    document.layer(layer).transform.opacity = .5;
+    document.validate();
+    REQUIRE(std::abs(qAlpha(SceneRenderer::render(document, 0).pixel(0, 0)) - 64) <= 1);
+    document.layer(layer).opacityBypassed = true;
+    document.validate();
+    const auto graph = CompositionGraph::orderedLayers(document);
+    const auto display = SceneRenderer::render(document, 0);
+    REQUIRE(qAlpha(display.pixel(0, 0)) == 128);
+    REQUIRE(display == GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Write));
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == display);
+}
+TEST_CASE("Multiply Screen and Add blend fractional layers in both color profiles") {
+    auto document = makeDocument();
+    document.width = document.height = 1;
+    document.background = {0, 0, 0, 0};
+    auto& lower = document.editableDrawing(document.layers.front().id, 0);
+    lower.image = ImageAsset{1, 1, {50, 150, 200, 128}};
+    Layer upper = document.layers.front();
+    upper.id = document.allocateId();
+    upper.name = "Upper";
+    auto upperDrawing = lower;
+    upperDrawing.id = document.allocateId();
+    upperDrawing.image = ImageAsset{1, 1, {200, 100, 50, 128}};
+    document.drawings.emplace(upperDrawing.id, upperDrawing);
+    for (auto& exposure : upper.exposures)
+        exposure.drawing = upperDrawing.id;
+    document.layers.push_back(upper);
+    document.validate();
+    const auto normal = SceneRenderer::render(document, 0);
+    Session session;
+    session.replace(document);
+    REQUIRE(session.apply("Multiply", [&](Document& d) {
+        d.layer(upper.id).blendMode = LayerBlendMode::Multiply;
+    }));
+    const auto multiply = SceneRenderer::render(session.document(), 0);
+    REQUIRE(qAlpha(multiply.pixel(0, 0)) == qAlpha(normal.pixel(0, 0)));
+    REQUIRE(qRed(multiply.pixel(0, 0)) < qRed(normal.pixel(0, 0)));
+    REQUIRE(multiply == GraphRenderer::render(CompositionGraph::orderedLayers(session.document()),
+                                              session.document(), 0, {}, {}, GraphTarget::Write));
+    REQUIRE(session.apply("Screen", [&](Document& d) {
+        d.layer(upper.id).blendMode = LayerBlendMode::Screen;
+    }));
+    const auto screen = SceneRenderer::render(session.document(), 0);
+    REQUIRE(qAlpha(screen.pixel(0, 0)) == qAlpha(multiply.pixel(0, 0)));
+    REQUIRE(qRed(screen.pixel(0, 0)) > qRed(normal.pixel(0, 0)));
+    REQUIRE(screen == GraphRenderer::render(CompositionGraph::orderedLayers(session.document()),
+                                            session.document(), 0, {}, {}, GraphTarget::Display));
+    REQUIRE(session.apply("Add", [&](Document& d) {
+        d.layer(upper.id).blendMode = LayerBlendMode::Add;
+    }));
+    const auto added = SceneRenderer::render(session.document(), 0);
+    REQUIRE(qAlpha(added.pixel(0, 0)) == qAlpha(screen.pixel(0, 0)));
+    REQUIRE(qRed(added.pixel(0, 0)) > qRed(screen.pixel(0, 0)));
+    REQUIRE(added == GraphRenderer::render(CompositionGraph::orderedLayers(session.document()),
+                                           session.document(), 0, {}, {}, GraphTarget::Write));
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(session.document())), 0) ==
+            added);
+    REQUIRE_THROWS(session.apply("Invalid blend", [&](Document& d) {
+        d.layer(upper.id).blendMode = static_cast<LayerBlendMode>(99);
+    }));
+    REQUIRE(SceneRenderer::render(session.document(), 0) == added);
+    REQUIRE(session.undo());
+    REQUIRE(SceneRenderer::render(session.document(), 0) == screen);
+    REQUIRE(session.undo());
+    REQUIRE(SceneRenderer::render(session.document(), 0) == multiply);
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == document);
+    REQUIRE(session.redo());
+    REQUIRE(session.redo());
+    REQUIRE(session.redo());
+    REQUIRE(SceneRenderer::render(session.document(), 0) == added);
+    for (const auto mode : {LayerBlendMode::Multiply, LayerBlendMode::Screen,
+                            LayerBlendMode::Add}) {
+        auto linear = session.document();
+        linear.composition = CompositionProfile::LinearSrgb;
+        linear.layer(upper.id).blendMode = mode;
+        linear.validate();
+        const auto graph = CompositionGraph::orderedLayers(linear);
+        const auto display = GraphRenderer::render(graph, linear, 0, {}, {}, GraphTarget::Display);
+        REQUIRE(SceneRenderer::render(linear, 0) == display);
+        REQUIRE(GraphRenderer::render(graph, linear, 0, {}, {}, GraphTarget::Write) == display);
+    }
+}
+TEST_CASE("Inverted cutter keeps target ink outside its source bounds") {
+    auto document = makeDocument();
+    document.width = 2;
+    document.height = 1;
+    document.background = {0, 0, 0, 0};
+    auto& target = document.editableDrawing(document.layers.front().id, 0);
+    target.image = ImageAsset{2, 1, {255, 0, 0, 128, 255, 0, 0, 128}};
+    Layer cutter = document.layers.front();
+    cutter.id = document.allocateId();
+    cutter.name = "Cutter";
+    Drawing source = target;
+    source.id = document.allocateId();
+    source.image = ImageAsset{2, 1, {0, 0, 255, 64, 0, 0, 0, 0}};
+    document.drawings.emplace(source.id, source);
+    for (auto& exposure : cutter.exposures)
+        exposure.drawing = source.id;
+    document.layers.push_back(cutter);
+    document.layers.front().matte = cutter.id;
+    document.layers.front().invertMatte = true;
+    document.validate();
+    const auto output = SceneRenderer::render(document, 0);
+    REQUIRE(qAlpha(output.pixel(0, 0)) == 96);
+    REQUIRE(qAlpha(output.pixel(1, 0)) == 128);
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == output);
 }
 TEST_CASE("Linear color chart keeps bounded alpha and premultiplied color across coverage levels") {
     auto document = makeDocument();

@@ -94,7 +94,8 @@ characters, substitutions and coordinated view sets with
 and [HM-13](../implementation/HM13-ACCEPTANCE.md) are accepted bounded contracts;
 the [HM-05 rest mesh/render](../implementation/HM05-ACCEPTANCE.md) contract is
 also accepted;
-the [HM-06 bone/curve subset](../implementation/HM06-PROGRESS.md) is in progress;
+the [HM-06 bone/curve subset](../implementation/HM06-PROGRESS.md) and
+[HM-07 published-control subset](../implementation/HM07-PROGRESS.md) are in progress;
 their owning full phases remain open. The second-animator working-shot review
 remains an HM-15 gate.
 

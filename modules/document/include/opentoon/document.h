@@ -29,6 +29,7 @@ struct Color {
     auto operator<=>(const Color&) const = default;
 };
 enum class CompositionProfile : std::uint8_t { LegacyQt, LinearSrgb };
+enum class LayerBlendMode : std::uint8_t { Normal, Multiply, Screen, Add };
 struct Swatch {
     Id id = 0;
     std::string name;
@@ -92,6 +93,8 @@ enum class LayerKind : std::uint8_t { Drawing, Character, Peg, Part, Camera };
 struct Substitution {
     Id drawing = 0;
     std::string name;
+    bool published = false;
+    std::string controlGroup = "Main";
     auto operator<=>(const Substitution&) const = default;
 };
 struct ViewChoice {
@@ -103,7 +106,37 @@ struct CharacterView {
     Id id = 0;
     std::string name;
     std::vector<ViewChoice> choices;
+    bool published = false;
+    std::string controlGroup = "Main";
     auto operator<=>(const CharacterView&) const = default;
+};
+namespace PoseChannels {
+constexpr std::uint16_t PositionX = 1u << 0;
+constexpr std::uint16_t PositionY = 1u << 1;
+constexpr std::uint16_t Rotation = 1u << 2;
+constexpr std::uint16_t ScaleX = 1u << 3;
+constexpr std::uint16_t ScaleY = 1u << 4;
+constexpr std::uint16_t Opacity = 1u << 5;
+constexpr std::uint16_t PivotX = 1u << 6;
+constexpr std::uint16_t PivotY = 1u << 7;
+constexpr std::uint16_t Drawing = 1u << 8;
+constexpr std::uint16_t AllTransforms = Drawing - 1;
+constexpr std::uint16_t All = AllTransforms | Drawing;
+} // namespace PoseChannels
+struct PosePart {
+    Id part = 0;
+    std::uint16_t channels = 0;
+    Transform transform;
+    Id drawing = 0;
+    auto operator<=>(const PosePart&) const = default;
+};
+struct CharacterPose {
+    Id id = 0;
+    std::string name;
+    std::vector<PosePart> parts;
+    bool published = false;
+    std::string controlGroup = "Main";
+    auto operator<=>(const CharacterPose&) const = default;
 };
 struct MeshPoint {
     double x = 0, y = 0;
@@ -161,6 +194,10 @@ struct Layer {
     std::string name;
     bool visible = true, locked = false, solo = false;
     Id parent = 0;
+    Id matte = 0;
+    bool invertMatte = false, matteBypassed = false, paintMatteSource = false;
+    bool opacityBypassed = false;
+    LayerBlendMode blendMode = LayerBlendMode::Normal;
     Transform transform;
     std::vector<Exposure> exposures;
     std::vector<Keyframe> keys;
@@ -168,6 +205,7 @@ struct Layer {
     std::string role;
     std::vector<Substitution> variants;
     std::vector<CharacterView> views;
+    std::vector<CharacterPose> poses;
     std::vector<MeshBinding> bindings;
     std::optional<BoneTipAnchor> boneTipAnchor;
     auto operator<=>(const Layer&) const = default;
@@ -177,8 +215,30 @@ struct Marker {
     std::string name;
     auto operator<=>(const Marker&) const = default;
 };
+struct AudioAsset {
+    Id id = 0;
+    std::string name;
+    std::int32_t sampleRate = 0;
+    std::int32_t channels = 0;
+    std::uint64_t sampleFrames = 0;
+    SharedBuffer<std::uint8_t> wav;
+    auto operator<=>(const AudioAsset&) const = default;
+};
+struct AudioClip {
+    Id id = 0;
+    Id asset = 0;
+    Frame start = 0;
+    std::uint64_t inSample = 0, outSample = 0;
+    double gain = 1;
+    int repeats = 1;
+    std::uint64_t fadeInSamples = 0, fadeOutSamples = 0;
+    bool muted = false;
+    bool solo = false;
+    double balance = 0;
+    auto operator<=>(const AudioClip&) const = default;
+};
 struct Document {
-    static constexpr int formatVersion = 11;
+    static constexpr int formatVersion = 28;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;
@@ -191,6 +251,8 @@ struct Document {
     std::map<Id, Drawing> drawings;
     std::vector<Swatch> palette;
     std::vector<Marker> markers;
+    std::vector<AudioAsset> audioAssets;
+    std::vector<AudioClip> audioClips;
     [[nodiscard]] Id allocateId() { return nextId++; }
     [[nodiscard]] Layer& layer(Id id);
     [[nodiscard]] const Layer& layer(Id id) const;

@@ -1,12 +1,418 @@
 #include "opentoon/property_address.h"
+#include "opentoon/character_pose.h"
 #include "opentoon/rigging.h"
 #include "opentoon/session.h"
 #include "serialization.h"
 #include "scene_renderer.h"
 #include <catch2/catch_test_macros.hpp>
+#include <algorithm>
 #include <cmath>
 
 using namespace opentoon;
+
+TEST_CASE("Named character poses apply only masked channels and substitutions in one undo step") {
+    Session session;
+    const Id body = session.document().layers.front().id;
+    Id root = 0, hand = 0, alternate = 0, pose = 0;
+    REQUIRE(session.apply("Assemble pose fixture", [&](Document& d) {
+        root = makeCharacter(d, body, "Hero");
+        Layer part;
+        part.id = d.allocateId();
+        hand = part.id;
+        part.name = "Hand";
+        d.layers.push_back(part);
+        attachDrawingAsPart(d, hand, root, "Hand");
+        (void)createSubstitution(d, hand, 0, false, "Closed hand");
+        alternate = createSubstitution(d, hand, 0, true, "Open hand");
+        d.layer(hand).transform.x = 40;
+        d.layer(hand).transform.rotation = 20;
+        d.layer(hand).transform.opacity = .8;
+        pose = captureCharacterPose(d, root, 0,
+            std::vector<PoseCaptureTarget>{{hand, PoseChannels::PositionX | PoseChannels::Drawing},
+                                           {body, PoseChannels::Rotation}}, "Wave");
+    }));
+    REQUIRE(session.apply("Change pose", [&](Document& d) {
+        d.layer(hand).transform.x = 110;
+        d.layer(hand).transform.rotation = 70;
+        d.layer(hand).transform.opacity = .4;
+        d.layer(body).transform.rotation = 32;
+        selectSubstitution(d, hand, 0, d.layer(hand).variants.front().drawing);
+    }));
+    const auto before = session.document();
+    REQUIRE(session.apply("Apply pose", [&](Document& d) { applyCharacterPose(d, root, pose, 8); }));
+    const auto result = session.document();
+    REQUIRE(evaluateTransform(result.layer(hand), 8).x == 40);
+    REQUIRE(evaluateTransform(result.layer(hand), 8).rotation == 70);
+    REQUIRE(evaluateTransform(result.layer(hand), 8).opacity == .4);
+    REQUIRE(evaluateTransform(result.layer(body), 8).rotation == 0);
+    REQUIRE(result.drawingAt(hand, 8)->id == alternate);
+    REQUIRE(result.drawingAt(hand, 0)->id != alternate);
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == before);
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == result);
+}
+
+TEST_CASE("Named poses survive duplication and remove stale part references") {
+    auto document = makeDocument();
+    const Id part = document.layers.front().id;
+    const Id root = makeCharacter(document, part, "Hero");
+    const Id pose = captureCharacterPose(document, root, 0,
+        std::vector<PoseCaptureTarget>{{part, PoseChannels::AllTransforms}}, "Stand");
+    publishCharacterPose(document, root, pose, true);
+    const Id copy = duplicateCharacter(document, root);
+    REQUIRE(document.layer(copy).poses.size() == 1);
+    REQUIRE(document.layer(copy).poses.front().id != pose);
+    REQUIRE(document.layer(copy).poses.front().published);
+    REQUIRE(document.layer(copy).poses.front().parts.front().part != part);
+    document.validate();
+    removeRigBranch(document, part);
+    REQUIRE(document.layer(root).poses.empty());
+    REQUIRE(document.layer(copy).poses.size() == 1);
+    document.validate();
+}
+TEST_CASE("Character copies remap cutter mattes and branch edits protect source references") {
+    Session session;
+    const Id body = session.document().layers.front().id;
+    Id root = 0, cutter = 0;
+    REQUIRE(session.apply("Build masked character", [&](Document& d) {
+        root = makeCharacter(d, body, "Hero");
+        Layer source;
+        source.id = d.allocateId();
+        cutter = source.id;
+        source.name = "Joint cutter";
+        d.layers.push_back(source);
+        attachDrawingAsPart(d, cutter, root, "Joint cutter");
+        d.layer(body).matte = cutter;
+    }));
+    const auto baseline = session.document();
+    REQUIRE_THROWS(session.apply("Remove referenced cutter", [&](Document& d) {
+        removeRigBranch(d, cutter);
+    }));
+    REQUIRE(session.document() == baseline);
+    REQUIRE_THROWS(session.apply("Copy target without cutter", [&](Document& d) {
+        (void)duplicateRigBranch(d, body, false);
+    }));
+    REQUIRE(session.document() == baseline);
+    Id copyRoot = 0;
+    REQUIRE(session.apply("Copy masked character", [&](Document& d) {
+        copyRoot = duplicateCharacter(d, root);
+    }));
+    const auto& copied = session.document();
+    auto copiedBody = std::find_if(copied.layers.begin(), copied.layers.end(), [&](const Layer& l) {
+        return l.parent == copyRoot && l.name == copied.layer(body).name;
+    });
+    REQUIRE(copiedBody != copied.layers.end());
+    REQUIRE(copiedBody->matte != cutter);
+    REQUIRE(copied.layer(copiedBody->matte).parent == copyRoot);
+    REQUIRE_NOTHROW(copied.validate());
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == baseline);
+}
+TEST_CASE("Pose transfer maps unique Part roles and drawing names without touching source") {
+    Session session;
+    const Id part = session.document().layers.front().id;
+    Id source = 0, target = 0, pose = 0, copiedPart = 0, alternate = 0;
+    REQUIRE(session.apply("Build compatible characters", [&](Document& d) {
+        source = makeCharacter(d, part, "Source");
+        (void)createSubstitution(d, part, 0, false, "Closed");
+        alternate = createSubstitution(d, part, 0, true, "Open");
+        d.layer(part).transform.x = 80;
+        pose = captureCharacterPose(d, source, 0,
+            std::vector<PoseCaptureTarget>{{part, PoseChannels::PositionX | PoseChannels::Drawing}},
+            "Reach");
+        publishCharacterPose(d, source, pose, true);
+        target = duplicateCharacter(d, source);
+        copiedPart = d.layer(target).poses.front().parts.front().part;
+        removeCharacterPose(d, target, d.layer(target).poses.front().id);
+        editTransform(d.layer(copiedPart), 8, "x", 20, AnimationEditMode::Animate, true);
+    }));
+    const auto baseline = session.document();
+    Id transferred = 0;
+    REQUIRE(session.apply("Transfer pose", [&](Document& d) {
+        transferred = transferCharacterPose(d, source, pose, target);
+    }));
+    REQUIRE(session.document().layer(source) == baseline.layer(source));
+    const auto& copy = session.document().layer(target).poses.front();
+    REQUIRE(copy.id == transferred);
+    REQUIRE(copy.parts.front().part == copiedPart);
+    REQUIRE(copy.parts.front().drawing != alternate);
+    REQUIRE(!copy.published);
+    const Id copiedDrawing = copy.parts.front().drawing;
+    REQUIRE(session.apply("Apply transferred pose", [&](Document& d) {
+        applyCharacterPose(d, target, transferred, 8);
+    }));
+    REQUIRE(evaluateTransform(session.document().layer(copiedPart), 8).x == 80);
+    REQUIRE(session.document().drawingAt(copiedPart, 8)->id == copiedDrawing);
+    REQUIRE(session.document().layer(source) == baseline.layer(source));
+    REQUIRE(session.undo());
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == baseline);
+    REQUIRE(session.redo());
+    REQUIRE(session.document().layer(target).poses.front().id == transferred);
+
+    auto mismatched = baseline;
+    mismatched.layer(copiedPart).role = "Other";
+    const auto beforeFailure = mismatched;
+    REQUIRE_THROWS(transferCharacterPose(mismatched, source, pose, target));
+    REQUIRE(mismatched == beforeFailure);
+    mismatched = baseline;
+    auto variant = std::find_if(mismatched.layer(copiedPart).variants.begin(),
+                                mismatched.layer(copiedPart).variants.end(),
+                                [copiedDrawing](const auto& item) { return item.drawing == copiedDrawing; });
+    REQUIRE(variant != mismatched.layer(copiedPart).variants.end());
+    variant->name = "Different";
+    const auto beforeDrawingFailure = mismatched;
+    REQUIRE_THROWS(transferCharacterPose(mismatched, source, pose, target));
+    REQUIRE(mismatched == beforeDrawingFailure);
+    mismatched = baseline;
+    mismatched.layer(copiedPart).transform.x += 1;
+    const auto beforeRestFailure = mismatched;
+    REQUIRE_THROWS(transferCharacterPose(mismatched, source, pose, target));
+    REQUIRE(mismatched == beforeRestFailure);
+}
+TEST_CASE("Mirrored pose swaps paired roles and reflects masked rest deltas") {
+    Session session;
+    const Id left = session.document().layers.front().id;
+    Id root = 0, right = 0, sourcePose = 0, rightOpen = 0;
+    REQUIRE(session.apply("Build paired character", [&](Document& d) {
+        root = makeCharacter(d, left, "Hero");
+        d.layer(left).role = "arm_left";
+        Layer part;
+        part.id = d.allocateId();
+        right = part.id;
+        part.name = "Right arm";
+        d.layers.push_back(part);
+        attachDrawingAsPart(d, right, root, "arm_right");
+        (void)createSubstitution(d, left, 0, false, "Closed");
+        (void)createSubstitution(d, right, 0, false, "Closed");
+        (void)createSubstitution(d, left, 0, true, "Open");
+        rightOpen = createSubstitution(d, right, 0, false, "Open");
+        d.layer(left).transform.x = -40;
+        d.layer(left).transform.rotation = -10;
+        d.layer(left).transform.opacity = .3;
+        d.layer(right).transform.x = 40;
+        d.layer(right).transform.rotation = 10;
+        d.layer(right).transform.opacity = .9;
+        d.layer(left).transform.x = -60;
+        d.layer(left).transform.y = 8;
+        d.layer(left).transform.rotation = -30;
+        d.layer(left).transform.opacity = .8;
+        sourcePose = captureCharacterPose(d, root, 0,
+            std::vector<PoseCaptureTarget>{{left, PoseChannels::PositionX |
+                                                 PoseChannels::PositionY |
+                                                 PoseChannels::Rotation |
+                                                 PoseChannels::Drawing}}, "Reach left");
+        d.layer(left).transform.x = -40;
+        d.layer(left).transform.y = 0;
+        d.layer(left).transform.rotation = -10;
+        d.layer(left).transform.opacity = .3;
+    }));
+    const auto baseline = session.document();
+    Id mirrored = 0;
+    REQUIRE(session.apply("Mirror pose", [&](Document& d) {
+        mirrored = mirrorCharacterPose(d, root, sourcePose);
+    }));
+    REQUIRE(session.document().layer(left) == baseline.layer(left));
+    REQUIRE(session.document().layer(right) == baseline.layer(right));
+    const auto& entry = session.document().layer(root).poses.back().parts.front();
+    REQUIRE(entry.part == right);
+    REQUIRE(entry.channels == (PoseChannels::PositionX | PoseChannels::PositionY |
+                               PoseChannels::Rotation | PoseChannels::Drawing));
+    REQUIRE(entry.transform.x == 60);
+    REQUIRE(entry.transform.y == 8);
+    REQUIRE(entry.transform.rotation == 30);
+    REQUIRE(entry.transform.opacity == .9);
+    REQUIRE(entry.drawing == rightOpen);
+    REQUIRE(!session.document().layer(root).poses.back().published);
+    REQUIRE(session.apply("Apply mirrored pose", [&](Document& d) {
+        applyCharacterPose(d, root, mirrored, 8);
+    }));
+    REQUIRE(evaluateTransform(session.document().layer(right), 8).x == 60);
+    REQUIRE(evaluateTransform(session.document().layer(right), 8).rotation == 30);
+    REQUIRE(session.document().drawingAt(right, 8)->id == rightOpen);
+    REQUIRE(session.document().layer(left) == baseline.layer(left));
+    REQUIRE(session.undo());
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == baseline);
+
+    auto invalid = baseline;
+    invalid.layer(right).role = "other";
+    const auto beforeMissing = invalid;
+    REQUIRE_THROWS(mirrorCharacterPose(invalid, root, sourcePose));
+    REQUIRE(invalid == beforeMissing);
+    invalid = baseline;
+    invalid.layer(right).variants.front().name = "Open";
+    const auto beforeAmbiguous = invalid;
+    REQUIRE_THROWS(mirrorCharacterPose(invalid, root, sourcePose));
+    REQUIRE(invalid == beforeAmbiguous);
+}
+TEST_CASE("Published view and pose bindings stay local and outside rendered output") {
+    auto document = makeDocument();
+    const Id part = document.layers.front().id;
+    const Id root = makeCharacter(document, part, "Hero");
+    const Id mouth = createSubstitution(document, part, 0, false, "Mouth A");
+    const Id view = captureCharacterView(document, root, 0, "Talk");
+    const Id pose = captureCharacterPose(document, root, 0,
+        std::vector<PoseCaptureTarget>{{part, PoseChannels::Rotation}}, "Turn");
+    const auto before = SceneRenderer::render(document, 0, {320, 180});
+    publishCharacterView(document, root, view, true);
+    publishCharacterPose(document, root, pose, true);
+    publishSubstitution(document, part, mouth, true);
+    REQUIRE(SceneRenderer::render(document, 0, {320, 180}) == before);
+    const Id copy = duplicateCharacter(document, root);
+    REQUIRE(document.layer(copy).views.front().published);
+    REQUIRE(document.layer(copy).poses.front().published);
+    const auto copiedPart = document.layer(copy).views.front().choices.front().part;
+    REQUIRE(document.layer(copiedPart).variants.front().published);
+    REQUIRE(document.layer(copiedPart).variants.front().drawing != mouth);
+    REQUIRE(document.layer(copy).views.front().id != view);
+    REQUIRE(document.layer(copy).poses.front().id != pose);
+    const auto original = document.layer(root).views.front();
+    publishCharacterView(document, copy, document.layer(copy).views.front().id, false);
+    publishSubstitution(document, copiedPart, document.layer(copiedPart).variants.front().drawing, false);
+    REQUIRE(document.layer(root).views.front() == original);
+    REQUIRE(document.layer(part).variants.front().published);
+    document.validate();
+}
+TEST_CASE("Published control groups survive independent copies without rendering") {
+    Session session;
+    const Id part = session.document().layers.front().id;
+    Id root = 0, view = 0, pose = 0, mouth = 0;
+    REQUIRE(session.apply("Create published controls", [&](Document& d) {
+        root = makeCharacter(d, part, "Hero");
+        mouth = createSubstitution(d, part, 0, false, "Smile");
+        view = captureCharacterView(d, root, 0, "Front");
+        pose = captureCharacterPose(d, root, 0,
+            std::vector<PoseCaptureTarget>{{part, PoseChannels::PositionX}}, "Reach");
+        publishSubstitution(d, part, mouth, true);
+        publishCharacterView(d, root, view, true);
+        publishCharacterPose(d, root, pose, true);
+    }));
+    const auto pixels = SceneRenderer::render(session.document(), 0, {320, 180});
+    const auto baseline = session.document();
+    REQUIRE(session.apply("Assign control groups", [&](Document& d) {
+        setSubstitutionControlGroup(d, part, mouth, "Face");
+        setCharacterViewControlGroup(d, root, view, "Stage");
+        setCharacterPoseControlGroup(d, root, pose, "Body");
+    }));
+    REQUIRE(SceneRenderer::render(session.document(), 0, {320, 180}) == pixels);
+    REQUIRE(session.document().layer(part).variants.back().controlGroup == "Face");
+    REQUIRE(session.document().layer(root).views.front().controlGroup == "Stage");
+    REQUIRE(session.document().layer(root).poses.front().controlGroup == "Body");
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == baseline);
+    REQUIRE(session.redo());
+    auto copy = session.document();
+    const Id copiedRoot = duplicateCharacter(copy, root);
+    const auto copiedPart = copy.layer(copiedRoot).views.front().choices.front().part;
+    REQUIRE(copy.layer(copiedPart).variants.back().controlGroup == "Face");
+    REQUIRE(copy.layer(copiedRoot).views.front().controlGroup == "Stage");
+    REQUIRE(copy.layer(copiedRoot).poses.front().controlGroup == "Body");
+    const auto beforeInvalid = copy;
+    REQUIRE_THROWS(setCharacterPoseControlGroup(copy, copiedRoot,
+                   copy.layer(copiedRoot).poses.front().id, ""));
+    REQUIRE_THROWS(setCharacterViewControlGroup(copy, copiedRoot,
+                   copy.layer(copiedRoot).views.front().id, std::string(65, 'x')));
+    REQUIRE_THROWS(setSubstitutionControlGroup(copy, copiedPart,
+                   copy.layer(copiedPart).variants.back().drawing, ""));
+    REQUIRE(copy == beforeInvalid);
+}
+TEST_CASE("Pose entries can be refined per Part without broadening other masks") {
+    Session session;
+    const Id body = session.document().layers.front().id;
+    Id root = 0, hand = 0, pose = 0;
+    REQUIRE(session.apply("Build character", [&](Document& d) {
+        root = makeCharacter(d, body, "Hero");
+        Layer layer;
+        layer.id = d.allocateId();
+        hand = layer.id;
+        layer.name = "Hand";
+        d.layers.push_back(layer);
+        attachDrawingAsPart(d, hand, root, "Hand");
+        d.layer(body).transform.x = 12;
+        d.layer(hand).transform.rotation = 30;
+        pose = captureCharacterPose(d, root, 0,
+            std::vector<PoseCaptureTarget>{{body, PoseChannels::PositionX}}, "Reach");
+    }));
+    REQUIRE(session.apply("Add hand rotation", [&](Document& d) {
+        setCharacterPosePart(d, root, pose, hand, 0, PoseChannels::Rotation);
+    }));
+    REQUIRE(session.document().layer(root).poses.front().parts.size() == 2);
+    const auto before = session.document();
+    REQUIRE_THROWS(session.apply("Missing hand drawing", [&](Document& d) {
+        setCharacterPosePart(d, root, pose, hand, 0, PoseChannels::Drawing);
+    }));
+    REQUIRE(session.document() == before);
+    REQUIRE(session.apply("Change hand rotation", [&](Document& d) {
+        d.layer(hand).transform.rotation = 70;
+        d.layer(hand).transform.x = 25;
+        d.layer(body).transform.x = 42;
+    }));
+    REQUIRE(session.apply("Apply refined pose", [&](Document& d) {
+        applyCharacterPose(d, root, pose, 8);
+    }));
+    REQUIRE(evaluateTransform(session.document().layer(hand), 8).rotation == 30);
+    REQUIRE(evaluateTransform(session.document().layer(hand), 8).x == 25);
+    REQUIRE(evaluateTransform(session.document().layer(body), 8).x == 12);
+    REQUIRE(session.apply("Remove hand entry", [&](Document& d) {
+        removeCharacterPosePart(d, root, pose, hand);
+    }));
+    REQUIRE(session.document().layer(root).poses.front().parts.size() == 1);
+    REQUIRE_THROWS(session.apply("Remove final entry", [&](Document& d) {
+        removeCharacterPosePart(d, root, pose, body);
+    }));
+    REQUIRE(session.document().layer(root).poses.front().parts.size() == 1);
+}
+TEST_CASE("Pose blend has exact endpoints, a half-way drawing threshold and one drag undo") {
+    Session session;
+    const Id part = session.document().layers.front().id;
+    Id root = 0, pose = 0, open = 0, closed = 0;
+    REQUIRE(session.apply("Make blend fixture", [&](Document& d) {
+        root = makeCharacter(d, part, "Hero");
+        closed = createSubstitution(d, part, 0, false, "Closed");
+        open = createSubstitution(d, part, 0, true, "Open");
+        d.layer(part).transform.x = 100;
+        d.layer(part).transform.opacity = .7;
+        pose = captureCharacterPose(d, root, 0,
+            std::vector<PoseCaptureTarget>{{part, PoseChannels::PositionX | PoseChannels::Drawing}},
+            "Reach");
+        selectSubstitution(d, part, 0, closed);
+        d.layer(part).transform.x = 20;
+        d.layer(part).transform.opacity = .3;
+    }));
+    const auto baseline = session.document();
+    auto sample = [&](double amount) {
+        auto d = baseline;
+        blendCharacterPose(d, root, pose, 8, amount);
+        return d;
+    };
+    REQUIRE(sample(0) == baseline);
+    REQUIRE(evaluateTransform(sample(.25).layer(part), 8).x == 40);
+    REQUIRE(sample(.49).drawingAt(part, 8)->id == closed);
+    REQUIRE(sample(.5).drawingAt(part, 8)->id == open);
+    REQUIRE(evaluateTransform(sample(1).layer(part), 8).x == 100);
+    REQUIRE(evaluateTransform(sample(1).layer(part), 8).opacity == .3);
+    REQUIRE(sample(1).drawingAt(part, 8)->id == open);
+    auto invalid = baseline;
+    REQUIRE_THROWS(blendCharacterPose(invalid, root, pose, 8, 1.1));
+    REQUIRE(invalid == baseline);
+    REQUIRE(session.applyCoalesced("Blend pose", 17, [&](Document& d) {
+        blendCharacterPose(d, root, pose, 8, .25);
+    }));
+    REQUIRE(session.applyCoalesced("Blend pose", 17, [&](Document& d) {
+        blendCharacterPose(d, root, pose, 8, .75);
+    }));
+    REQUIRE(session.applyCoalesced("Blend pose", 17, [&](Document& d) {
+        blendCharacterPose(d, root, pose, 8, 1);
+    }));
+    session.endCoalesced(17);
+    REQUIRE(session.document() == sample(1));
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == baseline);
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == sample(1));
+}
 
 TEST_CASE("Character assembly preserves registered artwork through peg and pivot edits") {
     Session session;

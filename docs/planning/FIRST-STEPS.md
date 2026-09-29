@@ -38,12 +38,12 @@ Producing the complete animated shot belongs to HM-15; it does not gate HM-01.
 
 | Recommended priority | Work | Hard join | Parallel work once its prerequisites pass |
 |---|---|---|---|
-| 9 / active | HM-06 bone/curve authoring, animation and variant binding; finish quality and interaction gates | HM-05 accepted | HM-07 poses/declarative controls; HM-10 audio |
-| 10 | HM-07 character poses, widgets, one-dimensional sliders and Animator/Rig views | HM-03 + HM-04 | HM-06; no scripting needed |
+| 9 / parked | HM-06 bone/curve authoring, animation and variant binding; finish quality and interaction gates after the sampled-edge and two-view artwork revision | HM-05 accepted | Resume after the requested session cutoff |
+| 10 / parked | HM-07 character poses, widgets, one-dimensional sliders and Animator/Rig views | HM-03 + HM-04 | Resume after the requested session cutoff |
 | 11 | HM-08 Quick Rig FK recipe: assign roles, place guides, preview/correct/commit | HM-03 + HM-07 | HM-06 or HM-10 |
 | 12 | HM-09 attachments, limited two-bone IK, optional rig recipes and dependency-closed templates | HM-06 + HM-07 + HM-08 | HM-10/11 and HM-12/13 branches |
-| Parallel branch A | HM-10 WAV device clock/waveform/trim/mix/scrub, then HM-11 mouth mapping and manual/timing-file lipsync | HM-01; HM-11 additionally needs HM-03 | Character/deformer work; audio need not wait for rig completion |
-| Parallel branch B | HM-12 node editor, groups, cutters, ordered overlap and template graph closure | HM-03 + HM-04 | Deformers and audio; no solver prerequisite |
+| Parallel branch A / parked | HM-10 PCM16 import, exact waveform, clip edits, repeats, source-sample fades, per-clip solo and stereo balance, exact 48 kHz single-pass splitting and frame-edge trimming, miniaudio preview, scrub, band-limited rate conversion and selected-range WAV export pass as a subset; qualify hardware presentation and rate quality before HM-11 mouth mapping | HM-01; HM-11 additionally needs HM-03 | Both branches are parked at the owner-requested 10:30 CEST cutoff |
+| Parallel branch B / parked | HM-12 format-19 inside/outside cutters and derived Nodes workspace with animated Opacity nodes and clicked previews, format-20 persistent bypass and format-21 visible cutter sources, format-24 opacity bypass and format-25 Normal/Multiply/Screen and format-28 Add blending, direct Drawing-card order dragging and name/kind search pass as a subset; general editable graph, groups, overlap recipes and template closure remain | HM-03 + HM-04 | Deformers and audio; no solver prerequisite |
 | Complete branch C | HM-13 one output camera with pan/zoom/rotation and framing | HM-04 | HM-12 or HM-10; no multiplane prerequisite |
 | 13 | HM-14 revision-safe cached preview and exact PNG/WAV/manifest delivery | HM-10 + HM-12 + HM-13 | Final HM-09 rig/template integration |
 | 14 | HM-15 second-animator complete shot, second-scene reuse, save/reopen/export equivalence and fault recovery | HM-09 + HM-11 + HM-14 | Qualification tasks only; no shortcut around an unfinished branch |

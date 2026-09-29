@@ -3,6 +3,8 @@
 #include "opentoon/rigging.h"
 #include "opentoon/deformation.h"
 #include "opentoon/deformer.h"
+#include "opentoon/character_pose.h"
+#include "opentoon/audio.h"
 #include <catch2/catch_test_macros.hpp>
 #include <algorithm>
 #include <chrono>
@@ -33,6 +35,36 @@ TEST_CASE("Projects round trip Unicode names keys and images with stable identit
     auto loaded = ProjectStore::load(p.file);
     REQUIRE(loaded.document == d);
     REQUIRE(loaded.revision == revision);
+}
+TEST_CASE("Format 13 persists published pose controls and loads older pose schemas") {
+    auto d = makeDocument();
+    const Id part = d.layers.front().id;
+    const Id root = makeCharacter(d, part, "Hero");
+    (void)createSubstitution(d, part, 0, false, "Default");
+    const Id pose = captureCharacterPose(d, root, 0,
+        std::vector<PoseCaptureTarget>{{part, PoseChannels::PositionX | PoseChannels::Drawing}},
+        "Reach");
+    publishCharacterPose(d, root, pose, true);
+    REQUIRE(deserializeDocument(serializeDocument(d)) == d);
+    TemporaryProject project;
+    (void)ProjectStore::save(project.file, d);
+    REQUIRE(ProjectStore::load(project.file).document == d);
+    auto version12 = nlohmann::json::parse(serializeDocument(d));
+    version12["version"] = 12;
+    for (auto& layer : version12["layers"])
+        for (auto& entry : layer["poses"])
+            entry.erase("published");
+    const auto oldPose = deserializeDocument(version12.dump());
+    REQUIRE(oldPose.layer(root).poses.size() == 1);
+    REQUIRE_FALSE(oldPose.layer(root).poses.front().published);
+    auto previous = nlohmann::json::parse(serializeDocument(d));
+    previous["version"] = 11;
+    for (auto& layer : previous["layers"])
+        layer.erase("poses");
+    const auto old = deserializeDocument(previous.dump());
+    REQUIRE(old.layer(root).poses.empty());
+    REQUIRE(old.nextId == d.nextId);
+    REQUIRE(d.layer(root).poses.front().id == pose);
 }
 TEST_CASE("Failure injection preserves the previous or fully committed revision") {
     for (auto point : {ProjectStore::SavePoint::BeforeTransaction, ProjectStore::SavePoint::AfterInsert,
@@ -545,4 +577,498 @@ TEST_CASE("Format ten linked rig migrates explicit rest anchors with a readable 
     REQUIRE(ProjectStore::load(backup).document == original.document);
     FixtureDatabase current(project.file);
     REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+}
+TEST_CASE("Format twelve pose scene upgrades published controls with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    const Id part = original.layers.front().id;
+    const Id root = makeCharacter(original, part, "Hero");
+    (void)createSubstitution(original, part, 0, false, "Mouth A");
+    const Id pose = captureCharacterPose(original, root, 0,
+        std::vector<PoseCaptureTarget>{{part, PoseChannels::Rotation}}, "Turn");
+    const Id view = captureCharacterView(original, root, 0, "Front");
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 12;
+    for (auto& layer : legacy["layers"]) {
+        for (auto& entry : layer["poses"])
+            entry.erase("published");
+        for (auto& entry : layer["views"])
+            entry.erase("published");
+    }
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=12");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    publishCharacterPose(changed, root, pose, true);
+    publishCharacterView(changed, root, view, true);
+    REQUIRE(ProjectStore::save(project.file, changed, "Publish controls", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v12.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+}
+TEST_CASE("Format thirteen substitutes migrate published drawings with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    const Id part = original.layers.front().id;
+    (void)makeCharacter(original, part, "Hero");
+    const Id drawing = createSubstitution(original, part, 0, false, "Mouth A");
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 13;
+    for (auto& layer : legacy["layers"])
+        for (auto& variant : layer["variants"])
+            variant.erase("published");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=13");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    publishSubstitution(changed, part, drawing, true);
+    REQUIRE(ProjectStore::save(project.file, changed, "Publish drawing", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v13.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+}
+TEST_CASE("Format fourteen control groups migrate with a readable source backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    const Id part = original.layers.front().id;
+    const Id root = makeCharacter(original, part, "Hero");
+    const Id drawing = createSubstitution(original, part, 0, false, "Smile");
+    const Id view = captureCharacterView(original, root, 0, "Front");
+    const Id pose = captureCharacterPose(original, root, 0,
+        std::vector<PoseCaptureTarget>{{part, PoseChannels::PositionX}}, "Reach");
+    publishSubstitution(original, part, drawing, true);
+    publishCharacterView(original, root, view, true);
+    publishCharacterPose(original, root, pose, true);
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 14;
+    for (auto& layer : legacy["layers"]) {
+        for (auto& variant : layer["variants"])
+            variant.erase("controlGroup");
+        for (auto& entry : layer["views"])
+            entry.erase("controlGroup");
+        for (auto& entry : layer["poses"])
+            entry.erase("controlGroup");
+    }
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=14");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    setSubstitutionControlGroup(changed, part, drawing, "Face");
+    setCharacterViewControlGroup(changed, root, view, "Stage");
+    setCharacterPoseControlGroup(changed, root, pose, "Body");
+    REQUIRE(ProjectStore::save(project.file, changed, "Group controls", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v14.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+}
+TEST_CASE("Format seventeen cutter matte migration keeps a readable source backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 17;
+    for (auto& layer : legacy["layers"])
+        layer.erase("matte");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=17");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    Layer source = changed.layers.front();
+    source.id = changed.allocateId();
+    source.name = "Cutter";
+    changed.layers.push_back(source);
+    changed.layers.front().matte = source.id;
+    changed.validate();
+    REQUIRE(ProjectStore::save(project.file, changed, "Add cutter matte", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v17.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+}
+TEST_CASE("Format eighteen cutter inversion migrates with a readable source backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    Layer source = original.layers.front();
+    source.id = original.allocateId();
+    source.name = "Cutter";
+    original.layers.push_back(source);
+    original.layers.front().matte = source.id;
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 18;
+    for (auto& layer : legacy["layers"])
+        layer.erase("invertMatte");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=18");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    changed.layers.front().invertMatte = true;
+    REQUIRE(ProjectStore::save(project.file, changed, "Invert cutter", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v18.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+}
+TEST_CASE("Format nineteen cutters migrate disabled bypass with a readable source backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    Layer source = original.layers.front();
+    source.id = original.allocateId();
+    source.name = "Cutter";
+    original.layers.push_back(source);
+    original.layers.front().matte = source.id;
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 19;
+    for (auto& layer : legacy["layers"])
+        layer.erase("matteBypassed");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=19");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    changed.layers.front().matteBypassed = true;
+    REQUIRE(ProjectStore::save(project.file, changed, "Bypass cutter", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v19.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+}
+TEST_CASE("Format twenty cutters migrate hidden source painting with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    Layer source = original.layers.front();
+    source.id = original.allocateId();
+    source.name = "Cutter";
+    original.layers.push_back(source);
+    original.layers.front().matte = source.id;
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 20;
+    for (auto& layer : legacy["layers"])
+        layer.erase("paintMatteSource");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=20");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    changed.layers.back().paintMatteSource = true;
+    REQUIRE(ProjectStore::save(project.file, changed, "Paint cutter source", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v20.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+}
+TEST_CASE("Format twenty-one audio clips migrate silent fades with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    std::vector<std::uint8_t> wav{'R', 'I', 'F', 'F'};
+    const auto put16 = [&](std::uint16_t value) {
+        wav.push_back(std::uint8_t(value));
+        wav.push_back(std::uint8_t(value >> 8));
+    };
+    const auto put32 = [&](std::uint32_t value) {
+        wav.push_back(std::uint8_t(value));
+        wav.push_back(std::uint8_t(value >> 8));
+        wav.push_back(std::uint8_t(value >> 16));
+        wav.push_back(std::uint8_t(value >> 24));
+    };
+    put32(36 + 8 * 2);
+    wav.insert(wav.end(), {'W', 'A', 'V', 'E', 'f', 'm', 't', ' '});
+    put32(16); put16(1); put16(1); put32(8000); put32(16000);
+    put16(2); put16(16);
+    wav.insert(wav.end(), {'d', 'a', 't', 'a'});
+    put32(16);
+    for (int sample = 0; sample < 8; ++sample)
+        put16(16384);
+    const auto clipId = importPcm16Wav(original, "tone", wav, 0);
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 21;
+    for (auto& clip : legacy["audioClips"]) {
+        clip.erase("fadeInSamples");
+        clip.erase("fadeOutSamples");
+    }
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=21");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    setAudioClipFades(changed, clipId, 2, 2);
+    REQUIRE(ProjectStore::save(project.file, changed, "Fade cue", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v21.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+}
+TEST_CASE("Format twenty-two audio clips default to unmuted with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    std::vector<std::uint8_t> wav{'R', 'I', 'F', 'F', 52, 0, 0, 0,
+                                  'W', 'A', 'V', 'E', 'f', 'm', 't', ' ',
+                                  16, 0, 0, 0, 1, 0, 1, 0,
+                                  0x40, 0x1f, 0, 0, 0x80, 0x3e, 0, 0,
+                                  2, 0, 16, 0, 'd', 'a', 't', 'a',
+                                  16, 0, 0, 0};
+    wav.resize(60, 0);
+    const auto clipId = importPcm16Wav(original, "silence", wav, 0);
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 22;
+    for (auto& clip : legacy["audioClips"])
+        clip.erase("muted");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=22");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    setAudioClipMuted(changed, clipId, true);
+    REQUIRE(ProjectStore::save(project.file, changed, "Mute cue", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v22.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+    auto invalidCurrent = legacy;
+    invalidCurrent["version"] = Document::formatVersion;
+    REQUIRE_THROWS(deserializeDocument(invalidCurrent.dump()));
+}
+TEST_CASE("Format twenty-three layers default to enabled opacity with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    original.layers.front().transform.opacity = .5;
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 23;
+    for (auto& layer : legacy["layers"])
+        layer.erase("opacityBypassed");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=23");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    changed.layers.front().opacityBypassed = true;
+    REQUIRE(ProjectStore::save(project.file, changed, "Bypass opacity", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v23.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+    auto invalidCurrent = legacy;
+    invalidCurrent["version"] = Document::formatVersion;
+    REQUIRE_THROWS(deserializeDocument(invalidCurrent.dump()));
+}
+TEST_CASE("Format twenty-four layers default to Normal blend with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 24;
+    for (auto& layer : legacy["layers"])
+        layer.erase("blendMode");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=24");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    changed.layers.front().blendMode = LayerBlendMode::Multiply;
+    REQUIRE(ProjectStore::save(project.file, changed, "Multiply blend", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v24.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+    auto invalidCurrent = legacy;
+    invalidCurrent["version"] = Document::formatVersion;
+    REQUIRE_THROWS(deserializeDocument(invalidCurrent.dump()));
+}
+TEST_CASE("Format twenty-seven layers retain Screen and upgrade Add with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    original.layers.front().blendMode = LayerBlendMode::Screen;
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 27;
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=27");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    changed.layers.front().blendMode = LayerBlendMode::Add;
+    REQUIRE(ProjectStore::save(project.file, changed, "Add blend", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v27.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+    auto invalidLegacy = legacy;
+    invalidLegacy["layers"][0]["blendMode"] = int(LayerBlendMode::Add);
+    REQUIRE_THROWS(deserializeDocument(invalidLegacy.dump()));
+}
+TEST_CASE("Format twenty-five audio clips default to unsoloed with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    std::vector<std::uint8_t> wav{'R', 'I', 'F', 'F', 52, 0, 0, 0,
+                                  'W', 'A', 'V', 'E', 'f', 'm', 't', ' ',
+                                  16, 0, 0, 0, 1, 0, 1, 0,
+                                  0x40, 0x1f, 0, 0, 0x80, 0x3e, 0, 0,
+                                  2, 0, 16, 0, 'd', 'a', 't', 'a',
+                                  16, 0, 0, 0};
+    wav.resize(60, 0);
+    const auto clipId = importPcm16Wav(original, "silence", wav, 0);
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 25;
+    for (auto& clip : legacy["audioClips"])
+        clip.erase("solo");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=25");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    setAudioClipSolo(changed, clipId, true);
+    REQUIRE(ProjectStore::save(project.file, changed, "Solo cue", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v25.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+    auto invalidCurrent = legacy;
+    invalidCurrent["version"] = Document::formatVersion;
+    REQUIRE_THROWS(deserializeDocument(invalidCurrent.dump()));
+}
+TEST_CASE("Format twenty-six audio clips default to centered balance with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    std::vector<std::uint8_t> wav{'R', 'I', 'F', 'F', 52, 0, 0, 0,
+                                  'W', 'A', 'V', 'E', 'f', 'm', 't', ' ',
+                                  16, 0, 0, 0, 1, 0, 1, 0,
+                                  0x40, 0x1f, 0, 0, 0x80, 0x3e, 0, 0,
+                                  2, 0, 16, 0, 'd', 'a', 't', 'a',
+                                  16, 0, 0, 0};
+    wav.resize(60, 0);
+    const auto clipId = importPcm16Wav(original, "silence", wav, 0);
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 26;
+    for (auto& clip : legacy["audioClips"])
+        clip.erase("balance");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=26");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    setAudioClipBalance(changed, clipId, -.75);
+    REQUIRE(ProjectStore::save(project.file, changed, "Balance cue", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v26.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+    auto invalidCurrent = legacy;
+    invalidCurrent["version"] = Document::formatVersion;
+    REQUIRE_THROWS(deserializeDocument(invalidCurrent.dump()));
+}
+TEST_CASE("Format fifteen audio migration preserves a readable source backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 15;
+    legacy.erase("audioAssets");
+    legacy.erase("audioClips");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=15");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    changed.name = "Sound-ready scene";
+    REQUIRE(ProjectStore::save(project.file, changed, "Migrate audio schema", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v15.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+}
+TEST_CASE("Format sixteen clips migrate to one repeat with a readable source backup") {
+    TemporaryProject project;
+    const auto original = makeDocument();
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 16;
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=16");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    changed.name = "Repeat-ready scene";
+    REQUIRE(ProjectStore::save(project.file, changed, "Migrate repeat schema", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v16.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
 }

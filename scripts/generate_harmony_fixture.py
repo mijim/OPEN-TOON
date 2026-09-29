@@ -40,6 +40,9 @@ HAIR_LIGHT = (124, 76, 75, 255)
 CREAM = (249, 228, 194, 255)
 ACCENT = (228, 103, 72, 255)
 ACCENT_DARK = (176, 67, 63, 255)
+CAP = (175, 63, 88, 255)
+CAP_LIGHT = (211, 93, 111, 255)
+CAP_DARK = (117, 42, 67, 255)
 PANTS = (43, 50, 62, 255)
 PANTS_LIGHT = (77, 88, 100, 255)
 MOUTH = (89, 48, 59, 255)
@@ -61,9 +64,25 @@ class Canvas:
         ink = bytes(color)
         for y in range(top, bottom):
             for x in range(left, right):
-                if hit(x + 0.5, y + 0.5):
-                    offset = (y * self.size + x) * 4
+                coverage = sum(hit(x + dx, y + dy)
+                               for dy in (0.25, 0.75) for dx in (0.25, 0.75))
+                if not coverage:
+                    continue
+                offset = (y * self.size + x) * 4
+                if coverage == 4 and color[3] == 255:
                     self.pixels[offset:offset + 4] = ink
+                    continue
+                source_alpha = color[3] * coverage / 4
+                old_alpha = self.pixels[offset + 3]
+                remaining = 1 - source_alpha / 255
+                output_alpha = source_alpha + old_alpha * remaining
+                if output_alpha:
+                    for channel in range(3):
+                        old = self.pixels[offset + channel]
+                        self.pixels[offset + channel] = round(
+                            (color[channel] * source_alpha +
+                             old * old_alpha * remaining) / output_alpha)
+                    self.pixels[offset + 3] = round(output_alpha)
 
     def ellipse(self, cx: float, cy: float, rx: float, ry: float, color: tuple[int, ...]) -> None:
         self.fill((cx - rx, cy - ry, cx + rx, cy + ry),
@@ -252,6 +271,23 @@ def artwork(role: str, variant: str) -> bytes:
                           82 + shift, 102)], HAIR)
         art.line([(101 + shift, 57), (135 + shift, 39),
                   (165 + shift, 44)], 1.7, HAIR_LIGHT)
+        art.curve_shape((74 + shift, 83),
+                        [('C', 75 + shift, 53, 102 + shift, 28, 139 + shift, 29),
+                         ('C', 172 + shift, 26, 197 + shift, 40, 202 + shift, 72),
+                         ('L', 194 + shift, 91),
+                         ('C', 152 + shift, 79, 110 + shift, 78, 77 + shift, 94),
+                         ('L', 74 + shift, 83)], CAP, 3.5)
+        art.curve_shape((90 + shift, 75),
+                        [('C', 111 + shift, 48, 145 + shift, 39, 169 + shift, 43),
+                         ('C', 132 + shift, 47, 112 + shift, 60, 98 + shift, 84),
+                         ('L', 90 + shift, 75)], CAP_LIGHT)
+        art.curve_shape((78 + shift, 88),
+                        [('C', 106 + shift, 74, 154 + shift, 74, 193 + shift, 88),
+                         ('C', 179 + shift, 104, 156 + shift, 107, 136 + shift, 101),
+                         ('C', 114 + shift, 95, 95 + shift, 97, 78 + shift, 105),
+                         ('L', 78 + shift, 88)], CAP_DARK, 3)
+        art.line([(84 + shift, 92), (111 + shift, 88), (137 + shift, 89)], 1.5,
+                 CAP_LIGHT)
     elif role == 'eyes':
         side = variant == 'three_quarter'
         eyes = [(112, 126, 9, 8), (163, 125, 9, 9)] if not side else [
@@ -480,7 +516,14 @@ def preview(spec: dict, parts: Path, pose: dict) -> bytes:
                 dx = round((center_x + sx - SIZE // 2 - width / 2) * zoom + width / 2)
                 if 0 <= dx < width:
                     target = (dy * width + dx) * 4
-                    pixels[target:target + 4] = raw[source:source + 4]
+                    alpha = raw[source + 3]
+                    if alpha == 255:
+                        pixels[target:target + 4] = raw[source:source + 4]
+                    else:
+                        for channel in range(3):
+                            pixels[target + channel] = (
+                                raw[source + channel] * alpha +
+                                pixels[target + channel] * (255 - alpha) + 127) // 255
     rows = b''.join(b'\0' + pixels[y * width * 4:(y + 1) * width * 4] for y in range(height))
     header = struct.pack('>2I5B', width, height, 8, 6, 0, 0, 0)
     return (b'\x89PNG\r\n\x1a\n' + png_chunk(b'IHDR', header) +

@@ -11,11 +11,11 @@
 | Language | English across first-party UI, assets, code, help and documentation | User requirement; previous documentation translated |
 | Technology | C++20, Qt 6 and Qt Quick/QML | Accepted by user; risky integration paths need spikes |
 | Renderer | CPU QPainter reference adapter; Qt RHI/Skia comparison remains open | Experimental |
-| Storage | SQLite revisions with compressed, checksummed immutable media; format-11 bone-tip anchors and source-version migration backups | See ADR-025–031 and recovery tests |
+| Storage/media | SQLite revisions with compressed, checksummed immutable media; format-28 layer blending, format-27 clip stereo balance, format-26 clip solo, earlier saved cutters, opacity and PCM16 clips, source-version migration backups, band-limited rate conversion and experimental miniaudio preview | See current ADRs and recovery tests |
 | Open-source reuse | Prefer proven libraries through tested adapters | User requirement; 30 library/tool entries evaluated in the roadmap |
 | Initial license | GPL-3.0-or-later for original contributions | Adopted |
 | Implementation | Experimental editor; partial catalog coverage | No complete phase or production release |
-| Distribution | Experimental.11 macOS arm64 ZIP and Linux x86_64 AppImage | Limited profiles; unsigned/not notarized and not supported 1.0 |
+| Distribution | Historical experimental.11 macOS arm64 ZIP and Linux x86_64 AppImage; current work is source only | Limited profiles; unsigned/not notarized and not supported 1.0 |
 | Development roadmap | Harmony Moment: 16 contract-gated slices; 23 retained phases, 70 work packages, 283 capabilities | Prepared; estimates subject to evidence |
 
 ## One route for current work

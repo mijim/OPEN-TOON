@@ -134,7 +134,7 @@ Docking, tabbing and saved workspaces with a Qt Quick frontend.
 
 ## LIB-AUDIO — miniaudio
 
-**Phase:** P07. **Decision:** `candidate_requires_spike`.
+**Phase:** P07. **Decision:** `experimental_adopted`.
 
 **Delivery:** harmony_moment_boundary; slices: HM-10.
 
@@ -142,11 +142,11 @@ Cross-platform audio device playback, mixing and capture infrastructure.
 
 **Boundary:** One real-time audio engine; FFmpeg handles media formats outside it. No allocations or document locks in the audio callback.
 
-**Evaluation:** SP-05: 10-minute rational-rate sync, device replacement, scrub and underrun traces. HM-10 starts with the already-resolved but unlinked miniaudio package; verify its exact revision and adopt only after clock/device tests. WAV/PCM does not require the FFmpeg adapter.
+**Evaluation:** Mac M1 Pro Release two-source 1024-frame callback mix p95 0.014 ms for 44.1/48 kHz and 0.232 ms for two anti-aliased 96 kHz sources versus a 21.33 ms output period; null backend start/seek/stop and exact 600-second fractional-rate scene mapping pass. Silent ten-minute CoreAudio probes at 24 and 24000/1001 fps measured zero callback processing overruns, with 569/262 final drift samples relative to the host monotonic clock. Hardware presentation latency/underruns, device replacement, full audiovisual drift and cross-platform qualification remain open.
 
-**Fallback:** Evaluate Qt Multimedia behind the same audio port, choosing one engine after measurement.
+**Fallback:** Retain deterministic offline PCM WAV and silent visual preview; evaluate Qt Multimedia behind the same audio-device boundary if hardware qualification fails.
 
-**License investigation:** Public domain or MIT No Attribution; record the selected option.
+**License investigation:** MIT No Attribution (MIT-0) option selected; packaged LICENSE reviewed, Copyright David Reid.
 
 **Primary source:** [miniaudio upstream](https://github.com/mackron/miniaudio).
 

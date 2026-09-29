@@ -40,6 +40,7 @@ Use the actual Homebrew prefix on Intel machines. System packages may differ fro
 ```sh
 # macOS; Linux/Windows use the open-toon executable in the build directory.
 open build/locked/open-toon.app
+build/locked/open-toon.app/Contents/MacOS/open-toon --open examples/clockwork-continuous.otoon
 build/locked/open-toon.app/Contents/MacOS/open-toon --smoke-test
 QT_QPA_PLATFORM=offscreen build/locked/open-toon.app/Contents/MacOS/open-toon \
   --render-demo build/example-export

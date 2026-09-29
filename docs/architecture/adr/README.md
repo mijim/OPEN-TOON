@@ -97,3 +97,60 @@ bone/curve animation contract, local weights and ephemeral pose evaluation.
 
 See [ADR-031](031-bone-tip-attachment.md) for the bounded format-10 parent
 bone-tip link, evaluation order, validation and migration boundary.
+
+See [ADR-032](032-named-character-poses.md) for format-12 named masked poses,
+atomic application and stable Part/substitution references.
+
+See [ADR-033](033-published-character-controls.md) for format-13 published
+poses/views and the local Animator/Rig workspace boundary.
+
+See [ADR-034](034-published-drawing-substitutions.md) for format-14 published
+drawing choices scoped to one Part in the Animator dashboard.
+
+See [ADR-035](035-character-control-groups.md) for format-15 grouped published
+controls and view-only group switching in Animator.
+
+See [ADR-036](036-pcm-audio-document.md) for format-16 original PCM16 WAV
+assets, sample-range clips and rational frame-to-sample waveform mapping.
+
+See [ADR-037](037-miniaudio-preview-clock.md) for experimental PCM16 device
+preview, immutable callback mixing and the submitted-sample playhead boundary.
+
+See [ADR-038](038-repeated-audio-clips.md) for format-17 saved repeat counts,
+sample-contiguous looping and format-16 migration.
+
+See [ADR-039](039-layer-cutter-matte.md) for format-18 saved cutter matte
+bindings, fractional graph evaluation and reference validation.
+
+See [ADR-040](040-inverted-cutter-matte.md) for format-19 fractional outside
+coverage and typed matte inversion.
+
+See [ADR-041](041-audio-downsampling-kernel.md) for the bounded precomputed
+band-limited filter used when PCM source and output rates differ.
+
+See [ADR-042](042-selected-audio-export-range.md) for half-open frame-range
+PCM WAV export and exact rational sample boundaries.
+
+See [ADR-043](043-typed-layer-opacity-node.md) for the derived Image → Opacity
+node, its existing animated layer property and fractional cutter ordering.
+
+See [ADR-044](044-persistent-cutter-bypass.md) for format-20 cutter bypass,
+retained source references and inactive graph dependencies.
+
+See [ADR-045](045-visible-cutter-source.md) for format-21 source painting while
+the same image supplies fractional matte coverage.
+
+See [ADR-046](046-sample-accurate-audio-fades.md) for format-22 source-sample
+clip envelopes shared by device playback and PCM WAV output.
+
+See [ADR-047](047-per-clip-audio-mute.md) for format-23 saved clip muting
+shared by device playback, scrub and PCM WAV export.
+
+See [ADR-048](048-persistent-opacity-bypass.md) for format-24 Drawing/Part
+opacity bypass with preserved keys and shared Display/Write graph evaluation.
+
+See [ADR-049](049-layer-blend-modes.md) for format-25 Normal, Multiply and
+Screen layer blending with premultiplied alpha and explicit color profiles.
+
+See [ADR-050](050-frame-aligned-audio-split.md) for an exact 48 kHz PCM clip
+split at a scene frame with shared source, fade boundaries and atomic undo.

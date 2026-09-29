@@ -31,6 +31,7 @@ ApplicationWindow {
         onActivated: editor.tool = "Animate"
     }
     property bool showCurves: false
+    property bool showNodes: false
     property bool showTimingTools: false
     property int meshBindColumns: 4
     property int meshBindRows: 4
@@ -49,10 +50,16 @@ ApplicationWindow {
     property string pendingAction: ""
     property bool allowClose: false
     property bool textEditing: activeFocusItem instanceof TextInput || activeFocusItem instanceof TextEdit
+    readonly property var activePublishedViews: editor.characterViews.filter(v =>
+        v.published && v.controlGroup === editor.selectedControlGroup)
+    readonly property var activePublishedPoses: editor.characterPoses.filter(p =>
+        p.published && p.controlGroup === editor.selectedControlGroup)
+    readonly property var activePublishedDrawings: editor.publishedCharacterSubstitutions.filter(d =>
+        d.group === editor.selectedControlGroup)
     readonly property bool drawingSelectionTool: ["Select", "Marquee", "Lasso"].includes(editor.tool)
     readonly property bool canvasEditingFocused: canvas.activeFocus && drawingSelectionTool
     property bool xsheet: false
-    readonly property bool keyWorkspaceFocused: (showCurves && curveEditor.activeFocus) || (!showCurves && keyEditing && timeline.activeFocus)
+    readonly property bool keyWorkspaceFocused: (showCurves && curveEditor.activeFocus) || (!showCurves && !showNodes && keyEditing && timeline.activeFocus)
     property bool keyEditing: editor.tool === "Animate"
     property int timelineCell: 22
     property int timelineRow: 34
@@ -264,6 +271,10 @@ ApplicationWindow {
                 onTriggered: sequenceDialog.open()
             }
             Action {
+                text: "Import PCM16 WAV…"
+                onTriggered: audioDialog.open()
+            }
+            Action {
                 text: editor.activeCamera ? "Edit output camera" : "Add output camera"
                 onTriggered: { editor.addCamera(); root.inspectorMode = "layer"; canvas.clearRegion(); }
             }
@@ -271,6 +282,16 @@ ApplicationWindow {
                 text: "Export PNG sequence…"
                 enabled: !editor.exporting
                 onTriggered: exportDialog.open()
+            }
+            Action {
+                text: "Export PCM WAV mix…"
+                enabled: !editor.exporting
+                onTriggered: audioExportDialog.open()
+            }
+            Action {
+                text: "Export selected PCM WAV range…"
+                enabled: !editor.exporting && editor.rangeEnd > editor.rangeStart
+                onTriggered: audioRangeExportDialog.open()
             }
             Action {
                 text: "Scene settings…"
@@ -455,6 +476,14 @@ ApplicationWindow {
                     elide: Text.ElideRight
                     Layout.preferredWidth: 220
                     Layout.maximumWidth: 350
+                }
+                C.CompactComboBox {
+                    objectName: "workspacePicker"
+                    model: ["Rig", "Animator"]
+                    currentIndex: editor.workspaceMode === "Animator" ? 1 : 0
+                    onActivated: editor.workspaceMode = currentText
+                    Accessible.name: "Workspace"
+                    implicitWidth: 112
                 }
                 Rectangle {
                     Layout.preferredWidth: stateLabel.implicitWidth + 16
@@ -826,6 +855,146 @@ ApplicationWindow {
                     anchors.fill: parent
                     editor: root.backend
                 }
+                Rectangle {
+                    id: canvasControls
+                    objectName: "canvasAnimatorControls"
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+                    anchors.margins: 16
+                    width: Math.min(254, parent.width - 32)
+                    height: Math.min(canvasControlsContent.implicitHeight + 20,
+                                     Math.max(120, parent.height - 32))
+                    visible: editor.workspaceMode === "Animator" && editor.characterId > 0 &&
+                             (root.activePublishedPoses.length > 0 || root.activePublishedDrawings.length > 0)
+                    z: 2
+                    radius: 6
+                    color: "#ee151515"
+                    border.color: "#555555"
+                    ScrollView {
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        clip: true
+                        contentWidth: availableWidth
+                        ColumnLayout {
+                            id: canvasControlsContent
+                            width: 232
+                            spacing: 6
+                            Label {
+                                text: "CHARACTER CONTROLS"
+                                color: "#aaaaaa"
+                                font.pixelSize: 10
+                                font.letterSpacing: 1.1
+                            }
+                            C.CompactComboBox {
+                                objectName: "canvasControlGroupPicker"
+                                Layout.fillWidth: true
+                                visible: editor.characterControlGroups.length > 1
+                                model: editor.characterControlGroups
+                                currentIndex: model.indexOf(editor.selectedControlGroup)
+                                onActivated: editor.selectedControlGroup = currentText
+                                Accessible.name: "Canvas control group"
+                            }
+                            C.CompactComboBox {
+                                objectName: "canvasPosePicker"
+                                Layout.fillWidth: true
+                                visible: root.activePublishedPoses.length > 0
+                                model: root.activePublishedPoses
+                                textRole: "name"
+                                valueRole: "id"
+                                currentIndex: model.findIndex(p => p.id === editor.selectedCharacterPose)
+                                onActivated: editor.selectCharacterPose(currentValue)
+                                Accessible.name: "Canvas published pose"
+                            }
+                            RowLayout {
+                                Layout.fillWidth: true
+                                visible: root.activePublishedPoses.length > 0
+                                C.CompactButton {
+                                    text: "Apply"
+                                    enabled: root.activePublishedPoses.some(p => p.id === editor.selectedCharacterPose)
+                                    onClicked: editor.applySelectedCharacterPose()
+                                    Accessible.name: "Apply canvas pose"
+                                }
+                                Slider {
+                                    id: canvasPoseBlend
+                                    objectName: "canvasPoseBlend"
+                                    Layout.fillWidth: true
+                                    implicitHeight: 24
+                                    from: 0
+                                    to: 1
+                                    value: 0
+                                    enabled: root.activePublishedPoses.some(p => p.id === editor.selectedCharacterPose)
+                                    onPressedChanged: {
+                                        if (pressed)
+                                            editor.beginSelectedCharacterPoseBlend()
+                                        else
+                                            editor.endSelectedCharacterPoseBlend()
+                                    }
+                                    onMoved: editor.updateSelectedCharacterPoseBlend(value)
+                                    Accessible.name: "Blend canvas character pose"
+                                    background: Rectangle {
+                                        x: canvasPoseBlend.leftPadding
+                                        y: canvasPoseBlend.topPadding + canvasPoseBlend.availableHeight / 2 - height / 2
+                                        width: canvasPoseBlend.availableWidth
+                                        height: 3
+                                        radius: 2
+                                        color: "#303030"
+                                        Rectangle {
+                                            width: canvasPoseBlend.visualPosition * parent.width
+                                            height: parent.height
+                                            radius: parent.radius
+                                            color: "#b8b8b8"
+                                        }
+                                    }
+                                    handle: Rectangle {
+                                        x: canvasPoseBlend.leftPadding + canvasPoseBlend.visualPosition *
+                                           (canvasPoseBlend.availableWidth - width)
+                                        y: canvasPoseBlend.topPadding + canvasPoseBlend.availableHeight / 2 - height / 2
+                                        width: 12
+                                        height: 12
+                                        radius: 6
+                                        color: "#e8e8e8"
+                                        border.color: "#171717"
+                                    }
+                                }
+                                Label {
+                                    text: Math.round(canvasPoseBlend.value * 100) + "%"
+                                    color: "#aaaaaa"
+                                    font.pixelSize: 10
+                                    Layout.preferredWidth: 32
+                                }
+                            }
+                            Connections {
+                                target: editor
+                                function onPoseSelectionChanged() { canvasPoseBlend.value = 0 }
+                            }
+                            Repeater {
+                                model: root.activePublishedDrawings
+                                ColumnLayout {
+                                    id: canvasDrawingGroup
+                                    required property var modelData
+                                    Layout.fillWidth: true
+                                    spacing: 2
+                                    Label {
+                                        text: canvasDrawingGroup.modelData.name
+                                        color: "#aaaaaa"
+                                        font.pixelSize: 10
+                                    }
+                                    C.CompactComboBox {
+                                        objectName: "canvasDrawingPicker"
+                                        Layout.fillWidth: true
+                                        model: canvasDrawingGroup.modelData.options
+                                        textRole: "name"
+                                        valueRole: "id"
+                                        currentIndex: model.findIndex(v => v.id === canvasDrawingGroup.modelData.selected)
+                                        onActivated: editor.applyPublishedSubstitution(canvasDrawingGroup.modelData.part,
+                                                                                        currentValue)
+                                        Accessible.name: "Canvas drawings for " + canvasDrawingGroup.modelData.name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 Text {
                     anchors.left: parent.left
                     anchors.top: parent.top
@@ -864,13 +1033,13 @@ ApplicationWindow {
                         Text {
                             Layout.leftMargin: 16
                             Layout.topMargin: 18
-                            text: "PROPERTIES"
+                            text: editor.workspaceMode === "Animator" ? "CHARACTER" : "PROPERTIES"
                             color: "#888888"
                             font.pixelSize: 10
                             font.letterSpacing: 1.4
                         }
                         Label {
-                            visible: canvas.objectProperties.kind === "none" && root.inspectorMode !== "layer"
+                            visible: editor.workspaceMode === "Rig" && canvas.objectProperties.kind === "none" && root.inspectorMode !== "layer"
                             Layout.leftMargin: 16
                             Layout.rightMargin: 16
                             Layout.fillWidth: true
@@ -879,7 +1048,7 @@ ApplicationWindow {
                             color: "#999999"
                         }
                         C.SelectionProperties {
-                            visible: canvas.objectProperties.kind !== "none"
+                            visible: editor.workspaceMode === "Rig" && canvas.objectProperties.kind !== "none"
                             Layout.leftMargin: 16
                             Layout.rightMargin: 16
                             Layout.fillWidth: true
@@ -888,7 +1057,7 @@ ApplicationWindow {
                         }
                         ColumnLayout {
                             id: layerInspector
-                            visible: root.inspectorMode === "layer" && canvas.objectProperties.kind === "none"
+                            visible: editor.workspaceMode === "Rig" && root.inspectorMode === "layer" && canvas.objectProperties.kind === "none"
                             Layout.fillWidth: true
                             property var rigLayer: editor.layers.find(l => l.id === editor.selectedLayer)
                             Label {
@@ -938,7 +1107,10 @@ ApplicationWindow {
                                 }
                                 C.ToolButton {
                                     text: "Curves"
-                                    onClicked: root.showCurves = true
+                                    onClicked: {
+                                        root.showNodes = false;
+                                        root.showCurves = true;
+                                    }
                                 }
                                 C.ToolButton {
                                     text: "Pose ▾"
@@ -1096,6 +1268,57 @@ ApplicationWindow {
                                 valueRole: "id"
                                 onActivated: editor.setParent(currentValue)
                                 Accessible.name: "Parent layer"
+                            }
+                            C.CompactComboBox {
+                                objectName: "cutterMattePicker"
+                                Layout.leftMargin: 16
+                                Layout.rightMargin: 16
+                                Layout.fillWidth: true
+                                implicitHeight: 30
+                                visible: layerInspector.rigLayer?.kind === 0 || layerInspector.rigLayer?.kind === 3
+                                enabled: visible && !layerInspector.rigLayer?.locked
+                                model: {
+                                    const selected = layerInspector.rigLayer;
+                                    if (!selected)
+                                        return [];
+                                    return [{id: 0, name: "No cutter matte"}].concat(
+                                        editor.layers.filter(l => (l.kind === 0 || l.kind === 3) &&
+                                                             l.id !== selected.id && l.visible && l.matte === 0));
+                                }
+                                currentIndex: Math.max(0, model.findIndex(l => l.id === layerInspector.rigLayer?.matte))
+                                textRole: "name"
+                                valueRole: "id"
+                                onActivated: editor.setLayerMatte(currentValue)
+                                Accessible.name: "Cutter matte source"
+                            }
+                            C.CompactCheckBox {
+                                Layout.leftMargin: 16
+                                visible: layerInspector.rigLayer?.matte > 0
+                                enabled: visible && !layerInspector.rigLayer?.locked
+                                text: "Bypass cutter"
+                                checked: layerInspector.rigLayer?.matteBypassed || false
+                                onClicked: editor.setMatteBypassed(checked)
+                                Accessible.name: "Bypass cutter matte"
+                            }
+                            C.CompactCheckBox {
+                                Layout.leftMargin: 16
+                                visible: layerInspector.rigLayer?.matte > 0
+                                enabled: visible && !layerInspector.rigLayer?.locked
+                                text: "Use outside of cutter"
+                                checked: layerInspector.rigLayer?.invertMatte || false
+                                onClicked: editor.setMatteInverted(checked)
+                                Accessible.name: "Invert cutter matte"
+                            }
+                            C.CompactCheckBox {
+                                objectName: "paintCutterSource"
+                                Layout.leftMargin: 16
+                                visible: layerInspector.rigLayer?.matte > 0
+                                enabled: visible && !layerInspector.rigLayer?.locked &&
+                                         !editor.layers.find(l => l.id === layerInspector.rigLayer?.matte)?.locked
+                                text: "Paint cutter source"
+                                checked: editor.layers.find(l => l.id === layerInspector.rigLayer?.matte)?.paintMatteSource || false
+                                onClicked: editor.setMatteSourceVisible(checked)
+                                Accessible.name: "Paint cutter source in composition"
                             }
                             RowLayout {
                                 Layout.leftMargin: 12
@@ -1278,6 +1501,21 @@ ApplicationWindow {
                                     enabled: editor.selectedSubstitution > 0
                                     onEditingFinished: editor.renameSubstitution(editor.selectedSubstitution, text)
                                     Accessible.name: "Substitution name"
+                                }
+                                C.CompactCheckBox {
+                                    text: "Show in Animator"
+                                    checked: editor.substitutions.find(s => s.id === editor.selectedSubstitution)?.published || false
+                                    enabled: editor.selectedSubstitution > 0
+                                    onClicked: editor.setSelectedSubstitutionPublished(checked)
+                                    Accessible.name: "Publish selected substitution"
+                                }
+                                C.CompactTextField {
+                                    Layout.fillWidth: true
+                                    text: editor.substitutions.find(s => s.id === editor.selectedSubstitution)?.controlGroup || "Main"
+                                    placeholderText: "Control group"
+                                    enabled: editor.selectedSubstitution > 0
+                                    onEditingFinished: editor.setSelectedSubstitutionControlGroup(text)
+                                    Accessible.name: "Drawing control group"
                                 }
                                 Label { text: "Drawing mesh · current substitution"; color: "#999999"; font.pixelSize: 10 }
                                 RowLayout {
@@ -1530,14 +1768,574 @@ ApplicationWindow {
                                     onEditingFinished: editor.renameCharacterView(text)
                                     Accessible.name: "Character view set name"
                                 }
+                                C.CompactCheckBox {
+                                    text: "Show in Animator"
+                                    checked: editor.characterViews.find(v => v.id === editor.selectedView)?.published || false
+                                    enabled: editor.selectedView > 0
+                                    onClicked: editor.setSelectedViewPublished(checked)
+                                    Accessible.name: "Publish character view"
+                                }
+                                C.CompactTextField {
+                                    Layout.fillWidth: true
+                                    text: editor.characterViews.find(v => v.id === editor.selectedView)?.controlGroup || "Main"
+                                    placeholderText: "Control group"
+                                    enabled: editor.selectedView > 0
+                                    onEditingFinished: editor.setSelectedViewControlGroup(text)
+                                    Accessible.name: "View control group"
+                                }
+                                Rectangle { Layout.fillWidth: true; height: 1; color: "#282828" }
+                                Label { text: "Character poses"; color: "#999999"; font.pixelSize: 10 }
+                                C.CompactComboBox {
+                                    Layout.fillWidth: true
+                                    model: editor.characterPoses
+                                    textRole: "name"
+                                    valueRole: "id"
+                                    currentIndex: model.findIndex(p => p.id === editor.selectedCharacterPose)
+                                    onActivated: editor.selectCharacterPose(currentValue)
+                                    Accessible.name: "Selected character pose"
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    C.CompactComboBox {
+                                        id: poseTarget
+                                        Layout.fillWidth: true
+                                        model: ["Selected part", "All parts"]
+                                        Accessible.name: "Pose capture target"
+                                    }
+                                    C.CompactComboBox {
+                                        id: poseChannels
+                                        Layout.fillWidth: true
+                                        model: [
+                                            { name: "All channels", mask: 511 },
+                                            { name: "Transforms", mask: 255 },
+                                            { name: "Position", mask: 3 },
+                                            { name: "Rotation", mask: 4 },
+                                            { name: "Scale", mask: 24 },
+                                            { name: "Opacity", mask: 32 },
+                                            { name: "Pivot", mask: 192 },
+                                            { name: "Drawing", mask: 256 }
+                                        ]
+                                        textRole: "name"
+                                        valueRole: "mask"
+                                        Accessible.name: "Pose capture channels"
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    C.CompactButton {
+                                        text: "+ Capture"
+                                        enabled: poseTarget.currentIndex === 1 || layerInspector.rigLayer?.kind === 3
+                                        onClicked: editor.captureSelectedCharacterPose(poseChannels.currentValue, poseTarget.currentIndex === 1)
+                                    }
+                                    C.CompactButton {
+                                        text: "Apply"
+                                        enabled: editor.selectedCharacterPose > 0
+                                        onClicked: editor.applySelectedCharacterPose()
+                                    }
+                                    C.CompactButton {
+                                        objectName: "mirrorPoseButton"
+                                        text: "Mirror"
+                                        enabled: editor.selectedCharacterPose > 0
+                                        onClicked: editor.mirrorSelectedCharacterPose()
+                                        Accessible.name: "Mirror selected character pose"
+                                    }
+                                    Item { Layout.fillWidth: true }
+                                    C.CompactButton {
+                                        text: "Remove"
+                                        enabled: editor.selectedCharacterPose > 0
+                                        onClicked: editor.removeSelectedCharacterPose()
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    visible: layerInspector.rigLayer?.kind === 3 && editor.selectedCharacterPose > 0
+                                    C.CompactButton {
+                                        text: "Set this part"
+                                        onClicked: editor.setSelectedPartInCharacterPose(poseChannels.currentValue)
+                                    }
+                                    C.CompactButton {
+                                        text: "Remove part"
+                                        enabled: {
+                                            const pose = editor.characterPoses.find(p => p.id === editor.selectedCharacterPose)
+                                            return pose?.parts > 1 && pose.entries.some(e => e.part === editor.selectedLayer)
+                                        }
+                                        onClicked: editor.removeSelectedPartFromCharacterPose()
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    visible: editor.selectedCharacterPose > 0 && editor.poseTransferTargets.length > 0
+                                    C.CompactComboBox {
+                                        id: poseTransferTarget
+                                        objectName: "poseTransferTargetPicker"
+                                        Layout.fillWidth: true
+                                        model: editor.poseTransferTargets
+                                        textRole: "name"
+                                        valueRole: "id"
+                                        currentIndex: model.length > 0 ? 0 : -1
+                                        Accessible.name: "Pose destination character"
+                                    }
+                                    C.CompactButton {
+                                        text: "Copy to"
+                                        enabled: poseTransferTarget.currentValue > 0
+                                        onClicked: editor.transferSelectedCharacterPose(poseTransferTarget.currentValue)
+                                        Accessible.name: "Copy pose to character"
+                                    }
+                                }
+                                Repeater {
+                                    model: editor.characterPoses.find(p => p.id === editor.selectedCharacterPose)?.entries || []
+                                    Label {
+                                        required property var modelData
+                                        Layout.fillWidth: true
+                                        text: {
+                                            const mask = modelData.channels
+                                            const names = []
+                                            if (mask & 3) names.push("Position")
+                                            if (mask & 4) names.push("Rotation")
+                                            if (mask & 24) names.push("Scale")
+                                            if (mask & 32) names.push("Opacity")
+                                            if (mask & 192) names.push("Pivot")
+                                            if (mask & 256) names.push("Drawing")
+                                            return modelData.name + " · " + names.join(", ")
+                                        }
+                                        color: "#777777"
+                                        font.pixelSize: 10
+                                        elide: Text.ElideRight
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    Label { text: "Blend"; color: "#999999"; font.pixelSize: 10 }
+                                    Slider {
+                                        id: poseBlend
+                                        Layout.fillWidth: true
+                                        implicitHeight: 24
+                                        from: 0
+                                        to: 1
+                                        value: 0
+                                        enabled: editor.selectedCharacterPose > 0
+                                        onPressedChanged: {
+                                            if (pressed)
+                                                editor.beginSelectedCharacterPoseBlend()
+                                            else
+                                                editor.endSelectedCharacterPoseBlend()
+                                        }
+                                        onMoved: editor.updateSelectedCharacterPoseBlend(value)
+                                        Accessible.name: "Blend selected character pose"
+                                        background: Rectangle {
+                                            x: poseBlend.leftPadding
+                                            y: poseBlend.topPadding + poseBlend.availableHeight / 2 - height / 2
+                                            width: poseBlend.availableWidth
+                                            height: 3
+                                            radius: 2
+                                            color: "#303030"
+                                            Rectangle {
+                                                width: poseBlend.visualPosition * parent.width
+                                                height: parent.height
+                                                radius: parent.radius
+                                                color: "#b8b8b8"
+                                            }
+                                        }
+                                        handle: Rectangle {
+                                            x: poseBlend.leftPadding + poseBlend.visualPosition *
+                                               (poseBlend.availableWidth - width)
+                                            y: poseBlend.topPadding + poseBlend.availableHeight / 2 - height / 2
+                                            width: 12
+                                            height: 12
+                                            radius: 6
+                                            color: "#e8e8e8"
+                                            border.color: "#171717"
+                                        }
+                                    }
+                                    Label {
+                                        text: Math.round(poseBlend.value * 100) + "%"
+                                        color: "#aaaaaa"
+                                        font.pixelSize: 10
+                                        Layout.preferredWidth: 32
+                                        horizontalAlignment: Text.AlignRight
+                                    }
+                                }
+                                Connections {
+                                    target: editor
+                                    function onPoseSelectionChanged() { poseBlend.value = 0 }
+                                }
+                                C.CompactTextField {
+                                    Layout.fillWidth: true
+                                    text: editor.characterPoses.find(p => p.id === editor.selectedCharacterPose)?.name || ""
+                                    placeholderText: "Pose name"
+                                    enabled: editor.selectedCharacterPose > 0
+                                    onEditingFinished: editor.renameSelectedCharacterPose(text)
+                                    Accessible.name: "Character pose name"
+                                }
+                                C.CompactCheckBox {
+                                    text: "Show in Animator"
+                                    checked: editor.characterPoses.find(p => p.id === editor.selectedCharacterPose)?.published || false
+                                    enabled: editor.selectedCharacterPose > 0
+                                    onClicked: editor.setSelectedCharacterPosePublished(checked)
+                                    Accessible.name: "Publish character pose"
+                                }
+                                C.CompactTextField {
+                                    Layout.fillWidth: true
+                                    text: editor.characterPoses.find(p => p.id === editor.selectedCharacterPose)?.controlGroup || "Main"
+                                    placeholderText: "Control group"
+                                    enabled: editor.selectedCharacterPose > 0
+                                    onEditingFinished: editor.setSelectedCharacterPoseControlGroup(text)
+                                    Accessible.name: "Pose control group"
+                                }
+                            }
+                        }
+                        ColumnLayout {
+                            objectName: "animatorDashboard"
+                            visible: editor.workspaceMode === "Animator"
+                            Layout.leftMargin: 16
+                            Layout.rightMargin: 16
+                            Layout.fillWidth: true
+                            spacing: 8
+                            Label {
+                                Layout.fillWidth: true
+                                text: editor.characterId > 0
+                                      ? (editor.layers.find(l => l.id === editor.characterId)?.name || "Character")
+                                      : "Select a character or one of its parts"
+                                color: "#eeeeee"
+                                font.pixelSize: 13
+                                font.bold: true
+                                wrapMode: Text.WordWrap
+                            }
+                            C.CompactComboBox {
+                                objectName: "animatorControlGroupPicker"
+                                Layout.fillWidth: true
+                                visible: editor.characterControlGroups.length > 1
+                                model: editor.characterControlGroups
+                                currentIndex: model.indexOf(editor.selectedControlGroup)
+                                onActivated: editor.selectedControlGroup = currentText
+                                Accessible.name: "Animator control group"
+                            }
+                            Label {
+                                visible: root.activePublishedViews.length > 0
+                                text: "Published views"
+                                color: "#999999"
+                                font.pixelSize: 10
+                            }
+                            Repeater {
+                                model: root.activePublishedViews
+                                C.CompactButton {
+                                    required property var modelData
+                                    Layout.fillWidth: true
+                                    text: modelData.name
+                                    Accessible.name: "Apply view " + modelData.name
+                                    onClicked: {
+                                        editor.selectView(modelData.id)
+                                        editor.applyCharacterView()
+                                    }
+                                }
+                            }
+                            Label {
+                                visible: editor.characterId > 0 && root.activePublishedViews.length === 0
+                                text: "No published views in this group."
+                                wrapMode: Text.WordWrap
+                                color: "#777777"
+                                font.pixelSize: 10
+                            }
+                            Label {
+                                visible: root.activePublishedDrawings.length > 0
+                                text: "Published drawings"
+                                color: "#999999"
+                                font.pixelSize: 10
+                            }
+                            Repeater {
+                                model: root.activePublishedDrawings
+                                ColumnLayout {
+                                    id: publishedPartGroup
+                                    objectName: "publishedDrawingGroup"
+                                    required property var modelData
+                                    Layout.fillWidth: true
+                                    spacing: 3
+                                    Label {
+                                        text: publishedPartGroup.modelData.name
+                                        color: "#aaaaaa"
+                                        font.pixelSize: 10
+                                    }
+                                    C.CompactComboBox {
+                                        Layout.fillWidth: true
+                                        model: publishedPartGroup.modelData.options
+                                        textRole: "name"
+                                        valueRole: "id"
+                                        currentIndex: model.findIndex(v => v.id === publishedPartGroup.modelData.selected)
+                                        onActivated: editor.applyPublishedSubstitution(publishedPartGroup.modelData.part,
+                                                                                        currentValue)
+                                        Accessible.name: "Published drawings for " + publishedPartGroup.modelData.name
+                                    }
+                                }
+                            }
+                            Label {
+                                visible: root.activePublishedPoses.length > 0
+                                text: "Published poses"
+                                color: "#999999"
+                                font.pixelSize: 10
+                            }
+                            C.CompactComboBox {
+                                objectName: "animatorPosePicker"
+                                Layout.fillWidth: true
+                                visible: root.activePublishedPoses.length > 0
+                                model: root.activePublishedPoses
+                                textRole: "name"
+                                valueRole: "id"
+                                currentIndex: model.findIndex(p => p.id === editor.selectedCharacterPose)
+                                onActivated: editor.selectCharacterPose(currentValue)
+                                Accessible.name: "Published character pose"
+                            }
+                            RowLayout {
+                                Layout.fillWidth: true
+                                visible: root.activePublishedPoses.length > 0
+                                C.CompactButton {
+                                    text: "Apply"
+                                    enabled: root.activePublishedPoses.some(p => p.id === editor.selectedCharacterPose)
+                                    onClicked: editor.applySelectedCharacterPose()
+                                }
+                                Slider {
+                                    id: animatorPoseBlend
+                                    objectName: "animatorPoseBlend"
+                                    Layout.fillWidth: true
+                                    implicitHeight: 24
+                                    from: 0
+                                    to: 1
+                                    value: 0
+                                    enabled: root.activePublishedPoses.some(p => p.id === editor.selectedCharacterPose)
+                                    onPressedChanged: {
+                                        if (pressed)
+                                            editor.beginSelectedCharacterPoseBlend()
+                                        else
+                                            editor.endSelectedCharacterPoseBlend()
+                                    }
+                                    onMoved: editor.updateSelectedCharacterPoseBlend(value)
+                                    Accessible.name: "Blend published character pose"
+                                    background: Rectangle {
+                                        x: animatorPoseBlend.leftPadding
+                                        y: animatorPoseBlend.topPadding + animatorPoseBlend.availableHeight / 2 - height / 2
+                                        width: animatorPoseBlend.availableWidth
+                                        height: 3
+                                        radius: 2
+                                        color: "#303030"
+                                        Rectangle {
+                                            width: animatorPoseBlend.visualPosition * parent.width
+                                            height: parent.height
+                                            radius: parent.radius
+                                            color: "#b8b8b8"
+                                        }
+                                    }
+                                    handle: Rectangle {
+                                        x: animatorPoseBlend.leftPadding + animatorPoseBlend.visualPosition *
+                                           (animatorPoseBlend.availableWidth - width)
+                                        y: animatorPoseBlend.topPadding + animatorPoseBlend.availableHeight / 2 - height / 2
+                                        width: 12
+                                        height: 12
+                                        radius: 6
+                                        color: "#e8e8e8"
+                                        border.color: "#171717"
+                                    }
+                                }
+                                Label {
+                                    text: Math.round(animatorPoseBlend.value * 100) + "%"
+                                    font.pixelSize: 10
+                                    color: "#aaaaaa"
+                                }
+                            }
+                            Connections {
+                                target: editor
+                                function onPoseSelectionChanged() { animatorPoseBlend.value = 0 }
+                            }
+                            Label {
+                                visible: editor.characterId > 0 && root.activePublishedPoses.length === 0
+                                text: "No published poses in this group."
+                                wrapMode: Text.WordWrap
+                                color: "#777777"
+                                font.pixelSize: 10
                             }
                         }
                         Rectangle {
                             Layout.fillWidth: true
                             height: 1
                             color: "#282828"
+                            visible: editor.workspaceMode === "Rig"
                         }
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            Layout.leftMargin: 12
+                            Layout.rightMargin: 12
+                            spacing: 6
+                            RowLayout {
+                                Layout.fillWidth: true
+                                Label { text: "Audio"; font.pixelSize: 13; font.bold: true }
+                                Item { Layout.fillWidth: true }
+                                C.ToolButton {
+                                    text: "+"
+                                    hint: "Import PCM16 WAV at the current frame"
+                                    onClicked: audioDialog.open()
+                                }
+                            }
+                            Repeater {
+                                model: editor.audioClips
+                                ColumnLayout {
+                                    required property var modelData
+                                    Layout.fillWidth: true
+                                    spacing: 4
+                                    Label {
+                                        Layout.fillWidth: true
+                                        text: modelData.name + " · " + modelData.channels + "ch / " + modelData.sampleRate + " Hz"
+                                        elide: Text.ElideRight
+                                        font.pixelSize: 10
+                                        color: "#bbbbbb"
+                                    }
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        Label { text: "Start"; font.pixelSize: 10; color: "#888888" }
+                                        C.CompactTextField {
+                                            Layout.fillWidth: true
+                                            text: String(modelData.start + 1)
+                                            validator: IntValidator { bottom: 1; top: editor.duration }
+                                            onEditingFinished: if (acceptableInput) editor.moveAudioClip(modelData.id, Number(text) - 1)
+                                            Accessible.name: "Audio clip start frame"
+                                        }
+                                        Label { text: "Gain"; font.pixelSize: 10; color: "#888888" }
+                                        C.CompactTextField {
+                                            Layout.preferredWidth: 48
+                                            text: Number(modelData.gain).toFixed(2)
+                                            validator: DoubleValidator { bottom: 0; top: 4; locale: "C" }
+                                            onEditingFinished: if (acceptableInput) editor.setAudioClipGain(modelData.id, Number(text))
+                                            Accessible.name: "Audio clip gain"
+                                        }
+                                    }
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        Label { text: "Balance"; font.pixelSize: 10; color: "#888888" }
+                                        C.CompactTextField {
+                                            objectName: "audioBalance"
+                                            Layout.preferredWidth: 56
+                                            text: Number(modelData.balance).toFixed(2)
+                                            validator: DoubleValidator { bottom: -1; top: 1; locale: "C" }
+                                            onEditingFinished: if (acceptableInput)
+                                                                   editor.setAudioClipBalance(modelData.id, Number(text))
+                                            Accessible.name: "Audio clip balance, minus one left, zero center, plus one right"
+                                        }
+                                        Item { Layout.fillWidth: true }
+                                        Label { text: "−1 L   0 C   +1 R"; font.pixelSize: 10; color: "#777777" }
+                                    }
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        Label { text: "Samples"; font.pixelSize: 10; color: "#888888" }
+                                        C.CompactTextField {
+                                            id: audioIn
+                                            Layout.fillWidth: true
+                                            text: String(modelData.inSample)
+                                            validator: IntValidator { bottom: 0; top: 2147483647 }
+                                            Accessible.name: "Audio clip in sample"
+                                        }
+                                        Label { text: "–"; font.pixelSize: 10; color: "#888888" }
+                                        C.CompactTextField {
+                                            id: audioOut
+                                            Layout.fillWidth: true
+                                            text: String(modelData.outSample)
+                                            validator: IntValidator { bottom: 1; top: 2147483647 }
+                                            Accessible.name: "Audio clip out sample"
+                                        }
+                                        C.ToolButton {
+                                            text: "Set"
+                                            hint: "Apply nondestructive audio trim"
+                                            onClicked: editor.trimAudioClip(modelData.id, Number(audioIn.text), Number(audioOut.text))
+                                        }
+                                    }
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        Label { text: "Repeats"; font.pixelSize: 10; color: "#888888" }
+                                        C.CompactSpinBox {
+                                            from: 1
+                                            to: 64
+                                            value: modelData.repeats
+                                            Layout.preferredWidth: 88
+                                            onValueModified: editor.setAudioClipRepeats(modelData.id, value)
+                                            Accessible.name: "Audio clip repeat count"
+                                        }
+                                        Item { Layout.fillWidth: true }
+                                        Label { text: "× trimmed range"; font.pixelSize: 10; color: "#777777" }
+                                    }
+                                    Label {
+                                        text: "Linear fades · source samples"
+                                        font.pixelSize: 10
+                                        color: "#777777"
+                                    }
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        Label { text: "Fade in"; font.pixelSize: 10; color: "#888888" }
+                                        C.CompactTextField {
+                                            id: audioFadeIn
+                                            objectName: "audioFadeInSamples"
+                                            Layout.fillWidth: true
+                                            text: String(modelData.fadeInSamples)
+                                            validator: IntValidator { bottom: 0; top: 2147483647 }
+                                            Accessible.name: "Audio fade in source samples"
+                                        }
+                                        Label { text: "Out"; font.pixelSize: 10; color: "#888888" }
+                                        C.CompactTextField {
+                                            id: audioFadeOut
+                                            objectName: "audioFadeOutSamples"
+                                            Layout.fillWidth: true
+                                            text: String(modelData.fadeOutSamples)
+                                            validator: IntValidator { bottom: 0; top: 2147483647 }
+                                            Accessible.name: "Audio fade out source samples"
+                                        }
+                                        C.ToolButton {
+                                            text: "Set"
+                                            hint: "Set linear audio fades in source samples"
+                                            onClicked: if (audioFadeIn.acceptableInput && audioFadeOut.acceptableInput)
+                                                           editor.setAudioClipFades(modelData.id, Number(audioFadeIn.text), Number(audioFadeOut.text))
+                                        }
+                                    }
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        C.ToolButton {
+                                            objectName: "audioDuplicateClip"
+                                            text: "Duplicate"
+                                            hint: "Copy this clip at the current frame using its original WAV"
+                                            Layout.fillWidth: true
+                                            onClicked: editor.duplicateAudioClip(modelData.id, editor.frame)
+                                        }
+                                        C.ToolButton {
+                                            objectName: "audioSplitClip"
+                                            text: "Split"
+                                            hint: "Divide a 48 kHz single-pass clip at the current frame"
+                                            enabled: modelData.sampleRate === 48000 && modelData.repeats === 1 &&
+                                                     editor.frame > modelData.start && editor.frame < modelData.end
+                                            onClicked: editor.splitAudioClip(modelData.id, editor.frame)
+                                        }
+                                        C.ToolButton {
+                                            objectName: "audioMuteClip"
+                                            text: modelData.muted ? "Unmute" : "Mute"
+                                            active: modelData.muted
+                                            hint: modelData.muted ? "Include this clip in playback and WAV export"
+                                                                  : "Silence this clip in playback and WAV export"
+                                            onClicked: editor.setAudioClipMuted(modelData.id, !modelData.muted)
+                                        }
+                                        C.ToolButton {
+                                            objectName: "audioSoloClip"
+                                            text: modelData.solo ? "Unsolo" : "Solo"
+                                            active: modelData.solo
+                                            hint: modelData.solo ? "Return this clip to the shared mix"
+                                                                 : "Play this clip with other soloed clips only"
+                                            onClicked: editor.setAudioClipSolo(modelData.id, !modelData.solo)
+                                        }
+                                    }
+                                    C.ToolButton {
+                                        text: "Remove clip"
+                                        Layout.fillWidth: true
+                                        hint: "Remove this clip placement without changing its source WAV"
+                                        onClicked: editor.removeAudioClip(modelData.id)
+                                    }
+                                }
+                            }
+                        }
+                        Rectangle { Layout.fillWidth: true; height: 1; color: "#282828" }
                         RowLayout {
+                            visible: editor.workspaceMode === "Rig"
                             Layout.leftMargin: 16
                             Layout.rightMargin: 12
                             Layout.fillWidth: true
@@ -1559,6 +2357,7 @@ ApplicationWindow {
                             }
                         }
                         Flow {
+                            visible: editor.workspaceMode === "Rig"
                             Layout.leftMargin: 16
                             Layout.rightMargin: 16
                             Layout.fillWidth: true
@@ -1587,6 +2386,7 @@ ApplicationWindow {
                             }
                         }
                         Text {
+                            visible: editor.workspaceMode === "Rig"
                             Layout.leftMargin: 16
                             Layout.rightMargin: 16
                             Layout.fillWidth: true
@@ -1599,8 +2399,10 @@ ApplicationWindow {
                             Layout.fillWidth: true
                             height: 1
                             color: "#282828"
+                            visible: editor.workspaceMode === "Rig"
                         }
                         ColumnLayout {
+                            visible: editor.workspaceMode === "Rig"
                             Layout.leftMargin: 12
                             Layout.rightMargin: 12
                             Layout.fillWidth: true
@@ -1683,47 +2485,60 @@ ApplicationWindow {
                 spacing: 8
                 C.ToolButton {
                     text: "Timeline"
-                    active: !root.xsheet && !root.showCurves
+                    active: !root.xsheet && !root.showCurves && !root.showNodes
                     onClicked: {
                         root.showCurves = false;
+                        root.showNodes = false;
                         root.xsheet = false;
                     }
                 }
                 C.ToolButton {
                     text: "Xsheet"
-                    active: root.xsheet && !root.showCurves
+                    active: root.xsheet && !root.showCurves && !root.showNodes
                     onClicked: {
                         root.showCurves = false;
+                        root.showNodes = false;
                         root.xsheet = true;
                     }
                 }
                 C.ToolButton {
                     text: "Curves"
-                    active: root.showCurves
-                    onClicked: root.showCurves = true
+                    active: root.showCurves && !root.showNodes
+                    onClicked: {
+                        root.showNodes = false;
+                        root.showCurves = true;
+                    }
+                }
+                C.ToolButton {
+                    text: "Nodes"
+                    active: root.showNodes
+                    onClicked: {
+                        root.showCurves = false;
+                        root.showNodes = true;
+                    }
                 }
                 C.ToolButton {
                     text: "Timing tools"
                     active: root.showTimingTools
-                    visible: !root.showCurves
+                    visible: !root.showCurves && !root.showNodes
                     onClicked: root.showTimingTools = !root.showTimingTools
                 }
                 C.ToolButton {
                     text: editor.selectedPoseFrames.length > 1 ? "Keys · " + editor.selectedPoseFrames.length : "Keys"
-                    visible: !root.showCurves
+                    visible: !root.showCurves && !root.showNodes
                     active: root.keyEditing
                     hint: "Key mode: drag diamonds to move poses; double-click an empty cell to add a key. Turn off to select exposure ranges."
                     onClicked: root.keyEditing = !root.keyEditing
                 }
                 C.ToolButton {
                     text: "+ Key"
-                    visible: !root.showCurves
+                    visible: !root.showCurves && !root.showNodes
                     hint: "Add pose key at the current frame"
                     onClicked: editor.addKey()
                 }
                 C.ToolButton {
                     text: "−"
-                    visible: !root.showCurves && !root.xsheet
+                    visible: !root.showCurves && !root.showNodes && !root.xsheet
                     hint: "Narrow timeline frames"
                     enabled: root.timelineCell > 12
                     onClicked: {
@@ -1733,7 +2548,7 @@ ApplicationWindow {
                 }
                 C.ToolButton {
                     text: "+"
-                    visible: !root.showCurves && !root.xsheet
+                    visible: !root.showCurves && !root.showNodes && !root.xsheet
                     hint: "Widen timeline frames for easier key placement"
                     enabled: root.timelineCell < 72
                     onClicked: {
@@ -1793,7 +2608,7 @@ ApplicationWindow {
         }
         C.TimingTools {
             id: timingTools
-            visible: root.showTimingTools && !root.showCurves
+            visible: root.showTimingTools && !root.showCurves && !root.showNodes
             controller: editor
             Layout.fillWidth: true
             Layout.leftMargin: 10
@@ -1809,9 +2624,24 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.preferredHeight: root.effectiveBottomHeight
         }
+        C.CompositionNodes {
+            id: compositionNodes
+            objectName: "compositionNodesPanel"
+            visible: root.showNodes
+            controller: editor
+            Layout.fillWidth: true
+            Layout.preferredHeight: root.effectiveBottomHeight
+            Layout.minimumHeight: root.effectiveBottomHeight
+            Layout.maximumHeight: root.effectiveBottomHeight
+            onLayerChosen: layer => {
+                canvas.clearRegion();
+                root.inspectorMode = "layer";
+                editor.selectedLayer = layer;
+            }
+        }
         RowLayout {
             Layout.fillWidth: true
-            visible: !root.showCurves
+            visible: !root.showCurves && !root.showNodes
             Layout.preferredHeight: root.effectiveBottomHeight
             Layout.minimumHeight: root.effectiveBottomHeight
             Layout.maximumHeight: root.effectiveBottomHeight
@@ -1950,7 +2780,7 @@ ApplicationWindow {
                 Layout.fillHeight: true
                 clip: true
                 contentWidth: root.xsheet ? Math.max(width, editor.layers.length * 100 + 48) : Math.max(width, editor.duration * root.timelineCell)
-                contentHeight: root.xsheet ? editor.duration * root.timelineRow + 30 : Math.max(height, editor.layers.length * root.timelineRow + 30)
+                contentHeight: root.xsheet ? editor.duration * root.timelineRow + 30 : Math.max(height, (editor.layers.length + editor.audioClips.length) * root.timelineRow + 30)
                 boundsBehavior: Flickable.StopAtBounds
                 ScrollBar.horizontal: ScrollBar {}
                 ScrollBar.vertical: ScrollBar {}
@@ -2046,6 +2876,86 @@ ApplicationWindow {
                                     ctx.fill();
                                 }
                             }
+                            const clips = editor.audioClips;
+                            const anySolo = clips.some(c => c.solo);
+                            for (let r = 0; r < clips.length; r++) {
+                                const clip = clips[r];
+                                const inactive = clip.muted || (anySolo && !clip.solo);
+                                const y = 30 + (data.length + r) * root.timelineRow - oy;
+                                if (y + root.timelineRow < 0 || y > height)
+                                    continue;
+                                ctx.fillStyle = "#1e1e1e";
+                                ctx.fillRect(0, y, width, root.timelineRow);
+                                ctx.strokeStyle = "#313131";
+                                ctx.beginPath(); ctx.moveTo(0, y + root.timelineRow); ctx.lineTo(width, y + root.timelineRow); ctx.stroke();
+                                const delta = timelineInput.audioDragClipId === clip.id ? timelineInput.audioPreviewStart - clip.start : 0;
+                                const first = Math.max(clip.start, Math.max(0, Math.floor(ox / root.timelineCell) - delta));
+                                const last = Math.min(clip.end, Math.ceil((ox + width) / root.timelineCell) - delta);
+                                const peaks = first < last ? editor.audioWaveform(clip.id, first, last - first) : [];
+                                for (let f = first; f < last; f++) {
+                                    const amplitude = peaks[f - first];
+                                    if (amplitude <= 0) continue;
+                                    const x = (f + delta) * root.timelineCell - ox + 1;
+                                    const h = Math.max(1, amplitude * 12);
+                                    ctx.fillStyle = inactive ? "#525252" : delta ? "#ffffff" : "#a8a8a8";
+                                    ctx.fillRect(x, y + 17 - h, Math.max(1, root.timelineCell - 2), h * 2);
+                                }
+                                const editingFade = timelineInput.audioFadeClipId === clip.id;
+                                const fadeIn = editingFade && timelineInput.audioFadeSide === "in"
+                                             ? timelineInput.audioFadePreviewSamples : clip.fadeInSamples;
+                                const fadeOut = editingFade && timelineInput.audioFadeSide === "out"
+                                              ? timelineInput.audioFadePreviewSamples : clip.fadeOutSamples;
+                                {
+                                    const pixelsPerSample = root.timelineCell * editor.fps / clip.sampleRate;
+                                    const beginX = (clip.start + delta) * root.timelineCell - ox;
+                                    const endX = beginX + (clip.outSample - clip.inSample) *
+                                                 clip.repeats * pixelsPerSample;
+                                    ctx.save();
+                                    ctx.beginPath();
+                                    ctx.rect(0, y, width, root.timelineRow);
+                                    ctx.clip();
+                                    ctx.strokeStyle = inactive ? "#777777" : "#eeeeee";
+                                    ctx.lineWidth = 1;
+                                    const inX = beginX + fadeIn * pixelsPerSample;
+                                    const outX = endX - fadeOut * pixelsPerSample;
+                                    if (fadeIn > 0) {
+                                        ctx.beginPath();
+                                        ctx.moveTo(beginX, y + 17);
+                                        ctx.lineTo(inX, y + 6);
+                                        ctx.moveTo(beginX, y + 17);
+                                        ctx.lineTo(inX, y + 28);
+                                        ctx.stroke();
+                                    }
+                                    if (fadeOut > 0) {
+                                        ctx.beginPath();
+                                        ctx.moveTo(outX, y + 6);
+                                        ctx.lineTo(endX, y + 17);
+                                        ctx.moveTo(outX, y + 28);
+                                        ctx.lineTo(endX, y + 17);
+                                        ctx.stroke();
+                                    }
+                                    ctx.fillStyle = inactive ? "#777777" : "#eeeeee";
+                                    ctx.fillRect(inX - 2, y + 4, 5, 5);
+                                    ctx.fillRect(outX - 2, y + 4, 5, 5);
+                                    ctx.restore();
+                                }
+                                ctx.fillStyle = inactive ? "#777777" : "#eeeeee";
+                                ctx.fillText(clip.name + (clip.muted ? " · Muted" : clip.solo ? " · Solo" : anySolo ? " · Other solo" : ""),
+                                             (clip.start + delta) * root.timelineCell - ox + 3, y + 5);
+                                if (clip.sampleRate === 48000 && clip.repeats === 1) {
+                                    const trimming = timelineInput.audioTrimClipId === clip.id;
+                                    const leftFrame = trimming && timelineInput.audioTrimLeft
+                                                    ? timelineInput.audioTrimPreviewFrame : clip.start;
+                                    const rightFrame = trimming && !timelineInput.audioTrimLeft
+                                                     ? timelineInput.audioTrimPreviewFrame : clip.end;
+                                    ctx.fillStyle = "#eeeeee";
+                                    for (const edgeFrame of [leftFrame, rightFrame]) {
+                                        const edgeX = edgeFrame * root.timelineCell - ox;
+                                        ctx.fillRect(edgeX - 2, y + 13, 4, 8);
+                                        if (trimming) ctx.fillRect(edgeX, y + 6, 1, 22);
+                                    }
+                                }
+                            }
                             for (let m = 0; m < editor.markers.length; ++m) {
                                 const marker = editor.markers[m];
                                 ctx.fillStyle = "#cccccc";
@@ -2103,18 +3013,85 @@ ApplicationWindow {
                     }
                     MouseArea {
                         id: timelineInput
+                        objectName: "timelineInput"
                         hoverEnabled: true
                         property bool overRangeEnd: {
                             const row = rowAt(Qt.point(mouseX, mouseY));
                             const edge = root.xsheet ? 30 + editor.rangeEnd * root.timelineRow - timelineScroll.contentY : editor.rangeEnd * root.timelineCell - timelineScroll.contentX;
                             return !root.keyEditing && row >= 0 && row < editor.layers.length && editor.selectedLayers.indexOf(editor.layers[row].id) >= 0 && Math.abs((root.xsheet ? mouseY : mouseX) - edge) <= 5;
                         }
-                        cursorShape: keySource >= 0 ? Qt.ClosedHandCursor : resizing || overRangeEnd ? (root.xsheet ? Qt.SizeVerCursor : Qt.SizeHorCursor) : keyAt(Qt.point(mouseX, mouseY)) >= 0 ? Qt.OpenHandCursor : pressed && moving ? Qt.ClosedHandCursor : Qt.CrossCursor
+                        cursorShape: audioFadeClipId >= 0 || fadeHandleAt(Qt.point(mouseX, mouseY)) ||
+                                     audioTrimClipId >= 0 || trimHandleAt(Qt.point(mouseX, mouseY))
+                                     ? Qt.SizeHorCursor : audioDragClipId >= 0 ? Qt.ClosedHandCursor :
+                                       keySource >= 0 ? Qt.ClosedHandCursor : resizing || overRangeEnd
+                                     ? (root.xsheet ? Qt.SizeVerCursor : Qt.SizeHorCursor) :
+                                       audioAt(Qt.point(mouseX, mouseY)) || keyAt(Qt.point(mouseX, mouseY)) >= 0
+                                     ? Qt.OpenHandCursor : pressed && moving ? Qt.ClosedHandCursor : Qt.CrossCursor
                         preventStealing: true
                         anchors.fill: parent
                         property int keySource: -1
                         property bool duplicateKeys: false
                         property bool canceled: false
+                        property int audioDragClipId: -1
+                        property int audioDragStart: 0
+                        property int audioPreviewStart: 0
+                        property int audioFadeClipId: -1
+                        property string audioFadeSide: ""
+                        property int audioFadePreviewSamples: 0
+                        property int audioTrimClipId: -1
+                        property bool audioTrimLeft: false
+                        property int audioTrimPreviewFrame: -1
+                        function fadeHandleAt(mouse) {
+                            if (root.xsheet)
+                                return null;
+                            const index = rowAt(mouse) - editor.layers.length;
+                            const clips = editor.audioClips;
+                            if (index < 0 || index >= clips.length)
+                                return null;
+                            const clip = clips[index];
+                            const y = 30 + (editor.layers.length + index) * root.timelineRow - timelineScroll.contentY;
+                            if (Math.abs(mouse.y - (y + 6)) > 8)
+                                return null;
+                            const pixelsPerSample = root.timelineCell * editor.fps / clip.sampleRate;
+                            const beginX = clip.start * root.timelineCell - timelineScroll.contentX;
+                            const endX = beginX + (clip.outSample - clip.inSample) *
+                                         clip.repeats * pixelsPerSample;
+                            const inDistance = Math.abs(mouse.x - (beginX + clip.fadeInSamples * pixelsPerSample));
+                            const outDistance = Math.abs(mouse.x - (endX - clip.fadeOutSamples * pixelsPerSample));
+                            if (Math.min(inDistance, outDistance) > 8)
+                                return null;
+                            return {clip: clip, side: inDistance <= outDistance ? "in" : "out"};
+                        }
+                        function trimHandleAt(mouse) {
+                            if (root.xsheet)
+                                return null;
+                            const index = rowAt(mouse) - editor.layers.length;
+                            const clips = editor.audioClips;
+                            if (index < 0 || index >= clips.length)
+                                return null;
+                            const clip = clips[index];
+                            if (clip.sampleRate !== 48000 || clip.repeats !== 1)
+                                return null;
+                            const y = 30 + (editor.layers.length + index) * root.timelineRow - timelineScroll.contentY;
+                            if (Math.abs(mouse.y - (y + 17)) > 5)
+                                return null;
+                            const left = Math.abs(mouse.x - (clip.start * root.timelineCell - timelineScroll.contentX));
+                            const right = Math.abs(mouse.x - (clip.end * root.timelineCell - timelineScroll.contentX));
+                            if (Math.min(left, right) > 7)
+                                return null;
+                            return {clip: clip, left: left <= right};
+                        }
+                        function audioAt(mouse) {
+                            if (root.xsheet)
+                                return null;
+                            const index = rowAt(mouse) - editor.layers.length;
+                            const clips = editor.audioClips;
+                            if (index < 0 || index >= clips.length)
+                                return null;
+                            const clip = clips[index];
+                            const frame = frameAt(mouse);
+                            return frame >= clip.start && frame < clip.end ? clip : null;
+                        }
                         function keyAt(mouse) {
                             const row = rowAt(mouse);
                             if (row < 0 || row >= editor.layers.length)
@@ -2130,8 +3107,14 @@ ApplicationWindow {
                             return nearest;
                         }
                         function cancel() {
+                            editor.endAudioScrub();
                             canceled = true;
                             keySource = -1;
+                            audioDragClipId = -1;
+                            audioFadeClipId = -1;
+                            audioFadeSide = "";
+                            audioTrimClipId = -1;
+                            audioTrimPreviewFrame = -1;
                             resizing = false;
                             moving = false;
                             previewFrame = -1;
@@ -2154,6 +3137,29 @@ ApplicationWindow {
                             canceled = false;
                             anchorFrame = frameAt(mouse);
                             anchorRow = rowAt(mouse);
+                            const fade = fadeHandleAt(mouse);
+                            if (fade) {
+                                audioFadeClipId = fade.clip.id;
+                                audioFadeSide = fade.side;
+                                audioFadePreviewSamples = fade.side === "in"
+                                                        ? fade.clip.fadeInSamples : fade.clip.fadeOutSamples;
+                                return;
+                            }
+                            const trim = trimHandleAt(mouse);
+                            if (trim) {
+                                audioTrimClipId = trim.clip.id;
+                                audioTrimLeft = trim.left;
+                                audioTrimPreviewFrame = trim.left ? trim.clip.start : trim.clip.end;
+                                return;
+                            }
+                            const audio = audioAt(mouse);
+                            if (audio) {
+                                audioDragClipId = audio.id;
+                                audioDragStart = audio.start;
+                                audioPreviewStart = audio.start;
+                                editor.frame = anchorFrame;
+                                return;
+                            }
                             const edge = root.xsheet ? 30 + editor.rangeEnd * root.timelineRow - timelineScroll.contentY : editor.rangeEnd * root.timelineCell - timelineScroll.contentX;
                             const coordinate = root.xsheet ? mouse.y : mouse.x;
                             resizing = !root.keyEditing && anchorRow >= 0 && anchorRow < editor.layers.length && editor.selectedLayers.indexOf(editor.layers[anchorRow].id) >= 0 && Math.abs(coordinate - edge) <= 5;
@@ -2179,6 +3185,7 @@ ApplicationWindow {
                             if (root.keyEditing && !moving && anchorRow >= 0 && anchorRow < editor.layers.length) {
                                 editor.selectedLayer = editor.layers[anchorRow].id;
                                 editor.frame = anchorFrame;
+                                editor.beginAudioScrub();
                                 canceled = false;
                                 return;
                             }
@@ -2188,10 +3195,43 @@ ApplicationWindow {
                                 editor.selectTimelineRange(anchorFrame, anchorFrame, anchorRow, anchorRow);
                             else
                                 editor.frame = anchorFrame;
+                            if (!moving)
+                                editor.beginAudioScrub();
                         }
                         onPositionChanged: function (mouse) {
                             if (!pressed || canceled)
                                 return;
+                            if (audioFadeClipId >= 0) {
+                                const clip = editor.audioClips.find(c => c.id === audioFadeClipId);
+                                if (!clip) { cancel(); return; }
+                                const total = (clip.outSample - clip.inSample) * clip.repeats;
+                                const pixelsPerSample = root.timelineCell * editor.fps / clip.sampleRate;
+                                const beginX = clip.start * root.timelineCell - timelineScroll.contentX;
+                                const endX = beginX + total * pixelsPerSample;
+                                const raw = audioFadeSide === "in"
+                                            ? (mouse.x - beginX) / pixelsPerSample
+                                            : (endX - mouse.x) / pixelsPerSample;
+                                const other = audioFadeSide === "in"
+                                              ? clip.fadeOutSamples : clip.fadeInSamples;
+                                audioFadePreviewSamples = Math.max(0, Math.min(total - other, Math.round(raw)));
+                                timeline.requestPaint();
+                                return;
+                            }
+                            if (audioTrimClipId >= 0) {
+                                const clip = editor.audioClips.find(c => c.id === audioTrimClipId);
+                                if (!clip) { cancel(); return; }
+                                const raw = frameAt(mouse);
+                                audioTrimPreviewFrame = audioTrimLeft
+                                                       ? Math.max(0, Math.min(clip.end - 1, raw))
+                                                       : Math.max(clip.start + 1, Math.min(editor.duration, raw));
+                                timeline.requestPaint();
+                                return;
+                            }
+                            if (audioDragClipId >= 0) {
+                                audioPreviewStart = Math.max(0, Math.min(editor.duration - 1, audioDragStart + frameAt(mouse) - anchorFrame));
+                                timeline.requestPaint();
+                                return;
+                            }
                             if (keySource >= 0) {
                                 const selected = editor.selectedPoseFrames;
                                 const offset = Math.max(-selected[0], Math.min(editor.duration - 1 - selected[selected.length - 1], frameAt(mouse) - anchorFrame));
@@ -2216,8 +3256,40 @@ ApplicationWindow {
                                 editor.frame = frameAt(mouse);
                         }
                         onReleased: {
+                            editor.endAudioScrub();
                             if (canceled)
                                 return;
+                            if (audioFadeClipId >= 0) {
+                                const clip = editor.audioClips.find(c => c.id === audioFadeClipId);
+                                const preview = audioFadePreviewSamples;
+                                const side = audioFadeSide;
+                                audioFadeClipId = -1;
+                                audioFadeSide = "";
+                                if (clip && preview !== (side === "in" ? clip.fadeInSamples : clip.fadeOutSamples))
+                                    editor.setAudioClipFades(clip.id,
+                                        side === "in" ? preview : clip.fadeInSamples,
+                                        side === "out" ? preview : clip.fadeOutSamples);
+                                timeline.requestPaint();
+                                return;
+                            }
+                            if (audioTrimClipId >= 0) {
+                                const clip = editor.audioClips.find(c => c.id === audioTrimClipId);
+                                const frame = audioTrimPreviewFrame, left = audioTrimLeft;
+                                audioTrimClipId = -1;
+                                audioTrimPreviewFrame = -1;
+                                if (clip && frame !== (left ? clip.start : clip.end))
+                                    editor.trimAudioClipAtFrame(clip.id, frame, left);
+                                timeline.requestPaint();
+                                return;
+                            }
+                            if (audioDragClipId >= 0) {
+                                const clipId = audioDragClipId, start = audioPreviewStart, oldStart = audioDragStart;
+                                audioDragClipId = -1;
+                                if (start !== oldStart)
+                                    editor.moveAudioClip(clipId, start);
+                                timeline.requestPaint();
+                                return;
+                            }
                             if (keySource >= 0) {
                                 const offset = previewFrame - keySource, duplicate = duplicateKeys;
                                 cancel();
@@ -2236,6 +3308,8 @@ ApplicationWindow {
                         }
                         onCanceled: cancel()
                         onDoubleClicked: mouse => {
+                            if (!root.xsheet && rowAt(mouse) >= editor.layers.length)
+                                return;
                             if (root.keyEditing) {
                                 const row = rowAt(mouse), frame = frameAt(mouse);
                                 cancel();
@@ -2247,10 +3321,10 @@ ApplicationWindow {
                             } else
                                 editor.newDrawing(false);
                         }
-                        Accessible.name: "Timeline. Drag diamonds to retime poses. Enable Keys to add keys by double-clicking. Alt-drag moves an exposure range."
+                        Accessible.name: "Timeline. Drag audio waveforms to move clips, their middle edge handles to trim single-pass 48 kHz clips, or their upper fade handles to adjust fades. Drag diamonds to retime poses. Enable Keys to add keys by double-clicking. Alt-drag moves an exposure range."
                     }
                     Keys.onEscapePressed: {
-                        if (timelineInput.keySource >= 0 || timelineInput.moving || timelineInput.resizing)
+                        if (timelineInput.audioDragClipId >= 0 || timelineInput.audioFadeClipId >= 0 || timelineInput.audioTrimClipId >= 0 || timelineInput.keySource >= 0 || timelineInput.moving || timelineInput.resizing)
                             timelineInput.cancel();
                         else
                             editor.clearPoseSelection();
@@ -2366,10 +3440,32 @@ ApplicationWindow {
         nameFilters: ["PNG images (*.png)"]
         onAccepted: editor.importImageSequence(selectedFiles)
     }
+    FileDialog {
+        id: audioDialog
+        title: "Import PCM16 WAV"
+        nameFilters: ["PCM WAV audio (*.wav)"]
+        onAccepted: editor.importAudio(selectedFile)
+    }
     FolderDialog {
         id: exportDialog
         title: "Choose a folder for a new PNG sequence export"
         onAccepted: editor.exportFrames(selectedFolder)
+    }
+    FileDialog {
+        id: audioExportDialog
+        title: "Export PCM WAV mix"
+        fileMode: FileDialog.SaveFile
+        defaultSuffix: "wav"
+        nameFilters: ["PCM WAV audio (*.wav)"]
+        onAccepted: editor.exportAudio(selectedFile)
+    }
+    FileDialog {
+        id: audioRangeExportDialog
+        title: "Export selected PCM WAV range"
+        fileMode: FileDialog.SaveFile
+        defaultSuffix: "wav"
+        nameFilters: ["PCM WAV audio (*.wav)"]
+        onAccepted: editor.exportAudioRange(selectedFile, editor.rangeStart, editor.rangeEnd)
     }
     ColorDialog {
         id: colorDialog

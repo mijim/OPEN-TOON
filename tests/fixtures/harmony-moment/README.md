@@ -15,6 +15,14 @@ Python's standard library; the artwork and tones are original GPL-3.0-or-later
 contributions. No Harmony artwork, manual assets, private recording or generated
 voice model is included. The tones are **timing signals, not speech**. A future
 artist-approved dialogue recording is required to judge actual lip-sync quality.
+`examples/clockwork-integrated-study.otoon` is an original editable 24 fps
+study assembled from the checked-in continuous toon. Its single embedded
+mono PCM16 track is generated deterministically by
+`tests/integrated_shot_tests.cpp`: nine short 440/660 Hz cues begin exactly at
+the nine mouth-change frames in `shot.json`. A 2,000-source-sample fade is
+saved at either end of the clip, and the head paints while its alpha cuts the
+eye Part. The project is a visual, audio and composition regression fixture,
+not a spoken performance or final production design.
 The 41 source PNGs are also checked in under `parts/` so import and render tests
 can use real encoded images without generating them at build time. The test verifies
 that each checked-in asset exactly matches the generator.
@@ -35,6 +43,13 @@ behind the visible ear. It changes only that head substitution and the three
 reference poses that expose it; the registered dimensions and drawing IDs are
 unchanged. The continuous-rig example and its frame-36 capture were regenerated
 from the corrected source.
+The later 2026-09-29 visual revision adds an original muted cap to the front
+and three-quarter views and samples drawing boundaries at 2 × 2 coverage.
+The 19 roles, 41 drawing names, registration and timing remain stable. The
+three editable studies and independent reference stills are regenerated from
+the same original drawing code. Qt render comparisons allow only a two-level
+8-bit channel difference at sampled edges and bound the affected pixel count.
+Artistic approval remains open.
 `--previews` renders five full-resolution reference poses for visual review; they
 are external acceptance targets, not frames from the OPEN-TOON evaluator.
 

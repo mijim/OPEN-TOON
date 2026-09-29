@@ -46,6 +46,68 @@ TEST_CASE("Composition profile is a validated document property") {
     document.composition = static_cast<CompositionProfile>(99);
     REQUIRE_THROWS(document.validate());
 }
+TEST_CASE("Cutter matte requires an independent visible drawing source") {
+    auto document = makeDocument();
+    const Id target = document.layers.front().id;
+    Layer source = document.layers.front();
+    source.id = document.allocateId();
+    source.name = "Cutter";
+    document.layers.push_back(source);
+    document.layer(target).matte = source.id;
+    REQUIRE_NOTHROW(document.validate());
+    const auto graph = CompositionGraph::orderedLayers(document);
+    REQUIRE_NOTHROW(graph.validate(document));
+    REQUIRE(std::count_if(graph.nodes.begin(), graph.nodes.end(), [](const auto& node) {
+                return node.kind == GraphNodeKind::ApplyMatte;
+            }) == 1);
+    document.layer(target).invertMatte = true;
+    REQUIRE_NOTHROW(document.validate());
+    const auto outside = CompositionGraph::orderedLayers(document);
+    REQUIRE(std::count_if(outside.nodes.begin(), outside.nodes.end(), [](const auto& node) {
+                return node.kind == GraphNodeKind::InvertMatte;
+            }) == 1);
+    REQUIRE_NOTHROW(outside.validate(document));
+    document.layer(target).matteBypassed = true;
+    const auto bypassed = CompositionGraph::orderedLayers(document);
+    REQUIRE(std::count_if(bypassed.nodes.begin(), bypassed.nodes.end(), [](const auto& node) {
+                return node.kind == GraphNodeKind::BypassMatte;
+            }) == 1);
+    REQUIRE(std::count_if(bypassed.nodes.begin(), bypassed.nodes.end(), [](const auto& node) {
+                return node.kind == GraphNodeKind::ApplyMatte;
+            }) == 0);
+    const auto sourceAffected = bypassed.affectedByLayer(document, source.id);
+    REQUIRE(std::find(sourceAffected.begin(), sourceAffected.end(), bypassed.write) ==
+            sourceAffected.end());
+    document.layer(source.id).paintMatteSource = true;
+    const auto painted = CompositionGraph::orderedLayers(document);
+    REQUIRE_NOTHROW(painted.validate(document));
+    REQUIRE(std::count_if(painted.nodes.begin(), painted.nodes.end(), [](const auto& node) {
+                return node.kind == GraphNodeKind::Over;
+            }) == 2);
+    const auto paintedAffected = painted.affectedByLayer(document, source.id);
+    REQUIRE(std::find(paintedAffected.begin(), paintedAffected.end(), painted.write) !=
+            paintedAffected.end());
+    document.layer(source.id).paintMatteSource = false;
+    document.layer(target).matteBypassed = false;
+    document.layer(target).invertMatte = false;
+    document.layer(target).matte = target;
+    REQUIRE_THROWS(document.validate());
+    document.layer(target).matte = 999999;
+    REQUIRE_THROWS(document.validate());
+    document.layer(target).matte = source.id;
+    document.layer(source.id).visible = false;
+    REQUIRE_THROWS(document.validate());
+    document.layer(source.id).visible = true;
+    document.layer(source.id).matte = target;
+    REQUIRE_THROWS(document.validate());
+    document.layer(source.id).matte = 0;
+    document.layer(target).matte = 0;
+    document.layer(target).invertMatte = true;
+    REQUIRE_THROWS(document.validate());
+    document.layer(target).invertMatte = false;
+    document.layer(target).matteBypassed = true;
+    REQUIRE_THROWS(document.validate());
+}
 TEST_CASE("Deep composition chains order and invalidate without recursive traversal") {
     auto document = makeDocument();
     CompositionGraph graph;

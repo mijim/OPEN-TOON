@@ -75,7 +75,7 @@ flowchart TD
 
 ## Work and ordering
 
-Remaining bounded work: **47–92 engineer-weeks**, low confidence. This is included within phase scope, not added to its full-program envelope.
+Remaining bounded work: **48–93 engineer-weeks**, low confidence. This is included within phase scope, not added to its full-program envelope.
 
 Dependency-only longest chains under the lower/upper estimates (unlimited staffing, no resource contention; **not delivery dates**):
 
@@ -94,7 +94,7 @@ Dependency-only longest chains under the lower/upper estimates (unlimited staffi
 | [HM-07](#hm-07) — First-class poses and declarative animator controls | P08 / controllers/rigging | HM-03, HM-04 | 3–6 |
 | [HM-08](#hm-08) — Quick Rig guided FK recipe | P08 / rigging/presentation | HM-03, HM-07 | 2–4 |
 | [HM-09](#hm-09) — Integrated deformable rig, IK and portable templates | P09 / rigging/deformation/library | HM-06, HM-07, HM-08 | 4–8 |
-| [HM-10](#hm-10) — Audio clock, waveform and manual timing | P07 / audio/media | HM-01 | 4–7 |
+| [HM-10](#hm-10) — Audio clock, waveform and manual timing | P07 / audio/media | HM-01 | 5–8 |
 | [HM-11](#hm-11) — Mouth mapping and editable lip sync | P07 / audio/rigging | HM-03, HM-10 | 2–4 |
 | [HM-12](#hm-12) — Useful nodes, cutters and part overlap | P10 / compositing/presentation | HM-04, HM-03 | 4–7 |
 | [HM-13](#hm-13) — Output camera and framing | P06 / camera/animation | HM-04 | 2–4 |
@@ -310,7 +310,7 @@ Deliver editable bone chains and curve chains with defined local/rest spaces, st
 
 ## HM-07
 
-**First-class poses and declarative animator controls** — `planned`; owner `controllers/rigging`, work package `P08-W3`.
+**First-class poses and declarative animator controls** — `in_progress`; owner `controllers/rigging`, work package `P08-W3`.
 
 Save named masked poses including discrete substitutions; apply/mirror only explicitly mapped parts. Add direct widgets, limited sliders/switches and a compact character dashboard. Pose interpolation blends compatible numeric properties; discrete variants use an explicit threshold rule. Animator and Rig workspaces expose the same document at different detail levels.
 
@@ -399,9 +399,9 @@ Add kinematic endpoint/curve attachments, bounded two-bone IK with limits and ex
 
 ## HM-10
 
-**Audio clock, waveform and manual timing** — `planned`; owner `audio/media`, work package `P07-W1`.
+**Audio clock, waveform and manual timing** — `in_progress`; owner `audio/media`, work package `P07-W1`.
 
-Adopt one playback backend after the miniaudio spike; start with WAV/PCM, waveform pyramids, trim/offset/gain, limited mixing and frame scrub. Audio device time drives playback, while headless sampling uses the same rational scene mapping.
+Adopt one playback backend after the miniaudio spike; start with WAV/PCM, waveform pyramids, trim/offset/gain, limited mixing and frame scrub. Audio device time drives playback, while headless sampling uses the same rational scene mapping. Export a selected half-open frame range to PCM WAV using exact rational output-sample boundaries.
 
 **Required delivered contracts:**
 
@@ -417,7 +417,7 @@ Adopt one playback backend after the miniaudio spike; start with WAV/PCM, wavefo
 
 - No raster/vector completion, lip detector, FFmpeg codec catalog or audio recording prerequisite.
 
-**Catalog subsets:** AUD-001, AUD-002, AUD-003, AUD-004, AUD-005, LYR-001.
+**Catalog subsets:** AUD-001, AUD-002, AUD-003, AUD-004, AUD-005, LYR-001, AUD-010.
 
 **Library boundaries:** LIB-AUDIO.
 
@@ -457,7 +457,7 @@ Map a small labelled viseme set to each character and edit held mouth timings ag
 
 ## HM-12
 
-**Useful nodes, cutters and part overlap** — `planned`; owner `compositing/presentation`, work package `P10-W2`.
+**Useful nodes, cutters and part overlap** — `in_progress`; owner `compositing/presentation`, work package `P10-W2`.
 
 Expose a small editable node graph: Drawing, Peg/Transform, ordered Composite, Opacity, Cutter/Matte, group ports, Display and Write. Add reversible front/back part ordering and manual joint matte recipes; a compact inspector hides graph complexity from animators.
 

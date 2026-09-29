@@ -1,6 +1,7 @@
 #include "opentoon/document.h"
 #include "opentoon/animation.h"
 #include "opentoon/deformation.h"
+#include "opentoon/audio.h"
 #include <cmath>
 #include <limits>
 #include <set>
@@ -113,7 +114,7 @@ void Document::validate() const {
             "Scene dimensions must be between 1 and 8192.");
     require(duration > 0 && duration <= 1000000, "Scene duration is outside supported limits.");
     require(name.size() <= 4096 && layers.size() <= 2000 && drawings.size() <= 50000 &&
-                palette.size() <= 65536,
+                palette.size() <= 65536 && audioAssets.size() <= 64 && audioClips.size() <= 1000,
             "Document exceeds resource limits.");
     std::set<Id> ids, swatches;
     auto id = [&](Id value) {
@@ -190,20 +191,51 @@ void Document::validate() const {
         require(static_cast<int>(l.kind) >= 0 && static_cast<int>(l.kind) <= 4,
                 "Unknown layer kind.");
         require(l.role.size() <= 128 && l.variants.size() <= 10000 && l.views.size() <= 1000 &&
+                    l.poses.size() <= 1000 &&
                     l.bindings.size() <= 256,
                 "Invalid part metadata size.");
         if (l.kind != LayerKind::Part)
             require(l.role.empty() && l.variants.empty(), "Only parts may own roles and variants.");
         if (l.kind != LayerKind::Character)
             require(l.views.empty(), "Only character roots may own view sets.");
+        if (l.kind != LayerKind::Character)
+            require(l.poses.empty(), "Only character roots may own named poses.");
         if (l.kind != LayerKind::Part)
             require(l.bindings.empty(), "Only parts may own mesh bindings.");
         if (l.kind == LayerKind::Character || l.kind == LayerKind::Peg || l.kind == LayerKind::Camera)
             require(l.exposures.empty(), "Character roots, pegs and cameras cannot own drawings.");
+        if (l.matte) {
+            require((l.kind == LayerKind::Drawing || l.kind == LayerKind::Part) &&
+                        l.matte != l.id, "Only a drawing or Part may use another layer as its matte.");
+            const auto source = std::find_if(layers.begin(), layers.end(), [&](const Layer& other) {
+                return other.id == l.matte;
+            });
+            require(source != layers.end() &&
+                        (source->kind == LayerKind::Drawing || source->kind == LayerKind::Part) &&
+                        source->matte == 0 && source->visible,
+                    "Matte source must be a visible drawing or Part without its own matte.");
+        }
+        require(!l.invertMatte || l.matte,
+                "An inverted cutter needs a matte source.");
+        require(!l.matteBypassed || l.matte,
+                "A bypassed cutter needs a matte source.");
+        require(!l.paintMatteSource || l.kind == LayerKind::Drawing || l.kind == LayerKind::Part,
+                "Only a drawing or Part may paint while used as a cutter.");
+        require(!l.opacityBypassed || l.kind == LayerKind::Drawing || l.kind == LayerKind::Part,
+                "Only a drawing or Part may bypass its image opacity.");
+        require(l.blendMode == LayerBlendMode::Normal ||
+                    l.blendMode == LayerBlendMode::Multiply ||
+                    l.blendMode == LayerBlendMode::Screen ||
+                    l.blendMode == LayerBlendMode::Add,
+                "Unknown layer blend mode.");
+        require(l.blendMode == LayerBlendMode::Normal ||
+                    l.kind == LayerKind::Drawing || l.kind == LayerKind::Part,
+                "Only a drawing or Part may change its blend mode.");
         std::set<Id> variants;
         for (const auto& variant : l.variants)
             require(drawings.contains(variant.drawing) && variant.name.size() > 0 &&
-                        variant.name.size() <= 128 && variants.insert(variant.drawing).second,
+                        variant.name.size() <= 128 && !variant.controlGroup.empty() &&
+                        variant.controlGroup.size() <= 64 && variants.insert(variant.drawing).second,
                     "Part references a missing or duplicate substitution.");
         if (l.kind == LayerKind::Part)
             require(!l.role.empty(), "Character part needs a role.");
@@ -310,6 +342,7 @@ void Document::validate() const {
         for (const auto& view : root.views) {
             id(view.id);
             require(!view.name.empty() && view.name.size() <= 128 && names.insert(view.name).second &&
+                        !view.controlGroup.empty() && view.controlGroup.size() <= 64 &&
                         view.choices.size() <= 2000,
                     "Invalid or duplicate character view set.");
             std::set<Id> parts;
@@ -328,9 +361,68 @@ void Document::validate() const {
                         "View set references a part or substitution outside its character.");
             }
         }
+        std::set<std::string> poseNames;
+        for (const auto& pose : root.poses) {
+            id(pose.id);
+            require(!pose.name.empty() && pose.name.size() <= 128 &&
+                        !pose.controlGroup.empty() && pose.controlGroup.size() <= 64 &&
+                        poseNames.insert(pose.name).second && !pose.parts.empty() &&
+                        pose.parts.size() <= 2000,
+                    "Invalid or duplicate character pose.");
+            std::set<Id> parts;
+            for (const auto& entry : pose.parts) {
+                const auto& target = layer(entry.part);
+                require(target.kind == LayerKind::Part && parts.insert(entry.part).second &&
+                            entry.channels && !(entry.channels & ~PoseChannels::All),
+                        "Pose contains a missing, duplicate or invalid part mask.");
+                Id ancestor = target.parent;
+                while (ancestor && ancestor != root.id)
+                    ancestor = layer(ancestor).parent;
+                require(ancestor == root.id, "Pose part belongs to another character.");
+                validateTransform(entry.transform);
+                if (entry.channels & PoseChannels::Drawing)
+                    require(std::any_of(target.variants.begin(), target.variants.end(),
+                                        [&](const Substitution& variant) {
+                                            return variant.drawing == entry.drawing;
+                                        }),
+                            "Pose references a missing part substitution.");
+                else
+                    require(entry.drawing == 0, "Pose has an unmasked drawing reference.");
+            }
+        }
     }
     for (const auto& m : markers)
         require(m.frame >= 0 && m.frame < duration && m.name.size() <= 4096, "Invalid scene marker.");
+    std::set<Id> assets;
+    std::size_t audioBytes = 0;
+    for (const auto& asset : audioAssets) {
+        id(asset.id);
+        assets.insert(asset.id);
+        audioBytes += asset.wav.size();
+        require(audioBytes <= 512 * 1024 * 1024, "Document audio budget exceeded.");
+        require(!asset.name.empty() && asset.name.size() <= 4096,
+                "Invalid audio asset name.");
+        const auto info = inspectPcm16Wav({asset.wav.data(), asset.wav.size()});
+        require(asset.sampleRate == info.sampleRate && asset.channels == info.channels &&
+                    asset.sampleFrames == info.sampleFrames,
+                "Audio metadata does not match its PCM source.");
+    }
+    for (const auto& clip : audioClips) {
+        id(clip.id);
+        require(assets.contains(clip.asset) && clip.start >= 0 && clip.start < duration &&
+                    bounded(clip.gain, 4) && clip.gain >= 0 &&
+                    bounded(clip.balance, 1) && clip.balance >= -1 &&
+                    clip.repeats >= 1 && clip.repeats <= 64,
+                "Invalid audio clip placement or gain.");
+        const auto& asset = *std::find_if(audioAssets.begin(), audioAssets.end(),
+                                          [&](const auto& value) { return value.id == clip.asset; });
+        require(clip.inSample < clip.outSample && clip.outSample <= asset.sampleFrames,
+                "Invalid audio clip trim range.");
+        const auto samples = (clip.outSample - clip.inSample) * std::uint64_t(clip.repeats);
+        require(clip.fadeInSamples <= samples &&
+                    clip.fadeOutSamples <= samples - clip.fadeInSamples,
+                "Audio fades exceed the repeated clip length.");
+    }
 }
 Document makeDocument() {
     Document d;
@@ -404,6 +496,9 @@ void insertFrames(Document& d, Frame at, Frame count) {
     for (auto& m : d.markers)
         if (m.frame >= at)
             m.frame += count;
+    for (auto& clip : d.audioClips)
+        if (clip.start >= at)
+            clip.start += count;
     d.duration += count;
 }
 void removeFrames(Document& d, Frame at, Frame count) {
@@ -442,6 +537,11 @@ void removeFrames(Document& d, Frame at, Frame count) {
     std::erase_if(d.markers, [=](const auto& m) { return m.frame >= at && m.frame < end; });
     for (auto& m : d.markers)
         m.frame = collapse(m.frame);
+    std::erase_if(d.audioClips, [=](const auto& clip) {
+        return clip.start >= at && clip.start < end;
+    });
+    for (auto& clip : d.audioClips)
+        clip.start = collapse(clip.start);
     d.duration -= count;
 }
 void eraseAt(Drawing& d, Point center, double radius, Id& nextId) {

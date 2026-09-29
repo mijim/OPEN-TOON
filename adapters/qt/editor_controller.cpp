@@ -2,15 +2,22 @@
 #include "opentoon/animation.h"
 #include "opentoon/property_address.h"
 #include "opentoon/rigging.h"
+#include "opentoon/character_pose.h"
 #include "opentoon/deformation.h"
 #include "opentoon/deformer.h"
+#include "opentoon/audio.h"
+#include "opentoon/composition_graph.h"
 #include "project_store.h"
 #include "image_batch_importer.h"
 #include "scene_renderer.h"
+#include "graph_renderer.h"
+#include "audio_wav_writer.h"
+#include "audio_device.h"
 #include <QColorSpace>
 #include <QBuffer>
 #include <QDateTime>
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QImageReader>
 #include <QJsonDocument>
@@ -22,6 +29,8 @@
 #include <algorithm>
 #include <cstdint>
 #include <cmath>
+#include <map>
+#include <set>
 #include <stdexcept>
 using namespace opentoon;
 namespace {
@@ -41,12 +50,27 @@ EditorController::EditorController(QObject* parent) : QObject(parent) {
     playTimer_.setTimerType(Qt::PreciseTimer);
     playTimer_.setInterval(8);
     connect(&playTimer_, &QTimer::timeout, this, [this] {
-        auto elapsed = playClock_.elapsed() / 1000.0;
-        setFrame((playStart_ + int(std::floor(elapsed * fps()))) % duration());
+        if (audioDevice_ && audioDevice_->interrupted()) {
+            stopPlayback();
+            report("Audio output was interrupted. Playback stopped.");
+            return;
+        }
+        const int next = audioDevice_
+                             ? audioDevice_->currentFrame()
+                             : (playStart_ + int(std::floor(playClock_.elapsed() / 1000.0 * fps()))) % duration();
+        if (next > frame_ + 1)
+            skippedPlayheadFrames_ += std::uint64_t(next - frame_ - 1);
+        if (next != frame_) {
+            endSelectedCharacterPoseBlend();
+            frame_ = next;
+            emit frameChanged();
+        }
     });
     auto recoveryDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/recovery";
     QDir().mkpath(recoveryDir);
     QSettings settings;
+    const auto workspace = settings.value("workspaceMode", "Rig").toString();
+    workspaceMode_ = workspace == "Animator" ? workspace : "Rig";
     previousRecovery_ = settings.value("recoveryPath").toString();
     if (!QFileInfo::exists(previousRecovery_))
         previousRecovery_.clear();
@@ -56,6 +80,7 @@ EditorController::EditorController(QObject* parent) : QObject(parent) {
     autosaveTimer_.start();
 }
 EditorController::~EditorController() {
+    stopPlayback();
     cancelExport_ = true;
     if (exportThread_.joinable())
         exportThread_.join();
@@ -70,6 +95,8 @@ void EditorController::report(QString message) {
     emit statusChanged();
 }
 void EditorController::resetSelection() {
+    audioPeakCache_.clear();
+    endSelectedCharacterPoseBlend();
     clearPoseSelection();
     ++sceneGeneration_;
     rangeStart_ = 0;
@@ -79,13 +106,18 @@ void EditorController::resetSelection() {
     layer_ = document().layers.empty() ? 0 : document().layers.back().id;
     selectedView_ = 0;
     emit viewSelectionChanged();
+    selectedCharacterPose_ = 0;
+    emit poseSelectionChanged();
     swatch_ = document().palette.empty() ? 0 : document().palette.front().id;
     frame_ = 0;
     emit selectionChanged();
     emit frameChanged();
     emit changed();
+    emit controlGroupChanged();
 }
 bool EditorController::edit(const std::string& label, const std::function<void(Document&)>& operation) {
+    endSelectedCharacterPoseBlend();
+    stopPlayback();
     try {
         bool result = session_.apply(label, operation);
         if (result) {
@@ -95,12 +127,15 @@ bool EditorController::edit(const std::string& label, const std::function<void(D
                 layer_ = document().layers.empty() ? 0 : document().layers.back().id;
                 rangeLayers_.clear();
                 selectedView_ = 0;
+                selectedCharacterPose_ = 0;
                 emit selectionChanged();
                 emit rangeChanged();
             }
             emit changed();
+            emit controlGroupChanged();
             emit frameChanged();
             emit viewSelectionChanged();
+            emit poseSelectionChanged();
             report(QString::fromStdString(label));
         }
         return result;
@@ -125,12 +160,87 @@ QVariantList EditorController::layers() const {
                                      {"locked", it->locked},
                                      {"solo", it->solo},
                                      {"parent", int(it->parent)},
+                                     {"matte", int(it->matte)},
+                                     {"invertMatte", it->invertMatte},
+                                     {"matteBypassed", it->matteBypassed},
+                                     {"paintMatteSource", it->paintMatteSource},
+                                     {"opacityBypassed", it->opacityBypassed},
+                                     {"blendMode", int(it->blendMode)},
                                      {"kind", int(it->kind)},
                                      {"role", QString::fromStdString(it->role)},
                                      {"spans", spans},
                                      {"keys", keys}});
     }
     return result;
+}
+QVariantList EditorController::compositionNodes() const {
+    const auto graph = CompositionGraph::orderedLayers(document());
+    QVariantList result;
+    std::map<GraphNodeId, const GraphNode*> indexed;
+    for (const auto& node : graph.nodes)
+        indexed.emplace(node.id, &node);
+    for (const auto id : graph.topologicalOrder()) {
+        const auto* node = indexed.at(id);
+        QString kind;
+        switch (node->kind) {
+        case GraphNodeKind::Background: kind = "Background"; break;
+        case GraphNodeKind::LayerImage: kind = "Drawing"; break;
+        case GraphNodeKind::LayerTransform: kind = "Transform"; break;
+        case GraphNodeKind::Opacity: kind = "Opacity"; break;
+        case GraphNodeKind::BypassOpacity: kind = "Bypassed opacity"; break;
+        case GraphNodeKind::Over: kind = "Composite"; break;
+        case GraphNodeKind::Multiply: kind = "Multiply"; break;
+        case GraphNodeKind::Screen: kind = "Screen"; break;
+        case GraphNodeKind::Add: kind = "Add"; break;
+        case GraphNodeKind::MatteFromImage: kind = "Cutter"; break;
+        case GraphNodeKind::InvertMatte: kind = "Invert matte"; break;
+        case GraphNodeKind::ApplyMatte: kind = "Apply matte"; break;
+        case GraphNodeKind::BypassMatte: kind = "Bypassed cutter"; break;
+        case GraphNodeKind::DisplayOutput: kind = "Display"; break;
+        case GraphNodeKind::WriteOutput: kind = "Write"; break;
+        }
+        QVariantList inputs;
+        for (const auto& input : node->inputs)
+            inputs.push_back(QVariantMap{{"source", int(input.source)}, {"slot", int(input.slot)}});
+        const QString name = node->layer
+                                 ? QString::fromStdString(document().layer(node->layer).name)
+                                 : kind;
+        result.push_back(QVariantMap{{"id", int(id)}, {"kind", kind}, {"name", name},
+                                     {"layer", int(node->layer)}, {"inputs", inputs}});
+    }
+    return result;
+}
+QString EditorController::compositionNodePreview(int nodeId) const {
+    try {
+        const auto graph = CompositionGraph::orderedLayers(document());
+        const auto found = std::find_if(graph.nodes.begin(), graph.nodes.end(),
+                                        [nodeId](const auto& node) { return node.id == GraphNodeId(nodeId); });
+        if (nodeId <= 0 || found == graph.nodes.end() ||
+            found->kind == GraphNodeKind::LayerTransform)
+            return {};
+        const QSize size = QSize(document().width, document().height)
+                               .scaled(256, 144, Qt::KeepAspectRatio);
+        auto preview = GraphRenderer::renderNode(graph, document(), frame_, GraphNodeId(nodeId),
+                                                  size, {.background = false});
+        if (found->kind == GraphNodeKind::MatteFromImage ||
+            found->kind == GraphNodeKind::InvertMatte) {
+            for (int y = 0; y < preview.height(); ++y) {
+                auto* pixels = reinterpret_cast<QRgb*>(preview.scanLine(y));
+                for (int x = 0; x < preview.width(); ++x) {
+                    const int alpha = qAlpha(pixels[x]);
+                    pixels[x] = qRgba(alpha, alpha, alpha, 255);
+                }
+            }
+        }
+        QByteArray bytes;
+        QBuffer buffer(&bytes);
+        if (!buffer.open(QIODevice::WriteOnly) || !preview.save(&buffer, "PNG"))
+            return {};
+        return QStringLiteral("data:image/png;base64,") +
+               QString::fromLatin1(bytes.toBase64());
+    } catch (const std::exception&) {
+        return {};
+    }
 }
 QVariantList EditorController::substitutions() const {
     QVariantList result;
@@ -142,7 +252,32 @@ QVariantList EditorController::substitutions() const {
     for (const auto& substitution : selected.variants)
         result.push_back(QVariantMap{{"id", int(substitution.drawing)},
                                      {"name", QString::fromStdString(substitution.name)},
+                                     {"published", substitution.published},
+                                     {"controlGroup", QString::fromStdString(substitution.controlGroup)},
                                      {"image", document().drawings.at(substitution.drawing).image.has_value()}});
+    return result;
+}
+QVariantList EditorController::publishedCharacterSubstitutions() const {
+    QVariantList result;
+    const int root = characterId();
+    if (!root)
+        return result;
+    for (const auto& layer : document().layers) {
+        if (layer.kind != LayerKind::Part || opentoon::characterFor(document(), layer.id) != Id(root))
+            continue;
+        std::map<std::string, QVariantList> groups;
+        for (const auto& variant : layer.variants)
+            if (variant.published)
+                groups[variant.controlGroup].push_back(QVariantMap{{"id", int(variant.drawing)},
+                                                                 {"name", QString::fromStdString(variant.name)}});
+        const auto* selected = document().drawingAt(layer.id, frame_);
+        for (const auto& [group, options] : groups)
+            result.push_back(QVariantMap{{"part", int(layer.id)},
+                                         {"name", QString::fromStdString(layer.role)},
+                                         {"group", QString::fromStdString(group)},
+                                         {"selected", selected ? int(selected->id) : 0},
+                                         {"options", options}});
+    }
     return result;
 }
 int EditorController::selectedSubstitution() const {
@@ -162,7 +297,9 @@ QVariantList EditorController::characterViews() const {
     for (const auto& view : document().layer(root).views)
         result.push_back(QVariantMap{{"id", int(view.id)},
                                      {"name", QString::fromStdString(view.name)},
-                                     {"parts", int(view.choices.size())}});
+                                     {"parts", int(view.choices.size())},
+                                     {"published", view.published},
+                                     {"controlGroup", QString::fromStdString(view.controlGroup)}});
     return result;
 }
 int EditorController::selectedView() const {
@@ -176,12 +313,181 @@ int EditorController::selectedView() const {
 }
 void EditorController::selectView(int view) {
     const auto options = characterViews();
-    if (std::any_of(options.begin(), options.end(), [view](const QVariant& option) {
-            return option.toMap().value("id").toInt() == view;
+    if (std::any_of(options.begin(), options.end(), [&](const QVariant& option) {
+            const auto item = option.toMap();
+            return item.value("id").toInt() == view &&
+                   (workspaceMode_ != "Animator" ||
+                    (item.value("published").toBool() &&
+                     item.value("controlGroup").toString() == selectedControlGroup()));
         })) {
         selectedView_ = view;
         emit viewSelectionChanged();
     }
+}
+QVariantList EditorController::characterPoses() const {
+    QVariantList result;
+    const int root = characterId();
+    if (!root)
+        return result;
+    for (const auto& pose : document().layer(root).poses) {
+        QVariantList entries;
+        for (const auto& entry : pose.parts)
+            entries.push_back(QVariantMap{{"part", int(entry.part)},
+                                          {"name", QString::fromStdString(document().layer(entry.part).role)},
+                                          {"channels", int(entry.channels)},
+                                          {"drawing", int(entry.drawing)}});
+        result.push_back(QVariantMap{{"id", int(pose.id)},
+                                     {"name", QString::fromStdString(pose.name)},
+                                     {"parts", int(pose.parts.size())},
+                                     {"published", pose.published},
+                                     {"controlGroup", QString::fromStdString(pose.controlGroup)},
+                                     {"entries", entries}});
+    }
+    return result;
+}
+QVariantList EditorController::audioClips() const {
+    QVariantList result;
+    for (const auto& clip : document().audioClips) {
+        const auto& asset = *std::find_if(document().audioAssets.begin(),
+            document().audioAssets.end(), [&](const auto& value) { return value.id == clip.asset; });
+        result.push_back(QVariantMap{{"id", int(clip.id)},
+                                     {"name", QString::fromStdString(asset.name)},
+                                     {"start", int(clip.start)},
+                                     {"end", int(opentoon::audioClipEndFrame(document(), clip, asset))},
+                                     {"inSample", qint64(clip.inSample)},
+                                     {"outSample", qint64(clip.outSample)},
+                                     {"sampleRate", asset.sampleRate},
+                                     {"channels", asset.channels},
+                                     {"gain", clip.gain},
+                                     {"repeats", clip.repeats},
+                                     {"fadeInSamples", qint64(clip.fadeInSamples)},
+                                     {"fadeOutSamples", qint64(clip.fadeOutSamples)},
+                                     {"muted", clip.muted},
+                                     {"solo", clip.solo},
+                                     {"balance", clip.balance}});
+    }
+    return result;
+}
+QVariantList EditorController::audioWaveform(int clipId, int firstFrame, int frameCount) const {
+    QVariantList result;
+    if (frameCount < 0 || frameCount > 4096 || firstFrame < 0 ||
+        firstFrame > document().duration || frameCount > document().duration - firstFrame)
+        return result;
+    const auto clip = std::find_if(document().audioClips.begin(), document().audioClips.end(),
+                                   [=](const auto& value) { return value.id == Id(clipId); });
+    if (clip == document().audioClips.end())
+        return result;
+    const auto asset = std::find_if(document().audioAssets.begin(), document().audioAssets.end(),
+                                    [&](const auto& value) { return value.id == clip->asset; });
+    if (asset == document().audioAssets.end())
+        return result;
+    auto cached = audioPeakCache_.find(asset->id);
+    if (cached == audioPeakCache_.end() || !cached->second.matches(*asset)) {
+        audioPeakCache_.erase(asset->id);
+        cached = audioPeakCache_.emplace(asset->id, opentoon::AudioPeakIndex(*asset)).first;
+    }
+    for (int frame = firstFrame; frame < firstFrame + frameCount; ++frame) {
+        if (frame < clip->start) {
+            result.push_back(0.0);
+            continue;
+        }
+        result.push_back(std::min(1.0,
+            opentoon::audioClipFramePeak(document(), *clip, *asset, cached->second, frame) * clip->gain));
+    }
+    return result;
+}
+QVariantList EditorController::characterControlGroups() const {
+    QVariantList result;
+    const int root = characterId();
+    if (!root)
+        return result;
+    std::set<std::string> groups;
+    const auto& character = document().layer(root);
+    for (const auto& view : character.views)
+        if (view.published)
+            groups.insert(view.controlGroup);
+    for (const auto& pose : character.poses)
+        if (pose.published)
+            groups.insert(pose.controlGroup);
+    for (const auto& layer : document().layers)
+        if (layer.kind == LayerKind::Part && opentoon::characterFor(document(), layer.id) == Id(root))
+            for (const auto& variant : layer.variants)
+                if (variant.published)
+                    groups.insert(variant.controlGroup);
+    if (groups.erase("Main"))
+        result.push_back(QStringLiteral("Main"));
+    for (const auto& group : groups)
+        result.push_back(QString::fromStdString(group));
+    return result;
+}
+QString EditorController::selectedControlGroup() const {
+    const auto groups = characterControlGroups();
+    return groups.contains(selectedControlGroup_) ? selectedControlGroup_
+                                                  : (groups.isEmpty() ? QStringLiteral("Main")
+                                                                      : groups.front().toString());
+}
+void EditorController::setSelectedControlGroup(QString group) {
+    if (!characterControlGroups().contains(group) || selectedControlGroup_ == group)
+        return;
+    endSelectedCharacterPoseBlend();
+    selectedControlGroup_ = std::move(group);
+    emit controlGroupChanged();
+    emit poseSelectionChanged();
+}
+QVariantList EditorController::poseTransferTargets() const {
+    QVariantList result;
+    const int source = characterId();
+    if (!source)
+        return result;
+    for (const auto& layer : document().layers)
+        if (layer.kind == LayerKind::Character && layer.id != Id(source) && !layer.locked)
+            result.push_back(QVariantMap{{"id", int(layer.id)},
+                                         {"name", QString::fromStdString(layer.name)}});
+    return result;
+}
+int EditorController::selectedCharacterPose() const {
+    const int root = characterId();
+    if (!root)
+        return 0;
+    const auto& poses = document().layer(root).poses;
+    const auto group = selectedControlGroup().toStdString();
+    if (std::any_of(poses.begin(), poses.end(), [&](const auto& item) {
+            return item.id == selectedCharacterPose_ &&
+                   (workspaceMode_ != "Animator" ||
+                    (item.published && item.controlGroup == group));
+        }))
+        return int(selectedCharacterPose_);
+    if (workspaceMode_ == "Animator") {
+        const auto found = std::find_if(poses.begin(), poses.end(),
+                                         [&](const auto& item) {
+                                             return item.published && item.controlGroup == group;
+                                         });
+        return found == poses.end() ? 0 : int(found->id);
+    }
+    return poses.empty() ? 0 : int(poses.front().id);
+}
+void EditorController::selectCharacterPose(int poseId) {
+    const auto options = characterPoses();
+    if (std::any_of(options.begin(), options.end(), [&](const QVariant& option) {
+            const auto item = option.toMap();
+            return item.value("id").toInt() == poseId &&
+                   (workspaceMode_ != "Animator" ||
+                    (item.value("published").toBool() &&
+                     item.value("controlGroup").toString() == selectedControlGroup()));
+        })) {
+        endSelectedCharacterPoseBlend();
+        selectedCharacterPose_ = poseId;
+        emit poseSelectionChanged();
+    }
+}
+void EditorController::setWorkspaceMode(QString mode) {
+    if ((mode != "Rig" && mode != "Animator") || mode == workspaceMode_)
+        return;
+    endSelectedCharacterPoseBlend();
+    workspaceMode_ = std::move(mode);
+    QSettings().setValue("workspaceMode", workspaceMode_);
+    emit workspaceModeChanged();
+    emit poseSelectionChanged();
 }
 QString EditorController::substitutionThumbnail(int drawingId) const {
     if (!layer_ || drawingId <= 0)
@@ -291,17 +597,29 @@ QVariantMap EditorController::transform() const {
 }
 void EditorController::setFrame(int value) {
     value = std::clamp(value, 0, duration() - 1);
+    if (audioDevice_)
+        audioDevice_->seek(value);
+    else if (scrubDevice_ && scrubDevice_->running() && value != frame_)
+        scrubDevice_->scrub(value);
+    else if (playing()) {
+        playStart_ = value;
+        playClock_.restart();
+    }
     if (value == frame_)
         return;
+    endSelectedCharacterPoseBlend();
     frame_ = value;
     emit frameChanged();
 }
 void EditorController::setSelectedLayer(int value) {
     try {
         (void)document().layer(value);
+        endSelectedCharacterPoseBlend();
         layer_ = value;
         selectedView_ = 0;
         emit viewSelectionChanged();
+        selectedCharacterPose_ = 0;
+        emit poseSelectionChanged();
         rangeLayers_ = {layer_};
         rangeStart_ = frame_;
         rangeEnd_ = frame_ + 1;
@@ -309,6 +627,7 @@ void EditorController::setSelectedLayer(int value) {
         emit selectionChanged();
         emit frameChanged();
         emit changed();
+        emit controlGroupChanged();
     } catch (...) {
     }
 }
@@ -545,6 +864,7 @@ void EditorController::restoreRevision(int revision) {
 }
 void EditorController::undo() {
     stopPlayback();
+    endSelectedCharacterPoseBlend();
     if (session_.undo()) {
         frame_ = std::min(frame_, duration() - 1);
         try {
@@ -556,14 +876,17 @@ void EditorController::undo() {
                          [&](const auto& swatch) { return swatch.id == swatch_; }))
             swatch_ = document().palette.empty() ? 0 : document().palette.front().id;
         emit changed();
+        emit controlGroupChanged();
         emit frameChanged();
         emit viewSelectionChanged();
+        emit poseSelectionChanged();
         emit selectionChanged();
         report("Undone");
     }
 }
 void EditorController::redo() {
     stopPlayback();
+    endSelectedCharacterPoseBlend();
     if (session_.redo()) {
         frame_ = std::min(frame_, duration() - 1);
         try {
@@ -575,8 +898,10 @@ void EditorController::redo() {
                          [&](const auto& swatch) { return swatch.id == swatch_; }))
             swatch_ = document().palette.empty() ? 0 : document().palette.front().id;
         emit changed();
+        emit controlGroupChanged();
         emit frameChanged();
         emit viewSelectionChanged();
+        emit poseSelectionChanged();
         emit selectionChanged();
         report("Redone");
     }
@@ -604,6 +929,9 @@ void EditorController::removeLayer() {
             for (const auto& l : d.layers)
                 if (l.parent == layer_)
                     throw std::runtime_error("Remove child layers before deleting their parent.");
+            for (const auto& l : d.layers)
+                if (l.matte == layer_)
+                    throw std::runtime_error("Remove the matte binding before deleting its source.");
             if (kind == LayerKind::Part) {
                 opentoon::removeRigBranch(d, layer_);
                 return;
@@ -702,6 +1030,33 @@ void EditorController::moveLayer(int direction) {
             std::iter_swap(it, d.layers.begin() + target);
     });
 }
+bool EditorController::moveDrawingAfter(int sourceLayer, int targetLayer) {
+    if (sourceLayer <= 0 || targetLayer <= 0 || sourceLayer == targetLayer)
+        return false;
+    const auto& current = document().layers;
+    const auto source = std::find_if(current.begin(), current.end(),
+                                     [sourceLayer](const auto& layer) { return layer.id == Id(sourceLayer); });
+    const auto target = std::find_if(current.begin(), current.end(),
+                                     [targetLayer](const auto& layer) { return layer.id == Id(targetLayer); });
+    if (source == current.end() || target == current.end() || source == target + 1)
+        return false;
+    return edit("Reorder drawing", [&](Document& d) {
+        auto from = std::find_if(d.layers.begin(), d.layers.end(),
+                                 [sourceLayer](const auto& layer) { return layer.id == Id(sourceLayer); });
+        auto to = std::find_if(d.layers.begin(), d.layers.end(),
+                               [targetLayer](const auto& layer) { return layer.id == Id(targetLayer); });
+        const auto isDrawing = [](const Layer& layer) {
+            return layer.kind == LayerKind::Drawing || layer.kind == LayerKind::Part;
+        };
+        if (!isDrawing(*from) || !isDrawing(*to) || from->locked || to->locked)
+            throw std::runtime_error("Reordering needs two unlocked drawings or Parts.");
+        Layer moving = std::move(*from);
+        d.layers.erase(from);
+        to = std::find_if(d.layers.begin(), d.layers.end(),
+                          [targetLayer](const auto& layer) { return layer.id == Id(targetLayer); });
+        d.layers.insert(to + 1, std::move(moving));
+    });
+}
 void EditorController::setParent(int parent) {
     if (!layer_)
         return;
@@ -719,6 +1074,86 @@ void EditorController::setParent(int parent) {
             opentoon::attachDrawingAsPart(d, layer_, parent, layer.name);
         else
             layer.parent = parent;
+    });
+}
+bool EditorController::setLayerMatte(int sourceLayer) {
+    if (!layer_ || sourceLayer < 0)
+        return false;
+    return edit(sourceLayer ? "Set cutter matte" : "Remove cutter matte", [&](Document& d) {
+        auto& target = d.layer(layer_);
+        if (target.locked)
+            throw std::runtime_error("Unlock the layer before editing.");
+        if (target.kind != LayerKind::Drawing && target.kind != LayerKind::Part)
+            throw std::runtime_error("A cutter matte needs a drawing or part target.");
+        if (sourceLayer) {
+            const auto& source = d.layer(sourceLayer);
+            if (source.id == target.id ||
+                (source.kind != LayerKind::Drawing && source.kind != LayerKind::Part) ||
+                !source.visible || source.matte)
+                throw std::runtime_error("Choose a visible drawing or part without its own matte.");
+        }
+        const Id oldMatte = target.matte;
+        target.matte = Id(sourceLayer);
+        if (!sourceLayer) {
+            target.invertMatte = false;
+            target.matteBypassed = false;
+        } else if (Id(sourceLayer) != oldMatte)
+            target.matteBypassed = false;
+    });
+}
+bool EditorController::setMatteInverted(bool inverted) {
+    if (!layer_)
+        return false;
+    return edit(inverted ? "Invert cutter matte" : "Use cutter matte inside", [&](Document& d) {
+        auto& target = d.layer(layer_);
+        if (target.locked || !target.matte)
+            throw std::runtime_error("Select an unlocked layer with a cutter matte.");
+        target.invertMatte = inverted;
+    });
+}
+bool EditorController::setMatteBypassed(bool bypassed) {
+    if (!layer_)
+        return false;
+    return edit(bypassed ? "Bypass cutter matte" : "Enable cutter matte", [&](Document& d) {
+        auto& target = d.layer(layer_);
+        if (target.locked || !target.matte)
+            throw std::runtime_error("Select an unlocked layer with a cutter matte.");
+        target.matteBypassed = bypassed;
+    });
+}
+bool EditorController::setOpacityBypassed(bool bypassed) {
+    if (!layer_)
+        return false;
+    return edit(bypassed ? "Bypass layer opacity" : "Enable layer opacity", [&](Document& d) {
+        auto& target = d.layer(layer_);
+        if (target.locked ||
+            (target.kind != LayerKind::Drawing && target.kind != LayerKind::Part))
+            throw std::runtime_error("Select an unlocked drawing or Part to bypass opacity.");
+        target.opacityBypassed = bypassed;
+    });
+}
+bool EditorController::setLayerBlendMode(int mode) {
+    if (!layer_ || mode < int(LayerBlendMode::Normal) || mode > int(LayerBlendMode::Add))
+        return false;
+    return edit("Set layer blend mode", [&](Document& d) {
+        auto& target = d.layer(layer_);
+        if (target.locked ||
+            (target.kind != LayerKind::Drawing && target.kind != LayerKind::Part))
+            throw std::runtime_error("Select an unlocked drawing or Part to change its blend mode.");
+        target.blendMode = static_cast<LayerBlendMode>(mode);
+    });
+}
+bool EditorController::setMatteSourceVisible(bool visible) {
+    if (!layer_)
+        return false;
+    return edit(visible ? "Show cutter source" : "Hide cutter source", [&](Document& d) {
+        const auto& target = d.layer(layer_);
+        if (target.locked || !target.matte)
+            throw std::runtime_error("Select an unlocked layer with a cutter matte.");
+        auto& source = d.layer(target.matte);
+        if (source.locked)
+            throw std::runtime_error("Unlock the cutter source before changing its visibility.");
+        source.paintMatteSource = visible;
     });
 }
 bool EditorController::selectedCanFollowBoneTip() const {
@@ -862,6 +1297,36 @@ void EditorController::renameSubstitution(int drawing, QString name) {
         edit("Rename substitution", [&](Document& d) {
             opentoon::renameSubstitution(d, layer_, drawing, name.toStdString());
         });
+}
+void EditorController::setSelectedSubstitutionPublished(bool published) {
+    const int drawing = selectedSubstitution();
+    if (layer_ && drawing)
+        edit(published ? "Publish substitution" : "Unpublish substitution", [&](Document& d) {
+            opentoon::publishSubstitution(d, layer_, drawing, published);
+        });
+}
+void EditorController::setSelectedSubstitutionControlGroup(QString group) {
+    const int drawing = selectedSubstitution();
+    if (layer_ && drawing)
+        edit("Set drawing control group", [&](Document& d) {
+            opentoon::setSubstitutionControlGroup(d, layer_, drawing, group.toStdString());
+        });
+}
+bool EditorController::applyPublishedSubstitution(int partId, int drawing) {
+    const int root = characterId();
+    if (!root || partId <= 0 || drawing <= 0)
+        return false;
+    return edit("Apply published substitution", [&](Document& d) {
+        const auto& part = d.layer(partId);
+        if (part.kind != LayerKind::Part || opentoon::characterFor(d, partId) != Id(root) ||
+            std::none_of(part.variants.begin(), part.variants.end(), [&](const auto& item) {
+                return item.drawing == Id(drawing) && item.published &&
+                       (workspaceMode_ != "Animator" ||
+                        QString::fromStdString(item.controlGroup) == selectedControlGroup());
+            }))
+            throw std::invalid_argument("Select a published substitution of this character.");
+        opentoon::selectSubstitution(d, partId, frame_, drawing);
+    });
 }
 void EditorController::selectSubstitution(int drawing) {
     if (layer_)
@@ -1068,6 +1533,169 @@ bool EditorController::removeSelectedMesh() {
         opentoon::removeMeshBinding(d, layer_, drawing);
     });
 }
+void EditorController::captureSelectedCharacterPose(int channels, bool allParts) {
+    const int root = characterId();
+    if (!root)
+        return;
+    Id created = 0;
+    if (edit("Capture character pose", [&](Document& d) {
+            const auto& poses = d.layer(root).poses;
+            int number = 1;
+            auto name = "Pose " + std::to_string(number);
+            while (std::any_of(poses.begin(), poses.end(),
+                               [&](const auto& pose) { return pose.name == name; }))
+                name = "Pose " + std::to_string(++number);
+            std::vector<opentoon::PoseCaptureTarget> targets;
+            if (allParts) {
+                for (const auto& layer : d.layers)
+                    if (layer.kind == LayerKind::Part && opentoon::characterFor(d, layer.id) == Id(root))
+                        targets.push_back({layer.id, std::uint16_t(channels)});
+            } else {
+                targets.push_back({layer_, std::uint16_t(channels)});
+            }
+            created = opentoon::captureCharacterPose(d, root, frame_, targets, name);
+        })) {
+        selectedCharacterPose_ = created;
+        emit poseSelectionChanged();
+    }
+}
+void EditorController::applySelectedCharacterPose() {
+    const int root = characterId(), poseId = selectedCharacterPose();
+    if (root && poseId)
+        edit("Apply character pose", [&](Document& d) {
+            opentoon::applyCharacterPose(d, root, poseId, frame_);
+        });
+}
+void EditorController::renameSelectedCharacterPose(QString name) {
+    const int root = characterId(), poseId = selectedCharacterPose();
+    if (root && poseId)
+        edit("Rename character pose", [&](Document& d) {
+            opentoon::renameCharacterPose(d, root, poseId, name.toStdString());
+        });
+}
+void EditorController::removeSelectedCharacterPose() {
+    const int root = characterId(), poseId = selectedCharacterPose();
+    if (root && poseId && edit("Remove character pose", [&](Document& d) {
+            opentoon::removeCharacterPose(d, root, poseId);
+        })) {
+        selectedCharacterPose_ = 0;
+        emit poseSelectionChanged();
+    }
+}
+void EditorController::setSelectedCharacterPosePublished(bool published) {
+    const int root = characterId(), poseId = selectedCharacterPose();
+    if (root && poseId)
+        edit(published ? "Publish character pose" : "Unpublish character pose", [&](Document& d) {
+            opentoon::publishCharacterPose(d, root, poseId, published);
+        });
+}
+void EditorController::setSelectedCharacterPoseControlGroup(QString group) {
+    const int root = characterId(), poseId = selectedCharacterPose();
+    if (root && poseId)
+        edit("Set pose control group", [&](Document& d) {
+            opentoon::setCharacterPoseControlGroup(d, root, poseId, group.toStdString());
+        });
+}
+void EditorController::setSelectedViewPublished(bool published) {
+    const int root = characterId(), viewId = selectedView();
+    if (root && viewId)
+        edit(published ? "Publish character view" : "Unpublish character view", [&](Document& d) {
+            opentoon::publishCharacterView(d, root, viewId, published);
+        });
+}
+void EditorController::setSelectedViewControlGroup(QString group) {
+    const int root = characterId(), viewId = selectedView();
+    if (root && viewId)
+        edit("Set view control group", [&](Document& d) {
+            opentoon::setCharacterViewControlGroup(d, root, viewId, group.toStdString());
+        });
+}
+void EditorController::setSelectedPartInCharacterPose(int channels) {
+    const int root = characterId(), poseId = selectedCharacterPose();
+    if (root && poseId && layer_)
+        edit("Set Part in character pose", [&](Document& d) {
+            opentoon::setCharacterPosePart(d, root, poseId, layer_, frame_,
+                                           std::uint16_t(channels));
+        });
+}
+void EditorController::removeSelectedPartFromCharacterPose() {
+    const int root = characterId(), poseId = selectedCharacterPose();
+    if (root && poseId && layer_)
+        edit("Remove Part from character pose", [&](Document& d) {
+            opentoon::removeCharacterPosePart(d, root, poseId, layer_);
+        });
+}
+bool EditorController::transferSelectedCharacterPose(int targetCharacter) {
+    const int source = characterId(), poseId = selectedCharacterPose();
+    if (!source || !poseId || targetCharacter <= 0)
+        return false;
+    Id created = 0;
+    if (!edit("Copy pose to character", [&](Document& d) {
+            created = opentoon::transferCharacterPose(d, source, poseId, targetCharacter);
+        }))
+        return false;
+    setSelectedLayer(targetCharacter);
+    selectedCharacterPose_ = created;
+    emit poseSelectionChanged();
+    return true;
+}
+bool EditorController::mirrorSelectedCharacterPose() {
+    const int root = characterId(), poseId = selectedCharacterPose();
+    if (!root || !poseId)
+        return false;
+    Id created = 0;
+    if (!edit("Mirror character pose", [&](Document& d) {
+            created = opentoon::mirrorCharacterPose(d, root, poseId);
+        }))
+        return false;
+    selectedCharacterPose_ = created;
+    emit poseSelectionChanged();
+    return true;
+}
+void EditorController::beginSelectedCharacterPoseBlend() {
+    endSelectedCharacterPoseBlend();
+    const int root = characterId(), poseId = selectedCharacterPose();
+    if (!root || !poseId)
+        return;
+    poseBlendGesture_ = ++poseBlendSerial_;
+    poseBlendRoot_ = root;
+    poseBlendPose_ = poseId;
+    poseBlendFrame_ = frame_;
+}
+bool EditorController::updateSelectedCharacterPoseBlend(double amount) {
+    const int root = characterId(), poseId = selectedCharacterPose();
+    if (!root || !poseId)
+        return false;
+    const bool temporary = !poseBlendGesture_;
+    if (!poseBlendGesture_ || poseBlendRoot_ != Id(root) || poseBlendPose_ != Id(poseId) ||
+        poseBlendFrame_ != frame_)
+        beginSelectedCharacterPoseBlend();
+    try {
+        const bool published = session_.applyCoalesced("Blend character pose", poseBlendGesture_,
+            [&](Document& document) {
+                opentoon::blendCharacterPose(document, root, poseId, frame_, amount);
+            });
+        if (published) {
+            emit changed();
+            emit frameChanged();
+            report("Blend character pose");
+        }
+        if (temporary)
+            endSelectedCharacterPoseBlend();
+        return published;
+    } catch (const std::exception& e) {
+        endSelectedCharacterPoseBlend();
+        report(QString::fromUtf8(e.what()));
+        return false;
+    }
+}
+void EditorController::endSelectedCharacterPoseBlend() {
+    if (poseBlendGesture_)
+        session_.endCoalesced(poseBlendGesture_);
+    poseBlendGesture_ = 0;
+    poseBlendRoot_ = 0;
+    poseBlendPose_ = 0;
+}
 void EditorController::captureCharacterView() {
     const int root = characterId();
     if (!root)
@@ -1088,6 +1716,13 @@ void EditorController::captureCharacterView() {
 }
 void EditorController::applyCharacterView() {
     const int root = characterId(), view = selectedView();
+    if (root && view && workspaceMode_ == "Animator" &&
+        std::none_of(document().layer(root).views.begin(), document().layer(root).views.end(),
+                     [&](const auto& item) {
+                         return item.id == Id(view) && item.published &&
+                                QString::fromStdString(item.controlGroup) == selectedControlGroup();
+                     }))
+        return;
     if (root && view)
         edit("Apply character view", [&](Document& d) {
             opentoon::applyCharacterView(d, root, view, frame_);
@@ -1251,6 +1886,93 @@ void EditorController::setSwatchColor(int id, QColor c) {
                 s.color = color(c);
     });
 }
+bool EditorController::importAudio(QUrl url) {
+    if (!url.isLocalFile() || QFileInfo(url.toLocalFile()).suffix().compare("wav", Qt::CaseInsensitive)) {
+        report("Import a local PCM16 WAV file.");
+        return false;
+    }
+    QFile source(url.toLocalFile());
+    if (source.size() < 44 || source.size() > 128 * 1024 * 1024 || !source.open(QIODevice::ReadOnly)) {
+        report("Cannot open WAV or file exceeds the 128 MiB import limit.");
+        return false;
+    }
+    const auto bytes = source.readAll();
+    if (bytes.size() != source.size()) {
+        report("Could not read the complete WAV file.");
+        return false;
+    }
+    std::vector<std::uint8_t> pcm(bytes.begin(), bytes.end());
+    const auto name = QFileInfo(url.toLocalFile()).completeBaseName().toStdString();
+    return edit("Import audio", [&](Document& d) {
+        (void)opentoon::importPcm16Wav(d, name, std::move(pcm), frame_);
+    });
+}
+bool EditorController::moveAudioClip(int clipId, int start) {
+    return edit("Move audio clip", [&](Document& d) {
+        opentoon::moveAudioClip(d, Id(clipId), start);
+    });
+}
+bool EditorController::duplicateAudioClip(int clipId, int start) {
+    return edit("Duplicate audio clip", [&](Document& d) {
+        (void)opentoon::duplicateAudioClip(d, Id(clipId), start);
+    });
+}
+bool EditorController::splitAudioClip(int clipId, int frame) {
+    return edit("Split audio clip", [&](Document& d) {
+        (void)opentoon::splitAudioClipAtFrame(d, Id(clipId), frame);
+    });
+}
+bool EditorController::trimAudioClip(int clipId, int inSample, int outSample) {
+    if (inSample < 0 || outSample < 0)
+        return false;
+    return edit("Trim audio clip", [&](Document& d) {
+        opentoon::trimAudioClip(d, Id(clipId), std::uint64_t(inSample),
+                                std::uint64_t(outSample));
+    });
+}
+bool EditorController::trimAudioClipAtFrame(int clipId, int frame, bool leftEdge) {
+    return edit("Trim audio clip at frame", [&](Document& d) {
+        opentoon::trimAudioClipAtFrame(d, Id(clipId), frame, leftEdge);
+    });
+}
+bool EditorController::setAudioClipGain(int clipId, double gain) {
+    return edit("Set audio gain", [&](Document& d) {
+        opentoon::setAudioClipGain(d, Id(clipId), gain);
+    });
+}
+bool EditorController::setAudioClipRepeats(int clipId, int repeats) {
+    return edit("Set audio repeats", [&](Document& d) {
+        opentoon::setAudioClipRepeats(d, Id(clipId), repeats);
+    });
+}
+bool EditorController::setAudioClipFades(int clipId, int fadeInSamples, int fadeOutSamples) {
+    if (fadeInSamples < 0 || fadeOutSamples < 0)
+        return false;
+    return edit("Set audio fades", [&](Document& d) {
+        opentoon::setAudioClipFades(d, Id(clipId), std::uint64_t(fadeInSamples),
+                                    std::uint64_t(fadeOutSamples));
+    });
+}
+bool EditorController::setAudioClipMuted(int clipId, bool muted) {
+    return edit("Mute audio clip", [&](Document& d) {
+        opentoon::setAudioClipMuted(d, Id(clipId), muted);
+    });
+}
+bool EditorController::setAudioClipSolo(int clipId, bool solo) {
+    return edit("Solo audio clip", [&](Document& d) {
+        opentoon::setAudioClipSolo(d, Id(clipId), solo);
+    });
+}
+bool EditorController::setAudioClipBalance(int clipId, double balance) {
+    return edit("Set audio balance", [&](Document& d) {
+        opentoon::setAudioClipBalance(d, Id(clipId), balance);
+    });
+}
+bool EditorController::removeAudioClip(int clipId) {
+    return edit("Remove audio clip", [&](Document& d) {
+        opentoon::removeAudioClip(d, Id(clipId));
+    });
+}
 void EditorController::setScene(QString name, int width, int height, int duration, int numerator,
                                 int denominator) {
     edit("Scene settings", [&](Document& d) {
@@ -1309,9 +2031,22 @@ void EditorController::deleteKey() {
     });
 }
 void EditorController::stopPlayback() {
+    endAudioScrub();
+    scrubDevice_.reset();
+    if (audioDevice_) {
+        audioDevice_->stop();
+        const auto stats = audioDevice_->stats();
+        playbackCallbacks_ = stats.callbacks;
+        playbackProcessingOverruns_ = stats.processingOverruns;
+        playbackMaximumCallbackNanoseconds_ = stats.maximumCallbackNanoseconds;
+        audioDevice_.reset();
+    }
     if (playing()) {
         playTimer_.stop();
         emit playbackChanged();
+        if (skippedPlayheadFrames_ || playbackProcessingOverruns_)
+            report(QString("Playback stopped: %1 skipped playhead frames, %2 mixer callbacks over period.")
+                       .arg(skippedPlayheadFrames_).arg(playbackProcessingOverruns_));
     }
 }
 void EditorController::togglePlayback() {
@@ -1319,10 +2054,52 @@ void EditorController::togglePlayback() {
         stopPlayback();
         return;
     }
+    endAudioScrub();
+    scrubDevice_.reset();
+    playbackCallbacks_ = playbackProcessingOverruns_ = playbackMaximumCallbackNanoseconds_ = 0;
+    skippedPlayheadFrames_ = 0;
     playStart_ = frame_;
     playClock_.start();
+    if (!document().audioClips.empty()) {
+        try {
+            audioDevice_ = std::make_unique<opentoon::AudioDevice>(
+                session_.snapshot(), qEnvironmentVariableIntValue("OPENTOON_TEST_NULL_AUDIO_BACKEND") == 1);
+            audioDevice_->start(frame_);
+        } catch (const std::exception& e) {
+            audioDevice_.reset();
+            report("Audio output unavailable; preview continues silently: " + QString::fromUtf8(e.what()));
+        }
+    }
     playTimer_.start();
     emit playbackChanged();
+}
+QVariantMap EditorController::playbackDiagnostics() const {
+    const auto current = audioDevice_ ? audioDevice_->stats() : opentoon::AudioDeviceStats{
+        playbackCallbacks_, playbackProcessingOverruns_, playbackMaximumCallbackNanoseconds_};
+    return {{"callbacks", qulonglong(current.callbacks)},
+            {"processingOverruns", qulonglong(current.processingOverruns)},
+            {"maximumCallbackMs", double(current.maximumCallbackNanoseconds) / 1000000.0},
+            {"skippedPlayheadFrames", qulonglong(skippedPlayheadFrames_)}};
+}
+void EditorController::beginAudioScrub() {
+    if (playing() || document().audioClips.empty())
+        return;
+    try {
+        if (!scrubDevice_)
+            scrubDevice_ = std::make_unique<opentoon::AudioDevice>(
+                session_.snapshot(), qEnvironmentVariableIntValue("OPENTOON_TEST_NULL_AUDIO_BACKEND") == 1);
+        scrubDevice_->scrub(frame_);
+    } catch (const std::exception& e) {
+        scrubDevice_.reset();
+        report("Audio scrub unavailable: " + QString::fromUtf8(e.what()));
+    }
+}
+void EditorController::endAudioScrub() {
+    if (scrubDevice_)
+        scrubDevice_->stop();
+}
+bool EditorController::audioScrubbing() const {
+    return scrubDevice_ && scrubDevice_->running();
 }
 void EditorController::importImage(QUrl url) {
     QImageReader reader(local(url));
@@ -1437,6 +2214,68 @@ bool EditorController::importImageBatch(QVariantList urls, bool sequence) {
                                 : QString("Imported %1 registered PNG parts.").arg(inputs.size());
     report(summary + (batch->hasUntaggedColor ? " Untagged PNGs were interpreted as sRGB." : ""));
     return true;
+}
+void EditorController::exportAudio(QUrl url) {
+    exportAudioRange(url, 0, duration());
+}
+void EditorController::exportAudioRange(QUrl url, int start, int end) {
+    if (exporting_ || !url.isLocalFile())
+        return;
+    if (start < 0 || end > duration() || start >= end) {
+        report("Select a nonempty audio export frame range.");
+        return;
+    }
+    const auto destination = url.toLocalFile();
+    if (destination.isEmpty())
+        return;
+    if (exportThread_.joinable())
+        exportThread_.join();
+    exporting_ = true;
+    exportProgress_ = 0;
+    cancelExport_ = false;
+    emit exportChanged();
+    const auto snapshot = session_.snapshot();
+    exportThread_ = std::thread([this, snapshot, destination, start, end] {
+        QString error;
+        bool cancelled = false;
+        std::int64_t samples = 0;
+        try {
+            QSaveFile file(destination);
+            if (!file.open(QIODevice::WriteOnly))
+                throw std::runtime_error("Could not create the PCM WAV output.");
+            int lastPercent = -1;
+            const auto result = opentoon::writeAudioWavRange(*snapshot, file, start, end,
+                [this] { return cancelExport_.load(); },
+                [this, &lastPercent](double progress) {
+                    const int percent = int(progress * 100);
+                    if (percent != lastPercent) {
+                        lastPercent = percent;
+                        QMetaObject::invokeMethod(this, [this, progress] {
+                            exportProgress_ = progress;
+                            emit exportChanged();
+                        }, Qt::QueuedConnection);
+                    }
+                });
+            samples = result.sampleFrames;
+            if (cancelExport_)
+                throw opentoon::AudioExportCancelled();
+            if (!file.commit())
+                throw std::runtime_error("Could not commit the PCM WAV output.");
+        } catch (const opentoon::AudioExportCancelled&) {
+            cancelled = true;
+        } catch (const std::exception& e) {
+            error = QString::fromUtf8(e.what());
+        }
+        QMetaObject::invokeMethod(this, [this, destination, samples, cancelled, error,
+                                         start, end] {
+            exporting_ = false;
+            emit exportChanged();
+            report(cancelled ? "Audio export cancelled." :
+                   error.isEmpty() ? QString("Exported %1 audio samples (frames %2–%3) to %4")
+                                        .arg(samples).arg(start + 1).arg(end).arg(destination)
+                                   : "Audio export failed: " + error);
+        }, Qt::QueuedConnection);
+    });
 }
 void EditorController::exportFrames(QUrl url) {
     if (exporting_)

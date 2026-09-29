@@ -553,7 +553,7 @@
     {
       "id": "P07",
       "title": "Sound and practical media output",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [
         "P01"
       ],
@@ -566,12 +566,12 @@
         {
           "id": "P07-W1",
           "description": "Use miniaudio for device playback/mixing and a restricted FFmpeg adapter for decoding/encoding; keep one authoritative rational timeline clock.",
-          "status": "planned"
+          "status": "in_progress"
         },
         {
           "id": "P07-W2",
           "description": "Add waveforms, trim/offset, gain, scrub, audio library, preview quality and render-range controls.",
-          "status": "planned"
+          "status": "in_progress"
         },
         {
           "id": "P07-W3",
@@ -804,7 +804,7 @@
         {
           "id": "P10-W2",
           "description": "Build the node editor as a view over the document graph; implement basic blending, opacity, blur, glow, shadows, color correction and mattes.",
-          "status": "planned"
+          "status": "in_progress"
         },
         {
           "id": "P10-W3",
@@ -1846,7 +1846,7 @@
     {
       "feature_id": "UI-002",
       "completion_phase": "P03",
-      "status": "planned",
+      "status": "in_progress",
       "disposition": "planned_delivery",
       "delivery_slices": [
         "HM-07"
@@ -2996,7 +2996,7 @@
     {
       "feature_id": "RIG-012",
       "completion_phase": "P08",
-      "status": "planned",
+      "status": "in_progress",
       "disposition": "planned_delivery",
       "delivery_slices": [
         "HM-07",
@@ -3198,7 +3198,7 @@
     {
       "feature_id": "CTL-002",
       "completion_phase": "P08",
-      "status": "planned",
+      "status": "in_progress",
       "disposition": "planned_delivery",
       "delivery_slices": [
         "HM-07"
@@ -3218,7 +3218,7 @@
     {
       "feature_id": "CTL-004",
       "completion_phase": "P08",
-      "status": "planned",
+      "status": "in_progress",
       "disposition": "planned_delivery",
       "delivery_slices": [
         "HM-07"
@@ -3229,7 +3229,7 @@
     {
       "feature_id": "CTL-005",
       "completion_phase": "P08",
-      "status": "planned",
+      "status": "in_progress",
       "disposition": "planned_delivery",
       "delivery_slices": [
         "HM-07",
@@ -3846,6 +3846,7 @@
       "status": "planned",
       "disposition": "planned_delivery",
       "delivery_slices": [
+        "HM-10",
         "HM-14"
       ],
       "delivery_priority": "harmony_moment_subset",
@@ -4843,7 +4844,7 @@
       "owner_phase": "P08",
       "work_package": "P08-W3",
       "owner_module": "controllers/rigging",
-      "status": "planned",
+      "status": "in_progress",
       "effort_engineer_weeks": [
         3,
         6
@@ -4985,10 +4986,10 @@
       "owner_phase": "P07",
       "work_package": "P07-W1",
       "owner_module": "audio/media",
-      "status": "planned",
+      "status": "in_progress",
       "effort_engineer_weeks": [
-        4,
-        7
+        5,
+        8
       ],
       "feature_ids": [
         "AUD-001",
@@ -4996,7 +4997,8 @@
         "AUD-003",
         "AUD-004",
         "AUD-005",
-        "LYR-001"
+        "LYR-001",
+        "AUD-010"
       ],
       "requires": [
         {
@@ -5004,7 +5006,7 @@
           "contract": "Saved typed audio assets/clips, rational sample/frame conversion and cancellable snapshot jobs"
         }
       ],
-      "scope": "Adopt one playback backend after the miniaudio spike; start with WAV/PCM, waveform pyramids, trim/offset/gain, limited mixing and frame scrub. Audio device time drives playback, while headless sampling uses the same rational scene mapping.",
+      "scope": "Adopt one playback backend after the miniaudio spike; start with WAV/PCM, waveform pyramids, trim/offset/gain, limited mixing and frame scrub. Audio device time drives playback, while headless sampling uses the same rational scene mapping. Export a selected half-open frame range to PCM WAV using exact rational output-sample boundaries.",
       "acceptance": [
         "Ten-minute 24 and 24000/1001 scenes stay within one-frame accumulated audiovisual drift; report underruns and dropped preview frames.",
         "Seek, loop, pause, device loss and sample-rate conversion do not desynchronize the playhead or mutate media; waveform peaks align with sample positions.",
@@ -5067,7 +5069,7 @@
       "owner_phase": "P10",
       "work_package": "P10-W2",
       "owner_module": "compositing/presentation",
-      "status": "planned",
+      "status": "in_progress",
       "effort_engineer_weeks": [
         4,
         7
@@ -5257,7 +5259,7 @@
   ],
   "execution_policy": {
     "primary_objective": "HM: reliable character animation Harmony Moment",
-    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06 bone/curve deformation is in progress with a format-11 animated backend, saved rest anchors and native controls and bounded bone-tip links; its quality and interaction budgets are still unaccepted. HM-07, HM-10 and HM-12 remain eligible independent branches. P09 and all other owning full phases remain open.",
+    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06, HM-07 and HM-10 remain parked in progress; HM-06 has a regenerated sampled-edge, two-view original toon over continuous limbs but still needs artistic acceptance; HM-12 is parked at the owner-requested 10:30 CEST cutoff after fractional cutter mattes, saved bypasses, visible cutter sources, node previews and Normal/Multiply/Screen/Add blend modes, direct Drawing-card order dragging and name/kind search. HM-10 retains band-limited rate conversion, selected-range export, saved clip mute and solo, stereo balance, exact 48 kHz single-pass splitting, direct frame-edge trimming and two silent ten-minute CoreAudio scheduling probes. P07/P08/P09/P10 and full feature acceptance remain open.",
     "phase_dependency_semantics": "Phase depends_on constrains full epic completion, not entry into an implementation slice. Only the explicit delivery-slice contract DAG gates the Harmony Moment. Domain dependencies are scope relationships, not all-features barriers.",
     "entry_rule": "Start a slice only when each required contract has accepted evidence. Baseline reuse is partial and must be qualified; planned is not ready. Independent spikes may run without claiming their consumer ready.",
     "wip_limit": 2,
@@ -5320,7 +5322,7 @@
       "Physical tablet, Intel, Linux/Windows or clean-machine qualification",
       "Measured superiority over Harmony before comparative artist study"
     ],
-    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06 bone/curve deformation is in progress with a format-11 animated backend, saved rest anchors and native controls and bounded bone-tip links; its quality and interaction budgets are still unaccepted. HM-07, HM-10 and HM-12 remain eligible independent branches. P09 and all other owning full phases remain open."
+    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06, HM-07 and HM-10 remain parked in progress; HM-06 has a regenerated sampled-edge, two-view original toon over continuous limbs but still needs artistic acceptance; HM-12 is parked at the owner-requested 10:30 CEST cutoff after fractional cutter mattes, saved bypasses, visible cutter sources, node previews and Normal/Multiply/Screen/Add blend modes, direct Drawing-card order dragging and name/kind search. HM-10 retains band-limited rate conversion, selected-range export, saved clip mute and solo, stereo balance, exact 48 kHz single-pass splitting, direct frame-edge trimming and two silent ten-minute CoreAudio scheduling probes. P07/P08/P09/P10 and full feature acceptance remain open."
   },
   "estimate_revision": {
     "basis": "Whole-program phase envelopes retain prior scope and are not estimates of remaining HM work. HM slice estimates cover remaining bounded work once, including integration; never add them to phase totals.",

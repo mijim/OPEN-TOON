@@ -9,11 +9,27 @@ The [twenty-second visual shot study](HM06-VISUAL-SHOT.md) now exercises the
 continuous rig with camera, face/hand/mouth substitutions and a torso curve
 over the agreed 480-frame timing. Audio, mattes and published controls remain
 in their owning slices; the study does not claim the complete Harmony Moment.
+The saved 48- and 480-frame studies now use alpha-following contour meshes
+for each continuous arm and leg. The same editable middle elbow/knee bones,
+keys, sleeve variants and attached hands/feet remain. A sharper 40 px elbow
+transition reduces the inflated inner-joint contour at frame 24 and at 90° while
+retaining a connected silhouette. The [current frame-24 bend](hm06-contour-bend-24.png)
+and [90° stress pose](hm06-contour-bend-90.png) were inspected. This is a
+bounded visual improvement; owner artistic approval remains open.
 The 480-frame preview/connectivity sweep also found and corrected a visible
 angle mismatch at the alternate-sleeve change. **Match previous pose** now
 records that incoming bone or curve key explicitly at a compatible drawing
 boundary; the visual shot uses it before the animation continues. The action
 is undoable and tested through native save/reopen.
+
+The current original-art revision adds a muted cap to both head views and
+2 × 2 edge coverage to the registered PNG drawings. The continuous limbs,
+their middle elbow/knee bones and the 19-role intake remain in place. The
+independent reference compositor can differ by at most two 8-bit channel
+levels at antialiased edges from Qt's premultiplied compositor; the tests bound
+both that maximum and the number of changed pixels. The generated art, three
+editable projects and displayed stills were regenerated together. This is
+candidate visual direction rather than owner artistic acceptance.
 
 ## Working subset
 
@@ -71,7 +87,8 @@ is undoable and tested through native save/reopen.
   serialization and range transfer with exact evaluated endpoints.
   `tests/mesh_render_tests.cpp` covers saved preview/Display/Write pixels,
   separate substitution chains, and the original 19-part scene. The assembled
-  frame-zero scene is byte-identical to `reference_0000.png`; an animated arm
+  frame-zero scene agrees with `reference_0000.png` within the bounded
+  antialias-compositing tolerance; an animated arm
   and torso reopen to identical frame-12 pixels. A manually placed elbow,
   deforming upper sleeve, and rigidly pivoted forearm/hand produce a 70°
   [extreme pose](hm06-bone-extreme.png) with unchanged rest pixels and identical
@@ -143,6 +160,16 @@ is undoable and tested through native save/reopen.
   pose; the hood-to-sleeve seam and knee volume still need artistic refinement.
   The candidate has no elbow or knee image seam; owner visual approval is still
   open.
+  The later leg redraw replaces the two angular trouser silhouettes with
+  continuous cubic contours, a modestly fuller knee and a narrower ankle.
+  The first wider knee candidate folded the right contour mesh at 90° and
+  was rejected; the final contour passes the same 40 px transition and
+  rejects the unsafe 35 px case. Registered hip/knee/ankle joints and the
+  one-image, one-mesh limb ownership are unchanged. Both openable examples
+  and their representative captures were regenerated. The local macOS suite
+  passes 166/166 entries, the deterministic asset test and native HM-07
+  dashboard smoke (40 mouse-to-present samples, p95 18.02 ms). This is a
+  smaller silhouette correction; full artistic approval remains open.
 - The native `--smoke-test` drags a bone tip and curve tangent, checks
   temporary preview isolation, cancellation, undo/redo, bone and curve rest-control
   retarget, a 6 × 16 mesh grid, numeric and on-canvas elbow influence tuning,
