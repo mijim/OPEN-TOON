@@ -73,7 +73,8 @@ editor test imports a real WAV file, edits a clip, samples its waveform and
 reopens it. Two-source tests cover overlapping clips, gain, 44.1-to-48 kHz
 linear conversion and stereo output. Editor export tests check exact 24 and
 24000/1001 lengths, cancellation preservation and byte-identical mixes after
-reopen. Native Qt Quick smoke inspects the audio row and control panel,
+reopen. [ADR-042](042-selected-audio-export-range.md) adds exact selected
+frame-range WAV output from the same immutable mix. Native Qt Quick smoke inspects the audio row and control panel,
 captures `build/hm10-audio-smoke.png`, checks the exported cue, and undoes import.
 
 The experimental desktop now uses the same `AudioMixPlan` for a miniaudio

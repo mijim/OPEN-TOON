@@ -2054,8 +2054,15 @@ bool EditorController::importImageBatch(QVariantList urls, bool sequence) {
     return true;
 }
 void EditorController::exportAudio(QUrl url) {
+    exportAudioRange(url, 0, duration());
+}
+void EditorController::exportAudioRange(QUrl url, int start, int end) {
     if (exporting_ || !url.isLocalFile())
         return;
+    if (start < 0 || end > duration() || start >= end) {
+        report("Select a nonempty audio export frame range.");
+        return;
+    }
     const auto destination = url.toLocalFile();
     if (destination.isEmpty())
         return;
@@ -2066,7 +2073,7 @@ void EditorController::exportAudio(QUrl url) {
     cancelExport_ = false;
     emit exportChanged();
     const auto snapshot = session_.snapshot();
-    exportThread_ = std::thread([this, snapshot, destination] {
+    exportThread_ = std::thread([this, snapshot, destination, start, end] {
         QString error;
         bool cancelled = false;
         std::int64_t samples = 0;
@@ -2075,7 +2082,7 @@ void EditorController::exportAudio(QUrl url) {
             if (!file.open(QIODevice::WriteOnly))
                 throw std::runtime_error("Could not create the PCM WAV output.");
             int lastPercent = -1;
-            const auto result = opentoon::writeAudioWav(*snapshot, file,
+            const auto result = opentoon::writeAudioWavRange(*snapshot, file, start, end,
                 [this] { return cancelExport_.load(); },
                 [this, &lastPercent](double progress) {
                     const int percent = int(progress * 100);
@@ -2097,12 +2104,13 @@ void EditorController::exportAudio(QUrl url) {
         } catch (const std::exception& e) {
             error = QString::fromUtf8(e.what());
         }
-        QMetaObject::invokeMethod(this, [this, destination, samples, cancelled, error] {
+        QMetaObject::invokeMethod(this, [this, destination, samples, cancelled, error,
+                                         start, end] {
             exporting_ = false;
             emit exportChanged();
             report(cancelled ? "Audio export cancelled." :
-                   error.isEmpty() ? QString("Exported %1 audio samples to %2")
-                                        .arg(samples).arg(destination)
+                   error.isEmpty() ? QString("Exported %1 audio samples (frames %2–%3) to %4")
+                                        .arg(samples).arg(start + 1).arg(end).arg(destination)
                                    : "Audio export failed: " + error);
         }, Qt::QueuedConnection);
     });

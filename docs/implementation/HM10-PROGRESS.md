@@ -16,10 +16,13 @@ source-sample in/out range, changes linear gain and repeat count,
 and removes the clip. Every change is undoable; trim and gain do not rewrite
 the source. **Scene → Export PCM WAV mix** writes a 48 kHz stereo PCM16 mix
 from an immutable document snapshot. Multiple clips sum at exact scene sample
-positions; source-rate conversion uses bounded linear interpolation. Export
-runs in the background, reports progress and atomically discards a cancelled
-temporary file. Downsampling uses a precomputed 32-tap anti-alias filter;
-equal-rate and upsampling paths retain bounded linear interpolation.
+positions. Export runs in the background, reports progress and atomically
+discards a cancelled temporary file. Downsampling uses a precomputed 32-tap
+anti-alias filter; equal-rate and upsampling paths retain bounded linear
+interpolation. **Scene → Export selected PCM WAV range** writes the selected
+half-open frame interval at exact rational 48 kHz sample boundaries. Its PCM
+payload equals the corresponding full-mix slice; invalid ranges and cancelled
+jobs do not replace an existing output.
 **Play** uses a miniaudio output device when placed clips exist.
 The callback mixes the immutable scene snapshot into bounded stack buffers;
 submitted sample position drives the playhead. Seeking during playback resets
@@ -41,6 +44,8 @@ for interval and frame-edit semantics and [ADR-038](../architecture/adr/038-repe
 for sample-contiguous repeats.
 See [ADR-041](../architecture/adr/041-audio-downsampling-kernel.md) for the
 shared bounded downsampling kernel and callback memory boundary.
+See [ADR-042](../architecture/adr/042-selected-audio-export-range.md) for
+selected frame-range export boundaries.
 
 ## Verification
 
@@ -77,6 +82,10 @@ shared bounded downsampling kernel and callback memory boundary.
   across the loop, and split versus whole output blocks were byte-identical.
   Two simultaneous 96 kHz tracks measured 0.232 ms p95 for a 1,024-frame
   block against a 21.33 ms callback period on the local M1 Pro Release build.
+- A range-export integration test compares selected PCM payload with the
+  full-scene mix slice at 24 and 24000/1001 fps, checks exact length and
+  rejects invalid boundaries before writing. The native HM-10 smoke exports
+  and compares a two-frame range containing the known cue.
 - `opentoon_audio_sync_benchmark` drives a silent repeated clip through the
   same adapter and samples its cursor every 8 ms. A two-second CoreAudio probe
   at 24 fps recorded 328 callbacks, zero callbacks over period, 0.043 ms
@@ -90,7 +99,7 @@ shared bounded downsampling kernel and callback memory boundary.
   and two skipped polled frames. Each drift is relative to the host monotonic
   clock after the first one-second baseline. These silent probes do not
   measure speaker delivery time, audible sync or hardware underruns.
-- Local macOS `build/locked`: 154/154 CTest entries pass. The native
+- Local macOS `build/locked`: 163/163 CTest entries pass. The native
   `--hm10-smoke` loaded the Qt Quick audio timeline, checked its cue sample,
   captured and visually inspected `build/hm10-audio-smoke.png`, exported an
   exactly sized WAV with its cue at the correct sample, advanced and sought

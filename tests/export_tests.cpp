@@ -232,6 +232,34 @@ TEST_CASE("Editor exports a reopened PCM cue at its exact output sample") {
     REQUIRE(bytes.mid(atCue, 2) == bytes.mid(atCue + 2, 2));
     const auto repeatedCue = 44 + 50002 * 4;
     REQUIRE(bytes.mid(atCue, 4) == bytes.mid(repeatedCue, 4));
+    const auto rangePath = directory.filePath("range.wav");
+    reopened.exportAudioRange(QUrl::fromLocalFile(rangePath), 1, 3);
+    waitForExport(reopened);
+    QFile rangeFile(rangePath);
+    REQUIRE(rangeFile.open(QIODevice::ReadOnly));
+    const auto rangeBytes = rangeFile.readAll();
+    REQUIRE(rangeBytes.size() == 44 + 4000 * 4);
+    REQUIRE(rangeBytes.mid(44) == bytes.mid(44 + 2000 * 4, 4000 * 4));
+    const auto invalidPath = directory.filePath("invalid-range.wav");
+    reopened.exportAudioRange(QUrl::fromLocalFile(invalidPath), 3, 3);
+    REQUIRE_FALSE(QFile::exists(invalidPath));
+    auto fractional = editor.document();
+    fractional.rate = {24000, 1001};
+    fractional.validate();
+    QBuffer fractionalFull, fractionalRange;
+    REQUIRE(fractionalFull.open(QIODevice::WriteOnly));
+    REQUIRE(fractionalRange.open(QIODevice::WriteOnly));
+    (void)opentoon::writeAudioWav(fractional, fractionalFull);
+    const auto result = opentoon::writeAudioWavRange(fractional, fractionalRange, 10, 20);
+    const auto firstSample = fractional.rate.sampleAt(10, 48000);
+    const auto count = fractional.rate.sampleAt(20, 48000) - firstSample;
+    REQUIRE(result.sampleFrames == count);
+    REQUIRE(fractionalRange.data().mid(44) == fractionalFull.data().mid(44 + firstSample * 4,
+                                                                       count * 4));
+    QBuffer rejected;
+    REQUIRE(rejected.open(QIODevice::WriteOnly));
+    REQUIRE_THROWS(opentoon::writeAudioWavRange(fractional, rejected, 20, 10));
+    REQUIRE(rejected.data().isEmpty());
 }
 TEST_CASE("Null audio device advances, seeks and stops against one immutable scene") {
     EditorController editor;

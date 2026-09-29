@@ -127,3 +127,6 @@ coverage and typed matte inversion.
 
 See [ADR-041](041-audio-downsampling-kernel.md) for the bounded precomputed
 anti-alias filter used when PCM source rates exceed the output rate.
+
+See [ADR-042](042-selected-audio-export-range.md) for half-open frame-range
+PCM WAV export and exact rational sample boundaries.

@@ -289,6 +289,11 @@ ApplicationWindow {
                 onTriggered: audioExportDialog.open()
             }
             Action {
+                text: "Export selected PCM WAV range…"
+                enabled: !editor.exporting && editor.rangeEnd > editor.rangeStart
+                onTriggered: audioRangeExportDialog.open()
+            }
+            Action {
                 text: "Scene settings…"
                 onTriggered: settingsDialog.open()
             }
@@ -3176,6 +3181,14 @@ ApplicationWindow {
         defaultSuffix: "wav"
         nameFilters: ["PCM WAV audio (*.wav)"]
         onAccepted: editor.exportAudio(selectedFile)
+    }
+    FileDialog {
+        id: audioRangeExportDialog
+        title: "Export selected PCM WAV range"
+        fileMode: FileDialog.SaveFile
+        defaultSuffix: "wav"
+        nameFilters: ["PCM WAV audio (*.wav)"]
+        onAccepted: editor.exportAudioRange(selectedFile, editor.rangeStart, editor.rangeEnd)
     }
     ColorDialog {
         id: colorDialog

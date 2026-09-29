@@ -326,12 +326,24 @@ int main(int argc, char** argv) {
                         quint8(mix[44 + 2002 * 4 + 1]) != 127 ||
                         mix.mid(44 + 50002 * 4, 4) != mix.mid(44 + 2002 * 4, 4))
                         throw std::runtime_error("Native PCM WAV cue shifted during export.");
+                    const auto selectedOutput = directory.filePath("selected.wav");
+                    editor.exportAudioRange(QUrl::fromLocalFile(selectedOutput), 1, 3);
+                    timeout.restart();
+                    while (editor.exporting() && timeout.elapsed() < 15000) {
+                        QCoreApplication::processEvents();
+                        QThread::msleep(1);
+                    }
+                    QFile selected(selectedOutput);
+                    if (editor.exporting() || !selected.open(QIODevice::ReadOnly) ||
+                        selected.size() != 44 + 4000 * 4 ||
+                        selected.readAll().mid(44) != mix.mid(44 + 2000 * 4, 4000 * 4))
+                        throw std::runtime_error("Native selected WAV range shifted or changed duration.");
                     editor.undo(); // Repeat count.
                     editor.undo();
                     if (editor.document() != baseline)
                         throw std::runtime_error("WAV import did not undo atomically.");
                     std::cout << "HM-10 audio smoke passed: native PCM16 import, cue waveform, "
-                                 "device-clock playhead/seek, waveform drag/undo, audio scrub/repeat, exact WAV mix export, timeline screenshot and atomic undo.\n";
+                                 "device-clock playhead/seek, waveform drag/undo, audio scrub/repeat, exact full and selected-range WAV export, timeline screenshot and atomic undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

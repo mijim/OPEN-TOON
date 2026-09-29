@@ -138,6 +138,6 @@ Export audio by range and synchronize it with rendering.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — exact-range 48 kHz stereo PCM16 WAV mix from immutable snapshot with cancellation, combined PNG/WAV delivery remains open.
+**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — exact 48 kHz stereo PCM16 WAV mix from an immutable snapshot for full scene or selected half-open frame range, with rational sample boundaries, cancellation and source preservation; synchronized PNG/WAV delivery remains open.
 
 **Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.

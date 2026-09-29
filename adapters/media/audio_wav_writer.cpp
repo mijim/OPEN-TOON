@@ -3,6 +3,7 @@
 #include <QByteArray>
 #include <algorithm>
 #include <limits>
+#include <utility>
 
 namespace opentoon {
 namespace {
@@ -19,12 +20,16 @@ void exactWrite(QIODevice& output, const QByteArray& bytes) {
         throw std::runtime_error("Could not write the PCM WAV output.");
 }
 } // namespace
-AudioWavResult writeAudioWav(const Document& document, QIODevice& output,
-                             std::function<bool()> cancelled,
-                             std::function<void(double)> progress) {
+AudioWavResult writeAudioWavRange(const Document& document, QIODevice& output,
+                                  Frame start, Frame end,
+                                  std::function<bool()> cancelled,
+                                  std::function<void(double)> progress) {
+    if (start < 0 || end > document.duration || start >= end)
+        throw std::invalid_argument("Audio export frame range is invalid.");
     AudioMixPlan mix(document, 48000);
-    const auto samples = mix.sceneSamples();
-    if (samples < 0 || samples > (std::numeric_limits<std::uint32_t>::max() - 36) / 4)
+    const auto firstSample = document.rate.sampleAt(start, 48000);
+    const auto samples = document.rate.sampleAt(end, 48000) - firstSample;
+    if (samples <= 0 || samples > (std::numeric_limits<std::uint32_t>::max() - 36) / 4)
         throw std::invalid_argument("Scene audio exceeds the PCM WAV size limit.");
     if (cancelled && cancelled())
         throw AudioExportCancelled();
@@ -41,7 +46,7 @@ AudioWavResult writeAudioWav(const Document& document, QIODevice& output,
         if (cancelled && cancelled())
             throw AudioExportCancelled();
         const auto count = std::size_t(std::min<std::int64_t>(blockFrames, samples - first));
-        const auto pcm = mix.renderBlock(first, count);
+        const auto pcm = mix.renderBlock(firstSample + first, count);
         QByteArray bytes;
         bytes.reserve(qsizetype(pcm.size() * 2));
         for (const auto sample : pcm)
@@ -51,5 +56,11 @@ AudioWavResult writeAudioWav(const Document& document, QIODevice& output,
             progress(double(first + count) / samples);
     }
     return {samples, 48000, 2};
+}
+AudioWavResult writeAudioWav(const Document& document, QIODevice& output,
+                             std::function<bool()> cancelled,
+                             std::function<void(double)> progress) {
+    return writeAudioWavRange(document, output, 0, document.duration,
+                              std::move(cancelled), std::move(progress));
 }
 } // namespace opentoon

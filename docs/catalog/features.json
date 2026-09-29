@@ -4376,7 +4376,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/HM10-PROGRESS.md; exact-range 48 kHz stereo PCM16 WAV mix from immutable snapshot with cancellation, combined PNG/WAV delivery remains open"
+      "implementation_evidence": "docs/implementation/HM10-PROGRESS.md; exact 48 kHz stereo PCM16 WAV mix from an immutable snapshot for full scene or selected half-open frame range, with rational sample boundaries, cancellation and source preservation; synchronized PNG/WAV delivery remains open"
     },
     {
       "id": "IMP-001",

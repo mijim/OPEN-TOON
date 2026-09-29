@@ -1,5 +1,15 @@
 # Experimental releases
 
+## 0.2.0-experimental.21 — working source, selected audio range
+
+- Export a selected half-open frame interval to PCM WAV. Its sample count
+  follows the exact scene rate, and its PCM payload matches the same slice
+  of a full-scene mix, including at 24000/1001 fps.
+- The native audio smoke checks a cue in a two-frame range. Invalid ranges
+  fail before writing; cancellation retains the earlier destination.
+- The local macOS build passes 163 CTest entries. Source only; no new public
+  binary or tag. Full synchronized PNG/WAV delivery remains open.
+
 ## 0.2.0-experimental.20 — working source, anti-alias audio downsampling
 
 - Precompute a bounded 32-tap, 1,024-phase low-pass table for each unique

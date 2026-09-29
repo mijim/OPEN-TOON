@@ -320,6 +320,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE bool setAudioClipRepeats(int clipId, int repeats);
     Q_INVOKABLE bool removeAudioClip(int clipId);
     Q_INVOKABLE void exportAudio(QUrl url);
+    Q_INVOKABLE void exportAudioRange(QUrl url, int start, int end);
     Q_INVOKABLE void setTransform(QString, double);
     bool hasCopiedTransform() const { return transformClipboard_.has_value(); }
     Q_INVOKABLE void copyTransformPose();
