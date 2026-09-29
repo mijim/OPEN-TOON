@@ -158,7 +158,7 @@ Save and transfer poses using stable part mappings.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM07-PROGRESS.md](../../../docs/implementation/HM07-PROGRESS.md) — named same-character masked capture/apply subset, full transfer acceptance open.
+**Implementation evidence:** [docs/implementation/HM07-PROGRESS.md](../../../docs/implementation/HM07-PROGRESS.md) — masked capture/apply and compatible in-project role/drawing mapped transfer, broader retargeting acceptance open.
 
 **Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 

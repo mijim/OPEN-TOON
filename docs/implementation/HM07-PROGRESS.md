@@ -20,6 +20,11 @@ the first format-12 save preserves a source-version backup.
 Rig can set or replace the selected Part's saved values and channel mask in
 an existing pose, and remove a mapped Part while retaining at least one entry.
 This makes per-Part masks editable after capture.
+Rig also copies a selected pose to another compatible Character in the same
+project. The command maps unique Part roles and unique drawing names, requires
+matching local rest transforms, assigns new destination IDs and leaves the
+source untouched. Incompatible mappings reject atomically. The copied pose
+starts unpublished and a name collision gets a numeric suffix.
 
 ## Evidence
 
@@ -34,7 +39,7 @@ This makes per-Part masks editable after capture.
   Parts, assembles a character, captures a selected Part, applies at another
   frame, refines/removes a second Part mapping, blends with several live
   updates, undoes/redoes once, saves and reopens.
-- Local macOS `build/locked`: 139/139 CTest entries pass. Native Qt Quick
+- Local macOS `build/locked`: 140/140 CTest entries pass. Native Qt Quick
   `--smoke-test` passes the mouse/input, window, deformation and reopen
   journeys. The new pose panel compiles and loads within that window; the
   controller journey exercises its backend rather than clicking its widgets.
@@ -69,6 +74,14 @@ published mouth choices on the 15-Part continuous toon, switches one choice
 and undoes it. The screenshot was inspected with the connected silhouette and
 mouth picker visible.
 
+`tests/rigging_tests.cpp` now transfers a pose across an independent character
+copy, applies the mapped drawing and numeric channel, checks source isolation,
+undo/redo and rejected mismatches. `tests/export_tests.cpp` checks the actual
+editor's destination selection and save/reopen. The native smoke copies the
+15-Part character, shows **Copy to** in Rig, transfers the pose and undoes it;
+`build/hm07-transfer-smoke.png` was visually inspected. This is an in-project
+compatible-rig subset, not an arbitrary rig retargeter.
+
 The same native smoke drags the published slider across the continuous
 15-Part character. Each run discards five warmup moves, measures 40 mouse
 move-to-`frameSwapped` samples, verifies that a mapped Part moves and that one
@@ -86,12 +99,12 @@ run. The published mouth command and one-step slider undo passed in each run.
 
 This remains a direct-command control subset. Persistent multi-driver
 evaluation, conflict/cycle handling, on-canvas widgets, control groups,
-cross-character mapping and a complete artist journey remain open. HM-07 is
+broader cross-character mapping and a complete artist journey remain open. HM-07 is
 still in progress.
 
 ## Remaining contract
 
-Saved pose masks use explicit Part IDs within one character. Cross-rig stable
-role mapping, mirroring, full published controls, direct widgets, control
+Saved pose masks use explicit Part IDs within one character. Broader cross-rig
+retargeting, mirroring, full published controls, direct widgets, control
 groups, conflict/cycle handling, complete workspace layout presets and artist
 acceptance remain open. RIG-012 and HM-07 are partial.

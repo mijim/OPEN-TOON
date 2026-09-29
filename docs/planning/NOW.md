@@ -8,7 +8,7 @@ The immediate objective is a complete, reliable character-animation **Harmony Mo
 
 **Open critical-path slice: [HM-06](HARMONY-MOMENT.md#hm-06).** HM-05 has accepted bounded [rest/UV and renderer evidence](../implementation/HM05-ACCEPTANCE.md). The [working HM-06 subset](../implementation/HM06-PROGRESS.md) saves bone/curve controls, weights and keys, supports canvas drags, continuous limbs and explicit matching of compatible substitution poses. The 480-frame visual shot passes continuity, native input and reopen checks. Further extreme-bend and complete-reference review remain before acceptance. Work on this slice is parked while the single implementer advances HM-07 at the owner's request.
 
-**Active slice: [HM-07](HARMONY-MOMENT.md#hm-07).** Format-12 named masked poses capture, apply and blend selected channels and substitutions with undo/reopen evidence. Format-14 publication exposes selected views, per-Part drawing choices and poses in an Animator dashboard over the same document. [The tested subset](../implementation/HM07-PROGRESS.md) leaves general controls, cross-rig transfer and complete workspace presets open.
+**Active slice: [HM-07](HARMONY-MOMENT.md#hm-07).** Format-12 named masked poses capture, apply and blend selected channels and substitutions with undo/reopen evidence. Format-14 publication exposes selected views, per-Part drawing choices and poses in an Animator dashboard over the same document. Compatible in-project pose transfer maps unique roles and drawing names. [The tested subset](../implementation/HM07-PROGRESS.md) leaves general controls, broader retargeting and complete workspace presets open.
 
 **Current gate:** HM-06 has animated bone/curve evaluation, bounded per-substitution binding and editable elbow influence; broader extreme-bend quality and artistic interaction remain unaccepted. HM-07 is active with owner-requested feature work. HM-10 audio and HM-12 nodes are independently eligible after the active bounded block is reviewed.
 
@@ -24,7 +24,7 @@ Statuses and hard prerequisites below come from `roadmap.json`; acceptance and p
 | [HM-04](HARMONY-MOMENT.md#hm-04) | Bounded contract accepted | HM-01 accepted | P10 owning phase remains open. |
 | [HM-05](HARMONY-MOMENT.md#hm-05) | Bounded contract accepted | HM-03, HM-04 accepted | P09 owning phase remains open. |
 | [HM-06](HARMONY-MOMENT.md#hm-06) | In progress | HM-05 accepted | Extreme-bend quality and interaction budgets remain. |
-| [HM-07](HARMONY-MOMENT.md#hm-07) | In progress | HM-03, HM-04 accepted | Published pose/view/drawing dashboard passes; general bindings and workspace presets remain. |
+| [HM-07](HARMONY-MOMENT.md#hm-07) | In progress | HM-03, HM-04 accepted | Published pose/view/drawing dashboard and compatible pose transfer pass; general bindings and workspace presets remain. |
 | [HM-08](HARMONY-MOMENT.md#hm-08) | Planned | HM-03, HM-07 | Wait for both contracts. |
 | [HM-09](HARMONY-MOMENT.md#hm-09) | Planned | HM-06, HM-07, HM-08 | Wait for all three contracts. |
 | [HM-10](HARMONY-MOMENT.md#hm-10) | Planned; independently eligible | HM-01 accepted | May start with a separate owner. |

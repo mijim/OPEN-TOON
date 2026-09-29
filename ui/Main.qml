@@ -1624,6 +1624,26 @@ ApplicationWindow {
                                         onClicked: editor.removeSelectedPartFromCharacterPose()
                                     }
                                 }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    visible: editor.selectedCharacterPose > 0 && editor.poseTransferTargets.length > 0
+                                    C.CompactComboBox {
+                                        id: poseTransferTarget
+                                        objectName: "poseTransferTargetPicker"
+                                        Layout.fillWidth: true
+                                        model: editor.poseTransferTargets
+                                        textRole: "name"
+                                        valueRole: "id"
+                                        currentIndex: model.length > 0 ? 0 : -1
+                                        Accessible.name: "Pose destination character"
+                                    }
+                                    C.CompactButton {
+                                        text: "Copy to"
+                                        enabled: poseTransferTarget.currentValue > 0
+                                        onClicked: editor.transferSelectedCharacterPose(poseTransferTarget.currentValue)
+                                        Accessible.name: "Copy pose to character"
+                                    }
+                                }
                                 Repeater {
                                     model: editor.characterPoses.find(p => p.id === editor.selectedCharacterPose)?.entries || []
                                     Label {

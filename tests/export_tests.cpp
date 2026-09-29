@@ -184,6 +184,50 @@ TEST_CASE("Editor captures a selected Part pose, applies its mask, undoes and re
     REQUIRE(reopened.characterPoses().front().toMap().value("id").toInt() == poseId);
     REQUIRE(reopened.document() == editor.document());
 }
+TEST_CASE("Editor copies a named pose to another character and reopens independent mapping") {
+    EditorController editor;
+    editor.newScene();
+    REQUIRE(editor.importParts(paths({partFixture + "hand_right__open.png"})));
+    const int sourcePart = editor.selectedLayer();
+    editor.makeCharacter();
+    const int source = editor.characterId();
+    editor.setSelectedLayer(sourcePart);
+    editor.setTransform("x", 64);
+    editor.captureSelectedCharacterPose(opentoon::PoseChannels::PositionX |
+                                        opentoon::PoseChannels::Drawing, false);
+    const int sourcePose = editor.selectedCharacterPose();
+    editor.setSelectedLayer(source);
+    editor.duplicateCharacter();
+    const int target = editor.characterId();
+    REQUIRE(target != source);
+    REQUIRE(editor.poseTransferTargets().size() == 1);
+    editor.removeSelectedCharacterPose();
+    REQUIRE(editor.characterPoses().empty());
+    editor.setSelectedLayer(source);
+    editor.selectCharacterPose(sourcePose);
+    const auto baseline = editor.document();
+    REQUIRE(editor.transferSelectedCharacterPose(target));
+    REQUIRE(editor.characterId() == target);
+    REQUIRE(editor.characterPoses().size() == 1);
+    const int transferred = editor.selectedCharacterPose();
+    REQUIRE(transferred != sourcePose);
+    const int targetPart = editor.characterPoses().front().toMap().value("entries").toList()
+                               .front().toMap().value("part").toInt();
+    REQUIRE(targetPart != sourcePart);
+    REQUIRE(editor.document().layer(source) == baseline.layer(source));
+    editor.undo();
+    REQUIRE(editor.document() == baseline);
+    editor.redo();
+    REQUIRE(editor.document().layer(target).poses.front().id == opentoon::Id(transferred));
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto path = QUrl::fromLocalFile(directory.filePath("transferred-pose.otoon"));
+    REQUIRE(editor.saveProject(path));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(path));
+    REQUIRE(reopened.document() == editor.document());
+    REQUIRE(reopened.document().layer(target).poses.front().parts.front().part == opentoon::Id(targetPart));
+}
 TEST_CASE("Composition profile edits are undoable and persist through project save") {
     EditorController editor;
     editor.newScene();

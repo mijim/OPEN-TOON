@@ -281,9 +281,41 @@ int main(int argc, char** argv) {
                                              {"sampleCount", int(samples.size())},
                                              {"p95Ms", samples[std::size_t(std::ceil(samples.size() * .95)) - 1]},
                                              {"peakProcessResidentBytes", peakBytes}};
+                    editor.setWorkspaceMode("Rig");
+                    editor.duplicateCharacter();
+                    const int targetCharacter = editor.characterId();
+                    if (targetCharacter == int(rootId) || editor.characterPoses().isEmpty())
+                        throw std::runtime_error("HM-07 pose destination copy is missing.");
+                    editor.removeSelectedCharacterPose();
+                    editor.setSelectedLayer(int(rootId));
+                    window->setProperty("inspectorMode", QStringLiteral("layer"));
+                    QCoreApplication::processEvents();
+                    auto* transferPicker = findVisualItem(findVisualItem, window->contentItem(),
+                                                          QStringLiteral("poseTransferTargetPicker"));
+                    for (auto* ancestor = transferPicker ? transferPicker->parentItem() : nullptr;
+                         ancestor; ancestor = ancestor->parentItem()) {
+                        if (ancestor->property("contentY").isValid()) {
+                            const double rowY = transferPicker->mapToItem(ancestor, QPointF(0, 0)).y();
+                            ancestor->setProperty("contentY", ancestor->property("contentY").toDouble() +
+                                                              rowY - 280);
+                            break;
+                        }
+                    }
+                    QCoreApplication::processEvents();
+                    if (!window->grabWindow().save("build/hm07-transfer-smoke.png") ||
+                        !transferPicker || !transferPicker->isVisible() || transferPicker->width() < 80 ||
+                        transferPicker->mapToScene(QPointF(0, 0)).y() > window->height())
+                        throw std::runtime_error("HM-07 pose transfer control is not visible.");
+                    const auto beforeTransfer = editor.document();
+                    if (!editor.transferSelectedCharacterPose(targetCharacter) ||
+                        editor.characterId() != targetCharacter || editor.characterPoses().size() != 1)
+                        throw std::runtime_error("HM-07 pose transfer did not select its independent copy.");
+                    editor.undo();
+                    if (editor.document() != beforeTransfer)
+                        throw std::runtime_error("HM-07 pose transfer did not undo atomically.");
                     std::cout << "HM-07 dashboard smoke passed: continuous toon project, published view, "
                                  "mouth drawing and pose, workspace selection/frame, native QML screenshot, "
-                                 "mouth switch and slider drag with undo.\n";
+                                 "mouth switch, slider drag and pose transfer with undo.\n";
                     std::cout << QJsonDocument(timing).toJson(QJsonDocument::Compact).constData() << '\n';
                     app.exit(0);
                 } catch (const std::exception& error) {

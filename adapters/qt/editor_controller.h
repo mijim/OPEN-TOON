@@ -50,6 +50,7 @@ class EditorController final : public QObject {
     Q_PROPERTY(QVariantList characterViews READ characterViews NOTIFY changed)
     Q_PROPERTY(int selectedView READ selectedView NOTIFY viewSelectionChanged)
     Q_PROPERTY(QVariantList characterPoses READ characterPoses NOTIFY changed)
+    Q_PROPERTY(QVariantList poseTransferTargets READ poseTransferTargets NOTIFY changed)
     Q_PROPERTY(int selectedCharacterPose READ selectedCharacterPose NOTIFY poseSelectionChanged)
     Q_PROPERTY(QString workspaceMode READ workspaceMode WRITE setWorkspaceMode NOTIFY workspaceModeChanged)
     Q_PROPERTY(qulonglong documentRevision READ documentRevision NOTIFY changed)
@@ -143,6 +144,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE QString substitutionThumbnail(int drawing) const;
     Q_INVOKABLE void selectView(int view);
     QVariantList characterPoses() const;
+    QVariantList poseTransferTargets() const;
     int selectedCharacterPose() const;
     Q_INVOKABLE void selectCharacterPose(int pose);
     QString workspaceMode() const { return workspaceMode_; }
@@ -277,6 +279,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE void setSelectedViewPublished(bool published);
     Q_INVOKABLE void setSelectedPartInCharacterPose(int channels);
     Q_INVOKABLE void removeSelectedPartFromCharacterPose();
+    Q_INVOKABLE bool transferSelectedCharacterPose(int targetCharacter);
     Q_INVOKABLE void beginSelectedCharacterPoseBlend();
     Q_INVOKABLE bool updateSelectedCharacterPoseBlend(double amount);
     Q_INVOKABLE void endSelectedCharacterPoseBlend();

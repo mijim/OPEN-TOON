@@ -5,6 +5,7 @@
 #include "serialization.h"
 #include "scene_renderer.h"
 #include <catch2/catch_test_macros.hpp>
+#include <algorithm>
 #include <cmath>
 
 using namespace opentoon;
@@ -69,6 +70,68 @@ TEST_CASE("Named poses survive duplication and remove stale part references") {
     REQUIRE(document.layer(root).poses.empty());
     REQUIRE(document.layer(copy).poses.size() == 1);
     document.validate();
+}
+TEST_CASE("Pose transfer maps unique Part roles and drawing names without touching source") {
+    Session session;
+    const Id part = session.document().layers.front().id;
+    Id source = 0, target = 0, pose = 0, copiedPart = 0, alternate = 0;
+    REQUIRE(session.apply("Build compatible characters", [&](Document& d) {
+        source = makeCharacter(d, part, "Source");
+        (void)createSubstitution(d, part, 0, false, "Closed");
+        alternate = createSubstitution(d, part, 0, true, "Open");
+        d.layer(part).transform.x = 80;
+        pose = captureCharacterPose(d, source, 0,
+            std::vector<PoseCaptureTarget>{{part, PoseChannels::PositionX | PoseChannels::Drawing}},
+            "Reach");
+        publishCharacterPose(d, source, pose, true);
+        target = duplicateCharacter(d, source);
+        copiedPart = d.layer(target).poses.front().parts.front().part;
+        removeCharacterPose(d, target, d.layer(target).poses.front().id);
+        editTransform(d.layer(copiedPart), 8, "x", 20, AnimationEditMode::Animate, true);
+    }));
+    const auto baseline = session.document();
+    Id transferred = 0;
+    REQUIRE(session.apply("Transfer pose", [&](Document& d) {
+        transferred = transferCharacterPose(d, source, pose, target);
+    }));
+    REQUIRE(session.document().layer(source) == baseline.layer(source));
+    const auto& copy = session.document().layer(target).poses.front();
+    REQUIRE(copy.id == transferred);
+    REQUIRE(copy.parts.front().part == copiedPart);
+    REQUIRE(copy.parts.front().drawing != alternate);
+    REQUIRE(!copy.published);
+    const Id copiedDrawing = copy.parts.front().drawing;
+    REQUIRE(session.apply("Apply transferred pose", [&](Document& d) {
+        applyCharacterPose(d, target, transferred, 8);
+    }));
+    REQUIRE(evaluateTransform(session.document().layer(copiedPart), 8).x == 80);
+    REQUIRE(session.document().drawingAt(copiedPart, 8)->id == copiedDrawing);
+    REQUIRE(session.document().layer(source) == baseline.layer(source));
+    REQUIRE(session.undo());
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == baseline);
+    REQUIRE(session.redo());
+    REQUIRE(session.document().layer(target).poses.front().id == transferred);
+
+    auto mismatched = baseline;
+    mismatched.layer(copiedPart).role = "Other";
+    const auto beforeFailure = mismatched;
+    REQUIRE_THROWS(transferCharacterPose(mismatched, source, pose, target));
+    REQUIRE(mismatched == beforeFailure);
+    mismatched = baseline;
+    auto variant = std::find_if(mismatched.layer(copiedPart).variants.begin(),
+                                mismatched.layer(copiedPart).variants.end(),
+                                [copiedDrawing](const auto& item) { return item.drawing == copiedDrawing; });
+    REQUIRE(variant != mismatched.layer(copiedPart).variants.end());
+    variant->name = "Different";
+    const auto beforeDrawingFailure = mismatched;
+    REQUIRE_THROWS(transferCharacterPose(mismatched, source, pose, target));
+    REQUIRE(mismatched == beforeDrawingFailure);
+    mismatched = baseline;
+    mismatched.layer(copiedPart).transform.x += 1;
+    const auto beforeRestFailure = mismatched;
+    REQUIRE_THROWS(transferCharacterPose(mismatched, source, pose, target));
+    REQUIRE(mismatched == beforeRestFailure);
 }
 TEST_CASE("Published view and pose bindings stay local and outside rendered output") {
     auto document = makeDocument();

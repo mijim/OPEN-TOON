@@ -2650,7 +2650,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; named same-character masked capture/apply subset, full transfer acceptance open"
+      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; masked capture/apply and compatible in-project role/drawing mapped transfer, broader retargeting acceptance open"
     },
     {
       "id": "RIG-013",

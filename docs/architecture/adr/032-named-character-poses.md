@@ -43,6 +43,16 @@ an empty pose collection; the first save in format 12 keeps the existing
 source-version backup policy. A format-12 file cannot be opened by an older
 editor without restoring its backup.
 
+The bounded cross-character transfer copies a saved pose to another Character
+in the same document. It maps Parts by roles that must be unique in both
+Characters, and drawing choices by names that must be unique in both mapped
+Parts. Their local rest transforms must match exactly; incompatible rigs
+reject before mutation. The destination receives a new pose ID, its own Part
+and drawing IDs, and an unpublished copy. A name collision receives a numeric
+suffix. Transfer does not change either character's current artwork or keys.
+The Rig inspector offers a compact destination selector and **Copy to**
+command; a successful copy selects the destination pose.
+
 ## Verification and limits
 
 Domain tests cover mixed masks, blend endpoints and the drawing threshold,
@@ -53,6 +63,10 @@ Storage tests cover format-12 SQLite/JSON round trips and format-11 loading.
 The controller test imports original registered PNG parts, captures a selected
 Part, applies it at another frame, undoes/redoes and reopens the project.
 
-Mirroring, cross-character stable role mappings, deformer channels, published
-controls and the Animator workspace remain
-unimplemented HM-07/HM-09 work. This ADR does not close RIG-012 or HM-07.
+Transfer tests apply a remapped pose, preserve the source, reject role/drawing
+and rest-transform mismatches atomically, undo/redo and save/reopen. Native Qt
+Quick smoke checks the destination control in the Rig inspector on a copied
+15-Part character and records `build/hm07-transfer-smoke.png`.
+
+Cross-project transfer, incompatible rest retargeting, mirroring and deformer
+channels remain HM-07/HM-09 work. This ADR does not close RIG-012 or HM-07.

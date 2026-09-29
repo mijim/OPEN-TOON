@@ -4,6 +4,7 @@
 #include "opentoon/rigging.h"
 #include <algorithm>
 #include <cmath>
+#include <map>
 #include <set>
 #include <stdexcept>
 
@@ -167,5 +168,63 @@ void removeCharacterPosePart(Document& document, Id rootId, Id poseId, Id partId
     if (found == saved.parts.end() || saved.parts.size() == 1)
         throw std::invalid_argument("Pose must retain at least one mapped Part.");
     saved.parts.erase(found);
+}
+Id transferCharacterPose(Document& document, Id sourceRoot, Id poseId, Id targetRoot) {
+    if (sourceRoot == targetRoot)
+        throw std::invalid_argument("Choose another character for pose transfer.");
+    const auto& source = character(document, sourceRoot);
+    const auto& target = character(document, targetRoot);
+    const auto found = std::find_if(source.poses.begin(), source.poses.end(),
+                                    [poseId](const auto& item) { return item.id == poseId; });
+    if (found == source.poses.end() || target.poses.size() >= 1000)
+        throw std::invalid_argument("Pose source or destination is unavailable.");
+
+    std::map<std::string, Id> sourceRoles, targetRoles;
+    for (const auto& layer : document.layers) {
+        if (layer.kind != LayerKind::Part)
+            continue;
+        const Id owner = characterFor(document, layer.id);
+        auto* roles = owner == sourceRoot ? &sourceRoles : owner == targetRoot ? &targetRoles : nullptr;
+        if (roles && !roles->emplace(layer.role, layer.id).second)
+            throw std::invalid_argument("Pose transfer needs unique Part roles in both characters.");
+    }
+
+    CharacterPose copy = *found;
+    copy.published = false;
+    for (auto& entry : copy.parts) {
+        const auto& from = document.layer(entry.part);
+        checkedPart(document, sourceRoot, from.id);
+        const auto mapped = targetRoles.find(from.role);
+        if (mapped == targetRoles.end() || sourceRoles.at(from.role) != from.id)
+            throw std::invalid_argument("Pose transfer has no unique matching Part role.");
+        const auto& to = document.layer(mapped->second);
+        checkedPart(document, targetRoot, to.id);
+        if (to.transform != from.transform)
+            throw std::invalid_argument("Pose transfer needs matching Part rest transforms.");
+        if (entry.channels & PoseChannels::Drawing) {
+            const auto original = std::find_if(from.variants.begin(), from.variants.end(),
+                                               [&](const auto& item) { return item.drawing == entry.drawing; });
+            if (original == from.variants.end())
+                throw std::invalid_argument("Pose source drawing is unavailable.");
+            const auto matches = std::count_if(to.variants.begin(), to.variants.end(),
+                                               [&](const auto& item) { return item.name == original->name; });
+            if (matches != 1 || std::count_if(from.variants.begin(), from.variants.end(),
+                                              [&](const auto& item) { return item.name == original->name; }) != 1)
+                throw std::invalid_argument("Pose transfer needs one matching drawing name per Part.");
+            entry.drawing = std::find_if(to.variants.begin(), to.variants.end(),
+                                         [&](const auto& item) { return item.name == original->name; })->drawing;
+        }
+        entry.part = to.id;
+    }
+    std::string name = copy.name;
+    for (int suffix = 2; std::any_of(target.poses.begin(), target.poses.end(),
+                                    [&](const auto& item) { return item.name == name; }); ++suffix)
+        name = copy.name + " " + std::to_string(suffix);
+    nameAvailable(target, name);
+    copy.name = std::move(name);
+    copy.id = document.allocateId();
+    const Id id = copy.id;
+    document.layer(targetRoot).poses.push_back(std::move(copy));
+    return id;
 }
 } // namespace opentoon

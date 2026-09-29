@@ -237,6 +237,17 @@ QVariantList EditorController::characterPoses() const {
     }
     return result;
 }
+QVariantList EditorController::poseTransferTargets() const {
+    QVariantList result;
+    const int source = characterId();
+    if (!source)
+        return result;
+    for (const auto& layer : document().layers)
+        if (layer.kind == LayerKind::Character && layer.id != Id(source) && !layer.locked)
+            result.push_back(QVariantMap{{"id", int(layer.id)},
+                                         {"name", QString::fromStdString(layer.name)}});
+    return result;
+}
 int EditorController::selectedCharacterPose() const {
     const int root = characterId();
     if (!root)
@@ -1264,6 +1275,20 @@ void EditorController::removeSelectedPartFromCharacterPose() {
         edit("Remove Part from character pose", [&](Document& d) {
             opentoon::removeCharacterPosePart(d, root, poseId, layer_);
         });
+}
+bool EditorController::transferSelectedCharacterPose(int targetCharacter) {
+    const int source = characterId(), poseId = selectedCharacterPose();
+    if (!source || !poseId || targetCharacter <= 0)
+        return false;
+    Id created = 0;
+    if (!edit("Copy pose to character", [&](Document& d) {
+            created = opentoon::transferCharacterPose(d, source, poseId, targetCharacter);
+        }))
+        return false;
+    setSelectedLayer(targetCharacter);
+    selectedCharacterPose_ = created;
+    emit poseSelectionChanged();
+    return true;
 }
 void EditorController::beginSelectedCharacterPoseBlend() {
     endSelectedCharacterPoseBlend();
