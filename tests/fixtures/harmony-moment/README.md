@@ -43,6 +43,13 @@ behind the visible ear. It changes only that head substitution and the three
 reference poses that expose it; the registered dimensions and drawing IDs are
 unchanged. The continuous-rig example and its frame-36 capture were regenerated
 from the corrected source.
+The later 2026-09-29 visual revision adds an original muted cap to the front
+and three-quarter views and samples drawing boundaries at 2 × 2 coverage.
+The 19 roles, 41 drawing names, registration and timing remain stable. The
+three editable studies and independent reference stills are regenerated from
+the same original drawing code. Qt render comparisons allow only a two-level
+8-bit channel difference at sampled edges and bound the affected pixel count.
+Artistic approval remains open.
 `--previews` renders five full-resolution reference poses for visual review; they
 are external acceptance targets, not frames from the OPEN-TOON evaluator.
 

@@ -12,6 +12,7 @@
 #include <QTemporaryDir>
 #include <catch2/catch_test_macros.hpp>
 #include <algorithm>
+#include <cmath>
 #include <cstring>
 #include <filesystem>
 #include <map>
@@ -91,6 +92,25 @@ opentoon::ImageAsset partImage(const QString& name) {
     }
     return {image.width(), image.height(), std::move(bytes)};
 }
+void requireNearIndependentReference(const QImage& actual, const QImage& reference) {
+    REQUIRE(actual.size() == reference.size());
+    int edgePixels = 0, maxDifference = 0;
+    for (int y = 0; y < actual.height(); ++y)
+        for (int x = 0; x < actual.width(); ++x) {
+            const auto rendered = actual.pixel(x, y);
+            const auto sampled = reference.pixel(x, y);
+            const int difference = std::max({std::abs(qRed(rendered) - qRed(sampled)),
+                                             std::abs(qGreen(rendered) - qGreen(sampled)),
+                                             std::abs(qBlue(rendered) - qBlue(sampled)),
+                                             std::abs(qAlpha(rendered) - qAlpha(sampled))});
+            edgePixels += difference > 0;
+            maxDifference = std::max(maxDifference, difference);
+        }
+    INFO("Antialiased reference differs at " << edgePixels
+         << " pixels, maximum channel difference " << maxDifference);
+    REQUIRE(maxDifference <= 2);
+    REQUIRE(edgePixels < 20000);
+}
 } // namespace
 
 TEST_CASE("Original registered character parts survive current-format save and reopen") {
@@ -110,8 +130,7 @@ TEST_CASE("Original registered character parts survive current-format save and r
     REQUIRE_FALSE(expected.isNull());
     REQUIRE(actual.size() == expected.size());
     REQUIRE(actual.format() == expected.format());
-    for (int y = 0; y < actual.height(); ++y)
-        REQUIRE(std::memcmp(actual.constScanLine(y), expected.constScanLine(y), actual.width() * 4) == 0);
+    requireNearIndependentReference(actual, expected);
 
     reopened.rate = {24000, 1001};
     REQUIRE(reopened.rate.sampleAt(480, 48000) == 960960);
@@ -155,9 +174,7 @@ TEST_CASE("Nineteen-part character switches coordinated views and reopens with i
     const auto reference = QImage(fixture + "reference_0000.png")
                                .convertToFormat(QImage::Format_ARGB32_Premultiplied);
     const auto original = opentoon::SceneRenderer::render(document, 0);
-    for (int y = 0; y < original.height(); ++y)
-        REQUIRE(std::memcmp(original.constScanLine(y), reference.constScanLine(y),
-                            original.width() * 4) == 0);
+    requireNearIndependentReference(original, reference);
     const auto root = document.layers.front().id;
     document.layer(root).kind = opentoon::LayerKind::Character;
     std::map<std::string, opentoon::Id> parts;

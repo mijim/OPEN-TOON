@@ -38,7 +38,7 @@ Producing the complete animated shot belongs to HM-15; it does not gate HM-01.
 
 | Recommended priority | Work | Hard join | Parallel work once its prerequisites pass |
 |---|---|---|---|
-| 9 / parked | HM-06 bone/curve authoring, animation and variant binding; finish quality and interaction gates | HM-05 accepted | HM-12 composition is active |
+| 9 / parked | HM-06 bone/curve authoring, animation and variant binding; finish quality and interaction gates after the sampled-edge and two-view artwork revision | HM-05 accepted | HM-10 audio is active |
 | 10 / parked | HM-07 character poses, widgets, one-dimensional sliders and Animator/Rig views | HM-03 + HM-04 | HM-12 composition is active |
 | 11 | HM-08 Quick Rig FK recipe: assign roles, place guides, preview/correct/commit | HM-03 + HM-07 | HM-06 or HM-10 |
 | 12 | HM-09 attachments, limited two-bone IK, optional rig recipes and dependency-closed templates | HM-06 + HM-07 + HM-08 | HM-10/11 and HM-12/13 branches |

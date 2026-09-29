@@ -462,7 +462,7 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.37",
+  "version": "0.2.0-experimental.38",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
@@ -473,6 +473,6 @@
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
     "state": "HM-00_through_HM-05_and_HM-13_complete__HM-06_HM-07_HM-12_parked_in_progress__HM-10_active_in_progress",
-    "note": "HM-06 and HM-07 are parked unaccepted subsets. HM-12 is parked after fractional cutters, saved bypasses, visible cutter sources, clicked node previews and layer blend modes; the general editable graph remains open. The single implementer is advancing eligible HM-10 after exact 48 kHz clip splitting; hardware presentation and audible quality remain unqualified. Full P07/P08/P09/P10 and feature acceptance remain open."
+    "note": "HM-06 and HM-07 are parked unaccepted subsets. HM-12 is parked after fractional cutters, saved bypasses, visible cutter sources, clicked node previews and layer blend modes; the general editable graph remains open. The original HM-06 toon and editable studies now use sampled edges and a two-view cap over the continuous-limb rig; artistic acceptance remains open. The single implementer is advancing eligible HM-10 after exact 48 kHz clip splitting; hardware presentation and audible quality remain unqualified. Full P07/P08/P09/P10 and feature acceptance remain open."
   }
 }

@@ -850,12 +850,21 @@ TEST_CASE("Nineteen imported parts complete the inspector view and substitution 
     }
     REQUIRE(assembled.size() == reference.size());
     REQUIRE(assembled.format() == reference.format());
-    int mismatches = 0;
+    int changed = 0;
+    int largestChannelError = 0;
     for (int y = 0; y < assembled.height(); ++y)
-        for (int x = 0; x < assembled.width(); ++x)
-            if (assembled.pixel(x, y) != reference.pixel(x, y))
-                ++mismatches;
-    REQUIRE(mismatches == 0);
+        for (int x = 0; x < assembled.width(); ++x) {
+            const QRgb rendered = assembled.pixel(x, y);
+            const QRgb sampled = reference.pixel(x, y);
+            if (rendered != sampled)
+                ++changed;
+            largestChannelError = std::max({largestChannelError,
+                                            std::abs(qRed(rendered) - qRed(sampled)),
+                                            std::abs(qGreen(rendered) - qGreen(sampled)),
+                                            std::abs(qBlue(rendered) - qBlue(sampled))});
+        }
+    REQUIRE(largestChannelError <= 2);
+    REQUIRE(changed < 20000);
     const auto frontImage = opentoon::SceneRenderer::render(editor.document(), 0, {480, 270});
     const auto localizedChange = [&](const QImage& before, const QImage& after,
                                      const QString& role) {

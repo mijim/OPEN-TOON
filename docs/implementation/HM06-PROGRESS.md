@@ -22,6 +22,15 @@ records that incoming bone or curve key explicitly at a compatible drawing
 boundary; the visual shot uses it before the animation continues. The action
 is undoable and tested through native save/reopen.
 
+The current original-art revision adds a muted cap to both head views and
+2 × 2 edge coverage to the registered PNG drawings. The continuous limbs,
+their middle elbow/knee bones and the 19-role intake remain in place. The
+independent reference compositor can differ by at most two 8-bit channel
+levels at antialiased edges from Qt's premultiplied compositor; the tests bound
+both that maximum and the number of changed pixels. The generated art, three
+editable projects and displayed stills were regenerated together. This is
+candidate visual direction rather than owner artistic acceptance.
+
 ## Working subset
 
 - The selected substitution retains its rest mesh and UVs. Bone joints,
@@ -78,7 +87,8 @@ is undoable and tested through native save/reopen.
   serialization and range transfer with exact evaluated endpoints.
   `tests/mesh_render_tests.cpp` covers saved preview/Display/Write pixels,
   separate substitution chains, and the original 19-part scene. The assembled
-  frame-zero scene is byte-identical to `reference_0000.png`; an animated arm
+  frame-zero scene agrees with `reference_0000.png` within the bounded
+  antialias-compositing tolerance; an animated arm
   and torso reopen to identical frame-12 pixels. A manually placed elbow,
   deforming upper sleeve, and rigidly pivoted forearm/hand produce a 70°
   [extreme pose](hm06-bone-extreme.png) with unchanged rest pixels and identical

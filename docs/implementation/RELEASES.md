@@ -1,5 +1,19 @@
 # Experimental releases
 
+## 0.2.0-experimental.38 — working source, refined connected toon
+
+- Redraw the original character's front and three-quarter headwear, and use
+  2 × 2 coverage sampling for the registered PNG artwork and its independent
+  reference composites. The source retains 19 intake roles and 41 drawing
+  names; the editable rig retains four continuous single-artwork limbs with
+  elbow and knee bones.
+- Regenerate the three editable studies and visual evidence. The 480-frame
+  connectivity sweep, independent reference comparison with bounded
+  compositor-rounding tolerance, 179 CTest entries, deterministic source-art
+  checks and native Animator/integrated-shot smokes pass on macOS.
+- Source only; no new public binary or tag. Owner artistic approval and
+  broader extreme-bend review remain open.
+
 ## 0.2.0-experimental.37 — working source, exact 48 kHz clip split
 
 - Split a single-pass 48 kHz clip at an interior scene frame. The two clips

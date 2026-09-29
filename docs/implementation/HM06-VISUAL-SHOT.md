@@ -49,8 +49,9 @@ saved example matches the constructed document in the 166-entry local suite.
 The current saved example rebinds the four one-piece limbs and both left-sleeve
 substitutions to alpha-following 6 × 16 contour meshes with a 40 px elbow/knee
 transition. The five displayed stills and integrated audio study were
-regenerated. All 480 preview frames and seven full-resolution frames retain
-one connected silhouette, and the current 171-entry suite plus native HM-07
+regenerated again with sampled artwork edges and the original two-view cap.
+All 480 preview frames and seven full-resolution frames retain
+one connected silhouette, and the current 179-entry suite plus native HM-07
 and integrated-shot smokes pass. A full-resolution 480-frame sweep measured
 5.00 ms/frame on this host. One current 40-sample native run measured p95
 17.84 ms at frame 12 and 18.22 ms at frame 360, with peak resident memory
