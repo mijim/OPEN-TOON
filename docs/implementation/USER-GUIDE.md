@@ -201,6 +201,11 @@ Enter both sample endpoints and choose **Set** to trim. **Duplicate** creates
 another placement at the playhead with the same trim, gain, repeats and fades;
 both clips share the embedded source. **Remove clip**
 removes its placement while leaving the source available to its other copies.
+For a 48 kHz single-pass clip, drag the small middle handle at either waveform
+edge to trim by whole scene frames. The left handle keeps source time aligned
+while moving the clip start; the right handle changes the source out-sample.
+Escape cancels a drag. Other source rates and repeated clips use the numeric
+sample fields.
 **Split** at an interior playhead frame divides one 48 kHz, single-pass clip
 into two placements sharing the same WAV. The cut must leave samples on both
 sides and stay outside the fade intervals. At 48 kHz output the before/after

@@ -174,6 +174,28 @@ void trimAudioClip(Document& document, Id id, std::uint64_t inSample,
     target.fadeInSamples = std::min(target.fadeInSamples, total);
     target.fadeOutSamples = std::min(target.fadeOutSamples, total - target.fadeInSamples);
 }
+void trimAudioClipAtFrame(Document& document, Id id, Frame frame, bool leftEdge) {
+    const auto original = clip(document, id);
+    const auto asset = std::find_if(document.audioAssets.begin(), document.audioAssets.end(),
+                                    [&](const auto& item) { return item.id == original.asset; });
+    if (asset == document.audioAssets.end() || asset->sampleRate != 48000 ||
+        original.repeats != 1 || frame < 0 || frame > document.duration ||
+        (leftEdge && frame >= document.duration))
+        throw std::invalid_argument("Frame trim requires a 48 kHz single-pass clip and an in-scene edge.");
+    const auto delta = document.rate.sampleAt(frame, asset->sampleRate) -
+                       document.rate.sampleAt(original.start, asset->sampleRate);
+    const auto sourceSample = std::int64_t(original.inSample) + delta;
+    if (sourceSample < 0 || std::uint64_t(sourceSample) > asset->sampleFrames ||
+        (leftEdge && std::uint64_t(sourceSample) >= original.outSample) ||
+        (!leftEdge && std::uint64_t(sourceSample) <= original.inSample))
+        throw std::invalid_argument("Frame trim must leave source samples inside the WAV.");
+    if (leftEdge) {
+        trimAudioClip(document, id, std::uint64_t(sourceSample), original.outSample);
+        clip(document, id).start = frame;
+    } else {
+        trimAudioClip(document, id, original.inSample, std::uint64_t(sourceSample));
+    }
+}
 void setAudioClipGain(Document& document, Id id, double gain) {
     if (!std::isfinite(gain) || gain < 0 || gain > 4)
         throw std::invalid_argument("Audio gain must be between zero and four.");

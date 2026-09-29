@@ -323,6 +323,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE bool duplicateAudioClip(int clipId, int start);
     Q_INVOKABLE bool splitAudioClip(int clipId, int frame);
     Q_INVOKABLE bool trimAudioClip(int clipId, int inSample, int outSample);
+    Q_INVOKABLE bool trimAudioClipAtFrame(int clipId, int frame, bool leftEdge);
     Q_INVOKABLE bool setAudioClipGain(int clipId, double gain);
     Q_INVOKABLE bool setAudioClipRepeats(int clipId, int repeats);
     Q_INVOKABLE bool setAudioClipFades(int clipId, int fadeInSamples, int fadeOutSamples);

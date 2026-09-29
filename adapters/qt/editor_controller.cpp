@@ -1901,6 +1901,11 @@ bool EditorController::trimAudioClip(int clipId, int inSample, int outSample) {
                                 std::uint64_t(outSample));
     });
 }
+bool EditorController::trimAudioClipAtFrame(int clipId, int frame, bool leftEdge) {
+    return edit("Trim audio clip at frame", [&](Document& d) {
+        opentoon::trimAudioClipAtFrame(d, Id(clipId), frame, leftEdge);
+    });
+}
 bool EditorController::setAudioClipGain(int clipId, double gain) {
     return edit("Set audio gain", [&](Document& d) {
         opentoon::setAudioClipGain(d, Id(clipId), gain);

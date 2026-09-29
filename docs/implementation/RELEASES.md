@@ -1,5 +1,17 @@
 # Experimental releases
 
+## 0.2.0-experimental.40 — working source, direct frame-aligned audio trim
+
+- Drag the middle handles at either end of a 48 kHz single-pass clip to trim
+  at scene frames. The left edge keeps scene and source positions aligned;
+  the right edge changes the source out-sample. Escape cancels and release
+  commits one undoable edit.
+- Rational 24 and 24000/1001 fps tests compare surviving PCM exactly and
+  check rollback, undo/redo and reopen. Native Qt Quick smoke drags both
+  edges and checks the resulting source samples.
+- Source only; no new public binary or tag. Other source rates and repeated
+  clips continue to use numeric trim.
+
 ## 0.2.0-experimental.39 — working source, per-clip audio solo
 
 - Isolate one or more audio placements from the Audio panel. Mute still wins;

@@ -14,7 +14,13 @@ release; Escape cancels. Format 17 adds 1–64 nondestructive repeats to each
 clip. The Audio panel also moves a clip by frame, edits its half-open
 source-sample in/out range, changes linear gain and repeat count,
 and removes the clip. Every change is undoable; trim and gain do not rewrite
-the source. **Duplicate** creates a second independently editable clip at
+the source. Middle edge handles on a 48 kHz single-pass waveform now trim at
+scene frames. The left edge advances scene start and source in-sample together;
+the right edge changes the source out-sample. A drag previews its edge, Escape
+cancels, and release commits one undoable edit. Numeric sample trim remains
+available for other rates and repeated clips. See
+[ADR-052](../architecture/adr/052-frame-aligned-audio-edge-trim.md).
+**Duplicate** creates a second independently editable clip at
 the playhead with the same
 source reference, trim, gain, repeats and fades; it keeps one embedded WAV
 resource and commits one undo step. Format 22 adds linear fade-in/out durations
@@ -82,6 +88,12 @@ See [ADR-046](../architecture/adr/046-sample-accurate-audio-fades.md) for
 source-sample fades and trim/repeat clamping.
 
 ## Verification
+
+- At 24 and 24000/1001 fps, left/right frame-edge trims preserve every
+  surviving canonical 48 kHz PCM sample. Tests check source coordinates,
+  one-step undo/redo, rejected out-of-WAV edits and save/reopen. Native Qt
+  Quick smoke drags both middle edge handles, checks Escape cancellation and
+  verifies the exact samples; the trimmed-row screenshot was inspected.
 
 - Two independent cue clips verify one and multiple solo selections, mute
   precedence, exact mix samples, undo/redo, invalid-command rollback and
@@ -179,7 +191,7 @@ source-sample fades and trim/repeat clamping.
   --hm-integrated-smoke` checks the opened project, timeline and visual frame
   change in a Qt Quick window; its screenshot was inspected. These tones are
   timing markers, not spoken dialogue or a lip-sync quality test.
-- Local macOS `build/locked`: 181/181 CTest entries pass. The native
+- Local macOS `build/locked`: 182/182 CTest entries pass. The native
   `--hm10-smoke` loaded the Qt Quick audio timeline, checked its cue sample,
   captured and visually inspected `build/hm10-audio-smoke.png`, exported an
   exactly sized WAV with its cue at the correct sample, advanced and sought

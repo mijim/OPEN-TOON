@@ -56,7 +56,7 @@ Move clip start, adjust in/out points and repeat clips nondestructively.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — format-17 1–64 sample-contiguous repeats of the nondestructively trimmed source, format-22 source-sample fade clamping, frame placement, native waveform drag, asset-sharing duplication and exact 48 kHz single-pass splitting at the playhead, atomic undo and format-16/21 migration.
+**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — format-17 1–64 sample-contiguous repeats of the nondestructively trimmed source, format-22 source-sample fade clamping, frame placement, native waveform drag, direct 48 kHz frame-edge trim, asset-sharing duplication and exact 48 kHz single-pass splitting at the playhead, atomic undo and format-16/21 migration.
 
 **Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 

@@ -757,11 +757,55 @@ int main(int argc, char** argv) {
                         throw std::runtime_error("Native fade changed the repeated cue or its endpoints.");
                     editor.undo(); // Fades.
                     editor.undo(); // Repeat count.
+                    (void)window->grabWindow();
+                    const auto beforeEdgeTrim = opentoon::AudioMixPlan(editor.document(), 48000)
+                                                    .renderBlock(0, 48000);
+                    const auto rightTrimHandle = timelineInput->mapToScene(QPointF(24 * 22, rowY));
+                    const auto rightTrimTarget = timelineInput->mapToScene(QPointF(22 * 22, rowY));
+                    sendDrag(QEvent::MouseButtonPress, rightTrimHandle, Qt::LeftButton, Qt::LeftButton);
+                    sendDrag(QEvent::MouseMove, rightTrimTarget, Qt::NoButton, Qt::LeftButton);
+                    sendDrag(QEvent::MouseButtonRelease, rightTrimTarget, Qt::LeftButton, Qt::NoButton);
+                    if (editor.audioClips().front().toMap().value("outSample").toLongLong() != 44000)
+                        throw std::runtime_error("Dragging the native right trim edge did not change its sample.");
+                    if (!window->grabWindow().save("build/hm10-edge-trim-smoke.png"))
+                        throw std::runtime_error("Cannot capture the trimmed audio timeline.");
+                    const auto afterEdgeTrim = opentoon::AudioMixPlan(editor.document(), 48000)
+                                                   .renderBlock(0, 48000);
+                    if (!std::equal(beforeEdgeTrim.begin(), beforeEdgeTrim.begin() + 44000 * 2,
+                                    afterEdgeTrim.begin()) ||
+                        !std::all_of(afterEdgeTrim.begin() + 44000 * 2, afterEdgeTrim.end(),
+                                     [](auto sample) { return sample == 0; }))
+                        throw std::runtime_error("Native right trim changed surviving PCM samples.");
+                    editor.undo();
+                    if (editor.audioClips().front().toMap().value("outSample").toLongLong() != 48000)
+                        throw std::runtime_error("Native right trim did not undo in one step.");
+                    (void)window->grabWindow();
+                    sendDrag(QEvent::MouseButtonPress, rightTrimHandle, Qt::LeftButton, Qt::LeftButton);
+                    sendDrag(QEvent::MouseMove, rightTrimTarget, Qt::NoButton, Qt::LeftButton);
+                    QKeyEvent trimEscape(QEvent::KeyPress, Qt::Key_Escape, Qt::NoModifier);
+                    QCoreApplication::sendEvent(window, &trimEscape);
+                    QCoreApplication::processEvents();
+                    sendDrag(QEvent::MouseButtonRelease, rightTrimTarget, Qt::LeftButton, Qt::NoButton);
+                    if (editor.audioClips().front().toMap().value("outSample").toLongLong() != 48000)
+                        throw std::runtime_error("Escape did not cancel the native edge trim.");
+                    (void)window->grabWindow();
+                    const auto leftTrimHandle = timelineInput->mapToScene(QPointF(1, rowY));
+                    const auto leftTrimTarget = timelineInput->mapToScene(QPointF(2 * 22, rowY));
+                    sendDrag(QEvent::MouseButtonPress, leftTrimHandle, Qt::LeftButton, Qt::LeftButton);
+                    sendDrag(QEvent::MouseMove, leftTrimTarget, Qt::NoButton, Qt::LeftButton);
+                    sendDrag(QEvent::MouseButtonRelease, leftTrimTarget, Qt::LeftButton, Qt::NoButton);
+                    if (editor.audioClips().front().toMap().value("start").toInt() != 2 ||
+                        editor.audioClips().front().toMap().value("inSample").toLongLong() != 4000)
+                        throw std::runtime_error("Dragging the native left trim edge did not retain source timing.");
+                    editor.undo();
+                    if (editor.audioClips().front().toMap().value("start").toInt() != 0 ||
+                        editor.audioClips().front().toMap().value("inSample").toLongLong() != 0)
+                        throw std::runtime_error("Native left trim did not undo in one step.");
                     editor.undo();
                     if (editor.document() != baseline)
                         throw std::runtime_error("WAV import did not undo atomically.");
                     std::cout << "HM-10 audio smoke passed: native PCM16 import, shared-source clip duplication/undo, exact split/undo, mute/undo, solo/undo, cue waveform, "
-                                 "device-clock playhead/seek, waveform drag/undo, audio scrub/repeat, source-sample fades, exact full and selected-range WAV export, timeline screenshot and atomic undo.\n";
+                                 "device-clock playhead/seek, waveform and edge-trim drags/undo, audio scrub/repeat, source-sample fades, exact full and selected-range WAV export, timeline screenshot and atomic undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

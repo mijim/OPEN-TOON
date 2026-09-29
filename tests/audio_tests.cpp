@@ -254,6 +254,63 @@ TEST_CASE("Soloed audio clips isolate their mix while mute still takes precedenc
     std::filesystem::remove_all(directory);
 }
 
+TEST_CASE("Frame-edge audio trim preserves surviving 48 kHz samples and reopens") {
+    for (const auto rate : {FrameRate{24, 1}, FrameRate{24000, 1001}}) {
+        Session session;
+        Id id = 0;
+        REQUIRE(session.apply("Import tone", [&](Document& d) {
+            d.rate = rate;
+            id = importPcm16Wav(d, "tone", toneWav(48000, 48000, 440), 0);
+        }));
+        const auto original = session.document();
+        const auto originalPcm = AudioMixPlan(original, 48000).renderBlock(0, 48000);
+        const auto rightSample = rate.sampleAt(12, 48000);
+        REQUIRE(session.apply("Trim right edge", [&](Document& d) {
+            trimAudioClipAtFrame(d, id, 12, false);
+        }));
+        const auto rightTrimmed = session.document();
+        REQUIRE(rightTrimmed.audioClips.front().outSample == std::uint64_t(rightSample));
+        const auto rightPcm = AudioMixPlan(rightTrimmed, 48000).renderBlock(0, 48000);
+        REQUIRE(std::equal(rightPcm.begin(), rightPcm.begin() + rightSample * 2,
+                           originalPcm.begin()));
+        REQUIRE(std::all_of(rightPcm.begin() + rightSample * 2, rightPcm.end(),
+                            [](auto sample) { return sample == 0; }));
+        REQUIRE(session.undo());
+        REQUIRE(session.document() == original);
+        REQUIRE(session.apply("Trim left edge", [&](Document& d) {
+            trimAudioClipAtFrame(d, id, 3, true);
+        }));
+        const auto leftTrimmed = session.document();
+        const auto leftSample = rate.sampleAt(3, 48000);
+        REQUIRE(leftTrimmed.audioClips.front().start == 3);
+        REQUIRE(leftTrimmed.audioClips.front().inSample == std::uint64_t(leftSample));
+        const auto leftPcm = AudioMixPlan(leftTrimmed, 48000).renderBlock(0, 48000);
+        REQUIRE(std::all_of(leftPcm.begin(), leftPcm.begin() + leftSample * 2,
+                            [](auto sample) { return sample == 0; }));
+        REQUIRE(std::equal(leftPcm.begin() + leftSample * 2, leftPcm.end(),
+                           originalPcm.begin() + leftSample * 2));
+        REQUIRE_THROWS(session.apply("Trim past WAV", [&](Document& d) {
+            trimAudioClipAtFrame(d, id, 47, false);
+        }));
+        REQUIRE(session.document() == leftTrimmed);
+        REQUIRE(session.undo());
+        REQUIRE(session.document() == original);
+        REQUIRE(session.redo());
+        REQUIRE(session.document() == leftTrimmed);
+        const auto directory = std::filesystem::temp_directory_path() /
+            ("opentoon-audio-edge-trim-" + std::to_string(rate.denominator) + "-" +
+             std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
+        std::filesystem::create_directories(directory);
+        const auto path = directory / "trim.otoon";
+        REQUIRE(ProjectStore::save(path, leftTrimmed) > 0);
+        REQUIRE(ProjectStore::load(path).document == leftTrimmed);
+        std::filesystem::remove_all(directory);
+        auto unsupported = original;
+        setAudioClipRepeats(unsupported, id, 2);
+        REQUIRE_THROWS(trimAudioClipAtFrame(unsupported, id, 12, false));
+    }
+}
+
 TEST_CASE("Downsampling suppresses aliased treble and keeps audible passband") {
     auto scene = makeDocument();
     (void)importPcm16Wav(scene, "30 kHz", toneWav(9600, 96000, 30000), 0);
