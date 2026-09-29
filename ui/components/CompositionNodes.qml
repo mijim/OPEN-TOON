@@ -71,7 +71,7 @@ Item {
                 font.letterSpacing: 1
             }
             Label {
-                text: "Drag a Drawing onto another to place it above; select to edit cutter"
+                text: "Drag to reorder; Alt-drag a Drawing onto another to use it as cutter"
                 color: "#777777"
                 font.pixelSize: 10
             }
@@ -153,6 +153,15 @@ Item {
                 currentIndex: root.selected?.blendMode || 0
                 onActivated: root.controller.setLayerBlendMode(currentIndex)
                 Accessible.name: "Selected drawing blend mode"
+            }
+            CompactCheckBox {
+                objectName: "nodeBypassBlend"
+                text: "Bypass blend"
+                visible: root.selected && (root.selected.kind === 0 || root.selected.kind === 3)
+                enabled: visible && !root.selected?.locked && root.selected?.blendMode !== 0
+                checked: root.selected?.blendBypassed || false
+                onClicked: root.controller.setBlendBypassed(checked)
+                Accessible.name: "Bypass selected drawing blend mode"
             }
             PropertyNumber {
                 objectName: "nodeOpacity"
@@ -236,6 +245,7 @@ Item {
                                       modelData.kind === "Multiply" ||
                                       modelData.kind === "Screen" ||
                                       modelData.kind === "Add" ||
+                                      modelData.kind === "Bypassed blend" ||
                                       modelData.kind === "Bypassed cutter" ||
                                       modelData.kind === "Invert matte" ||
                                       modelData.kind === "Apply matte"
@@ -274,10 +284,12 @@ Item {
                             cursorShape: Qt.PointingHandCursor
                             preventStealing: modelData.kind === "Drawing"
                             property bool dragging: false
+                            property bool dragCutter: false
                             property real downX: 0
                             property real downY: 0
                             onPressed: mouse => {
                                 dragging = false
+                                dragCutter = (mouse.modifiers & Qt.AltModifier) !== 0
                                 downX = mouse.x
                                 downY = mouse.y
                             }
@@ -301,8 +313,13 @@ Item {
                                 root.draggedLayer = 0
                                 root.dropLayer = 0
                                 if (dragging && target > 0) {
-                                    root.layerChosen(source)
-                                    root.controller.moveDrawingAfter(source, target)
+                                    if (dragCutter) {
+                                        root.layerChosen(target)
+                                        root.controller.setLayerMatte(source)
+                                    } else {
+                                        root.layerChosen(source)
+                                        root.controller.moveDrawingAfter(source, target)
+                                    }
                                 }
                             }
                             onCanceled: {

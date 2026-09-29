@@ -110,6 +110,7 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
                   {"paintMatteSource", l.paintMatteSource},
                   {"opacityBypassed", l.opacityBypassed},
                   {"blendMode", static_cast<int>(l.blendMode)},
+                  {"blendBypassed", l.blendBypassed},
                   {"kind", static_cast<int>(l.kind)},
                   {"role", l.role},
                   {"variants", Json::array()},
@@ -396,6 +397,8 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
                 throw std::runtime_error("An older project contains an unsupported blend mode.");
             l.blendMode = static_cast<LayerBlendMode>(mode);
         }
+        if (j.at("version").get<int>() >= 29)
+            l.blendBypassed = x.at("blendBypassed");
         if (j.at("version").get<int>() >= 11) {
             const auto& anchor = x.at("boneTipAnchor");
             if (!anchor.is_null())

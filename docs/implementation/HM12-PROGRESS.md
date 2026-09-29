@@ -43,12 +43,21 @@ clamps the sum of the two straight-color channels before the existing
 premultiplied source-over calculation; fractional alpha and cutters keep
 their behavior. Legacy and Linear sRGB apply the sum in their respective
 spaces. See [ADR-054](../architecture/adr/054-additive-layer-blending.md).
+Format 29 adds **Bypass blend** for a selected Drawing or Part. A typed
+`Bypassed blend` node renders Normal source-over while retaining the saved
+Multiply, Screen or Add choice. Re-enabling restores that choice without
+reselecting it. See [ADR-055](../architecture/adr/055-persistent-blend-bypass.md).
 Drawing cards can now be dragged onto another Drawing card to put the source
 immediately above the target in the saved composite order. The drop target
 highlights; the operation rejects missing, same and locked layers. The
 document command is atomic, with undo/redo and save/reopen. This edits layer
 order through the derived Nodes presentation; arbitrary node placement and
 wiring remain open.
+Alt-dragging a Drawing card onto another binds the first as the second's
+cutter source through the existing validated document command. Its fractional
+alpha, saved references and one-step undo use the same path as the inspector.
+An ordinary drag continues to reorder. This is a direct graph connection for
+the supported cutter recipe; arbitrary wiring remains open.
 The Nodes search field locates cards by layer name or node kind without
 editing the document. It highlights matches, scrolls to the current result
 and cycles through them with Enter or Next; arbitrary graph edits remain open.
@@ -129,9 +138,18 @@ preview. This is diagnostic navigation, not a persisted graph edit.
   an older file. Native Qt Quick smoke clicks Add on a painted cutter source,
   checks brighter pixels, undoes and reopens the result.
 - A three-opaque-color fixture checks exact order and rendered top color,
+- Fractional overlap now checks blend bypass against Normal pixels, the typed
+  bypass node, Write parity, one-step undo/redo and save/reopen. Format-28
+  migration preserves Add with bypass off and a readable backup. Native Qt
+  Quick smoke clicks bypass on an Add-blended painted source, then verifies
+  retained Add, rendered pixels, undo/redo and reopen.
+- A three-opaque-color fixture checks exact order and rendered top color,
   invalid/same/locked targets, one-step undo/redo and save/reopen. Native Qt
   Quick smoke drags a Drawing card onto a second card, observes the target
   highlight and checks the new output pixels before and after undo/reopen.
+- Native Qt Quick smoke types Write into the search field in a narrower window,
+- Native Qt Quick smoke Alt-drags a Drawing source onto a Drawing target,
+  checks the target binding and output color, then undoes, redoes and reopens.
 - Native Qt Quick smoke types Write into the search field in a narrower window,
   checks that the graph scrolls to the result with unchanged output, then
   finds three Drawing cards and clicks Next to visit the second result.

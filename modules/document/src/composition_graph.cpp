@@ -18,6 +18,7 @@ GraphPortType outputType(GraphNodeKind kind) {
     case GraphNodeKind::Multiply:
     case GraphNodeKind::Screen:
     case GraphNodeKind::Add:
+    case GraphNodeKind::BypassBlend:
     case GraphNodeKind::ApplyMatte:
     case GraphNodeKind::BypassMatte:
     case GraphNodeKind::DisplayOutput:
@@ -44,6 +45,7 @@ std::vector<GraphPortType> inputTypes(GraphNodeKind kind) {
     case GraphNodeKind::Multiply:
     case GraphNodeKind::Screen:
     case GraphNodeKind::Add:
+    case GraphNodeKind::BypassBlend:
         return {GraphPortType::Image, GraphPortType::Image};
     case GraphNodeKind::MatteFromImage:
         return {GraphPortType::Image};
@@ -115,7 +117,9 @@ CompositionGraph CompositionGraph::orderedLayers(const Document& document) {
             }
         }
         const GraphNodeId composite = next++;
-        const auto kind = layer.blendMode == LayerBlendMode::Multiply
+        const auto kind = layer.blendBypassed && layer.blendMode != LayerBlendMode::Normal
+                              ? GraphNodeKind::BypassBlend
+                              : layer.blendMode == LayerBlendMode::Multiply
                               ? GraphNodeKind::Multiply
                               : layer.blendMode == LayerBlendMode::Screen
                                     ? GraphNodeKind::Screen

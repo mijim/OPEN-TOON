@@ -1,5 +1,18 @@
 # Experimental releases
 
+## 0.2.0-experimental.45 — working source, blend bypass and direct cutter connection
+
+- Bypass a Drawing or Part blend in Nodes while retaining Multiply, Screen or
+  Add. Format 29 saves the state; older projects load with bypass off and keep
+  a readable source-version backup on first save. The derived graph presents
+  a typed bypass node and both output terminals render Normal source-over.
+- Alt-drag a Drawing card onto another to bind it as the target's cutter.
+  Ordinary dragging continues to reorder. The existing validation and one
+  undoable command protect references.
+- Fractional pixel, migration, undo/reopen and native Qt Quick pointer tests
+  pass on the locked macOS build (186/186 CTest entries). Source only; no new
+  public binary or tag. Full editable graph and group ports remain open.
+
 ## 0.2.0-experimental.44 — working source, node navigation
 
 - Search the derived Nodes graph by layer name or node kind. Matching cards

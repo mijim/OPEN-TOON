@@ -263,6 +263,7 @@ QImage renderGraphTerminal(const CompositionGraph& graph, const Document& docume
         layer.matte = 0; // Isolated source render must not re-enter the graph.
         layer.opacityBypassed = false;
         layer.blendMode = LayerBlendMode::Normal;
+        layer.blendBypassed = false;
     }
     for (const auto& node : graph.nodes)
         if (node.kind == GraphNodeKind::Opacity ||
@@ -330,6 +331,7 @@ QImage renderGraphTerminal(const CompositionGraph& graph, const Document& docume
             bound = inputBounds(0);
             break;
         case GraphNodeKind::Over:
+        case GraphNodeKind::BypassBlend:
             image = over(input(0), input(1), document.composition, options, inputBounds(1));
             bound = inputBounds(0).united(inputBounds(1));
             break;

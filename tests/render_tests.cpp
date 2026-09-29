@@ -338,6 +338,24 @@ TEST_CASE("Multiply Screen and Add blend fractional layers in both color profile
                                            session.document(), 0, {}, {}, GraphTarget::Write));
     REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(session.document())), 0) ==
             added);
+    REQUIRE(session.apply("Bypass blend", [&](Document& d) {
+        d.layer(upper.id).blendBypassed = true;
+    }));
+    const auto bypassed = SceneRenderer::render(session.document(), 0);
+    REQUIRE(bypassed == normal);
+    const auto bypassGraph = CompositionGraph::orderedLayers(session.document());
+    REQUIRE(std::count_if(bypassGraph.nodes.begin(), bypassGraph.nodes.end(), [](const auto& node) {
+                return node.kind == GraphNodeKind::BypassBlend;
+            }) == 1);
+    REQUIRE(bypassed == GraphRenderer::render(bypassGraph, session.document(), 0, {}, {},
+                                              GraphTarget::Write));
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(session.document())), 0) ==
+            bypassed);
+    REQUIRE(session.undo());
+    REQUIRE(SceneRenderer::render(session.document(), 0) == added);
+    REQUIRE(session.redo());
+    REQUIRE(SceneRenderer::render(session.document(), 0) == normal);
+    REQUIRE(session.undo());
     REQUIRE_THROWS(session.apply("Invalid blend", [&](Document& d) {
         d.layer(upper.id).blendMode = static_cast<LayerBlendMode>(99);
     }));

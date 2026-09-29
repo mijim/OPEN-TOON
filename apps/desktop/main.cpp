@@ -467,6 +467,38 @@ int main(int argc, char** argv) {
                     if (!editor.saveProject({}) || !editor.openProject(QUrl::fromLocalFile(path)) ||
                         opentoon::SceneRenderer::render(editor.document(), 0) != added)
                         throw std::runtime_error("Add blend changed after save and reopen.");
+                    editor.setSelectedLayer(int(source.id));
+                    QCoreApplication::processEvents();
+                    auto* bypassBlend = window->findChild<QQuickItem*>("nodeBypassBlend");
+                    if (!bypassBlend || !bypassBlend->isVisible() || !bypassBlend->isEnabled())
+                        throw std::runtime_error("Blend bypass control is unavailable.");
+                    const auto bypassBlendPoint = bypassBlend->mapToScene(QPointF(
+                        bypassBlend->width() / 2, bypassBlend->height() / 2));
+                    QMouseEvent bypassBlendPress(QEvent::MouseButtonPress, bypassBlendPoint,
+                        window->mapToGlobal(bypassBlendPoint.toPoint()),
+                        Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                    QMouseEvent bypassBlendRelease(QEvent::MouseButtonRelease, bypassBlendPoint,
+                        window->mapToGlobal(bypassBlendPoint.toPoint()),
+                        Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+                    QCoreApplication::sendEvent(window, &bypassBlendPress);
+                    QCoreApplication::sendEvent(window, &bypassBlendRelease);
+                    QCoreApplication::processEvents();
+                    if (!editor.document().layer(source.id).blendBypassed ||
+                        opentoon::SceneRenderer::render(editor.document(), 0) != painted)
+                        throw std::runtime_error("Blend bypass did not restore Normal output.");
+                    editor.undo();
+                    if (opentoon::SceneRenderer::render(editor.document(), 0) != added)
+                        throw std::runtime_error("Blend bypass did not undo in one step.");
+                    editor.redo();
+                    if (!editor.saveProject({}) || !editor.openProject(QUrl::fromLocalFile(path)) ||
+                        !editor.document().layer(source.id).blendBypassed ||
+                        editor.document().layer(source.id).blendMode != opentoon::LayerBlendMode::Add ||
+                        opentoon::SceneRenderer::render(editor.document(), 0) != painted)
+                        throw std::runtime_error("Blend bypass changed after save and reopen.");
+                    editor.setSelectedLayer(int(source.id));
+                    if (!editor.setBlendBypassed(false) ||
+                        opentoon::SceneRenderer::render(editor.document(), 0) != added)
+                        throw std::runtime_error("Re-enabled blend did not preserve Add.");
 
                     auto reordered = opentoon::makeDocument();
                     reordered.width = reordered.height = 1;
@@ -552,6 +584,46 @@ int main(int argc, char** argv) {
                         !editor.openProject(QUrl::fromLocalFile(reorderPath)) ||
                         editor.document().layers.back().id != red)
                         throw std::runtime_error("Drawing drag order changed after reopen.");
+                    nodes->setProperty("previewNodeId", 0);
+                    strip->setProperty("contentX", 0);
+                    QCoreApplication::processEvents();
+                    (void)window->grabWindow();
+                    redCard = findDrawingCard(int(red));
+                    blueCard = findDrawingCard(int(blue));
+                    if (!redCard || !blueCard)
+                        throw std::runtime_error("Drawing cards vanished after reopening order.");
+                    const auto cutterFrom = redCard->mapToScene(QPointF(redCard->width() / 2, 30));
+                    const auto cutterTo = blueCard->mapToScene(QPointF(blueCard->width() / 2, 30));
+                    const auto altMove = [&](QEvent::Type type, QPointF point,
+                                             Qt::MouseButtons buttons) {
+                        QMouseEvent event(type, point, window->mapToGlobal(point.toPoint()),
+                                          type == QEvent::MouseMove ? Qt::NoButton : Qt::LeftButton,
+                                          buttons, Qt::AltModifier);
+                        QCoreApplication::sendEvent(window, &event);
+                        QCoreApplication::processEvents();
+                    };
+                    altMove(QEvent::MouseButtonPress, cutterFrom, Qt::LeftButton);
+                    altMove(QEvent::MouseMove, cutterFrom + QPointF(16, 0), Qt::LeftButton);
+                    altMove(QEvent::MouseMove, cutterTo, Qt::LeftButton);
+                    const auto altDragSource = nodes->property("draggedLayer").toInt();
+                    const auto altDragTarget = nodes->property("dropLayer").toInt();
+                    altMove(QEvent::MouseButtonRelease, cutterTo, Qt::NoButton);
+                    if (editor.document().layer(blue).matte != red ||
+                        qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Alt-drag did not bind a cutter to its target: source=" +
+                            std::to_string(altDragSource) + " target=" + std::to_string(altDragTarget) +
+                            " matte=" + std::to_string(editor.document().layer(blue).matte) +
+                            " blue=" + std::to_string(qBlue(
+                                opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0))));
+                    editor.undo();
+                    if (editor.document().layer(blue).matte ||
+                        qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Alt-drag cutter did not undo atomically.");
+                    editor.redo();
+                    if (!editor.saveProject({}) || !editor.openProject(QUrl::fromLocalFile(reorderPath)) ||
+                        editor.document().layer(blue).matte != red ||
+                        qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Alt-drag cutter changed after reopen.");
                     window->setWidth(1000);
                     QCoreApplication::processEvents();
                     (void)window->grabWindow();
@@ -570,7 +642,7 @@ int main(int argc, char** argv) {
                     if (search->property("text").toString() != "Write" ||
                         nodes->property("matchingNodeIds").toList().size() != 1 ||
                         strip->property("contentX").toDouble() <= 0 ||
-                        qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
                         throw std::runtime_error("Typed node search did not navigate to Write without an edit: text=" +
                             search->property("text").toString().toStdString() +
                             " matches=" + std::to_string(nodes->property("matchingNodeIds").toList().size()) +
@@ -591,7 +663,7 @@ int main(int argc, char** argv) {
                     if (nodes->property("matchIndex").toInt() != 1)
                         throw std::runtime_error("Next did not navigate to the second Drawing match.");
                     std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass, fractional cutter, "
-                                 "painted-source Multiply/Add, drawing drag order, typed search, save/reopen and undo.\n";
+                                 "painted-source Multiply/Add, blend bypass, drawing drag order, Alt-drag cutter, typed search, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

@@ -166,6 +166,7 @@ QVariantList EditorController::layers() const {
                                      {"paintMatteSource", it->paintMatteSource},
                                      {"opacityBypassed", it->opacityBypassed},
                                      {"blendMode", int(it->blendMode)},
+                                     {"blendBypassed", it->blendBypassed},
                                      {"kind", int(it->kind)},
                                      {"role", QString::fromStdString(it->role)},
                                      {"spans", spans},
@@ -192,6 +193,7 @@ QVariantList EditorController::compositionNodes() const {
         case GraphNodeKind::Multiply: kind = "Multiply"; break;
         case GraphNodeKind::Screen: kind = "Screen"; break;
         case GraphNodeKind::Add: kind = "Add"; break;
+        case GraphNodeKind::BypassBlend: kind = "Bypassed blend"; break;
         case GraphNodeKind::MatteFromImage: kind = "Cutter"; break;
         case GraphNodeKind::InvertMatte: kind = "Invert matte"; break;
         case GraphNodeKind::ApplyMatte: kind = "Apply matte"; break;
@@ -1141,6 +1143,17 @@ bool EditorController::setLayerBlendMode(int mode) {
             (target.kind != LayerKind::Drawing && target.kind != LayerKind::Part))
             throw std::runtime_error("Select an unlocked drawing or Part to change its blend mode.");
         target.blendMode = static_cast<LayerBlendMode>(mode);
+    });
+}
+bool EditorController::setBlendBypassed(bool bypassed) {
+    if (!layer_)
+        return false;
+    return edit(bypassed ? "Bypass layer blend" : "Enable layer blend", [&](Document& d) {
+        auto& target = d.layer(layer_);
+        if (target.locked ||
+            (target.kind != LayerKind::Drawing && target.kind != LayerKind::Part))
+            throw std::runtime_error("Select an unlocked drawing or Part to bypass its blend mode.");
+        target.blendBypassed = bypassed;
     });
 }
 bool EditorController::setMatteSourceVisible(bool visible) {

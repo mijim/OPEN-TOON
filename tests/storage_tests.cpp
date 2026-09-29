@@ -960,6 +960,34 @@ TEST_CASE("Format twenty-seven layers retain Screen and upgrade Add with a reada
     invalidLegacy["layers"][0]["blendMode"] = int(LayerBlendMode::Add);
     REQUIRE_THROWS(deserializeDocument(invalidLegacy.dump()));
 }
+TEST_CASE("Format twenty-eight layers default to active blend with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    original.layers.front().blendMode = LayerBlendMode::Add;
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 28;
+    for (auto& layer : legacy["layers"])
+        layer.erase("blendBypassed");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=28");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    changed.layers.front().blendBypassed = true;
+    REQUIRE(ProjectStore::save(project.file, changed, "Bypass blend", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v28.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+    auto invalidCurrent = legacy;
+    invalidCurrent["version"] = Document::formatVersion;
+    REQUIRE_THROWS(deserializeDocument(invalidCurrent.dump()));
+}
 TEST_CASE("Format twenty-five audio clips default to unsoloed with a readable backup") {
     TemporaryProject project;
     auto original = makeDocument();
