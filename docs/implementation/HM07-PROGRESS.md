@@ -79,6 +79,15 @@ published mouth choices on the 15-Part continuous toon, switches one choice
 and undoes it. The screenshot was inspected with the connected silhouette and
 mouth picker visible.
 
+Animator now also places a compact control panel in the camera viewport. Its
+published pose slider and Part drawing pickers call the same bounded document
+commands as the sidebar. It disappears in Rig and never enters output pixels.
+The native mouse smoke checks the actual overlay, moves a mapped torso
+position, verifies the mouth drawing, torso rotation, selection and frame are
+unchanged, and restores the document with one undo. The visually inspected
+`build/hm07-canvas-controls-smoke.png` shows the control panel beside the
+connected character rather than over its silhouette.
+
 `tests/rigging_tests.cpp` now transfers a pose across an independent character
 copy, applies the mapped drawing and numeric channel, checks source isolation,
 undo/redo and rejected mismatches. `tests/export_tests.cpp` checks the actual
@@ -106,14 +115,20 @@ After adding the drawing picker, three further native runs measured p95
 **333.2 / 331.3 / 339.3 MB** with the same 40 samples and five warmups per
 run. The published mouth command and one-step slider undo passed in each run.
 
+With the floating viewport widget present, three native runs exercised its
+mouse drag and undo before the same 40-sample panel timing loop. Panel
+mouse-to-`frameSwapped` p95 was **18.45 / 17.91 / 18.05 ms** with peak process
+resident memory **342.2 / 332.6 / 337.7 MB**. The overlay did not alter the
+connected character or exceed the sampled 50 ms / 2 GiB budget on this host.
+
 This remains a direct-command control subset. Persistent multi-driver
-evaluation, conflict/cycle handling, on-canvas widgets, control groups,
-broader cross-character mapping and a complete artist journey remain open. HM-07 is
-still in progress.
+evaluation, conflict/cycle handling, general typed widget bindings, control
+groups, broader cross-character mapping and a complete artist journey remain
+open. HM-07 is still in progress.
 
 ## Remaining contract
 
 Saved pose masks use explicit Part IDs within one character. Broader cross-rig
-retargeting, broader mirroring, full published controls, direct widgets, control
+retargeting, broader mirroring, full published controls, general typed widgets, control
 groups, conflict/cycle handling, complete workspace layout presets and artist
 acceptance remain open. RIG-012 and HM-07 are partial.

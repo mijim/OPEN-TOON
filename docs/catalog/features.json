@@ -216,7 +216,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; bounded published pose/view dashboard subset, full catalog acceptance open"
+      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; published pose/view/drawing dashboard and compact viewport controls, full catalog acceptance open"
     },
     {
       "id": "UI-003",
@@ -3015,7 +3015,7 @@
         "Dragging a widget changes only its linked attributes."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "advanced",
       "owner_module": "controllers",
@@ -3024,7 +3024,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; bounded viewport pose slider and published Part drawing choices, general typed bindings and control placement remain open"
     },
     {
       "id": "CTL-002",
@@ -3086,7 +3087,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; bounded published pose/view dashboard subset, full catalog acceptance open"
+      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; published pose/view/drawing controls filter Animator visibility, general binding wizard remains open"
     },
     {
       "id": "CTL-005",
@@ -3107,7 +3108,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; bounded published pose/view dashboard subset, full catalog acceptance open"
+      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; published pose/view/drawing dashboard and compact viewport controls, full catalog acceptance open"
     },
     {
       "id": "CTL-006",

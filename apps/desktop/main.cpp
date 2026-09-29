@@ -181,9 +181,18 @@ int main(int argc, char** argv) {
                     };
                     auto* drawingGroup = findVisualItem(findVisualItem, window->contentItem(),
                                                         QStringLiteral("publishedDrawingGroup"));
+                    auto* canvasControls = findVisualItem(findVisualItem, window->contentItem(),
+                                                           QStringLiteral("canvasAnimatorControls"));
+                    auto* canvasBlend = findVisualItem(findVisualItem, window->contentItem(),
+                                                        QStringLiteral("canvasPoseBlend"));
+                    auto* canvasDrawing = findVisualItem(findVisualItem, window->contentItem(),
+                                                          QStringLiteral("canvasDrawingPicker"));
                     if (editor.selectedLayer() != selected || editor.frame() != frame ||
                         !dashboard->isVisible() || !posePicker->isVisible() || !poseBlend->isVisible() ||
                         !drawingGroup || !drawingGroup->isVisible() ||
+                        !canvasControls || !canvasControls->isVisible() ||
+                        !canvasBlend || !canvasBlend->isVisible() ||
+                        !canvasDrawing || !canvasDrawing->isVisible() ||
                         !editor.characterPoses().front().toMap().value("published").toBool() ||
                         !editor.characterViews().front().toMap().value("published").toBool() ||
                         editor.publishedCharacterSubstitutions().isEmpty())
@@ -204,6 +213,8 @@ int main(int argc, char** argv) {
                             ", groupSize=" +
                             std::to_string(drawingGroup ? drawingGroup->width() : 0) + "x" +
                             std::to_string(drawingGroup ? drawingGroup->height() : 0));
+                    if (!window->grabWindow().save("build/hm07-canvas-controls-smoke.png"))
+                        throw std::runtime_error("Cannot save the canvas controls screenshot.");
                     const auto beforeMouth = editor.document();
                     if (!editor.applyPublishedSubstitution(int(mouthId), int(alternateMouth)) ||
                         editor.document().drawingAt(mouthId, frame)->id != alternateMouth)
@@ -225,15 +236,34 @@ int main(int argc, char** argv) {
                     }
                     if (!window->isActive() || poseBlend->width() < 100)
                         throw std::runtime_error("HM-07 slider window is not active or usable.");
-                    auto sendSlider = [&](QEvent::Type type, double fraction,
+                    auto sendSlider = [&](QQuickItem* slider, QEvent::Type type, double fraction,
                                           Qt::MouseButton button, Qt::MouseButtons held) {
-                        const auto point = poseBlend->mapToScene(
-                            QPointF(poseBlend->width() * fraction, poseBlend->height() / 2));
+                        const auto point = slider->mapToScene(
+                            QPointF(slider->width() * fraction, slider->height() / 2));
                         QMouseEvent event(type, point, window->mapToGlobal(point.toPoint()),
                                           button, held, Qt::NoModifier);
                         QCoreApplication::sendEvent(window, &event);
                     };
-                    sendSlider(QEvent::MouseButtonPress, .05, Qt::LeftButton, Qt::LeftButton);
+                    if (canvasBlend->width() < 70 || canvasDrawing->width() < 100)
+                        throw std::runtime_error("HM-07 canvas controls are too small to use.");
+                    sendSlider(canvasBlend, QEvent::MouseButtonPress, .05, Qt::LeftButton, Qt::LeftButton);
+                    QCoreApplication::processEvents();
+                    sendSlider(canvasBlend, QEvent::MouseMove, .8, Qt::NoButton, Qt::LeftButton);
+                    QCoreApplication::processEvents();
+                    sendSlider(canvasBlend, QEvent::MouseButtonRelease, .8, Qt::LeftButton, Qt::NoButton);
+                    if (opentoon::evaluateTransform(editor.document().layer(torsoId), 0).x <=
+                        originalTorsoX + 40)
+                        throw std::runtime_error("HM-07 canvas slider did not move its mapped Part.");
+                    if (editor.document().drawingAt(mouthId, 0)->id !=
+                            baseline.drawingAt(mouthId, 0)->id ||
+                        opentoon::evaluateTransform(editor.document().layer(torsoId), 0).rotation !=
+                            opentoon::evaluateTransform(baseline.layer(torsoId), 0).rotation ||
+                        editor.selectedLayer() != selected || editor.frame() != frame)
+                        throw std::runtime_error("HM-07 canvas slider changed an unbound property or view state.");
+                    editor.undo();
+                    if (editor.document() != baseline)
+                        throw std::runtime_error("HM-07 canvas slider drag did not undo in one step.");
+                    sendSlider(poseBlend, QEvent::MouseButtonPress, .05, Qt::LeftButton, Qt::LeftButton);
                     QCoreApplication::processEvents();
                     std::vector<double> samples;
                     samples.reserve(40);
@@ -250,7 +280,7 @@ int main(int argc, char** argv) {
                         QObject::connect(&timeout, &QTimer::timeout, &loop, &QEventLoop::quit);
                         QElapsedTimer timer;
                         timer.start();
-                        sendSlider(QEvent::MouseMove, index % 2 ? .2 : .8,
+                        sendSlider(poseBlend, QEvent::MouseMove, index % 2 ? .2 : .8,
                                    Qt::NoButton, Qt::LeftButton);
                         timeout.start(3000);
                         if (!presented)
@@ -264,7 +294,7 @@ int main(int argc, char** argv) {
                     if (opentoon::evaluateTransform(editor.document().layer(torsoId), 0).x <=
                         originalTorsoX + 40)
                         throw std::runtime_error("HM-07 slider did not move its mapped Part.");
-                    sendSlider(QEvent::MouseButtonRelease, .8, Qt::LeftButton, Qt::NoButton);
+                    sendSlider(poseBlend, QEvent::MouseButtonRelease, .8, Qt::LeftButton, Qt::NoButton);
                     editor.undo();
                     if (editor.document() != baseline)
                         throw std::runtime_error("HM-07 slider drag did not undo in one step.");
@@ -283,6 +313,8 @@ int main(int argc, char** argv) {
                                              {"p95Ms", samples[std::size_t(std::ceil(samples.size() * .95)) - 1]},
                                              {"peakProcessResidentBytes", peakBytes}};
                     editor.setWorkspaceMode("Rig");
+                    if (canvasControls->isVisible())
+                        throw std::runtime_error("Animator canvas controls remained visible in Rig.");
                     editor.duplicateCharacter();
                     const int targetCharacter = editor.characterId();
                     if (targetCharacter == int(rootId) || editor.characterPoses().isEmpty())
@@ -330,7 +362,7 @@ int main(int argc, char** argv) {
                         throw std::runtime_error("HM-07 mirror pose did not undo atomically.");
                     std::cout << "HM-07 dashboard smoke passed: continuous toon project, published view, "
                                  "mouth drawing and pose, workspace selection/frame, native QML screenshot, "
-                                 "mouth switch, slider drag, pose transfer and mirroring with undo.\n";
+                                 "mouth switch, canvas and panel sliders, pose transfer and mirroring with undo.\n";
                     std::cout << QJsonDocument(timing).toJson(QJsonDocument::Compact).constData() << '\n';
                     app.exit(0);
                 } catch (const std::exception& error) {

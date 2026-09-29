@@ -834,6 +834,138 @@ ApplicationWindow {
                     anchors.fill: parent
                     editor: root.backend
                 }
+                Rectangle {
+                    id: canvasControls
+                    objectName: "canvasAnimatorControls"
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+                    anchors.margins: 16
+                    width: Math.min(254, parent.width - 32)
+                    height: Math.min(canvasControlsContent.implicitHeight + 20,
+                                     Math.max(120, parent.height - 32))
+                    visible: editor.workspaceMode === "Animator" && editor.characterId > 0 &&
+                             (editor.characterPoses.some(p => p.published) ||
+                              editor.publishedCharacterSubstitutions.length > 0)
+                    z: 2
+                    radius: 6
+                    color: "#ee151515"
+                    border.color: "#555555"
+                    ScrollView {
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        clip: true
+                        contentWidth: availableWidth
+                        ColumnLayout {
+                            id: canvasControlsContent
+                            width: 232
+                            spacing: 6
+                            Label {
+                                text: "CHARACTER CONTROLS"
+                                color: "#aaaaaa"
+                                font.pixelSize: 10
+                                font.letterSpacing: 1.1
+                            }
+                            C.CompactComboBox {
+                                objectName: "canvasPosePicker"
+                                Layout.fillWidth: true
+                                visible: editor.characterPoses.some(p => p.published)
+                                model: editor.characterPoses.filter(p => p.published)
+                                textRole: "name"
+                                valueRole: "id"
+                                currentIndex: model.findIndex(p => p.id === editor.selectedCharacterPose)
+                                onActivated: editor.selectCharacterPose(currentValue)
+                                Accessible.name: "Canvas published pose"
+                            }
+                            RowLayout {
+                                Layout.fillWidth: true
+                                visible: editor.characterPoses.some(p => p.published)
+                                C.CompactButton {
+                                    text: "Apply"
+                                    enabled: editor.characterPoses.some(p => p.id === editor.selectedCharacterPose && p.published)
+                                    onClicked: editor.applySelectedCharacterPose()
+                                    Accessible.name: "Apply canvas pose"
+                                }
+                                Slider {
+                                    id: canvasPoseBlend
+                                    objectName: "canvasPoseBlend"
+                                    Layout.fillWidth: true
+                                    implicitHeight: 24
+                                    from: 0
+                                    to: 1
+                                    value: 0
+                                    enabled: editor.characterPoses.some(p => p.id === editor.selectedCharacterPose && p.published)
+                                    onPressedChanged: {
+                                        if (pressed)
+                                            editor.beginSelectedCharacterPoseBlend()
+                                        else
+                                            editor.endSelectedCharacterPoseBlend()
+                                    }
+                                    onMoved: editor.updateSelectedCharacterPoseBlend(value)
+                                    Accessible.name: "Blend canvas character pose"
+                                    background: Rectangle {
+                                        x: canvasPoseBlend.leftPadding
+                                        y: canvasPoseBlend.topPadding + canvasPoseBlend.availableHeight / 2 - height / 2
+                                        width: canvasPoseBlend.availableWidth
+                                        height: 3
+                                        radius: 2
+                                        color: "#303030"
+                                        Rectangle {
+                                            width: canvasPoseBlend.visualPosition * parent.width
+                                            height: parent.height
+                                            radius: parent.radius
+                                            color: "#b8b8b8"
+                                        }
+                                    }
+                                    handle: Rectangle {
+                                        x: canvasPoseBlend.leftPadding + canvasPoseBlend.visualPosition *
+                                           (canvasPoseBlend.availableWidth - width)
+                                        y: canvasPoseBlend.topPadding + canvasPoseBlend.availableHeight / 2 - height / 2
+                                        width: 12
+                                        height: 12
+                                        radius: 6
+                                        color: "#e8e8e8"
+                                        border.color: "#171717"
+                                    }
+                                }
+                                Label {
+                                    text: Math.round(canvasPoseBlend.value * 100) + "%"
+                                    color: "#aaaaaa"
+                                    font.pixelSize: 10
+                                    Layout.preferredWidth: 32
+                                }
+                            }
+                            Connections {
+                                target: editor
+                                function onPoseSelectionChanged() { canvasPoseBlend.value = 0 }
+                            }
+                            Repeater {
+                                model: editor.publishedCharacterSubstitutions
+                                ColumnLayout {
+                                    id: canvasDrawingGroup
+                                    required property var modelData
+                                    Layout.fillWidth: true
+                                    spacing: 2
+                                    Label {
+                                        text: canvasDrawingGroup.modelData.name
+                                        color: "#aaaaaa"
+                                        font.pixelSize: 10
+                                    }
+                                    C.CompactComboBox {
+                                        objectName: "canvasDrawingPicker"
+                                        Layout.fillWidth: true
+                                        model: canvasDrawingGroup.modelData.options
+                                        textRole: "name"
+                                        valueRole: "id"
+                                        currentIndex: model.findIndex(v => v.id === canvasDrawingGroup.modelData.selected)
+                                        onActivated: editor.applyPublishedSubstitution(canvasDrawingGroup.modelData.part,
+                                                                                        currentValue)
+                                        Accessible.name: "Canvas drawings for " + canvasDrawingGroup.modelData.name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 Text {
                     anchors.left: parent.left
                     anchors.top: parent.top

@@ -22,10 +22,19 @@ state stored with Qt settings; switching modes retains document selection and
 frame and changes no render pixels. The same saved document is used in both
 workspaces.
 
+Animator also shows a bounded floating control panel in the camera viewport
+when the selected Character has a published pose or drawing substitution. It
+uses the same published pose picker, 0–1 blend command and per-Part drawing
+choices as the side dashboard. The overlay is Qt view state, does not enter
+the animation document or output render, and is hidden in Rig. The slider
+updates only its saved mask; drawing choices use the published Part-scoped
+command. The viewport keeps the panel compact and scrollable when many Parts
+have published drawings.
+
 These are direct commands, not persistent graph drivers: only the active
 gesture writes the candidate document. No dependency edge or expression is
 created, so there is no control graph cycle to evaluate. Simultaneous
-published-control drivers, general on-canvas widget bindings and conflict
+published-control drivers, general typed on-canvas widget bindings and conflict
 resolution remain outside this subset. Adding those requires an explicit
 typed driver contract and cycle validation before HM-07 can be accepted.
 
@@ -41,7 +50,12 @@ view and a pose, checks visible controls and captures the actual window. It
 also measures a real mouse drag to `frameSwapped` and validates one-step undo;
 three 40-sample runs passed the proposed sampled interaction budget on the
 recorded M1 Pro host.
+The native smoke also checks `build/hm07-canvas-controls-smoke.png`, drags the
+viewport slider with mouse events, checks an unmapped drawing and rotation as
+well as selection/frame preservation, then verifies a single undo. The
+overlay hides on return to Rig. The screenshot was inspected on the connected
+15-Part character.
 
 The two workspace modes do not yet provide saved geometry/docking presets for
-drawing, compositing and other phase work. On-canvas control widgets, control
+drawing, compositing and other phase work. General typed on-canvas widgets, control
 groups/switches, conflict handling and character portability remain open.
