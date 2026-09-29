@@ -64,6 +64,7 @@ class EditorController final : public QObject {
     Q_PROPERTY(QString workspacePreset READ workspacePreset NOTIFY workspaceLayoutChanged)
     Q_PROPERTY(QString bottomPanelTab READ bottomPanelTab WRITE setBottomPanelTab NOTIFY workspaceLayoutChanged)
     Q_PROPERTY(int bottomPanelHeight READ bottomPanelHeight WRITE setBottomPanelHeight NOTIFY workspaceLayoutChanged)
+    Q_PROPERTY(int inspectorWidth READ inspectorWidth WRITE setInspectorWidth NOTIFY workspaceLayoutChanged)
     Q_PROPERTY(int timelineCellWidth READ timelineCellWidth WRITE setTimelineCellWidth NOTIFY workspaceLayoutChanged)
     Q_PROPERTY(bool timingToolsVisible READ timingToolsVisible WRITE setTimingToolsVisible NOTIFY workspaceLayoutChanged)
     Q_PROPERTY(qulonglong documentRevision READ documentRevision NOTIFY changed)
@@ -178,6 +179,8 @@ class EditorController final : public QObject {
     void setBottomPanelTab(QString tab);
     int bottomPanelHeight() const { return bottomPanelHeight_; }
     void setBottomPanelHeight(int height);
+    int inspectorWidth() const { return inspectorWidth_; }
+    void setInspectorWidth(int width);
     int timelineCellWidth() const { return timelineCellWidth_; }
     void setTimelineCellWidth(int width);
     bool timingToolsVisible() const { return timingToolsVisible_; }
@@ -432,6 +435,7 @@ class EditorController final : public QObject {
     bool applyingWorkspacePreset_ = false;
     QString bottomPanelTab_ = "Timeline";
     int bottomPanelHeight_ = 280, timelineCellWidth_ = 22;
+    int inspectorWidth_ = 250;
     bool timingToolsVisible_ = false;
     QString selectedControlGroup_ = "Main";
     std::uint64_t poseBlendSerial_ = 0;

@@ -216,7 +216,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; docs/architecture/adr/066-personal-workspace-layout.md; docs/architecture/adr/067-named-workspace-layouts.md; grouped dashboard and four overridable personal layouts persist across controller reopen and switch without changing scene, selection or frame. Full dockable workspace serialization and catalog acceptance remain open"
+      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; docs/architecture/adr/066-personal-workspace-layout.md; docs/architecture/adr/067-named-workspace-layouts.md; docs/architecture/adr/069-resizable-inspector-layout.md; grouped dashboard and four overridable personal layouts include a draggable inspector width, persist across controller reopen and switch without changing scene, selection or frame. Full dockable workspace serialization and catalog acceptance remain open"
     },
     {
       "id": "UI-003",
@@ -274,7 +274,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/architecture/adr/066-personal-workspace-layout.md; docs/architecture/adr/067-named-workspace-layouts.md; QSettings stores personal layout controls and named overrides independently of scene mutations, with malformed-value fallback, reopen and reset tests. UI scale and full preference separation remain open."
+      "implementation_evidence": "docs/architecture/adr/066-personal-workspace-layout.md; docs/architecture/adr/067-named-workspace-layouts.md; docs/architecture/adr/069-resizable-inspector-layout.md; QSettings stores personal layout controls including inspector width and named overrides independently of scene mutations, with malformed-value fallback, reopen and reset tests. UI scale and full preference separation remain open."
     },
     {
       "id": "UI-006",

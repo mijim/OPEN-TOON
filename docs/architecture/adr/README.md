@@ -184,3 +184,6 @@ workspace layouts with scene-independent switching.
 
 See [ADR-068](068-audio-output-interruption.md) for stopping playback at the
 last submitted audio frame after output interruption.
+
+See [ADR-069](069-resizable-inspector-layout.md) for the personal horizontal
+inspector splitter and its inclusion in named workspace layouts.

@@ -413,6 +413,11 @@ one of the four names. A manual adjustment shows **Custom** until you save or
 apply a named layout again. Saved layouts are personal to this computer;
 switching them keeps the selected object and current frame.
 
+Drag the narrow vertical grip between the canvas and Properties/Character to
+resize that panel. Double-click the grip for its default width. The preferred
+width reopens with the app and is included when you save a named layout; a
+smaller window temporarily limits it to leave room for the canvas.
+
 Curves keeps its actions in a single compact toolbar. **Values** reveals the optional
 frame/value/base-interpolation fields; hiding them gives that space back to the graph.
 Hover the question mark for editing gestures. Buttons, dropdowns, number fields and

@@ -1,5 +1,16 @@
 # Experimental releases
 
+## 0.2.0-experimental.70 — working source, resizable inspector
+
+- Drag the visible vertical divider to resize Properties/Character from 250
+  to 520 px; double-click restores its default. The canvas keeps a useful
+  minimum at smaller window sizes. The preferred width reopens as a personal
+  setting and joins the four saved workspace layouts.
+- Controller and native Qt Quick drag checks cover bounds, reopen, reset and
+  unchanged document, selection and frame. The locked macOS suite passes
+  202/202 CTest entries and Workspace, HM-07, HM-10, HM-12 and broad UI native
+  smokes. Full docking remains open. Source only.
+
 ## 0.2.0-experimental.69 — working source, audio interruption alignment
 
 - An audio-output interruption stops the device and leaves the playhead on

@@ -53,18 +53,19 @@ struct WorkspaceLayout {
     QString mode;
     QString tab;
     int height;
+    int inspector;
     int cell;
     bool timingTools;
 };
 std::optional<WorkspaceLayout> defaultWorkspaceLayout(const QString& name) {
     if (name == "Drawing")
-        return WorkspaceLayout{"Rig", "Xsheet", 300, 28, false};
+        return WorkspaceLayout{"Rig", "Xsheet", 300, 250, 28, false};
     if (name == "Animation")
-        return WorkspaceLayout{"Animator", "Curves", 360, 28, false};
+        return WorkspaceLayout{"Animator", "Curves", 360, 270, 28, false};
     if (name == "Rigging")
-        return WorkspaceLayout{"Rig", "Timeline", 280, 22, false};
+        return WorkspaceLayout{"Rig", "Timeline", 280, 300, 22, false};
     if (name == "Compositing")
-        return WorkspaceLayout{"Rig", "Nodes", 420, 22, false};
+        return WorkspaceLayout{"Rig", "Nodes", 420, 320, 22, false};
     return std::nullopt;
 }
 } // namespace
@@ -117,6 +118,7 @@ EditorController::EditorController(QObject* parent) : QObject(parent) {
     if (tab == "Xsheet" || tab == "Curves" || tab == "Nodes")
         bottomPanelTab_ = tab;
     bottomPanelHeight_ = boundedSetting(settings, "layout/bottomHeight", 280, 140, 1600);
+    inspectorWidth_ = boundedSetting(settings, "layout/inspectorWidth", 250, 250, 520);
     timelineCellWidth_ = boundedSetting(settings, "layout/timelineCell", 22, 12, 72);
     timingToolsVisible_ = settings.value("layout/timingTools", false).toBool();
     const auto preset = settings.value("layout/activePreset", "Custom").toString();
@@ -600,6 +602,15 @@ void EditorController::setBottomPanelHeight(int height) {
     markWorkspaceCustom();
     emit workspaceLayoutChanged();
 }
+void EditorController::setInspectorWidth(int width) {
+    width = std::clamp(width, 250, 520);
+    if (width == inspectorWidth_)
+        return;
+    inspectorWidth_ = width;
+    QSettings().setValue("layout/inspectorWidth", width);
+    markWorkspaceCustom();
+    emit workspaceLayoutChanged();
+}
 void EditorController::setTimelineCellWidth(int width) {
     width = std::clamp(width, 12, 72);
     if (width == timelineCellWidth_)
@@ -621,6 +632,7 @@ void EditorController::resetWorkspaceLayout() {
     setWorkspaceMode("Rig");
     setBottomPanelTab("Timeline");
     setBottomPanelHeight(280);
+    setInspectorWidth(250);
     setTimelineCellWidth(22);
     setTimingToolsVisible(false);
     markWorkspaceCustom();
@@ -633,6 +645,7 @@ bool EditorController::saveWorkspacePreset(QString name) {
     settings.setValue(key + "mode", workspaceMode_);
     settings.setValue(key + "tab", bottomPanelTab_);
     settings.setValue(key + "height", bottomPanelHeight_);
+    settings.setValue(key + "inspector", inspectorWidth_);
     settings.setValue(key + "cell", timelineCellWidth_);
     settings.setValue(key + "timingTools", timingToolsVisible_);
     settings.setValue("layout/activePreset", name);
@@ -656,12 +669,14 @@ bool EditorController::applyWorkspacePreset(QString name) {
     if (tab != "Timeline" && tab != "Xsheet" && tab != "Curves" && tab != "Nodes")
         tab = defaults->tab;
     const int height = boundedSetting(settings, key + "height", defaults->height, 140, 1600);
+    const int inspector = boundedSetting(settings, key + "inspector", defaults->inspector, 250, 520);
     const int cell = boundedSetting(settings, key + "cell", defaults->cell, 12, 72);
     const bool timing = settings.value(key + "timingTools", defaults->timingTools).toBool();
     applyingWorkspacePreset_ = true;
     setWorkspaceMode(mode);
     setBottomPanelTab(tab);
     setBottomPanelHeight(height);
+    setInspectorWidth(inspector);
     setTimelineCellWidth(cell);
     setTimingToolsVisible(timing);
     applyingWorkspacePreset_ = false;

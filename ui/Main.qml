@@ -39,6 +39,13 @@ ApplicationWindow {
     property real previewBottomHeight: -1
     readonly property real bottomHeight: previewBottomHeight >= 0
                                          ? previewBottomHeight : editor.bottomPanelHeight
+    property real previewInspectorWidth: -1
+    readonly property real inspectorWidth: previewInspectorWidth >= 0
+                                          ? previewInspectorWidth : editor.inspectorWidth
+    readonly property real maximumInspectorWidth: Math.max(250, Math.min(520,
+        canvasWorkspace.width - 48 - inspectorResize.width - 360))
+    readonly property real effectiveInspectorWidth: Math.max(250,
+        Math.min(inspectorWidth, maximumInspectorWidth))
     readonly property real maximumBottomHeight: Math.max(140, workspace.height - appHeader.height - canvasToolbar.height - bottomSplitter.height - bottomTabs.height - statusBar.height - (timingTools.visible ? timingTools.height : 0) - canvasWorkspace.Layout.minimumHeight - 2)
     readonly property real effectiveBottomHeight: Math.max(140, Math.min(bottomHeight, maximumBottomHeight))
     Connections {
@@ -1046,20 +1053,63 @@ ApplicationWindow {
                 }
             }
             Rectangle {
-                width: 1
+                id: inspectorResize
+                Layout.preferredWidth: 8
                 Layout.fillHeight: true
-                color: "#282828"
+                color: inspectorResizeArea.containsMouse ? "#282828" : "#1c1c1c"
+                Rectangle {
+                    anchors.centerIn: parent
+                    width: 2
+                    height: 42
+                    radius: 1
+                    color: "#555555"
+                }
+                MouseArea {
+                    id: inspectorResizeArea
+                    objectName: "inspectorResizeHandle"
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.SplitHCursor
+                    property real startX: 0
+                    property real startWidth: 0
+                    onPressed: mouse => {
+                        startX = mapToGlobal(mouse.x, mouse.y).x;
+                        startWidth = root.effectiveInspectorWidth;
+                    }
+                    onPositionChanged: mouse => {
+                        if (pressed)
+                            root.previewInspectorWidth = Math.max(250,
+                                Math.min(root.maximumInspectorWidth,
+                                         startWidth + startX - mapToGlobal(mouse.x, mouse.y).x));
+                    }
+                    onReleased: {
+                        if (root.previewInspectorWidth >= 0) {
+                            editor.inspectorWidth = Math.round(root.effectiveInspectorWidth);
+                            root.previewInspectorWidth = -1;
+                        }
+                    }
+                    onCanceled: root.previewInspectorWidth = -1
+                    onDoubleClicked: {
+                        root.previewInspectorWidth = -1;
+                        editor.inspectorWidth = 250;
+                    }
+                    Accessible.name: "Resize Properties and Character panel horizontally"
+                }
             }
             Rectangle {
-                Layout.preferredWidth: 250
+                id: inspectorPane
+                Layout.preferredWidth: root.effectiveInspectorWidth
+                Layout.minimumWidth: root.effectiveInspectorWidth
+                Layout.maximumWidth: root.effectiveInspectorWidth
                 Layout.fillHeight: true
                 color: "#101010"
                 ScrollView {
+                    id: inspectorScroll
                     anchors.fill: parent
                     clip: true
                     contentWidth: availableWidth
                     ColumnLayout {
-                        width: 248
+                        width: inspectorScroll.availableWidth
                         spacing: 16
                         Text {
                             Layout.leftMargin: 16

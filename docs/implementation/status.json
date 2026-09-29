@@ -16,7 +16,7 @@
     {
       "id": "P01",
       "status": "in_progress",
-      "available": "Native English QML shell, CMake modules, commands, immutable snapshots, undo/redo and validation. Integrated resizable timing/curve workspace and selection-owned object/layer Properties. Shared compact controls, optional curve numeric fields and a draggable workspace divider with dynamic bounds. Personal Rig/Animator mode and lower tab, height, timeline zoom and Timing tools preferences persist across reopen with a reset action and unchanged scene/selection/frame checks. Typed layer-transform property addresses now distinguish rest, authored keys and evaluated values with atomic edits. Format-4 typed character/peg/part addresses and source-version migration backups now persist and reject invalid references.",
+      "available": "Native English QML shell, CMake modules, commands, immutable snapshots, undo/redo and validation. Integrated resizable timing/curve workspace and selection-owned object/layer Properties. Shared compact controls, optional curve numeric fields and draggable vertical/horizontal workspace dividers with dynamic canvas bounds. Personal Rig/Animator mode, lower tab and height, inspector width, timeline zoom and Timing tools preferences persist across reopen with a reset action and unchanged scene/selection/frame checks. Typed layer-transform property addresses now distinguish rest, authored keys and evaluated values with atomic edits. Format-4 typed character/peg/part addresses and source-version migration backups now persist and reject invalid references.",
       "remaining": "Docking and full workspace presets, UI scale, configurable shortcuts, full accessibility, scalable resource/cache protocols and cross-platform qualification."
     },
     {
@@ -28,7 +28,7 @@
     {
       "id": "P03",
       "status": "in_progress",
-      "available": "Synchronized virtualized timeline/Xsheet, create/hold/clear exposures, insert/remove frames and navigate drawings. Multi-layer range clipboard, independent drawing paste, key paste, cycles, ones/twos/threes, overwrite retiming, Alt-drag moves, markers and bounded Xsheet PDF export. Clear removes selected exposures and pose keys together. Timeline/Xsheet diamonds can be dragged directly; Keys mode adds poses by double-click, with adjustable timeline cell width. Four personal Drawing/Animation/Rigging/Compositing lower-workspace layouts can be applied, overwritten and reopened without changing selection or current frame.",
+      "available": "Synchronized virtualized timeline/Xsheet, create/hold/clear exposures, insert/remove frames and navigate drawings. Multi-layer range clipboard, independent drawing paste, key paste, cycles, ones/twos/threes, overwrite retiming, Alt-drag moves, markers and bounded Xsheet PDF export. Clear removes selected exposures and pose keys together. Timeline/Xsheet diamonds can be dragged directly; Keys mode adds poses by double-click, with adjustable timeline cell width. Four personal Drawing/Animation/Rigging/Compositing layouts include lower-workspace and inspector width preferences and can be applied, overwritten and reopened without changing selection or current frame.",
       "remaining": "Full dockable workspace serialization, frame annotations/thumbnails, advanced onion/tracing controls, paperless workflows and artist acceptance."
     },
     {
@@ -475,11 +475,11 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.69",
+  "version": "0.2.0-experimental.70",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
-    "release_artifacts": "Historical experimental.11 macOS arm64 ZIP and Ubuntu-built Linux x86_64 AppImage; current experimental.69 work is source only",
+    "release_artifacts": "Historical experimental.11 macOS arm64 ZIP and Ubuntu-built Linux x86_64 AppImage; current experimental.70 work is source only",
     "cross_platform_builds": "Manual release workflow; broader Linux, Windows and device qualification remain open"
   },
   "planning_priority": {

@@ -196,6 +196,21 @@ int main(int argc, char** argv) {
                     drag(QEvent::MouseButtonRelease, end, Qt::NoButton);
                     if (editor.bottomPanelHeight() <= 280)
                         throw std::runtime_error("Workspace separator drag was not saved.");
+                    auto* inspectorSplitter = window->findChild<QQuickItem*>("inspectorResizeHandle");
+                    if (!inspectorSplitter || !inspectorSplitter->isVisible())
+                        throw std::runtime_error("Inspector resize handle is unavailable.");
+                    const auto inspectorStart = inspectorSplitter->mapToScene(QPointF(
+                        inspectorSplitter->width() / 2, inspectorSplitter->height() / 2));
+                    const auto inspectorEnd = inspectorStart + QPointF(-64, 0);
+                    drag(QEvent::MouseButtonPress, inspectorStart, Qt::LeftButton);
+                    drag(QEvent::MouseMove, inspectorEnd, Qt::LeftButton);
+                    if (editor.inspectorWidth() != 250 ||
+                        window->property("effectiveInspectorWidth").toInt() <= 250)
+                        throw std::runtime_error("Inspector resize preview was not live or saved too early.");
+                    drag(QEvent::MouseButtonRelease, inspectorEnd, Qt::NoButton);
+                    if (editor.inspectorWidth() <= 250 ||
+                        window->property("effectiveInspectorWidth").toInt() != editor.inspectorWidth())
+                        throw std::runtime_error("Inspector separator drag was not saved.");
                     click("bottomNodesTab");
                     if (editor.bottomPanelTab() != "Nodes" ||
                         !window->property("showNodes").toBool())
@@ -205,6 +220,7 @@ int main(int argc, char** argv) {
                     EditorController restored;
                     if (restored.bottomPanelTab() != "Nodes" ||
                         restored.bottomPanelHeight() != editor.bottomPanelHeight() ||
+                        restored.inspectorWidth() != editor.inspectorWidth() ||
                         restored.timelineCellWidth() != 32 ||
                         !restored.timingToolsVisible() || restored.workspaceMode() != "Animator")
                         throw std::runtime_error("Workspace layout changed after controller reopen.");
@@ -213,6 +229,7 @@ int main(int argc, char** argv) {
                     EditorController reset;
                     if (reset.bottomPanelTab() != "Timeline" ||
                         reset.bottomPanelHeight() != 280 || reset.timelineCellWidth() != 22 ||
+                        reset.inspectorWidth() != 250 ||
                         reset.timingToolsVisible() || reset.workspaceMode() != "Rig" ||
                         window->property("showNodes").toBool() ||
                         window->property("effectiveBottomHeight").toInt() != 280 ||
@@ -226,6 +243,7 @@ int main(int argc, char** argv) {
                     QCoreApplication::processEvents();
                     if (presetPicker->property("currentIndex").toInt() != 4 ||
                         !window->property("showNodes").toBool() ||
+                        editor.inspectorWidth() != 320 ||
                         editor.document() != before || editor.documentRevision() != revision ||
                         editor.frame() != 7 || editor.selectedLayer() != layer)
                         throw std::runtime_error("Compositing layout changed document state or missed QML.");
@@ -269,17 +287,18 @@ int main(int argc, char** argv) {
                         editor.document() != before || editor.frame() != 7)
                         throw std::runtime_error("Native Animation layout choice did not apply.");
                     editor.setBottomPanelHeight(470);
+                    editor.setInspectorWidth(410);
                     if (editor.workspacePreset() != "Custom" ||
                         !editor.saveWorkspacePreset("Drawing") ||
                         !editor.applyWorkspacePreset("Animation") ||
                         !editor.applyWorkspacePreset("Drawing") ||
-                        editor.bottomPanelHeight() != 470)
+                        editor.bottomPanelHeight() != 470 || editor.inspectorWidth() != 410)
                         throw std::runtime_error("Named workspace layout did not retain its edited height.");
                     const auto layoutShot = window->grabWindow();
                     if (layoutShot.isNull() || !layoutShot.save("build/workspace-layout-smoke.png"))
                         throw std::runtime_error("Named workspace layout screenshot failed.");
                     std::cout << "Workspace native smoke passed: tab, timeline zoom, timing tools, "
-                                 "splitter drag, named layouts, preferences reopen and reset "
+                                 "both splitter drags, named layouts, preferences reopen and reset "
                                  "without document changes.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {

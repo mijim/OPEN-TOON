@@ -13,7 +13,11 @@ layouts over the existing Rig/Animator mode and lower panels. Each can be
 overwritten with the current personal settings and reopened on the same
 computer. Applying a layout keeps the document, revision, selection and frame
 unchanged. The header picker and View menu expose them; manual changes show
-Custom. This is a bounded UI-002 subset, not arbitrary dockable presets.
+Custom. The Properties/Character panel now has a horizontal drag grip; its
+preferred width is personal and joins each named layout. The canvas keeps a
+minimum width when the window shrinks. This is a bounded UI-002 subset, not
+arbitrary dockable presets; see
+[ADR-069](../architecture/adr/069-resizable-inspector-layout.md).
 
 Properties now captures either the selected Part or all Parts with a visible
 channel group. The panel selects, applies, renames and removes poses. Character
@@ -42,7 +46,9 @@ without mutation. Unmasked channels retain destination rest values.
 
 - `tests/export_tests.cpp` checks four factory layouts, a saved override,
   controller reopen, malformed values and unchanged document, revision,
-  selection and frame. The native workspace smoke clicks the header layout
+  selection and frame. It also checks each factory inspector width, saved
+  overrides and invalid preference bounds. The native workspace smoke drags
+  the inspector splitter, reopens and resets it, clicks the header layout
   picker and confirms the Animation panel and selected frame. The `.68`
   macOS HM-07 dashboard smoke passed its published-control input and undo
   checks; one run measured 49.62 ms p95 against the proposed 50 ms limit,
