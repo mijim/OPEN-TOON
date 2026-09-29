@@ -291,6 +291,58 @@ TEST_CASE("Composite grouping is one undoable edit with stable ports and reopene
     REQUIRE(editor.document().drawingAt(copiedGroup.members.front(), 0)->id !=
             editor.document().drawingAt(red, 0)->id);
 }
+TEST_CASE("Composite group edges can be edited without changing unbypassed pixels") {
+    auto document = opentoon::makeDocument();
+    document.width = document.height = 1;
+    document.background = {0, 0, 0, 0};
+    const auto first = document.layers.front().id;
+    document.editableDrawing(first, 0).image = opentoon::ImageAsset{1, 1, {255, 0, 0, 255}};
+    const auto append = [&](std::string name, std::vector<std::uint8_t> pixels) {
+        auto layer = document.layers.front();
+        layer.id = document.allocateId();
+        layer.name = std::move(name);
+        auto drawing = document.drawings.at(layer.exposures.front().drawing);
+        drawing.id = document.allocateId();
+        drawing.image = opentoon::ImageAsset{1, 1, std::move(pixels)};
+        document.drawings.emplace(drawing.id, drawing);
+        layer.exposures.front().drawing = drawing.id;
+        document.layers.push_back(layer);
+        return layer.id;
+    };
+    const auto second = append("Second", {0, 255, 0, 255});
+    const auto third = append("Third", {0, 0, 255, 255});
+    const auto fourth = append("Fourth", {255, 255, 0, 255});
+    const auto fifth = append("Fifth", {255, 0, 255, 255});
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto path = QUrl::fromLocalFile(directory.filePath("members.otoon"));
+    REQUIRE(opentoon::ProjectStore::save(
+        std::filesystem::path(path.toLocalFile().toStdString()), document) > 0);
+    EditorController editor;
+    REQUIRE(editor.openProject(path));
+    const auto original = opentoon::SceneRenderer::render(editor.document(), 0);
+    REQUIRE(editor.groupDrawings(int(second), int(third)));
+    const auto group = editor.document().compositeGroups.front().id;
+    REQUIRE_FALSE(editor.toggleCompositeGroupMember(int(group), int(fifth)));
+    REQUIRE(editor.toggleCompositeGroupMember(int(group), int(first)));
+    REQUIRE(editor.toggleCompositeGroupMember(int(group), int(fourth)));
+    REQUIRE(editor.document().compositeGroups.front().members ==
+            std::vector<opentoon::Id>{first, second, third, fourth});
+    REQUIRE_FALSE(editor.toggleCompositeGroupMember(int(group), int(second)));
+    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 0) == original);
+    REQUIRE(editor.saveProject({}));
+    REQUIRE(editor.openProject(path));
+    REQUIRE(editor.document().compositeGroups.front().members.size() == 4);
+    REQUIRE(editor.toggleCompositeGroupMember(int(group), int(first)));
+    REQUIRE(editor.document().compositeGroups.front().members.front() == second);
+    editor.undo();
+    REQUIRE(editor.document().compositeGroups.front().members.front() == first);
+    editor.redo();
+    REQUIRE(editor.toggleCompositeGroupMember(int(group), int(fourth)));
+    REQUIRE(editor.toggleCompositeGroupMember(int(group), int(second)));
+    REQUIRE(editor.document().compositeGroups.empty());
+    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 0) == original);
+}
 TEST_CASE("Deleting a composition source uses the chosen reference policy atomically") {
     auto document = opentoon::makeDocument();
     document.width = document.height = 1;

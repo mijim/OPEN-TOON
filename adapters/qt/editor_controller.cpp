@@ -1148,6 +1148,61 @@ bool EditorController::groupDrawings(int firstLayer, int lastLayer) {
         d.compositeGroups.push_back({id, "Group " + std::to_string(id), std::move(members)});
     });
 }
+bool EditorController::toggleCompositeGroupMember(int groupId, int layerId) {
+    if (groupId <= 0 || layerId <= 0)
+        return false;
+    return edit("Edit composite group members", [&](Document& d) {
+        const auto group = std::find_if(d.compositeGroups.begin(), d.compositeGroups.end(),
+                                        [groupId](const auto& candidate) {
+                                            return candidate.id == Id(groupId);
+                                        });
+        if (group == d.compositeGroups.end())
+            throw std::runtime_error("The composite group is missing.");
+        for (const Id member : group->members)
+            if (d.layer(member).locked)
+                throw std::runtime_error("Unlock the group before changing its members.");
+        const auto target = std::find_if(d.layers.begin(), d.layers.end(),
+                                         [layerId](const Layer& layer) {
+                                             return layer.id == Id(layerId);
+                                         });
+        if (target == d.layers.end() ||
+            (target->kind != LayerKind::Drawing && target->kind != LayerKind::Part) ||
+            target->locked)
+            throw std::runtime_error("Choose an unlocked Drawing or Part.");
+        const auto membership = std::find(group->members.begin(), group->members.end(), target->id);
+        if (membership != group->members.end()) {
+            if (membership != group->members.begin() &&
+                membership != std::prev(group->members.end()))
+                throw std::runtime_error("Only an edge member can leave a contiguous group.");
+            if (group->members.size() == 2)
+                d.compositeGroups.erase(group);
+            else
+                group->members.erase(membership);
+            return;
+        }
+        for (const auto& other : d.compositeGroups)
+            if (std::find(other.members.begin(), other.members.end(), target->id) !=
+                other.members.end())
+                throw std::runtime_error("Ungroup this drawing before adding it elsewhere.");
+        if (group->members.size() >= 256)
+            throw std::runtime_error("A composite group supports at most 256 members.");
+        std::vector<Id> drawings;
+        for (const auto& layer : d.layers)
+            if (layer.kind == LayerKind::Drawing || layer.kind == LayerKind::Part)
+                drawings.push_back(layer.id);
+        const auto indexOf = [&](Id id) {
+            return std::size_t(std::distance(drawings.begin(),
+                std::find(drawings.begin(), drawings.end(), id)));
+        };
+        const auto position = indexOf(target->id);
+        if (position + 1 == indexOf(group->members.front()))
+            group->members.insert(group->members.begin(), target->id);
+        else if (position == indexOf(group->members.back()) + 1)
+            group->members.push_back(target->id);
+        else
+            throw std::runtime_error("Add only an adjacent Drawing or Part to the group.");
+    });
+}
 bool EditorController::ungroupDrawings(int groupId) {
     if (groupId <= 0 || std::none_of(document().compositeGroups.begin(),
                                      document().compositeGroups.end(),

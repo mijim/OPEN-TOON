@@ -689,7 +689,7 @@ int main(int argc, char** argv) {
                         reordered.layers.push_back(layer);
                         return layer.id;
                     };
-                    (void)addOpaqueLayer("Green", {0, 255, 0, 255});
+                    const auto green = addOpaqueLayer("Green", {0, 255, 0, 255});
                     const auto blue = addOpaqueLayer("Blue", {0, 0, 255, 255});
                     const auto reorderPath = directory.filePath("reorder.otoon");
                     reordered.validate();
@@ -956,12 +956,45 @@ int main(int argc, char** argv) {
                                 return node.value("group").toInt() == int(groupId);
                             }) != 2)
                         throw std::runtime_error("Composite group input/output cards are missing.");
+                    const auto altShiftClick = [&](QQuickItem* card) {
+                        if (!card)
+                            throw std::runtime_error("Group-member Drawing card is unavailable.");
+                        const auto withinStrip = card->mapToItem(strip, QPointF(card->width() / 2, 30));
+                        if (withinStrip.x() < 20 || withinStrip.x() > strip->width() - 20)
+                            strip->setProperty("contentX", std::max(0.0,
+                                strip->property("contentX").toDouble() +
+                                withinStrip.x() - strip->width() / 2));
+                        QCoreApplication::processEvents();
+                        (void)window->grabWindow();
+                        const auto point = card->mapToScene(QPointF(card->width() / 2, 30));
+                        for (const auto type : {QEvent::MouseButtonPress, QEvent::MouseButtonRelease}) {
+                            QMouseEvent event(type, point, window->mapToGlobal(point.toPoint()),
+                                              Qt::LeftButton,
+                                              type == QEvent::MouseButtonPress ? Qt::LeftButton
+                                                                               : Qt::NoButton,
+                                              Qt::AltModifier | Qt::ShiftModifier);
+                            QCoreApplication::sendEvent(window, &event);
+                            QCoreApplication::processEvents();
+                        }
+                    };
+                    altShiftClick(findDrawingCard(int(green)));
+                    if (editor.document().compositeGroups.front().members !=
+                            std::vector<opentoon::Id>{blue, red, green})
+                        throw std::runtime_error("Alt+Shift-click did not add adjacent group member.");
+                    altShiftClick(findDrawingCard(int(green)));
+                    if (editor.document().compositeGroups.front().members !=
+                            std::vector<opentoon::Id>{blue, red})
+                        throw std::runtime_error("Alt+Shift-click did not remove group edge member.");
+                    editor.undo();
+                    editor.undo();
                     editor.undo();
                     if (!editor.document().compositeGroups.empty())
                         throw std::runtime_error("Composite grouping did not undo atomically.");
                     editor.redo();
                     if (editor.document().compositeGroups.size() != 1)
                         throw std::runtime_error("Composite grouping did not redo atomically.");
+                    editor.setSelectedLayer(int(red));
+                    QCoreApplication::processEvents();
                     auto* groupName = window->findChild<QQuickItem*>("nodeGroupName");
                     if (!groupName || !groupName->isVisible())
                         throw std::runtime_error("Composite group name field is unavailable.");
@@ -980,6 +1013,7 @@ int main(int argc, char** argv) {
                         throw std::runtime_error("Composite grouping changed after reopen.");
                     editor.setSelectedLayer(int(red));
                     QCoreApplication::processEvents();
+                    (void)window->grabWindow();
                     auto* front = window->findChild<QQuickItem*>("nodeFront");
                     if (!front || !front->isEnabled())
                         throw std::runtime_error("Composite group Front control is unavailable.");
@@ -1183,7 +1217,7 @@ int main(int argc, char** argv) {
                         editor.document().layer(blue).matte != 0)
                         throw std::runtime_error("Disconnected source deletion changed after reopen.");
                     std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass, fractional cutter, "
-                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, group order, bypass, duplicate and ungroup ports, Alt-drag cutter, Alt-click bypass, operator library search/apply, explicit source deletion, typed node search, save/reopen and undo.\n";
+                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, group order, member edits, bypass, duplicate and ungroup ports, Alt-drag cutter, Alt-click bypass, operator library search/apply, explicit source deletion, typed node search, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

@@ -23,6 +23,10 @@ Character and rig-branch copies clone groups only when every member is inside
 the copied branch. Members receive the copied layer IDs and the group receives
 a new ID; partial groups reject copy or deletion. Removing a closed branch
 removes its contained groups in the same document command.
+Alt+Shift-click on a Drawing card edits the selected group's boundary. Only an
+adjacent ungrouped Drawing/Part can join; only an edge member can leave.
+Removing from a two-member group dissolves it. The transaction preserves the
+group ID and contiguous order, or rejects locked and overlapping targets.
 The character dependency collector includes group IDs and matte source IDs
 alongside drawings and referenced swatches. An independent character copy
 rejects an external matte or partially owned group before allocating copied

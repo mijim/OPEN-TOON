@@ -1,5 +1,15 @@
 # Experimental releases
 
+## 0.2.0-experimental.61 — working source, direct group member editing
+
+- Alt+Shift-click a Drawing card while a group is selected to add an adjacent
+  Drawing/Part or remove an edge member. A two-member group dissolves when one
+  leaves. Locked, nonadjacent, already grouped and interior targets reject in
+  one undoable command; group IDs and port order remain stable.
+- Pixel, undo/redo and ProjectStore reopen fixtures plus native Qt Quick clicks
+  pass. The locked macOS suite passes 199/199 CTest entries and HM-12 smoke.
+  Arbitrary graph wiring and nested groups remain open. Source only.
+
 ## 0.2.0-experimental.60 — working source, character dependency closure
 
 - A Qt-free character dependency collector inventories owned layers, drawing

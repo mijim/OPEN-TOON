@@ -103,6 +103,12 @@ carry over. Copied Parts join their character's saved view sets. A cutter
 outside the group or a Part descendant outside its boundary rejects the copy
 before mutation. Published external ports, nested groups and portable
 templates remain open.
+Alt+Shift-click on a Drawing card while a group is selected now edits its
+membership directly: an adjacent ungrouped Drawing/Part joins at the matching
+edge, and an edge member leaves. Removing from a two-member group dissolves it.
+Interior, nonadjacent, locked or already grouped targets reject in one
+transaction. Group ID and order stay stable while unbypassed output pixels do
+not change. No new project-format field is needed.
 A Qt-free collector now inventories a character's layers, exposed and variant
 drawings, view/pose choices, mesh-bound drawings, referenced swatches, composite
 groups and matte source IDs. It rejects a group crossing the character boundary
@@ -259,6 +265,9 @@ preview. This is diagnostic navigation, not a persisted graph edit.
 - A character dependency fixture inventories drawings, swatches, groups and
   matte sources, then verifies a closed independent copy and atomic refusal of
   an external cutter source.
+- Group-member fixtures add at both edges, reject a nonadjacent target and an
+  interior removal, verify pixel parity, undo/redo and ProjectStore reopen.
+  Native Qt Quick smoke Alt+Shift-clicks an adjacent card in and out.
 - Drawing and Part deletion fixtures verify Protect rejection, explicit
   disconnection of cutter users and group boundaries, locked-user refusal,
   changed pixels, atomic undo/redo and reopen. Native Qt Quick smoke clicks

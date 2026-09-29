@@ -163,8 +163,9 @@ Item {
                 font.letterSpacing: 1
             }
             Label {
-                text: "Drag: front · Shift-drag: behind · Alt-drag: cutter · Shift-click: group"
-                visible: root.selectedGroup === 0
+                text: root.selectedGroup > 0
+                      ? "Alt+Shift-click: edit members"
+                      : "Drag: front · Shift-drag: behind · Alt-drag: cutter · Shift-click: group"
                 color: "#777777"
                 font.pixelSize: 10
             }
@@ -492,6 +493,16 @@ Item {
                             onClicked: mouse => {
                                 if (dragging)
                                     return
+                                if ((mouse.modifiers & (Qt.AltModifier | Qt.ShiftModifier)) ===
+                                        (Qt.AltModifier | Qt.ShiftModifier) &&
+                                    modelData.kind === "Drawing" && root.selectedGroup > 0) {
+                                    const panel = root
+                                    const group = panel.selectedGroup
+                                    const layer = modelData.layer
+                                    if (panel.controller.toggleCompositeGroupMember(group, layer))
+                                        panel.layerChosen(layer)
+                                    return
+                                }
                                 if ((mouse.modifiers & Qt.ShiftModifier) !== 0 &&
                                     modelData.kind === "Drawing") {
                                     if (root.groupStartLayer === modelData.layer) {

@@ -237,6 +237,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE bool moveDrawingAfter(int sourceLayer, int targetLayer);
     Q_INVOKABLE bool moveDrawingBefore(int sourceLayer, int targetLayer);
     Q_INVOKABLE bool groupDrawings(int firstLayer, int lastLayer);
+    Q_INVOKABLE bool toggleCompositeGroupMember(int groupId, int layerId);
     Q_INVOKABLE bool ungroupDrawings(int groupId);
     Q_INVOKABLE bool duplicateCompositeGroup(int groupId);
     Q_INVOKABLE bool renameCompositeGroup(int groupId, QString name);
