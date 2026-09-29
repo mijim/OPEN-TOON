@@ -58,7 +58,7 @@
     {
       "id": "P08",
       "status": "in_progress",
-      "available": "Accepted bounded HM-03 rigid-character contract: 19-part original-art assembly, coordinated views, pixel-equivalent reopen and independent copy. Parented layers and typed character roots, pegs and Parts; role editing, preserve-world rigid reparenting within shared animated ancestry, stable rest pivots, named held substitutions, renderer-backed thumbnails and coordinated view sets. Batch Part assembly, independent or explicitly linked-artwork Part/Peg branch copies, safe branch deletion, Part detachment, Peg dissolution and view-range edits preserve view membership through save/reopen. Format-12 named masked poses capture selected/all Parts and selected transform/drawing channels, apply with atomic undo, and save/reopen. The direct pose slider blends from the current evaluated pose with an explicit 50% drawing threshold and one undo per drag. Format-14 publication filters named poses/views and per-Part drawing substitutions into a compact Animator dashboard; a local Rig/Animator workspace switch preserves selection, frame and render pixels. Saved poses can replace or remove one selected Part mapping and mask after capture. Compatible in-project pose transfer maps unique roles and drawing names into independent Character bindings.",
+      "available": "Accepted bounded HM-03 rigid-character contract: 19-part original-art assembly, coordinated views, pixel-equivalent reopen and independent copy. Parented layers and typed character roots, pegs and Parts; role editing, preserve-world rigid reparenting within shared animated ancestry, stable rest pivots, named held substitutions, renderer-backed thumbnails and coordinated view sets. Batch Part assembly, independent or explicitly linked-artwork Part/Peg branch copies, safe branch deletion, Part detachment, Peg dissolution and view-range edits preserve view membership through save/reopen. Format-12 named masked poses capture selected/all Parts and selected transform/drawing channels, apply with atomic undo, and save/reopen. The direct pose slider blends from the current evaluated pose with an explicit 50% drawing threshold and one undo per drag. Format-14 publication filters named poses/views and per-Part drawing substitutions into a compact Animator dashboard; a local Rig/Animator workspace switch preserves selection, frame and render pixels. Saved poses can replace or remove one selected Part mapping and mask after capture. Compatible in-project pose transfer maps unique roles and drawing names into independent Character bindings; paired left/right roles can create mirrored masked poses.",
       "remaining": "Independent second-animator review, reparenting across differently animated branches, broader pose retargeting/mirroring, Quick Rig, general typed controls, conflict handling, complete workspace presets, portable assets/templates and production-scale qualification."
     },
     {
@@ -84,7 +84,7 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 140,
+      "count": 141,
       "command": "ctest --test-dir build/locked --output-on-failure -j6"
     },
     "native_input_workflow": {
@@ -248,7 +248,7 @@
         "animated orthographic camera matches reopened preview and two exported PNG frames"
       ]
     },
-    "total_local_ctest_entries": 140,
+    "total_local_ctest_entries": 141,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -382,7 +382,7 @@
     },
     "named_character_poses": {
       "status": "passed_subset",
-      "scope": "Format-12 named Part/channel masks and drawing substitutions; editor import/capture/apply/undo/save/reopen; independent duplication and branch cleanup; numeric blend endpoints and 50% drawing threshold with coalesced slider undo; Rig refines/removes selected Part mappings with independent masks; compatible in-project pose transfer by unique role and drawing name with atomic rejection",
+      "scope": "Format-12 named Part/channel masks and drawing substitutions; editor import/capture/apply/undo/save/reopen; independent duplication and branch cleanup; numeric blend endpoints and 50% drawing threshold with coalesced slider undo; Rig refines/removes selected Part mappings with independent masks; compatible in-project pose transfer by unique role and drawing name with atomic rejection; paired left/right role mirroring reflects masked rest deltas",
       "tests": [
         "Named character poses apply only masked channels and substitutions in one undo step",
         "Named poses survive duplication and remove stale part references",
@@ -391,7 +391,8 @@
         "Pose blend has exact endpoints, a half-way drawing threshold and one drag undo",
         "Pose entries can be refined per Part without broadening other masks",
         "Pose transfer maps unique Part roles and drawing names without touching source",
-        "Editor copies a named pose to another character and reopens independent mapping"
+        "Editor copies a named pose to another character and reopens independent mapping",
+        "Mirrored pose swaps paired roles and reflects masked rest deltas"
       ],
       "limits": "Broader cross-character retargeting, mirroring, general control bindings and complete artist journey remain open."
     },

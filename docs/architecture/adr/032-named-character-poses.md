@@ -53,6 +53,16 @@ suffix. Transfer does not change either character's current artwork or keys.
 The Rig inspector offers a compact destination selector and **Copy to**
 command; a successful copy selects the destination pose.
 
+**Mirror** creates another pose on the same Character. Roles ending in
+`_left` and `_right` are paired; other roles map to themselves. Each mapped
+Part role must be unique. Numeric values reflect the masked delta from the
+source Part's rest transform onto the destination Part's rest transform: X,
+rotation and pivot X reverse sign; Y, scale, opacity and pivot Y retain their
+delta. Unmasked channels use the destination rest value. A masked drawing
+maps by one matching substitution name on the destination Part. Missing or
+ambiguous pairs reject before publication. The new pose starts unpublished;
+the source pose, artwork and keys remain unchanged.
+
 ## Verification and limits
 
 Domain tests cover mixed masks, blend endpoints and the drawing threshold,
@@ -67,6 +77,10 @@ Transfer tests apply a remapped pose, preserve the source, reject role/drawing
 and rest-transform mismatches atomically, undo/redo and save/reopen. Native Qt
 Quick smoke checks the destination control in the Rig inspector on a copied
 15-Part character and records `build/hm07-transfer-smoke.png`.
+Mirror tests reflect a saved left-arm pose onto its right-arm counterpart,
+preserve excluded opacity, apply the result, undo twice and reject missing or
+ambiguous role/drawing mappings. Native smoke checks the mirror control and
+undo on the same continuous Character.
 
-Cross-project transfer, incompatible rest retargeting, mirroring and deformer
+Cross-project transfer, incompatible rest retargeting, broader mirroring and deformer
 channels remain HM-07/HM-09 work. This ADR does not close RIG-012 or HM-07.

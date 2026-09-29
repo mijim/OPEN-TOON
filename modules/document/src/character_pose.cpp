@@ -7,6 +7,7 @@
 #include <map>
 #include <set>
 #include <stdexcept>
+#include <string_view>
 
 namespace opentoon {
 namespace {
@@ -30,6 +31,14 @@ void nameAvailable(const Layer& root, const std::string& name, Id except = 0) {
             return item.id != except && item.name == name;
         }))
         throw std::invalid_argument("Character pose name is invalid or already used.");
+}
+std::string mirroredRole(const std::string& role) {
+    constexpr std::string_view left = "_left", right = "_right";
+    if (role.ends_with(left))
+        return role.substr(0, role.size() - left.size()) + std::string(right);
+    if (role.ends_with(right))
+        return role.substr(0, role.size() - right.size()) + std::string(left);
+    return role;
 }
 void checkedPart(const Document& document, Id root, Id partId) {
     const auto& part = document.layer(partId);
@@ -225,6 +234,76 @@ Id transferCharacterPose(Document& document, Id sourceRoot, Id poseId, Id target
     copy.id = document.allocateId();
     const Id id = copy.id;
     document.layer(targetRoot).poses.push_back(std::move(copy));
+    return id;
+}
+Id mirrorCharacterPose(Document& document, Id rootId, Id poseId) {
+    const auto& root = character(document, rootId);
+    const auto found = std::find_if(root.poses.begin(), root.poses.end(),
+                                    [poseId](const auto& item) { return item.id == poseId; });
+    if (found == root.poses.end() || root.poses.size() >= 1000)
+        throw std::invalid_argument("Pose is unavailable for mirroring.");
+    std::map<std::string, Id> roles;
+    for (const auto& layer : document.layers)
+        if (layer.kind == LayerKind::Part && characterFor(document, layer.id) == rootId &&
+            !roles.emplace(layer.role, layer.id).second)
+            throw std::invalid_argument("Pose mirroring needs unique Part roles.");
+    CharacterPose reflected = *found;
+    reflected.published = false;
+    for (auto& entry : reflected.parts) {
+        checkedPart(document, rootId, entry.part);
+        const auto& from = document.layer(entry.part);
+        const auto targetRole = mirroredRole(from.role);
+        const auto mapped = roles.find(targetRole);
+        if (mapped == roles.end())
+            throw std::invalid_argument("Pose mirror Part has no opposite role.");
+        const auto& to = document.layer(mapped->second);
+        checkedPart(document, rootId, to.id);
+        Transform value = to.transform;
+        if (entry.channels & PoseChannels::PositionX)
+            value.x -= entry.transform.x - from.transform.x;
+        if (entry.channels & PoseChannels::PositionY)
+            value.y += entry.transform.y - from.transform.y;
+        if (entry.channels & PoseChannels::Rotation)
+            value.rotation -= entry.transform.rotation - from.transform.rotation;
+        if (entry.channels & PoseChannels::ScaleX)
+            value.scaleX += entry.transform.scaleX - from.transform.scaleX;
+        if (entry.channels & PoseChannels::ScaleY)
+            value.scaleY += entry.transform.scaleY - from.transform.scaleY;
+        if (entry.channels & PoseChannels::Opacity)
+            value.opacity += entry.transform.opacity - from.transform.opacity;
+        if (entry.channels & PoseChannels::PivotX)
+            value.pivotX -= entry.transform.pivotX - from.transform.pivotX;
+        if (entry.channels & PoseChannels::PivotY)
+            value.pivotY += entry.transform.pivotY - from.transform.pivotY;
+        if (entry.channels & PoseChannels::Drawing) {
+            const auto original = std::find_if(from.variants.begin(), from.variants.end(),
+                                               [&](const auto& item) { return item.drawing == entry.drawing; });
+            if (original == from.variants.end() ||
+                std::count_if(from.variants.begin(), from.variants.end(),
+                              [&](const auto& item) { return item.name == original->name; }) != 1)
+                throw std::invalid_argument("Pose mirror drawing name is ambiguous.");
+            const auto matches = std::count_if(to.variants.begin(), to.variants.end(),
+                                               [&](const auto& item) { return item.name == original->name; });
+            if (matches != 1)
+                throw std::invalid_argument("Pose mirror needs one matching drawing name.");
+            entry.drawing = std::find_if(to.variants.begin(), to.variants.end(),
+                                         [&](const auto& item) { return item.name == original->name; })->drawing;
+        }
+        entry.part = to.id;
+        entry.transform = value;
+    }
+    std::string name = found->name + " mirrored";
+    for (int suffix = 2; std::any_of(root.poses.begin(), root.poses.end(),
+                                    [&](const auto& item) { return item.name == name; }); ++suffix)
+        name = found->name + " mirrored " + std::to_string(suffix);
+    nameAvailable(root, name);
+    Document candidate = document;
+    reflected.name = std::move(name);
+    reflected.id = candidate.allocateId();
+    const Id id = reflected.id;
+    candidate.layer(rootId).poses.push_back(std::move(reflected));
+    candidate.validate();
+    document = std::move(candidate);
     return id;
 }
 } // namespace opentoon

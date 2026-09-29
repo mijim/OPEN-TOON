@@ -25,6 +25,11 @@ project. The command maps unique Part roles and unique drawing names, requires
 matching local rest transforms, assigns new destination IDs and leaves the
 source untouched. Incompatible mappings reject atomically. The copied pose
 starts unpublished and a name collision gets a numeric suffix.
+Rig's **Mirror** command creates a new pose by pairing `_left` and `_right`
+Part roles. It reflects masked X, rotation and pivot-X deltas around each
+Part's rest values, preserves the sign of other masked deltas, and maps an
+included drawing by an unambiguous name. Unmapped or ambiguous pairs reject
+without mutation. Unmasked channels retain destination rest values.
 
 ## Evidence
 
@@ -39,7 +44,7 @@ starts unpublished and a name collision gets a numeric suffix.
   Parts, assembles a character, captures a selected Part, applies at another
   frame, refines/removes a second Part mapping, blends with several live
   updates, undoes/redoes once, saves and reopens.
-- Local macOS `build/locked`: 140/140 CTest entries pass. Native Qt Quick
+- Local macOS `build/locked`: 141/141 CTest entries pass. Native Qt Quick
   `--smoke-test` passes the mouse/input, window, deformation and reopen
   journeys. The new pose panel compiles and loads within that window; the
   controller journey exercises its backend rather than clicking its widgets.
@@ -81,6 +86,10 @@ editor's destination selection and save/reopen. The native smoke copies the
 15-Part character, shows **Copy to** in Rig, transfers the pose and undoes it;
 `build/hm07-transfer-smoke.png` was visually inspected. This is an in-project
 compatible-rig subset, not an arbitrary rig retargeter.
+The mirrored left/right Part fixture checks numeric reflection, drawing
+mapping, excluded opacity, missing and ambiguous mappings, source isolation
+and two-step undo. The native smoke checks the visible Rig mirror action and
+its atomic undo on the 15-Part character.
 
 The same native smoke drags the published slider across the continuous
 15-Part character. Each run discards five warmup moves, measures 40 mouse
@@ -105,6 +114,6 @@ still in progress.
 ## Remaining contract
 
 Saved pose masks use explicit Part IDs within one character. Broader cross-rig
-retargeting, mirroring, full published controls, direct widgets, control
+retargeting, broader mirroring, full published controls, direct widgets, control
 groups, conflict/cycle handling, complete workspace layout presets and artist
 acceptance remain open. RIG-012 and HM-07 are partial.

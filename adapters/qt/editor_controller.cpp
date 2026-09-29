@@ -1290,6 +1290,19 @@ bool EditorController::transferSelectedCharacterPose(int targetCharacter) {
     emit poseSelectionChanged();
     return true;
 }
+bool EditorController::mirrorSelectedCharacterPose() {
+    const int root = characterId(), poseId = selectedCharacterPose();
+    if (!root || !poseId)
+        return false;
+    Id created = 0;
+    if (!edit("Mirror character pose", [&](Document& d) {
+            created = opentoon::mirrorCharacterPose(d, root, poseId);
+        }))
+        return false;
+    selectedCharacterPose_ = created;
+    emit poseSelectionChanged();
+    return true;
+}
 void EditorController::beginSelectedCharacterPoseBlend() {
     endSelectedCharacterPoseBlend();
     const int root = characterId(), poseId = selectedCharacterPose();

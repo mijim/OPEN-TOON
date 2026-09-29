@@ -148,6 +148,7 @@ int main(int argc, char** argv) {
                     editor.setTransform("x", originalTorsoX + 80);
                     editor.setSelectedLayer(int(rootId));
                     editor.captureSelectedCharacterPose(opentoon::PoseChannels::PositionX, true);
+                    const int poseId = editor.selectedCharacterPose();
                     editor.setSelectedLayer(int(torsoId));
                     editor.setTransform("x", originalTorsoX);
                     editor.setSelectedLayer(int(rootId));
@@ -313,9 +314,23 @@ int main(int argc, char** argv) {
                     editor.undo();
                     if (editor.document() != beforeTransfer)
                         throw std::runtime_error("HM-07 pose transfer did not undo atomically.");
+                    editor.setSelectedLayer(int(rootId));
+                    editor.selectCharacterPose(int(poseId));
+                    QCoreApplication::processEvents();
+                    auto* mirrorButton = findVisualItem(findVisualItem, window->contentItem(),
+                                                        QStringLiteral("mirrorPoseButton"));
+                    if (!mirrorButton || !mirrorButton->isVisible() ||
+                        mirrorButton->mapToScene(QPointF(0, 0)).y() > window->height())
+                        throw std::runtime_error("HM-07 mirror pose control is not visible.");
+                    const auto beforeMirror = editor.document();
+                    if (!editor.mirrorSelectedCharacterPose() || editor.characterPoses().size() != 2)
+                        throw std::runtime_error("HM-07 mirror pose command failed.");
+                    editor.undo();
+                    if (editor.document() != beforeMirror)
+                        throw std::runtime_error("HM-07 mirror pose did not undo atomically.");
                     std::cout << "HM-07 dashboard smoke passed: continuous toon project, published view, "
                                  "mouth drawing and pose, workspace selection/frame, native QML screenshot, "
-                                 "mouth switch, slider drag and pose transfer with undo.\n";
+                                 "mouth switch, slider drag, pose transfer and mirroring with undo.\n";
                     std::cout << QJsonDocument(timing).toJson(QJsonDocument::Compact).constData() << '\n';
                     app.exit(0);
                 } catch (const std::exception& error) {

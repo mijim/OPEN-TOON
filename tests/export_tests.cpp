@@ -187,6 +187,7 @@ TEST_CASE("Editor captures a selected Part pose, applies its mask, undoes and re
 TEST_CASE("Editor copies a named pose to another character and reopens independent mapping") {
     EditorController editor;
     editor.newScene();
+    editor.setWorkspaceMode("Rig");
     REQUIRE(editor.importParts(paths({partFixture + "hand_right__open.png"})));
     const int sourcePart = editor.selectedLayer();
     editor.makeCharacter();

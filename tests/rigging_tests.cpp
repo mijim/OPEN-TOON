@@ -133,6 +133,82 @@ TEST_CASE("Pose transfer maps unique Part roles and drawing names without touchi
     REQUIRE_THROWS(transferCharacterPose(mismatched, source, pose, target));
     REQUIRE(mismatched == beforeRestFailure);
 }
+TEST_CASE("Mirrored pose swaps paired roles and reflects masked rest deltas") {
+    Session session;
+    const Id left = session.document().layers.front().id;
+    Id root = 0, right = 0, sourcePose = 0, rightOpen = 0;
+    REQUIRE(session.apply("Build paired character", [&](Document& d) {
+        root = makeCharacter(d, left, "Hero");
+        d.layer(left).role = "arm_left";
+        Layer part;
+        part.id = d.allocateId();
+        right = part.id;
+        part.name = "Right arm";
+        d.layers.push_back(part);
+        attachDrawingAsPart(d, right, root, "arm_right");
+        (void)createSubstitution(d, left, 0, false, "Closed");
+        (void)createSubstitution(d, right, 0, false, "Closed");
+        (void)createSubstitution(d, left, 0, true, "Open");
+        rightOpen = createSubstitution(d, right, 0, false, "Open");
+        d.layer(left).transform.x = -40;
+        d.layer(left).transform.rotation = -10;
+        d.layer(left).transform.opacity = .3;
+        d.layer(right).transform.x = 40;
+        d.layer(right).transform.rotation = 10;
+        d.layer(right).transform.opacity = .9;
+        d.layer(left).transform.x = -60;
+        d.layer(left).transform.y = 8;
+        d.layer(left).transform.rotation = -30;
+        d.layer(left).transform.opacity = .8;
+        sourcePose = captureCharacterPose(d, root, 0,
+            std::vector<PoseCaptureTarget>{{left, PoseChannels::PositionX |
+                                                 PoseChannels::PositionY |
+                                                 PoseChannels::Rotation |
+                                                 PoseChannels::Drawing}}, "Reach left");
+        d.layer(left).transform.x = -40;
+        d.layer(left).transform.y = 0;
+        d.layer(left).transform.rotation = -10;
+        d.layer(left).transform.opacity = .3;
+    }));
+    const auto baseline = session.document();
+    Id mirrored = 0;
+    REQUIRE(session.apply("Mirror pose", [&](Document& d) {
+        mirrored = mirrorCharacterPose(d, root, sourcePose);
+    }));
+    REQUIRE(session.document().layer(left) == baseline.layer(left));
+    REQUIRE(session.document().layer(right) == baseline.layer(right));
+    const auto& entry = session.document().layer(root).poses.back().parts.front();
+    REQUIRE(entry.part == right);
+    REQUIRE(entry.channels == (PoseChannels::PositionX | PoseChannels::PositionY |
+                               PoseChannels::Rotation | PoseChannels::Drawing));
+    REQUIRE(entry.transform.x == 60);
+    REQUIRE(entry.transform.y == 8);
+    REQUIRE(entry.transform.rotation == 30);
+    REQUIRE(entry.transform.opacity == .9);
+    REQUIRE(entry.drawing == rightOpen);
+    REQUIRE(!session.document().layer(root).poses.back().published);
+    REQUIRE(session.apply("Apply mirrored pose", [&](Document& d) {
+        applyCharacterPose(d, root, mirrored, 8);
+    }));
+    REQUIRE(evaluateTransform(session.document().layer(right), 8).x == 60);
+    REQUIRE(evaluateTransform(session.document().layer(right), 8).rotation == 30);
+    REQUIRE(session.document().drawingAt(right, 8)->id == rightOpen);
+    REQUIRE(session.document().layer(left) == baseline.layer(left));
+    REQUIRE(session.undo());
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == baseline);
+
+    auto invalid = baseline;
+    invalid.layer(right).role = "other";
+    const auto beforeMissing = invalid;
+    REQUIRE_THROWS(mirrorCharacterPose(invalid, root, sourcePose));
+    REQUIRE(invalid == beforeMissing);
+    invalid = baseline;
+    invalid.layer(right).variants.front().name = "Open";
+    const auto beforeAmbiguous = invalid;
+    REQUIRE_THROWS(mirrorCharacterPose(invalid, root, sourcePose));
+    REQUIRE(invalid == beforeAmbiguous);
+}
 TEST_CASE("Published view and pose bindings stay local and outside rendered output") {
     auto document = makeDocument();
     const Id part = document.layers.front().id;

@@ -1601,6 +1601,13 @@ ApplicationWindow {
                                         enabled: editor.selectedCharacterPose > 0
                                         onClicked: editor.applySelectedCharacterPose()
                                     }
+                                    C.CompactButton {
+                                        objectName: "mirrorPoseButton"
+                                        text: "Mirror"
+                                        enabled: editor.selectedCharacterPose > 0
+                                        onClicked: editor.mirrorSelectedCharacterPose()
+                                        Accessible.name: "Mirror selected character pose"
+                                    }
                                     Item { Layout.fillWidth: true }
                                     C.CompactButton {
                                         text: "Remove"
