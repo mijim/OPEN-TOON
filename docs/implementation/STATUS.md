@@ -71,6 +71,14 @@ The working source version is `0.2.0-experimental.44`; no new binary or source
 tag has been published for it. The last locally qualified macOS preview and
 earlier binaries do not qualify these source changes.
 
+At the owner-requested 2026-09-29 10:30 CEST session cutoff, the `.44` macOS
+source build is compiled locally and left running with the integrated example.
+The final local pass reports 185/185 CTest entries, deterministic source-art
+checks, native HM-07, HM-10, HM-12, integrated-shot and broad editor smokes,
+plus valid generated documentation. HM-12 remains an unfinished bounded
+contract; next work can continue its graph grouping/part-overlap behavior.
+HM-06 visual approval and HM-10 hardware presentation also remain open.
+
 ## Phase coverage
 
 | Phase | Status | Available subset | Remaining before completion |

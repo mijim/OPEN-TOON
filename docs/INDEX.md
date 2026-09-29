@@ -15,7 +15,7 @@
 | Open-source reuse | Prefer proven libraries through tested adapters | User requirement; 30 library/tool entries evaluated in the roadmap |
 | Initial license | GPL-3.0-or-later for original contributions | Adopted |
 | Implementation | Experimental editor; partial catalog coverage | No complete phase or production release |
-| Distribution | Experimental.11 macOS arm64 ZIP and Linux x86_64 AppImage | Limited profiles; unsigned/not notarized and not supported 1.0 |
+| Distribution | Historical experimental.11 macOS arm64 ZIP and Linux x86_64 AppImage; current work is source only | Limited profiles; unsigned/not notarized and not supported 1.0 |
 | Development roadmap | Harmony Moment: 16 contract-gated slices; 23 retained phases, 70 work packages, 283 capabilities | Prepared; estimates subject to evidence |
 
 ## One route for current work

@@ -466,13 +466,13 @@
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
-    "release_artifacts": "Experimental macOS 15+ arm64 ZIP and Ubuntu 24.04-built Linux x86_64 AppImage",
+    "release_artifacts": "Historical experimental.11 macOS arm64 ZIP and Ubuntu-built Linux x86_64 AppImage; current experimental.44 work is source only",
     "cross_platform_builds": "Manual release workflow; broader Linux, Windows and device qualification remain open"
   },
   "planning_priority": {
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
-    "state": "HM-00_through_HM-05_and_HM-13_complete__HM-06_HM-07_HM-10_parked_in_progress__HM-12_active_in_progress",
-    "note": "HM-06 and HM-07 are parked unaccepted subsets. HM-12 is active after fractional cutters, saved bypasses, visible cutter sources, clicked node previews, direct Drawing-card order dragging, name/kind search and Normal/Multiply/Screen/Add blend modes; the general editable graph remains open. The original HM-06 toon and editable studies now use sampled edges and a two-view cap over the continuous-limb rig; artistic acceptance remains open. HM-10 is parked after exact 48 kHz clip splitting, saved clip solo, direct frame-edge trimming and stereo balance; hardware presentation and audible quality remain unqualified. Full P07/P08/P09/P10 and feature acceptance remain open."
+    "state": "HM-00_through_HM-05_and_HM-13_complete__HM-06_HM-07_HM-10_HM-12_parked_in_progress",
+    "note": "HM-06 and HM-07 are parked unaccepted subsets. HM-12 is parked at the owner-requested 10:30 CEST cutoff after fractional cutters, saved bypasses, visible cutter sources, clicked node previews, direct Drawing-card order dragging, name/kind search and Normal/Multiply/Screen/Add blend modes; the general editable graph remains open. The original HM-06 toon and editable studies now use sampled edges and a two-view cap over the continuous-limb rig; artistic acceptance remains open. HM-10 is parked after exact 48 kHz clip splitting, saved clip solo, direct frame-edge trimming and stereo balance; hardware presentation and audible quality remain unqualified. Full P07/P08/P09/P10 and feature acceptance remain open."
   }
 }
