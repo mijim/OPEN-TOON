@@ -118,8 +118,8 @@ void visualEditingSmoke(EditorController& editor, CanvasItem& canvas, QQuickWind
     require(editor.setCurveHandles(0, "x", .25, 0, .65, 1.8), "Bezier creation failed.");
     editor.setFrame(0);
     editor.setTool("Animate");
-    window.setProperty("showCurves", true);
-    window.setProperty("bottomHeight", 330);
+    editor.setBottomPanelTab("Curves");
+    editor.setBottomPanelHeight(330);
     QCoreApplication::processEvents();
     auto* graph = window.findChild<QQuickItem*>("animationCurveCanvas");
     auto* panel = window.findChild<QQuickItem*>("curveEditorPanel");
@@ -182,7 +182,7 @@ void visualEditingSmoke(EditorController& editor, CanvasItem& canvas, QQuickWind
     require(graph->height() > 90, "Optional numeric row collapsed the graph.");
     panel->setProperty("showNumbers", false);
     window.resize(1440, 920);
-    window.setProperty("bottomHeight", 280);
+    editor.setBottomPanelHeight(280);
     settle();
     QMetaObject::invokeMethod(panel, "selectChannel", Q_ARG(QVariant, QVariant("all")));
     settle();
@@ -282,7 +282,7 @@ void visualEditingSmoke(EditorController& editor, CanvasItem& canvas, QQuickWind
             "Time zoom did not spread nearby keys.");
     panel->setProperty("timeZoom", 1);
     panel->setProperty("timeStart", 0);
-    window.setProperty("showCurves", false);
+    editor.setBottomPanelTab("Timeline");
     window.setProperty("keyEditing", true);
     settle();
     auto* timeline = window.findChild<QQuickItem*>("timelineCanvas");
@@ -295,7 +295,7 @@ void visualEditingSmoke(EditorController& editor, CanvasItem& canvas, QQuickWind
         return timeline->mapToScene(result.toPointF());
     };
     for (bool xsheet : {false, true}) {
-        window.setProperty("xsheet", xsheet);
+        editor.setBottomPanelTab(xsheet ? "Xsheet" : "Timeline");
         settle();
         // Xsheet's frame 12 is below the viewport: use frame zero to test the same gesture.
         const int source = xsheet ? 0 : 12, destinationFrame = xsheet ? 2 : 18;
@@ -312,7 +312,7 @@ void visualEditingSmoke(EditorController& editor, CanvasItem& canvas, QQuickWind
         editor.undo();
         require(editor.document() == beforeTimeline, "Timeline key drag undo failed.");
     }
-    window.setProperty("xsheet", false);
+    editor.setBottomPanelTab("Timeline");
     settle();
     auto newTimelineKey = timelineKey(20);
     sendGraph(QEvent::MouseButtonPress, newTimelineKey, Qt::LeftButton, Qt::LeftButton);
@@ -322,7 +322,7 @@ void visualEditingSmoke(EditorController& editor, CanvasItem& canvas, QQuickWind
                 editor.document().layer(editor.selectedLayer()).keys.back().frame == 20,
             "Timeline Keys mode double-click did not add a pose.");
     editor.undo();
-    window.setProperty("showTimingTools", true);
+    editor.setTimingToolsVisible(true);
     editor.selectTimelineRange(0, 12, 0, 0);
     settle();
     auto* clear = window.findChild<QQuickItem*>("clearTimelineButton");
@@ -337,7 +337,7 @@ void visualEditingSmoke(EditorController& editor, CanvasItem& canvas, QQuickWind
             "Clear button left the selected exposure behind.");
     editor.undo();
     require(editor.document() == beforeClear, "Clear undo failed to restore animation and drawing exposure.");
-    window.setProperty("showCurves", true);
+    editor.setBottomPanelTab("Curves");
     editor.setFrame(0);
     settle();
 }

@@ -72,8 +72,8 @@ void motionPathSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow&
     editor.setCurveHandles(0, "x", .2, 0, .8, 1);
     editor.setFrame(0);
     editor.setTool("Animate");
-    window.setProperty("showCurves", true);
-    window.setProperty("bottomHeight", 280);
+    editor.setBottomPanelTab("Curves");
+    editor.setBottomPanelHeight(280);
     canvas.setMirrored(false);
     canvas.fit();
     settle();

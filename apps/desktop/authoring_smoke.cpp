@@ -38,6 +38,7 @@ void authoringSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& 
         window.requestActivate();
         settle();
         canvas.forceActiveFocus();
+        settle();
         QKeyEvent press(QEvent::KeyPress, code, mods), release(QEvent::KeyRelease, code, mods);
         QCoreApplication::sendEvent(&window, &press);
         QCoreApplication::sendEvent(&window, &release);
@@ -46,8 +47,8 @@ void authoringSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& 
     canvas.fit();
     canvas.setMirrored(false);
     canvas.setSnapToGrid(false);
-    window.setProperty("showCurves", false);
-    window.setProperty("bottomHeight", 240);
+    editor.setBottomPanelTab("Timeline");
+    editor.setBottomPanelHeight(240);
     settle();
     auto screen = [&](double x, double y) {
         const double scale = std::min((canvas.width() - 64) / editor.sceneWidth(),
@@ -120,17 +121,23 @@ void authoringSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& 
     require(editor.document() == beforeNudge, "Vector nudge undo failed.");
     editor.setTool("Select");
     canvas.selectAllVectors();
-    key(Qt::Key_C, Qt::ControlModifier);
+    const auto clipboardModifier =
+#ifdef Q_OS_MACOS
+        Qt::MetaModifier;
+#else
+        Qt::ControlModifier;
+#endif
+    key(Qt::Key_C, clipboardModifier);
     require(canvas.hasVectorClipboard(), "Canvas copy shortcut did not fill the vector clipboard.");
     const auto beforeCut = editor.document();
-    key(Qt::Key_X, Qt::ControlModifier);
+    key(Qt::Key_X, clipboardModifier);
     require(strokes().empty(), "Canvas cut shortcut failed.");
     editor.undo();
     require(editor.document() == beforeCut, "Cut undo failed.");
     editor.addLayer();
     editor.setFrame(3);
     canvas.forceActiveFocus();
-    key(Qt::Key_V, Qt::ControlModifier);
+    key(Qt::Key_V, clipboardModifier);
     require(count() == 3 && strokes().size() == 3,
             "Paste did not create and select independent vectors on an empty frame.");
     const auto beforeLock = editor.document();

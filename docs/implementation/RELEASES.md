@@ -1,5 +1,14 @@
 # Experimental releases
 
+## 0.2.0-experimental.67 — working source, personal workspace layout
+
+- Rig/Animator mode, lower Timeline/Xsheet/Curves/Nodes tab, panel height,
+  timeline frame width and timing-tools visibility now reopen as personal
+  preferences. View > Reset workspace layout restores the defaults.
+- Controller and native Qt Quick checks cover reopening, malformed settings,
+  live splitter input and unchanged scene, selection and current frame. Full
+  workspace presets, docking and UI scale remain open. Source only.
+
 ## 0.2.0-experimental.66 — working source, selected-range playback
 
 - The transport's Range toggle plays the selected half-open timeline interval.

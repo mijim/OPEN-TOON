@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "as_of": "2026-09-29",
+  "as_of": "2026-09-30",
   "release_stage": "experimental",
   "target_phase": "P11",
   "target_complete": false,
@@ -16,8 +16,8 @@
     {
       "id": "P01",
       "status": "in_progress",
-      "available": "Native English QML shell, CMake modules, commands, immutable snapshots, undo/redo and validation. Integrated resizable timing/curve workspace and selection-owned object/layer Properties. Shared compact controls, optional curve numeric fields and a draggable workspace divider with dynamic bounds. Typed layer-transform property addresses now distinguish rest, authored keys and evaluated values with atomic edits. Format-4 typed character/peg/part addresses and source-version migration backups now persist and reject invalid references.",
-      "remaining": "Docking/workspace persistence, configurable shortcuts, full accessibility, scalable resource/cache protocols and cross-platform qualification."
+      "available": "Native English QML shell, CMake modules, commands, immutable snapshots, undo/redo and validation. Integrated resizable timing/curve workspace and selection-owned object/layer Properties. Shared compact controls, optional curve numeric fields and a draggable workspace divider with dynamic bounds. Personal Rig/Animator mode and lower tab, height, timeline zoom and Timing tools preferences persist across reopen with a reset action and unchanged scene/selection/frame checks. Typed layer-transform property addresses now distinguish rest, authored keys and evaluated values with atomic edits. Format-4 typed character/peg/part addresses and source-version migration backups now persist and reject invalid references.",
+      "remaining": "Docking and full workspace presets, UI scale, configurable shortcuts, full accessibility, scalable resource/cache protocols and cross-platform qualification."
     },
     {
       "id": "P02",
@@ -475,11 +475,11 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.66",
+  "version": "0.2.0-experimental.67",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
-    "release_artifacts": "Historical experimental.11 macOS arm64 ZIP and Ubuntu-built Linux x86_64 AppImage; current experimental.66 work is source only",
+    "release_artifacts": "Historical experimental.11 macOS arm64 ZIP and Ubuntu-built Linux x86_64 AppImage; current experimental.67 work is source only",
     "cross_platform_builds": "Manual release workflow; broader Linux, Windows and device qualification remain open"
   },
   "planning_priority": {

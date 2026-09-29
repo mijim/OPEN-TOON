@@ -30,13 +30,15 @@ ApplicationWindow {
         enabled: !root.textEditing
         onActivated: editor.tool = "Animate"
     }
-    property bool showCurves: false
-    property bool showNodes: false
-    property bool showTimingTools: false
+    readonly property bool showCurves: editor.bottomPanelTab === "Curves"
+    readonly property bool showNodes: editor.bottomPanelTab === "Nodes"
+    readonly property bool showTimingTools: editor.timingToolsVisible
     property int meshBindColumns: 4
     property int meshBindRows: 4
     property string inspectorMode: "none"
-    property real bottomHeight: 280
+    property real previewBottomHeight: -1
+    readonly property real bottomHeight: previewBottomHeight >= 0
+                                         ? previewBottomHeight : editor.bottomPanelHeight
     readonly property real maximumBottomHeight: Math.max(140, workspace.height - appHeader.height - canvasToolbar.height - bottomSplitter.height - bottomTabs.height - statusBar.height - (timingTools.visible ? timingTools.height : 0) - canvasWorkspace.Layout.minimumHeight - 2)
     readonly property real effectiveBottomHeight: Math.max(140, Math.min(bottomHeight, maximumBottomHeight))
     Connections {
@@ -58,10 +60,10 @@ ApplicationWindow {
         d.group === editor.selectedControlGroup)
     readonly property bool drawingSelectionTool: ["Select", "Marquee", "Lasso"].includes(editor.tool)
     readonly property bool canvasEditingFocused: canvas.activeFocus && drawingSelectionTool
-    property bool xsheet: false
+    readonly property bool xsheet: editor.bottomPanelTab === "Xsheet"
     readonly property bool keyWorkspaceFocused: (showCurves && curveEditor.activeFocus) || (!showCurves && !showNodes && keyEditing && timeline.activeFocus)
     property bool keyEditing: editor.tool === "Animate"
-    property int timelineCell: 22
+    readonly property int timelineCell: editor.timelineCellWidth
     property int timelineRow: 34
     property int colorEditId: 0
     function requestAction(action) {
@@ -321,7 +323,7 @@ ApplicationWindow {
             title: "Edit"
             Action {
                 text: "Timeline range…"
-                onTriggered: root.showTimingTools = !root.showTimingTools
+                onTriggered: editor.timingToolsVisible = !editor.timingToolsVisible
             }
             Action {
                 text: "Copy timeline range"
@@ -422,6 +424,10 @@ ApplicationWindow {
             Action {
                 text: "Revision history"
                 onTriggered: historyDialog.open()
+            }
+            Action {
+                text: "Reset workspace layout"
+                onTriggered: editor.resetWorkspaceLayout()
             }
         }
         Menu {
@@ -1107,10 +1113,7 @@ ApplicationWindow {
                                 }
                                 C.ToolButton {
                                     text: "Curves"
-                                    onClicked: {
-                                        root.showNodes = false;
-                                        root.showCurves = true;
-                                    }
+                                    onClicked: editor.bottomPanelTab = "Curves"
                                 }
                                 C.ToolButton {
                                     text: "Pose ▾"
@@ -2465,9 +2468,20 @@ ApplicationWindow {
                 }
                 onPositionChanged: mouse => {
                     if (pressed)
-                        root.bottomHeight = Math.max(140, Math.min(root.maximumBottomHeight, startHeight + startY - mapToGlobal(mouse.x, mouse.y).y));
+                        root.previewBottomHeight = Math.max(140, Math.min(root.maximumBottomHeight, startHeight + startY - mapToGlobal(mouse.x, mouse.y).y));
                 }
-                onDoubleClicked: root.bottomHeight = 280
+                onReleased: {
+                    if (root.previewBottomHeight >= 0) {
+                        editor.bottomPanelHeight = Math.round(root.effectiveBottomHeight);
+                        root.previewBottomHeight = -1;
+                    }
+                }
+                onCanceled: root.previewBottomHeight = -1
+                onDoubleClicked: {
+                    root.previewBottomHeight = -1;
+                    editor.bottomPanelHeight = 280;
+                }
+                objectName: "workspaceResizeHandle"
                 Accessible.name: "Resize timeline and curves vertically"
             }
         }
@@ -2484,44 +2498,35 @@ ApplicationWindow {
                 anchors.rightMargin: 14
                 spacing: 8
                 C.ToolButton {
+                    objectName: "bottomTimelineTab"
                     text: "Timeline"
                     active: !root.xsheet && !root.showCurves && !root.showNodes
-                    onClicked: {
-                        root.showCurves = false;
-                        root.showNodes = false;
-                        root.xsheet = false;
-                    }
+                    onClicked: editor.bottomPanelTab = "Timeline"
                 }
                 C.ToolButton {
+                    objectName: "bottomXsheetTab"
                     text: "Xsheet"
                     active: root.xsheet && !root.showCurves && !root.showNodes
-                    onClicked: {
-                        root.showCurves = false;
-                        root.showNodes = false;
-                        root.xsheet = true;
-                    }
+                    onClicked: editor.bottomPanelTab = "Xsheet"
                 }
                 C.ToolButton {
+                    objectName: "bottomCurvesTab"
                     text: "Curves"
                     active: root.showCurves && !root.showNodes
-                    onClicked: {
-                        root.showNodes = false;
-                        root.showCurves = true;
-                    }
+                    onClicked: editor.bottomPanelTab = "Curves"
                 }
                 C.ToolButton {
+                    objectName: "bottomNodesTab"
                     text: "Nodes"
                     active: root.showNodes
-                    onClicked: {
-                        root.showCurves = false;
-                        root.showNodes = true;
-                    }
+                    onClicked: editor.bottomPanelTab = "Nodes"
                 }
                 C.ToolButton {
+                    objectName: "bottomTimingToolsTab"
                     text: "Timing tools"
                     active: root.showTimingTools
                     visible: !root.showCurves && !root.showNodes
-                    onClicked: root.showTimingTools = !root.showTimingTools
+                    onClicked: editor.timingToolsVisible = !editor.timingToolsVisible
                 }
                 C.ToolButton {
                     text: editor.selectedPoseFrames.length > 1 ? "Keys · " + editor.selectedPoseFrames.length : "Keys"
@@ -2537,22 +2542,24 @@ ApplicationWindow {
                     onClicked: editor.addKey()
                 }
                 C.ToolButton {
+                    objectName: "timelineZoomOut"
                     text: "−"
                     visible: !root.showCurves && !root.showNodes && !root.xsheet
                     hint: "Narrow timeline frames"
                     enabled: root.timelineCell > 12
                     onClicked: {
-                        root.timelineCell = Math.max(12, root.timelineCell - 10);
+                        editor.timelineCellWidth = Math.max(12, root.timelineCell - 10);
                         timeline.requestPaint();
                     }
                 }
                 C.ToolButton {
+                    objectName: "timelineZoomIn"
                     text: "+"
                     visible: !root.showCurves && !root.showNodes && !root.xsheet
                     hint: "Widen timeline frames for easier key placement"
                     enabled: root.timelineCell < 72
                     onClicked: {
-                        root.timelineCell = Math.min(72, root.timelineCell + 10);
+                        editor.timelineCellWidth = Math.min(72, root.timelineCell + 10);
                         timeline.requestPaint();
                     }
                 }

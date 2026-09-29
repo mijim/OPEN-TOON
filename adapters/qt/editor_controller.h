@@ -61,6 +61,10 @@ class EditorController final : public QObject {
     Q_PROPERTY(QVariantList poseTransferTargets READ poseTransferTargets NOTIFY changed)
     Q_PROPERTY(int selectedCharacterPose READ selectedCharacterPose NOTIFY poseSelectionChanged)
     Q_PROPERTY(QString workspaceMode READ workspaceMode WRITE setWorkspaceMode NOTIFY workspaceModeChanged)
+    Q_PROPERTY(QString bottomPanelTab READ bottomPanelTab WRITE setBottomPanelTab NOTIFY workspaceLayoutChanged)
+    Q_PROPERTY(int bottomPanelHeight READ bottomPanelHeight WRITE setBottomPanelHeight NOTIFY workspaceLayoutChanged)
+    Q_PROPERTY(int timelineCellWidth READ timelineCellWidth WRITE setTimelineCellWidth NOTIFY workspaceLayoutChanged)
+    Q_PROPERTY(bool timingToolsVisible READ timingToolsVisible WRITE setTimingToolsVisible NOTIFY workspaceLayoutChanged)
     Q_PROPERTY(qulonglong documentRevision READ documentRevision NOTIFY changed)
     Q_PROPERTY(QVariantList palette READ palette NOTIFY changed)
     Q_PROPERTY(QVariantList revisions READ revisions NOTIFY changed)
@@ -166,6 +170,15 @@ class EditorController final : public QObject {
     Q_INVOKABLE void selectCharacterPose(int pose);
     QString workspaceMode() const { return workspaceMode_; }
     void setWorkspaceMode(QString mode);
+    QString bottomPanelTab() const { return bottomPanelTab_; }
+    void setBottomPanelTab(QString tab);
+    int bottomPanelHeight() const { return bottomPanelHeight_; }
+    void setBottomPanelHeight(int height);
+    int timelineCellWidth() const { return timelineCellWidth_; }
+    void setTimelineCellWidth(int width);
+    bool timingToolsVisible() const { return timingToolsVisible_; }
+    void setTimingToolsVisible(bool visible);
+    Q_INVOKABLE void resetWorkspaceLayout();
     QVariantList palette() const;
     QVariantList revisions() const;
     QVariantMap transform() const;
@@ -385,6 +398,7 @@ class EditorController final : public QObject {
     void viewSelectionChanged();
     void poseSelectionChanged();
     void workspaceModeChanged();
+    void workspaceLayoutChanged();
     void controlGroupChanged();
     void animationModeChanged();
     void rangeChanged();
@@ -408,6 +422,9 @@ class EditorController final : public QObject {
     opentoon::Id selectedView_ = 0;
     opentoon::Id selectedCharacterPose_ = 0;
     QString workspaceMode_ = "Rig";
+    QString bottomPanelTab_ = "Timeline";
+    int bottomPanelHeight_ = 280, timelineCellWidth_ = 22;
+    bool timingToolsVisible_ = false;
     QString selectedControlGroup_ = "Main";
     std::uint64_t poseBlendSerial_ = 0;
     std::uint64_t poseBlendGesture_ = 0;

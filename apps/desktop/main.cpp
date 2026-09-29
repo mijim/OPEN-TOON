@@ -29,6 +29,7 @@
 #include <QQuickStyle>
 #include <QQuickItem>
 #include <QQuickWindow>
+#include <QSettings>
 #include <QStandardPaths>
 #include <QTabletEvent>
 #include <QTemporaryDir>
@@ -39,6 +40,7 @@
 #include <array>
 #include <cmath>
 #include <iostream>
+#include <optional>
 #include <stdexcept>
 #include <sys/resource.h>
 #include <vector>
@@ -49,6 +51,7 @@ int main(int argc, char** argv) {
     QCoreApplication::setOrganizationName("OPEN-TOON");
     QQuickStyle::setStyle("Basic");
     const auto args = app.arguments();
+    std::optional<QTemporaryDir> smokeSettings;
     if (args.contains("--version")) {
         std::cout << OPENTOON_VERSION << '\n';
         return 0;
@@ -56,9 +59,17 @@ int main(int argc, char** argv) {
     if (args.contains("--smoke-test") || args.contains("--hm06-benchmark") ||
         args.contains("--hm07-smoke") || args.contains("--hm10-smoke") ||
         args.contains("--hm12-smoke") || args.contains("--hm-integrated-smoke") ||
-        args.contains("--milo-smoke")) {
+        args.contains("--milo-smoke") || args.contains("--workspace-smoke")) {
+        smokeSettings.emplace();
+        if (!smokeSettings->isValid())
+            return 1;
+        QSettings::setDefaultFormat(QSettings::IniFormat);
+        QSettings::setPath(QSettings::IniFormat, QSettings::UserScope,
+                           smokeSettings->path());
         QStandardPaths::setTestModeEnabled(true);
-        QCoreApplication::setApplicationName(args.contains("--smoke-test")
+        QCoreApplication::setApplicationName(args.contains("--workspace-smoke")
+                                                 ? "OPEN-TOON-workspace-smoke"
+                                             : args.contains("--smoke-test")
                                                  ? "OPEN-TOON-smoke"
                                                  : args.contains("--hm07-smoke")
                                                        ? "OPEN-TOON-hm07-smoke"
@@ -131,6 +142,92 @@ int main(int argc, char** argv) {
         }
         if (args.contains("--demo"))
             editor.loadDemo();
+        if (args.contains("--workspace-smoke")) {
+            QTimer::singleShot(1200, &app, [&] {
+                try {
+                    if (engine.rootObjects().isEmpty())
+                        throw std::runtime_error("Workspace smoke has no QML window.");
+                    auto* window = qobject_cast<QQuickWindow*>(engine.rootObjects().first());
+                    if (!window)
+                        throw std::runtime_error("Workspace smoke has no native window.");
+                    editor.newScene();
+                    editor.setFrame(7);
+                    const auto before = editor.document();
+                    const auto revision = editor.documentRevision();
+                    const auto layer = editor.selectedLayer();
+                    QCoreApplication::processEvents();
+                    (void)window->grabWindow();
+                    const auto click = [&](const char* name) {
+                        auto* item = window->findChild<QQuickItem*>(name);
+                        if (!item || !item->isVisible() || !item->isEnabled())
+                            throw std::runtime_error(std::string("Workspace control unavailable: ") + name);
+                        const auto point = item->mapToScene(QPointF(item->width() / 2,
+                                                                  item->height() / 2));
+                        QMouseEvent press(QEvent::MouseButtonPress, point,
+                            window->mapToGlobal(point.toPoint()), Qt::LeftButton,
+                            Qt::LeftButton, Qt::NoModifier);
+                        QMouseEvent release(QEvent::MouseButtonRelease, point,
+                            window->mapToGlobal(point.toPoint()), Qt::LeftButton,
+                            Qt::NoButton, Qt::NoModifier);
+                        QCoreApplication::sendEvent(window, &press);
+                        QCoreApplication::sendEvent(window, &release);
+                        QCoreApplication::processEvents();
+                    };
+                    click("timelineZoomIn");
+                    click("bottomTimingToolsTab");
+                    if (editor.timelineCellWidth() != 32 || !editor.timingToolsVisible())
+                        throw std::runtime_error("Timeline preferences did not follow native clicks.");
+                    auto* splitter = window->findChild<QQuickItem*>("workspaceResizeHandle");
+                    if (!splitter || !splitter->isVisible())
+                        throw std::runtime_error("Workspace resize handle is unavailable.");
+                    const auto start = splitter->mapToScene(QPointF(splitter->width() / 2,
+                                                                   splitter->height() / 2));
+                    const auto end = start + QPointF(0, -48);
+                    const auto drag = [&](QEvent::Type type, QPointF point,
+                                          Qt::MouseButtons buttons) {
+                        QMouseEvent event(type, point, window->mapToGlobal(point.toPoint()),
+                                          type == QEvent::MouseMove ? Qt::NoButton : Qt::LeftButton,
+                                          buttons, Qt::NoModifier);
+                        QCoreApplication::sendEvent(window, &event);
+                        QCoreApplication::processEvents();
+                    };
+                    drag(QEvent::MouseButtonPress, start, Qt::LeftButton);
+                    drag(QEvent::MouseMove, end, Qt::LeftButton);
+                    drag(QEvent::MouseButtonRelease, end, Qt::NoButton);
+                    if (editor.bottomPanelHeight() <= 280)
+                        throw std::runtime_error("Workspace separator drag was not saved.");
+                    click("bottomNodesTab");
+                    if (editor.bottomPanelTab() != "Nodes" ||
+                        !window->property("showNodes").toBool())
+                        throw std::runtime_error("Nodes workspace tab did not open.");
+                    editor.setWorkspaceMode("Animator");
+                    QSettings().sync();
+                    EditorController restored;
+                    if (restored.bottomPanelTab() != "Nodes" ||
+                        restored.bottomPanelHeight() != editor.bottomPanelHeight() ||
+                        restored.timelineCellWidth() != 32 ||
+                        !restored.timingToolsVisible() || restored.workspaceMode() != "Animator")
+                        throw std::runtime_error("Workspace layout changed after controller reopen.");
+                    editor.resetWorkspaceLayout();
+                    QCoreApplication::processEvents();
+                    EditorController reset;
+                    if (reset.bottomPanelTab() != "Timeline" ||
+                        reset.bottomPanelHeight() != 280 || reset.timelineCellWidth() != 22 ||
+                        reset.timingToolsVisible() || reset.workspaceMode() != "Rig" ||
+                        window->property("showNodes").toBool() ||
+                        window->property("effectiveBottomHeight").toInt() != 280 ||
+                        editor.document() != before || editor.documentRevision() != revision ||
+                        editor.frame() != 7 || editor.selectedLayer() != layer)
+                        throw std::runtime_error("Workspace reset changed the scene or left stale UI state.");
+                    std::cout << "Workspace native smoke passed: tab, timeline zoom, timing tools, "
+                                 "splitter drag, preferences reopen and reset without document changes.\n";
+                    app.exit(0);
+                } catch (const std::exception& error) {
+                    std::cerr << error.what() << '\n';
+                    app.exit(1);
+                }
+            });
+        }
         if (args.contains("--milo-smoke")) {
             QTimer::singleShot(1200, &app, [&] {
                 try {
@@ -252,7 +349,7 @@ int main(int argc, char** argv) {
                         throw std::runtime_error("Cutter matte inspector is unavailable.");
                     if (!editor.setLayerMatte(int(source.id)))
                         throw std::runtime_error("Cannot assign a cutter matte.");
-                    window->setProperty("showNodes", true);
+                    editor.setBottomPanelTab("Nodes");
                     QCoreApplication::processEvents();
                     auto* nodes = window->findChild<QQuickItem*>("compositionNodesPanel");
                     auto* strip = window->findChild<QQuickItem*>("compositionNodeStrip");
@@ -2385,8 +2482,8 @@ int main(int argc, char** argv) {
                     editor.setFrame(24);
                     editor.setTransform("x", 240);
                     editor.setFrame(12);
-                    window->setProperty("showCurves", true);
-                    window->setProperty("bottomHeight", 300);
+                    editor.setBottomPanelTab("Curves");
+                    editor.setBottomPanelHeight(300);
                     QTimer::singleShot(250, &app, [&, window] {
                         auto* graph = window->findChild<QQuickItem*>("animationCurveCanvas");
                         if (!graph) {
@@ -2456,9 +2553,9 @@ int main(int argc, char** argv) {
                                      "undo/redo, save/reopen, canvas layout "
                                      "mixed selection move/cancel/reopen, and native curve drag/undo and "
                                      "screenshot.\n";
-                        window->setProperty("showCurves", false);
-                        window->setProperty("showTimingTools", true);
-                        window->setProperty("bottomHeight", 200);
+                        editor.setBottomPanelTab("Timeline");
+                        editor.setTimingToolsVisible(true);
+                        editor.setBottomPanelHeight(200);
                         editor.setFrame(0);
                         editor.setTool("Select");
                         QTimer::singleShot(100, &app, [&, window] {

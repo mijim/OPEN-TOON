@@ -43,6 +43,12 @@ Color color(QColor c) {
 QString local(QUrl url) {
     return url.isLocalFile() ? url.toLocalFile() : url.toString();
 }
+int boundedSetting(QSettings& settings, const QString& key, int fallback,
+                   int minimum, int maximum) {
+    bool valid = false;
+    const int value = settings.value(key, fallback).toInt(&valid);
+    return valid ? std::clamp(value, minimum, maximum) : fallback;
+}
 } // namespace
 EditorController::EditorController(QObject* parent) : QObject(parent) {
     resetSelection();
@@ -90,6 +96,12 @@ EditorController::EditorController(QObject* parent) : QObject(parent) {
     QSettings settings;
     const auto workspace = settings.value("workspaceMode", "Rig").toString();
     workspaceMode_ = workspace == "Animator" ? workspace : "Rig";
+    const auto tab = settings.value("layout/bottomTab", "Timeline").toString();
+    if (tab == "Xsheet" || tab == "Curves" || tab == "Nodes")
+        bottomPanelTab_ = tab;
+    bottomPanelHeight_ = boundedSetting(settings, "layout/bottomHeight", 280, 140, 1600);
+    timelineCellWidth_ = boundedSetting(settings, "layout/timelineCell", 22, 12, 72);
+    timingToolsVisible_ = settings.value("layout/timingTools", false).toBool();
     previousRecovery_ = settings.value("recoveryPath").toString();
     if (!QFileInfo::exists(previousRecovery_))
         previousRecovery_.clear();
@@ -541,6 +553,44 @@ void EditorController::setWorkspaceMode(QString mode) {
     QSettings().setValue("workspaceMode", workspaceMode_);
     emit workspaceModeChanged();
     emit poseSelectionChanged();
+}
+void EditorController::setBottomPanelTab(QString tab) {
+    if ((tab != "Timeline" && tab != "Xsheet" && tab != "Curves" && tab != "Nodes") ||
+        tab == bottomPanelTab_)
+        return;
+    bottomPanelTab_ = std::move(tab);
+    QSettings().setValue("layout/bottomTab", bottomPanelTab_);
+    emit workspaceLayoutChanged();
+}
+void EditorController::setBottomPanelHeight(int height) {
+    height = std::clamp(height, 140, 1600);
+    if (height == bottomPanelHeight_)
+        return;
+    bottomPanelHeight_ = height;
+    QSettings().setValue("layout/bottomHeight", height);
+    emit workspaceLayoutChanged();
+}
+void EditorController::setTimelineCellWidth(int width) {
+    width = std::clamp(width, 12, 72);
+    if (width == timelineCellWidth_)
+        return;
+    timelineCellWidth_ = width;
+    QSettings().setValue("layout/timelineCell", width);
+    emit workspaceLayoutChanged();
+}
+void EditorController::setTimingToolsVisible(bool visible) {
+    if (visible == timingToolsVisible_)
+        return;
+    timingToolsVisible_ = visible;
+    QSettings().setValue("layout/timingTools", visible);
+    emit workspaceLayoutChanged();
+}
+void EditorController::resetWorkspaceLayout() {
+    setWorkspaceMode("Rig");
+    setBottomPanelTab("Timeline");
+    setBottomPanelHeight(280);
+    setTimelineCellWidth(22);
+    setTimingToolsVisible(false);
 }
 QString EditorController::substitutionThumbnail(int drawingId) const {
     if (!layer_ || drawingId <= 0)

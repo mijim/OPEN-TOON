@@ -103,12 +103,12 @@ skipped polled playhead frames, respectively. These counters do not measure
 speaker underruns or actual
 presented-frame drops.
 
-The working source version is `0.2.0-experimental.66`; no new binary or source
+The working source version is `0.2.0-experimental.67`; no new binary or source
 tag has been published for it. The last locally qualified macOS preview and
 earlier binaries do not qualify these source changes.
 
-The owner resumed development after the earlier 10:30 CEST cutoff. The `.66`
-locked macOS build passes 202/202 CTest entries and native HM-10 and HM-12 smoke,
+The owner resumed development after the earlier 10:30 CEST cutoff. The `.67`
+locked macOS build passes 202/202 CTest entries and native Workspace, HM-10 and HM-12 smoke,
 including contiguous group input/output ports, matte-only source pixels,
 grouping/rename/ungroup, direct edge-member edits, whole-group order, bypass
 and independent duplication,
@@ -117,6 +117,15 @@ undo/redo and save/reopen. Earlier native smokes and
 artistic checks are recorded in prior
 release entries. HM-12 remains an unfinished bounded contract; next work can
 continue its graph and automatic overlap behavior.
+
+The lower workspace tab, panel height, timeline cell width and Timing tools
+visibility now reopen from personal settings alongside Rig/Animator mode; View
+can reset them without changing the scene, selection or frame. Full workspace
+presets, docking and UI scale remain open. The broader legacy UI smoke still
+shows intermittent synthetic-input focus failures on this macOS session, so
+its entire workflow is not claimed as passing for `.67`. The HM-07 native
+slider smoke also failed at the mapped-Part drag check; dashboard interaction
+needs a focused rerun before its current build can be claimed qualified.
 HM-06 visual approval and HM-10 hardware presentation also remain open.
 
 ## Phase coverage
@@ -124,7 +133,7 @@ HM-06 visual approval and HM-10 hardware presentation also remain open.
 | Phase | Status | Available subset | Remaining before completion |
 |---|---|---|---|
 | P00 | in_progress | Qt-free core, CPU reference renderer, locked infrastructure dependencies, bounded OpenToonz source audit and save failure tests. | Renderer comparison, successful reuse extraction/build audit, fill spike, broader deformation comparison, device matrix and production budgets. |
-| P01 | in_progress | Native English QML shell, CMake modules, commands, immutable snapshots, undo/redo and validation. Typed character/peg/part property addresses separate rest, authored and evaluated values; format-5 migration preserves older scenes with source-version backups. Integrated resizable timing/curve workspace and selection-owned object/layer Properties. Shared compact controls, optional curve numeric fields and a draggable workspace divider with dynamic bounds. | Docking/workspace persistence, configurable shortcuts, full accessibility, scalable resource/cache protocols and cross-platform qualification. |
+| P01 | in_progress | Native English QML shell, CMake modules, commands, immutable snapshots, undo/redo and validation. Typed character/peg/part property addresses separate rest, authored and evaluated values; format-5 migration preserves older scenes with source-version backups. Integrated resizable timing/curve workspace and selection-owned object/layer Properties. Shared compact controls, optional curve numeric fields and a draggable workspace divider with dynamic bounds. Personal Rig/Animator mode and lower tab, height, timeline zoom and Timing tools settings persist and reset without scene edits. | Docking and full workspace presets, UI scale, configurable shortcuts, full accessibility, scalable resource/cache protocols and cross-platform qualification. |
 | P02 | in_progress | Mouse pencil, exposures, onion skin, playback, save/reopen, 48-frame 1080p PNG export, and atomic registered PNG parts/numbered-sequence intake. | Full phase feature acceptance and animator-led workflow checks; large-project behavior and all fixture gates. |
 | P03 | in_progress | Synchronized virtualized timeline/Xsheet, create/hold/clear exposures, insert/remove frames and navigate drawings. Multi-layer range clipboard, independent drawing paste, key paste, cycles, ones/twos/threes, overwrite retiming, Alt-drag moves, markers and bounded Xsheet PDF export. Clear removes selected exposures and pose keys together. Timeline/Xsheet diamonds can be dragged directly; Keys mode adds poses by double-click, with adjustable timeline cell width. | Frame annotations/thumbnails, advanced onion/tracing controls, paperless workflows and artist acceptance. |
 | P04 | in_progress | Sampled vector strokes, approximate eraser, primitives, single-stroke selection, point editing/smoothing, stable palette IDs and shape recoloring. Rectangular whole-stroke multi-selection, move/duplicate/delete, flips and quarter turns preserve editable geometry, swatch and art-layer IDs. On-canvas scale/rotation handles with live previews and explicit selected-vector properties. Thin vectors have a constant screen-space hit margin respecting art order; point dragging previews the complete stroke, with contextual tool/handle cursors. Pencil/polygon points can be inserted on segments by double-click and deleted individually while preserving identity, pressure interpolation and minimum geometry. Shift/Alt add/subtract whole vectors by click or marquee, with sparse membership, individual selection bounds, tool-switch preservation and identity-safe duplication. Whole-footprint vector lasso with modifiers, select all/invert, cross-scene vector cut/copy/paste, local nudges, alignment/distribution, art-layer stacking, batch styles, corner-aware smoothing, pressure-aware simplification, constrained lines/primitives and drawing-local grid/snapping. | Region topology/fill, analytic erasing, Bezier/contour/width editors, presets/textures, advanced guides, partial contour and raster lasso selection, geometry combining and production-scale optimization. |

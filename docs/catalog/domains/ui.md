@@ -38,7 +38,7 @@ Save and switch layouts for drawing, animation, rigging and compositing.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM07-PROGRESS.md](../../../docs/implementation/HM07-PROGRESS.md) — grouped published pose/view/drawing dashboard and compact viewport controls, full catalog acceptance open.
+**Implementation evidence:** [docs/implementation/HM07-PROGRESS.md](../../../docs/implementation/HM07-PROGRESS.md) — grouped published pose/view/drawing dashboard and compact viewport controls. docs/architecture/adr/066-personal-workspace-layout.md; personal Rig/Animator mode and lower tab/height/time zoom persist across controller reopen, with reset and unchanged scene/selection/frame checks. Full saved workspace presets and catalog acceptance remain open.
 
 **Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
@@ -68,9 +68,13 @@ Separate personal preferences, document settings and temporary values.
 
 **Initial acceptance:** Changing UI scale does not modify the project file.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/architecture/adr/066-personal-workspace-layout.md](../../../docs/architecture/adr/066-personal-workspace-layout.md) — QSettings stores personal layout controls independently of scene mutations, with malformed-value fallback, reopen and reset tests. UI scale and full preference separation remain open..
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## UI-006 — View zoom, pan and rotation
 

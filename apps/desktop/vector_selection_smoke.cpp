@@ -38,8 +38,8 @@ void vectorSelectionSmoke(EditorController& editor, CanvasItem& canvas, QQuickWi
     editor.newScene();
     window.setWidth(1440);
     window.setHeight(940);
-    window.setProperty("bottomHeight", 240);
-    window.setProperty("showCurves", false);
+    editor.setBottomPanelHeight(240);
+    editor.setBottomPanelTab("Timeline");
     canvas.setMirrored(false);
     canvas.fit();
     editor.setTool("Rectangle");

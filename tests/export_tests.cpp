@@ -842,6 +842,56 @@ TEST_CASE("Silent transport can stop once or loop without editing the scene") {
     editor.togglePlayback();
     REQUIRE(editor.document() == before);
 }
+TEST_CASE("Workspace layout preferences reopen and reset without changing the scene") {
+    QSettings settings;
+    settings.remove("layout");
+    settings.remove("workspaceMode");
+    EditorController editor;
+    editor.newScene();
+    editor.setFrame(7);
+    const auto before = editor.document();
+    const auto revision = editor.documentRevision();
+    const auto selected = editor.selectedLayer();
+    editor.setWorkspaceMode("Animator");
+    editor.setBottomPanelTab("Nodes");
+    editor.setBottomPanelHeight(410);
+    editor.setTimelineCellWidth(42);
+    editor.setTimingToolsVisible(true);
+    editor.setBottomPanelTab("Unsupported");
+    REQUIRE(editor.bottomPanelTab() == "Nodes");
+    REQUIRE(editor.document() == before);
+    REQUIRE(editor.documentRevision() == revision);
+    REQUIRE(editor.frame() == 7);
+    REQUIRE(editor.selectedLayer() == selected);
+    QSettings().sync();
+    EditorController reopened;
+    REQUIRE(reopened.workspaceMode() == "Animator");
+    REQUIRE(reopened.bottomPanelTab() == "Nodes");
+    REQUIRE(reopened.bottomPanelHeight() == 410);
+    REQUIRE(reopened.timelineCellWidth() == 42);
+    REQUIRE(reopened.timingToolsVisible());
+    editor.resetWorkspaceLayout();
+    REQUIRE(editor.document() == before);
+    REQUIRE(editor.documentRevision() == revision);
+    REQUIRE(editor.frame() == 7);
+    REQUIRE(editor.selectedLayer() == selected);
+    EditorController reset;
+    REQUIRE(reset.workspaceMode() == "Rig");
+    REQUIRE(reset.bottomPanelTab() == "Timeline");
+    REQUIRE(reset.bottomPanelHeight() == 280);
+    REQUIRE(reset.timelineCellWidth() == 22);
+    REQUIRE_FALSE(reset.timingToolsVisible());
+    settings.setValue("layout/bottomTab", "Missing");
+    settings.setValue("layout/bottomHeight", -300);
+    settings.setValue("layout/timelineCell", "invalid");
+    settings.sync();
+    EditorController sanitized;
+    REQUIRE(sanitized.bottomPanelTab() == "Timeline");
+    REQUIRE(sanitized.bottomPanelHeight() == 140);
+    REQUIRE(sanitized.timelineCellWidth() == 22);
+    settings.remove("layout");
+    settings.remove("workspaceMode");
+}
 TEST_CASE("Selected frame playback uses exact sample limits and leaves document untouched") {
     EditorController editor;
     editor.newScene();

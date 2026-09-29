@@ -175,3 +175,6 @@ play-once behavior in device and silent preview.
 
 See [ADR-065](065-selected-range-playback.md) for playback of a selected
 half-open timeline interval using rational frame-to-sample boundaries.
+
+See [ADR-066](066-personal-workspace-layout.md) for personal lower-workspace
+layout preferences and their separation from document state.

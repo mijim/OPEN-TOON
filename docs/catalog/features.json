@@ -216,7 +216,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; grouped published pose/view/drawing dashboard and compact viewport controls, full catalog acceptance open"
+      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; grouped published pose/view/drawing dashboard and compact viewport controls. docs/architecture/adr/066-personal-workspace-layout.md; personal Rig/Animator mode and lower tab/height/time zoom persist across controller reopen, with reset and unchanged scene/selection/frame checks. Full saved workspace presets and catalog acceptance remain open"
     },
     {
       "id": "UI-003",
@@ -265,7 +265,7 @@
         "Changing UI scale does not modify the project file."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "workspace",
@@ -273,7 +273,8 @@
         "PRJ"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/architecture/adr/066-personal-workspace-layout.md; QSettings stores personal layout controls independently of scene mutations, with malformed-value fallback, reopen and reset tests. UI scale and full preference separation remain open."
     },
     {
       "id": "UI-006",

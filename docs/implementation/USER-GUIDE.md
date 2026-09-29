@@ -398,6 +398,11 @@ tabs upward to enlarge the lower panel, or downward to return space to the canva
 Double-click the grip to restore the default height. The panel follows the window size
 and retains a usable canvas minimum.
 
+The Rig/Animator mode, lower tab, panel height, timeline frame width and Timing
+tools visibility reopen with the app as personal preferences. Use **View > Reset
+workspace layout** to restore Rig, Timeline, default panel height and frame width,
+and hidden Timing tools. These changes do not edit the project or its current frame.
+
 Curves keeps its actions in a single compact toolbar. **Values** reveals the optional
 frame/value/base-interpolation fields; hiding them gives that space back to the graph.
 Hover the question mark for editing gestures. Buttons, dropdowns, number fields and

@@ -2,12 +2,14 @@
 #include "editor_controller.h"
 #include "scene_renderer.h"
 #include <QCoreApplication>
+#include <QElapsedTimer>
 #include <QEventLoop>
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QQuickItem>
 #include <QQuickWindow>
 #include <QTemporaryDir>
+#include <QThread>
 #include <QTimer>
 #include <stdexcept>
 void keyBlockSmoke(EditorController& editor, QQuickWindow& window) {
@@ -35,8 +37,14 @@ void keyBlockSmoke(EditorController& editor, QQuickWindow& window) {
     auto key = [&](int code, Qt::KeyboardModifiers modifiers = Qt::NoModifier) {
         // Native Shortcut dispatch requires an active window even for synthetic key events.
         if (!window.isActive()) {
+            window.raise();
             window.requestActivate();
-            settle();
+            QElapsedTimer timer;
+            timer.start();
+            while (!window.isActive() && timer.elapsed() < 3000) {
+                QCoreApplication::processEvents();
+                QThread::msleep(10);
+            }
         }
         require(window.isActive(), "Activate the smoke window before checking native key shortcuts.");
         QKeyEvent press(QEvent::KeyPress, code, modifiers), release(QEvent::KeyRelease, code, modifiers);
@@ -47,8 +55,8 @@ void keyBlockSmoke(EditorController& editor, QQuickWindow& window) {
     editor.addCurveKey(8, "x", 60);
     editor.addCurveKey(24, "x", 100);
     editor.clearPoseSelection();
-    window.setProperty("showCurves", true);
-    window.setProperty("bottomHeight", 350);
+    editor.setBottomPanelTab("Curves");
+    editor.setBottomPanelHeight(350);
     settle();
     auto* panel = window.findChild<QQuickItem*>("curveEditorPanel");
     require(panel, "Curve panel missing during key-block workflow.");
@@ -158,7 +166,7 @@ void keyBlockSmoke(EditorController& editor, QQuickWindow& window) {
             "Key block round trip changed document or rendered output.");
     editor.setSelectedLayer(source);
     select();
-    window.setProperty("showCurves", false);
+    editor.setBottomPanelTab("Timeline");
     window.setProperty("keyEditing", true);
     settle();
     auto* timeline = window.findChild<QQuickItem*>("timelineCanvas");
@@ -176,7 +184,7 @@ void keyBlockSmoke(EditorController& editor, QQuickWindow& window) {
             "Timeline failed to move the shared key selection.");
     editor.undo();
     require(editor.document() == beforeTimeline, "Timeline group move undo failed.");
-    window.setProperty("showCurves", true);
+    editor.setBottomPanelTab("Curves");
     settle();
     select();
     editor.setFrame(4);
