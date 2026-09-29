@@ -162,6 +162,8 @@ int main(int argc, char** argv) {
                         throw std::runtime_error("Native audio playhead seek failed.");
                     editor.togglePlayback();
                     qunsetenv("OPENTOON_TEST_NULL_AUDIO_BACKEND");
+                    if (editor.playbackDiagnostics().value("callbacks").toULongLong() == 0)
+                        throw std::runtime_error("Native audio callback diagnostics are empty.");
                     editor.setFrame(0);
                     auto* timelineInput = window->findChild<QQuickItem*>("timelineInput");
                     if (!timelineInput)

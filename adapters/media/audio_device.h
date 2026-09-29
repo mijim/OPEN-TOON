@@ -4,6 +4,11 @@
 #include <memory>
 
 namespace opentoon {
+struct AudioDeviceStats {
+    std::uint64_t callbacks = 0;
+    std::uint64_t processingOverruns = 0;
+    std::uint64_t maximumCallbackNanoseconds = 0;
+};
 // One playback device owns one immutable scene snapshot. The callback reads
 // only that snapshot and publishes a sample cursor through atomics.
 class AudioDevice {
@@ -20,6 +25,7 @@ class AudioDevice {
     [[nodiscard]] std::int64_t currentSample() const;
     [[nodiscard]] bool running() const;
     [[nodiscard]] bool interrupted() const;
+    [[nodiscard]] AudioDeviceStats stats() const;
 
   private:
     struct Impl;

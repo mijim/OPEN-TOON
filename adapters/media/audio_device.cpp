@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <array>
 #include <atomic>
+#include <chrono>
 #include <stdexcept>
 
 namespace opentoon {
@@ -24,11 +25,13 @@ struct AudioDevice::Impl {
     std::atomic<std::int64_t> scrubEnd{-1};
     std::atomic_bool interrupted{false};
     std::atomic_bool active{false};
+    std::atomic<std::uint64_t> callbacks{0}, processingOverruns{0}, maximumCallbackNanoseconds{0};
 
     explicit Impl(std::shared_ptr<const Document> source)
         : snapshot(std::move(source)), mix(*snapshot, 48000) {}
 
     static void data(ma_device* device, void* destination, const void*, ma_uint32 frameCount) noexcept {
+        const auto started = std::chrono::steady_clock::now();
         auto* self = static_cast<Impl*>(device->pUserData);
         auto* output = static_cast<std::int16_t*>(destination);
         std::array<double, 4096 * 2> scratch;
@@ -62,6 +65,15 @@ struct AudioDevice::Impl {
         auto previous = origin;
         self->cursor.compare_exchange_strong(previous, cursor, std::memory_order_release,
                                              std::memory_order_relaxed);
+        const auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::steady_clock::now() - started).count();
+        self->callbacks.fetch_add(1, std::memory_order_relaxed);
+        if (elapsed > std::int64_t(frameCount) * 1000000000 / 48000)
+            self->processingOverruns.fetch_add(1, std::memory_order_relaxed);
+        auto maximum = self->maximumCallbackNanoseconds.load(std::memory_order_relaxed);
+        while (elapsed > std::int64_t(maximum) &&
+               !self->maximumCallbackNanoseconds.compare_exchange_weak(
+                   maximum, std::uint64_t(elapsed), std::memory_order_relaxed)) {}
     }
     static void notification(const ma_device_notification* event) noexcept {
         auto* self = static_cast<Impl*>(event->pDevice->pUserData);
@@ -156,5 +168,10 @@ bool AudioDevice::running() const {
 }
 bool AudioDevice::interrupted() const {
     return impl_->interrupted.load(std::memory_order_acquire);
+}
+AudioDeviceStats AudioDevice::stats() const {
+    return {impl_->callbacks.load(std::memory_order_relaxed),
+            impl_->processingOverruns.load(std::memory_order_relaxed),
+            impl_->maximumCallbackNanoseconds.load(std::memory_order_relaxed)};
 }
 } // namespace opentoon

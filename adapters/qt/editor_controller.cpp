@@ -56,6 +56,8 @@ EditorController::EditorController(QObject* parent) : QObject(parent) {
         const int next = audioDevice_
                              ? audioDevice_->currentFrame()
                              : (playStart_ + int(std::floor(playClock_.elapsed() / 1000.0 * fps()))) % duration();
+        if (next > frame_ + 1)
+            skippedPlayheadFrames_ += std::uint64_t(next - frame_ - 1);
         if (next != frame_) {
             endSelectedCharacterPoseBlend();
             frame_ = next;
@@ -1803,11 +1805,18 @@ void EditorController::stopPlayback() {
     scrubDevice_.reset();
     if (audioDevice_) {
         audioDevice_->stop();
+        const auto stats = audioDevice_->stats();
+        playbackCallbacks_ = stats.callbacks;
+        playbackProcessingOverruns_ = stats.processingOverruns;
+        playbackMaximumCallbackNanoseconds_ = stats.maximumCallbackNanoseconds;
         audioDevice_.reset();
     }
     if (playing()) {
         playTimer_.stop();
         emit playbackChanged();
+        if (skippedPlayheadFrames_ || playbackProcessingOverruns_)
+            report(QString("Playback stopped: %1 skipped playhead frames, %2 mixer callbacks over period.")
+                       .arg(skippedPlayheadFrames_).arg(playbackProcessingOverruns_));
     }
 }
 void EditorController::togglePlayback() {
@@ -1817,6 +1826,8 @@ void EditorController::togglePlayback() {
     }
     endAudioScrub();
     scrubDevice_.reset();
+    playbackCallbacks_ = playbackProcessingOverruns_ = playbackMaximumCallbackNanoseconds_ = 0;
+    skippedPlayheadFrames_ = 0;
     playStart_ = frame_;
     playClock_.start();
     if (!document().audioClips.empty()) {
@@ -1831,6 +1842,14 @@ void EditorController::togglePlayback() {
     }
     playTimer_.start();
     emit playbackChanged();
+}
+QVariantMap EditorController::playbackDiagnostics() const {
+    const auto current = audioDevice_ ? audioDevice_->stats() : opentoon::AudioDeviceStats{
+        playbackCallbacks_, playbackProcessingOverruns_, playbackMaximumCallbackNanoseconds_};
+    return {{"callbacks", qulonglong(current.callbacks)},
+            {"processingOverruns", qulonglong(current.processingOverruns)},
+            {"maximumCallbackMs", double(current.maximumCallbackNanoseconds) / 1000000.0},
+            {"skippedPlayheadFrames", qulonglong(skippedPlayheadFrames_)}};
 }
 void EditorController::beginAudioScrub() {
     if (playing() || document().audioClips.empty())

@@ -330,6 +330,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE void addKey(int interpolation = 0);
     Q_INVOKABLE void deleteKey();
     Q_INVOKABLE void togglePlayback();
+    Q_INVOKABLE QVariantMap playbackDiagnostics() const;
     Q_INVOKABLE void beginAudioScrub();
     Q_INVOKABLE void endAudioScrub();
     bool audioScrubbing() const;
@@ -397,6 +398,8 @@ class EditorController final : public QObject {
     int playStart_ = 0;
     std::unique_ptr<opentoon::AudioDevice> audioDevice_;
     std::unique_ptr<opentoon::AudioDevice> scrubDevice_;
+    std::uint64_t playbackCallbacks_ = 0, playbackProcessingOverruns_ = 0;
+    std::uint64_t playbackMaximumCallbackNanoseconds_ = 0, skippedPlayheadFrames_ = 0;
     mutable std::map<opentoon::Id, opentoon::AudioPeakIndex> audioPeakCache_;
     std::int64_t diskRevision_ = -1;
     bool exporting_ = false;

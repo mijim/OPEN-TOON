@@ -28,6 +28,13 @@ the same immutable rational mix and an audio-submitted playhead. Timeline
 traversal previews bounded frame fragments without document edits. Hardware
 drift/underrun qualification and synchronized PNG/WAV delivery remain open.
 
+Playback diagnostics expose mixer callbacks over their output period and
+playhead frames skipped by the 8 ms timer. A two-second silent CoreAudio probe
+measured zero callback-period overruns and 142 samples of final drift relative
+to the host monotonic clock after a one-second baseline. Ten-minute evidence
+is pending; these counters do not measure speaker underruns or actual
+presented-frame drops.
+
 The working source version is `0.2.0-experimental.17`; no new binary or source
 tag has been published for it. The last locally qualified macOS preview and
 earlier binaries do not qualify this composition change.

@@ -27,6 +27,9 @@ fragments from each marked frame and stops on release. Moving a waveform
 continues to edit clip placement instead.
 Editing or device interruption stops playback; a failed device open leaves the
 visual preview available and reports the failure.
+Playback diagnostics count mixer callbacks over their own output period and
+playhead frames skipped by the UI timer. These are scheduling proxies; actual
+device underruns and presented-frame drops need platform instrumentation.
 
 The saved document supports up to 64 audio assets, 1,000 clips, 512 MiB total
 audio and 128 MiB per WAV asset. Formats 1–15 load without audio; format 16
@@ -59,10 +62,18 @@ for sample-contiguous repeats.
   A new-scene test verifies that a reused asset ID cannot expose old peaks.
   A rational-end test checks trimmed clips at 24 and 24000/1001 fps. A
   controller test saves, reopens and exports a two-repeat cue byte-identically.
+  The null device test checks callback diagnostics and the controller retains
+  those counts after stopping preview.
 - A 600-second fractional-rate, two-source 1024-frame callback workload
   measured p95 **0.014 ms** against a 21.33 ms output period on the local
   M1 Pro macOS Release build. It checks the exact scene sample count and a
   rendered cue; this is a mixer cost sample, not a hardware underrun trace.
+- `opentoon_audio_sync_benchmark` drives a silent repeated clip through the
+  same adapter and samples its cursor every 8 ms. A two-second CoreAudio probe
+  at 24 fps recorded 328 callbacks, zero callbacks over period, 0.043 ms
+  maximum callback time and 142 final drift samples relative to the host
+  monotonic clock after a one-second baseline. Ten-minute host runs are
+  separate qualification work.
 - Local macOS `build/locked`: 154/154 CTest entries pass. The native
   `--hm10-smoke` loaded the Qt Quick audio timeline, checked its cue sample,
   captured and visually inspected `build/hm10-audio-smoke.png`, exported an

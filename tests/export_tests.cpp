@@ -221,6 +221,7 @@ TEST_CASE("Null audio device advances, seeks and stops against one immutable sce
         QThread::msleep(5);
     REQUIRE(device.running());
     REQUIRE(device.currentSample() > scene->rate.sampleAt(5, 48000));
+    REQUIRE(device.stats().callbacks > 0);
     device.seek(25);
     REQUIRE(device.currentSample() >= scene->rate.sampleAt(25, 48000));
     REQUIRE(device.currentFrame() >= 25);
@@ -229,6 +230,7 @@ TEST_CASE("Null audio device advances, seeks and stops against one immutable sce
     const auto stoppedAt = device.currentSample();
     QThread::msleep(30);
     REQUIRE(device.currentSample() == stoppedAt);
+    REQUIRE(device.stats().maximumCallbackNanoseconds > 0);
     device.scrub(10);
     const auto scrubStart = scene->rate.sampleAt(10, 48000);
     timeout.restart();
@@ -271,6 +273,8 @@ TEST_CASE("Editor audio preview follows the device cursor and stops before an ed
     REQUIRE(editor.frame() == 18);
     editor.setAudioClipGain(editor.audioClips().front().toMap().value("id").toInt(), 0.5);
     REQUIRE_FALSE(editor.playing());
+    REQUIRE(editor.playbackDiagnostics().value("callbacks").toULongLong() > 0);
+    REQUIRE(editor.playbackDiagnostics().contains("skippedPlayheadFrames"));
     REQUIRE(editor.document().audioClips.front().gain == 0.5);
     qunsetenv("OPENTOON_TEST_NULL_AUDIO_BACKEND");
 }

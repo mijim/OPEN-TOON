@@ -22,6 +22,12 @@ of advancing a second wall clock. An edit stops playback before publishing a
 new document revision. Device interruption or reroute stops playback and
 reports it; a failed output open falls back to silent visual preview.
 
+The adapter counts callbacks whose processing time exceeds their output
+period and retains the maximum callback duration. The desktop counts
+playhead frames skipped by its 8 ms timer and exposes both through playback
+diagnostics; nonzero counts are reported when preview stops. A mixer callback
+over its period is a scheduling warning, not a device underrun measurement.
+
 Timeline traversal opens the same adapter in scrub mode. A requested frame
 starts an 80 ms sample fragment, capped at scene end; remaining callback
 frames are silent. Moving to another frame atomically replaces the fragment
