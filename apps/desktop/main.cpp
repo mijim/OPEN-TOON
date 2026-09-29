@@ -259,6 +259,8 @@ int main(int argc, char** argv) {
                     if (!displayedPreview || displayedPreview->property("status").toInt() != 1)
                         throw std::runtime_error("Drawing node preview did not appear in Qt Quick.");
                     clickNode(4);
+                    if (editor.selectedLayer() != int(source.id))
+                        throw std::runtime_error("Clicking a Cutter node did not select its source.");
                     const auto matteUrl = nodes->property("previewData").toString();
                     const auto matteImage = QImage::fromData(
                         QByteArray::fromBase64(matteUrl.mid(22).toLatin1()), "PNG");
@@ -266,6 +268,14 @@ int main(int argc, char** argv) {
                         qRed(matteImage.pixel(matteImage.width() / 2,
                                               matteImage.height() / 2)) != 64)
                         throw std::runtime_error("Matte preview did not show fractional alpha.");
+                    (void)window->grabWindow();
+                    clickNode(5);
+                    if (editor.selectedLayer() != int(document.layers.front().id))
+                        throw std::runtime_error("Clicking Apply matte did not select its target.");
+                    (void)window->grabWindow();
+                    clickNode(6);
+                    if (editor.selectedLayer() != int(document.layers.front().id))
+                        throw std::runtime_error("Clicking a Composite node did not select its drawing.");
                     editor.setSelectedLayer(int(document.layers.front().id));
                     const auto clipped = opentoon::SceneRenderer::render(editor.document(), 0);
                     if (qAlpha(clipped.pixel(0, 0)) != 32 || qBlue(clipped.pixel(0, 0)) != 0)
@@ -654,8 +664,8 @@ int main(int argc, char** argv) {
                     QCoreApplication::processEvents();
                     auto* nextMatch = window->findChild<QQuickItem*>("nodeSearchNext");
                     if (!nextMatch || !nextMatch->isVisible() ||
-                        nodes->property("matchingNodeIds").toList().size() != 3)
-                        throw std::runtime_error("Drawing search did not find all three cards.");
+                        nodes->property("matchingNodeIds").toList().size() < 3)
+                        throw std::runtime_error("Drawing search did not find all Drawing cards.");
                     const auto nextPoint = nextMatch->mapToScene(
                         QPointF(nextMatch->width() / 2, nextMatch->height() / 2));
                     movePoint(QEvent::MouseButtonPress, nextPoint, Qt::LeftButton);

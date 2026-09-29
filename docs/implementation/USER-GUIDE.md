@@ -26,7 +26,9 @@ and applies to canvas preview and PNG export. Current composition is 8-bit CPU
 rendering. Unchanged linear frames are reused while you pan, zoom or rotate the
 view; editing or switching scenes refreshes them. Open the bottom **Nodes**
 tab to inspect the derived graph. Click an image or matte card to see its
-output at the current frame; matte alpha appears as grayscale. Type a layer
+output at the current frame; matte alpha appears as grayscale. Clicking a
+source, matte or composite card also selects its owning Drawing or Part for
+the inspector. Type a layer
 name or node kind in **Find node** to highlight and scroll to a match; press
 Enter or **Next** for the following match. Search does not edit the project. The tab can
 change drawing order, opacity, opacity bypass, Normal/Multiply/Screen/Add blend mode, blend bypass and cutter settings. Drag a Drawing card onto another to place it immediately above that target in composite order. Hold Alt while dragging to use the first Drawing as the target's cutter. The target card highlights during the drag. Invalid or locked references reject the edit. Select a Drawing or Part,

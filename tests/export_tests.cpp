@@ -45,6 +45,12 @@ TEST_CASE("Composition node presentation follows cutter edits and undo") {
     }) == 1);
     REQUIRE(nodes.back().toMap().value("kind").toString() == "Write");
     REQUIRE(nodes.front().toMap().value("kind").toString() == "Background");
+    REQUIRE(std::count_if(nodes.begin(), nodes.end(), [&](const QVariant& item) {
+        const auto node = item.toMap();
+        return node.value("kind").toString() == "Composite" &&
+               node.value("layer").toInt() == int(target) &&
+               node.value("name").toString() == QString::fromStdString(editor.document().layer(target).name);
+    }) == 1);
     REQUIRE(editor.setMatteInverted(true));
     REQUIRE(editor.compositionNodes().size() == 9);
     REQUIRE(editor.document().layer(target).invertMatte);

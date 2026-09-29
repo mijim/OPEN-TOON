@@ -47,8 +47,9 @@ order dragging and offers selected-layer order,
 cutter, animated opacity edits, saved opacity bypass, Normal/Multiply/Screen/Add blend modes and saved blend bypass.
 Ordinary card drag changes order; Alt-drag binds a cutter source. Both use
 native pointer input and are checked through pixels, undo/redo and save/reopen. Node search locates cards by name or
-kind, scrolls to matches and cycles without editing pixels; arbitrary graph
-wiring is still open.
+kind, scrolls to matches and cycles without editing pixels. Cutter, matte and
+composite cards select their owning source or target for the inspector; arbitrary
+graph wiring is still open.
 
 An original 20-second integrated study now combines the connected toon, nine
 mouth substitutions, a visible eye cutter and sample-aligned synthetic audio
@@ -67,13 +68,13 @@ skipped polled playhead frames, respectively. These counters do not measure
 speaker underruns or actual
 presented-frame drops.
 
-The working source version is `0.2.0-experimental.45`; no new binary or source
+The working source version is `0.2.0-experimental.46`; no new binary or source
 tag has been published for it. The last locally qualified macOS preview and
 earlier binaries do not qualify these source changes.
 
-The owner resumed development after the earlier 10:30 CEST cutoff. The `.45`
+The owner resumed development after the earlier 10:30 CEST cutoff. The `.46`
 locked macOS build passes 186/186 CTest entries and native HM-12 pointer smoke,
-including blend bypass and Alt-drag cutter binding. Other earlier native
+including blend bypass, Alt-drag cutter binding and source/target owner selection. Other earlier native
 smokes and artistic checks are recorded in prior release entries. HM-12 remains an unfinished bounded
 contract; next work can continue its graph grouping/part-overlap behavior.
 HM-06 visual approval and HM-10 hardware presentation also remain open.

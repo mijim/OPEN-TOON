@@ -61,6 +61,11 @@ the supported cutter recipe; arbitrary wiring remains open.
 The Nodes search field locates cards by layer name or node kind without
 editing the document. It highlights matches, scrolls to the current result
 and cycles through them with Enter or Next; arbitrary graph edits remain open.
+Cutter source, Invert matte, Apply matte and composite cards now carry their
+owning Drawing or Part. Clicking one selects that exact source or target in
+the inspector while preserving its image/matte preview. The metadata is
+derived, validated and does not change saved pixels or project format. See
+[ADR-056](../architecture/adr/056-derived-node-owner-selection.md).
 Format 20 adds a persistent **Bypass cutter** control in Properties and Nodes.
 Bypass keeps its source and Inside/Outside choice but shows the uncut target;
 the source remains reserved and does not paint. Re-enable restores the exact
@@ -150,6 +155,9 @@ preview. This is diagnostic navigation, not a persisted graph edit.
 - Native Qt Quick smoke types Write into the search field in a narrower window,
 - Native Qt Quick smoke Alt-drags a Drawing source onto a Drawing target,
   checks the target binding and output color, then undoes, redoes and reopens.
+- Graph tests check derived cutter, matte and composite owner IDs and reject
+  dangling owners. Native Qt Quick smoke clicks the Cutter, Apply matte and
+  Composite cards and checks that the intended layer becomes selected.
 - Native Qt Quick smoke types Write into the search field in a narrower window,
   checks that the graph scrolls to the result with unchanged output, then
   finds three Drawing cards and clicks Next to visit the second result.

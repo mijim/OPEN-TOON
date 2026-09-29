@@ -1,5 +1,15 @@
 # Experimental releases
 
+## 0.2.0-experimental.46 — working source, node owner selection
+
+- Cutter source, Invert matte, Apply matte and layer composite cards carry
+  derived owner identity. Clicking one selects the source or target Drawing
+  or Part for the inspector while retaining the node preview.
+- Typed graph validation rejects invalid owners. Domain, presentation and
+  native Qt Quick click tests pass; the locked macOS build passes 186/186
+  CTest entries. Source only; no new public binary or tag. Arbitrary graph
+  wiring and group ports remain open.
+
 ## 0.2.0-experimental.45 — working source, blend bypass and direct cutter connection
 
 - Bypass a Drawing or Part blend in Nodes while retaining Multiply, Screen or

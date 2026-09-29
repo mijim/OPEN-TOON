@@ -9,6 +9,10 @@ TEST_CASE("Ordered composition has typed outputs and invalidates layer descendan
     auto graph = CompositionGraph::orderedLayers(document);
     REQUIRE_NOTHROW(graph.validate(document));
     REQUIRE(graph.display != graph.write);
+    REQUIRE(std::count_if(graph.nodes.begin(), graph.nodes.end(), [&](const auto& node) {
+                return node.kind == GraphNodeKind::Over &&
+                       node.layer == document.layers.front().id;
+            }) == 1);
     const auto order = graph.topologicalOrder();
     REQUIRE(order.size() == graph.nodes.size());
     const auto affected = graph.affectedByLayer(document, document.layers.front().id);
@@ -37,6 +41,9 @@ TEST_CASE("Composition rejects cycles, dangling edges, wrong ports and duplicate
     graph = baseline;
     graph.nodes[1].layer = 99999;
     REQUIRE_THROWS(graph.validate(document));
+    graph = baseline;
+    graph.nodes[2].layer = 99999;
+    REQUIRE_THROWS(graph.validate(document));
 }
 
 TEST_CASE("Composition profile is a validated document property") {
@@ -57,12 +64,21 @@ TEST_CASE("Cutter matte requires an independent visible drawing source") {
     REQUIRE_NOTHROW(document.validate());
     const auto graph = CompositionGraph::orderedLayers(document);
     REQUIRE_NOTHROW(graph.validate(document));
+    REQUIRE(std::count_if(graph.nodes.begin(), graph.nodes.end(), [&](const auto& node) {
+                return node.kind == GraphNodeKind::MatteFromImage && node.layer == source.id;
+            }) == 1);
+    REQUIRE(std::count_if(graph.nodes.begin(), graph.nodes.end(), [&](const auto& node) {
+                return node.kind == GraphNodeKind::ApplyMatte && node.layer == target;
+            }) == 1);
     REQUIRE(std::count_if(graph.nodes.begin(), graph.nodes.end(), [](const auto& node) {
                 return node.kind == GraphNodeKind::ApplyMatte;
             }) == 1);
     document.layer(target).invertMatte = true;
     REQUIRE_NOTHROW(document.validate());
     const auto outside = CompositionGraph::orderedLayers(document);
+    REQUIRE(std::count_if(outside.nodes.begin(), outside.nodes.end(), [&](const auto& node) {
+                return node.kind == GraphNodeKind::InvertMatte && node.layer == target;
+            }) == 1);
     REQUIRE(std::count_if(outside.nodes.begin(), outside.nodes.end(), [](const auto& node) {
                 return node.kind == GraphNodeKind::InvertMatte;
             }) == 1);

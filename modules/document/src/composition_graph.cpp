@@ -103,15 +103,15 @@ CompositionGraph CompositionGraph::orderedLayers(const Document& document) {
                 source = bypassed;
             } else {
                 GraphNodeId matte = next++;
-                graph.nodes.push_back({matte, GraphNodeKind::MatteFromImage, 0,
+                graph.nodes.push_back({matte, GraphNodeKind::MatteFromImage, layer.matte,
                                        {{sourceIds.at(layer.matte), 0}}});
                 if (layer.invertMatte) {
                     const GraphNodeId inverted = next++;
-                    graph.nodes.push_back({inverted, GraphNodeKind::InvertMatte, 0, {{matte, 0}}});
+                    graph.nodes.push_back({inverted, GraphNodeKind::InvertMatte, layer.id, {{matte, 0}}});
                     matte = inverted;
                 }
                 const GraphNodeId masked = next++;
-                graph.nodes.push_back({masked, GraphNodeKind::ApplyMatte, 0,
+                graph.nodes.push_back({masked, GraphNodeKind::ApplyMatte, layer.id,
                                        {{source, 0}, {matte, 1}}});
                 source = masked;
             }
@@ -126,7 +126,7 @@ CompositionGraph CompositionGraph::orderedLayers(const Document& document) {
                                     : layer.blendMode == LayerBlendMode::Add
                                           ? GraphNodeKind::Add
                                           : GraphNodeKind::Over;
-        graph.nodes.push_back({composite, kind, 0, {{image, 0}, {source, 1}}});
+        graph.nodes.push_back({composite, kind, layer.id, {{image, 0}, {source, 1}}});
         image = composite;
     }
     graph.display = next++;
@@ -153,8 +153,18 @@ void CompositionGraph::validate(const Document& document) const {
                 layer.kind != LayerKind::Drawing && layer.kind != LayerKind::Part)
                 throw std::invalid_argument("This image node requires a drawing source.");
         }
-        else if (node.layer)
-            throw std::invalid_argument("This compositor node cannot reference a layer.");
+        else if (node.layer) {
+            if (node.kind != GraphNodeKind::MatteFromImage &&
+                node.kind != GraphNodeKind::InvertMatte &&
+                node.kind != GraphNodeKind::ApplyMatte &&
+                node.kind != GraphNodeKind::Over && node.kind != GraphNodeKind::Multiply &&
+                node.kind != GraphNodeKind::Screen && node.kind != GraphNodeKind::Add &&
+                node.kind != GraphNodeKind::BypassBlend)
+                throw std::invalid_argument("This compositor node cannot reference a layer.");
+            const auto& layer = document.layer(node.layer);
+            if (layer.kind != LayerKind::Drawing && layer.kind != LayerKind::Part)
+                throw std::invalid_argument("A layer composite needs a drawing or Part owner.");
+        }
     }
     if (!indexed.contains(display) || !indexed.contains(write) || display == write ||
         indexed.at(display)->kind != GraphNodeKind::DisplayOutput ||
