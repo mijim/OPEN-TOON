@@ -28,9 +28,9 @@ Create, move, connect, search and delete nodes while navigating the graph.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM12-PROGRESS.md](../../../docs/implementation/HM12-PROGRESS.md) — native front/behind Drawing-card drags and Shift-click grouping, typed search/navigation, Part pixel order, undo/reopen and invalid-target checks.
+**Implementation evidence:** [docs/implementation/HM12-PROGRESS.md](../../../docs/implementation/HM12-PROGRESS.md) — docs/architecture/adr/062-composition-source-deletion-policy.md; native front/behind drags, grouping, explicit source-deletion policies, typed search/navigation, Part pixel order, undo/reopen and invalid-target checks.
 
-**Remaining scope:** The derived graph offers clickable image/matte previews, name/kind search, direct front/behind Drawing-card order and contiguous group boundaries. Arbitrary node creation, wiring, deletion and layout remain open.
+**Remaining scope:** The derived graph offers clickable image/matte previews, name/kind search, direct front/behind Drawing-card order and contiguous group boundaries. Drawing/Part source deletion chooses Protect or Disconnect, with explicit cutter/group reconnection and atomic undo. Arbitrary processing-node creation, wiring, deletion and layout remain open.
 
 ## NOD-002 — Typed ports
 

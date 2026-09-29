@@ -1,5 +1,16 @@
 # Experimental releases
 
+## 0.2.0-experimental.58 — working source, explicit source deletion
+
+- A Drawing or Part source card offers **Delete source…** with Protect and
+  Disconnect choices. Protect rejects a referenced source. Disconnect clears
+  cutter users and intersecting group boundaries before deleting the source
+  or complete Part branch in one undoable command.
+- Drawing/Part application fixtures and native Qt Quick input check refusal,
+  result pixels, atomic undo/redo and save/reopen. The locked macOS suite passes
+  196/196 CTest entries. General node deletion and user-wired reconnection
+  remain open. Source only; no public binary or tag.
+
 ## 0.2.0-experimental.57 — working source, group dependency closure
 
 - Full character and closed rig-branch copies now clone contained composite

@@ -96,6 +96,12 @@ remapping remains intact. A branch deletion removes a fully contained group;
 copying or removing only part of one rejects atomically. This closes one
 in-project graph dependency path; a portable template dependency collector
 and general reusable subgraphs remain open.
+Drawing and Part source cards now offer **Delete source…**. Protect references
+rejects a source used by a cutter or group. Disconnect references clears every
+external cutter user and intersecting group boundary before deleting the
+source or complete Part branch. Locked users and child-bearing Drawings still
+reject. The chosen policy is one undoable command, with no new project-format
+field; see [ADR-062](../architecture/adr/062-composition-source-deletion-policy.md).
 Alt-dragging a Drawing card onto another binds the first as the second's
 cutter source through the existing validated document command. Its fractional
 alpha, saved references and one-step undo use the same path as the inspector.
@@ -233,6 +239,10 @@ preview. This is diagnostic navigation, not a persisted graph edit.
 - A grouped two-Part rig fixture checks full character and branch copies,
   remapped group/cutter IDs, saved bypass, serialization, atomic undo/redo,
   closed-branch deletion and rejection when a group crosses the copy boundary.
+- Drawing and Part deletion fixtures verify Protect rejection, explicit
+  disconnection of cutter users and group boundaries, locked-user refusal,
+  changed pixels, atomic undo/redo and reopen. Native Qt Quick smoke clicks
+  both policy choices and checks the saved disconnected target.
 - Native Qt Quick smoke Alt-drags a Drawing source onto a Drawing target,
   checks the target binding and output color, then undoes, redoes and reopens.
 - Native Qt Quick smoke Alt-clicks Apply matte to bypass, undoes, redoes and

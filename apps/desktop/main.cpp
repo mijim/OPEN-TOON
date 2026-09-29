@@ -1114,8 +1114,54 @@ int main(int argc, char** argv) {
                     editor.undo();
                     if (editor.document().layers.size() != beforeOperatorAdd)
                         throw std::runtime_error("Drawing operator did not undo atomically.");
+                    editor.setSelectedLayer(int(blue));
+                    if (!editor.setLayerMatte(int(red)))
+                        throw std::runtime_error("Cannot prepare referenced source deletion.");
+                    const auto beforeSourceDelete = editor.document();
+                    strip->setProperty("contentX", 0);
+                    QCoreApplication::processEvents();
+                    (void)window->grabWindow();
+                    redCard = findDrawingCard(int(red));
+                    if (!redCard || !redCard->isVisible())
+                        throw std::runtime_error("Referenced Drawing source card is unavailable.");
+                    const auto deleteCardPoint = redCard->mapToScene(QPointF(
+                        redCard->width() / 2, 30));
+                    movePoint(QEvent::MouseButtonPress, deleteCardPoint, Qt::LeftButton);
+                    movePoint(QEvent::MouseButtonRelease, deleteCardPoint, Qt::NoButton);
+                    auto* deleteSource = window->findChild<QQuickItem*>("nodeDeleteSource");
+                    if (!deleteSource || !deleteSource->isVisible())
+                        throw std::runtime_error("Delete source choice is unavailable.");
+                    const auto deleteSourcePoint = deleteSource->mapToScene(QPointF(
+                        deleteSource->width() / 2, deleteSource->height() / 2));
+                    movePoint(QEvent::MouseButtonPress, deleteSourcePoint, Qt::LeftButton);
+                    movePoint(QEvent::MouseButtonRelease, deleteSourcePoint, Qt::NoButton);
+                    auto* protectReferences = window->findChild<QQuickItem*>("nodeDeleteProtect");
+                    auto* disconnectReferences = window->findChild<QQuickItem*>("nodeDeleteDisconnect");
+                    if (!protectReferences || !disconnectReferences ||
+                        !protectReferences->isVisible() || !disconnectReferences->isVisible())
+                        throw std::runtime_error("Delete source policies are unavailable.");
+                    const auto protectPoint = protectReferences->mapToScene(QPointF(
+                        protectReferences->width() / 2, protectReferences->height() / 2));
+                    movePoint(QEvent::MouseButtonPress, protectPoint, Qt::LeftButton);
+                    movePoint(QEvent::MouseButtonRelease, protectPoint, Qt::NoButton);
+                    if (editor.document() != beforeSourceDelete)
+                        throw std::runtime_error("Protect references changed a used source.");
+                    const auto disconnectPoint = disconnectReferences->mapToScene(QPointF(
+                        disconnectReferences->width() / 2, disconnectReferences->height() / 2));
+                    movePoint(QEvent::MouseButtonPress, disconnectPoint, Qt::LeftButton);
+                    movePoint(QEvent::MouseButtonRelease, disconnectPoint, Qt::NoButton);
+                    if (editor.document().layers.size() != beforeSourceDelete.layers.size() - 1 ||
+                        editor.document().layer(blue).matte != 0)
+                        throw std::runtime_error("Disconnect and delete left a partial cutter graph.");
+                    editor.undo();
+                    if (editor.document() != beforeSourceDelete)
+                        throw std::runtime_error("Disconnect and delete did not undo atomically.");
+                    editor.redo();
+                    if (!editor.saveProject({}) || !editor.openProject(QUrl::fromLocalFile(behindPath)) ||
+                        editor.document().layer(blue).matte != 0)
+                        throw std::runtime_error("Disconnected source deletion changed after reopen.");
                     std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass, fractional cutter, "
-                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, group order, bypass and ungroup ports, Alt-drag cutter, Alt-click bypass, operator library search/apply, typed node search, save/reopen and undo.\n";
+                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, group order, bypass and ungroup ports, Alt-drag cutter, Alt-click bypass, operator library search/apply, explicit source deletion, typed node search, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

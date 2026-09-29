@@ -1246,6 +1246,65 @@ bool EditorController::setCompositeGroupBypassed(int groupId, bool bypassed) {
         group->bypassed = bypassed;
     });
 }
+bool EditorController::deleteCompositionSource(int layerId, bool disconnectReferences) {
+    if (layerId <= 0)
+        return false;
+    const bool removed = edit(disconnectReferences ? "Disconnect and delete composition source"
+                                                  : "Delete unreferenced composition source",
+                              [&](Document& d) {
+        const auto source = std::find_if(d.layers.begin(), d.layers.end(),
+                                         [layerId](const Layer& layer) {
+                                             return layer.id == Id(layerId);
+                                         });
+        if (source == d.layers.end() ||
+            (source->kind != LayerKind::Drawing && source->kind != LayerKind::Part))
+            throw std::runtime_error("Select a Drawing or Part source to delete.");
+        std::set<Id> removedLayers{source->id};
+        if (source->kind == LayerKind::Part) {
+            for (const auto& layer : d.layers)
+                for (Id parent = layer.parent; parent; parent = d.layer(parent).parent)
+                    if (parent == source->id) {
+                        removedLayers.insert(layer.id);
+                        break;
+                    }
+        } else if (std::any_of(d.layers.begin(), d.layers.end(),
+                               [layerId](const Layer& layer) {
+                                   return layer.parent == Id(layerId);
+                               }))
+            throw std::runtime_error("Remove or reparent child layers before deleting the source.");
+        for (const auto& layer : d.layers)
+            if (removedLayers.contains(layer.id) && layer.locked)
+                throw std::runtime_error("Unlock every source layer before deleting it.");
+        for (auto& layer : d.layers)
+            if (!removedLayers.contains(layer.id) && removedLayers.contains(layer.matte)) {
+                if (!disconnectReferences)
+                    throw std::runtime_error("Choose Disconnect references to remove cutter users.");
+                if (layer.locked)
+                    throw std::runtime_error("Unlock cutter users before disconnecting them.");
+                layer.matte = 0;
+                layer.invertMatte = false;
+                layer.matteBypassed = false;
+            }
+        const auto groupIntersects = [&](const CompositeGroup& group) {
+            return std::any_of(group.members.begin(), group.members.end(),
+                               [&](Id member) { return removedLayers.contains(member); });
+        };
+        if (!disconnectReferences &&
+            std::any_of(d.compositeGroups.begin(), d.compositeGroups.end(), groupIntersects))
+            throw std::runtime_error("Choose Disconnect references to remove group boundaries.");
+        if (disconnectReferences)
+            std::erase_if(d.compositeGroups, groupIntersects);
+        if (source->kind == LayerKind::Part)
+            opentoon::removeRigBranch(d, Id(layerId));
+        else
+            std::erase_if(d.layers, [layerId](const Layer& layer) {
+                return layer.id == Id(layerId);
+            });
+    });
+    if (removed)
+        resetSelection();
+    return removed;
+}
 void EditorController::setParent(int parent) {
     if (!layer_)
         return;

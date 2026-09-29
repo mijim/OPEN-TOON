@@ -56,6 +56,13 @@ bypass setting, and internal cutter bindings point to the new Parts. A copy
 or deletion that includes only some group members is rejected; ungroup first
 or select the complete branch.
 
+Click a Drawing or Part source card, then **Delete source…** in its preview.
+**Protect references** removes it only if no cutter user or composite group
+depends on it. **Disconnect references and delete** clears those cutter
+bindings and group boundaries before removing the source or complete Part
+branch. Both choices are one undoable edit. A locked cutter user or a Drawing
+with child layers must be handled first.
+
 ## Drawing and view controls
 
 - **Pencil:** sampled vector centerline with round segments and pressure-weighted width.

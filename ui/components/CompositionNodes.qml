@@ -574,8 +574,76 @@ Item {
                                      root.previewLayerId)
                     Accessible.name: text
                 }
+                ToolButton {
+                    objectName: "nodeDeleteSource"
+                    Layout.fillWidth: true
+                    visible: root.previewNodeKind === "Drawing" && root.previewLayerId > 0
+                    text: "Delete source…"
+                    onClicked: {
+                        deleteSourcePopup.sourceLayer = root.previewLayerId
+                        deleteSourcePopup.open()
+                    }
+                    Accessible.name: "Choose how to delete the previewed Drawing or Part source"
+                }
             }
         }
+        }
+    }
+    Popup {
+        id: deleteSourcePopup
+        objectName: "nodeDeleteSourcePopup"
+        property int sourceLayer: 0
+        parent: root
+        x: Math.max(8, root.width - width - 12)
+        y: 76
+        width: 320
+        height: 174
+        padding: 10
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        background: Rectangle {
+            color: "#171717"
+            border.color: "#555555"
+            radius: 5
+        }
+        contentItem: ColumnLayout {
+            spacing: 6
+            Label {
+                text: "DELETE COMPOSITION SOURCE"
+                color: "#eeeeee"
+                font.pixelSize: 11
+                font.bold: true
+            }
+            Label {
+                Layout.fillWidth: true
+                wrapMode: Text.WordWrap
+                text: "Choose what happens to cutter users and group boundaries."
+                color: "#999999"
+                font.pixelSize: 10
+            }
+            ToolButton {
+                objectName: "nodeDeleteProtect"
+                Layout.fillWidth: true
+                text: "Protect references · reject if used"
+                onClicked: {
+                    if (root.controller.deleteCompositionSource(deleteSourcePopup.sourceLayer, false)) {
+                        root.previewNodeId = 0
+                        deleteSourcePopup.close()
+                    }
+                }
+                Accessible.name: "Delete source only when no graph references use it"
+            }
+            ToolButton {
+                objectName: "nodeDeleteDisconnect"
+                Layout.fillWidth: true
+                text: "Disconnect references and delete"
+                onClicked: {
+                    if (root.controller.deleteCompositionSource(deleteSourcePopup.sourceLayer, true)) {
+                        root.previewNodeId = 0
+                        deleteSourcePopup.close()
+                    }
+                }
+                Accessible.name: "Disconnect cutter users and group boundaries, then delete source"
+            }
         }
     }
     Popup {

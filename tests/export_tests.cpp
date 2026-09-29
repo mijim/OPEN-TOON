@@ -279,6 +279,107 @@ TEST_CASE("Composite grouping is one undoable edit with stable ports and reopene
     REQUIRE_FALSE(editor.moveCompositeGroup(int(frontGroup), int(yellow), true));
     REQUIRE(editor.document().compositeGroups.front().id == rearGroup);
 }
+TEST_CASE("Deleting a composition source uses the chosen reference policy atomically") {
+    auto document = opentoon::makeDocument();
+    document.width = document.height = 1;
+    document.background = {0, 0, 0, 0};
+    const auto source = document.layers.front().id;
+    document.editableDrawing(source, 0).image =
+        opentoon::ImageAsset{1, 1, {255, 0, 0, 128}};
+    const auto append = [&](std::string name, std::vector<std::uint8_t> pixels) {
+        auto layer = document.layers.front();
+        layer.id = document.allocateId();
+        layer.name = std::move(name);
+        auto drawing = document.drawings.at(layer.exposures.front().drawing);
+        drawing.id = document.allocateId();
+        drawing.image = opentoon::ImageAsset{1, 1, std::move(pixels)};
+        document.drawings.emplace(drawing.id, drawing);
+        layer.exposures.front().drawing = drawing.id;
+        document.layers.push_back(layer);
+        return layer.id;
+    };
+    const auto middle = append("Middle", {0, 255, 0, 255});
+    const auto target = append("Target", {0, 0, 255, 255});
+    document.layer(target).matte = source;
+    document.layer(target).invertMatte = true;
+    const auto groupId = document.allocateId();
+    document.compositeGroups.push_back({groupId, "Source and middle",
+                                        {source, middle}});
+    document.validate();
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto path = QUrl::fromLocalFile(directory.filePath("delete-source.otoon"));
+    REQUIRE(opentoon::ProjectStore::save(std::filesystem::path(path.toLocalFile().toStdString()),
+                                         document) > 0);
+    EditorController editor;
+    REQUIRE(editor.openProject(path));
+    const auto baseline = editor.document();
+    const auto original = opentoon::SceneRenderer::render(editor.document(), 0);
+    REQUIRE_FALSE(editor.deleteCompositionSource(int(source), false));
+    REQUIRE(editor.document() == baseline);
+    editor.toggleLayer(int(target), "locked");
+    const auto locked = editor.document();
+    REQUIRE_FALSE(editor.deleteCompositionSource(int(source), true));
+    REQUIRE(editor.document() == locked);
+    editor.toggleLayer(int(target), "locked");
+    REQUIRE(editor.deleteCompositionSource(int(source), true));
+    REQUIRE(editor.document().layers.size() == 2);
+    REQUIRE(editor.document().compositeGroups.empty());
+    REQUIRE(editor.document().layer(target).matte == 0);
+    REQUIRE_FALSE(editor.document().layer(target).invertMatte);
+    REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    editor.undo();
+    REQUIRE(editor.document() == baseline);
+    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 0) == original);
+    editor.redo();
+    REQUIRE(editor.saveProject({}));
+    REQUIRE(editor.openProject(path));
+    REQUIRE(editor.document().compositeGroups.empty());
+    REQUIRE(editor.document().layer(target).matte == 0);
+    REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+}
+TEST_CASE("Deleting a Part source disconnects external cutters and group boundaries") {
+    auto document = opentoon::makeDocument();
+    const auto body = document.layers.front().id;
+    const auto root = opentoon::makeCharacter(document, body, "Hero");
+    opentoon::Layer cutter;
+    cutter.id = document.allocateId();
+    const auto cutterId = cutter.id;
+    cutter.name = "Cutter";
+    document.layers.push_back(cutter);
+    opentoon::attachDrawingAsPart(document, cutterId, root, "Cutter");
+    opentoon::Layer outside;
+    outside.id = document.allocateId();
+    const auto outsideId = outside.id;
+    outside.name = "Outside target";
+    outside.matte = cutterId;
+    document.layers.push_back(outside);
+    const auto groupId = document.allocateId();
+    document.compositeGroups.push_back({groupId, "Body joint", {body, cutterId}});
+    document.validate();
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto path = QUrl::fromLocalFile(directory.filePath("delete-part-source.otoon"));
+    REQUIRE(opentoon::ProjectStore::save(std::filesystem::path(path.toLocalFile().toStdString()),
+                                         document) > 0);
+    EditorController editor;
+    REQUIRE(editor.openProject(path));
+    const auto baseline = editor.document();
+    REQUIRE_FALSE(editor.deleteCompositionSource(int(cutterId), false));
+    REQUIRE(editor.document() == baseline);
+    REQUIRE(editor.deleteCompositionSource(int(cutterId), true));
+    REQUIRE(editor.document().compositeGroups.empty());
+    REQUIRE(editor.document().layer(outsideId).matte == 0);
+    REQUIRE(editor.document().layer(body).parent == root);
+    REQUIRE_THROWS(editor.document().layer(cutterId));
+    editor.undo();
+    REQUIRE(editor.document() == baseline);
+    editor.redo();
+    REQUIRE(editor.saveProject({}));
+    REQUIRE(editor.openProject(path));
+    REQUIRE(editor.document().compositeGroups.empty());
+    REQUIRE(editor.document().layer(outsideId).matte == 0);
+}
 namespace {
 const QString partFixture = QStringLiteral(OPENTOON_SOURCE_DIR "/tests/fixtures/harmony-moment/parts/");
 QVariantList paths(std::initializer_list<QString> values) {

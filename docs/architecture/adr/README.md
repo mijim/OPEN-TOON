@@ -163,3 +163,6 @@ composite groups, typed input/output ports and source-version backup behavior.
 
 See [ADR-061](061-persistent-composite-group-bypass.md) for format-32 saved
 group bypass with an input-image fallback and retained cutter sources.
+
+See [ADR-062](062-composition-source-deletion-policy.md) for explicit
+protect/disconnect choices when deleting a Drawing or Part composition source.

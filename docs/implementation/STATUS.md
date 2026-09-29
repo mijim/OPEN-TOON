@@ -79,6 +79,10 @@ Full character and closed rig-branch copies now remap contained group IDs and
 members. A branch removal removes its closed groups; partial group boundaries
 reject copy or deletion atomically. Portable template dependency collection
 remains open.
+Nodes also exposes an explicit source deletion choice on Drawing/Part cards:
+Protect rejects cutter or group references, while Disconnect clears those
+references and removes the source in one undoable edit. Locked users reject;
+native input and reopened output pass for the supported subset.
 
 An original 20-second integrated study now combines the connected toon, nine
 mouth substitutions, a visible eye cutter and sample-aligned synthetic audio
@@ -97,11 +101,11 @@ skipped polled playhead frames, respectively. These counters do not measure
 speaker underruns or actual
 presented-frame drops.
 
-The working source version is `0.2.0-experimental.57`; no new binary or source
+The working source version is `0.2.0-experimental.58`; no new binary or source
 tag has been published for it. The last locally qualified macOS preview and
 earlier binaries do not qualify these source changes.
 
-The owner resumed development after the earlier 10:30 CEST cutoff. The `.57`
+The owner resumed development after the earlier 10:30 CEST cutoff. The `.58`
 locked macOS build passes 196/196 CTest entries and native HM-12 smoke,
 including contiguous group input/output ports, matte-only source pixels,
 grouping/rename/ungroup, whole-group order and bypass, operator search/apply,
