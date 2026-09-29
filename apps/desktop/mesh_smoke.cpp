@@ -356,6 +356,49 @@ void meshSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& windo
     QCoreApplication::processEvents();
     if (window.grabWindow().isNull())
         throw std::runtime_error("Native canvas did not display the continuous rig example.");
+    const auto visual = QDir::current().filePath("examples/clockwork-visual-shot.otoon");
+    if (!editor.openProject(QUrl::fromLocalFile(visual)))
+        throw std::runtime_error("Native editor could not open the visual shot: " +
+                                 editor.status().toStdString());
+    if (editor.document().duration != 480 || !editor.document().activeCamera)
+        throw std::runtime_error("Visual shot lost its timing or output camera.");
+    Id visualHand = 0, visualTorso = 0, visualLeg = 0;
+    for (const auto& layer : editor.document().layers) {
+        if (layer.role == "hand_left") visualHand = layer.id;
+        if (layer.role == "torso") visualTorso = layer.id;
+        if (layer.role == "leg_left") visualLeg = layer.id;
+    }
+    if (!visualHand || !visualTorso || !visualLeg)
+        throw std::runtime_error("Visual shot lost its character roles or torso curve.");
+    const auto* torsoMesh = meshBindingFor(editor.document().layer(visualTorso),
+                                           editor.document().drawingAt(visualTorso, 0)->id);
+    if (!torsoMesh || !torsoMesh->curve)
+        throw std::runtime_error("Visual shot lost its torso curve.");
+    editor.setSelectedLayer(int(visualHand));
+    if (!editor.selectedFollowsBoneTip())
+        throw std::runtime_error("Visual shot lost its linked hand.");
+    editor.setFrame(0);
+    const Id openDrawing = editor.selectedSubstitution();
+    editor.setFrame(240);
+    const Id pointDrawing = editor.selectedSubstitution();
+    editor.setFrame(336);
+    const Id fistDrawing = editor.selectedSubstitution();
+    if (!openDrawing || !pointDrawing || !fistDrawing ||
+        openDrawing == pointDrawing || pointDrawing == fistDrawing)
+        throw std::runtime_error("Visual shot did not show three hand substitutions.");
+    const auto visualDocument = editor.document();
+    const auto visualFrame = SceneRenderer::render(visualDocument, 360);
+    for (int frame : {0, 120, 240, 336, 360, 479}) {
+        editor.setFrame(frame);
+        QCoreApplication::processEvents();
+        if (window.grabWindow().isNull())
+            throw std::runtime_error("Native canvas could not present a visual-shot beat.");
+    }
+    const auto visualCopy = QUrl::fromLocalFile(temporary.path() + "/visual-shot.otoon");
+    if (!editor.saveProject(visualCopy) || !editor.openProject(visualCopy) ||
+        editor.document() != visualDocument ||
+        SceneRenderer::render(editor.document(), 360) != visualFrame)
+        throw std::runtime_error("Visual-shot UI save/reopen changed the authored scene.");
 }
 
 void meshInteractionBenchmark(EditorController& editor, CanvasItem& canvas,
@@ -369,12 +412,23 @@ void meshInteractionBenchmark(EditorController& editor, CanvasItem& canvas,
             arm = layer.id;
     if (!arm)
         throw std::runtime_error("HM-06 benchmark project has no bound left arm Part.");
+    int sampleFrame = 12;
+    if (qEnvironmentVariableIsSet("OPENTOON_HM06_BENCH_FRAME")) {
+        bool valid = false;
+        sampleFrame = qEnvironmentVariable("OPENTOON_HM06_BENCH_FRAME").toInt(&valid);
+        if (!valid || sampleFrame < 0 || sampleFrame >= editor.duration())
+            throw std::runtime_error("HM-06 benchmark frame is outside the scene.");
+    }
     editor.setSelectedLayer(int(arm));
-    editor.setFrame(12);
+    editor.setFrame(sampleFrame);
     editor.setTool("Mesh");
     canvas.setCameraGuidesVisible(false);
     canvas.fit();
-    const int partCount = int(editor.document().layers.size()) - 1;
+    const int partCount = int(std::count_if(editor.document().layers.begin(),
+                                           editor.document().layers.end(),
+                                           [](const Layer& layer) {
+                                               return layer.kind == LayerKind::Part;
+                                           }));
     if (editor.selectedMeshDeformer() != 1 || (partCount != 19 && partCount != 15))
         throw std::runtime_error("HM-06 benchmark requires a bound Harmony scene.");
     const auto original = editor.document();
@@ -436,6 +490,7 @@ void meshInteractionBenchmark(EditorController& editor, CanvasItem& canvas,
 #endif
     const QJsonObject report{{"profile", "native Qt Quick input-to-frameSwapped"},
                              {"documentParts", partCount},
+                             {"sampleFrame", sampleFrame},
                              {"sceneWidth", editor.sceneWidth()},
                              {"sceneHeight", editor.sceneHeight()},
                              {"canvasWidth", canvas.width()},

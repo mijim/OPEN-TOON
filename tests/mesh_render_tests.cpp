@@ -45,6 +45,43 @@ struct MeshScene {
         document.validate();
     }
 };
+std::pair<int, int> connectedInk(const QImage& frame) {
+    const int width = frame.width(), height = frame.height();
+    std::vector<std::uint8_t> visited(std::size_t(width) * height);
+    int total = 0, largest = 0;
+    for (int y = 0; y < height; ++y)
+        for (int x = 0; x < width; ++x) {
+            if (frame.pixel(x, y) == qRgb(255, 255, 255))
+                continue;
+            ++total;
+            const int start = y * width + x;
+            if (visited[std::size_t(start)])
+                continue;
+            std::vector<int> pending{start};
+            visited[std::size_t(start)] = 1;
+            int size = 0;
+            while (!pending.empty()) {
+                const int current = pending.back();
+                pending.pop_back();
+                ++size;
+                const int cx = current % width, cy = current / width;
+                for (int dy = -1; dy <= 1; ++dy)
+                    for (int dx = -1; dx <= 1; ++dx) {
+                        const int nx = cx + dx, ny = cy + dy;
+                        if (nx < 0 || nx >= width || ny < 0 || ny >= height)
+                            continue;
+                        const int next = ny * width + nx;
+                        if (!visited[std::size_t(next)] &&
+                            frame.pixel(nx, ny) != qRgb(255, 255, 255)) {
+                            visited[std::size_t(next)] = 1;
+                            pending.push_back(next);
+                        }
+                    }
+            }
+            largest = std::max(largest, size);
+        }
+    return {largest, total};
+}
 } // namespace
 
 TEST_CASE("Rest mesh is pixel-identical; posed mesh renders through save, reopen and both outputs") {
@@ -537,49 +574,13 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
         partIds.insert(role, layer->id);
     }
     const Id root = makeCharacter(document, partIds.value("leg_left"), "Clockwork Hello");
+    setPartRole(document, partIds.value("leg_left"), "leg_left");
     for (const auto& role : order)
         if (role != "leg_left")
             attachDrawingAsPart(document, partIds.value(role), root, role.toStdString());
     document.validate();
     REQUIRE(document.layers.size() == 16); // Fifteen artwork Parts plus the character peg.
     const auto rest = SceneRenderer::render(document, 0);
-    auto connectedInk = [](const QImage& frame) {
-        const int width = frame.width(), height = frame.height();
-        std::vector<std::uint8_t> visited(std::size_t(width) * height);
-        int total = 0, largest = 0;
-        for (int y = 0; y < height; ++y)
-            for (int x = 0; x < width; ++x) {
-                if (frame.pixel(x, y) == qRgb(255, 255, 255))
-                    continue;
-                ++total;
-                const int start = y * width + x;
-                if (visited[std::size_t(start)])
-                    continue;
-                std::vector<int> pending{start};
-                visited[std::size_t(start)] = 1;
-                int size = 0;
-                while (!pending.empty()) {
-                    const int current = pending.back();
-                    pending.pop_back();
-                    ++size;
-                    const int cx = current % width, cy = current / width;
-                    for (int dy = -1; dy <= 1; ++dy)
-                        for (int dx = -1; dx <= 1; ++dx) {
-                            const int nx = cx + dx, ny = cy + dy;
-                            if (nx < 0 || nx >= width || ny < 0 || ny >= height)
-                                continue;
-                            const int next = ny * width + nx;
-                            if (!visited[std::size_t(next)] &&
-                                frame.pixel(nx, ny) != qRgb(255, 255, 255)) {
-                                visited[std::size_t(next)] = 1;
-                                pending.push_back(next);
-                            }
-                        }
-                }
-                largest = std::max(largest, size);
-            }
-        return std::pair{largest, total};
-    };
     const auto [restConnected, restInk] = connectedInk(rest);
     REQUIRE(restConnected == restInk);
     struct LimbKey { QString role; double angle; QString follower; };
@@ -1045,4 +1046,228 @@ TEST_CASE("Full-length continuous toon retimes linked limbs and coordinated view
         const auto output = qEnvironmentVariable("OPENTOON_HM06_LONG_PROJECT");
         REQUIRE(ProjectStore::save(std::filesystem::path(output.toStdString()), reopened) > 0);
     }
+}
+
+TEST_CASE("Twenty-second visual shot combines deformers views mouth hands and camera") {
+    QFile specification(QStringLiteral(OPENTOON_SOURCE_DIR
+        "/tests/fixtures/harmony-moment/shot.json"));
+    REQUIRE(specification.open(QIODevice::ReadOnly));
+    const auto brief = QJsonDocument::fromJson(specification.readAll()).object();
+    const auto cues = brief.value("audio").toObject().value("cue_frames").toArray();
+    REQUIRE(cues.size() == 9);
+    const auto shortScene = ProjectStore::load(std::filesystem::path(
+        OPENTOON_SOURCE_DIR "/examples/clockwork-continuous.otoon")).document;
+    REQUIRE(shortScene.duration == 48);
+    auto scene = shortScene;
+    scene.name = "Clockwork Hello — visual shot study";
+    std::vector<Id> tracks;
+    for (const auto& layer : scene.layers)
+        tracks.push_back(layer.id);
+    REQUIRE_NOTHROW(retimeRange(scene, tracks, 0, 48, 480));
+    const auto findRole = [&](const char* role) {
+        const auto found = std::find_if(scene.layers.begin(), scene.layers.end(),
+                                        [&](const Layer& layer) { return layer.role == role; });
+        return found == scene.layers.end() ? Id{0} : found->id;
+    };
+    const auto rootLayer = std::find_if(scene.layers.begin(), scene.layers.end(),
+                                        [](const Layer& layer) {
+                                            return layer.kind == LayerKind::Character;
+                                        });
+    REQUIRE(rootLayer != scene.layers.end());
+    const Id root = rootLayer->id;
+    const Id arm = findRole("arm_left"), hand = findRole("hand_left");
+    const Id mouth = findRole("mouth"), torso = findRole("torso");
+    REQUIRE(arm != 0);
+    REQUIRE(hand != 0);
+    REQUIRE(mouth != 0);
+    REQUIRE(torso != 0);
+    const auto views = scene.layer(root).views;
+    REQUIRE(views.size() == 2);
+    const Id front = views.front().id, side = views.back().id;
+    applyCharacterViewRange(scene, root, front, 0, scene.duration);
+    applyCharacterViewRange(scene, root, side, 120, 432);
+    const Id baseSleeve = scene.layer(arm).variants.front().drawing;
+    const Id alternateSleeve = scene.layer(arm).variants.back().drawing;
+    expose(scene.layer(arm), 120, 300, baseSleeve);
+    REQUIRE(scene.drawingAt(arm, 299)->id == baseSleeve);
+    REQUIRE(scene.drawingAt(arm, 300)->id == alternateSleeve);
+
+    const auto addArt = [&](Id part, Frame frame, std::string name, QString file) {
+        const Id drawing = createSubstitution(scene, part, frame, false, std::move(name));
+        const QImage source(QStringLiteral(OPENTOON_SOURCE_DIR
+            "/tests/fixtures/harmony-moment/parts/") + file + ".png");
+        REQUIRE_FALSE(source.isNull());
+        const auto image = source.convertToFormat(QImage::Format_RGBA8888);
+        std::vector<std::uint8_t> pixels;
+        pixels.reserve(std::size_t(image.width()) * image.height() * 4);
+        for (int y = 0; y < image.height(); ++y) {
+            const auto* row = image.constScanLine(y);
+            pixels.insert(pixels.end(), row, row + image.width() * 4);
+        }
+        scene.drawings.at(drawing).image =
+            ImageAsset{image.width(), image.height(), std::move(pixels)};
+        return drawing;
+    };
+    const Id openHand = scene.layer(hand).variants.front().drawing;
+    const Id fistHand = scene.layer(hand).variants.back().drawing;
+    const Id pointHand = addArt(hand, 240, "Point", "hand_left__point");
+    expose(scene.layer(hand), 120, 240, openHand);
+    expose(scene.layer(hand), 240, 336, pointHand);
+    expose(scene.layer(hand), 336, 360, fistHand);
+    expose(scene.layer(hand), 360, 432, pointHand);
+    const Id sideAh = scene.drawingAt(mouth, 120)->id;
+    std::map<std::string, Id> sideMouth{{"ah", sideAh}};
+    for (const auto* shape : {"rest", "mbp", "fv", "ee", "oh", "l", "wide"})
+        sideMouth.emplace(shape, addArt(mouth, 120, std::string("Side ") + shape,
+                             QStringLiteral("mouth__three_quarter__") + shape));
+    REQUIRE(sideMouth.size() == 8);
+    expose(scene.layer(mouth), 120, 432, sideMouth.at("rest"));
+    const std::array<std::pair<Frame, const char*>, 10> mouthKeys{{
+        {120, "ah"}, {126, "mbp"}, {144, "ee"}, {168, "ah"}, {190, "fv"},
+        {214, "rest"}, {345, "oh"}, {365, "l"}, {388, "wide"}, {410, "rest"}}};
+    for (std::size_t index = 0; index < mouthKeys.size(); ++index) {
+        const Frame end = index + 1 < mouthKeys.size() ? mouthKeys[index + 1].first : 432;
+        expose(scene.layer(mouth), mouthKeys[index].first, end,
+               sideMouth.at(mouthKeys[index].second));
+    }
+    for (int index = 0; index < cues.size(); ++index) {
+        REQUIRE(cues[index].toInt() == mouthKeys[std::size_t(index + 1)].first);
+        scene.markers.push_back({cues[index].toInt(),
+                                 "Dialogue cue " + std::to_string(index + 1)});
+    }
+
+    const auto rootRest = scene.layer(root).transform;
+    for (const auto [frame, offset] :
+         {std::pair{Frame{0}, 0.0}, {Frame{120}, 60.0}, {Frame{240}, 80.0},
+          {Frame{360}, 80.0}, {Frame{479}, 0.0}}) {
+        auto pose = rootRest;
+        pose.x += offset;
+        recordPose(scene.layer(root), frame, pose);
+    }
+    std::vector<std::pair<Id, Id>> boneBindings;
+    for (const auto& layer : scene.layers)
+        for (const auto& binding : layer.bindings)
+            if (binding.bone)
+                boneBindings.emplace_back(layer.id, binding.drawing);
+    REQUIRE(boneBindings.size() == 5);
+    for (const auto [part, drawing] : boneBindings)
+        recordBonePose(scene, part, drawing, 432, 0, 0);
+    const Id torsoDrawing = scene.drawingAt(torso, 0)->id;
+    bindRegularImageMesh(scene, torso, torsoDrawing, 4, 8);
+    const std::array<MeshPoint, 4> restCurve{{{128, 35}, {126, 95},
+                                               {130, 155}, {128, 215}}};
+    bindCurveDeformer(scene, torso, torsoDrawing, restCurve);
+    auto sway = restCurve;
+    sway[1].x += 3;
+    sway[2].x += 6;
+    recordCurvePose(scene, torso, torsoDrawing, 240, sway);
+    sway[1].x += 3;
+    sway[2].x += 4;
+    recordCurvePose(scene, torso, torsoDrawing, 360, sway);
+    recordCurvePose(scene, torso, torsoDrawing, 432, restCurve);
+
+    Layer camera;
+    camera.id = scene.allocateId();
+    camera.kind = LayerKind::Camera;
+    camera.name = "Output camera";
+    camera.transform.x = scene.width / 2;
+    camera.transform.y = scene.height / 2;
+    scene.activeCamera = camera.id;
+    scene.layers.push_back(camera);
+    for (const auto [frame, zoom] :
+         {std::pair{Frame{0}, 1.0}, {Frame{336}, 1.0},
+          {Frame{360}, 1.12}, {Frame{432}, 1.12}, {Frame{479}, 1.0}}) {
+        auto pose = camera.transform;
+        pose.scaleX = pose.scaleY = zoom;
+        recordPose(scene.layer(camera.id), frame, pose);
+    }
+    scene.validate();
+    REQUIRE(scene.duration == 480);
+    REQUIRE(scene.layer(hand).boneTipAnchor.has_value());
+    REQUIRE(scene.drawingAt(hand, 239)->id == openHand);
+    REQUIRE(scene.drawingAt(hand, 240)->id == pointHand);
+    REQUIRE(scene.drawingAt(hand, 336)->id == fistHand);
+    REQUIRE(scene.drawingAt(hand, 360)->id == pointHand);
+    REQUIRE(scene.drawingAt(hand, 432)->id == openHand);
+    REQUIRE(scene.drawingAt(mouth, 120)->id == sideAh);
+    REQUIRE(scene.drawingAt(mouth, 345)->id == sideMouth.at("oh"));
+    REQUIRE(scene.drawingAt(mouth, 410)->id == sideMouth.at("rest"));
+    REQUIRE(scene.drawingAt(mouth, 432)->id == scene.drawingAt(mouth, 0)->id);
+    REQUIRE(evaluateTransform(scene.layer(camera.id), 360).scaleX == 1.12);
+    for (const auto [sourceRole, followerRole] :
+         {std::pair{"arm_left", "hand_left"}, {"arm_right", "hand_right"},
+         {"leg_left", "foot_left"}, {"leg_right", "foot_right"}}) {
+        INFO(sourceRole);
+        const Id sourceId = findRole(sourceRole), followerId = findRole(followerRole);
+        REQUIRE(sourceId != 0);
+        REQUIRE(followerId != 0);
+        const auto& restSource = scene.layer(sourceId);
+        const auto& restBone = *meshBindingFor(restSource,
+            scene.drawingAt(sourceId, 0)->id)->bone;
+        const auto restTip = restBone.restJoints[2];
+        const auto restWorld = SceneRenderer::worldTransform(scene, restSource, 0)
+            .map(QPointF(restTip.x, restTip.y));
+        const auto followerLocal = SceneRenderer::worldTransform(
+            scene, scene.layer(followerId), 0).inverted().map(restWorld);
+        for (Frame frame : {Frame{0}, Frame{120}, Frame{240}, Frame{300},
+                            Frame{336}, Frame{360}, Frame{432}, Frame{479}}) {
+            INFO(sourceRole << " at frame " << frame);
+            const auto& source = scene.layer(sourceId);
+            const auto& bone = *meshBindingFor(source,
+                scene.drawingAt(sourceId, frame)->id)->bone;
+            const auto tip = sampleBoneJoints(bone, frame)[2];
+            const auto expected = SceneRenderer::worldTransform(scene, source, frame)
+                .map(QPointF(tip.x, tip.y));
+            const auto actual = SceneRenderer::worldTransform(
+                scene, scene.layer(followerId), frame).map(followerLocal);
+            REQUIRE(std::hypot(expected.x() - actual.x(), expected.y() - actual.y()) < 1e-8);
+        }
+    }
+
+    const std::array<Frame, 5> stills{0, 120, 240, 360, 479};
+    std::map<Frame, QImage> frames;
+    const bool fullResolution = qEnvironmentVariableIsSet("OPENTOON_HM06_VISUAL_FULL_RENDER");
+    const QSize previewSize = fullResolution ? QSize{} : QSize(480, 270);
+    const QSize expectedSize = fullResolution ? QSize(1920, 1080) : previewSize;
+    const auto renderStart = std::chrono::steady_clock::now();
+    for (Frame frame = 0; frame < scene.duration; ++frame) {
+        const auto preview = SceneRenderer::render(scene, frame, previewSize);
+        REQUIRE(preview.size() == expectedSize);
+    }
+    if (fullResolution) {
+        const auto elapsed = std::chrono::duration<double, std::milli>(
+            std::chrono::steady_clock::now() - renderStart).count();
+        std::fprintf(stderr, "HM-06 480-frame visual shot 1920x1080: %.2f ms/frame\n",
+                     elapsed / scene.duration);
+    }
+    for (Frame frame : stills) {
+        const auto image = SceneRenderer::render(scene, frame);
+        REQUIRE(image.size() == QSize(1920, 1080));
+        REQUIRE(image != QImage{});
+        const auto [largest, ink] = connectedInk(image);
+        REQUIRE(ink > 10000);
+        REQUIRE(largest == ink);
+        frames.emplace(frame, image);
+        REQUIRE(image.save(QString("hm06-visual-shot-%1.png").arg(frame, 4, 10, QLatin1Char('0'))));
+    }
+    REQUIRE(frames.at(120) != frames.at(0));
+    REQUIRE(frames.at(0) == SceneRenderer::render(shortScene, 0));
+    REQUIRE(frames.at(360) != frames.at(240));
+    REQUIRE(frames.at(479) != frames.at(360));
+    REQUIRE(frames.at(479) == frames.at(0));
+    QTemporaryDir temporary;
+    REQUIRE(temporary.isValid());
+    const auto path = std::filesystem::path((temporary.path() + "/visual-shot.otoon").toStdString());
+    REQUIRE(ProjectStore::save(path, scene) > 0);
+    const auto reopened = ProjectStore::load(path).document;
+    REQUIRE(reopened == scene);
+    for (Frame frame : stills)
+        REQUIRE(SceneRenderer::render(reopened, frame) == frames.at(frame));
+    if (qEnvironmentVariableIsSet("OPENTOON_HM06_VISUAL_PROJECT")) {
+        const auto output = qEnvironmentVariable("OPENTOON_HM06_VISUAL_PROJECT");
+        REQUIRE(ProjectStore::save(std::filesystem::path(output.toStdString()), reopened) > 0);
+    }
+    const auto bundled = ProjectStore::load(std::filesystem::path(
+        OPENTOON_SOURCE_DIR "/examples/clockwork-visual-shot.otoon")).document;
+    REQUIRE(bundled == reopened);
 }

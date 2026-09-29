@@ -50,6 +50,11 @@ backup. The current example uses format 11. Its limb geometry and joint
 registration are unchanged; its waist art replaces the earlier separate
 pelvis drawing.
 
+The [480-frame visual shot study](../../../examples/clockwork-visual-shot.otoon)
+uses the same continuous artwork and adds timed view, mouth, hand, torso-curve,
+character-motion and output-camera keys. Its initial leg retains the explicit
+`leg_left` role. See the [measurement and limits](../../../docs/implementation/HM06-VISUAL-SHOT.md).
+
 ![Four bent continuous limbs](../../../docs/implementation/hm06-continuous-limbs.png)
 
 ![Four continuous limbs at 90 degrees](../../../docs/implementation/hm06-continuous-limbs-90.png)

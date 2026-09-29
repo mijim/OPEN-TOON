@@ -5,6 +5,11 @@ one two-segment bone chain or one cubic curve per bound Part substitution and
 links a child Part to its parent's evaluated bone tip. It
 does not yet satisfy the full HM-06 interaction and artistic quality gate.
 
+The [twenty-second visual shot study](HM06-VISUAL-SHOT.md) now exercises the
+continuous rig with camera, face/hand/mouth substitutions and a torso curve
+over the agreed 480-frame timing. Audio, mattes and published controls remain
+in their owning slices; the study does not claim the complete Harmony Moment.
+
 ## Working subset
 
 - The selected substitution retains its rest mesh and UVs. Bone joints,
@@ -172,6 +177,13 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   278 MB; one 480-frame headless 1080p run averaged 5.07 ms/frame. This
   synthetic timing workload does not yet include audio, mattes, animated
   camera or published controls.
+  The later [visual shot study](HM06-VISUAL-SHOT.md) adds the animated camera,
+  torso curve and timed face/hand/mouth choices over all 480 frames. It passes
+  129/129 CTest entries and native open/scrub/save/reopen smoke. At frames 12
+  and 360, six native drag runs measured p95 17.03–18.10 ms and peak resident
+  memory below 286 MB. One 480-frame 1080p renderer run averaged 5.72
+  ms/frame. This remains a visual HM-06 workload, with audio, mattes and
+  published controls pending their owning slices.
 
 ## Remaining acceptance
 

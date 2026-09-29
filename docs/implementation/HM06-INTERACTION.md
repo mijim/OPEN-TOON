@@ -119,6 +119,11 @@ animated camera, mattes or published animator controls. The measurements
 therefore qualify this deformation workload only; they do not close the full
 B4/HM shot budget or artistic acceptance.
 
+A later [480-frame visual shot](HM06-VISUAL-SHOT.md) adds timed face, mouth and
+hand changes, a torso curve, character travel and an output-camera push. Its
+native input measurements sample both an early front pose and the later
+camera/alternate-sleeve pose. Audio, mattes and published controls remain open.
+
 Reproduce from the repository root with the optimized macOS build:
 
 ```sh
