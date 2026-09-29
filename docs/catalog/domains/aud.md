@@ -42,7 +42,7 @@ Display amplitude at different timeline zoom levels.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — sample-aligned per-frame waveform peaks in timeline at current zoom, no pyramid cache or audio playback.
+**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — exact-edge 256-sample peak tree answers rational per-frame timeline queries across zoom levels and reuses immutable assets.
 
 **Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 

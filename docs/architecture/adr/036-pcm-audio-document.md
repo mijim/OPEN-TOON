@@ -35,6 +35,12 @@ The source WAV remains part of the project after a clip is removed, allowing
 future reuse. Media resources share immutable buffers across document undo
 snapshots. No callback or audio device is created by this format change.
 
+The timeline's derived peak index uses 256-source-sample maximum leaves and a
+range-max tree. Queries scan partial first/last leaves exactly and combine
+complete leaves from the tree, so a one-sample cue remains aligned at any
+frame width. It owns a shared immutable WAV buffer, never enters the saved
+format, and is rebuilt if a scene replaces an asset with the same ID.
+
 ## Offline mix and delivery
 
 The headless `AudioMixPlan` borrows validated immutable source buffers from a
@@ -69,4 +75,4 @@ captures `build/hm10-audio-smoke.png`, checks the exported cue, and undoes impor
 The experimental desktop now uses the same `AudioMixPlan` for a miniaudio
 device callback and offline export. See [ADR-037](037-miniaudio-preview-clock.md).
 Hardware clock qualification, higher-quality rate conversion, audible
-scrubbing, waveform pyramids and clip repeat remain HM-10 work.
+scrubbing and clip repeat remain HM-10 work.

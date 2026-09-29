@@ -91,6 +91,7 @@ void EditorController::report(QString message) {
     emit statusChanged();
 }
 void EditorController::resetSelection() {
+    audioPeakCache_.clear();
     endSelectedCharacterPoseBlend();
     clearPoseSelection();
     ++sceneGeneration_;
@@ -294,6 +295,11 @@ QVariantList EditorController::audioWaveform(int clipId, int firstFrame, int fra
                                     [&](const auto& value) { return value.id == clip->asset; });
     if (asset == document().audioAssets.end())
         return result;
+    auto cached = audioPeakCache_.find(asset->id);
+    if (cached == audioPeakCache_.end() || !cached->second.matches(*asset)) {
+        audioPeakCache_.erase(asset->id);
+        cached = audioPeakCache_.emplace(asset->id, opentoon::AudioPeakIndex(*asset)).first;
+    }
     for (int frame = firstFrame; frame < firstFrame + frameCount; ++frame) {
         if (frame < clip->start) {
             result.push_back(0.0);
@@ -303,7 +309,7 @@ QVariantList EditorController::audioWaveform(int clipId, int firstFrame, int fra
         const auto end = std::min(clip->outSample,
             clip->inSample + document().rate.sampleAt(frame - clip->start + 1, asset->sampleRate));
         result.push_back(begin < clip->outSample ?
-            std::min(1.0, audioPeak(*asset, begin, std::max(begin, end)) * clip->gain) : 0.0);
+            std::min(1.0, cached->second.peak(begin, std::max(begin, end)) * clip->gain) : 0.0);
     }
     return result;
 }

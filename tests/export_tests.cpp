@@ -103,6 +103,37 @@ TEST_CASE("Editor imports a WAV cue, draws exact frame peaks, edits and reopens"
     REQUIRE(editor.document().audioClips.size() == 1);
     REQUIRE(before.audioAssets.empty());
 }
+TEST_CASE("Waveform cache rebuilds when a new scene reuses an audio asset ID") {
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto first = directory.filePath("first.wav");
+    QFile source(first);
+    REQUIRE(source.open(QIODevice::WriteOnly));
+    REQUIRE(source.write(audioCueWav()) == 44 + 48000 * 2);
+    source.close();
+    EditorController editor;
+    editor.newScene();
+    REQUIRE(editor.importAudio(QUrl::fromLocalFile(first)));
+    const auto firstClip = editor.audioClips().front().toMap().value("id").toInt();
+    REQUIRE(editor.audioWaveform(firstClip, 0, 3)[1].toDouble() > 0.99);
+    auto movedCue = audioCueWav();
+    movedCue[44 + 2002 * 2] = 0;
+    movedCue[44 + 2002 * 2 + 1] = 0;
+    movedCue[44 + 5000 * 2] = char(255);
+    movedCue[44 + 5000 * 2 + 1] = char(127);
+    const auto second = directory.filePath("second.wav");
+    source.setFileName(second);
+    REQUIRE(source.open(QIODevice::WriteOnly));
+    REQUIRE(source.write(movedCue) == movedCue.size());
+    source.close();
+    editor.newScene();
+    REQUIRE(editor.importAudio(QUrl::fromLocalFile(second)));
+    const auto secondClip = editor.audioClips().front().toMap().value("id").toInt();
+    REQUIRE(secondClip == firstClip);
+    const auto peaks = editor.audioWaveform(secondClip, 0, 3);
+    REQUIRE(peaks[1].toDouble() == 0);
+    REQUIRE(peaks[2].toDouble() > 0.99);
+}
 TEST_CASE("PCM WAV mix export has exact rational length and cancellation keeps the destination") {
     EditorController editor;
     editor.newScene();

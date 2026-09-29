@@ -1,6 +1,7 @@
 #pragma once
 #include "opentoon/document.h"
 #include <span>
+#include <cstdint>
 #include <vector>
 
 namespace opentoon {
@@ -22,6 +23,23 @@ void removeAudioClip(Document& document, Id clip);
 // independent of the current timeline zoom and leaves the source unchanged.
 [[nodiscard]] double audioPeak(const AudioAsset& asset, std::uint64_t begin,
                                std::uint64_t end);
+// Immutable 256-sample peak leaves with a range-max tree. Exact edge samples
+// keep cues aligned when timeline zoom changes.
+class AudioPeakIndex {
+  public:
+    explicit AudioPeakIndex(const AudioAsset& asset);
+    [[nodiscard]] bool matches(const AudioAsset& asset) const;
+    [[nodiscard]] double peak(std::uint64_t begin, std::uint64_t end) const;
+
+  private:
+    SharedBuffer<std::uint8_t> wav_;
+    std::uint64_t sampleFrames_ = 0;
+    std::size_t dataOffset_ = 0, treeBase_ = 1;
+    std::int32_t channels_ = 0, sampleRate_ = 0;
+    std::vector<std::uint16_t> tree_;
+    [[nodiscard]] std::uint16_t samplePeak(std::uint64_t frame) const;
+    [[nodiscard]] std::uint16_t edgePeak(std::uint64_t begin, std::uint64_t end) const;
+};
 class AudioMixPlan {
   public:
     AudioMixPlan(const Document& document, std::int32_t outputRate);

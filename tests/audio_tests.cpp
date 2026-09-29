@@ -118,6 +118,67 @@ TEST_CASE("Rational audio cue positions remain exact across integer and fraction
         REQUIRE(last - rate.sampleAt(14385, 48000) <= 2002);
     }
 }
+TEST_CASE("Waveform peak pyramid matches exact PCM edges at every queried zoom interval") {
+    auto d = makeDocument();
+    auto source = wav(8192, 257);
+    const auto clipId = importPcm16Wav(d, "boundary cue", std::move(source), 0);
+    const auto& asset = d.audioAssets.front();
+    REQUIRE(d.audioClips.front().id == clipId);
+    AudioPeakIndex index(asset);
+    REQUIRE(index.matches(asset));
+    REQUIRE(index.peak(256, 257) == 0);
+    REQUIRE(index.peak(257, 258) > 0.99);
+    REQUIRE(index.peak(258, 512) == 0);
+    for (std::uint64_t query = 0; query < 300; ++query) {
+        const auto begin = (query * 131) % 8192;
+        const auto end = std::min<std::uint64_t>(8192, begin + (query * 197) % 2048);
+        REQUIRE(index.peak(begin, end) == audioPeak(asset, begin, end));
+    }
+    REQUIRE_THROWS(index.peak(8000, 8200));
+    std::vector<std::uint8_t> stereo{'R', 'I', 'F', 'F'};
+    write32(stereo, 36 + 1024 * 4);
+    stereo.insert(stereo.end(), {'W', 'A', 'V', 'E', 'f', 'm', 't', ' '});
+    write32(stereo, 16); write16(stereo, 1); write16(stereo, 2);
+    write32(stereo, 48000); write32(stereo, 48000 * 4);
+    write16(stereo, 4); write16(stereo, 16);
+    stereo.insert(stereo.end(), {'d', 'a', 't', 'a'});
+    write32(stereo, 1024 * 4);
+    for (int sample = 0; sample < 1024; ++sample) {
+        write16(stereo, 0);
+        write16(stereo, sample == 256 ? 32768 : 0);
+    }
+    (void)importPcm16Wav(d, "right-only", std::move(stereo), 0);
+    AudioPeakIndex stereoIndex(d.audioAssets.back());
+    REQUIRE(stereoIndex.peak(256, 257) == 1);
+    REQUIRE(stereoIndex.peak(257, 1024) == 0);
+}
+TEST_CASE("Waveform index reuses a long source across repeated timeline pans") {
+    auto scene = makeDocument();
+    (void)importPcm16Wav(scene, "long source", wav(48000 * 30, 48000 * 20), 0);
+    const auto& source = scene.audioAssets.front();
+    const auto startBuild = std::chrono::steady_clock::now();
+    AudioPeakIndex index(source);
+    const auto endBuild = std::chrono::steady_clock::now();
+    double indexedSum = 0, directSum = 0;
+    const auto indexedStart = std::chrono::steady_clock::now();
+    for (int query = 0; query < 1000; ++query) {
+        const auto begin = std::uint64_t((query * 1289) % (48000 * 29));
+        indexedSum += index.peak(begin, begin + 2000);
+    }
+    const auto indexedEnd = std::chrono::steady_clock::now();
+    for (int query = 0; query < 1000; ++query) {
+        const auto begin = std::uint64_t((query * 1289) % (48000 * 29));
+        directSum += audioPeak(source, begin, begin + 2000);
+    }
+    const auto directEnd = std::chrono::steady_clock::now();
+    const auto ms = [](auto duration) {
+        return std::chrono::duration<double, std::milli>(duration).count();
+    };
+    std::cout << "Waveform index build: " << ms(endBuild - startBuild)
+              << " ms; 1000 indexed queries: " << ms(indexedEnd - indexedStart)
+              << " ms; direct queries: " << ms(directEnd - indexedEnd) << " ms\n";
+    REQUIRE(indexedSum == directSum);
+}
 TEST_CASE("Two placed clips mix at the same rational sample with rate conversion and stereo output") {
     auto d = makeDocument();
     const auto first = importPcm16Wav(d, "cue-48k", wav(48000, 2000), 0);

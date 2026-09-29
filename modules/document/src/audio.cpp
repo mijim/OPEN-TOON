@@ -127,6 +127,66 @@ double audioPeak(const AudioAsset& asset, std::uint64_t begin, std::uint64_t end
         }
     return double(peak) / 32768.0;
 }
+AudioPeakIndex::AudioPeakIndex(const AudioAsset& asset)
+    : wav_(asset.wav), sampleFrames_(asset.sampleFrames), channels_(asset.channels),
+      sampleRate_(asset.sampleRate) {
+    const auto info = inspectPcm16Wav({wav_.data(), wav_.size()});
+    if (info.sampleFrames != sampleFrames_ || info.channels != channels_ ||
+        info.sampleRate != sampleRate_)
+        throw std::invalid_argument("Audio peak source metadata does not match its WAV.");
+    dataOffset_ = info.dataOffset;
+    const auto binCount = std::size_t((sampleFrames_ + 255) / 256);
+    while (treeBase_ < binCount)
+        treeBase_ *= 2;
+    tree_.resize(treeBase_ * 2);
+    for (std::uint64_t frame = 0; frame < sampleFrames_; ++frame)
+        tree_[treeBase_ + std::size_t(frame / 256)] =
+            std::max(tree_[treeBase_ + std::size_t(frame / 256)], samplePeak(frame));
+    for (std::size_t node = treeBase_ - 1; node > 0; --node)
+        tree_[node] = std::max(tree_[node * 2], tree_[node * 2 + 1]);
+}
+bool AudioPeakIndex::matches(const AudioAsset& asset) const {
+    return wav_.data() == asset.wav.data() && sampleFrames_ == asset.sampleFrames &&
+           channels_ == asset.channels && sampleRate_ == asset.sampleRate;
+}
+std::uint16_t AudioPeakIndex::samplePeak(std::uint64_t frame) const {
+    std::uint16_t peak = 0;
+    for (int channel = 0; channel < channels_; ++channel) {
+        const auto at = dataOffset_ + (frame * channels_ + channel) * 2;
+        const auto encoded = std::uint16_t(wav_[at] | (std::uint16_t(wav_[at + 1]) << 8));
+        const int value = encoded <= 32767 ? encoded : int(encoded) - 65536;
+        peak = std::max(peak, std::uint16_t(value == -32768 ? 32768 : std::abs(value)));
+    }
+    return peak;
+}
+std::uint16_t AudioPeakIndex::edgePeak(std::uint64_t begin, std::uint64_t end) const {
+    std::uint16_t peak = 0;
+    for (auto frame = begin; frame < end; ++frame)
+        peak = std::max(peak, samplePeak(frame));
+    return peak;
+}
+double AudioPeakIndex::peak(std::uint64_t begin, std::uint64_t end) const {
+    if (begin > end || end > sampleFrames_)
+        throw std::invalid_argument("Waveform interval is outside the audio asset.");
+    if (begin == end)
+        return 0;
+    const auto firstFull = std::min(end, ((begin + 255) / 256) * 256);
+    const auto lastFull = (end / 256) * 256;
+    if (firstFull >= lastFull)
+        return double(edgePeak(begin, end)) / 32768.0;
+    std::uint16_t maximum = std::max(edgePeak(begin, firstFull), edgePeak(lastFull, end));
+    auto left = treeBase_ + std::size_t(firstFull / 256);
+    auto right = treeBase_ + std::size_t(lastFull / 256);
+    while (left < right) {
+        if (left & 1)
+            maximum = std::max(maximum, tree_[left++]);
+        if (right & 1)
+            maximum = std::max(maximum, tree_[--right]);
+        left /= 2;
+        right /= 2;
+    }
+    return double(maximum) / 32768.0;
+}
 AudioMixPlan::AudioMixPlan(const Document& document, std::int32_t outputRate)
     : frameRate_(document.rate), duration_(document.duration), outputRate_(outputRate) {
     frameRate_.validate();

@@ -4212,7 +4212,7 @@
       ],
       "specification_status": "analysis_draft",
       "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
-      "implementation_evidence": "docs/implementation/HM10-PROGRESS.md; sample-aligned per-frame waveform peaks in timeline at current zoom, no pyramid cache or audio playback"
+      "implementation_evidence": "docs/implementation/HM10-PROGRESS.md; exact-edge 256-sample peak tree answers rational per-frame timeline queries across zoom levels and reuses immutable assets"
     },
     {
       "id": "AUD-003",

@@ -1,5 +1,6 @@
 #pragma once
 #include "opentoon/drawing_selection.h"
+#include "opentoon/audio.h"
 #include "opentoon/key_block.h"
 #include "opentoon/session.h"
 #include "opentoon/timeline.h"
@@ -12,6 +13,7 @@
 #include <QUrl>
 #include <QVariantList>
 #include <atomic>
+#include <map>
 #include <memory>
 #include <thread>
 namespace opentoon { class AudioDevice; }
@@ -390,6 +392,7 @@ class EditorController final : public QObject {
     QElapsedTimer playClock_;
     int playStart_ = 0;
     std::unique_ptr<opentoon::AudioDevice> audioDevice_;
+    mutable std::map<opentoon::Id, opentoon::AudioPeakIndex> audioPeakCache_;
     std::int64_t diskRevision_ = -1;
     bool exporting_ = false;
     double exportProgress_ = 0;
