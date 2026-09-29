@@ -483,8 +483,9 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
     QFile specification(QStringLiteral(OPENTOON_SOURCE_DIR
         "/tests/fixtures/harmony-continuous-limbs/rig.json"));
     REQUIRE(specification.open(QIODevice::ReadOnly));
-    const auto limbs = QJsonDocument::fromJson(specification.readAll()).object()
-                           .value("limbs").toObject();
+    const auto rig = QJsonDocument::fromJson(specification.readAll()).object();
+    const auto limbs = rig.value("limbs").toObject();
+    const auto waist = rig.value("joined_waist").toObject();
     QFile shotFile(QStringLiteral(OPENTOON_SOURCE_DIR
         "/tests/fixtures/harmony-moment/shot.json"));
     REQUIRE(shotFile.open(QIODevice::ReadOnly));
@@ -501,7 +502,7 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
     QHash<QString, Id> partIds;
     for (const auto& role : order) {
         const bool limb = limbs.contains(role);
-        const auto base = limb ? QStringLiteral(OPENTOON_SOURCE_DIR
+        const auto base = (limb || role == "pelvis") ? QStringLiteral(OPENTOON_SOURCE_DIR
             "/tests/fixtures/harmony-continuous-limbs/parts/") :
             QStringLiteral(OPENTOON_SOURCE_DIR "/tests/fixtures/harmony-moment/parts/");
         const QString variant = role == "mouth" ? "front__rest" :
@@ -528,7 +529,8 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
         created.image->rgba.assign(image.constBits(), image.constBits() + image.sizeInBytes());
         document.drawings.emplace(drawing, std::move(created));
         const auto center = limb ? limbs.value(role).toObject().value("center_px").toArray() :
-                                   centers.value(role).toArray();
+                            role == "pelvis" ? waist.value("center_px").toArray() :
+                                               centers.value(role).toArray();
         REQUIRE(center.size() == 2);
         layer->transform.x = center[0].toDouble() - image.width() / 2;
         layer->transform.y = center[1].toDouble() - image.height() / 2;
@@ -941,7 +943,7 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
         if (part == foldedArm)
             REQUIRE(meshBindingFor(contoured.layer(part), drawing)->vertices[7 * 7].rest.x >
                     meshBindingFor(document.layer(part), drawing)->vertices[7 * 7].rest.x);
-        bindBoneChain(contoured, part, drawing, originalBone.restJoints, 55);
+        bindBoneChain(contoured, part, drawing, originalBone.restJoints, 40);
         recordBonePose(contoured, part, drawing, 24, 0, key.angle);
         REQUIRE_NOTHROW(recordBonePose(contoured, part, drawing, 36, 0,
                                       key.angle < 0 ? -90 : 90));
@@ -952,6 +954,10 @@ TEST_CASE("Continuous Harmony limbs bend as four single meshes and reopen identi
     REQUIRE_THROWS_AS(bindContourImageMesh(contoured, foldedArm, foldedDrawing, 6, 16),
                       std::invalid_argument);
     REQUIRE(serializeDocument(contoured) == beforeUnsafeRebind);
+    auto overlySharp = contoured;
+    REQUIRE_THROWS_AS(setBoneElbowTransition(overlySharp, foldedArm, foldedDrawing, 35),
+                      std::invalid_argument);
+    REQUIRE(overlySharp == contoured);
     REQUIRE(SceneRenderer::render(contoured, 0) == rest);
     const auto contourFrame = SceneRenderer::render(contoured, 36);
     const auto [contourConnected, contourInk] = connectedInk(contourFrame);

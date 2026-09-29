@@ -70,6 +70,14 @@ memory was 277,200,896, 278,052,864 and 279,216,128 bytes. All remain below
 the proposed subset limits. These runs are not a controlled comparison with
 the preceding format-10 measurements; host load and frame scheduling vary.
 
+After the joined trouser-waist redraw, the regenerated 15-Part example used
+one 512 × 512 waist image in place of the 256 × 256 pelvis image. Three native
+40-sample drags on the same host measured p95 31.11, 17.24 and 16.94 ms;
+peak resident memory was 277,331,968, 278,593,536 and 276,430,848 bytes.
+All three meet the proposed subset limits. The first run had a higher frame
+tail, so this is qualification evidence for the changed art, not proof of a
+render-speed improvement. The complete B4/HM scene is still open.
+
 Reproduce after building the render tests and desktop app:
 
 ```sh

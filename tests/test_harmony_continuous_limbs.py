@@ -38,7 +38,9 @@ class ContinuousLimbFixtureTest(unittest.TestCase):
             generated = Path(temporary)
             subprocess.run([sys.executable, str(ROOT / 'scripts/generate_harmony_continuous_limbs.py'),
                             '--output', str(generated)], check=True)
-            for role, limb in spec['limbs'].items():
+            parts = dict(spec['limbs'])
+            parts['pelvis'] = {**spec['joined_waist'], 'joints_scene_px': []}
+            for role, limb in parts.items():
                 name = f'{role}__base.png'
                 self.assertEqual((generated / name).read_bytes(),
                                  (FIXTURE / 'parts' / name).read_bytes())

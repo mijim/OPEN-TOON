@@ -111,12 +111,21 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   document on the regular rectangular grid. An explicit **Contour** bind now
   fits each mesh row to the image alpha with a one-cell lookahead and one-pixel
   margin. The [contour 90° stress pose](hm06-contour-bend-90.png) bends all four
-  one-piece limbs at 55 px without a folded triangle. Rest rendering is
+  one-piece limbs at a sharper 40 px transition without a folded triangle;
+  a 35 px transition on the left arm rejects atomically. Rest rendering is
   byte-identical; a source-alpha coverage check protects every opaque texel,
   the posed character remains connected, and serialized and reopened frame-36
   pixels match. The native editor smoke also binds, undoes and redoes the
-  contour profile. This is a deformation stress image, not a polished animation
-  pose; shoulder/hip integration and knee volume still need artistic refinement.
+  contour profile. The continuous candidate now uses an original joined
+  trouser-waist drawing over both leg roots; its long highlights flow into
+  the thigh art without the former pouch-shaped pelvis or a lower cap line.
+  The regenerated example and rest, view-switch and 90° captures are checked
+  against the saved document. The updated 15-Part candidate passed 128/128
+  CTest entries, the deterministic art test and native smoke; three 40-sample
+  native drags measured p95 16.94–31.11 ms and peak resident memory below
+  279 MB on the same M1 Pro. This is a deformation stress image, not a
+  polished animation pose; shoulder integration and knee volume still need
+  artistic refinement.
   The candidate has no elbow or knee image seam; owner visual approval is still
   open.
 - The native `--smoke-test` drags a bone tip and curve tangent, checks

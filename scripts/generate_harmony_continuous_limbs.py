@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Draw original, single-sprite toon sleeves and trouser legs for HM-06."""
+"""Draw original, continuous toon limbs and joined trouser waist for HM-06."""
 from __future__ import annotations
 
 import argparse
@@ -69,6 +69,37 @@ def draw(role: str, center: list[int]) -> bytes:
     return encode(art.pixels)
 
 
+def draw_pelvis(center: list[int]) -> bytes:
+    """Cover the trouser roots with one waist shape that flows into both legs."""
+    art = Canvas(SIZE)
+    def p(x: float, y: float) -> tuple[float, float]:
+        return x - center[0] + SIZE / 2, y - center[1] + SIZE / 2
+    def poly(points: list[tuple[float, float]], color: tuple[int, ...]) -> None:
+        art.polygon([p(x, y) for x, y in points], color)
+    def line(points: list[tuple[float, float]], radius: float,
+             color: tuple[int, ...]) -> None:
+        art.line([p(x, y) for x, y in points], radius, color)
+
+    # The lower edges deliberately overlap the complete leg drawings. There is
+    # no outlined cap across either thigh or a separate codpiece silhouette.
+    poly([(901, 635), (1019, 635), (1029, 647), (1034, 677),
+          (1038, 707), (1021, 711), (985, 711), (973, 697),
+          (960, 690), (947, 697), (935, 711), (899, 711),
+          (882, 707), (886, 677), (891, 648)], PANTS)
+    poly([(899, 650), (911, 650), (910, 681), (905, 711),
+          (892, 711), (895, 681)], PANTS_LIGHT)
+    poly([(1021, 650), (1009, 650), (1010, 681), (1015, 711),
+          (1028, 711), (1025, 681)], PANTS_LIGHT)
+    poly([(945, 651), (975, 651), (979, 677), (960, 690),
+          (941, 677)], PANTS)
+    line([(900, 641), (889, 651), (884, 679), (881, 707)], 2.2, INK)
+    line([(1020, 641), (1031, 651), (1036, 679), (1039, 707)], 2.2, INK)
+    line([(946, 690), (960, 682), (974, 690)], 1.6, INK)
+    line([(896, 654), (922, 655)], 1.2, PANTS_LIGHT)
+    line([(998, 655), (1024, 654)], 1.2, PANTS_LIGHT)
+    return encode(art.pixels)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', type=Path, default=SPEC.parent / 'parts')
@@ -77,6 +108,7 @@ def main() -> None:
     args.output.mkdir(parents=True, exist_ok=True)
     for role, part in spec['limbs'].items():
         (args.output / f'{role}__base.png').write_bytes(draw(role, part['center_px']))
+    (args.output / 'pelvis__base.png').write_bytes(draw_pelvis(spec['joined_waist']['center_px']))
 
 
 if __name__ == '__main__':
