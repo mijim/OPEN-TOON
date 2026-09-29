@@ -86,7 +86,12 @@ Dragging across the timeline ruler or drawing rows previews 80 ms audio
 fragments from each marked frame and stops on release. Moving a waveform
 continues to edit clip placement instead.
 Editing or device interruption stops playback; a failed device open leaves the
-visual preview available and reports the failure.
+visual preview available and reports the failure. On interruption, the output
+device stops first and the visible playhead follows its final submitted sample
+to the exact containing scene frame. Diagnostics retain that sample and the
+callback counters. Pressing Play creates a new device. The scene and original
+media are not changed; see
+[ADR-068](../architecture/adr/068-audio-output-interruption.md).
 Playback diagnostics count mixer callbacks over their own output period and
 playhead frames skipped by the UI timer. These are scheduling proxies; actual
 device underruns and presented-frame drops need platform instrumentation.
@@ -175,6 +180,10 @@ source-sample fades and trim/repeat clamping.
   bounds, silent preview, outside-range seek and unchanged document. Native
   HM-10 smoke clicks Range and runs an imported WAV from the first selected
   frame to the last included frame.
+- A 24000/1001 fps null-backend controller test advances the audio cursor,
+  invokes the output-interruption handler, verifies the stopped playhead from
+  its final sample and checks unchanged scene, revision and selection. This
+  does not emulate a physical CoreAudio unplug or automatic replacement.
 - A 600-second fractional-rate, two-source 1024-frame callback workload
   measured p95 **0.014 ms** against a 21.33 ms output period on the local
   M1 Pro macOS Release build. It checks the exact scene sample count and a

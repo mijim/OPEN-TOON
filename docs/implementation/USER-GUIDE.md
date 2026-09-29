@@ -270,8 +270,10 @@ playhead while playing seeks the audio. With playback stopped, press and drag
 across the timeline ruler or drawing rows to hear short fragments at each
 frame; release stops the sound. Editing stops playback so the next
 preview uses the new document. If the device cannot open, the visual preview
-continues silently and shows an error. Hardware scrub quality and device-loss
-recovery are still open. [HM-10 progress](HM10-PROGRESS.md) records
+continues silently and shows an error. If output is interrupted during
+playback, transport stops on the last audio-submitted frame and reports the
+event. Press Play again to open a new device. Hardware scrub quality and
+automatic device replacement are still open. [HM-10 progress](HM10-PROGRESS.md) records
 the current test evidence and remaining work.
 
 ## Animation edits and curves

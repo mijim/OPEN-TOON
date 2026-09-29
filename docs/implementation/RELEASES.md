@@ -1,5 +1,15 @@
 # Experimental releases
 
+## 0.2.0-experimental.69 — working source, audio interruption alignment
+
+- An audio-output interruption stops the device and leaves the playhead on
+  the frame of its final submitted sample. Playback diagnostics retain that
+  sample and callback counters. The project and media remain unchanged.
+- A fractional-rate null-device test exercises the interruption handler and
+  exact frame mapping. The locked macOS suite and relevant native smokes pass;
+  real device unplug/reroute and automatic replacement remain unqualified.
+  Source only.
+
 ## 0.2.0-experimental.68 — working source, named workspace layouts
 
 - Drawing, Animation, Rigging and Compositing layouts select useful existing

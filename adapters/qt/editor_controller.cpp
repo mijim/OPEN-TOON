@@ -75,8 +75,7 @@ EditorController::EditorController(QObject* parent) : QObject(parent) {
     playTimer_.setInterval(8);
     connect(&playTimer_, &QTimer::timeout, this, [this] {
         if (audioDevice_ && audioDevice_->interrupted()) {
-            stopPlayback();
-            report("Audio output was interrupted. Playback stopped.");
+            handleAudioOutputInterruption();
             return;
         }
         if (audioDevice_ && audioDevice_->finished()) {
@@ -2547,6 +2546,7 @@ void EditorController::stopPlayback() {
     scrubDevice_.reset();
     if (audioDevice_) {
         audioDevice_->stop();
+        playbackLastAudioSample_ = audioDevice_->currentSample();
         const auto stats = audioDevice_->stats();
         playbackCallbacks_ = stats.callbacks;
         playbackProcessingOverruns_ = stats.processingOverruns;
@@ -2560,6 +2560,19 @@ void EditorController::stopPlayback() {
             report(QString("Playback stopped: %1 skipped playhead frames, %2 mixer callbacks over period.")
                        .arg(skippedPlayheadFrames_).arg(playbackProcessingOverruns_));
     }
+}
+void EditorController::handleAudioOutputInterruption() {
+    if (!audioDevice_ || !playing())
+        return;
+    audioDevice_->stop();
+    const auto lastAudioFrame = std::clamp(audioDevice_->currentFrame(),
+                                           playbackFirst_, playbackEnd_ - 1);
+    stopPlayback();
+    if (frame_ != lastAudioFrame) {
+        frame_ = lastAudioFrame;
+        emit frameChanged();
+    }
+    report("Audio output was interrupted. Playback stopped at the last audio frame.");
 }
 void EditorController::setLoopPlayback(bool looping) {
     if (loopPlayback_ == looping)
@@ -2588,6 +2601,8 @@ void EditorController::togglePlayback() {
     endAudioScrub();
     scrubDevice_.reset();
     playbackCallbacks_ = playbackProcessingOverruns_ = playbackMaximumCallbackNanoseconds_ = 0;
+    playbackLastAudioSample_ = 0;
+    playbackUsedAudio_ = false;
     skippedPlayheadFrames_ = 0;
     playbackFirst_ = playSelectedRange_ ? std::clamp(rangeStart_, 0, duration() - 1) : 0;
     playbackEnd_ = playSelectedRange_
@@ -2604,6 +2619,7 @@ void EditorController::togglePlayback() {
             audioDevice_->setPlaybackRange(playbackFirst_, playbackEnd_);
             audioDevice_->setLooping(loopPlayback_);
             audioDevice_->start(frame_);
+            playbackUsedAudio_ = true;
         } catch (const std::exception& e) {
             audioDevice_.reset();
             report("Audio output unavailable; preview continues silently: " + QString::fromUtf8(e.what()));
@@ -2615,10 +2631,14 @@ void EditorController::togglePlayback() {
 QVariantMap EditorController::playbackDiagnostics() const {
     const auto current = audioDevice_ ? audioDevice_->stats() : opentoon::AudioDeviceStats{
         playbackCallbacks_, playbackProcessingOverruns_, playbackMaximumCallbackNanoseconds_};
-    return {{"callbacks", qulonglong(current.callbacks)},
+    QVariantMap diagnostics{{"callbacks", qulonglong(current.callbacks)},
             {"processingOverruns", qulonglong(current.processingOverruns)},
             {"maximumCallbackMs", double(current.maximumCallbackNanoseconds) / 1000000.0},
             {"skippedPlayheadFrames", qulonglong(skippedPlayheadFrames_)}};
+    if (playbackUsedAudio_)
+        diagnostics.insert("audioSample", qlonglong(audioDevice_ ? audioDevice_->currentSample()
+                                                       : playbackLastAudioSample_));
+    return diagnostics;
 }
 void EditorController::beginAudioScrub() {
     if (playing() || document().audioClips.empty())

@@ -52,8 +52,8 @@
     {
       "id": "P07",
       "status": "in_progress",
-      "available": "Format-16 original PCM16 WAV assets, format-17 sample-contiguous repeats, format-22 source-sample fades, format-23 clip mute, format-26 clip solo and format-27 stereo balance, undoable clip frame placement/trim/gain and direct waveform, fade-handle and frame-edge trim drags plus exact single-pass clip splitting with indexed sample-aligned peaks and visible fade guides. Bounded precomputed band-limited rate conversion and deterministic 48 kHz stereo mixing serves exact-length offline WAV export and bounded miniaudio device preview; an audio-submitted playhead with exact-boundary loop/play-once and selected-range transport toggles, 80 ms timeline scrub, save/reopen and source-version backups pass local tests. Export cancellation preserves an existing destination.",
-      "remaining": "Hardware latency, underrun, device replacement, ten-minute audiovisual drift and audible scrub-quality qualification; broader rate-ratio quality, mouth mapping/manual lip correction, optional detection, media policies, FFmpeg adapter and video output."
+      "available": "Format-16 original PCM16 WAV assets, format-17 sample-contiguous repeats, format-22 source-sample fades, format-23 clip mute, format-26 clip solo and format-27 stereo balance, undoable clip frame placement/trim/gain and direct waveform, fade-handle and frame-edge trim drags plus exact single-pass clip splitting with indexed sample-aligned peaks and visible fade guides. Bounded precomputed band-limited rate conversion and deterministic 48 kHz stereo mixing serves exact-length offline WAV export and bounded miniaudio device preview; an audio-submitted playhead with exact-boundary loop/play-once and selected-range transport toggles, 80 ms timeline scrub, save/reopen and source-version backups pass local tests. An output interruption stops on the final submitted audio frame with retained sample diagnostics and no document edit. Export cancellation preserves an existing destination.",
+      "remaining": "Hardware latency, underrun, physical device loss and replacement, ten-minute audiovisual drift and audible scrub-quality qualification; broader rate-ratio quality, mouth mapping/manual lip correction, optional detection, media policies, FFmpeg adapter and video output."
     },
     {
       "id": "P08",
@@ -475,11 +475,11 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.68",
+  "version": "0.2.0-experimental.69",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
-    "release_artifacts": "Historical experimental.11 macOS arm64 ZIP and Ubuntu-built Linux x86_64 AppImage; current experimental.68 work is source only",
+    "release_artifacts": "Historical experimental.11 macOS arm64 ZIP and Ubuntu-built Linux x86_64 AppImage; current experimental.69 work is source only",
     "cross_platform_builds": "Manual release workflow; broader Linux, Windows and device qualification remain open"
   },
   "planning_priority": {

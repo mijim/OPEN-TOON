@@ -181,3 +181,6 @@ layout preferences and their separation from document state.
 
 See [ADR-067](067-named-workspace-layouts.md) for four overridable personal
 workspace layouts with scene-independent switching.
+
+See [ADR-068](068-audio-output-interruption.md) for stopping playback at the
+last submitted audio frame after output interruption.

@@ -813,6 +813,52 @@ TEST_CASE("Editor audio preview follows the device cursor and stops before an ed
     editor.togglePlayback();
     qunsetenv("OPENTOON_TEST_NULL_AUDIO_BACKEND");
 }
+TEST_CASE("Audio output interruption freezes the playhead at the submitted sample") {
+    qputenv("OPENTOON_TEST_NULL_AUDIO_BACKEND", "1");
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto path = directory.filePath("interrupted.wav");
+    QFile source(path);
+    REQUIRE(source.open(QIODevice::WriteOnly));
+    REQUIRE(source.write(audioCueWav()) == 44 + 48000 * 2);
+    source.close();
+    EditorController editor;
+    editor.newScene();
+    editor.setScene("Interrupted preview", 1920, 1080, 48, 24000, 1001);
+    REQUIRE(editor.importAudio(QUrl::fromLocalFile(path)));
+    editor.setFrame(5);
+    editor.setLoopPlayback(false);
+    const auto before = editor.document();
+    const auto revision = editor.documentRevision();
+    const auto selected = editor.selectedLayer();
+    editor.togglePlayback();
+    REQUIRE(editor.playing());
+    QElapsedTimer timeout;
+    timeout.start();
+    while (editor.playbackDiagnostics().value("audioSample").toLongLong() <
+               before.rate.sampleAt(7, 48000) && timeout.elapsed() < 1000) {
+        QCoreApplication::processEvents();
+        QThread::msleep(5);
+    }
+    REQUIRE(editor.playbackDiagnostics().value("audioSample").toLongLong() >=
+            before.rate.sampleAt(7, 48000));
+    editor.handleAudioOutputInterruption();
+    const auto finalSample = editor.playbackDiagnostics().value("audioSample").toLongLong();
+    int expected = 0;
+    for (int frame = 0; frame < before.duration; ++frame)
+        if (before.rate.sampleAt(frame, 48000) <= finalSample)
+            expected = frame;
+    REQUIRE_FALSE(editor.playing());
+    REQUIRE(editor.frame() == expected);
+    REQUIRE(editor.frame() >= 7);
+    REQUIRE(editor.status().contains("interrupted"));
+    REQUIRE(editor.document() == before);
+    REQUIRE(editor.documentRevision() == revision);
+    REQUIRE(editor.selectedLayer() == selected);
+    editor.handleAudioOutputInterruption();
+    REQUIRE(editor.frame() == expected);
+    qunsetenv("OPENTOON_TEST_NULL_AUDIO_BACKEND");
+}
 TEST_CASE("Silent transport can stop once or loop without editing the scene") {
     EditorController editor;
     editor.newScene();
