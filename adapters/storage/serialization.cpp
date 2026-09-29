@@ -390,8 +390,12 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
             l.paintMatteSource = x.at("paintMatteSource");
         if (j.at("version").get<int>() >= 24)
             l.opacityBypassed = x.at("opacityBypassed");
-        if (j.at("version").get<int>() >= 25)
-            l.blendMode = static_cast<LayerBlendMode>(x.at("blendMode").get<int>());
+        if (j.at("version").get<int>() >= 25) {
+            const int mode = x.at("blendMode").get<int>();
+            if (j.at("version").get<int>() < 28 && mode > int(LayerBlendMode::Screen))
+                throw std::runtime_error("An older project contains an unsupported blend mode.");
+            l.blendMode = static_cast<LayerBlendMode>(mode);
+        }
         if (j.at("version").get<int>() >= 11) {
             const auto& anchor = x.at("boneTipAnchor");
             if (!anchor.is_null())

@@ -292,7 +292,7 @@ TEST_CASE("Opacity bypass reaches legacy scenes without a matte") {
     REQUIRE(display == GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Write));
     REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == display);
 }
-TEST_CASE("Multiply and Screen blend fractional layers in both color profiles") {
+TEST_CASE("Multiply Screen and Add blend fractional layers in both color profiles") {
     auto document = makeDocument();
     document.width = document.height = 1;
     document.background = {0, 0, 0, 0};
@@ -328,11 +328,21 @@ TEST_CASE("Multiply and Screen blend fractional layers in both color profiles") 
     REQUIRE(qRed(screen.pixel(0, 0)) > qRed(normal.pixel(0, 0)));
     REQUIRE(screen == GraphRenderer::render(CompositionGraph::orderedLayers(session.document()),
                                             session.document(), 0, {}, {}, GraphTarget::Display));
+    REQUIRE(session.apply("Add", [&](Document& d) {
+        d.layer(upper.id).blendMode = LayerBlendMode::Add;
+    }));
+    const auto added = SceneRenderer::render(session.document(), 0);
+    REQUIRE(qAlpha(added.pixel(0, 0)) == qAlpha(screen.pixel(0, 0)));
+    REQUIRE(qRed(added.pixel(0, 0)) > qRed(screen.pixel(0, 0)));
+    REQUIRE(added == GraphRenderer::render(CompositionGraph::orderedLayers(session.document()),
+                                           session.document(), 0, {}, {}, GraphTarget::Write));
     REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(session.document())), 0) ==
-            screen);
+            added);
     REQUIRE_THROWS(session.apply("Invalid blend", [&](Document& d) {
         d.layer(upper.id).blendMode = static_cast<LayerBlendMode>(99);
     }));
+    REQUIRE(SceneRenderer::render(session.document(), 0) == added);
+    REQUIRE(session.undo());
     REQUIRE(SceneRenderer::render(session.document(), 0) == screen);
     REQUIRE(session.undo());
     REQUIRE(SceneRenderer::render(session.document(), 0) == multiply);
@@ -340,8 +350,10 @@ TEST_CASE("Multiply and Screen blend fractional layers in both color profiles") 
     REQUIRE(session.document() == document);
     REQUIRE(session.redo());
     REQUIRE(session.redo());
-    REQUIRE(SceneRenderer::render(session.document(), 0) == screen);
-    for (const auto mode : {LayerBlendMode::Multiply, LayerBlendMode::Screen}) {
+    REQUIRE(session.redo());
+    REQUIRE(SceneRenderer::render(session.document(), 0) == added);
+    for (const auto mode : {LayerBlendMode::Multiply, LayerBlendMode::Screen,
+                            LayerBlendMode::Add}) {
         auto linear = session.document();
         linear.composition = CompositionProfile::LinearSrgb;
         linear.layer(upper.id).blendMode = mode;

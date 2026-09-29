@@ -38,6 +38,11 @@ composite after its cutter and opacity. A painted cutter source keeps its own
 mode; source alpha remains a fractional matte. Legacy and Linear sRGB use
 their respective color spaces, while alpha stays source-over. See
 [ADR-049](../architecture/adr/049-layer-blend-modes.md).
+Format 28 adds **Add** to the same selector and typed graph. The overlap
+clamps the sum of the two straight-color channels before the existing
+premultiplied source-over calculation; fractional alpha and cutters keep
+their behavior. Legacy and Linear sRGB apply the sum in their respective
+spaces. See [ADR-054](../architecture/adr/054-additive-layer-blending.md).
 Format 20 adds a persistent **Bypass cutter** control in Properties and Nodes.
 Bypass keeps its source and Inside/Outside choice but shows the uncut target;
 the source remains reserved and does not paint. Re-enable restores the exact
@@ -109,6 +114,15 @@ preview. This is diagnostic navigation, not a persisted graph edit.
   save/reopen and format-24 migration backup. Native Qt Quick smoke selects
   Multiply from the actual popup on a painted cutter source and checks its
   pixel difference, undo and reopened output.
+- The same fractional image fixture now checks Add in both color profiles,
+  Display/Write parity, undo/redo and reopened pixels. A format-27 migration
+  retains Screen, writes a readable `.pre-v27.bak` and rejects Add claimed by
+  an older file. Native Qt Quick smoke clicks Add on a painted cutter source,
+  checks brighter pixels, undoes and reopens the result.
+- A current three-frame original-art run with five Add layers measured
+  50.93 ms/frame in Legacy and 45.22 ms/frame in Linear sRGB. The same host
+  run measured Multiply/Screen at 45.79/45.18 ms and Normal at 1.84/42.99 ms.
+  These are short-run means, not p95 interaction times.
 - The original 20-layer 1080p fixture measured 49.36 ms/frame for five
   alternating Multiply/Screen layers in Legacy and 43.59 ms/frame in Linear
   sRGB, averaged over three frames on the M1 Pro. Normal measured 1.62 and

@@ -225,7 +225,8 @@ void Document::validate() const {
                 "Only a drawing or Part may bypass its image opacity.");
         require(l.blendMode == LayerBlendMode::Normal ||
                     l.blendMode == LayerBlendMode::Multiply ||
-                    l.blendMode == LayerBlendMode::Screen,
+                    l.blendMode == LayerBlendMode::Screen ||
+                    l.blendMode == LayerBlendMode::Add,
                 "Unknown layer blend mode.");
         require(l.blendMode == LayerBlendMode::Normal ||
                     l.kind == LayerKind::Drawing || l.kind == LayerKind::Part,

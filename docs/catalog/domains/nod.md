@@ -72,9 +72,9 @@ Combine inputs while preserving order, alpha and depth according to the mode.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — docs/implementation/HM12-PROGRESS.md; ordered premultiplied Over, fractional Multiply/Screen blends, alpha charts and keyed opacity/cutter/source-paint evidence.
+**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — docs/implementation/HM12-PROGRESS.md; ordered premultiplied Over, fractional Multiply/Screen/Add blends, alpha charts and keyed opacity/cutter/source-paint evidence.
 
-**Remaining scope:** Ordered Over, alpha, visible cutter-source painting, derived animated Opacity and saved Normal/Multiply/Screen layer blending work. Depth modes and broader compositing operators remain open.
+**Remaining scope:** Ordered Over, alpha, visible cutter-source painting, derived animated Opacity and saved Normal/Multiply/Screen/Add layer blending work. Depth modes and broader compositing operators remain open.
 
 ## NOD-006 — Masks and cutters
 

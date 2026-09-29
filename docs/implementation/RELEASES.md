@@ -1,5 +1,16 @@
 # Experimental releases
 
+## 0.2.0-experimental.42 — working source, additive layer blend
+
+- Add saved Add blending for Drawing and Part layers in Nodes. Fractional
+  alpha, cutters and painted sources use the same Display/Write graph under
+  Legacy and Linear sRGB composition.
+- Format 28 preserves older modes with a readable backup. Pixel, migration,
+  undo/reopen and native popup-click tests pass; the original 1080p Add study
+  measured 50.93 ms/frame in Legacy and 45.22 ms/frame in Linear sRGB on the
+  M1 Pro across three frames.
+- Source only; no new public binary or tag. General graph editing remains open.
+
 ## 0.2.0-experimental.41 — working source, per-clip stereo balance
 
 - Set a clip's left/right balance from the Audio inspector. Center retains

@@ -126,8 +126,11 @@ QImage blendImages(const QImage& background, const QImage& foreground,
         return qRgba(channel(value.r), channel(value.g), channel(value.b), channel(value.a));
     };
     const auto blended = [mode](float front, float back) {
-        return mode == GraphNodeKind::Multiply ? front * back
-                                               : front + back - front * back;
+        if (mode == GraphNodeKind::Multiply)
+            return front * back;
+        if (mode == GraphNodeKind::Add)
+            return std::min(1.0f, front + back);
+        return front + back - front * back;
     };
     for (int y = foregroundBounds.top(); y <= foregroundBounds.bottom(); ++y) {
         checkCancelled(options);
@@ -332,6 +335,7 @@ QImage renderGraphTerminal(const CompositionGraph& graph, const Document& docume
             break;
         case GraphNodeKind::Multiply:
         case GraphNodeKind::Screen:
+        case GraphNodeKind::Add:
             image = blendImages(input(0), input(1), document.composition, node.kind,
                                 options, inputBounds(1));
             bound = inputBounds(0).united(inputBounds(1));

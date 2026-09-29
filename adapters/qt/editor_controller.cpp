@@ -191,6 +191,7 @@ QVariantList EditorController::compositionNodes() const {
         case GraphNodeKind::Over: kind = "Composite"; break;
         case GraphNodeKind::Multiply: kind = "Multiply"; break;
         case GraphNodeKind::Screen: kind = "Screen"; break;
+        case GraphNodeKind::Add: kind = "Add"; break;
         case GraphNodeKind::MatteFromImage: kind = "Cutter"; break;
         case GraphNodeKind::InvertMatte: kind = "Invert matte"; break;
         case GraphNodeKind::ApplyMatte: kind = "Apply matte"; break;
@@ -1105,7 +1106,7 @@ bool EditorController::setOpacityBypassed(bool bypassed) {
     });
 }
 bool EditorController::setLayerBlendMode(int mode) {
-    if (!layer_ || mode < int(LayerBlendMode::Normal) || mode > int(LayerBlendMode::Screen))
+    if (!layer_ || mode < int(LayerBlendMode::Normal) || mode > int(LayerBlendMode::Add))
         return false;
     return edit("Set layer blend mode", [&](Document& d) {
         auto& target = d.layer(layer_);

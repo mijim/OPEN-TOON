@@ -420,8 +420,54 @@ int main(int argc, char** argv) {
                     if (!editor.saveProject({}) || !editor.openProject(QUrl::fromLocalFile(path)) ||
                         opentoon::SceneRenderer::render(editor.document(), 0) != multiplied)
                         throw std::runtime_error("Blend mode changed after save and reopen.");
+                    editor.setSelectedLayer(int(source.id));
+                    QCoreApplication::processEvents();
+                    (void)window->grabWindow();
+                    auto* addPicker = window->findChild<QQuickItem*>("nodeBlendMode");
+                    if (!addPicker || !addPicker->isVisible())
+                        throw std::runtime_error("Add blend control is unavailable.");
+                    const auto addPickerPoint = addPicker->mapToScene(QPointF(
+                        addPicker->width() / 2, addPicker->height() / 2));
+                    QMouseEvent addOpenPress(QEvent::MouseButtonPress, addPickerPoint,
+                                             window->mapToGlobal(addPickerPoint.toPoint()),
+                                             Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                    QMouseEvent addOpenRelease(QEvent::MouseButtonRelease, addPickerPoint,
+                                               window->mapToGlobal(addPickerPoint.toPoint()),
+                                               Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+                    QCoreApplication::sendEvent(window, &addOpenPress);
+                    QCoreApplication::sendEvent(window, &addOpenRelease);
+                    QCoreApplication::processEvents();
+                    auto* addPopup = addPicker->property("popup").value<QObject*>();
+                    auto* addList = addPopup
+                                        ? addPopup->property("contentItem").value<QQuickItem*>()
+                                        : nullptr;
+                    if (!addPopup || !addPopup->property("visible").toBool() || !addList)
+                        throw std::runtime_error("Add blend menu did not open.");
+                    const auto addPoint = addList->mapToScene(QPointF(addList->width() / 2, 91));
+                    QMouseEvent addPress(QEvent::MouseButtonPress, addPoint,
+                                         window->mapToGlobal(addPoint.toPoint()),
+                                         Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                    QMouseEvent addRelease(QEvent::MouseButtonRelease, addPoint,
+                                           window->mapToGlobal(addPoint.toPoint()),
+                                           Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+                    QCoreApplication::sendEvent(window, &addPress);
+                    QCoreApplication::sendEvent(window, &addRelease);
+                    QCoreApplication::processEvents();
+                    const auto added = opentoon::SceneRenderer::render(editor.document(), 0);
+                    if (editor.document().layer(source.id).blendMode !=
+                            opentoon::LayerBlendMode::Add ||
+                        qAlpha(added.pixel(0, 0)) != qAlpha(multiplied.pixel(0, 0)) ||
+                        qBlue(added.pixel(0, 0)) <= qBlue(multiplied.pixel(0, 0)))
+                        throw std::runtime_error("Add blend did not brighten the painted cutter source.");
+                    editor.undo();
+                    if (opentoon::SceneRenderer::render(editor.document(), 0) != multiplied)
+                        throw std::runtime_error("Add blend did not undo in one step.");
+                    editor.redo();
+                    if (!editor.saveProject({}) || !editor.openProject(QUrl::fromLocalFile(path)) ||
+                        opentoon::SceneRenderer::render(editor.document(), 0) != added)
+                        throw std::runtime_error("Add blend changed after save and reopen.");
                     std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass, fractional cutter, "
-                                 "painted-source Multiply, save/reopen and undo.\n";
+                                 "painted-source Multiply/Add, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

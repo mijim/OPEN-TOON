@@ -123,7 +123,7 @@ Item {
                 implicitWidth: 130
                 enabled: root.selected && !root.selected.locked &&
                          (root.selected.kind === 0 || root.selected.kind === 3)
-                model: ["Normal", "Multiply", "Screen"]
+                model: ["Normal", "Multiply", "Screen", "Add"]
                 currentIndex: root.selected?.blendMode || 0
                 onActivated: root.controller.setLayerBlendMode(currentIndex)
                 Accessible.name: "Selected drawing blend mode"
@@ -182,6 +182,7 @@ Item {
                                       modelData.kind === "Bypassed opacity" ||
                                       modelData.kind === "Multiply" ||
                                       modelData.kind === "Screen" ||
+                                      modelData.kind === "Add" ||
                                       modelData.kind === "Bypassed cutter" ||
                                       modelData.kind === "Invert matte" ||
                                       modelData.kind === "Apply matte"

@@ -29,7 +29,7 @@ struct Color {
     auto operator<=>(const Color&) const = default;
 };
 enum class CompositionProfile : std::uint8_t { LegacyQt, LinearSrgb };
-enum class LayerBlendMode : std::uint8_t { Normal, Multiply, Screen };
+enum class LayerBlendMode : std::uint8_t { Normal, Multiply, Screen, Add };
 struct Swatch {
     Id id = 0;
     std::string name;
@@ -238,7 +238,7 @@ struct AudioClip {
     auto operator<=>(const AudioClip&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 27;
+    static constexpr int formatVersion = 28;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;
