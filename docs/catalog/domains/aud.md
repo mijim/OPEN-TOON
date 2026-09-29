@@ -56,7 +56,7 @@ Move clip start, adjust in/out points and repeat clips nondestructively.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — format-17 1–64 sample-contiguous repeats of the nondestructively trimmed source, frame placement and native waveform drag, atomic undo and format-16 migration.
+**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — format-17 1–64 sample-contiguous repeats of the nondestructively trimmed source, format-22 source-sample fade clamping, frame placement and native waveform drag, atomic undo and format-16/21 migration.
 
 **Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
@@ -70,7 +70,7 @@ Control volume and play multiple synchronized tracks.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — saved clip gain and deterministic stereo mix of overlapping clips drive offline WAV and bounded miniaudio preview; hardware sync remains open.
+**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — saved clip gain and source-sample fades in deterministic stereo mix drive offline WAV and bounded miniaudio preview; hardware sync remains open.
 
 **Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 

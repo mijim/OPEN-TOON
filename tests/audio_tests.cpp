@@ -83,6 +83,58 @@ TEST_CASE("Downsampling suppresses aliased treble and keeps audible passband") {
     REQUIRE(std::equal(first.begin(), first.end(), whole.begin()));
     REQUIRE(std::equal(second.begin(), second.end(), whole.begin() + first.size()));
 }
+TEST_CASE("Source-sample fades shape repeated PCM without changing its bytes") {
+    Session session;
+    auto source = wav(8, 8, 8000);
+    for (int sample = 0; sample < 8; ++sample) {
+        source[44 + sample * 2] = 0;
+        source[45 + sample * 2] = 64; // 16384, constant mono PCM.
+    }
+    Id id = 0;
+    REQUIRE(session.apply("Import cue", [&](Document& d) {
+        id = importPcm16Wav(d, "constant", source, 0);
+    }));
+    const auto baseline = session.document();
+    REQUIRE(session.apply("Fade cue", [&](Document& d) {
+        setAudioClipFades(d, id, 3, 3);
+    }));
+    const auto faded = session.document();
+    REQUIRE(faded.audioAssets.front().wav.values() == source);
+    const auto sample = [&](const Document& d, int at) {
+        return AudioMixPlan(d, 8000).renderBlock(at, 1)[0];
+    };
+    REQUIRE(sample(faded, 0) == 0);
+    REQUIRE(sample(faded, 1) == 8192);
+    REQUIRE(sample(faded, 2) == 16384);
+    REQUIRE(sample(faded, 5) == 16384);
+    REQUIRE(sample(faded, 6) == 8192);
+    REQUIRE(sample(faded, 7) == 0);
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == baseline);
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == faded);
+    REQUIRE_THROWS(session.apply("Overlong fade", [&](Document& d) {
+        setAudioClipFades(d, id, 5, 4);
+    }));
+    REQUIRE(session.document() == faded);
+    REQUIRE(session.apply("Repeat cue", [&](Document& d) { setAudioClipRepeats(d, id, 2); }));
+    REQUIRE(sample(session.document(), 7) == 16384);
+    REQUIRE(sample(session.document(), 8) == 16384);
+    REQUIRE(sample(session.document(), 15) == 0);
+    REQUIRE(session.apply("Trim cue", [&](Document& d) { trimAudioClip(d, id, 2, 4); }));
+    REQUIRE(session.document().audioClips.front().fadeInSamples == 3);
+    REQUIRE(session.document().audioClips.front().fadeOutSamples == 1);
+    REQUIRE(deserializeDocument(serializeDocument(session.document())) == session.document());
+    auto previous = nlohmann::json::parse(serializeDocument(faded));
+    previous["version"] = 21;
+    for (auto& clip : previous["audioClips"]) {
+        clip.erase("fadeInSamples");
+        clip.erase("fadeOutSamples");
+    }
+    const auto loaded = deserializeDocument(previous.dump());
+    REQUIRE(loaded.audioClips.front().fadeInSamples == 0);
+    REQUIRE(loaded.audioClips.front().fadeOutSamples == 0);
+}
 TEST_CASE("Downsampled repeated cue keeps its source-sample seam") {
     auto scene = makeDocument();
     const auto clip = importPcm16Wav(scene, "96 kHz cue", wav(96000, 2002, 96000), 0);

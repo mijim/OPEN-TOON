@@ -14,7 +14,12 @@ release; Escape cancels. Format 17 adds 1–64 nondestructive repeats to each
 clip. The Audio panel also moves a clip by frame, edits its half-open
 source-sample in/out range, changes linear gain and repeat count,
 and removes the clip. Every change is undoable; trim and gain do not rewrite
-the source. **Scene → Export PCM WAV mix** writes a 48 kHz stereo PCM16 mix
+the source. Format 22 adds linear fade-in/out durations in original source
+samples across the complete repeated clip. The two values are set atomically;
+shorter trims or repeat counts clamp them to the new length. They shape
+preview and export through the same mix plan without changing source bytes.
+The waveform still shows source peaks and gain; it does not draw the fade
+envelope. **Scene → Export PCM WAV mix** writes a 48 kHz stereo PCM16 mix
 from an immutable document snapshot. Multiple clips sum at exact scene sample
 positions. Export runs in the background, reports progress and atomically
 discards a cancelled temporary file. Conversion between different sample
@@ -46,6 +51,8 @@ See [ADR-041](../architecture/adr/041-audio-downsampling-kernel.md) for the
 shared bounded rate-conversion kernel and callback memory boundary.
 See [ADR-042](../architecture/adr/042-selected-audio-export-range.md) for
 selected frame-range export boundaries.
+See [ADR-046](../architecture/adr/046-sample-accurate-audio-fades.md) for
+source-sample fades and trim/repeat clamping.
 
 ## Verification
 
@@ -84,6 +91,12 @@ selected frame-range export boundaries.
   block against a 21.33 ms callback period on the local M1 Pro Release build.
 - The same filter now reconstructs an 8-to-48 kHz source tone at 3 kHz (0.560 RMS);
   whole and split output blocks agree. Equal-rate cue sampling remains direct.
+- A constant PCM fixture checks fade endpoint samples, the full-volume
+  repeated-cycle seam, invalid sum rejection, atomic undo/redo, trim clamping
+  and source-byte preservation. A format-21 project loads with zero fades,
+  saves chosen values and retains a readable `.pre-v21.bak`. Native HM-10
+  smoke finds both controls, exports a faded mix and verifies an attenuated
+  first cue with the second cue unchanged.
 - A range-export integration test compares selected PCM payload with the
   full-scene mix slice at 24 and 24000/1001 fps, checks exact length and
   rejects invalid boundaries before writing. The native HM-10 smoke exports
@@ -101,7 +114,7 @@ selected frame-range export boundaries.
   and two skipped polled frames. Each drift is relative to the host monotonic
   clock after the first one-second baseline. These silent probes do not
   measure speaker delivery time, audible sync or hardware underruns.
-- Local macOS `build/locked`: 164/164 CTest entries pass. The native
+- Local macOS `build/locked`: 169/169 CTest entries pass. The native
   `--hm10-smoke` loaded the Qt Quick audio timeline, checked its cue sample,
   captured and visually inspected `build/hm10-audio-smoke.png`, exported an
   exactly sized WAV with its cue at the correct sample, advanced and sought

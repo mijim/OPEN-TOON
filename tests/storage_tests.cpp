@@ -4,6 +4,7 @@
 #include "opentoon/deformation.h"
 #include "opentoon/deformer.h"
 #include "opentoon/character_pose.h"
+#include "opentoon/audio.h"
 #include <catch2/catch_test_macros.hpp>
 #include <algorithm>
 #include <chrono>
@@ -793,6 +794,52 @@ TEST_CASE("Format twenty cutters migrate hidden source painting with a readable 
     REQUIRE(ProjectStore::load(project.file).document == changed);
     auto backup = project.file;
     backup += ".pre-v20.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+}
+TEST_CASE("Format twenty-one audio clips migrate silent fades with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    std::vector<std::uint8_t> wav{'R', 'I', 'F', 'F'};
+    const auto put16 = [&](std::uint16_t value) {
+        wav.push_back(std::uint8_t(value));
+        wav.push_back(std::uint8_t(value >> 8));
+    };
+    const auto put32 = [&](std::uint32_t value) {
+        wav.push_back(std::uint8_t(value));
+        wav.push_back(std::uint8_t(value >> 8));
+        wav.push_back(std::uint8_t(value >> 16));
+        wav.push_back(std::uint8_t(value >> 24));
+    };
+    put32(36 + 8 * 2);
+    wav.insert(wav.end(), {'W', 'A', 'V', 'E', 'f', 'm', 't', ' '});
+    put32(16); put16(1); put16(1); put32(8000); put32(16000);
+    put16(2); put16(16);
+    wav.insert(wav.end(), {'d', 'a', 't', 'a'});
+    put32(16);
+    for (int sample = 0; sample < 8; ++sample)
+        put16(16384);
+    const auto clipId = importPcm16Wav(original, "tone", wav, 0);
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 21;
+    for (auto& clip : legacy["audioClips"]) {
+        clip.erase("fadeInSamples");
+        clip.erase("fadeOutSamples");
+    }
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=21");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    setAudioClipFades(changed, clipId, 2, 2);
+    REQUIRE(ProjectStore::save(project.file, changed, "Fade cue", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v21.bak";
     REQUIRE(ProjectStore::load(backup).document == original);
     FixtureDatabase current(project.file);
     REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);

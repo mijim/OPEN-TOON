@@ -218,7 +218,9 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
         j["audioClips"].push_back({{"id", clip.id}, {"asset", clip.asset},
                                    {"start", clip.start}, {"inSample", clip.inSample},
                                    {"outSample", clip.outSample}, {"gain", clip.gain},
-                                   {"repeats", clip.repeats}});
+                                   {"repeats", clip.repeats},
+                                   {"fadeInSamples", clip.fadeInSamples},
+                                   {"fadeOutSamples", clip.fadeOutSamples}});
     return j.dump();
 }
 Document deserializeDocument(const std::string& text, ResourceReader read) {
@@ -274,7 +276,11 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
                                     entry.at("start"), entry.at("inSample"),
                                     entry.at("outSample"), entry.at("gain"),
                                     j.at("version").get<int>() >= 17
-                                        ? entry.at("repeats").get<int>() : 1});
+                                        ? entry.at("repeats").get<int>() : 1,
+                                    j.at("version").get<int>() >= 22
+                                        ? entry.at("fadeInSamples").get<std::uint64_t>() : 0,
+                                    j.at("version").get<int>() >= 22
+                                        ? entry.at("fadeOutSamples").get<std::uint64_t>() : 0});
     }
     for (const auto& s : j.at("palette"))
         d.palette.push_back({s.at("id"), s.at("name"), readColor(s.at("color"))});

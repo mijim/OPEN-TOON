@@ -423,12 +423,55 @@ int main(int argc, char** argv) {
                         selected.size() != 44 + 4000 * 4 ||
                         selected.readAll().mid(44) != mix.mid(44 + 2000 * 4, 4000 * 4))
                         throw std::runtime_error("Native selected WAV range shifted or changed duration.");
+                    (void)window->grabWindow();
+                    const auto findVisualItem = [](auto&& self, QQuickItem* parent,
+                                                   const QString& name) -> QQuickItem* {
+                        if (!parent)
+                            return nullptr;
+                        if (parent->objectName() == name)
+                            return parent;
+                        for (auto* child : parent->childItems())
+                            if (auto* found = self(self, child, name))
+                                return found;
+                        return nullptr;
+                    };
+                    const auto* fadeInControl = findVisualItem(findVisualItem, window->contentItem(),
+                                                                "audioFadeInSamples");
+                    const auto* fadeOutControl = findVisualItem(findVisualItem, window->contentItem(),
+                                                                 "audioFadeOutSamples");
+                    if (!fadeInControl || !fadeOutControl)
+                        throw std::runtime_error("Native audio fade controls are unavailable.");
+                    if (!editor.setAudioClipFades(clip, 4000, 4000))
+                        throw std::runtime_error("Native audio fades were rejected.");
+                    if (editor.audioClips().front().toMap().value("fadeInSamples").toInt() != 4000)
+                        throw std::runtime_error("Native audio fade did not reach the document.");
+                    editor.undo();
+                    if (editor.audioClips().front().toMap().value("fadeInSamples").toInt() != 0)
+                        throw std::runtime_error("Native audio fade undo failed.");
+                    editor.redo();
+                    const auto fadedOutput = directory.filePath("faded.wav");
+                    editor.exportAudio(QUrl::fromLocalFile(fadedOutput));
+                    timeout.restart();
+                    while (editor.exporting() && timeout.elapsed() < 15000) {
+                        QCoreApplication::processEvents();
+                        QThread::msleep(1);
+                    }
+                    QFile fadedFile(fadedOutput);
+                    if (editor.exporting() || !fadedFile.open(QIODevice::ReadOnly))
+                        throw std::runtime_error("Native faded WAV export failed.");
+                    const auto fadedMix = fadedFile.readAll();
+                    if (fadedMix.size() != mix.size() ||
+                        fadedMix.mid(44, 4) != QByteArray(4, '\0') ||
+                        fadedMix.mid(44 + 2002 * 4, 4) == mix.mid(44 + 2002 * 4, 4) ||
+                        fadedMix.mid(44 + 50002 * 4, 4) != mix.mid(44 + 50002 * 4, 4))
+                        throw std::runtime_error("Native fade changed the repeated cue or its endpoints.");
+                    editor.undo(); // Fades.
                     editor.undo(); // Repeat count.
                     editor.undo();
                     if (editor.document() != baseline)
                         throw std::runtime_error("WAV import did not undo atomically.");
                     std::cout << "HM-10 audio smoke passed: native PCM16 import, cue waveform, "
-                                 "device-clock playhead/seek, waveform drag/undo, audio scrub/repeat, exact full and selected-range WAV export, timeline screenshot and atomic undo.\n";
+                                 "device-clock playhead/seek, waveform drag/undo, audio scrub/repeat, source-sample fades, exact full and selected-range WAV export, timeline screenshot and atomic undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

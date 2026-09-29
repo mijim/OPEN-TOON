@@ -2243,6 +2243,38 @@ ApplicationWindow {
                                         Item { Layout.fillWidth: true }
                                         Label { text: "× trimmed range"; font.pixelSize: 10; color: "#777777" }
                                     }
+                                    Label {
+                                        text: "Linear fades · source samples"
+                                        font.pixelSize: 10
+                                        color: "#777777"
+                                    }
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        Label { text: "Fade in"; font.pixelSize: 10; color: "#888888" }
+                                        C.CompactTextField {
+                                            id: audioFadeIn
+                                            objectName: "audioFadeInSamples"
+                                            Layout.fillWidth: true
+                                            text: String(modelData.fadeInSamples)
+                                            validator: IntValidator { bottom: 0; top: 2147483647 }
+                                            Accessible.name: "Audio fade in source samples"
+                                        }
+                                        Label { text: "Out"; font.pixelSize: 10; color: "#888888" }
+                                        C.CompactTextField {
+                                            id: audioFadeOut
+                                            objectName: "audioFadeOutSamples"
+                                            Layout.fillWidth: true
+                                            text: String(modelData.fadeOutSamples)
+                                            validator: IntValidator { bottom: 0; top: 2147483647 }
+                                            Accessible.name: "Audio fade out source samples"
+                                        }
+                                        C.ToolButton {
+                                            text: "Set"
+                                            hint: "Set linear audio fades in source samples"
+                                            onClicked: if (audioFadeIn.acceptableInput && audioFadeOut.acceptableInput)
+                                                           editor.setAudioClipFades(modelData.id, Number(audioFadeIn.text), Number(audioFadeOut.text))
+                                        }
+                                    }
                                     C.ToolButton {
                                         text: "Remove clip"
                                         Layout.fillWidth: true

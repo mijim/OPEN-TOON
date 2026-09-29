@@ -353,7 +353,9 @@ QVariantList EditorController::audioClips() const {
                                      {"sampleRate", asset.sampleRate},
                                      {"channels", asset.channels},
                                      {"gain", clip.gain},
-                                     {"repeats", clip.repeats}});
+                                     {"repeats", clip.repeats},
+                                     {"fadeInSamples", qint64(clip.fadeInSamples)},
+                                     {"fadeOutSamples", qint64(clip.fadeOutSamples)}});
     }
     return result;
 }
@@ -1868,6 +1870,14 @@ bool EditorController::setAudioClipGain(int clipId, double gain) {
 bool EditorController::setAudioClipRepeats(int clipId, int repeats) {
     return edit("Set audio repeats", [&](Document& d) {
         opentoon::setAudioClipRepeats(d, Id(clipId), repeats);
+    });
+}
+bool EditorController::setAudioClipFades(int clipId, int fadeInSamples, int fadeOutSamples) {
+    if (fadeInSamples < 0 || fadeOutSamples < 0)
+        return false;
+    return edit("Set audio fades", [&](Document& d) {
+        opentoon::setAudioClipFades(d, Id(clipId), std::uint64_t(fadeInSamples),
+                                    std::uint64_t(fadeOutSamples));
     });
 }
 bool EditorController::removeAudioClip(int clipId) {

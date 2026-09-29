@@ -131,6 +131,9 @@ void trimAudioClip(Document& document, Id id, std::uint64_t inSample,
         throw std::invalid_argument("Invalid audio trim range.");
     target.inSample = inSample;
     target.outSample = outSample;
+    const auto total = (outSample - inSample) * std::uint64_t(target.repeats);
+    target.fadeInSamples = std::min(target.fadeInSamples, total);
+    target.fadeOutSamples = std::min(target.fadeOutSamples, total - target.fadeInSamples);
 }
 void setAudioClipGain(Document& document, Id id, double gain) {
     if (!std::isfinite(gain) || gain < 0 || gain > 4)
@@ -140,7 +143,20 @@ void setAudioClipGain(Document& document, Id id, double gain) {
 void setAudioClipRepeats(Document& document, Id id, int repeats) {
     if (repeats < 1 || repeats > 64)
         throw std::invalid_argument("Audio repeat count must be between one and 64.");
-    clip(document, id).repeats = repeats;
+    auto& target = clip(document, id);
+    target.repeats = repeats;
+    const auto total = (target.outSample - target.inSample) * std::uint64_t(repeats);
+    target.fadeInSamples = std::min(target.fadeInSamples, total);
+    target.fadeOutSamples = std::min(target.fadeOutSamples, total - target.fadeInSamples);
+}
+void setAudioClipFades(Document& document, Id id, std::uint64_t fadeInSamples,
+                       std::uint64_t fadeOutSamples) {
+    auto& target = clip(document, id);
+    const auto total = (target.outSample - target.inSample) * std::uint64_t(target.repeats);
+    if (fadeInSamples > total || fadeOutSamples > total - fadeInSamples)
+        throw std::invalid_argument("Audio fades exceed the repeated clip length.");
+    target.fadeInSamples = fadeInSamples;
+    target.fadeOutSamples = fadeOutSamples;
 }
 void removeAudioClip(Document& document, Id id) {
     const auto oldSize = document.audioClips.size();
@@ -276,7 +292,10 @@ AudioMixPlan::AudioMixPlan(const Document& document, std::int32_t outputRate)
         const auto info = inspectPcm16Wav({asset->wav.data(), asset->wav.size()});
         if (clip.inSample >= clip.outSample || clip.outSample > info.sampleFrames ||
             clip.start < 0 || clip.start >= duration_ || !std::isfinite(clip.gain) ||
-            clip.gain < 0 || clip.gain > 4 || clip.repeats < 1 || clip.repeats > 64)
+            clip.gain < 0 || clip.gain > 4 || clip.repeats < 1 || clip.repeats > 64 ||
+            clip.fadeInSamples > (clip.outSample - clip.inSample) * std::uint64_t(clip.repeats) ||
+            clip.fadeOutSamples > (clip.outSample - clip.inSample) *
+                                      std::uint64_t(clip.repeats) - clip.fadeInSamples)
             throw std::invalid_argument("Invalid audio clip in mix plan.");
         sources_.push_back({&*asset, clip, info.dataOffset,
                             frameRate_.sampleAt(clip.start, outputRate_)});
@@ -321,6 +340,18 @@ void AudioMixPlan::renderInto(std::int64_t firstSample, std::span<std::int16_t> 
                                        : cycle + 1 < std::uint64_t(source.clip.repeats)
                                              ? source.clip.inSample : sourceFrame;
             const double fraction = double(subsecond % outputRate_) / outputRate_;
+            const double sourcePosition = double(sourceOffset) + fraction;
+            const double totalSource = double(length * std::uint64_t(source.clip.repeats));
+            const auto ramp = [](double position, std::uint64_t samples) {
+                if (!samples)
+                    return 1.0;
+                if (samples == 1)
+                    return position > 0 ? 1.0 : 0.0;
+                return std::clamp(position / double(samples - 1), 0.0, 1.0);
+            };
+            const double envelope = ramp(sourcePosition, source.clip.fadeInSamples) *
+                                    ramp(totalSource - 1 - sourcePosition,
+                                         source.clip.fadeOutSamples);
             auto read = [&](std::uint64_t frame, int channel) {
                 const auto at = source.dataOffset + (frame * asset.channels + channel) * 2;
                 const auto encoded = u16(bytes, at);
@@ -345,7 +376,7 @@ void AudioMixPlan::renderInto(std::int64_t firstSample, std::span<std::int16_t> 
                     const double b = read(nextFrame, inputChannel);
                     value = a + (b - a) * fraction;
                 }
-                scratch[index * 2 + channel] += value * source.clip.gain;
+                scratch[index * 2 + channel] += value * source.clip.gain * envelope;
             }
         }
     }

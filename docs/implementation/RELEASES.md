@@ -1,5 +1,16 @@
 # Experimental releases
 
+## 0.2.0-experimental.28 — working source, source-sample audio fades
+
+- Set linear fade-in and fade-out durations on a repeated clip in source
+  samples. The immutable mixer applies them to device preview and full or
+  selected-range PCM WAV output without changing the original WAV.
+- Format 22 migrates older clips to zero fades and keeps a readable backup.
+  Exact PCM, undo/redo, trim clamping, 169 CTest entries and native HM-10
+  smoke pass on macOS.
+- Source only; no new public binary or tag. Audible hardware quality remains
+  unqualified and the waveform does not yet draw the fade envelope.
+
 ## 0.2.0-experimental.27 — working source, node output preview
 
 - Click a derived image or matte node to inspect its evaluated output at the

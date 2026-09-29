@@ -407,6 +407,10 @@ void Document::validate() const {
                                           [&](const auto& value) { return value.id == clip.asset; });
         require(clip.inSample < clip.outSample && clip.outSample <= asset.sampleFrames,
                 "Invalid audio clip trim range.");
+        const auto samples = (clip.outSample - clip.inSample) * std::uint64_t(clip.repeats);
+        require(clip.fadeInSamples <= samples &&
+                    clip.fadeOutSamples <= samples - clip.fadeInSamples,
+                "Audio fades exceed the repeated clip length.");
     }
 }
 Document makeDocument() {

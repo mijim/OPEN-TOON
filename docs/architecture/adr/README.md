@@ -139,3 +139,6 @@ retained source references and inactive graph dependencies.
 
 See [ADR-045](045-visible-cutter-source.md) for format-21 source painting while
 the same image supplies fractional matte coverage.
+
+See [ADR-046](046-sample-accurate-audio-fades.md) for format-22 source-sample
+clip envelopes shared by device playback and PCM WAV output.
