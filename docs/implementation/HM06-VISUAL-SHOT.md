@@ -15,7 +15,7 @@ orthographic camera pushes in from frames 336–360 before returning to rest.
 Frame 479 renders identically to frame zero.
 
 The render test checks all 480 frames at 480 × 270 with one connected
-character silhouette in every preview, plus five selected frames at
+character silhouette in every preview, plus seven selected frames at
 1920 × 1080 with the same connectivity. It checks 1,920 bone-tip/follower
 positions across four parts and every frame, source substitution choices,
 saved state and exact pixels
@@ -35,6 +35,10 @@ of the authored study, not an automatic cross-substitution matching feature.
 Representative saved frames: [front speech](hm06-visual-shot-0120.png),
 [pointing and bend](hm06-visual-shot-0240.png), and
 [camera push](hm06-visual-shot-0360.png).
+The [frame before the sleeve change](hm06-visual-shot-0299.png) and
+[the incoming sleeve frame](hm06-visual-shot-0300.png) are retained at
+1920 × 1080 for direct contour inspection. Their left shoulder, elbow,
+cuff and hand remain visually joined across the change.
 
 ## Local macOS measurements
 

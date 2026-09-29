@@ -1238,7 +1238,7 @@ TEST_CASE("Twenty-second visual shot combines deformers views mouth hands and ca
         }
     }
 
-    const std::array<Frame, 5> stills{0, 120, 240, 360, 479};
+    const std::array<Frame, 7> stills{0, 120, 240, 299, 300, 360, 479};
     std::map<Frame, QImage> frames;
     const bool fullResolution = qEnvironmentVariableIsSet("OPENTOON_HM06_VISUAL_FULL_RENDER");
     const QSize previewSize = fullResolution ? QSize{} : QSize(480, 270);
