@@ -31,7 +31,7 @@ source, matte or composite card also selects its owning Drawing or Part for
 the inspector. Type a layer
 name or node kind in **Find node** to highlight and scroll to a match; press
 Enter or **Next** for the following match. Search does not edit the project. The tab can
-change drawing order, opacity, opacity bypass, Normal/Multiply/Screen/Add blend mode, blend bypass and cutter settings. Drag a Drawing card onto another to place it immediately above that target in composite order. Hold Alt while dragging to use the first Drawing as the target's cutter. The target card highlights during the drag. Invalid or locked references reject the edit. Select a Drawing or Part,
+change drawing order, opacity, opacity bypass, Normal/Multiply/Screen/Add blend mode, blend bypass and cutter settings. Drag a Drawing card onto another to place it immediately above that target in composite order. Hold Alt while dragging to use the first Drawing as the target's cutter. Alt-click an Opacity, Apply matte or non-Normal blend card to toggle its saved bypass. The target card highlights during a drag. Invalid or locked references reject the edit. Select a Drawing or Part,
 choose a visible source in **Cutter matte**, then use **Outside**, **Bypass**
 or **Paint cutter source** as needed. The last option keeps the source visible
 at its normal layer order while it masks the selected target; it is shared by

@@ -205,7 +205,7 @@ int main(int argc, char** argv) {
                     if (!nodes || !nodes->isVisible() || !strip || !strip->isVisible() ||
                         editor.compositionNodes().size() != 8)
                         throw std::runtime_error("Derived composition nodes are unavailable.");
-                    auto clickNode = [&](int graphId) {
+                    auto clickNode = [&](int graphId, bool altClick = false) {
                         const auto findVisualItem = [](auto&& self, QQuickItem* parent,
                                                        const QString& name) -> QQuickItem* {
                             if (!parent)
@@ -222,12 +222,13 @@ int main(int argc, char** argv) {
                         if (!card || !card->isVisible())
                             throw std::runtime_error("A composition node card is unavailable.");
                         const auto point = card->mapToScene(QPointF(20, 20));
+                        const auto modifiers = altClick ? Qt::AltModifier : Qt::NoModifier;
                         QMouseEvent press(QEvent::MouseButtonPress, point,
                                           window->mapToGlobal(point.toPoint()),
-                                          Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                                          Qt::LeftButton, Qt::LeftButton, modifiers);
                         QMouseEvent release(QEvent::MouseButtonRelease, point,
                                             window->mapToGlobal(point.toPoint()),
-                                            Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+                                            Qt::LeftButton, Qt::NoButton, modifiers);
                         QCoreApplication::sendEvent(window, &press);
                         QCoreApplication::sendEvent(window, &release);
                         QCoreApplication::processEvents();
@@ -270,8 +271,32 @@ int main(int argc, char** argv) {
                         throw std::runtime_error("Matte preview did not show fractional alpha.");
                     (void)window->grabWindow();
                     clickNode(5);
-                    if (editor.selectedLayer() != int(document.layers.front().id))
+                    if (editor.selectedLayer() != int(document.layers.front().id) ||
+                        nodes->property("previewNodeId").toInt() != 5)
                         throw std::runtime_error("Clicking Apply matte did not select its target.");
+                    clickNode(5, true);
+                    if (!editor.document().layer(document.layers.front().id).matteBypassed ||
+                        qAlpha(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 128)
+                        throw std::runtime_error("Alt-clicking Apply matte did not bypass its cutter.");
+                    editor.undo();
+                    if (editor.document().layer(document.layers.front().id).matteBypassed ||
+                        qAlpha(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 32)
+                        throw std::runtime_error("Node Alt-click bypass did not undo atomically.");
+                    editor.redo();
+                    int bypassCardId = 0;
+                    for (const auto& variant : editor.compositionNodes()) {
+                        const auto card = variant.toMap();
+                        if (card.value("kind").toString() == "Bypassed cutter" &&
+                            card.value("layer").toInt() == int(document.layers.front().id))
+                            bypassCardId = card.value("id").toInt();
+                    }
+                    if (!bypassCardId)
+                        throw std::runtime_error("Bypassed cutter card is missing.");
+                    (void)window->grabWindow();
+                    clickNode(bypassCardId, true);
+                    if (editor.document().layer(document.layers.front().id).matteBypassed ||
+                        qAlpha(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 32)
+                        throw std::runtime_error("Alt-clicking a bypassed cutter did not re-enable it.");
                     (void)window->grabWindow();
                     clickNode(6);
                     if (editor.selectedLayer() != int(document.layers.front().id))
@@ -673,7 +698,7 @@ int main(int argc, char** argv) {
                     if (nodes->property("matchIndex").toInt() != 1)
                         throw std::runtime_error("Next did not navigate to the second Drawing match.");
                     std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass, fractional cutter, "
-                                 "painted-source Multiply/Add, blend bypass, drawing drag order, Alt-drag cutter, typed search, save/reopen and undo.\n";
+                                 "painted-source Multiply/Add, blend bypass, drawing drag order, Alt-drag cutter, Alt-click bypass, typed search, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

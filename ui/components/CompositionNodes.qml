@@ -22,6 +22,24 @@ Item {
             n.name.toLowerCase().includes(query) || n.kind.toLowerCase().includes(query))
             .map(n => n.id) : []
     }
+    function toggleNodeBypass(node) {
+        if (node.layer <= 0)
+            return false
+        if (node.kind === "Opacity" || node.kind === "Bypassed opacity") {
+            root.layerChosen(node.layer)
+            root.controller.setOpacityBypassed(node.kind === "Opacity")
+        } else if (node.kind === "Apply matte" || node.kind === "Bypassed cutter") {
+            root.layerChosen(node.layer)
+            root.controller.setMatteBypassed(node.kind === "Apply matte")
+        } else if (node.kind === "Multiply" || node.kind === "Screen" ||
+                   node.kind === "Add" || node.kind === "Bypassed blend") {
+            root.layerChosen(node.layer)
+            root.controller.setBlendBypassed(node.kind !== "Bypassed blend")
+        } else {
+            return false
+        }
+        return true
+    }
     function showMatch(index) {
         if (matchingNodeIds.length === 0) {
             matchIndex = -1
@@ -71,7 +89,7 @@ Item {
                 font.letterSpacing: 1
             }
             Label {
-                text: "Drag to reorder; Alt-drag a Drawing onto another to use it as cutter"
+                text: "Drag: order · Alt-drag: cutter · Alt-click: bypass"
                 color: "#777777"
                 font.pixelSize: 10
             }
@@ -326,8 +344,11 @@ Item {
                                 root.draggedLayer = 0
                                 root.dropLayer = 0
                             }
-                            onClicked: {
+                            onClicked: mouse => {
                                 if (dragging)
+                                    return
+                                if ((mouse.modifiers & Qt.AltModifier) !== 0 &&
+                                    root.toggleNodeBypass(modelData))
                                     return
                                 root.previewNodeId = modelData.id
                                 root.previewNodeKind = modelData.kind
@@ -337,7 +358,7 @@ Item {
                                     root.layerChosen(modelData.layer)
                             }
                             Accessible.name: modelData.layer > 0
-                                             ? "Preview and select " + modelData.name + " composition source"
+                                             ? "Preview and select " + modelData.name + " composition source; Alt-click bypassable nodes to toggle"
                                              : "Preview " + modelData.kind + " composition node"
                         }
                     }

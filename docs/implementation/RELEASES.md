@@ -1,5 +1,14 @@
 # Experimental releases
 
+## 0.2.0-experimental.47 — working source, direct node bypass
+
+- Alt-click an Opacity, Apply matte or non-Normal blend card to toggle its
+  existing saved bypass through the same document command as the toolbar.
+  Alt-clicking the bypassed card restores the retained setting.
+- Native Qt Quick pointer smoke verifies cutter bypass, one-step undo/redo
+  and re-enabling from the node card. The locked macOS suite remains green at
+  186/186 CTest entries. Source only; no new public binary or tag.
+
 ## 0.2.0-experimental.46 — working source, node owner selection
 
 - Cutter source, Invert matte, Apply matte and layer composite cards carry

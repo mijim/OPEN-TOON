@@ -58,6 +58,10 @@ cutter source through the existing validated document command. Its fractional
 alpha, saved references and one-step undo use the same path as the inspector.
 An ordinary drag continues to reorder. This is a direct graph connection for
 the supported cutter recipe; arbitrary wiring remains open.
+Alt-clicking an Opacity, Apply matte or non-Normal blend card toggles its
+existing saved bypass through the same validated command as the toolbar.
+Alt-clicking the bypassed card restores the retained setting. Locked layers
+continue to reject the edit; the card label changes with graph evaluation.
 The Nodes search field locates cards by layer name or node kind without
 editing the document. It highlights matches, scrolls to the current result
 and cycles through them with Enter or Next; arbitrary graph edits remain open.
@@ -155,6 +159,8 @@ preview. This is diagnostic navigation, not a persisted graph edit.
 - Native Qt Quick smoke types Write into the search field in a narrower window,
 - Native Qt Quick smoke Alt-drags a Drawing source onto a Drawing target,
   checks the target binding and output color, then undoes, redoes and reopens.
+- Native Qt Quick smoke Alt-clicks Apply matte to bypass, undoes, redoes and
+  Alt-clicks the resulting Bypassed cutter card to re-enable the same binding.
 - Graph tests check derived cutter, matte and composite owner IDs and reject
   dangling owners. Native Qt Quick smoke clicks the Cutter, Apply matte and
   Composite cards and checks that the intended layer becomes selected.
