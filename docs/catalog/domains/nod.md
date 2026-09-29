@@ -28,9 +28,9 @@ Create, move, connect, search and delete nodes while navigating the graph.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM12-PROGRESS.md](../../../docs/implementation/HM12-PROGRESS.md) — native front/behind Drawing-card drags, typed search/navigation, Part pixel order, undo/reopen and invalid-target checks.
+**Implementation evidence:** [docs/implementation/HM12-PROGRESS.md](../../../docs/implementation/HM12-PROGRESS.md) — native front/behind Drawing-card drags and Shift-click grouping, typed search/navigation, Part pixel order, undo/reopen and invalid-target checks.
 
-**Remaining scope:** The derived graph offers clickable image/matte previews, name/kind search and direct front/behind Drawing-card reordering of saved composite order. Arbitrary node creation, wiring, deletion and layout remain open.
+**Remaining scope:** The derived graph offers clickable image/matte previews, name/kind search, direct front/behind Drawing-card order and contiguous group boundaries. Arbitrary node creation, wiring, deletion and layout remain open.
 
 ## NOD-002 — Typed ports
 
@@ -62,9 +62,13 @@ Encapsulate subgraphs with reusable inputs and outputs.
 
 **Initial acceptance:** Grouping preserves the graph's resulting image.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM12-PROGRESS.md](../../../docs/implementation/HM12-PROGRESS.md) — docs/architecture/adr/060-contiguous-composite-groups.md; group/matte pixel parity, invalid membership rejection, native Shift-click/rename/ungroup and format-30 backup.
+
+**Remaining scope:** Format-31 named contiguous Drawing/Part composite groups show typed image input/output ports and preserve exact pixels, matte references, undo and reopen. Nested or reusable general groups and published external bindings remain open.
 
 ## NOD-005 — Layer compositing
 

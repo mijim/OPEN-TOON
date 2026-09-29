@@ -260,7 +260,7 @@ void SceneRenderer::paintStroke(QPainter& painter, const Stroke& s, const std::v
     painter.restore();
 }
 void SceneRenderer::paint(QPainter& painter, const Document& d, Frame frame, RenderOptions options) {
-    if (d.composition == CompositionProfile::LinearSrgb ||
+    if (d.composition == CompositionProfile::LinearSrgb || !d.compositeGroups.empty() ||
         std::any_of(d.layers.begin(), d.layers.end(), [](const Layer& layer) {
             return layer.matte != 0 || layer.opacityBypassed || layer.compositeBypassed ||
                    layer.blendMode != LayerBlendMode::Normal;
@@ -342,7 +342,7 @@ QImage SceneRenderer::render(const Document& d, Frame frame, QSize size, RenderO
         size = QSize(d.width, d.height);
     if (size.width() > 8192 || size.height() > 8192 || size.width() <= 0 || size.height() <= 0)
         throw std::invalid_argument("Invalid render dimensions.");
-    if (d.composition == CompositionProfile::LinearSrgb ||
+    if (d.composition == CompositionProfile::LinearSrgb || !d.compositeGroups.empty() ||
         std::any_of(d.layers.begin(), d.layers.end(), [](const Layer& layer) {
             return layer.matte != 0 || layer.opacityBypassed || layer.compositeBypassed ||
                    layer.blendMode != LayerBlendMode::Normal;

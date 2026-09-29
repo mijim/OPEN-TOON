@@ -474,6 +474,48 @@ TEST_CASE("Composite bypass keeps a painted cutter usable without painting its l
     unmasked.validate();
     REQUIRE(qAlpha(SceneRenderer::render(unmasked, 0).pixel(0, 0)) == 0);
 }
+TEST_CASE("Composite group ports preserve matte-only sources and exact rendered pixels") {
+    auto document = makeDocument();
+    document.width = document.height = 1;
+    document.background = {0, 0, 0, 0};
+    const Id baseId = document.layers.front().id;
+    document.editableDrawing(baseId, 0).image = ImageAsset{1, 1, {255, 0, 0, 255}};
+    const auto addImage = [&](std::string name, std::vector<std::uint8_t> pixels) {
+        auto layer = document.layers.front();
+        layer.id = document.allocateId();
+        layer.name = std::move(name);
+        auto drawing = document.drawings.at(layer.exposures.front().drawing);
+        drawing.id = document.allocateId();
+        drawing.image = ImageAsset{1, 1, std::move(pixels)};
+        document.drawings.emplace(drawing.id, drawing);
+        for (auto& exposure : layer.exposures)
+            exposure.drawing = drawing.id;
+        document.layers.push_back(layer);
+        return layer.id;
+    };
+    const Id sourceId = addImage("Cutter", {0, 0, 255, 128});
+    const Id targetId = addImage("Target", {0, 255, 0, 255});
+    document.layer(targetId).matte = sourceId;
+    const auto original = SceneRenderer::render(document, 0);
+    REQUIRE(qBlue(original.pixel(0, 0)) == 0);
+    const Id groupId = document.allocateId();
+    document.compositeGroups.push_back({groupId, "Body and cutter",
+                                        {baseId, sourceId, targetId}});
+    document.validate();
+    const auto graph = CompositionGraph::orderedLayers(document);
+    REQUIRE_NOTHROW(graph.validate(document));
+    const auto output = std::find_if(graph.nodes.begin(), graph.nodes.end(), [&](const auto& node) {
+        return node.kind == GraphNodeKind::GroupOutput && node.group == groupId;
+    });
+    REQUIRE(output != graph.nodes.end());
+    REQUIRE(SceneRenderer::render(document, 0) == original);
+    REQUIRE(GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Display) == original);
+    REQUIRE(GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Write) == original);
+    REQUIRE(GraphRenderer::renderNode(graph, document, 0, output->id, {1, 1}) == original);
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == original);
+    document.compositeGroups.clear();
+    REQUIRE(SceneRenderer::render(document, 0) == original);
+}
 TEST_CASE("Linear color chart keeps bounded alpha and premultiplied color across coverage levels") {
     auto document = makeDocument();
     document.width = 8;

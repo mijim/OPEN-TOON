@@ -54,6 +54,44 @@ TEST_CASE("Bypassed composite disconnects layer ink without removing its source 
     characterDocument.layer(peg.id).compositeBypassed = true;
     REQUIRE_THROWS(characterDocument.validate());
 }
+TEST_CASE("Composite groups expose typed input and output ports across adjacent drawings") {
+    auto document = makeDocument();
+    const Id first = document.layers.front().id;
+    auto second = document.layers.front();
+    second.id = document.allocateId();
+    second.name = "Second";
+    document.layers.push_back(second);
+    const Id group = document.allocateId();
+    document.compositeGroups.push_back({group, "Body", {first, second.id}});
+    REQUIRE_NOTHROW(document.validate());
+    const auto graph = CompositionGraph::orderedLayers(document);
+    REQUIRE_NOTHROW(graph.validate(document));
+    const auto input = std::find_if(graph.nodes.begin(), graph.nodes.end(), [&](const auto& node) {
+        return node.kind == GraphNodeKind::GroupInput && node.group == group;
+    });
+    const auto output = std::find_if(graph.nodes.begin(), graph.nodes.end(), [&](const auto& node) {
+        return node.kind == GraphNodeKind::GroupOutput && node.group == group;
+    });
+    REQUIRE(input != graph.nodes.end());
+    REQUIRE(output != graph.nodes.end());
+    REQUIRE(input->inputs.size() == 1);
+    REQUIRE(output->inputs.size() == 1);
+    const auto affected = graph.affectedByLayer(document, first);
+    REQUIRE(std::find(affected.begin(), affected.end(), output->id) != affected.end());
+    REQUIRE(std::find(affected.begin(), affected.end(), graph.write) != affected.end());
+    auto invalid = document;
+    invalid.compositeGroups.front().members = {second.id, first};
+    REQUIRE_THROWS(invalid.validate());
+    invalid = document;
+    invalid.compositeGroups.front().members = {first, 999999};
+    REQUIRE_THROWS(invalid.validate());
+    invalid = document;
+    invalid.compositeGroups.push_back({invalid.allocateId(), "Other", {first, second.id}});
+    REQUIRE_THROWS(invalid.validate());
+    invalid = document;
+    invalid.compositeGroups.front().members.clear();
+    REQUIRE_THROWS(CompositionGraph::orderedLayers(invalid));
+}
 
 TEST_CASE("Composition rejects cycles, dangling edges, wrong ports and duplicate slots") {
     auto document = makeDocument();

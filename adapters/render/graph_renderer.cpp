@@ -259,6 +259,7 @@ QImage renderGraphTerminal(const CompositionGraph& graph, const Document& docume
     std::map<GraphNodeId, QRect> bounds;
     Document legacy = document;
     legacy.composition = CompositionProfile::LegacyQt;
+    legacy.compositeGroups.clear(); // Isolated source render must not re-enter the group graph.
     for (auto& layer : legacy.layers) {
         layer.matte = 0; // Isolated source render must not re-enter the graph.
         layer.opacityBypassed = false;
@@ -332,6 +333,8 @@ QImage renderGraphTerminal(const CompositionGraph& graph, const Document& docume
             bound = inputBounds(0);
             break;
         case GraphNodeKind::BypassComposite:
+        case GraphNodeKind::GroupInput:
+        case GraphNodeKind::GroupOutput:
             image = input(0);
             bound = inputBounds(0);
             break;

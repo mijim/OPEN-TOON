@@ -24,6 +24,8 @@ GraphPortType outputType(GraphNodeKind kind) {
     case GraphNodeKind::BypassMatte:
     case GraphNodeKind::DisplayOutput:
     case GraphNodeKind::WriteOutput:
+    case GraphNodeKind::GroupInput:
+    case GraphNodeKind::GroupOutput:
         return GraphPortType::Image;
     case GraphNodeKind::LayerTransform:
         return GraphPortType::Transform;
@@ -60,6 +62,8 @@ std::vector<GraphPortType> inputTypes(GraphNodeKind kind) {
         return {GraphPortType::Image};
     case GraphNodeKind::DisplayOutput:
     case GraphNodeKind::WriteOutput:
+    case GraphNodeKind::GroupInput:
+    case GraphNodeKind::GroupOutput:
         return {GraphPortType::Image};
     }
     throw std::invalid_argument("Unknown compositor node kind.");
@@ -72,6 +76,13 @@ CompositionGraph CompositionGraph::orderedLayers(const Document& document) {
     GraphNodeId image = graph.nodes.front().id;
     std::map<Id, GraphNodeId> sourceIds;
     std::set<Id> matteSources;
+    std::map<Id, Id> groupStarts, groupEnds;
+    for (const auto& group : document.compositeGroups) {
+        if (group.members.size() < 2)
+            throw std::invalid_argument("Composite group needs at least two drawing members.");
+        groupStarts[group.members.front()] = group.id;
+        groupEnds[group.members.back()] = group.id;
+    }
     for (const auto& layer : document.layers) {
         if (layer.kind != LayerKind::Drawing && layer.kind != LayerKind::Part)
             continue;
@@ -95,49 +106,60 @@ CompositionGraph CompositionGraph::orderedLayers(const Document& document) {
     for (const auto& layer : document.layers) {
         if (layer.kind != LayerKind::Drawing && layer.kind != LayerKind::Part)
             continue;
-        if (matteSources.contains(layer.id) && !layer.paintMatteSource)
-            continue;
-        GraphNodeId source = sourceIds.at(layer.id);
-        if (layer.matte) {
-            if (layer.matteBypassed) {
-                const GraphNodeId bypassed = next++;
-                graph.nodes.push_back({bypassed, GraphNodeKind::BypassMatte, layer.id,
-                                       {{source, 0}}});
-                source = bypassed;
-            } else {
-                GraphNodeId matte = next++;
-                graph.nodes.push_back({matte, GraphNodeKind::MatteFromImage, layer.matte,
-                                       {{sourceIds.at(layer.matte), 0}}});
-                if (layer.invertMatte) {
-                    const GraphNodeId inverted = next++;
-                    graph.nodes.push_back({inverted, GraphNodeKind::InvertMatte, layer.id, {{matte, 0}}});
-                    matte = inverted;
+        if (const auto start = groupStarts.find(layer.id); start != groupStarts.end()) {
+            const GraphNodeId port = next++;
+            graph.nodes.push_back({port, GraphNodeKind::GroupInput, 0, {{image, 0}}, start->second});
+            image = port;
+        }
+        if (!matteSources.contains(layer.id) || layer.paintMatteSource) {
+            GraphNodeId source = sourceIds.at(layer.id);
+            if (layer.matte) {
+                if (layer.matteBypassed) {
+                    const GraphNodeId bypassed = next++;
+                    graph.nodes.push_back({bypassed, GraphNodeKind::BypassMatte, layer.id,
+                                           {{source, 0}}});
+                    source = bypassed;
+                } else {
+                    GraphNodeId matte = next++;
+                    graph.nodes.push_back({matte, GraphNodeKind::MatteFromImage, layer.matte,
+                                           {{sourceIds.at(layer.matte), 0}}});
+                    if (layer.invertMatte) {
+                        const GraphNodeId inverted = next++;
+                        graph.nodes.push_back({inverted, GraphNodeKind::InvertMatte, layer.id,
+                                               {{matte, 0}}});
+                        matte = inverted;
+                    }
+                    const GraphNodeId masked = next++;
+                    graph.nodes.push_back({masked, GraphNodeKind::ApplyMatte, layer.id,
+                                           {{source, 0}, {matte, 1}}});
+                    source = masked;
                 }
-                const GraphNodeId masked = next++;
-                graph.nodes.push_back({masked, GraphNodeKind::ApplyMatte, layer.id,
-                                       {{source, 0}, {matte, 1}}});
-                source = masked;
+            }
+            if (layer.compositeBypassed) {
+                const GraphNodeId bypassed = next++;
+                graph.nodes.push_back({bypassed, GraphNodeKind::BypassComposite, layer.id,
+                                       {{image, 0}}});
+                image = bypassed;
+            } else {
+                const GraphNodeId composite = next++;
+                const auto kind = layer.blendBypassed && layer.blendMode != LayerBlendMode::Normal
+                                      ? GraphNodeKind::BypassBlend
+                                      : layer.blendMode == LayerBlendMode::Multiply
+                                      ? GraphNodeKind::Multiply
+                                      : layer.blendMode == LayerBlendMode::Screen
+                                            ? GraphNodeKind::Screen
+                                            : layer.blendMode == LayerBlendMode::Add
+                                                  ? GraphNodeKind::Add
+                                                  : GraphNodeKind::Over;
+                graph.nodes.push_back({composite, kind, layer.id, {{image, 0}, {source, 1}}});
+                image = composite;
             }
         }
-        if (layer.compositeBypassed) {
-            const GraphNodeId bypassed = next++;
-            graph.nodes.push_back({bypassed, GraphNodeKind::BypassComposite, layer.id,
-                                   {{image, 0}}});
-            image = bypassed;
-            continue;
+        if (const auto end = groupEnds.find(layer.id); end != groupEnds.end()) {
+            const GraphNodeId port = next++;
+            graph.nodes.push_back({port, GraphNodeKind::GroupOutput, 0, {{image, 0}}, end->second});
+            image = port;
         }
-        const GraphNodeId composite = next++;
-        const auto kind = layer.blendBypassed && layer.blendMode != LayerBlendMode::Normal
-                              ? GraphNodeKind::BypassBlend
-                              : layer.blendMode == LayerBlendMode::Multiply
-                              ? GraphNodeKind::Multiply
-                              : layer.blendMode == LayerBlendMode::Screen
-                                    ? GraphNodeKind::Screen
-                                    : layer.blendMode == LayerBlendMode::Add
-                                          ? GraphNodeKind::Add
-                                          : GraphNodeKind::Over;
-        graph.nodes.push_back({composite, kind, layer.id, {{image, 0}, {source, 1}}});
-        image = composite;
     }
     graph.display = next++;
     graph.nodes.push_back({graph.display, GraphNodeKind::DisplayOutput, 0, {{image, 0}}});
@@ -153,6 +175,13 @@ void CompositionGraph::validate(const Document& document) const {
         if (!node.id || !indexed.emplace(node.id, &node).second)
             throw std::invalid_argument("Duplicate or invalid compositor node ID.");
         (void)outputType(node.kind);
+        if (node.kind == GraphNodeKind::GroupInput || node.kind == GraphNodeKind::GroupOutput) {
+            if (node.layer || !node.group ||
+                std::none_of(document.compositeGroups.begin(), document.compositeGroups.end(),
+                             [&](const auto& group) { return group.id == node.group; }))
+                throw std::invalid_argument("Group port references a missing composite group.");
+        } else if (node.group)
+            throw std::invalid_argument("Only group ports may own a composite group.");
         if (node.kind == GraphNodeKind::LayerImage || node.kind == GraphNodeKind::LayerTransform ||
             node.kind == GraphNodeKind::Opacity || node.kind == GraphNodeKind::BypassOpacity ||
             node.kind == GraphNodeKind::BypassMatte) {

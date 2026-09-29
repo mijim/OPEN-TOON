@@ -113,7 +113,8 @@ void Document::validate() const {
     require(width > 0 && width <= 8192 && height > 0 && height <= 8192,
             "Scene dimensions must be between 1 and 8192.");
     require(duration > 0 && duration <= 1000000, "Scene duration is outside supported limits.");
-    require(name.size() <= 4096 && layers.size() <= 2000 && drawings.size() <= 50000 &&
+    require(name.size() <= 4096 && layers.size() <= 2000 && compositeGroups.size() <= 500 &&
+                drawings.size() <= 50000 &&
                 palette.size() <= 65536 && audioAssets.size() <= 64 && audioClips.size() <= 1000,
             "Document exceeds resource limits.");
     std::set<Id> ids, swatches;
@@ -393,6 +394,27 @@ void Document::validate() const {
                 else
                     require(entry.drawing == 0, "Pose has an unmasked drawing reference.");
             }
+        }
+    }
+    std::map<Id, std::size_t> drawingPositions;
+    std::size_t drawingPosition = 0;
+    for (const auto& layer : layers)
+        if (layer.kind == LayerKind::Drawing || layer.kind == LayerKind::Part)
+            drawingPositions.emplace(layer.id, drawingPosition++);
+    std::set<Id> groupedLayers;
+    for (const auto& group : compositeGroups) {
+        id(group.id);
+        require(!group.name.empty() && group.name.size() <= 128 &&
+                    group.members.size() >= 2 && group.members.size() <= 256,
+                "Composite group needs a name and two to 256 drawing members.");
+        const auto first = drawingPositions.find(group.members.front());
+        require(first != drawingPositions.end(), "Composite group starts at a missing drawing.");
+        for (std::size_t index = 0; index < group.members.size(); ++index) {
+            const auto position = drawingPositions.find(group.members[index]);
+            require(position != drawingPositions.end() &&
+                        position->second == first->second + index &&
+                        groupedLayers.insert(group.members[index]).second,
+                    "Composite group members must be adjacent, ordered and unique.");
         }
     }
     for (const auto& m : markers)

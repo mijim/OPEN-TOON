@@ -3446,8 +3446,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The derived graph offers clickable image/matte previews, name/kind search and direct front/behind Drawing-card reordering of saved composite order. Arbitrary node creation, wiring, deletion and layout remain open.",
-      "implementation_evidence": "docs/implementation/HM12-PROGRESS.md; native front/behind Drawing-card drags, typed search/navigation, Part pixel order, undo/reopen and invalid-target checks"
+      "notes": "The derived graph offers clickable image/matte previews, name/kind search, direct front/behind Drawing-card order and contiguous group boundaries. Arbitrary node creation, wiring, deletion and layout remain open.",
+      "implementation_evidence": "docs/implementation/HM12-PROGRESS.md; native front/behind Drawing-card drags and Shift-click grouping, typed search/navigation, Part pixel order, undo/reopen and invalid-target checks"
     },
     {
       "id": "NOD-002",
@@ -3499,7 +3499,7 @@
         "Grouping preserves the graph's resulting image."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "compositor-graph",
@@ -3508,7 +3508,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "Format-31 named contiguous Drawing/Part composite groups show typed image input/output ports and preserve exact pixels, matte references, undo and reopen. Nested or reusable general groups and published external bindings remain open.",
+      "implementation_evidence": "docs/implementation/HM12-PROGRESS.md; docs/architecture/adr/060-contiguous-composite-groups.md; group/matte pixel parity, invalid membership rejection, native Shift-click/rename/ungroup and format-30 backup"
     },
     {
       "id": "NOD-005",

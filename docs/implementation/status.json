@@ -70,8 +70,8 @@
     {
       "id": "P10",
       "status": "in_progress",
-      "available": "Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. Format-18 Drawing/Part cutter matte bindings and format-19 inverted Outside coverage clip by fractional alpha through the shared graph, with compact inspector, resizable derived Nodes panel with clicked image/matte previews and direct front/behind Drawing/Part-card order dragging and search, order/cutter/opacity edits, format-20 persistent cutter bypass, format-21 visible cutter-source painting, format-24 opacity bypass and format-25 Normal/Multiply/Screen and format-28 Add blending, format-29 saved blend bypass and format-30 saved composite bypass and Alt-drag cutter binding and derived source/target node-owner selection and direct Alt-click bypass and alternate image/matte canvas Display routing and node-scoped cache, reference validation, undo, save/reopen and character-copy remapping. A bounded revision cache reuses canvas frames and speculatively prepares the next frame from an immutable snapshot. Native playback/scrub, alpha/color charts and animated original artwork close bounded HM-04; orthographic camera output joins HM-13.",
-      "remaining": "General editable node UI and group ports, joint recipes, useful effects, full ROI scheduling, production-scale performance and later deformer integration."
+      "available": "Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. Format-18 Drawing/Part cutter matte bindings and format-19 inverted Outside coverage clip by fractional alpha through the shared graph, with compact inspector, resizable derived Nodes panel with clicked image/matte previews and direct front/behind Drawing/Part-card order dragging, format-31 named contiguous groups and search, order/cutter/opacity edits, format-20 persistent cutter bypass, format-21 visible cutter-source painting, format-24 opacity bypass and format-25 Normal/Multiply/Screen and format-28 Add blending, format-29 saved blend bypass and format-30 saved composite bypass and Alt-drag cutter binding and derived source/target node-owner selection and direct Alt-click bypass and alternate image/matte canvas Display routing and node-scoped cache, reference validation, undo, save/reopen and character-copy remapping. A bounded revision cache reuses canvas frames and speculatively prepares the next frame from an immutable snapshot. Native playback/scrub, alpha/color charts and animated original artwork close bounded HM-04; orthographic camera output joins HM-13.",
+      "remaining": "General editable node UI, nested/reusable groups and published ports, joint recipes, useful effects, full ROI scheduling, production-scale performance and later deformer integration."
     },
     {
       "id": "P11",
@@ -84,7 +84,7 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 191,
+      "count": 194,
       "command": "ctest --test-dir build/locked --output-on-failure -j8"
     },
     "native_input_workflow": {
@@ -248,7 +248,7 @@
         "animated orthographic camera matches reopened preview and two exported PNG frames"
       ]
     },
-    "total_local_ctest_entries": 191,
+    "total_local_ctest_entries": 194,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -431,10 +431,10 @@
     },
     "cutter_matte": {
       "status": "passed_subset",
-      "scope": "Format-18 Drawing/Part source binding and format-19 inversion, fractional inside/outside alpha, source exclusion, validated references, derived Nodes panel with clicked image/matte previews, direct front/behind Drawing/Part-card order dragging, name/kind search and animated Opacity nodes, format-20 persistent cutter bypass, format-21 visible cutter-source painting, format-24 opacity bypass and format-25 Normal/Multiply/Screen and format-28 Add blending, format-29 saved blend bypass and format-30 saved composite bypass and Alt-drag cutter binding and derived source/target node-owner selection and direct Alt-click bypass and alternate image/matte canvas Display routing and node-scoped cache, save/reopen and undo",
+      "scope": "Format-18 Drawing/Part source binding and format-19 inversion, fractional inside/outside alpha, source exclusion, validated references, derived Nodes panel with clicked image/matte previews, direct front/behind Drawing/Part-card order dragging, format-31 named contiguous groups, name/kind search and animated Opacity nodes, format-20 persistent cutter bypass, format-21 visible cutter-source painting, format-24 opacity bypass and format-25 Normal/Multiply/Screen and format-28 Add blending, format-29 saved blend bypass and format-30 saved composite bypass and Alt-drag cutter binding and derived source/target node-owner selection and direct Alt-click bypass and alternate image/matte canvas Display routing and node-scoped cache, save/reopen and undo",
       "command": "build/locked/open-toon.app/Contents/MacOS/open-toon --hm12-smoke",
       "screenshot": "build/hm12-matte-smoke.png",
-      "limits": "General node editor, general node bypass, group/ungroup, arm/eye recipes and full 480-frame composition budgets remain open."
+      "limits": "General node editor, general node bypass, nested/reusable groups and published ports, arm/eye recipes and full 480-frame composition budgets remain open."
     },
     "integrated_study": {
       "status": "passed_subset",
@@ -475,17 +475,17 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.52",
+  "version": "0.2.0-experimental.53",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
-    "release_artifacts": "Historical experimental.11 macOS arm64 ZIP and Ubuntu-built Linux x86_64 AppImage; current experimental.52 work is source only",
+    "release_artifacts": "Historical experimental.11 macOS arm64 ZIP and Ubuntu-built Linux x86_64 AppImage; current experimental.53 work is source only",
     "cross_platform_builds": "Manual release workflow; broader Linux, Windows and device qualification remain open"
   },
   "planning_priority": {
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
     "state": "HM-00_through_HM-05_and_HM-13_complete__HM-06_HM-07_HM-10_HM-12_in_progress",
-    "note": "Editor functionality is the current priority; Milo and Clockwork remain animation fixtures. HM-12 now supports fractional cutters, source painting, saved cutter/opacity/blend/composite bypass, Normal/Multiply/Screen/Add, direct front/behind Drawing and Part ordering, Alt-drag cutter binding, node-owner selection, image/matte Display routing, node-scoped cache and search. A two-Part arm/torso overlap passes pixel, undo and reopen checks. The arbitrary editable graph, grouping, animated depth and joint recipes remain open. HM-06 artistic review, HM-07 general control bindings and HM-10 hardware presentation remain open. Full P07/P08/P09/P10 and feature acceptance remain open."
+    "note": "Editor functionality is the current priority; Milo and Clockwork remain animation fixtures. HM-12 now supports fractional cutters, source painting, saved cutter/opacity/blend/composite bypass, Normal/Multiply/Screen/Add, direct front/behind Drawing and Part ordering, format-31 named contiguous groups, Alt-drag cutter binding, node-owner selection, image/matte Display routing, node-scoped cache and search. Group ports preserve output pixels and cutter references with atomic undo and reopen. The arbitrary editable graph, nested/reusable groups, published external ports, animated depth and joint recipes remain open. HM-06 artistic review, HM-07 general control bindings and HM-10 hardware presentation remain open. Full P07/P08/P09/P10 and feature acceptance remain open."
   }
 }

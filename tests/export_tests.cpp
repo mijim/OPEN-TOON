@@ -168,6 +168,58 @@ TEST_CASE("A Part crosses behind and in front of the torso with stable saved pix
     REQUIRE(editor.moveDrawingAfter(int(armId), int(torso)));
     REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
 }
+TEST_CASE("Composite grouping is one undoable edit with stable ports and reopened pixels") {
+    auto document = opentoon::makeDocument();
+    document.width = document.height = 1;
+    document.background = {0, 0, 0, 0};
+    const auto red = document.layers.front().id;
+    document.editableDrawing(red, 0).image = opentoon::ImageAsset{1, 1, {255, 0, 0, 255}};
+    auto blue = document.layers.front();
+    blue.id = document.allocateId();
+    blue.name = "Blue";
+    auto blueDrawing = document.drawings.at(blue.exposures.front().drawing);
+    blueDrawing.id = document.allocateId();
+    blueDrawing.image = opentoon::ImageAsset{1, 1, {0, 0, 255, 255}};
+    document.drawings.emplace(blueDrawing.id, blueDrawing);
+    blue.exposures.front().drawing = blueDrawing.id;
+    document.layers.push_back(blue);
+    document.validate();
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto path = QUrl::fromLocalFile(directory.filePath("group.otoon"));
+    REQUIRE(opentoon::ProjectStore::save(std::filesystem::path(path.toLocalFile().toStdString()),
+                                         document) > 0);
+    EditorController editor;
+    REQUIRE(editor.openProject(path));
+    const auto original = opentoon::SceneRenderer::render(editor.document(), 0);
+    REQUIRE(editor.groupDrawings(int(red), int(blue.id)));
+    REQUIRE(editor.document().compositeGroups.size() == 1);
+    const auto groupId = editor.document().compositeGroups.front().id;
+    REQUIRE(editor.document().compositeGroups.front().members ==
+            std::vector<opentoon::Id>{red, blue.id});
+    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 0) == original);
+    REQUIRE_FALSE(editor.groupDrawings(int(red), int(blue.id)));
+    REQUIRE_FALSE(editor.moveDrawingBefore(int(blue.id), int(red)));
+    REQUIRE(editor.document().compositeGroups.front().members.front() == red);
+    editor.undo();
+    REQUIRE(editor.document().compositeGroups.empty());
+    editor.redo();
+    REQUIRE(editor.document().compositeGroups.front().id == groupId);
+    REQUIRE(editor.renameCompositeGroup(int(groupId), "Body"));
+    REQUIRE(editor.document().compositeGroups.front().name == "Body");
+    REQUIRE_FALSE(editor.renameCompositeGroup(int(groupId), ""));
+    REQUIRE(editor.saveProject({}));
+    REQUIRE(editor.openProject(path));
+    REQUIRE(editor.document().compositeGroups.front().name == "Body");
+    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 0) == original);
+    REQUIRE(editor.ungroupDrawings(int(groupId)));
+    REQUIRE(editor.document().compositeGroups.empty());
+    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 0) == original);
+    editor.undo();
+    REQUIRE(editor.document().compositeGroups.front().id == groupId);
+    editor.redo();
+    REQUIRE(editor.document().compositeGroups.empty());
+}
 namespace {
 const QString partFixture = QStringLiteral(OPENTOON_SOURCE_DIR "/tests/fixtures/harmony-moment/parts/");
 QVariantList paths(std::initializer_list<QString> values) {

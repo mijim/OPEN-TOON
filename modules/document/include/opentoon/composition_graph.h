@@ -9,7 +9,7 @@ enum class GraphNodeKind : std::uint8_t {
     Background, LayerImage, LayerTransform, Opacity, BypassOpacity, Over, Multiply, Screen, Add,
     BypassBlend, BypassComposite,
     MatteFromImage, InvertMatte,
-    ApplyMatte, BypassMatte, DisplayOutput, WriteOutput
+    ApplyMatte, BypassMatte, DisplayOutput, WriteOutput, GroupInput, GroupOutput
 };
 struct GraphConnection {
     GraphNodeId source = 0;
@@ -21,6 +21,7 @@ struct GraphNode {
     GraphNodeKind kind = GraphNodeKind::Background;
     Id layer = 0;
     std::vector<GraphConnection> inputs;
+    Id group = 0;
     auto operator<=>(const GraphNode&) const = default;
 };
 enum class GraphTarget : std::uint8_t { Display, Write };

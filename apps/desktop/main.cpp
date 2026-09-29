@@ -928,8 +928,70 @@ int main(int argc, char** argv) {
                         editor.document().layers.front().id != blue ||
                         qGreen(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
                         throw std::runtime_error("Shift-drag behind order changed after reopen.");
+                    strip->setProperty("contentX", 0);
+                    QCoreApplication::processEvents();
+                    (void)window->grabWindow();
+                    redCard = findDrawingCard(int(red));
+                    blueCard = findDrawingCard(int(blue));
+                    if (!redCard || !blueCard)
+                        throw std::runtime_error("Group-boundary Drawing cards are unavailable.");
+                    const auto groupFirst = blueCard->mapToScene(QPointF(blueCard->width() / 2, 30));
+                    const auto groupLast = redCard->mapToScene(QPointF(redCard->width() / 2, 30));
+                    shiftMove(QEvent::MouseButtonPress, groupFirst, Qt::LeftButton);
+                    shiftMove(QEvent::MouseButtonRelease, groupFirst, Qt::NoButton);
+                    if (nodes->property("groupStartLayer").toInt() != int(blue))
+                        throw std::runtime_error("Shift-click did not mark the first group member.");
+                    shiftMove(QEvent::MouseButtonPress, groupLast, Qt::LeftButton);
+                    shiftMove(QEvent::MouseButtonRelease, groupLast, Qt::NoButton);
+                    if (editor.document().compositeGroups.size() != 1 ||
+                        editor.document().compositeGroups.front().members !=
+                            std::vector<opentoon::Id>{blue, red} ||
+                        qGreen(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Shift-click grouping changed members or pixels.");
+                    const auto groupId = editor.document().compositeGroups.front().id;
+                    const auto groupedNodes = editor.compositionNodes();
+                    if (std::count_if(groupedNodes.begin(), groupedNodes.end(),
+                            [groupId](const auto& variant) {
+                                const auto node = variant.toMap();
+                                return node.value("group").toInt() == int(groupId);
+                            }) != 2)
+                        throw std::runtime_error("Composite group input/output cards are missing.");
+                    editor.undo();
+                    if (!editor.document().compositeGroups.empty())
+                        throw std::runtime_error("Composite grouping did not undo atomically.");
+                    editor.redo();
+                    if (editor.document().compositeGroups.size() != 1)
+                        throw std::runtime_error("Composite grouping did not redo atomically.");
+                    auto* groupName = window->findChild<QQuickItem*>("nodeGroupName");
+                    if (!groupName || !groupName->isVisible())
+                        throw std::runtime_error("Composite group name field is unavailable.");
+                    groupName->setProperty("text", "Body");
+                    groupName->forceActiveFocus();
+                    QKeyEvent groupNamePress(QEvent::KeyPress, Qt::Key_Return, Qt::NoModifier);
+                    QKeyEvent groupNameRelease(QEvent::KeyRelease, Qt::Key_Return, Qt::NoModifier);
+                    QCoreApplication::sendEvent(window, &groupNamePress);
+                    QCoreApplication::sendEvent(window, &groupNameRelease);
+                    QCoreApplication::processEvents();
+                    if (editor.document().compositeGroups.front().name != "Body" ||
+                        !editor.saveProject({}) || !editor.openProject(QUrl::fromLocalFile(behindPath)) ||
+                        editor.document().compositeGroups.front().id != groupId ||
+                        editor.document().compositeGroups.front().name != "Body" ||
+                        qGreen(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Composite grouping changed after reopen.");
+                    editor.setSelectedLayer(int(red));
+                    QCoreApplication::processEvents();
+                    auto* ungroup = window->findChild<QQuickItem*>("nodeUngroup");
+                    if (!ungroup || !ungroup->isVisible() || !ungroup->isEnabled())
+                        throw std::runtime_error("Composite Ungroup control is unavailable.");
+                    const auto ungroupPoint = ungroup->mapToScene(QPointF(
+                        ungroup->width() / 2, ungroup->height() / 2));
+                    movePoint(QEvent::MouseButtonPress, ungroupPoint, Qt::LeftButton);
+                    movePoint(QEvent::MouseButtonRelease, ungroupPoint, Qt::NoButton);
+                    if (!editor.document().compositeGroups.empty() ||
+                        qGreen(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Ungroup did not restore the ungrouped graph and pixels.");
                     std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass, fractional cutter, "
-                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, Alt-drag cutter, Alt-click bypass, typed search, save/reopen and undo.\n";
+                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, group/ungroup ports, Alt-drag cutter, Alt-click bypass, typed search, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

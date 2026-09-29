@@ -157,3 +157,6 @@ split at a scene frame with shared source, fade boundaries and atomic undo.
 
 See [ADR-059](059-persistent-composite-bypass.md) for format-30 Drawing/Part
 composite bypass with preserved cutter sources and inactive output dependencies.
+
+See [ADR-060](060-contiguous-composite-groups.md) for format-31 named contiguous
+composite groups, typed input/output ports and source-version backup behavior.

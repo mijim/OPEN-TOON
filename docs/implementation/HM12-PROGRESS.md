@@ -64,6 +64,15 @@ The same command boundary accepts Drawing and Part layers. A saved two-Part
 torso/arm scene switches the visible overlap in both directions while retaining
 the character parent and exact reopened pixels. Static layer order is saved;
 animated per-frame depth and joint recipes remain open.
+Format 31 adds named contiguous composite groups. Shift-click two Drawing
+cards to group their inclusive Drawing/Part span, rename the group in Nodes or
+use Ungroup on a selected member. The derived graph shows typed Group input
+and Group output image ports. Grouping preserves the exact rendered pixels and
+external cutter references, including matte-only sources within the span.
+Undo/redo and save/reopen preserve group identity and membership; invalid
+overlaps or edits that split a group reject atomically. See
+[ADR-060](../architecture/adr/060-contiguous-composite-groups.md). Nested or
+reusable general graph groups remain open.
 Alt-dragging a Drawing card onto another binds the first as the second's
 cutter source through the existing validated document command. Its fractional
 alpha, saved references and one-step undo use the same path as the inspector.
@@ -179,6 +188,13 @@ preview. This is diagnostic navigation, not a persisted graph edit.
   parent identity, pixel output, one-step undo/redo and reopened output. Native
   Qt Quick smoke Shift-drags a Drawing behind another, checks the drop target,
   color, undo/redo and save/reopen.
+- Graph tests check typed Group input/output ports, exact ordered membership,
+  downstream invalidation and invalid/missing/overlapping members. A one-pixel
+  matte-only source inside a group retains Display/Write and group-output
+  pixels. Format-30 storage migration defaults to no groups and retains a
+  readable `.pre-v30.bak`. Application tests reject splitting a group, and
+  native Qt Quick smoke Shift-clicks two cards, renames, undoes/redoes, reopens
+  and ungroups without changing output.
 - Native Qt Quick smoke Alt-drags a Drawing source onto a Drawing target,
   checks the target binding and output color, then undoes, redoes and reopens.
 - Native Qt Quick smoke Alt-clicks Apply matte to bypass, undoes, redoes and
@@ -216,5 +232,5 @@ preview. This is diagnostic navigation, not a persisted graph edit.
 ## Open contract
 
 The arbitrary editable node graph, other operator bypasses, broader transform
-presentation, group ports, group/ungroup and full arm/eye overlap recipe are pending. HM-12
+presentation, nested/reusable groups, published ports and the full arm/eye overlap recipe are pending. HM-12
 and its P10 owning phase remain open.

@@ -1,5 +1,15 @@
 # Experimental releases
 
+## 0.2.0-experimental.53 — working source, composite groups
+
+- Format 31 saves named adjacent Drawing/Part groups. The derived Nodes graph
+  exposes image input/output ports; Shift-click groups cards, an inline field
+  renames, and Ungroup removes the boundary in one undoable edit.
+- Cutter references and output pixels survive grouping and reopening. Graph,
+  matte pixel, migration/backup, command and native Qt Quick checks pass; the
+  locked macOS suite passes 194/194 CTest entries. Source only; no public
+  binary or tag. Nested and reusable general graph groups remain open.
+
 ## 0.2.0-experimental.52 — working source, direct behind order
 
 - Shift-drag a Drawing or Part card onto another to place it immediately

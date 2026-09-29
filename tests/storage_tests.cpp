@@ -1014,6 +1014,41 @@ TEST_CASE("Format twenty-nine layers default to active composite with a readable
     legacy["version"] = Document::formatVersion;
     REQUIRE_THROWS(deserializeDocument(legacy.dump()));
 }
+TEST_CASE("Format thirty projects migrate to persistent composite groups with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    auto second = original.layers.front();
+    second.id = original.allocateId();
+    second.name = "Second";
+    original.layers.push_back(second);
+    original.validate();
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 30;
+    legacy.erase("compositeGroups");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=30");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    changed.compositeGroups.push_back({changed.allocateId(), "Body",
+                                       {original.layers.front().id, second.id}});
+    REQUIRE(ProjectStore::save(project.file, changed, "Group drawings", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v30.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+    legacy["version"] = Document::formatVersion;
+    REQUIRE_THROWS(deserializeDocument(legacy.dump()));
+    legacy["version"] = 30;
+    legacy["compositeGroups"] = {{{"id", 999999}, {"name", "Bad"},
+                                   {"members", {original.layers.front().id, second.id}}}};
+    REQUIRE_THROWS(deserializeDocument(legacy.dump()));
+}
 TEST_CASE("Format twenty-five audio clips default to unsoloed with a readable backup") {
     TemporaryProject project;
     auto original = makeDocument();

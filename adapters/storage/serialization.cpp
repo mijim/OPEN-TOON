@@ -46,6 +46,7 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
               {"activeCamera", d.activeCamera},
               {"nextId", d.nextId},
               {"layers", Json::array()},
+              {"compositeGroups", Json::array()},
               {"drawings", Json::array()},
               {"palette", Json::array()},
               {"markers", Json::array()},
@@ -206,6 +207,9 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
         }
         j["layers"].push_back(std::move(x));
     }
+    for (const auto& group : d.compositeGroups)
+        j["compositeGroups"].push_back({{"id", group.id}, {"name", group.name},
+                                         {"members", group.members}});
     for (const auto& m : d.markers)
         j["markers"].push_back({m.frame, m.name});
     for (const auto& asset : d.audioAssets) {
@@ -258,6 +262,10 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
     limit(j.at("drawings"), 50000);
     limit(j.at("layers"), 2000);
     limit(j.at("markers"), 1000000);
+    if (j.at("version").get<int>() >= 31)
+        limit(j.at("compositeGroups"), 500);
+    else if (j.contains("compositeGroups") && !j.at("compositeGroups").empty())
+        throw std::runtime_error("An older project contains unsupported composite groups.");
     if (j.at("version").get<int>() >= 16) {
         limit(j.at("audioAssets"), 64);
         limit(j.at("audioClips"), 1000);
@@ -541,6 +549,12 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
         }
         d.layers.push_back(std::move(l));
     }
+    if (j.at("version").get<int>() >= 31)
+        for (const auto& group : j.at("compositeGroups")) {
+            limit(group.at("members"), 256);
+            d.compositeGroups.push_back({group.at("id"), group.at("name"),
+                                         group.at("members").get<std::vector<Id>>()});
+        }
     for (const Id childId : legacyLinked) {
         auto& child = d.layer(childId);
         const auto& source = d.layer(child.parent);

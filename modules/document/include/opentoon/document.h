@@ -212,6 +212,12 @@ struct Layer {
     std::optional<BoneTipAnchor> boneTipAnchor;
     auto operator<=>(const Layer&) const = default;
 };
+struct CompositeGroup {
+    Id id = 0;
+    std::string name;
+    std::vector<Id> members;
+    auto operator<=>(const CompositeGroup&) const = default;
+};
 struct Marker {
     Frame frame = 0;
     std::string name;
@@ -240,7 +246,7 @@ struct AudioClip {
     auto operator<=>(const AudioClip&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 30;
+    static constexpr int formatVersion = 31;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;
@@ -250,6 +256,7 @@ struct Document {
     Id activeCamera = 0;
     Id nextId = 1;
     std::vector<Layer> layers;
+    std::vector<CompositeGroup> compositeGroups;
     std::map<Id, Drawing> drawings;
     std::vector<Swatch> palette;
     std::vector<Marker> markers;

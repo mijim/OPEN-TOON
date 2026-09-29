@@ -42,7 +42,7 @@ formats 18–21, 24, 25, 28–30. Fractional source alpha clips the target in th
 write graph; the compact inspector assigns the source, toggles a saved bypass,
 and can paint the cutter source in its normal layer order, all with undo.
 Reference validation, save/reopen and native Qt Quick smoke pass. General
-node editing, groups and joint recipes remain open. Inside and
+node editing, nested/reusable groups and joint recipes remain open. Inside and
 Outside modes preserve fractional coverage; a typed inverse matte is saved and
 undoable. The bottom
 Nodes tab displays the derived typed graph, supports direct Drawing-card
@@ -57,6 +57,11 @@ graph wiring is still open. Alt-click bypassable node cards to toggle their
 saved processing state. Image and matte nodes may temporarily feed the canvas Display; mattes appear
 as grayscale while Write and export keep the final composition. The bounded
 revision cache distinguishes intermediate nodes.
+Format-31 named contiguous composite groups add typed input/output cards
+without changing final pixels or external cutter dependencies. Shift-click
+groups an inclusive Drawing/Part span; Nodes renames or ungroups it. Atomic
+undo, save/reopen and format-30 migration pass. Published external ports and
+general reusable graph groups remain open.
 
 An original 20-second integrated study now combines the connected toon, nine
 mouth substitutions, a visible eye cutter and sample-aligned synthetic audio
@@ -75,14 +80,15 @@ skipped polled playhead frames, respectively. These counters do not measure
 speaker underruns or actual
 presented-frame drops.
 
-The working source version is `0.2.0-experimental.52`; no new binary or source
+The working source version is `0.2.0-experimental.53`; no new binary or source
 tag has been published for it. The last locally qualified macOS preview and
 earlier binaries do not qualify these source changes.
 
-The owner resumed development after the earlier 10:30 CEST cutoff. The `.52`
-locked macOS build passes 191/191 CTest entries and native HM-12 smoke,
-including a two-Part front/behind pixel journey, composite bypass, undo/redo
-and save/reopen. Earlier native smokes and artistic checks are recorded in prior
+The owner resumed development after the earlier 10:30 CEST cutoff. The `.53`
+locked macOS build passes 194/194 CTest entries and native HM-12 smoke,
+including contiguous group input/output ports, matte-only source pixels,
+grouping/rename/ungroup, undo/redo and save/reopen. Earlier native smokes and
+artistic checks are recorded in prior
 release entries. HM-12 remains an unfinished bounded contract; next work can
 continue its graph grouping/part-overlap behavior.
 HM-06 visual approval and HM-10 hardware presentation also remain open.
@@ -101,7 +107,7 @@ HM-06 visual approval and HM-10 hardware presentation also remain open.
 | P07 | in_progress | Format-16 original PCM16 WAV assets, format-17 sample-contiguous clip repeats, format-22 source-sample fades, format-23 clip mute, format-26 clip solo and format-27 stereo balance; undoable placed/trimmed/gained clips, direct waveform, fade-handle and frame-edge trim drags, exact single-pass clip splitting, indexed sample-aligned timeline waveforms and visible fade guides. A precomputed band-limited rate converter and deterministic stereo mix serves full or selected-frame-range offline WAV export and bounded miniaudio device preview with an audio-submitted playhead and 80 ms timeline scrub, exact rational length and atomic export cancellation. | Hardware latency/underrun/drift and audible fragment quality qualification, sample-weighted fade waveform, mouth mapping/manual lip correction, optional detection, media policies, FFmpeg adapter and video output. |
 | P08 | in_progress | Parented layers and typed character roots, pegs and parts; role editing, preserve-world rigid reparenting within shared animated ancestry, stable rest pivots, named held substitutions, renderer-backed thumbnail browsing and coordinated view sets. Batch Part assembly, independent or explicitly linked-artwork Part/Peg branch copies, safe branch deletion, Part detachment, Peg dissolution and view-range editing preserve view membership with format-5 save/reopen. Format-12 named poses capture and apply explicit Part/channel masks and discrete substitutions; a direct slider blends from the evaluated pose with one undo. Format-15 publication shows selected poses/views and Part-scoped drawing choices in a compact Animator dashboard and viewport panel; named groups filter them without changing output while Rig retains detail. Compatible in-project pose transfer maps unique roles and drawing names across independent Characters; paired left/right roles create mirrored masked poses. | Independent second-animator review, reparenting across differently animated branches, broader pose retargeting/mirroring, Quick Rig, broader typed controls and conflict handling, portable assets/templates and production-scale qualification. |
 | P09 | in_progress | Bounded HM-05 format-8 rest/UV meshes and static warp. Format-9 per-substitution two-segment bone/cubic curve keys, weights, direct cancellable mouse handles, posed mesh grid, rest key, same-Part range key transfer and preview/output parity. Format 10 introduced a child-Part bone-tip link; format 11 saves its attachment-time rest anchor. Properties offers 1–32 grid cells per axis and undoable elbow influence tuning with a direct rest-mode handle. An original 15-artwork-Part candidate bends four continuous limb images with one connected render silhouette and linked hands/feet; a later cubic trouser redraw smooths knee and ankle contours without changing joints. Native linked 15-part and unlinked 19-part subset input-to-present p95 and process peak memory meet proposed limits on the measured M1 Pro profile. A 480-frame visual shot adds timed face/hand/mouth choices, torso curve, camera movement and linked limb recovery; the saved rig and shot now use alpha-following contour meshes for all four complete limbs and the alternate sleeve; its sampled native interaction and memory remain within the proposed limits. Static front/behind Part ordering passes a two-Part pixel/reopen check. | Animated depth, further extreme-bend and seam quality review, full audio/matte/control shot budgets, portable cross-Part key transfer, constraints, multiple-pose breadth and full shot qualification. |
-| P10 | in_progress | Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. Format-18 Drawing/Part cutter bindings, format-19 inversion and format-21 source painting preserve fractional alpha with inspector, derived Nodes tab, direct front/behind Drawing/Part-card order dragging and search, order/cutter/opacity edits and a format-20 persistent cutter bypass, format-24 opacity bypass and format-25 Normal/Multiply/Screen and format-28 Add modes with undo and save/reopen. A bounded revision cache reuses canvas frames and a worker speculatively prepares the next frame from an immutable snapshot. Native playback/scrub, color charts and animated original artwork close HM-04; output camera sampling joins HM-13. Legacy scenes without graph features keep their direct-painter appearance. | General editable node UI, group/ungroup, joint recipes, effects, full ROI scheduling, production-scale performance and later deformer integration. |
+| P10 | in_progress | Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. Format-18 Drawing/Part cutter bindings, format-19 inversion and format-21 source painting preserve fractional alpha with inspector, derived Nodes tab, direct front/behind Drawing/Part-card order dragging, format-31 contiguous groups and search, order/cutter/opacity edits and a format-20 persistent cutter bypass, format-24 opacity bypass and format-25 Normal/Multiply/Screen and format-28 Add modes with undo and save/reopen. A bounded revision cache reuses canvas frames and a worker speculatively prepares the next frame from an immutable snapshot. Native playback/scrub, color charts and animated original artwork close HM-04; output camera sampling joins HM-13. Legacy scenes without graph features keep their direct-painter appearance. | General editable node UI, nested/reusable groups and published ports, joint recipes, effects, full ROI scheduling, production-scale performance and later deformer integration. |
 | P11 | planned | Saved revisions, recovery UX, English guide, regression tests and source CI are initial prerequisites. Format 1/2 migration backups, format 3 curve metadata and checked compressed media resources, explicit backed-up compaction and asynchronous recovery snapshots. Requested arm64 macOS preview now includes audited runtime dependencies, notices, matching source archives/recipes and verified ad-hoc signatures. | All required journeys, remaining hardening, supported device/OS matrix, accessibility, reproducible release SBOM automation, clean-machine validation and Developer ID signed/notarized releases. |
 
 ## Verification

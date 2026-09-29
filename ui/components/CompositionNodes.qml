@@ -10,6 +10,10 @@ Item {
     signal displayRequested(int nodeId, int kindCode, int layer)
     signal finalDisplayRequested()
     readonly property var selected: controller.layers.find(l => l.id === controller.selectedLayer)
+    readonly property int selectedGroup: selected?.compositeGroup || 0
+    readonly property var selectedGroupNode: controller.compositionNodes.find(n =>
+        n.kind === "Group output" && n.group === selectedGroup)
+    property int groupStartLayer: 0
     property int previewNodeId: 0
     property string previewNodeKind: ""
     property int previewLayerId: 0
@@ -95,9 +99,18 @@ Item {
                 font.letterSpacing: 1
             }
             Label {
-                text: "Drag: in front · Shift-drag: behind · Alt-drag: cutter · Alt-click: bypass"
+                text: "Drag: front · Shift-drag: behind · Alt-drag: cutter · Shift-click: group"
+                visible: root.selectedGroup === 0
                 color: "#777777"
                 font.pixelSize: 10
+            }
+            CompactTextField {
+                objectName: "nodeGroupName"
+                visible: root.selectedGroup > 0
+                implicitWidth: 116
+                text: root.selectedGroupNode?.name || ""
+                onAccepted: root.controller.renameCompositeGroup(root.selectedGroup, text)
+                Accessible.name: "Composite group name"
             }
             Item { Layout.fillWidth: true }
             ToolButton {
@@ -111,6 +124,13 @@ Item {
                 enabled: root.selected && (root.selected.kind === 0 || root.selected.kind === 3)
                 onClicked: root.controller.moveLayer(1)
                 Accessible.name: "Move selected drawing forward in composite order"
+            }
+            ToolButton {
+                objectName: "nodeUngroup"
+                text: "Ungroup"
+                visible: root.selectedGroup > 0
+                onClicked: root.controller.ungroupDrawings(root.selectedGroup)
+                Accessible.name: "Ungroup selected composite drawings"
             }
             CompactComboBox {
                 objectName: "nodeCutterPicker"
@@ -272,7 +292,10 @@ Item {
                                       ? "#eeeeee" : root.matchIndex >= 0 &&
                                       root.matchingNodeIds[root.matchIndex] === modelData.id
                                       ? "#dddddd" : root.matchingNodeIds.includes(modelData.id)
-                                      ? "#666666" : modelData.kind === "Cutter" ||
+                                      ? "#666666" : drawingLayer > 0 &&
+                                      root.groupStartLayer === drawingLayer
+                                      ? "#ffffff" : modelData.group > 0
+                                      ? "#aaaaaa" : modelData.kind === "Cutter" ||
                                       modelData.kind === "Opacity" ||
                                       modelData.kind === "Bypassed opacity" ||
                                       modelData.kind === "Multiply" ||
@@ -368,6 +391,23 @@ Item {
                             onClicked: mouse => {
                                 if (dragging)
                                     return
+                                if ((mouse.modifiers & Qt.ShiftModifier) !== 0 &&
+                                    modelData.kind === "Drawing") {
+                                    if (root.groupStartLayer === modelData.layer) {
+                                        root.groupStartLayer = 0
+                                        return
+                                    }
+                                    if (root.groupStartLayer === 0) {
+                                        root.groupStartLayer = modelData.layer
+                                        root.layerChosen(modelData.layer)
+                                        return
+                                    }
+                                    const first = root.groupStartLayer
+                                    root.groupStartLayer = 0
+                                    root.layerChosen(modelData.layer)
+                                    root.controller.groupDrawings(first, modelData.layer)
+                                    return
+                                }
                                 if ((mouse.modifiers & Qt.AltModifier) !== 0 &&
                                     root.toggleNodeBypass(modelData))
                                     return
@@ -377,6 +417,12 @@ Item {
                                 root.refreshPreview()
                                 if (modelData.layer > 0)
                                     root.layerChosen(modelData.layer)
+                                else if (modelData.group > 0) {
+                                    const member = root.controller.layers.find(l =>
+                                        l.compositeGroup === modelData.group)
+                                    if (member)
+                                        root.layerChosen(member.id)
+                                }
                             }
                             Accessible.name: modelData.layer > 0
                                              ? "Preview and select " + modelData.name + " composition source; Alt-click bypassable nodes to toggle"

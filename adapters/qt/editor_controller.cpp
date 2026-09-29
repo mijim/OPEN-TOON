@@ -146,6 +146,10 @@ bool EditorController::edit(const std::string& label, const std::function<void(D
 }
 QVariantList EditorController::layers() const {
     QVariantList result;
+    std::map<Id, Id> compositeGroupByLayer;
+    for (const auto& group : document().compositeGroups)
+        for (const auto member : group.members)
+            compositeGroupByLayer.emplace(member, group.id);
     for (auto it = document().layers.rbegin(); it != document().layers.rend(); ++it) {
         QVariantList spans;
         for (auto e : it->exposures)
@@ -168,6 +172,7 @@ QVariantList EditorController::layers() const {
                                      {"blendMode", int(it->blendMode)},
                                      {"blendBypassed", it->blendBypassed},
                                      {"compositeBypassed", it->compositeBypassed},
+                                     {"compositeGroup", int(compositeGroupByLayer[it->id])},
                                      {"kind", int(it->kind)},
                                      {"role", QString::fromStdString(it->role)},
                                      {"spans", spans},
@@ -202,15 +207,24 @@ QVariantList EditorController::compositionNodes() const {
         case GraphNodeKind::BypassMatte: kind = "Bypassed cutter"; break;
         case GraphNodeKind::DisplayOutput: kind = "Display"; break;
         case GraphNodeKind::WriteOutput: kind = "Write"; break;
+        case GraphNodeKind::GroupInput: kind = "Group input"; break;
+        case GraphNodeKind::GroupOutput: kind = "Group output"; break;
         }
         QVariantList inputs;
         for (const auto& input : node->inputs)
             inputs.push_back(QVariantMap{{"source", int(input.source)}, {"slot", int(input.slot)}});
-        const QString name = node->layer
-                                 ? QString::fromStdString(document().layer(node->layer).name)
-                                 : kind;
+        QString name = node->layer
+                           ? QString::fromStdString(document().layer(node->layer).name)
+                           : kind;
+        if (node->group) {
+            const auto found = std::find_if(document().compositeGroups.begin(),
+                                            document().compositeGroups.end(),
+                                            [&](const auto& group) { return group.id == node->group; });
+            name = QString::fromStdString(found->name);
+        }
         result.push_back(QVariantMap{{"id", int(id)}, {"kind", kind}, {"kindCode", int(node->kind)}, {"name", name},
-                                     {"layer", int(node->layer)}, {"inputs", inputs}});
+                                     {"layer", int(node->layer)}, {"group", int(node->group)},
+                                     {"inputs", inputs}});
     }
     return result;
 }
@@ -1086,6 +1100,64 @@ bool EditorController::moveDrawingBefore(int sourceLayer, int targetLayer) {
         to = std::find_if(d.layers.begin(), d.layers.end(),
                           [targetLayer](const auto& layer) { return layer.id == Id(targetLayer); });
         d.layers.insert(to, std::move(moving));
+    });
+}
+bool EditorController::groupDrawings(int firstLayer, int lastLayer) {
+    if (firstLayer <= 0 || lastLayer <= 0 || firstLayer == lastLayer)
+        return false;
+    return edit("Group composite drawings", [&](Document& d) {
+        auto first = std::find_if(d.layers.begin(), d.layers.end(),
+                                  [firstLayer](const auto& layer) { return layer.id == Id(firstLayer); });
+        auto last = std::find_if(d.layers.begin(), d.layers.end(),
+                                 [lastLayer](const auto& layer) { return layer.id == Id(lastLayer); });
+        if (first == d.layers.end() || last == d.layers.end())
+            throw std::runtime_error("Select two existing drawings or Parts to group.");
+        const auto isDrawing = [](const Layer& layer) {
+            return layer.kind == LayerKind::Drawing || layer.kind == LayerKind::Part;
+        };
+        if (!isDrawing(*first) || !isDrawing(*last))
+            throw std::runtime_error("Group boundaries need Drawing or Part layers.");
+        if (first > last)
+            std::swap(first, last);
+        std::vector<Id> members;
+        for (auto it = first; it <= last; ++it) {
+            if (it->kind != LayerKind::Drawing && it->kind != LayerKind::Part)
+                continue;
+            if (it->locked)
+                throw std::runtime_error("Unlock every drawing in the composite group.");
+            for (const auto& group : d.compositeGroups)
+                if (std::find(group.members.begin(), group.members.end(), it->id) !=
+                    group.members.end())
+                    throw std::runtime_error("Ungroup a drawing before grouping it again.");
+            members.push_back(it->id);
+        }
+        if (members.size() < 2 || members.size() > 256)
+            throw std::runtime_error("Group two to 256 adjacent drawings or Parts.");
+        const auto id = d.allocateId();
+        d.compositeGroups.push_back({id, "Group " + std::to_string(id), std::move(members)});
+    });
+}
+bool EditorController::ungroupDrawings(int groupId) {
+    if (groupId <= 0 || std::none_of(document().compositeGroups.begin(),
+                                     document().compositeGroups.end(),
+                                     [groupId](const auto& group) { return group.id == Id(groupId); }))
+        return false;
+    return edit("Ungroup composite drawings", [&](Document& d) {
+        std::erase_if(d.compositeGroups,
+                      [groupId](const auto& group) { return group.id == Id(groupId); });
+    });
+}
+bool EditorController::renameCompositeGroup(int groupId, QString name) {
+    if (groupId <= 0)
+        return false;
+    return edit("Rename composite group", [&](Document& d) {
+        const auto found = std::find_if(d.compositeGroups.begin(), d.compositeGroups.end(),
+                                        [groupId](const auto& group) {
+                                            return group.id == Id(groupId);
+                                        });
+        if (found == d.compositeGroups.end())
+            throw std::runtime_error("The composite group is missing.");
+        found->name = name.trimmed().toStdString();
     });
 }
 void EditorController::setParent(int parent) {
