@@ -46,12 +46,23 @@ The later cubic trouser-contour correction regenerated this project and the
 five displayed stills without changing the 480-frame timing, bone joints or
 substitution decisions. All frames retain one connected silhouette and the
 saved example matches the constructed document in the 166-entry local suite.
+The current saved example rebinds the four one-piece limbs and both left-sleeve
+substitutions to alpha-following 6 × 16 contour meshes with a 40 px elbow/knee
+transition. The five displayed stills and integrated audio study were
+regenerated. All 480 preview frames and seven full-resolution frames retain
+one connected silhouette, and the current 171-entry suite plus native HM-07
+and integrated-shot smokes pass. A full-resolution 480-frame sweep measured
+5.00 ms/frame on this host. One current 40-sample native run measured p95
+17.84 ms at frame 12 and 18.22 ms at frame 360, with peak resident memory
+291.1 MB and 290.5 MB respectively. These measurements cover the visual
+shot; complete audio/matte/control interaction budgets remain open.
 
 ## Local macOS measurements
 
 The optimized `build/locked` build ran on macOS 15.5, Apple M1 Pro with
 16 GiB RAM. One complete 480-frame headless render at 1920 × 1080 averaged
-5.45 ms/frame with the matched sleeve key. This measures renderer throughput,
+5.45 ms/frame with the earlier rectangular limb mesh and matched sleeve key.
+This measures renderer throughput,
 not input latency.
 
 The native Qt Quick benchmark used a 1140 × 491 canvas at device pixel ratio

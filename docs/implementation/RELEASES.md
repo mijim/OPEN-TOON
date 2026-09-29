@@ -1,5 +1,15 @@
 # Experimental releases
 
+## 0.2.0-experimental.33 — working source, contour-bound continuous toon
+
+- Rebind all four continuous arms/legs and the alternate sleeve in the saved
+  rig and 20-second studies to alpha-following meshes with a 40 px joint
+  transition. The elbow and knee silhouette stays joined at the bend.
+- Regenerate the editable examples and representative stills. A 480-frame
+  connectivity sweep, 171 CTest entries, native HM-07 and integrated-shot
+  smokes, and current visual-shot input/render measurements pass on macOS.
+- Source only; no new public binary or tag. Artistic approval remains open.
+
 ## 0.2.0-experimental.32 — working source, reusable audio clip placement
 
 - Duplicate a clip at the playhead without copying its embedded WAV. The new

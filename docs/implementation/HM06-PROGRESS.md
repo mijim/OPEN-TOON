@@ -9,6 +9,13 @@ The [twenty-second visual shot study](HM06-VISUAL-SHOT.md) now exercises the
 continuous rig with camera, face/hand/mouth substitutions and a torso curve
 over the agreed 480-frame timing. Audio, mattes and published controls remain
 in their owning slices; the study does not claim the complete Harmony Moment.
+The saved 48- and 480-frame studies now use alpha-following contour meshes
+for each continuous arm and leg. The same editable middle elbow/knee bones,
+keys, sleeve variants and attached hands/feet remain. A sharper 40 px elbow
+transition reduces the inflated inner-joint contour at frame 24 and at 90° while
+retaining a connected silhouette. The [current frame-24 bend](hm06-contour-bend-24.png)
+and [90° stress pose](hm06-contour-bend-90.png) were inspected. This is a
+bounded visual improvement; owner artistic approval remains open.
 The 480-frame preview/connectivity sweep also found and corrected a visible
 angle mismatch at the alternate-sleeve change. **Match previous pose** now
 records that incoming bone or curve key explicitly at a compatible drawing
