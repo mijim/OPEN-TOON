@@ -128,6 +128,17 @@ If rebinding would reveal a formerly matte-only source, its composite output
 is bypassed in the same command. This lets an animator edit a joint or eye
 silhouette independently; automatic seam repair and general Auto Patch remain
 open. See [ADR-039](../architecture/adr/039-layer-cutter-matte.md).
+The selected Part's Nodes inspector now offers **Joint patch** from a visible
+leaf Part in the same character. One command copies the source's artwork,
+exposures, keys and mesh binding with fresh drawing/stroke IDs, places the copy
+above the target's group boundary, and registers it in saved views and poses.
+The original source and group membership stay intact. The copy follows the
+source's saved motion; the animator erases surplus copied ink to expose only
+the desired joint overlap. An animated translucent arm over an opaque torso
+keeps full alpha with a blue seam patch at frames 0 and 12. Domain, editor and
+native Qt Quick checks cover independent copy, pixels, undo/redo and reopen.
+This manual recipe has no automatic overlap detection or bent-contour repair;
+see [ADR-063](../architecture/adr/063-manual-joint-patch.md).
 Alt-dragging a Drawing card onto another binds the first as the second's
 cutter source through the existing validated document command. Its fractional
 alpha, saved references and one-step undo use the same path as the inspector.
@@ -320,5 +331,5 @@ preview. This is diagnostic navigation, not a persisted graph edit.
 ## Open contract
 
 The arbitrary editable node graph, other operator bypasses, broader transform
-presentation, nested/reusable groups, published ports and the full arm/eye overlap recipe are pending. HM-12
+presentation, nested/reusable groups, published ports and automatic seam repair across the full arm/eye overlap recipe are pending. HM-12
 and its P10 owning phase remain open.

@@ -435,6 +435,77 @@ TEST_CASE("Private Part cutter copies its view choice and refuses a child branch
     }));
     REQUIRE(session.document() == baseline);
 }
+TEST_CASE("Animated joint patch covers a torso seam without changing its source Part") {
+    Session session;
+    const Id torso = session.document().layers.front().id;
+    Id root = 0, arm = 0, group = 0;
+    REQUIRE(session.apply("Build crossing Parts", [&](Document& d) {
+        d.width = 3;
+        d.height = 1;
+        d.background = {0, 0, 0, 0};
+        d.editableDrawing(torso, 0).image = ImageAsset{3, 1,
+            {255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255}};
+        d.layer(torso).exposures.front().end = d.duration;
+        root = makeCharacter(d, torso, "Actor");
+        Layer source;
+        source.id = d.allocateId();
+        arm = source.id;
+        source.name = "Arm";
+        d.layers.push_back(source);
+        d.editableDrawing(arm, 0).image = ImageAsset{1, 1, {0, 0, 255, 128}};
+        d.layer(arm).exposures.front().end = d.duration;
+        attachDrawingAsPart(d, arm, root, "Arm");
+        bindRegularImageMesh(d, arm, d.layer(arm).exposures.front().drawing, 1, 1);
+        Keyframe rest;
+        rest.frame = 0;
+        rest.value = d.layer(arm).transform;
+        rest.value.x = 1;
+        Keyframe moved = rest;
+        moved.frame = 12;
+        moved.value.x = 2;
+        d.layer(arm).keys = {rest, moved};
+        (void)captureCharacterView(d, root, 0, "Front");
+        (void)captureCharacterPose(d, root, 0,
+            std::vector<PoseCaptureTarget>{{arm, PoseChannels::PositionX | PoseChannels::Drawing}},
+            "Rest arm");
+        Layer ordered = d.layer(arm);
+        std::erase_if(d.layers, [arm](const Layer& layer) { return layer.id == arm; });
+        d.layers.insert(d.layers.begin(), std::move(ordered));
+        group = d.allocateId();
+        d.compositeGroups.push_back({group, "Crossing", {arm, torso}});
+    }));
+    const auto baseline = session.document();
+    REQUIRE(qRed(SceneRenderer::render(baseline, 0).pixel(1, 0)) == 255);
+    REQUIRE(qRed(SceneRenderer::render(baseline, 12).pixel(2, 0)) == 255);
+    Id patch = 0;
+    REQUIRE(session.apply("Create editable joint patch", [&](Document& d) {
+        patch = createJointPatch(d, arm, torso);
+    }));
+    const auto& result = session.document();
+    REQUIRE(result.layer(patch).role == "Arm patch");
+    REQUIRE(result.layer(patch).parent == root);
+    REQUIRE(result.layer(patch).keys == result.layer(arm).keys);
+    REQUIRE(result.layer(patch).bindings.front().drawing == result.drawingAt(patch, 0)->id);
+    REQUIRE(result.drawingAt(patch, 0)->id != result.drawingAt(arm, 0)->id);
+    REQUIRE(result.compositeGroups.front().members == std::vector<Id>{arm, torso});
+    REQUIRE(result.layers[2].id == patch);
+    REQUIRE(result.layer(root).views.front().choices.size() == 3);
+    REQUIRE(result.layer(root).poses.front().parts.size() == 2);
+    REQUIRE(result.layer(root).poses.front().parts.back().part == patch);
+    for (const Frame frame : {0, 12}) {
+        const auto image = SceneRenderer::render(result, frame);
+        const int joint = frame == 0 ? 1 : 2;
+        for (int x = 0; x < 3; ++x)
+            REQUIRE(qAlpha(image.pixel(x, 0)) == 255);
+        REQUIRE(qBlue(image.pixel(joint, 0)) > 0);
+        REQUIRE(qRed(image.pixel(joint, 0)) < 255);
+    }
+    REQUIRE(deserializeDocument(serializeDocument(result)) == result);
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == baseline);
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == result);
+}
 TEST_CASE("Pose transfer maps unique Part roles and drawing names without touching source") {
     Session session;
     const Id part = session.document().layers.front().id;

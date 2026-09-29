@@ -2487,7 +2487,7 @@
         "VEC"
       ],
       "specification_status": "analysis_draft",
-      "notes": "A Drawing or Part can be placed immediately in front of or behind another with a direct Nodes-card drag. A one-pixel Part overlap crosses an arm and torso with undo and reopened pixels. Animated per-frame depth, finer depth controls and joint overlap recipes remain open.",
+      "notes": "A Drawing or Part can be placed immediately in front of or behind another with a direct Nodes-card drag. A one-pixel Part overlap crosses an arm and torso with undo and reopened pixels. Animated per-frame depth, finer depth controls and automatic joint repair remain open.",
       "implementation_evidence": "docs/implementation/HM12-PROGRESS.md; Part torso/arm pixel-order test, native Shift-drag, one-step undo and save/reopen"
     },
     {
@@ -2498,8 +2498,8 @@
       "acceptance_criteria": [
         "The test joint shows no seam when the arm bends."
       ],
-      "evidence": "proposal",
-      "implementation_status": "not_started",
+      "evidence": "manual editable Part patch; animated opaque output at two keyed frames",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "rigging",
@@ -2508,7 +2508,8 @@
         "VEC"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "A private editable source-Part copy can cover a selected Part above its composite group. The animator erases surplus ink; automatic overlap detection, contour repair and broader bend quality remain open.",
+      "implementation_evidence": "docs/implementation/HM12-PROGRESS.md; animated arm/torso pixel test, editor undo/reopen and native Qt Quick recipe smoke"
     },
     {
       "id": "RIG-006",

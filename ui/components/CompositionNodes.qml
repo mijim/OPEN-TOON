@@ -351,6 +351,46 @@ Item {
                 Accessible.name: "Find next matching composition node"
             }
         }
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.preferredHeight: visible ? 32 : 0
+            Layout.leftMargin: 12
+            Layout.rightMargin: 12
+            spacing: 8
+            visible: root.selected?.kind === 3
+            Label {
+                text: "JOINT PATCH"
+                color: "#999999"
+                font.pixelSize: 10
+                font.letterSpacing: 1
+            }
+            CompactComboBox {
+                id: jointSource
+                objectName: "nodeJointPatchSource"
+                implicitWidth: 180
+                model: [{id: 0, name: "Choose source Part"}].concat(
+                    root.controller.layers.filter(l =>
+                        l.kind === 3 && l.id !== root.selected?.id &&
+                        l.character === root.selected?.character && l.visible && l.matte === 0 &&
+                        !root.controller.layers.some(child => child.parent === l.id)))
+                textRole: "name"
+                valueRole: "id"
+                Accessible.name: "Source Part for an editable joint patch"
+            }
+            ToolButton {
+                objectName: "nodeCreateJointPatch"
+                text: "Create patch"
+                enabled: root.selected && !root.selected.locked && jointSource.currentValue > 0
+                onClicked: root.controller.createJointPatch(jointSource.currentValue)
+                Accessible.name: "Copy source Part above the selected Part as an editable joint patch"
+            }
+            Label {
+                Layout.fillWidth: true
+                text: "The patch follows source motion; erase unwanted copied ink."
+                color: "#777777"
+                font.pixelSize: 10
+            }
+        }
         Rectangle { Layout.fillWidth: true; height: 1; color: "#303030" }
         RowLayout {
             Layout.fillWidth: true

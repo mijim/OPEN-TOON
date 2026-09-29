@@ -18,6 +18,7 @@ Id duplicateCharacter(Document&, Id character, double offsetX = 64, double offse
 Id duplicateRigBranch(Document&, Id branch, bool linkedArtwork = false);
 Id duplicateCompositeGroup(Document&, Id group);
 Id copyPrivateCutter(Document&, Id source, Id target);
+Id createJointPatch(Document&, Id sourcePart, Id targetPart);
 void removeRigBranch(Document&, Id branch);
 void detachPart(Document&, Id part);
 void dissolvePeg(Document&, Id peg);

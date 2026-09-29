@@ -203,6 +203,21 @@ TEST_CASE("A Part crosses behind and in front of the torso with stable saved pix
     REQUIRE(qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
     REQUIRE(editor.moveDrawingAfter(int(armId), int(torso)));
     REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    REQUIRE(editor.moveDrawingBefore(int(armId), int(torso)));
+    REQUIRE(qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    editor.setSelectedLayer(int(torso));
+    REQUIRE(editor.createJointPatch(int(armId)));
+    const auto patch = opentoon::Id(editor.selectedLayer());
+    REQUIRE(patch != armId);
+    REQUIRE(editor.document().layer(patch).role == "Arm patch");
+    REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    editor.undo();
+    REQUIRE(qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    editor.redo();
+    REQUIRE(editor.saveProject({}));
+    REQUIRE(editor.openProject(path));
+    REQUIRE(editor.document().layer(patch).parent == root);
+    REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
 }
 TEST_CASE("Composite grouping is one undoable edit with stable ports and reopened pixels") {
     auto document = opentoon::makeDocument();

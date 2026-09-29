@@ -72,7 +72,7 @@ Control part overlap with fine depth adjustments.
 
 **Implementation evidence:** [docs/implementation/HM12-PROGRESS.md](../../../docs/implementation/HM12-PROGRESS.md) — Part torso/arm pixel-order test, native Shift-drag, one-step undo and save/reopen.
 
-**Remaining scope:** A Drawing or Part can be placed immediately in front of or behind another with a direct Nodes-card drag. A one-pixel Part overlap crosses an arm and torso with undo and reopened pixels. Animated per-frame depth, finer depth controls and joint overlap recipes remain open.
+**Remaining scope:** A Drawing or Part can be placed immediately in front of or behind another with a direct Nodes-card drag. A one-pixel Part overlap crosses an arm and torso with undo and reopened pixels. Animated per-frame depth, finer depth controls and automatic joint repair remain open.
 
 ## RIG-005 — Joints and Auto Patch
 
@@ -80,9 +80,13 @@ Resolve joints and hide lines between overlapping parts.
 
 **Initial acceptance:** The test joint shows no seam when the arm bends.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
-**Specification source:** `proposal`.
+**Specification source:** `manual editable Part patch; animated opaque output at two keyed frames`.
+
+**Implementation evidence:** [docs/implementation/HM12-PROGRESS.md](../../../docs/implementation/HM12-PROGRESS.md) — animated arm/torso pixel test, editor undo/reopen and native Qt Quick recipe smoke.
+
+**Remaining scope:** A private editable source-Part copy can cover a selected Part above its composite group. The animator erases surplus ink; automatic overlap detection, contour repair and broader bend quality remain open.
 
 ## RIG-006 — Drawing substitutions
 

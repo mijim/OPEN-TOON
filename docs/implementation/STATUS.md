@@ -42,7 +42,7 @@ formats 18–21, 24, 25, 28–30. Fractional source alpha clips the target in th
 write graph; the compact inspector assigns the source, toggles a saved bypass,
 and can paint the cutter source in its normal layer order, all with undo.
 Reference validation, save/reopen and native Qt Quick smoke pass. General
-node editing, nested/reusable groups and joint recipes remain open. Inside and
+node editing, nested/reusable groups and automatic joint repair remain open. Inside and
 Outside modes preserve fractional coverage; a typed inverse matte is saved and
 undoable. The bottom
 Nodes tab displays the derived typed graph, supports direct Drawing-card
@@ -101,20 +101,20 @@ skipped polled playhead frames, respectively. These counters do not measure
 speaker underruns or actual
 presented-frame drops.
 
-The working source version is `0.2.0-experimental.62`; no new binary or source
+The working source version is `0.2.0-experimental.63`; no new binary or source
 tag has been published for it. The last locally qualified macOS preview and
 earlier binaries do not qualify these source changes.
 
-The owner resumed development after the earlier 10:30 CEST cutoff. The `.62`
-locked macOS build passes 201/201 CTest entries and native HM-12 smoke,
+The owner resumed development after the earlier 10:30 CEST cutoff. The `.63`
+locked macOS build passes 202/202 CTest entries and native HM-12 smoke,
 including contiguous group input/output ports, matte-only source pixels,
 grouping/rename/ungroup, direct edge-member edits, whole-group order, bypass
 and independent duplication,
-operator search/apply, private editable cutter copies, dependency collection with closed matte/group references,
+operator search/apply, private editable cutter copies, a manual editable Part joint patch, dependency collection with closed matte/group references,
 undo/redo and save/reopen. Earlier native smokes and
 artistic checks are recorded in prior
 release entries. HM-12 remains an unfinished bounded contract; next work can
-continue its graph grouping/part-overlap behavior.
+continue its graph and automatic overlap behavior.
 HM-06 visual approval and HM-10 hardware presentation also remain open.
 
 ## Phase coverage

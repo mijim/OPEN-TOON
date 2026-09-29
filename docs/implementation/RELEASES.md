@@ -1,5 +1,17 @@
 # Experimental releases
 
+## 0.2.0-experimental.63 — working source, editable joint patch
+
+- Nodes can copy a visible leaf Part above another Part in the same character
+  as an editable joint patch. The copy owns its drawings and strokes, follows
+  the source's keyed motion and mesh binding, and joins saved views and poses.
+  The source and any enclosing composite group keep their original order.
+- Animated translucent arm/torso pixels remain opaque across the tested bend.
+  Domain, editor and native Qt Quick checks cover rendered pixels, one-step
+  undo/redo and ProjectStore reopen. The locked macOS suite passes 202/202
+  CTest entries and HM-12 smoke. An animator must erase unwanted copied ink;
+  automatic seam repair and broader joint validation remain open. Source only.
+
 ## 0.2.0-experimental.62 — working source, private editable cutters
 
 - Alt+Shift-drag a Drawing or leaf Part source card onto a target to create a

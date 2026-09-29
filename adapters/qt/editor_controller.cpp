@@ -167,6 +167,7 @@ QVariantList EditorController::layers() const {
                                      {"locked", it->locked},
                                      {"solo", it->solo},
                                      {"parent", int(it->parent)},
+                                     {"character", int(characterFor(document(), it->id))},
                                      {"matte", int(it->matte)},
                                      {"invertMatte", it->invertMatte},
                                      {"matteBypassed", it->matteBypassed},
@@ -1422,6 +1423,17 @@ bool EditorController::copyPrivateCutter(int sourceLayer) {
     return edit("Copy private cutter", [&](Document& d) {
         (void)opentoon::copyPrivateCutter(d, Id(sourceLayer), layer_);
     });
+}
+bool EditorController::createJointPatch(int sourceLayer) {
+    if (!layer_ || sourceLayer <= 0)
+        return false;
+    Id created = 0;
+    const bool patched = edit("Create joint patch", [&](Document& d) {
+        created = opentoon::createJointPatch(d, Id(sourceLayer), layer_);
+    });
+    if (patched)
+        setSelectedLayer(int(created));
+    return patched;
 }
 bool EditorController::setMatteInverted(bool inverted) {
     if (!layer_)

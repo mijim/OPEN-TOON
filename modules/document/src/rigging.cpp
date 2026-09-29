@@ -180,6 +180,78 @@ void appendRemappedGroups(Document& document, const std::vector<CompositeGroup>&
         document.compositeGroups.push_back(std::move(group));
     }
 }
+Id copyLeafArtworkLayer(Document& document, Id sourceId, const std::string& suffix) {
+    const Layer source = document.layer(sourceId);
+    require((source.kind == LayerKind::Drawing || source.kind == LayerKind::Part) &&
+                !source.exposures.empty() && suffix.size() <= 128,
+            "Copy an exposed Drawing or Part with a valid name suffix.");
+    const Id root = characterFor(document, sourceId);
+    if (source.kind == LayerKind::Part) {
+        require(root && !document.layer(root).locked,
+                "Unlock the character before copying a Part.");
+        require(std::none_of(document.layers.begin(), document.layers.end(),
+                             [sourceId](const Layer& layer) { return layer.parent == sourceId; }),
+                "Copy a leaf Part without child layers.");
+    }
+    Layer copy = source;
+    copy.id = document.allocateId();
+    const Id copiedId = copy.id;
+    copy.name = copy.name.substr(0, 4096 - suffix.size()) + suffix;
+    if (copy.kind == LayerKind::Part)
+        copy.role = copy.role.substr(0, 128 - suffix.size()) + suffix;
+    copy.locked = false;
+    copy.solo = false;
+    copy.matte = 0;
+    copy.invertMatte = false;
+    copy.matteBypassed = false;
+    copy.paintMatteSource = false;
+    copy.compositeBypassed = false;
+    std::map<Id, Id> drawings;
+    const auto copyDrawing = [&](Id old) -> Id {
+        if (drawings.contains(old))
+            return drawings.at(old);
+        Drawing drawing = document.drawings.at(old);
+        drawing.id = document.allocateId();
+        for (auto& stroke : drawing.strokes)
+            stroke.id = document.allocateId();
+        const Id id = drawing.id;
+        document.drawings.emplace(id, std::move(drawing));
+        drawings.emplace(old, id);
+        return id;
+    };
+    for (auto& exposure : copy.exposures)
+        exposure.drawing = copyDrawing(exposure.drawing);
+    for (auto& variant : copy.variants)
+        variant.drawing = copyDrawing(variant.drawing);
+    for (auto& binding : copy.bindings)
+        binding.drawing = copyDrawing(binding.drawing);
+    document.layers.push_back(std::move(copy));
+    if (source.kind == LayerKind::Part) {
+        auto& character = document.layer(root);
+        for (auto& view : character.views) {
+            const auto choice = std::find_if(view.choices.begin(), view.choices.end(),
+                                             [sourceId](const ViewChoice& entry) {
+                                                 return entry.part == sourceId;
+                                             });
+            if (choice != view.choices.end())
+                view.choices.push_back({copiedId, copyDrawing(choice->drawing)});
+        }
+        for (auto& pose : character.poses) {
+            const auto entry = std::find_if(pose.parts.begin(), pose.parts.end(),
+                                            [sourceId](const PosePart& item) {
+                                                return item.part == sourceId;
+                                            });
+            if (entry != pose.parts.end()) {
+                PosePart copied = *entry;
+                copied.part = copiedId;
+                if (copied.channels & PoseChannels::Drawing)
+                    copied.drawing = copyDrawing(copied.drawing);
+                pose.parts.push_back(std::move(copied));
+            }
+        }
+    }
+    return copiedId;
+}
 } // namespace
 Id characterFor(const Document& document, Id layerId) {
     Id current = layerId;
@@ -822,54 +894,7 @@ Id copyPrivateCutter(Document& document, Id sourceId, Id targetId) {
     const Id root = characterFor(document, sourceId);
     require(root == characterFor(document, targetId),
             "A private cutter must stay inside the target character boundary.");
-    if (source.kind == LayerKind::Part) {
-        require(!document.layer(root).locked, "Unlock the character before copying a Part cutter.");
-        require(std::none_of(document.layers.begin(), document.layers.end(),
-                             [sourceId](const Layer& layer) { return layer.parent == sourceId; }),
-                "Copy a leaf Part as a private cutter.");
-    }
-    Layer copy = source;
-    copy.id = document.allocateId();
-    const Id copiedId = copy.id;
-    copy.name = copy.name.substr(0, 4089) + " cutter";
-    if (copy.kind == LayerKind::Part)
-        copy.role = copy.role.substr(0, 121) + " cutter";
-    copy.locked = false;
-    copy.solo = false;
-    copy.matte = 0;
-    copy.invertMatte = false;
-    copy.matteBypassed = false;
-    copy.paintMatteSource = false;
-    copy.compositeBypassed = false;
-    std::map<Id, Id> drawings;
-    const auto copyDrawing = [&](Id old) -> Id {
-        if (drawings.contains(old))
-            return drawings.at(old);
-        Drawing drawing = document.drawings.at(old);
-        drawing.id = document.allocateId();
-        for (auto& stroke : drawing.strokes)
-            stroke.id = document.allocateId();
-        const Id id = drawing.id;
-        document.drawings.emplace(id, std::move(drawing));
-        drawings.emplace(old, id);
-        return id;
-    };
-    for (auto& exposure : copy.exposures)
-        exposure.drawing = copyDrawing(exposure.drawing);
-    for (auto& variant : copy.variants)
-        variant.drawing = copyDrawing(variant.drawing);
-    for (auto& binding : copy.bindings)
-        binding.drawing = copyDrawing(binding.drawing);
-    document.layers.push_back(std::move(copy));
-    if (source.kind == LayerKind::Part)
-        for (auto& view : document.layer(root).views) {
-            const auto choice = std::find_if(view.choices.begin(), view.choices.end(),
-                                             [sourceId](const ViewChoice& entry) {
-                                                 return entry.part == sourceId;
-                                             });
-            if (choice != view.choices.end())
-                view.choices.push_back({copiedId, copyDrawing(choice->drawing)});
-        }
+    const Id copiedId = copyLeafArtworkLayer(document, sourceId, " cutter");
     const Id previous = target.matte;
     if (previous && !document.layer(previous).paintMatteSource &&
         std::none_of(document.layers.begin(), document.layers.end(),
@@ -881,6 +906,32 @@ Id copyPrivateCutter(Document& document, Id sourceId, Id targetId) {
     edited.matte = copiedId;
     edited.matteBypassed = false;
     return copiedId;
+}
+Id createJointPatch(Document& document, Id sourceId, Id targetId) {
+    require(sourceId != targetId, "A Part cannot patch itself.");
+    const Layer source = document.layer(sourceId);
+    const Layer target = document.layer(targetId);
+    require(source.kind == LayerKind::Part && target.kind == LayerKind::Part &&
+                source.visible && !source.matte && !target.locked,
+            "Choose a visible Part without a cutter and an unlocked target Part.");
+    require(characterFor(document, sourceId) == characterFor(document, targetId),
+            "A joint patch must stay inside one character.");
+    const Id patchId = copyLeafArtworkLayer(document, sourceId, " patch");
+    Id boundary = targetId;
+    for (const auto& group : document.compositeGroups)
+        if (std::find(group.members.begin(), group.members.end(), targetId) !=
+            group.members.end()) {
+            boundary = group.members.back();
+            break;
+        }
+    Layer patch = std::move(document.layers.back());
+    document.layers.pop_back();
+    const auto position = std::find_if(document.layers.begin(), document.layers.end(),
+                                       [boundary](const Layer& layer) {
+                                           return layer.id == boundary;
+                                       });
+    document.layers.insert(std::next(position), std::move(patch));
+    return patchId;
 }
 void removeRigBranch(Document& document, Id branchId) {
     const auto& branch = document.layer(branchId);

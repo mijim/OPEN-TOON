@@ -8,6 +8,7 @@
 #include "motion_path_smoke.h"
 #include "mesh_smoke.h"
 #include "project_store.h"
+#include "opentoon/rigging.h"
 #include "scene_renderer.h"
 #include "serialization.h"
 #include "vector_selection_smoke.h"
@@ -1248,8 +1249,63 @@ int main(int argc, char** argv) {
                     if (!editor.saveProject({}) || !editor.openProject(QUrl::fromLocalFile(behindPath)) ||
                         editor.document().layer(blue).matte != 0)
                         throw std::runtime_error("Disconnected source deletion changed after reopen.");
+                    auto joint = opentoon::makeDocument();
+                    joint.width = joint.height = 1;
+                    joint.background = {0, 0, 0, 0};
+                    const auto torsoPart = joint.layers.front().id;
+                    joint.editableDrawing(torsoPart, 0).image =
+                        opentoon::ImageAsset{1, 1, {255, 0, 0, 255}};
+                    auto armPart = joint.layers.front();
+                    armPart.id = joint.allocateId();
+                    armPart.name = "Arm";
+                    auto armArt = joint.drawings.at(armPart.exposures.front().drawing);
+                    armArt.id = joint.allocateId();
+                    armArt.image = opentoon::ImageAsset{1, 1, {0, 0, 255, 255}};
+                    joint.drawings.emplace(armArt.id, armArt);
+                    armPart.exposures.front().drawing = armArt.id;
+                    const auto armPartId = armPart.id;
+                    const auto character = opentoon::makeCharacter(joint, torsoPart, "Actor");
+                    joint.layers.insert(joint.layers.begin(), armPart);
+                    opentoon::attachDrawingAsPart(joint, armPartId, character, "Arm");
+                    joint.validate();
+                    const auto jointPath = directory.filePath("joint-patch.otoon");
+                    if (!opentoon::ProjectStore::save(
+                            std::filesystem::path(jointPath.toStdString()), joint))
+                        throw std::runtime_error("Cannot save joint patch fixture.");
+                    if (!editor.openProject(QUrl::fromLocalFile(jointPath)))
+                        throw std::runtime_error("Cannot open joint patch fixture.");
+                    editor.setSelectedLayer(int(torsoPart));
+                    QCoreApplication::processEvents();
+                    (void)window->grabWindow();
+                    auto* jointPicker = window->findChild<QQuickItem*>("nodeJointPatchSource");
+                    auto* jointButton = window->findChild<QQuickItem*>("nodeCreateJointPatch");
+                    if (!jointPicker || !jointButton || !jointPicker->isVisible() ||
+                        !jointButton->isVisible())
+                        throw std::runtime_error("Joint patch recipe is unavailable in Nodes.");
+                    jointPicker->setProperty("currentIndex", 1);
+                    QCoreApplication::processEvents();
+                    (void)window->grabWindow();
+                    if (!jointButton->isEnabled())
+                        throw std::runtime_error("Joint patch source cannot be selected.");
+                    const auto jointButtonPoint = jointButton->mapToScene(QPointF(
+                        jointButton->width() / 2, jointButton->height() / 2));
+                    movePoint(QEvent::MouseButtonPress, jointButtonPoint, Qt::LeftButton);
+                    movePoint(QEvent::MouseButtonRelease, jointButtonPoint, Qt::NoButton);
+                    const auto jointPatchId = opentoon::Id(editor.selectedLayer());
+                    if (jointPatchId == torsoPart ||
+                        editor.document().layer(jointPatchId).role != "Arm patch" ||
+                        qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Joint patch click did not cover the torso seam.");
+                    editor.undo();
+                    if (qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Joint patch undo did not restore the torso.");
+                    editor.redo();
+                    if (!editor.saveProject({}) ||
+                        !editor.openProject(QUrl::fromLocalFile(jointPath)) ||
+                        qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Joint patch changed after save and reopen.");
                     std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass, fractional cutter, "
-                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, group order, member edits, bypass, duplicate and ungroup ports, Alt-drag cutter, Alt+Shift-drag private cutter, Alt-click bypass, operator library search/apply, explicit source deletion, typed node search, save/reopen and undo.\n";
+                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, group order, member edits, bypass, duplicate and ungroup ports, Alt-drag cutter, Alt+Shift-drag private cutter, editable joint patch, Alt-click bypass, operator library search/apply, explicit source deletion, typed node search, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';
