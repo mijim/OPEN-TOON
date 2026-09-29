@@ -28,9 +28,9 @@ Play at the scene frame rate with range, loop and performance status.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — docs/implementation/HM10-PROGRESS.md; play-once/loop toggle with exact sample boundary, native Qt Quick input and null-device tests; dropped-frame acceptance remains open.
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — docs/implementation/HM10-PROGRESS.md; play-once/loop and selected-range transport with exact sample boundaries, native Qt Quick input and null-device tests; dropped-frame acceptance remains open.
 
-**Remaining scope:** Loop playback is on by default; an unsaved toolbar toggle stops once at the rational scene boundary and leaves the last frame visible. Device callback diagnostics and polled playhead skips are available; actual presented-frame drops remain unqualified.
+**Remaining scope:** Loop playback is on by default; Range mode uses the selected half-open timeline frames and stops on the last included frame or wraps at its exact end sample. Both toggles are unsaved view state. Device callback diagnostics and polled playhead skips are available; actual presented-frame drops remain unqualified.
 
 ## OUT-002 — Quality-controlled preview
 

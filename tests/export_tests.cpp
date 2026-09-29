@@ -842,6 +842,81 @@ TEST_CASE("Silent transport can stop once or loop without editing the scene") {
     editor.togglePlayback();
     REQUIRE(editor.document() == before);
 }
+TEST_CASE("Selected frame playback uses exact sample limits and leaves document untouched") {
+    EditorController editor;
+    editor.newScene();
+    const auto scene = editor.snapshot();
+    opentoon::AudioDevice device(scene, true);
+    REQUIRE_THROWS(device.setPlaybackRange(8, 5));
+    REQUIRE_THROWS(device.setPlaybackRange(0, scene->duration + 1));
+    device.setPlaybackRange(5, 8);
+    REQUIRE_THROWS(device.seek(4));
+    device.setLooping(false);
+    device.start(7);
+    REQUIRE_THROWS(device.setPlaybackRange(6, 9));
+    QElapsedTimer timeout;
+    timeout.start();
+    while (!device.finished() && timeout.elapsed() < 1000)
+        QThread::msleep(5);
+    REQUIRE(device.finished());
+    REQUIRE(device.currentSample() == scene->rate.sampleAt(8, 48000));
+    REQUIRE(device.currentFrame() == 7);
+    device.stop();
+    device.setLooping(true);
+    device.start(7);
+    timeout.restart();
+    while (device.currentSample() >= scene->rate.sampleAt(7, 48000) &&
+           timeout.elapsed() < 1000)
+        QThread::msleep(5);
+    REQUIRE(device.currentSample() >= scene->rate.sampleAt(5, 48000));
+    REQUIRE(device.currentSample() < scene->rate.sampleAt(7, 48000));
+    device.stop();
+    auto fractional = std::make_shared<opentoon::Document>(*scene);
+    fractional->rate = {24000, 1001};
+    fractional->validate();
+    opentoon::AudioDevice fractionalDevice(fractional, true);
+    fractionalDevice.setPlaybackRange(10, 13);
+    fractionalDevice.setLooping(false);
+    fractionalDevice.start(12);
+    timeout.restart();
+    while (!fractionalDevice.finished() && timeout.elapsed() < 1000)
+        QThread::msleep(5);
+    REQUIRE(fractionalDevice.finished());
+    REQUIRE(fractionalDevice.currentSample() == fractional->rate.sampleAt(13, 48000));
+    fractionalDevice.stop();
+
+    const auto before = editor.document();
+    editor.selectTimelineRange(5, 7, 0, 0);
+    editor.setPlaySelectedRange(true);
+    editor.setLoopPlayback(false);
+    editor.setFrame(0);
+    editor.togglePlayback();
+    REQUIRE(editor.frame() == 5);
+    timeout.restart();
+    while (editor.playing() && timeout.elapsed() < 1000) {
+        QCoreApplication::processEvents();
+        QThread::msleep(5);
+    }
+    REQUIRE_FALSE(editor.playing());
+    REQUIRE(editor.frame() == 7);
+    REQUIRE(editor.document() == before);
+    editor.setLoopPlayback(true);
+    editor.togglePlayback();
+    timeout.restart();
+    while (editor.frame() == 7 && timeout.elapsed() < 1000) {
+        QCoreApplication::processEvents();
+        QThread::msleep(5);
+    }
+    REQUIRE(editor.playing());
+    REQUIRE(editor.frame() >= 5);
+    REQUIRE(editor.frame() <= 7);
+    editor.setFrame(0);
+    REQUIRE_FALSE(editor.playing());
+    REQUIRE(editor.frame() == 0);
+    REQUIRE(editor.document() == before);
+    editor.newScene();
+    REQUIRE_FALSE(editor.playSelectedRange());
+}
 TEST_CASE("Editor scrubs short audio fragments while traversing frames") {
     qputenv("OPENTOON_TEST_NULL_AUDIO_BACKEND", "1");
     QTemporaryDir directory;

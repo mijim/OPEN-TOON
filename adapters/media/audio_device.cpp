@@ -26,10 +26,13 @@ struct AudioDevice::Impl {
     std::atomic_bool interrupted{false};
     std::atomic_bool active{false};
     std::atomic_bool looping{true};
+    Frame rangeFirst = 0, rangeEnd = 0;
+    std::int64_t rangeFirstSample = 0, rangeEndSample = 0;
     std::atomic<std::uint64_t> callbacks{0}, processingOverruns{0}, maximumCallbackNanoseconds{0};
 
     explicit Impl(std::shared_ptr<const Document> source)
-        : snapshot(std::move(source)), mix(*snapshot, 48000) {}
+        : snapshot(std::move(source)), mix(*snapshot, 48000),
+          rangeEnd(snapshot->duration), rangeEndSample(mix.sceneSamples()) {}
 
     static void data(ma_device* device, void* destination, const void*, ma_uint32 frameCount) noexcept {
         const auto started = std::chrono::steady_clock::now();
@@ -38,15 +41,15 @@ struct AudioDevice::Impl {
         std::array<double, 4096 * 2> scratch;
         const auto sceneEnd = self->mix.sceneSamples();
         const auto scrubEnd = self->scrubEnd.load(std::memory_order_acquire);
-        const auto boundary = scrubEnd >= 0 ? std::min(sceneEnd, scrubEnd) : sceneEnd;
+        const auto boundary = scrubEnd >= 0 ? std::min(sceneEnd, scrubEnd) : self->rangeEndSample;
         const auto origin = self->cursor.load(std::memory_order_relaxed);
         std::int64_t cursor = origin;
         ma_uint32 done = 0;
         while (done < frameCount) {
-            if (scrubEnd < 0 && cursor >= sceneEnd) {
+            if (scrubEnd < 0 && cursor >= self->rangeEndSample) {
                 if (!self->looping.load(std::memory_order_relaxed))
                     break;
-                cursor = 0;
+                cursor = self->rangeFirstSample;
             }
             if (cursor >= boundary)
                 break;
@@ -145,10 +148,20 @@ void AudioDevice::stop() {
         ma_device_stop(&impl_->device);
 }
 void AudioDevice::seek(Frame frame) {
-    if (frame < 0 || frame >= impl_->snapshot->duration)
-        throw std::invalid_argument("Audio seek frame is outside the scene.");
+    if (frame < impl_->rangeFirst || frame >= impl_->rangeEnd)
+        throw std::invalid_argument("Audio seek frame is outside the playback range.");
     impl_->cursor.store(impl_->snapshot->rate.sampleAt(frame, 48000),
                         std::memory_order_release);
+}
+void AudioDevice::setPlaybackRange(Frame first, Frame end) {
+    if (impl_->active.load(std::memory_order_acquire) ||
+        first < 0 || first >= end || end > impl_->snapshot->duration)
+        throw std::invalid_argument("Select a valid playback range while the device is stopped.");
+    impl_->rangeFirst = first;
+    impl_->rangeEnd = end;
+    impl_->rangeFirstSample = impl_->snapshot->rate.sampleAt(first, 48000);
+    impl_->rangeEndSample = impl_->snapshot->rate.sampleAt(end, 48000);
+    impl_->cursor.store(impl_->rangeFirstSample, std::memory_order_release);
 }
 void AudioDevice::setLooping(bool looping) {
     impl_->looping.store(looping, std::memory_order_release);
@@ -156,14 +169,17 @@ void AudioDevice::setLooping(bool looping) {
 bool AudioDevice::finished() const {
     return !impl_->looping.load(std::memory_order_acquire) &&
            impl_->scrubEnd.load(std::memory_order_acquire) < 0 &&
-           impl_->cursor.load(std::memory_order_acquire) >= impl_->mix.sceneSamples();
+           impl_->cursor.load(std::memory_order_acquire) >= impl_->rangeEndSample;
 }
 std::int64_t AudioDevice::currentSample() const {
     const auto value = impl_->cursor.load(std::memory_order_acquire);
-    return value == impl_->mix.sceneSamples() &&
-                   impl_->looping.load(std::memory_order_acquire) ? 0 : value;
+    return value == impl_->rangeEndSample &&
+                   impl_->looping.load(std::memory_order_acquire)
+               ? impl_->rangeFirstSample : value;
 }
 Frame AudioDevice::currentFrame() const {
+    if (finished())
+        return impl_->rangeEnd - 1;
     const auto sample = currentSample();
     Frame low = 0, high = impl_->snapshot->duration;
     while (low + 1 < high) {

@@ -4783,8 +4783,8 @@
         "AUD"
       ],
       "specification_status": "analysis_draft",
-      "notes": "Loop playback is on by default; an unsaved toolbar toggle stops once at the rational scene boundary and leaves the last frame visible. Device callback diagnostics and polled playhead skips are available; actual presented-frame drops remain unqualified.",
-      "implementation_evidence": "docs/implementation/status.json; docs/implementation/HM10-PROGRESS.md; play-once/loop toggle with exact sample boundary, native Qt Quick input and null-device tests; dropped-frame acceptance remains open"
+      "notes": "Loop playback is on by default; Range mode uses the selected half-open timeline frames and stops on the last included frame or wraps at its exact end sample. Both toggles are unsaved view state. Device callback diagnostics and polled playhead skips are available; actual presented-frame drops remain unqualified.",
+      "implementation_evidence": "docs/implementation/status.json; docs/implementation/HM10-PROGRESS.md; play-once/loop and selected-range transport with exact sample boundaries, native Qt Quick input and null-device tests; dropped-frame acceptance remains open"
     },
     {
       "id": "OUT-002",

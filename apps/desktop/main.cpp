@@ -1590,6 +1590,39 @@ int main(int argc, char** argv) {
                     if (editor.playing() || editor.frame() != editor.duration() - 1 ||
                         editor.document() != transportScene)
                         throw std::runtime_error("Play once did not stop at the final frame.");
+                    editor.selectTimelineRange(4, 6, 0, 0);
+                    QCoreApplication::processEvents();
+                    (void)window->grabWindow();
+                    auto* rangeButton = window->findChild<QQuickItem*>("playSelectedRangeButton");
+                    if (!rangeButton || !rangeButton->isVisible())
+                        throw std::runtime_error("Selected-range playback control is unavailable.");
+                    const auto rangePoint = rangeButton->mapToScene(QPointF(
+                        rangeButton->width() / 2, rangeButton->height() / 2));
+                    QMouseEvent rangePress(QEvent::MouseButtonPress, rangePoint,
+                        window->mapToGlobal(rangePoint.toPoint()), Qt::LeftButton,
+                        Qt::LeftButton, Qt::NoModifier);
+                    QMouseEvent rangeRelease(QEvent::MouseButtonRelease, rangePoint,
+                        window->mapToGlobal(rangePoint.toPoint()), Qt::LeftButton,
+                        Qt::NoButton, Qt::NoModifier);
+                    QCoreApplication::sendEvent(window, &rangePress);
+                    QCoreApplication::sendEvent(window, &rangeRelease);
+                    QCoreApplication::processEvents();
+                    if (!editor.playSelectedRange() || editor.rangeStart() != 4 ||
+                        editor.rangeEnd() != 7)
+                        throw std::runtime_error("Native Range control did not use the selected frames.");
+                    editor.setFrame(0);
+                    editor.togglePlayback();
+                    if (editor.frame() != 4)
+                        throw std::runtime_error("Range playback did not start at its first frame.");
+                    playbackWait.restart();
+                    while (editor.playing() && playbackWait.elapsed() < 1000) {
+                        QCoreApplication::processEvents();
+                        QThread::msleep(5);
+                    }
+                    if (editor.playing() || editor.frame() != 6 || editor.document() != transportScene)
+                        throw std::runtime_error("Selected-range playback missed its final frame.");
+                    editor.setPlaySelectedRange(false);
+                    editor.selectTimelineRange(0, 0, 0, 0);
                     qunsetenv("OPENTOON_TEST_NULL_AUDIO_BACKEND");
                     if (editor.playbackDiagnostics().value("callbacks").toULongLong() == 0)
                         throw std::runtime_error("Native audio callback diagnostics are empty.");
@@ -1801,7 +1834,7 @@ int main(int argc, char** argv) {
                     if (editor.document() != baseline)
                         throw std::runtime_error("WAV import did not undo atomically.");
                     std::cout << "HM-10 audio smoke passed: native PCM16 import, shared-source clip duplication/undo, exact split/undo, mute/undo, solo/undo, balance/undo, cue waveform, "
-                                 "device-clock playhead/seek, native play-once loop toggle, waveform and edge-trim drags/undo, audio scrub/repeat, source-sample fades, exact full and selected-range WAV export, timeline screenshot and atomic undo.\n";
+                                 "device-clock playhead/seek, native play-once and selected-range transport, waveform and edge-trim drags/undo, audio scrub/repeat, source-sample fades, exact full and selected-range WAV export, timeline screenshot and atomic undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

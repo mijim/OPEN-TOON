@@ -1,5 +1,17 @@
 # Experimental releases
 
+## 0.2.0-experimental.66 — working source, selected-range playback
+
+- The transport's Range toggle plays the selected half-open timeline interval.
+  Play outside it starts at its first frame; Loop wraps at its exact rational
+  end sample, and Play once stops on its last frame. Seeking outside an active
+  playback range stops transport. Opening another scene clears Range mode.
+- Null-device tests cover exact end samples, wrapping and invalid bounds;
+  silent controller and native Qt Quick audio tests cover final-frame stop and
+  unchanged document state. The locked macOS suite passes 202/202 CTest
+  entries and HM-10 native smoke. Source only; hardware presentation and
+  dropped-frame qualification remain open.
+
 ## 0.2.0-experimental.65 — working source, play-once transport
 
 - The transport now has a Loop playback toggle, on by default. With looping

@@ -76,6 +76,12 @@ silence after the scene's exact end sample and stops the UI on the last frame;
 silent preview follows the same rule. The toggle is view state and leaves the
 document and original WAV untouched. See
 [ADR-064](../architecture/adr/064-playback-loop-boundary.md).
+**Range** plays the selected half-open timeline frame interval. Starting
+outside it jumps to its first frame; Loop wraps at the rational end sample,
+and Play once leaves its last frame visible. Seeking outside an active range
+stops playback. This view-only mode clears when another scene opens. The
+callback and silent preview share the interval; see
+[ADR-065](../architecture/adr/065-selected-range-playback.md).
 Dragging across the timeline ruler or drawing rows previews 80 ms audio
 fragments from each marked frame and stops on release. Moving a waveform
 continues to edit clip placement instead.
@@ -164,6 +170,11 @@ source-sample fades and trim/repeat clamping.
 - Null-device and editor transport tests now cover one-pass completion at the
   exact rational end sample, loop wrap, final-frame stop and unchanged scene.
   A silent transport test checks the same last-frame stop and wrap. Native HM-10 smoke clicks the loop toggle and checks play-once completion.
+- A selected-range test checks exact integer and 24000/1001 device end samples,
+  loop wrap, invalid
+  bounds, silent preview, outside-range seek and unchanged document. Native
+  HM-10 smoke clicks Range and runs an imported WAV from the first selected
+  frame to the last included frame.
 - A 600-second fractional-rate, two-source 1024-frame callback workload
   measured p95 **0.014 ms** against a 21.33 ms output period on the local
   M1 Pro macOS Release build. It checks the exact scene sample count and a

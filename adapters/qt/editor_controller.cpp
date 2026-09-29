@@ -56,17 +56,17 @@ EditorController::EditorController(QObject* parent) : QObject(parent) {
             return;
         }
         if (audioDevice_ && audioDevice_->finished()) {
-            if (frame_ != duration() - 1) {
-                frame_ = duration() - 1;
+            if (frame_ != playbackEnd_ - 1) {
+                frame_ = playbackEnd_ - 1;
                 emit frameChanged();
             }
             stopPlayback();
             return;
         }
         const int elapsedFrames = int(std::floor(playClock_.elapsed() / 1000.0 * fps()));
-        if (!audioDevice_ && !loopPlayback_ && playStart_ + elapsedFrames >= duration()) {
-            if (frame_ != duration() - 1) {
-                frame_ = duration() - 1;
+        if (!audioDevice_ && !loopPlayback_ && playStart_ + elapsedFrames >= playbackEnd_) {
+            if (frame_ != playbackEnd_ - 1) {
+                frame_ = playbackEnd_ - 1;
                 emit frameChanged();
             }
             stopPlayback();
@@ -74,7 +74,9 @@ EditorController::EditorController(QObject* parent) : QObject(parent) {
         }
         const int next = audioDevice_
                              ? audioDevice_->currentFrame()
-                             : (playStart_ + elapsedFrames) % duration();
+                             : playbackFirst_ +
+                                   (playStart_ - playbackFirst_ + elapsedFrames) %
+                                       (playbackEnd_ - playbackFirst_);
         if (next > frame_ + 1)
             skippedPlayheadFrames_ += std::uint64_t(next - frame_ - 1);
         if (next != frame_) {
@@ -119,6 +121,10 @@ void EditorController::resetSelection() {
     rangeStart_ = 0;
     rangeEnd_ = 1;
     rangeLayers_.clear();
+    if (playSelectedRange_) {
+        playSelectedRange_ = false;
+        emit playbackChanged();
+    }
     emit rangeChanged();
     layer_ = document().layers.empty() ? 0 : document().layers.back().id;
     selectedView_ = 0;
@@ -644,6 +650,9 @@ QVariantMap EditorController::transform() const {
 }
 void EditorController::setFrame(int value) {
     value = std::clamp(value, 0, duration() - 1);
+    if (playing() && playSelectedRange_ &&
+        (value < playbackFirst_ || value >= playbackEnd_))
+        stopPlayback();
     if (audioDevice_)
         audioDevice_->seek(value);
     else if (scrubDevice_ && scrubDevice_->running() && value != frame_)
@@ -2435,6 +2444,13 @@ void EditorController::setLoopPlayback(bool looping) {
     }
     emit playbackChanged();
 }
+void EditorController::setPlaySelectedRange(bool selected) {
+    if (playSelectedRange_ == selected)
+        return;
+    stopPlayback();
+    playSelectedRange_ = selected;
+    emit playbackChanged();
+}
 void EditorController::togglePlayback() {
     if (playing()) {
         stopPlayback();
@@ -2444,12 +2460,19 @@ void EditorController::togglePlayback() {
     scrubDevice_.reset();
     playbackCallbacks_ = playbackProcessingOverruns_ = playbackMaximumCallbackNanoseconds_ = 0;
     skippedPlayheadFrames_ = 0;
+    playbackFirst_ = playSelectedRange_ ? std::clamp(rangeStart_, 0, duration() - 1) : 0;
+    playbackEnd_ = playSelectedRange_
+                       ? std::clamp(rangeEnd_, playbackFirst_ + 1, duration())
+                       : duration();
+    if (frame_ < playbackFirst_ || frame_ >= playbackEnd_)
+        setFrame(playbackFirst_);
     playStart_ = frame_;
     playClock_.start();
     if (!document().audioClips.empty()) {
         try {
             audioDevice_ = std::make_unique<opentoon::AudioDevice>(
                 session_.snapshot(), qEnvironmentVariableIntValue("OPENTOON_TEST_NULL_AUDIO_BACKEND") == 1);
+            audioDevice_->setPlaybackRange(playbackFirst_, playbackEnd_);
             audioDevice_->setLooping(loopPlayback_);
             audioDevice_->start(frame_);
         } catch (const std::exception& e) {

@@ -21,6 +21,7 @@ class AudioDevice {
     void scrub(Frame frame);
     void stop();
     void seek(Frame frame);
+    void setPlaybackRange(Frame first, Frame end);
     void setLooping(bool looping);
     [[nodiscard]] bool finished() const;
     [[nodiscard]] Frame currentFrame() const;

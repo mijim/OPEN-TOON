@@ -2583,6 +2583,13 @@ ApplicationWindow {
                     onClicked: editor.loopPlayback = !editor.loopPlayback
                 }
                 C.ToolButton {
+                    objectName: "playSelectedRangeButton"
+                    text: "Range"
+                    active: editor.playSelectedRange
+                    hint: "Play the selected timeline range"
+                    onClicked: editor.playSelectedRange = !editor.playSelectedRange
+                }
+                C.ToolButton {
                     text: "›"
                     hint: "Next drawing"
                     onClicked: editor.nextDrawing(1)

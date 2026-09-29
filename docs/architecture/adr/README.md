@@ -166,3 +166,12 @@ group bypass with an input-image fallback and retained cutter sources.
 
 See [ADR-062](062-composition-source-deletion-policy.md) for explicit
 protect/disconnect choices when deleting a Drawing or Part composition source.
+
+See [ADR-063](063-manual-joint-patch.md) for an independent editable Part
+overlay placed above its target's composite group.
+
+See [ADR-064](064-playback-loop-boundary.md) for exact scene-boundary loop and
+play-once behavior in device and silent preview.
+
+See [ADR-065](065-selected-range-playback.md) for playback of a selected
+half-open timeline interval using rational frame-to-sample boundaries.
