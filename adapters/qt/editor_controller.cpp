@@ -181,6 +181,7 @@ QVariantList EditorController::compositionNodes() const {
         case GraphNodeKind::Background: kind = "Background"; break;
         case GraphNodeKind::LayerImage: kind = "Drawing"; break;
         case GraphNodeKind::LayerTransform: kind = "Transform"; break;
+        case GraphNodeKind::Opacity: kind = "Opacity"; break;
         case GraphNodeKind::Over: kind = "Composite"; break;
         case GraphNodeKind::MatteFromImage: kind = "Cutter"; break;
         case GraphNodeKind::InvertMatte: kind = "Invert matte"; break;

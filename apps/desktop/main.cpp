@@ -14,6 +14,7 @@
 #include <QElapsedTimer>
 #include <QEventLoop>
 #include <QFile>
+#include <QFileInfo>
 #include <QGuiApplication>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -110,6 +111,14 @@ int main(int argc, char** argv) {
             &engine, &QQmlApplicationEngine::objectCreationFailed, &app, [] { QCoreApplication::exit(1); },
             Qt::QueuedConnection);
         engine.loadFromModule("OpenToon", "Main");
+        if (args.contains("--open")) {
+            const int index = args.indexOf("--open");
+            if (index + 1 >= args.size())
+                throw std::runtime_error("Usage: open-toon --open PROJECT");
+            const auto path = QFileInfo(args[index + 1]).absoluteFilePath();
+            if (!editor.openProject(QUrl::fromLocalFile(path)))
+                throw std::runtime_error("Could not open project: " + path.toStdString());
+        }
         if (args.contains("--demo"))
             editor.loadDemo();
         if (args.contains("--hm12-smoke")) {
@@ -203,13 +212,25 @@ int main(int argc, char** argv) {
                     if (!editor.saveProject({}) || !editor.openProject(QUrl::fromLocalFile(path)) ||
                         opentoon::SceneRenderer::render(editor.document(), 0) != outside)
                         throw std::runtime_error("Cutter matte changed after save and reopen.");
+                    editor.setSelectedLayer(int(source.id));
+                    QCoreApplication::processEvents();
+                    auto* opacityField = window->findChild<QQuickItem*>("nodeOpacity");
+                    if (!opacityField || !opacityField->isVisible())
+                        throw std::runtime_error("Node opacity control is unavailable.");
+                    editor.setTransform("opacity", .5);
+                    if (qAlpha(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 112 ||
+                        editor.compositionNodes().size() != 10)
+                        throw std::runtime_error("Opacity node did not attenuate inverted cutter alpha.");
+                    editor.undo();
+                    if (opentoon::SceneRenderer::render(editor.document(), 0) != outside)
+                        throw std::runtime_error("Opacity node undo changed the cutter result.");
                     editor.setSelectedLayer(int(document.layers.front().id));
                     if (!editor.setLayerMatte(0))
                         throw std::runtime_error("Cannot bypass a cutter matte.");
                     editor.undo();
                     if (opentoon::SceneRenderer::render(editor.document(), 0) != outside)
                         throw std::runtime_error("Cutter matte bypass did not undo.");
-                    std::cout << "HM-12 native smoke passed: inspector and clickable node strip, fractional inside/outside matte, "
+                    std::cout << "HM-12 native smoke passed: inspector and clickable node strip, opacity and fractional inside/outside matte, "
                                  "save/reopen, bypass/undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {

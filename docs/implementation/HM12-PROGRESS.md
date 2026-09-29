@@ -20,6 +20,12 @@ fractional alpha across the full scene through a typed `InvertMatte` node.
 Removing the binding also clears inversion. See
 [ADR-039](../architecture/adr/039-layer-cutter-matte.md) and
 [ADR-040](../architecture/adr/040-inverted-cutter-matte.md).
+The derived graph now inserts a typed Opacity node when a Drawing or Part
+has non-unit setup or keyed opacity. The Nodes toolbar edits that existing
+property. The cutter reads source alpha after opacity; target opacity is
+applied before its cutter. This preserves fractional alpha, shared Display
+and Write output, undo and saved transform keys without a new format field.
+See [ADR-043](../architecture/adr/043-typed-layer-opacity-node.md).
 
 ## Verification
 
@@ -40,9 +46,16 @@ Removing the binding also clears inversion. See
   full character copies remap the source.
 - Storage tests load a format-18 matte with Inside as the default and keep a
   readable `.pre-v18.bak` after the first format-19 save.
+- A one-pixel render test checks two Opacity nodes on a cutter and its
+  target: 128/255 target alpha and 64/255 source alpha, each at 50% opacity,
+  produce 8/255 Inside alpha. A keyed target at full opacity yields 16/255;
+  Outside yields 56/255. Display/Write, native edit/undo and save/reopen agree.
+- `--open PROJECT --hm12-smoke` loads the real continuous-character project
+  before the fixture smoke. A missing startup project exits with an error.
+- Local macOS `build/locked`: 165/165 CTest entries and native HM-12 smoke pass.
 
 ## Open contract
 
-The arbitrary editable node graph, Opacity and transform presentation,
+The arbitrary editable node graph, broader transform presentation,
 group ports, group/ungroup and full arm/eye overlap recipe are pending. HM-12
 and its P10 owning phase remain open.

@@ -120,6 +120,51 @@ TEST_CASE("Saved cutter matte clips a layer without painting its source") {
     document.layers.back().visible = false;
     REQUIRE_THROWS(document.validate());
 }
+TEST_CASE("Layer opacity is a typed image node and attenuates fractional cutter alpha") {
+    auto document = makeDocument();
+    document.width = document.height = 1;
+    document.background = {0, 0, 0, 0};
+    auto& target = document.editableDrawing(document.layers.front().id, 0);
+    target.image = ImageAsset{1, 1, {255, 0, 0, 128}};
+    auto& layer = document.layers.front();
+    layer.transform.opacity = .5;
+    Keyframe first, second;
+    first.frame = 0;
+    first.value = layer.transform;
+    second.frame = 12;
+    second.value = layer.transform;
+    second.value.opacity = 1;
+    layer.keys = {first, second};
+    Layer cutter = layer;
+    cutter.id = document.allocateId();
+    cutter.name = "Cutter";
+    cutter.keys.clear();
+    Drawing cutterDrawing = target;
+    cutterDrawing.id = document.allocateId();
+    cutterDrawing.image = ImageAsset{1, 1, {0, 0, 255, 64}};
+    document.drawings.emplace(cutterDrawing.id, cutterDrawing);
+    for (auto& exposure : cutter.exposures)
+        exposure.drawing = cutterDrawing.id;
+    layer.matte = cutter.id;
+    document.layers.push_back(cutter);
+    expose(document.layers.front(), 0, document.duration, target.id);
+    expose(document.layers.back(), 0, document.duration, cutterDrawing.id);
+    document.composition = CompositionProfile::LinearSrgb;
+    document.validate();
+    const auto graph = CompositionGraph::orderedLayers(document);
+    REQUIRE(std::count_if(graph.nodes.begin(), graph.nodes.end(), [](const GraphNode& node) {
+                return node.kind == GraphNodeKind::Opacity;
+            }) == 2);
+    const auto inside = GraphRenderer::render(graph, document, 0, {});
+    REQUIRE(qAlpha(inside.pixel(0, 0)) == 8);
+    REQUIRE(inside == GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Write));
+    REQUIRE(inside == SceneRenderer::render(document, 0));
+    REQUIRE(qAlpha(SceneRenderer::render(document, 12).pixel(0, 0)) == 16);
+    const auto reopened = deserializeDocument(serializeDocument(document));
+    REQUIRE(SceneRenderer::render(reopened, 0) == inside);
+    document.layers.front().invertMatte = true;
+    REQUIRE(qAlpha(SceneRenderer::render(document, 0).pixel(0, 0)) == 56);
+}
 TEST_CASE("Inverted cutter keeps target ink outside its source bounds") {
     auto document = makeDocument();
     document.width = 2;

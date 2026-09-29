@@ -5259,7 +5259,7 @@
   ],
   "execution_policy": {
     "primary_objective": "HM: reliable character animation Harmony Moment",
-    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06, HM-07 and HM-12 remain parked in progress; HM-12 has tested format-19 inside/outside cutter mattes and a derived Nodes workspace. The single implementer is active on eligible HM-10 audio quality and selected-range export after two silent ten-minute CoreAudio scheduling probes. P07/P08/P09/P10 and full feature acceptance remain open.",
+    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06, HM-07 and HM-10 remain parked in progress; HM-10 has band-limited rate conversion, selected-range export and two silent ten-minute CoreAudio scheduling probes. The single implementer is active on eligible HM-12 after format-19 inside/outside cutter mattes and a derived Nodes workspace with animated Opacity nodes. P07/P08/P09/P10 and full feature acceptance remain open.",
     "phase_dependency_semantics": "Phase depends_on constrains full epic completion, not entry into an implementation slice. Only the explicit delivery-slice contract DAG gates the Harmony Moment. Domain dependencies are scope relationships, not all-features barriers.",
     "entry_rule": "Start a slice only when each required contract has accepted evidence. Baseline reuse is partial and must be qualified; planned is not ready. Independent spikes may run without claiming their consumer ready.",
     "wip_limit": 2,
@@ -5322,7 +5322,7 @@
       "Physical tablet, Intel, Linux/Windows or clean-machine qualification",
       "Measured superiority over Harmony before comparative artist study"
     ],
-    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06, HM-07 and HM-12 remain parked in progress; HM-12 has tested format-19 inside/outside cutter mattes and a derived Nodes workspace. The single implementer is active on eligible HM-10 audio quality and selected-range export after two silent ten-minute CoreAudio scheduling probes. P07/P08/P09/P10 and full feature acceptance remain open."
+    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06, HM-07 and HM-10 remain parked in progress; HM-10 has band-limited rate conversion, selected-range export and two silent ten-minute CoreAudio scheduling probes. The single implementer is active on eligible HM-12 after format-19 inside/outside cutter mattes and a derived Nodes workspace with animated Opacity nodes. P07/P08/P09/P10 and full feature acceptance remain open."
   },
   "estimate_revision": {
     "basis": "Whole-program phase envelopes retain prior scope and are not estimates of remaining HM work. HM slice estimates cover remaining bounded work once, including integration; never add them to phase totals.",

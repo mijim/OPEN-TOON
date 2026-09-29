@@ -139,6 +139,30 @@ QImage applyMatte(const QImage& image, const QImage& matte, const RenderOptions&
     }
     return result;
 }
+QImage applyOpacity(const QImage& image, double opacity, QRect bounds,
+                    const RenderOptions& options) {
+    if (opacity >= 1)
+        return image;
+    if (opacity <= 0) {
+        QImage empty(image.size(), QImage::Format_ARGB32_Premultiplied);
+        empty.fill(Qt::transparent);
+        return empty;
+    }
+    bounds = bounds.intersected(QRect(QPoint(0, 0), image.size()));
+    QImage result = image.copy();
+    for (int y = bounds.top(); y <= bounds.bottom(); ++y) {
+        checkCancelled(options);
+        auto* row = reinterpret_cast<QRgb*>(result.scanLine(y));
+        for (int x = bounds.left(); x <= bounds.right(); ++x) {
+            const auto scale = [opacity](int channel) {
+                return std::clamp(int(std::lround(channel * opacity)), 0, 255);
+            };
+            row[x] = qRgba(scale(qRed(row[x])), scale(qGreen(row[x])),
+                            scale(qBlue(row[x])), scale(qAlpha(row[x])));
+        }
+    }
+    return result;
+}
 } // namespace
 QImage GraphRenderer::render(const CompositionGraph& graph, const Document& document,
                              Frame frame, QSize size, RenderOptions options, GraphTarget target) {
@@ -179,6 +203,13 @@ QImage GraphRenderer::render(const CompositionGraph& graph, const Document& docu
     legacy.composition = CompositionProfile::LegacyQt;
     for (auto& layer : legacy.layers)
         layer.matte = 0; // Isolated source render must not re-enter the graph.
+    for (const auto& node : graph.nodes)
+        if (node.kind == GraphNodeKind::Opacity) {
+            auto& layer = legacy.layer(node.layer);
+            layer.transform.opacity = 1;
+            for (auto& key : layer.keys)
+                key.value.opacity = 1;
+        }
     for (const auto id : order) {
         checkCancelled(options);
         if (!needed.contains(id))
@@ -226,6 +257,12 @@ QImage GraphRenderer::render(const CompositionGraph& graph, const Document& docu
         case GraphNodeKind::LayerTransform:
             (void)evaluatedTransform(node, document, frame);
             break;
+        case GraphNodeKind::Opacity: {
+            const double opacity = evaluateTransform(document.layer(node.layer), frame).opacity;
+            image = applyOpacity(input(0), opacity, inputBounds(0), options);
+            bound = opacity > 0 ? inputBounds(0) : QRect{};
+            break;
+        }
         case GraphNodeKind::Over:
             image = over(input(0), input(1), document.composition, options, inputBounds(1));
             bound = inputBounds(0).united(inputBounds(1));

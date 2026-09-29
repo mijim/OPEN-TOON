@@ -1,5 +1,16 @@
 # Experimental releases
 
+## 0.2.0-experimental.23 — working source, typed opacity composition
+
+- Show animated Drawing/Part opacity as a typed node in the derived composition
+  graph and edit the existing property from the Nodes panel. Fractional cutter
+  alpha follows source opacity before Inside or Outside coverage.
+- A one-pixel keyed fixture checks Display/Write, undo and save/reopen; native
+  HM-12 smoke checks opacity editing and a real project startup with `--open`.
+  Missing startup projects fail with a clear error.
+- The local macOS build passes 165 CTest entries. Source only; no new public
+  binary or tag. General editable nodes and part-overlap recipes remain open.
+
 ## 0.2.0-experimental.22 — working source, band-limited upsampling
 
 - Use the same bounded 32-tap, 1,024-phase rate-conversion kernel for

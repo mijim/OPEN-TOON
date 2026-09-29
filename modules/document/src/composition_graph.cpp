@@ -12,6 +12,7 @@ GraphPortType outputType(GraphNodeKind kind) {
     switch (kind) {
     case GraphNodeKind::Background:
     case GraphNodeKind::LayerImage:
+    case GraphNodeKind::Opacity:
     case GraphNodeKind::Over:
     case GraphNodeKind::ApplyMatte:
     case GraphNodeKind::DisplayOutput:
@@ -31,6 +32,8 @@ std::vector<GraphPortType> inputTypes(GraphNodeKind kind) {
     case GraphNodeKind::LayerImage:
     case GraphNodeKind::LayerTransform:
         return {};
+    case GraphNodeKind::Opacity:
+        return {GraphPortType::Image};
     case GraphNodeKind::Over:
         return {GraphPortType::Image, GraphPortType::Image};
     case GraphNodeKind::MatteFromImage:
@@ -56,8 +59,18 @@ CompositionGraph CompositionGraph::orderedLayers(const Document& document) {
     for (const auto& layer : document.layers) {
         if (layer.kind != LayerKind::Drawing && layer.kind != LayerKind::Part)
             continue;
-        sourceIds[layer.id] = next++;
-        graph.nodes.push_back({sourceIds[layer.id], GraphNodeKind::LayerImage, layer.id, {}});
+        const GraphNodeId imageNode = next++;
+        graph.nodes.push_back({imageNode, GraphNodeKind::LayerImage, layer.id, {}});
+        sourceIds[layer.id] = imageNode;
+        const bool hasOpacity = layer.transform.opacity != 1 ||
+            std::any_of(layer.keys.begin(), layer.keys.end(), [](const Keyframe& key) {
+                return key.value.opacity != 1;
+            });
+        if (hasOpacity) {
+            sourceIds[layer.id] = next++;
+            graph.nodes.push_back({sourceIds[layer.id], GraphNodeKind::Opacity, layer.id,
+                                   {{imageNode, 0}}});
+        }
         if (layer.matte)
             matteSources.insert(layer.matte);
     }
@@ -99,8 +112,13 @@ void CompositionGraph::validate(const Document& document) const {
         if (!node.id || !indexed.emplace(node.id, &node).second)
             throw std::invalid_argument("Duplicate or invalid compositor node ID.");
         (void)outputType(node.kind);
-        if (node.kind == GraphNodeKind::LayerImage || node.kind == GraphNodeKind::LayerTransform)
-            (void)document.layer(node.layer);
+        if (node.kind == GraphNodeKind::LayerImage || node.kind == GraphNodeKind::LayerTransform ||
+            node.kind == GraphNodeKind::Opacity) {
+            const auto& layer = document.layer(node.layer);
+            if (node.kind == GraphNodeKind::Opacity && layer.kind != LayerKind::Drawing &&
+                layer.kind != LayerKind::Part)
+                throw std::invalid_argument("Opacity node requires a drawing source.");
+        }
         else if (node.layer)
             throw std::invalid_argument("This compositor node cannot reference a layer.");
     }

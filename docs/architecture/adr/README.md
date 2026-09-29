@@ -130,3 +130,6 @@ band-limited filter used when PCM source and output rates differ.
 
 See [ADR-042](042-selected-audio-export-range.md) for half-open frame-range
 PCM WAV export and exact rational sample boundaries.
+
+See [ADR-043](043-typed-layer-opacity-node.md) for the derived Image → Opacity
+node, its existing animated layer property and fractional cutter ordering.

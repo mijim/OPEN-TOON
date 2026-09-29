@@ -25,7 +25,7 @@ Item {
                 font.letterSpacing: 1
             }
             Label {
-                text: "Select a Drawing node to edit its order or cutter"
+                text: "Select a Drawing node to edit order, opacity or cutter"
                 color: "#777777"
                 font.pixelSize: 10
             }
@@ -66,6 +66,16 @@ Item {
                 onClicked: root.controller.setMatteInverted(checked)
                 Accessible.name: "Invert selected cutter matte"
             }
+            PropertyNumber {
+                objectName: "nodeOpacity"
+                implicitWidth: 88
+                visible: root.selected && (root.selected.kind === 0 || root.selected.kind === 3)
+                enabled: visible && !root.selected?.locked
+                number: root.controller.transform.opacity === undefined
+                        ? 1 : root.controller.transform.opacity
+                label: "Selected drawing opacity 0–1"
+                onCommitted: value => root.controller.setTransform("opacity", value)
+            }
         }
         Rectangle { Layout.fillWidth: true; height: 1; color: "#303030" }
         Flickable {
@@ -93,6 +103,7 @@ Item {
                         color: modelData.layer === root.controller.selectedLayer && modelData.layer > 0
                                ? "#292929" : "#181818"
                         border.color: modelData.kind === "Cutter" ||
+                                      modelData.kind === "Opacity" ||
                                       modelData.kind === "Invert matte" ||
                                       modelData.kind === "Apply matte"
                                       ? "#7b7b7b" : "#393939"
