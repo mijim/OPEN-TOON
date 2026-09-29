@@ -109,6 +109,64 @@ TEST_CASE("Direct drawing reorder changes pixels atomically and survives reopen"
     editor.toggleLayer(int(red), "locked");
     REQUIRE_FALSE(editor.moveDrawingAfter(int(blue), int(red)));
     REQUIRE(editor.document().layers.back().id == red);
+    REQUIRE_FALSE(editor.moveDrawingBefore(int(blue), int(red)));
+    editor.toggleLayer(int(green), "locked");
+    editor.toggleLayer(int(red), "locked");
+    REQUIRE_FALSE(editor.moveDrawingBefore(int(red), int(red)));
+    REQUIRE_FALSE(editor.moveDrawingBefore(999999, int(blue)));
+    REQUIRE(editor.moveDrawingBefore(int(red), int(blue)));
+    REQUIRE(editor.document().layers[1].id == red);
+    REQUIRE(editor.document().layers.back().id == blue);
+    REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    REQUIRE_FALSE(editor.moveDrawingBefore(int(red), int(blue)));
+    editor.undo();
+    REQUIRE(editor.document().layers.back().id == red);
+    REQUIRE(qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    editor.redo();
+    REQUIRE(editor.saveProject({}));
+    REQUIRE(editor.openProject(path));
+    REQUIRE(editor.document().layers[1].id == red);
+    REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+}
+TEST_CASE("A Part crosses behind and in front of the torso with stable saved pixels") {
+    auto document = opentoon::makeDocument();
+    document.width = document.height = 1;
+    document.background = {0, 0, 0, 0};
+    const auto torso = document.layers.front().id;
+    document.editableDrawing(torso, 0).image = opentoon::ImageAsset{1, 1, {255, 0, 0, 255}};
+    auto arm = document.layers.front();
+    arm.id = document.allocateId();
+    arm.name = "Arm";
+    const auto armId = arm.id;
+    auto armDrawing = document.drawings.at(arm.exposures.front().drawing);
+    armDrawing.id = document.allocateId();
+    armDrawing.image = opentoon::ImageAsset{1, 1, {0, 0, 255, 255}};
+    document.drawings.emplace(armDrawing.id, armDrawing);
+    arm.exposures.front().drawing = armDrawing.id;
+    const auto root = opentoon::makeCharacter(document, torso, "Character");
+    document.layers.push_back(arm);
+    opentoon::attachDrawingAsPart(document, armId, root, "Arm");
+    document.validate();
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto path = QUrl::fromLocalFile(directory.filePath("part-overlap.otoon"));
+    REQUIRE(opentoon::ProjectStore::save(std::filesystem::path(path.toLocalFile().toStdString()),
+                                         document) > 0);
+    EditorController editor;
+    REQUIRE(editor.openProject(path));
+    REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    REQUIRE(editor.moveDrawingBefore(int(armId), int(torso)));
+    REQUIRE(editor.document().layer(armId).parent == root);
+    REQUIRE(qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    editor.undo();
+    REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    editor.redo();
+    REQUIRE(editor.saveProject({}));
+    REQUIRE(editor.openProject(path));
+    REQUIRE(editor.document().layer(armId).parent == root);
+    REQUIRE(qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    REQUIRE(editor.moveDrawingAfter(int(armId), int(torso)));
+    REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
 }
 namespace {
 const QString partFixture = QStringLiteral(OPENTOON_SOURCE_DIR "/tests/fixtures/harmony-moment/parts/");

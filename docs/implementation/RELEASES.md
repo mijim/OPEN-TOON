@@ -1,5 +1,14 @@
 # Experimental releases
 
+## 0.2.0-experimental.52 — working source, direct behind order
+
+- Shift-drag a Drawing or Part card onto another to place it immediately
+  behind the target. Ordinary drag still places it in front; Alt-drag still
+  connects a cutter. One command owns each move.
+- A two-Part arm/torso fixture and native Qt Quick drag check the visible
+  overlap, parent identity, undo/redo and reopened pixels. The macOS suite
+  passes 191/191 CTest entries. Source only; no public binary or tag.
+
 ## 0.2.0-experimental.51 — working source, composite bypass
 
 - Format 30 saves a Drawing/Part composite bypass. The layer stops painting

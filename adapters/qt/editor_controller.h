@@ -235,6 +235,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE void toggleLayer(int, QString);
     Q_INVOKABLE void moveLayer(int);
     Q_INVOKABLE bool moveDrawingAfter(int sourceLayer, int targetLayer);
+    Q_INVOKABLE bool moveDrawingBefore(int sourceLayer, int targetLayer);
     Q_INVOKABLE void setParent(int);
     Q_INVOKABLE bool setLayerMatte(int sourceLayer);
     Q_INVOKABLE bool setMatteInverted(bool inverted);

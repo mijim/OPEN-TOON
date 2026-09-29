@@ -66,9 +66,13 @@ Control part overlap with fine depth adjustments.
 
 **Initial acceptance:** An arm can move in front of and behind the torso with stable results.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM12-PROGRESS.md](../../../docs/implementation/HM12-PROGRESS.md) — Part torso/arm pixel-order test, native Shift-drag, one-step undo and save/reopen.
+
+**Remaining scope:** A Drawing or Part can be placed immediately in front of or behind another with a direct Nodes-card drag. A one-pixel Part overlap crosses an arm and torso with undo and reopened pixels. Animated per-frame depth, finer depth controls and joint overlap recipes remain open.
 
 ## RIG-005 — Joints and Auto Patch
 

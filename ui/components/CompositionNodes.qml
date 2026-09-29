@@ -95,7 +95,7 @@ Item {
                 font.letterSpacing: 1
             }
             Label {
-                text: "Drag: order · Alt-drag: cutter · Alt-click: bypass"
+                text: "Drag: in front · Shift-drag: behind · Alt-drag: cutter · Alt-click: bypass"
                 color: "#777777"
                 font.pixelSize: 10
             }
@@ -319,11 +319,13 @@ Item {
                             preventStealing: modelData.kind === "Drawing"
                             property bool dragging: false
                             property bool dragCutter: false
+                            property bool dragBehind: false
                             property real downX: 0
                             property real downY: 0
                             onPressed: mouse => {
                                 dragging = false
                                 dragCutter = (mouse.modifiers & Qt.AltModifier) !== 0
+                                dragBehind = !dragCutter && (mouse.modifiers & Qt.ShiftModifier) !== 0
                                 downX = mouse.x
                                 downY = mouse.y
                             }
@@ -352,7 +354,10 @@ Item {
                                         root.controller.setLayerMatte(source)
                                     } else {
                                         root.layerChosen(source)
-                                        root.controller.moveDrawingAfter(source, target)
+                                        if (dragBehind)
+                                            root.controller.moveDrawingBefore(source, target)
+                                        else
+                                            root.controller.moveDrawingAfter(source, target)
                                     }
                                 }
                             }

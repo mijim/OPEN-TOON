@@ -59,6 +59,11 @@ highlights; the operation rejects missing, same and locked layers. The
 document command is atomic, with undo/redo and save/reopen. This edits layer
 order through the derived Nodes presentation; arbitrary node placement and
 wiring remain open.
+Holding Shift during the drag places the source immediately behind the target.
+The same command boundary accepts Drawing and Part layers. A saved two-Part
+torso/arm scene switches the visible overlap in both directions while retaining
+the character parent and exact reopened pixels. Static layer order is saved;
+animated per-frame depth and joint recipes remain open.
 Alt-dragging a Drawing card onto another binds the first as the second's
 cutter source through the existing validated document command. Its fractional
 alpha, saved references and one-step undo use the same path as the inspector.
@@ -170,6 +175,10 @@ preview. This is diagnostic navigation, not a persisted graph edit.
   invalid/same/locked targets, one-step undo/redo and save/reopen. Native Qt
   Quick smoke drags a Drawing card onto a second card, observes the target
   highlight and checks the new output pixels before and after undo/reopen.
+- A two-Part torso/arm fixture checks direct front/behind order, character
+  parent identity, pixel output, one-step undo/redo and reopened output. Native
+  Qt Quick smoke Shift-drags a Drawing behind another, checks the drop target,
+  color, undo/redo and save/reopen.
 - Native Qt Quick smoke Alt-drags a Drawing source onto a Drawing target,
   checks the target binding and output color, then undoes, redoes and reopens.
 - Native Qt Quick smoke Alt-clicks Apply matte to bypass, undoes, redoes and

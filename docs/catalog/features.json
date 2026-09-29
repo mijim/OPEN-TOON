@@ -2478,7 +2478,7 @@
         "An arm can move in front of and behind the torso with stable results."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "rigging",
@@ -2487,7 +2487,8 @@
         "VEC"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "A Drawing or Part can be placed immediately in front of or behind another with a direct Nodes-card drag. A one-pixel Part overlap crosses an arm and torso with undo and reopened pixels. Animated per-frame depth, finer depth controls and joint overlap recipes remain open.",
+      "implementation_evidence": "docs/implementation/HM12-PROGRESS.md; Part torso/arm pixel-order test, native Shift-drag, one-step undo and save/reopen"
     },
     {
       "id": "RIG-005",
@@ -3445,8 +3446,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The derived graph offers clickable image/matte previews, name/kind search and direct Drawing-card reordering of saved composite order. Arbitrary node creation, wiring, deletion and layout remain open.",
-      "implementation_evidence": "docs/implementation/HM12-PROGRESS.md; native Drawing-card drag, typed search/navigation, pixel order, undo/reopen and invalid-target checks"
+      "notes": "The derived graph offers clickable image/matte previews, name/kind search and direct front/behind Drawing-card reordering of saved composite order. Arbitrary node creation, wiring, deletion and layout remain open.",
+      "implementation_evidence": "docs/implementation/HM12-PROGRESS.md; native front/behind Drawing-card drags, typed search/navigation, Part pixel order, undo/reopen and invalid-target checks"
     },
     {
       "id": "NOD-002",

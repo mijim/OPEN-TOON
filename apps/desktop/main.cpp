@@ -886,8 +886,50 @@ int main(int argc, char** argv) {
                             std::to_string(editor.document().layer(blue).compositeBypassed) +
                             " search=" + search->property("text").toString().toStdString() +
                             " scroll=" + std::to_string(strip->property("contentX").toDouble()));
+                    const auto behindPath = directory.filePath("behind.otoon");
+                    (void)opentoon::ProjectStore::save(
+                        std::filesystem::path(behindPath.toStdString()), reordered);
+                    if (!editor.openProject(QUrl::fromLocalFile(behindPath)))
+                        throw std::runtime_error("Cannot open direct behind-order fixture.");
+                    search->setProperty("text", "");
+                    strip->setProperty("contentX", 0);
+                    QCoreApplication::processEvents();
+                    (void)window->grabWindow();
+                    redCard = findDrawingCard(int(red));
+                    blueCard = findDrawingCard(int(blue));
+                    if (!redCard || !blueCard)
+                        throw std::runtime_error("Behind-order Drawing cards are unavailable.");
+                    const auto behindFrom = blueCard->mapToScene(QPointF(blueCard->width() / 2, 30));
+                    const auto behindTo = redCard->mapToScene(QPointF(redCard->width() / 2, 30));
+                    const auto shiftMove = [&](QEvent::Type type, QPointF point,
+                                               Qt::MouseButtons buttons) {
+                        QMouseEvent event(type, point, window->mapToGlobal(point.toPoint()),
+                                          type == QEvent::MouseMove ? Qt::NoButton : Qt::LeftButton,
+                                          buttons, Qt::ShiftModifier);
+                        QCoreApplication::sendEvent(window, &event);
+                        QCoreApplication::processEvents();
+                    };
+                    shiftMove(QEvent::MouseButtonPress, behindFrom, Qt::LeftButton);
+                    shiftMove(QEvent::MouseMove, behindFrom + QPointF(16, 0), Qt::LeftButton);
+                    shiftMove(QEvent::MouseMove, behindTo, Qt::LeftButton);
+                    if (nodes->property("draggedLayer").toInt() != int(blue) ||
+                        nodes->property("dropLayer").toInt() != int(red))
+                        throw std::runtime_error("Shift-drag did not target the behind-order card.");
+                    shiftMove(QEvent::MouseButtonRelease, behindTo, Qt::NoButton);
+                    if (editor.document().layers.front().id != blue ||
+                        qGreen(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Shift-drag did not place Blue behind Red and Green.");
+                    editor.undo();
+                    if (editor.document().layers.back().id != blue ||
+                        qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Shift-drag behind order did not undo atomically.");
+                    editor.redo();
+                    if (!editor.saveProject({}) || !editor.openProject(QUrl::fromLocalFile(behindPath)) ||
+                        editor.document().layers.front().id != blue ||
+                        qGreen(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Shift-drag behind order changed after reopen.");
                     std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass, fractional cutter, "
-                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, drawing drag order, Alt-drag cutter, Alt-click bypass, typed search, save/reopen and undo.\n";
+                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, Alt-drag cutter, Alt-click bypass, typed search, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

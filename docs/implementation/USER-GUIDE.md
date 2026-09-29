@@ -36,7 +36,7 @@ to the scene. This is
 view state: saving and exporting still use the final Write output. Type a layer
 name or node kind in **Find node** to highlight and scroll to a match; press
 Enter or **Next** for the following match. Search does not edit the project. The tab can
-change drawing order, opacity, opacity bypass, Normal/Multiply/Screen/Add blend mode, blend bypass, composite bypass and cutter settings. Drag a Drawing card onto another to place it immediately above that target in composite order. Hold Alt while dragging to use the first Drawing as the target's cutter. Alt-click an Opacity, Apply matte, blend or Composite card to toggle its saved bypass. Bypassing a Composite removes that layer's ink while preserving its image for cutters. The target card highlights during a drag. Invalid or locked references reject the edit. Select a Drawing or Part,
+change drawing order, opacity, opacity bypass, Normal/Multiply/Screen/Add blend mode, blend bypass, composite bypass and cutter settings. Drag a Drawing or Part card onto another to place it immediately in front of the target; hold Shift during the drag to place it behind. Hold Alt while dragging to use the first Drawing or Part as the target's cutter. Alt-click an Opacity, Apply matte, blend or Composite card to toggle its saved bypass. Bypassing a Composite removes that layer's ink while preserving its image for cutters. The target card highlights during a drag. Invalid or locked references reject the edit. Select a Drawing or Part,
 choose a visible source in **Cutter matte**, then use **Outside**, **Bypass**
 or **Paint cutter source** as needed. The last option keeps the source visible
 at its normal layer order while it masks the selected target; it is shared by
