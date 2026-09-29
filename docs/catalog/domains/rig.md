@@ -84,9 +84,9 @@ Resolve joints and hide lines between overlapping parts.
 
 **Specification source:** `manual editable Part patch; animated opaque output at two keyed frames`.
 
-**Implementation evidence:** [docs/implementation/HM12-PROGRESS.md](../../../docs/implementation/HM12-PROGRESS.md) — animated arm/torso pixel test, editor undo/reopen and native Qt Quick recipe smoke.
+**Implementation evidence:** [docs/implementation/HM12-PROGRESS.md](../../../docs/implementation/HM12-PROGRESS.md) — animated arm/torso pixel test, editor undo/reopen and native Qt Quick inspector plus Control+Alt Part-card drag smoke.
 
-**Remaining scope:** A private editable source-Part copy can cover a selected Part above its composite group. The animator erases surplus ink; automatic overlap detection, contour repair and broader bend quality remain open.
+**Remaining scope:** A private editable source-Part copy can cover a selected Part above its composite group. Control+Alt Part-card drag creates the same patch. The animator erases surplus ink; automatic overlap detection, contour repair and broader bend quality remain open.
 
 ## RIG-006 — Drawing substitutions
 

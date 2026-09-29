@@ -139,6 +139,8 @@ keeps full alpha with a blue seam patch at frames 0 and 12. Domain, editor and
 native Qt Quick checks cover independent copy, pixels, undo/redo and reopen.
 This manual recipe has no automatic overlap detection or bent-contour repair;
 see [ADR-063](../architecture/adr/063-manual-joint-patch.md).
+Control+Alt-drag between Part cards invokes the same command directly. Native
+pointer smoke checks the resulting pixels, undo/redo and reopened project.
 Alt-dragging a Drawing card onto another binds the first as the second's
 cutter source through the existing validated document command. Its fractional
 alpha, saved references and one-step undo use the same path as the inspector.

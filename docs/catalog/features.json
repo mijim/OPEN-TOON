@@ -2508,8 +2508,8 @@
         "VEC"
       ],
       "specification_status": "analysis_draft",
-      "notes": "A private editable source-Part copy can cover a selected Part above its composite group. The animator erases surplus ink; automatic overlap detection, contour repair and broader bend quality remain open.",
-      "implementation_evidence": "docs/implementation/HM12-PROGRESS.md; animated arm/torso pixel test, editor undo/reopen and native Qt Quick recipe smoke"
+      "notes": "A private editable source-Part copy can cover a selected Part above its composite group. Control+Alt Part-card drag creates the same patch. The animator erases surplus ink; automatic overlap detection, contour repair and broader bend quality remain open.",
+      "implementation_evidence": "docs/implementation/HM12-PROGRESS.md; animated arm/torso pixel test, editor undo/reopen and native Qt Quick inspector plus Control+Alt Part-card drag smoke"
     },
     {
       "id": "RIG-006",

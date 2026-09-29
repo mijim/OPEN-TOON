@@ -101,16 +101,16 @@ skipped polled playhead frames, respectively. These counters do not measure
 speaker underruns or actual
 presented-frame drops.
 
-The working source version is `0.2.0-experimental.63`; no new binary or source
+The working source version is `0.2.0-experimental.64`; no new binary or source
 tag has been published for it. The last locally qualified macOS preview and
 earlier binaries do not qualify these source changes.
 
-The owner resumed development after the earlier 10:30 CEST cutoff. The `.63`
+The owner resumed development after the earlier 10:30 CEST cutoff. The `.64`
 locked macOS build passes 202/202 CTest entries and native HM-12 smoke,
 including contiguous group input/output ports, matte-only source pixels,
 grouping/rename/ungroup, direct edge-member edits, whole-group order, bypass
 and independent duplication,
-operator search/apply, private editable cutter copies, a manual editable Part joint patch, dependency collection with closed matte/group references,
+operator search/apply, private editable cutter copies, a manual editable Part joint patch with direct Control+Alt card drag, dependency collection with closed matte/group references,
 undo/redo and save/reopen. Earlier native smokes and
 artistic checks are recorded in prior
 release entries. HM-12 remains an unfinished bounded contract; next work can

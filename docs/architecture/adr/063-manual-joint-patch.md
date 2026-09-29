@@ -21,6 +21,8 @@ command. The animator edits or erases copied ink to define the patch.
 The recipe uses existing Part, drawing and composite order fields; the project
 format does not change. It does not infer a patch silhouette, repair bent
 contours automatically, or promise seam quality across arbitrary poses.
+Control+Alt-dragging a Part source card onto the target Part card invokes the
+same command as the inspector recipe; it adds no separate document semantics.
 
 ## Verification
 
@@ -28,3 +30,5 @@ An alpha-half arm over an opaque torso is checked at two keyed positions for
 opaque output and visible overlap. Domain and editor tests check independent
 artwork, view/pose/mesh closure, grouping, undo/redo and save/reopen; native Qt
 Quick smoke clicks the recipe and repeats pixel, undo and reopen checks.
+Native pointer smoke also drags between Part cards and checks the same output,
+undo and reopen behavior.

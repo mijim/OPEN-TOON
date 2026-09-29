@@ -1,5 +1,14 @@
 # Experimental releases
 
+## 0.2.0-experimental.64 — working source, direct joint patch gesture
+
+- Control+Alt-dragging a leaf Part card onto another Part in Nodes creates the
+  editable manual joint patch directly. The existing character, visibility,
+  matte and group checks still run through the same document command.
+- Native Qt Quick pointer input verifies a Part-card drag, overlap pixels,
+  atomic undo/redo and ProjectStore reopen. The locked macOS suite passes
+  202/202 CTest entries and HM-12 smoke. Source only.
+
 ## 0.2.0-experimental.63 — working source, editable joint patch
 
 - Nodes can copy a visible leaf Part above another Part in the same character

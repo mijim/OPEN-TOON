@@ -386,7 +386,7 @@ Item {
             }
             Label {
                 Layout.fillWidth: true
-                text: "The patch follows source motion; erase unwanted copied ink."
+                text: "The patch follows source motion; erase unwanted ink. Control+Alt-drag Part cards to create it."
                 color: "#777777"
                 font.pixelSize: 10
             }
@@ -478,6 +478,7 @@ Item {
                             property bool dragging: false
                             property bool dragCutter: false
                             property bool dragPrivateCutter: false
+                            property bool dragJointPatch: false
                             property bool dragBehind: false
                             property real downX: 0
                             property real downY: 0
@@ -485,7 +486,12 @@ Item {
                                 dragging = false
                                 dragCutter = modelData.kind === "Drawing" &&
                                              (mouse.modifiers & Qt.AltModifier) !== 0
+                                dragJointPatch = dragCutter &&
+                                                 (mouse.modifiers & Qt.ControlModifier) !== 0 &&
+                                                 root.controller.layers.some(l =>
+                                                     l.id === modelData.layer && l.kind === 3)
                                 dragPrivateCutter = dragCutter &&
+                                                    !dragJointPatch &&
                                                     (mouse.modifiers & Qt.ShiftModifier) !== 0
                                 dragBehind = !dragCutter && (mouse.modifiers & Qt.ShiftModifier) !== 0
                                 downX = mouse.x
@@ -511,12 +517,16 @@ Item {
                                 const group = root.draggedGroup
                                 const target = root.dropLayer
                                 const privateCutter = dragPrivateCutter
+                                const jointPatch = dragJointPatch
                                 root.draggedLayer = 0
                                 root.draggedGroup = 0
                                 root.dropLayer = 0
                                 if (dragging && target > 0) {
                                     if (group > 0) {
                                         root.controller.moveCompositeGroup(group, target, dragBehind)
+                                    } else if (jointPatch) {
+                                        root.layerChosen(target)
+                                        root.controller.createJointPatch(source)
                                     } else if (dragCutter) {
                                         const panel = root
                                         panel.layerChosen(target)

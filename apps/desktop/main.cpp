@@ -1304,8 +1304,50 @@ int main(int argc, char** argv) {
                         !editor.openProject(QUrl::fromLocalFile(jointPath)) ||
                         qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
                         throw std::runtime_error("Joint patch changed after save and reopen.");
+                    const auto gesturePath = directory.filePath("joint-patch-gesture.otoon");
+                    if (!opentoon::ProjectStore::save(
+                            std::filesystem::path(gesturePath.toStdString()), joint) ||
+                        !editor.openProject(QUrl::fromLocalFile(gesturePath)))
+                        throw std::runtime_error("Cannot open direct joint patch fixture.");
+                    strip->setProperty("contentX", 0);
+                    QCoreApplication::processEvents();
+                    (void)window->grabWindow();
+                    auto* armJointCard = findDrawingCard(int(armPartId));
+                    auto* torsoJointCard = findDrawingCard(int(torsoPart));
+                    if (!armJointCard || !torsoJointCard || !armJointCard->isVisible() ||
+                        !torsoJointCard->isVisible())
+                        throw std::runtime_error("Part cards are unavailable for patch drag.");
+                    const auto patchFrom = armJointCard->mapToScene(QPointF(
+                        armJointCard->width() / 2, 30));
+                    const auto patchTo = torsoJointCard->mapToScene(QPointF(
+                        torsoJointCard->width() / 2, 30));
+                    const auto patchMove = [&](QEvent::Type type, QPointF point,
+                                               Qt::MouseButtons buttons) {
+                        QMouseEvent event(type, point, window->mapToGlobal(point.toPoint()),
+                                          type == QEvent::MouseMove ? Qt::NoButton : Qt::LeftButton,
+                                          buttons, Qt::AltModifier | Qt::ControlModifier);
+                        QCoreApplication::sendEvent(window, &event);
+                        QCoreApplication::processEvents();
+                    };
+                    patchMove(QEvent::MouseButtonPress, patchFrom, Qt::LeftButton);
+                    patchMove(QEvent::MouseMove, patchFrom + QPointF(16, 0), Qt::LeftButton);
+                    patchMove(QEvent::MouseMove, patchTo, Qt::LeftButton);
+                    patchMove(QEvent::MouseButtonRelease, patchTo, Qt::NoButton);
+                    const auto gesturePatch = opentoon::Id(editor.selectedLayer());
+                    if (gesturePatch == torsoPart ||
+                        editor.document().layer(gesturePatch).role != "Arm patch" ||
+                        qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Control+Alt-drag did not create an editable patch.");
+                    editor.undo();
+                    if (qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Direct joint patch did not undo atomically.");
+                    editor.redo();
+                    if (!editor.saveProject({}) ||
+                        !editor.openProject(QUrl::fromLocalFile(gesturePath)) ||
+                        qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Direct joint patch changed after reopen.");
                     std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass, fractional cutter, "
-                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, group order, member edits, bypass, duplicate and ungroup ports, Alt-drag cutter, Alt+Shift-drag private cutter, editable joint patch, Alt-click bypass, operator library search/apply, explicit source deletion, typed node search, save/reopen and undo.\n";
+                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, group order, member edits, bypass, duplicate and ungroup ports, Alt-drag cutter, Alt+Shift-drag private cutter, editable joint patch and direct Control+Alt-drag, Alt-click bypass, operator library search/apply, explicit source deletion, typed node search, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';
