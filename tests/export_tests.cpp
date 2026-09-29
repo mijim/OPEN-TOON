@@ -1,6 +1,7 @@
 #include "editor_controller.h"
 #include "opentoon/rigging.h"
 #include "opentoon/character_pose.h"
+#include "opentoon/audio.h"
 #include "project_store.h"
 #include "scene_renderer.h"
 #include <QCoreApplication>
@@ -45,7 +46,59 @@ QJsonObject manifest(const QDir& root, QString folder) {
     REQUIRE(file.open(QIODevice::ReadOnly));
     return QJsonDocument::fromJson(file.readAll()).object();
 }
+QByteArray audioCueWav() {
+    QByteArray bytes;
+    auto u16 = [&](quint16 value) { bytes.append(char(value & 255)); bytes.append(char(value >> 8)); };
+    auto u32 = [&](quint32 value) { u16(value & 65535); u16(value >> 16); };
+    bytes.append("RIFF", 4); u32(36 + 48000 * 2); bytes.append("WAVEfmt ", 8);
+    u32(16); u16(1); u16(1); u32(48000); u32(96000); u16(2); u16(16);
+    bytes.append("data", 4); u32(48000 * 2);
+    for (int sample = 0; sample < 48000; ++sample)
+        u16(sample == 2002 ? 32767 : 0);
+    return bytes;
+}
 } // namespace
+TEST_CASE("Editor imports a WAV cue, draws exact frame peaks, edits and reopens") {
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto path = directory.filePath("cue.wav");
+    QFile file(path);
+    REQUIRE(file.open(QIODevice::WriteOnly));
+    REQUIRE(file.write(audioCueWav()) == 44 + 48000 * 2);
+    file.close();
+    EditorController editor;
+    editor.newScene();
+    editor.setFrame(0);
+    const auto before = editor.document();
+    const auto url = QUrl::fromLocalFile(path);
+    REQUIRE(editor.importAudio(url));
+    REQUIRE(editor.audioClips().size() == 1);
+    const int clip = editor.audioClips().front().toMap().value("id").toInt();
+    const auto peaks = editor.audioWaveform(clip, 0, 3);
+    REQUIRE(peaks.size() == 3);
+    REQUIRE(peaks[0].toDouble() == 0);
+    REQUIRE(peaks[1].toDouble() > 0.99);
+    REQUIRE(peaks[2].toDouble() == 0);
+    REQUIRE(editor.moveAudioClip(clip, 8));
+    REQUIRE(editor.trimAudioClip(clip, 2002, 4000));
+    REQUIRE(editor.setAudioClipGain(clip, 0.5));
+    REQUIRE(editor.audioWaveform(clip, 8, 1).front().toDouble() > 0.49);
+    const auto edited = editor.document();
+    REQUIRE(editor.saveProject(QUrl::fromLocalFile(directory.filePath("audio.otoon"))));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(QUrl::fromLocalFile(directory.filePath("audio.otoon"))));
+    REQUIRE(reopened.document() == edited);
+    REQUIRE(reopened.audioWaveform(clip, 8, 1).front().toDouble() > 0.49);
+    editor.undo(); // Gain.
+    REQUIRE(editor.audioClips().front().toMap().value("gain").toDouble() == 1);
+    REQUIRE_FALSE(editor.importAudio(QUrl::fromLocalFile(directory.filePath("missing.wav"))));
+    REQUIRE(editor.document().audioAssets.size() == 1);
+    REQUIRE(editor.removeAudioClip(clip));
+    REQUIRE(editor.document().audioClips.empty());
+    editor.undo();
+    REQUIRE(editor.document().audioClips.size() == 1);
+    REQUIRE(before.audioAssets.empty());
+}
 TEST_CASE("Registered PNG parts preserve a shared canvas and undo as one edit") {
     EditorController editor;
     editor.newScene();

@@ -51,9 +51,9 @@
     },
     {
       "id": "P07",
-      "status": "planned",
-      "available": "Exact rational frame-to-sample arithmetic has a domain test; no audio playback.",
-      "remaining": "Audio decode/timeline/waveform/sync, mouth mapping/manual lip correction, optional detection, media policies, FFmpeg adapter and video output."
+      "status": "in_progress",
+      "available": "Format-16 original mono/stereo PCM16 WAV assets, undoable clips with frame placement, half-open source-sample trim and linear gain, and sample-aligned waveform rows in the timeline. Exact rational frame-to-sample positions, invalid-file rejection, save/reopen and source-version migration backup pass local tests.",
+      "remaining": "Audio-device playback and clock, scrubbing, rate conversion, limited mixing, waveform pyramids, repeat, ten-minute audiovisual qualification, mouth mapping/manual lip correction, optional detection, media policies, FFmpeg adapter and video output."
     },
     {
       "id": "P08",
@@ -84,7 +84,7 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 143,
+      "count": 147,
       "command": "ctest --test-dir build/locked --output-on-failure -j6"
     },
     "native_input_workflow": {
@@ -248,7 +248,7 @@
         "animated orthographic camera matches reopened preview and two exported PNG frames"
       ]
     },
-    "total_local_ctest_entries": 143,
+    "total_local_ctest_entries": 147,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -427,6 +427,13 @@
         ],
         "limits": "48-frame scene without audio or matte nodes; full 480-frame control latency not qualified"
       }
+    },
+    "pcm_audio_timing": {
+      "status": "passed_subset",
+      "scope": "Format-16 original PCM16 WAV assets, clip placement/trim/gain, sample-aligned timeline waveform, invalid import rejection, undo/redo, save/reopen and format-15 backup",
+      "command": "build/locked/open-toon.app/Contents/MacOS/open-toon --hm10-smoke",
+      "screenshot": "build/hm10-audio-smoke.png",
+      "limits": "Visual timing only; no audio device playback, sample-rate conversion, mixing, scrub or sound export."
     }
   },
   "ownership": {
@@ -440,7 +447,7 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.15",
+  "version": "0.2.0-experimental.16",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
@@ -450,7 +457,7 @@
   "planning_priority": {
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
-    "state": "HM-00_through_HM-05_and_HM-13_complete__HM-06_parked_in_progress__HM-07_active_in_progress",
-    "note": "HM-06 continuous deformation remains an unaccepted working subset; owner-directed HM-07 named poses and published controls are active. HM-10 and HM-12 remain eligible independent slices after the current bounded block. Full P08/P09 feature and phase acceptance remain open."
+    "state": "HM-00_through_HM-05_and_HM-13_complete__HM-06_and_HM-07_parked_in_progress__HM-10_active_in_progress",
+    "note": "HM-06 continuous deformation and HM-07 named controls remain unaccepted working subsets, parked while the single implementer advances HM-10. Format-16 PCM16 import, clip editing and waveform pass locally; playback and the full audio clock contract remain open. HM-12 remains eligible. Full P07/P08/P09 feature and phase acceptance remain open."
   }
 }

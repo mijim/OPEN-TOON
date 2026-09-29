@@ -48,7 +48,9 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
               {"layers", Json::array()},
               {"drawings", Json::array()},
               {"palette", Json::array()},
-              {"markers", Json::array()}};
+              {"markers", Json::array()},
+              {"audioAssets", Json::array()},
+              {"audioClips", Json::array()}};
     for (auto s : d.palette)
         j["palette"].push_back({{"id", s.id}, {"name", s.name}, {"color", color(s.color)}});
     for (const auto& [id, drawing] : d.drawings) {
@@ -198,6 +200,20 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
     }
     for (const auto& m : d.markers)
         j["markers"].push_back({m.frame, m.name});
+    for (const auto& asset : d.audioAssets) {
+        Json entry = {{"id", asset.id}, {"name", asset.name},
+                      {"sampleRate", asset.sampleRate}, {"channels", asset.channels},
+                      {"sampleFrames", asset.sampleFrames}};
+        if (write)
+            entry["resource"] = write({asset.wav.data(), asset.wav.size()});
+        else
+            entry["wav"] = asset.wav.values();
+        j["audioAssets"].push_back(std::move(entry));
+    }
+    for (const auto& clip : d.audioClips)
+        j["audioClips"].push_back({{"id", clip.id}, {"asset", clip.asset},
+                                   {"start", clip.start}, {"inSample", clip.inSample},
+                                   {"outSample", clip.outSample}, {"gain", clip.gain}});
     return j.dump();
 }
 Document deserializeDocument(const std::string& text, ResourceReader read) {
@@ -229,6 +245,30 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
     limit(j.at("drawings"), 50000);
     limit(j.at("layers"), 2000);
     limit(j.at("markers"), 1000000);
+    if (j.at("version").get<int>() >= 16) {
+        limit(j.at("audioAssets"), 64);
+        limit(j.at("audioClips"), 1000);
+        std::size_t audioBytes = 0;
+        for (const auto& entry : j.at("audioAssets")) {
+            std::vector<std::uint8_t> bytes;
+            if (entry.contains("resource")) {
+                if (!read)
+                    throw std::runtime_error("An external audio resource resolver is required.");
+                bytes = read(entry.at("resource"));
+            } else
+                bytes = entry.at("wav").get<std::vector<std::uint8_t>>();
+            audioBytes += bytes.size();
+            if (bytes.size() > 128 * 1024 * 1024 || audioBytes > 512 * 1024 * 1024)
+                throw std::runtime_error("Audio asset exceeds the import budget.");
+            d.audioAssets.push_back({entry.at("id"), entry.at("name"),
+                                     entry.at("sampleRate"), entry.at("channels"),
+                                     entry.at("sampleFrames"), std::move(bytes)});
+        }
+        for (const auto& entry : j.at("audioClips"))
+            d.audioClips.push_back({entry.at("id"), entry.at("asset"),
+                                    entry.at("start"), entry.at("inSample"),
+                                    entry.at("outSample"), entry.at("gain")});
+    }
     for (const auto& s : j.at("palette"))
         d.palette.push_back({s.at("id"), s.at("name"), readColor(s.at("color"))});
     std::size_t points = 0, pixels = 0;

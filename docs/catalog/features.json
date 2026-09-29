@@ -4181,7 +4181,7 @@
         "An incompatible file reports an error without leaving an empty track."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "audio",
@@ -4190,7 +4190,8 @@
         "RIG"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM10-PROGRESS.md; bounded mono/stereo PCM16 WAV import preserves original bytes and rejects incompatible input atomically"
     },
     {
       "id": "AUD-002",
@@ -4201,7 +4202,7 @@
         "The reference peak aligns with its audio sample."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "audio",
@@ -4210,7 +4211,8 @@
         "RIG"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM10-PROGRESS.md; sample-aligned per-frame waveform peaks in timeline at current zoom, no pyramid cache or audio playback"
     },
     {
       "id": "AUD-003",
@@ -4221,7 +4223,7 @@
         "Trimming and undoing restores the complete audio."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "audio",
@@ -4230,7 +4232,8 @@
         "RIG"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM10-PROGRESS.md; undoable clip start and half-open source-sample trim, no repeat"
     },
     {
       "id": "AUD-004",
@@ -4241,7 +4244,7 @@
         "Aligned tracks mix without a time offset."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "core",
       "owner_module": "audio",
@@ -4250,7 +4253,8 @@
         "RIG"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM10-PROGRESS.md; saved clip gain control only, synchronized playback/mixing remains open"
     },
     {
       "id": "AUD-005",

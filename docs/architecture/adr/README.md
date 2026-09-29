@@ -109,3 +109,6 @@ drawing choices scoped to one Part in the Animator dashboard.
 
 See [ADR-035](035-character-control-groups.md) for format-15 grouped published
 controls and view-only group switching in Animator.
+
+See [ADR-036](036-pcm-audio-document.md) for format-16 original PCM16 WAV
+assets, sample-range clips and rational frame-to-sample waveform mapping.

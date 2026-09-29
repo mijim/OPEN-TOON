@@ -38,11 +38,11 @@ Producing the complete animated shot belongs to HM-15; it does not gate HM-01.
 
 | Recommended priority | Work | Hard join | Parallel work once its prerequisites pass |
 |---|---|---|---|
-| 9 / active | HM-06 bone/curve authoring, animation and variant binding; finish quality and interaction gates | HM-05 accepted | HM-07 poses/declarative controls; HM-10 audio |
-| 10 | HM-07 character poses, widgets, one-dimensional sliders and Animator/Rig views | HM-03 + HM-04 | HM-06; no scripting needed |
+| 9 / parked | HM-06 bone/curve authoring, animation and variant binding; finish quality and interaction gates | HM-05 accepted | HM-10 audio is active |
+| 10 / parked | HM-07 character poses, widgets, one-dimensional sliders and Animator/Rig views | HM-03 + HM-04 | HM-10 audio is active |
 | 11 | HM-08 Quick Rig FK recipe: assign roles, place guides, preview/correct/commit | HM-03 + HM-07 | HM-06 or HM-10 |
 | 12 | HM-09 attachments, limited two-bone IK, optional rig recipes and dependency-closed templates | HM-06 + HM-07 + HM-08 | HM-10/11 and HM-12/13 branches |
-| Parallel branch A | HM-10 WAV device clock/waveform/trim/mix/scrub, then HM-11 mouth mapping and manual/timing-file lipsync | HM-01; HM-11 additionally needs HM-03 | Character/deformer work; audio need not wait for rig completion |
+| Parallel branch A / active | HM-10 PCM16 WAV import, waveform and clip edits pass; add device clock, mix and scrub, then HM-11 mouth mapping and manual/timing-file lipsync | HM-01; HM-11 additionally needs HM-03 | Character/deformer work is parked while one implementer advances audio |
 | Parallel branch B | HM-12 node editor, groups, cutters, ordered overlap and template graph closure | HM-03 + HM-04 | Deformers and audio; no solver prerequisite |
 | Complete branch C | HM-13 one output camera with pan/zoom/rotation and framing | HM-04 | HM-12 or HM-10; no multiplane prerequisite |
 | 13 | HM-14 revision-safe cached preview and exact PNG/WAV/manifest delivery | HM-10 + HM-12 + HM-13 | Final HM-09 rig/template integration |

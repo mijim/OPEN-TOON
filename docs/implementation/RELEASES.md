@@ -1,5 +1,14 @@
 # Experimental releases
 
+## 0.2.0-experimental.16 — source milestone, audio timing subset
+
+- Save original mono/stereo PCM16 WAV assets and undoable scene clips in format 16.
+- Draw sample-aligned waveform rows and edit clip frame position, source trim
+  and gain; playback, mixing and sound export remain open HM-10 work.
+- Keep format-15 migration backups and reject invalid WAV input atomically.
+  The macOS locked source build passes 147 CTest entries and native audio smoke.
+- Source only; no new public binary or cross-platform qualification.
+
 ## 0.2.0-experimental.15 — orthographic output camera
 
 - Add 20 bounded camera behaviors: direct pan/rotate/zoom, constrained gestures,

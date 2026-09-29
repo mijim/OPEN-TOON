@@ -210,8 +210,25 @@ struct Marker {
     std::string name;
     auto operator<=>(const Marker&) const = default;
 };
+struct AudioAsset {
+    Id id = 0;
+    std::string name;
+    std::int32_t sampleRate = 0;
+    std::int32_t channels = 0;
+    std::uint64_t sampleFrames = 0;
+    SharedBuffer<std::uint8_t> wav;
+    auto operator<=>(const AudioAsset&) const = default;
+};
+struct AudioClip {
+    Id id = 0;
+    Id asset = 0;
+    Frame start = 0;
+    std::uint64_t inSample = 0, outSample = 0;
+    double gain = 1;
+    auto operator<=>(const AudioClip&) const = default;
+};
 struct Document {
-    static constexpr int formatVersion = 15;
+    static constexpr int formatVersion = 16;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;
@@ -224,6 +241,8 @@ struct Document {
     std::map<Id, Drawing> drawings;
     std::vector<Swatch> palette;
     std::vector<Marker> markers;
+    std::vector<AudioAsset> audioAssets;
+    std::vector<AudioClip> audioClips;
     [[nodiscard]] Id allocateId() { return nextId++; }
     [[nodiscard]] Layer& layer(Id id);
     [[nodiscard]] const Layer& layer(Id id) const;

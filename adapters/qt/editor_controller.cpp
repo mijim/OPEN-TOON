@@ -5,6 +5,7 @@
 #include "opentoon/character_pose.h"
 #include "opentoon/deformation.h"
 #include "opentoon/deformer.h"
+#include "opentoon/audio.h"
 #include "project_store.h"
 #include "image_batch_importer.h"
 #include "scene_renderer.h"
@@ -12,6 +13,7 @@
 #include <QBuffer>
 #include <QDateTime>
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QImageReader>
 #include <QJsonDocument>
@@ -245,6 +247,48 @@ QVariantList EditorController::characterPoses() const {
                                      {"published", pose.published},
                                      {"controlGroup", QString::fromStdString(pose.controlGroup)},
                                      {"entries", entries}});
+    }
+    return result;
+}
+QVariantList EditorController::audioClips() const {
+    QVariantList result;
+    for (const auto& clip : document().audioClips) {
+        const auto& asset = *std::find_if(document().audioAssets.begin(),
+            document().audioAssets.end(), [&](const auto& value) { return value.id == clip.asset; });
+        result.push_back(QVariantMap{{"id", int(clip.id)},
+                                     {"name", QString::fromStdString(asset.name)},
+                                     {"start", int(clip.start)},
+                                     {"inSample", qint64(clip.inSample)},
+                                     {"outSample", qint64(clip.outSample)},
+                                     {"sampleRate", asset.sampleRate},
+                                     {"channels", asset.channels},
+                                     {"gain", clip.gain}});
+    }
+    return result;
+}
+QVariantList EditorController::audioWaveform(int clipId, int firstFrame, int frameCount) const {
+    QVariantList result;
+    if (frameCount < 0 || frameCount > 4096 || firstFrame < 0 ||
+        firstFrame > document().duration || frameCount > document().duration - firstFrame)
+        return result;
+    const auto clip = std::find_if(document().audioClips.begin(), document().audioClips.end(),
+                                   [=](const auto& value) { return value.id == Id(clipId); });
+    if (clip == document().audioClips.end())
+        return result;
+    const auto asset = std::find_if(document().audioAssets.begin(), document().audioAssets.end(),
+                                    [&](const auto& value) { return value.id == clip->asset; });
+    if (asset == document().audioAssets.end())
+        return result;
+    for (int frame = firstFrame; frame < firstFrame + frameCount; ++frame) {
+        if (frame < clip->start) {
+            result.push_back(0.0);
+            continue;
+        }
+        const auto begin = clip->inSample + document().rate.sampleAt(frame - clip->start, asset->sampleRate);
+        const auto end = std::min(clip->outSample,
+            clip->inSample + document().rate.sampleAt(frame - clip->start + 1, asset->sampleRate));
+        result.push_back(begin < clip->outSample ?
+            std::min(1.0, audioPeak(*asset, begin, std::max(begin, end)) * clip->gain) : 0.0);
     }
     return result;
 }
@@ -1618,6 +1662,50 @@ void EditorController::setSwatchColor(int id, QColor c) {
         for (auto& s : d.palette)
             if (s.id == Id(id))
                 s.color = color(c);
+    });
+}
+bool EditorController::importAudio(QUrl url) {
+    if (!url.isLocalFile() || QFileInfo(url.toLocalFile()).suffix().compare("wav", Qt::CaseInsensitive)) {
+        report("Import a local PCM16 WAV file.");
+        return false;
+    }
+    QFile source(url.toLocalFile());
+    if (source.size() < 44 || source.size() > 128 * 1024 * 1024 || !source.open(QIODevice::ReadOnly)) {
+        report("Cannot open WAV or file exceeds the 128 MiB import limit.");
+        return false;
+    }
+    const auto bytes = source.readAll();
+    if (bytes.size() != source.size()) {
+        report("Could not read the complete WAV file.");
+        return false;
+    }
+    std::vector<std::uint8_t> pcm(bytes.begin(), bytes.end());
+    const auto name = QFileInfo(url.toLocalFile()).completeBaseName().toStdString();
+    return edit("Import audio", [&](Document& d) {
+        (void)opentoon::importPcm16Wav(d, name, std::move(pcm), frame_);
+    });
+}
+bool EditorController::moveAudioClip(int clipId, int start) {
+    return edit("Move audio clip", [&](Document& d) {
+        opentoon::moveAudioClip(d, Id(clipId), start);
+    });
+}
+bool EditorController::trimAudioClip(int clipId, int inSample, int outSample) {
+    if (inSample < 0 || outSample < 0)
+        return false;
+    return edit("Trim audio clip", [&](Document& d) {
+        opentoon::trimAudioClip(d, Id(clipId), std::uint64_t(inSample),
+                                std::uint64_t(outSample));
+    });
+}
+bool EditorController::setAudioClipGain(int clipId, double gain) {
+    return edit("Set audio gain", [&](Document& d) {
+        opentoon::setAudioClipGain(d, Id(clipId), gain);
+    });
+}
+bool EditorController::removeAudioClip(int clipId) {
+    return edit("Remove audio clip", [&](Document& d) {
+        opentoon::removeAudioClip(d, Id(clipId));
     });
 }
 void EditorController::setScene(QString name, int width, int height, int duration, int numerator,

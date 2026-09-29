@@ -24,9 +24,13 @@ Decode supported formats while preserving the original sample and metadata.
 
 **Initial acceptance:** An incompatible file reports an error without leaving an empty track.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — bounded mono/stereo PCM16 WAV import preserves original bytes and rejects incompatible input atomically.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## AUD-002 — Waveform
 
@@ -34,9 +38,13 @@ Display amplitude at different timeline zoom levels.
 
 **Initial acceptance:** The reference peak aligns with its audio sample.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — sample-aligned per-frame waveform peaks in timeline at current zoom, no pyramid cache or audio playback.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## AUD-003 — Trim and place clips
 
@@ -44,9 +52,13 @@ Move clip start, adjust in/out points and repeat clips nondestructively.
 
 **Initial acceptance:** Trimming and undoing restores the complete audio.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — undoable clip start and half-open source-sample trim, no repeat.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## AUD-004 — Track mixing
 
@@ -54,9 +66,13 @@ Control volume and play multiple synchronized tracks.
 
 **Initial acceptance:** Aligned tracks mix without a time offset.
 
-**Scope:** `base` · **Level:** `core` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `core` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — saved clip gain control only, synchronized playback/mixing remains open.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## AUD-005 — Scrubbing
 

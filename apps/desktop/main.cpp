@@ -48,12 +48,14 @@ int main(int argc, char** argv) {
         return 0;
     }
     if (args.contains("--smoke-test") || args.contains("--hm06-benchmark") ||
-        args.contains("--hm07-smoke")) {
+        args.contains("--hm07-smoke") || args.contains("--hm10-smoke")) {
         QStandardPaths::setTestModeEnabled(true);
         QCoreApplication::setApplicationName(args.contains("--smoke-test")
                                                  ? "OPEN-TOON-smoke"
                                                  : args.contains("--hm07-smoke")
                                                        ? "OPEN-TOON-hm07-smoke"
+                                                       : args.contains("--hm10-smoke")
+                                                             ? "OPEN-TOON-hm10-smoke"
                                                        : "OPEN-TOON-benchmark");
     }
     try {
@@ -107,6 +109,56 @@ int main(int argc, char** argv) {
         engine.loadFromModule("OpenToon", "Main");
         if (args.contains("--demo"))
             editor.loadDemo();
+        if (args.contains("--hm10-smoke")) {
+            QTimer::singleShot(1200, &app, [&] {
+                try {
+                    if (engine.rootObjects().isEmpty())
+                        throw std::runtime_error("No QML window for HM-10 smoke.");
+                    auto* window = qobject_cast<QQuickWindow*>(engine.rootObjects().first());
+                    if (!window || !window->findChild<QQuickItem*>("timelineCanvas"))
+                        throw std::runtime_error("The audio timeline has no native canvas.");
+                    editor.newScene();
+                    editor.setWorkspaceMode("Rig");
+                    QTemporaryDir directory;
+                    if (!directory.isValid())
+                        throw std::runtime_error("Cannot create HM-10 WAV fixture.");
+                    QByteArray bytes;
+                    auto u16 = [&](quint16 value) {
+                        bytes.append(char(value & 255)); bytes.append(char(value >> 8));
+                    };
+                    auto u32 = [&](quint32 value) { u16(value & 65535); u16(value >> 16); };
+                    bytes.append("RIFF", 4); u32(36 + 48000 * 2); bytes.append("WAVEfmt ", 8);
+                    u32(16); u16(1); u16(1); u32(48000); u32(96000); u16(2); u16(16);
+                    bytes.append("data", 4); u32(48000 * 2);
+                    for (int sample = 0; sample < 48000; ++sample)
+                        u16(sample == 2002 ? 32767 : (sample % 80 < 40 ? 9000 : quint16(-9000)));
+                    QFile source(directory.filePath("original-cue.wav"));
+                    if (!source.open(QIODevice::WriteOnly) || source.write(bytes) != bytes.size())
+                        throw std::runtime_error("Cannot write HM-10 WAV fixture.");
+                    source.close();
+                    const auto baseline = editor.document();
+                    if (!editor.importAudio(QUrl::fromLocalFile(source.fileName())) ||
+                        editor.audioClips().size() != 1)
+                        throw std::runtime_error("Native WAV import did not create a clip.");
+                    const auto clip = editor.audioClips().front().toMap().value("id").toInt();
+                    const auto peaks = editor.audioWaveform(clip, 0, 3);
+                    if (peaks.size() != 3 || peaks[1].toDouble() < 0.99)
+                        throw std::runtime_error("Native waveform cue is not sample aligned.");
+                    QCoreApplication::processEvents();
+                    if (!window->grabWindow().save("build/hm10-audio-smoke.png"))
+                        throw std::runtime_error("Cannot capture the audio timeline.");
+                    editor.undo();
+                    if (editor.document() != baseline)
+                        throw std::runtime_error("WAV import did not undo atomically.");
+                    std::cout << "HM-10 audio smoke passed: native PCM16 import, cue waveform, "
+                                 "timeline screenshot and atomic undo.\n";
+                    app.exit(0);
+                } catch (const std::exception& error) {
+                    std::cerr << error.what() << '\n';
+                    app.exit(1);
+                }
+            });
+        }
         if (args.contains("--hm07-smoke")) {
             QTimer::singleShot(1200, &app, [&] {
                 try {

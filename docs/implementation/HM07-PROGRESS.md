@@ -141,13 +141,13 @@ resident memory **342.2 / 332.6 / 337.7 MB**. The overlay did not alter the
 connected character or exceed the sampled 50 ms / 2 GiB budget on this host.
 
 This remains a direct-command control subset. Persistent multi-driver
-evaluation, conflict/cycle handling, general typed widget bindings, control
-groups, broader cross-character mapping and a complete artist journey remain
+evaluation, conflict/cycle handling, general typed widget bindings,
+broader cross-character mapping and a complete artist journey remain
 open. HM-07 is still in progress.
 
 ## Remaining contract
 
 Saved pose masks use explicit Part IDs within one character. Broader cross-rig
-retargeting, broader mirroring, full published controls, general typed widgets, control
-groups, conflict/cycle handling, complete workspace layout presets and artist
+retargeting, broader mirroring, full published controls, general typed widgets,
+conflict/cycle handling, complete workspace layout presets and artist
 acceptance remain open. RIG-012 and HM-07 are partial.

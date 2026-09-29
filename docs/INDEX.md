@@ -11,7 +11,7 @@
 | Language | English across first-party UI, assets, code, help and documentation | User requirement; previous documentation translated |
 | Technology | C++20, Qt 6 and Qt Quick/QML | Accepted by user; risky integration paths need spikes |
 | Renderer | CPU QPainter reference adapter; Qt RHI/Skia comparison remains open | Experimental |
-| Storage | SQLite revisions with compressed, checksummed immutable media; format-15 character control groups and source-version migration backups | See ADR-025–035 and recovery tests |
+| Storage | SQLite revisions with compressed, checksummed immutable media; format-16 PCM16 audio assets and source-version migration backups | See ADR-025–036 and recovery tests |
 | Open-source reuse | Prefer proven libraries through tested adapters | User requirement; 30 library/tool entries evaluated in the roadmap |
 | Initial license | GPL-3.0-or-later for original contributions | Adopted |
 | Implementation | Experimental editor; partial catalog coverage | No complete phase or production release |

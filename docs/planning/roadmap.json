@@ -553,7 +553,7 @@
     {
       "id": "P07",
       "title": "Sound and practical media output",
-      "status": "planned",
+      "status": "in_progress",
       "depends_on": [
         "P01"
       ],
@@ -571,7 +571,7 @@
         {
           "id": "P07-W2",
           "description": "Add waveforms, trim/offset, gain, scrub, audio library, preview quality and render-range controls.",
-          "status": "planned"
+          "status": "in_progress"
         },
         {
           "id": "P07-W3",
@@ -4985,7 +4985,7 @@
       "owner_phase": "P07",
       "work_package": "P07-W1",
       "owner_module": "audio/media",
-      "status": "planned",
+      "status": "in_progress",
       "effort_engineer_weeks": [
         4,
         7
@@ -5257,7 +5257,7 @@
   ],
   "execution_policy": {
     "primary_objective": "HM: reliable character animation Harmony Moment",
-    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06 remains in progress with format-11 animated bone/curve controls and continuous-limb evidence; its wider quality and artistic gate is open. The owner directed the single implementer to advance other functionality, so HM-06 is parked while HM-07 named poses and published controls are active. HM-10 and HM-12 remain independently eligible after the active bounded block. P08/P09 and full feature acceptance remain open.",
+    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06 remains parked in progress with continuous-limb evidence and an open artistic gate. HM-07 remains parked in progress after format-15 grouped published controls. The single implementer is active on HM-10: format-16 PCM16 WAV assets, placed/trimmed/gained clips and sample-aligned timeline waveforms pass local tests; playback, device clock and full synchronization remain open. HM-12 remains independently eligible. P07/P08/P09 and full feature acceptance remain open.",
     "phase_dependency_semantics": "Phase depends_on constrains full epic completion, not entry into an implementation slice. Only the explicit delivery-slice contract DAG gates the Harmony Moment. Domain dependencies are scope relationships, not all-features barriers.",
     "entry_rule": "Start a slice only when each required contract has accepted evidence. Baseline reuse is partial and must be qualified; planned is not ready. Independent spikes may run without claiming their consumer ready.",
     "wip_limit": 2,
@@ -5320,7 +5320,7 @@
       "Physical tablet, Intel, Linux/Windows or clean-machine qualification",
       "Measured superiority over Harmony before comparative artist study"
     ],
-    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06 remains in progress with format-11 animated bone/curve controls and continuous-limb evidence; its wider quality and artistic gate is open. The owner directed the single implementer to advance other functionality, so HM-06 is parked while HM-07 named poses and published controls are active. HM-10 and HM-12 remain independently eligible after the active bounded block. P08/P09 and full feature acceptance remain open."
+    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06 remains parked in progress with continuous-limb evidence and an open artistic gate. HM-07 remains parked in progress after format-15 grouped published controls. The single implementer is active on HM-10: format-16 PCM16 WAV assets, placed/trimmed/gained clips and sample-aligned timeline waveforms pass local tests; playback, device clock and full synchronization remain open. HM-12 remains independently eligible. P07/P08/P09 and full feature acceptance remain open."
   },
   "estimate_revision": {
     "basis": "Whole-program phase envelopes retain prior scope and are not estimates of remaining HM work. HM slice estimates cover remaining bounded work once, including integration; never add them to phase totals.",

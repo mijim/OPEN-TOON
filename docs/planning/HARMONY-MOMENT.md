@@ -399,7 +399,7 @@ Add kinematic endpoint/curve attachments, bounded two-bone IK with limits and ex
 
 ## HM-10
 
-**Audio clock, waveform and manual timing** — `planned`; owner `audio/media`, work package `P07-W1`.
+**Audio clock, waveform and manual timing** — `in_progress`; owner `audio/media`, work package `P07-W1`.
 
 Adopt one playback backend after the miniaudio spike; start with WAV/PCM, waveform pyramids, trim/offset/gain, limited mixing and frame scrub. Audio device time drives playback, while headless sampling uses the same rational scene mapping.
 

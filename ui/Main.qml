@@ -270,6 +270,10 @@ ApplicationWindow {
                 onTriggered: sequenceDialog.open()
             }
             Action {
+                text: "Import PCM16 WAV…"
+                onTriggered: audioDialog.open()
+            }
+            Action {
                 text: editor.activeCamera ? "Edit output camera" : "Add output camera"
                 onTriggered: { editor.addCamera(); root.inspectorMode = "layer"; canvas.clearRegion(); }
             }
@@ -2089,6 +2093,86 @@ ApplicationWindow {
                             color: "#282828"
                             visible: editor.workspaceMode === "Rig"
                         }
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            Layout.leftMargin: 12
+                            Layout.rightMargin: 12
+                            spacing: 6
+                            RowLayout {
+                                Layout.fillWidth: true
+                                Label { text: "Audio"; font.pixelSize: 13; font.bold: true }
+                                Item { Layout.fillWidth: true }
+                                C.ToolButton {
+                                    text: "+"
+                                    hint: "Import PCM16 WAV at the current frame"
+                                    onClicked: audioDialog.open()
+                                }
+                            }
+                            Repeater {
+                                model: editor.audioClips
+                                ColumnLayout {
+                                    required property var modelData
+                                    Layout.fillWidth: true
+                                    spacing: 4
+                                    Label {
+                                        Layout.fillWidth: true
+                                        text: modelData.name + " · " + modelData.channels + "ch / " + modelData.sampleRate + " Hz"
+                                        elide: Text.ElideRight
+                                        font.pixelSize: 10
+                                        color: "#bbbbbb"
+                                    }
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        Label { text: "Start"; font.pixelSize: 10; color: "#888888" }
+                                        C.CompactTextField {
+                                            Layout.fillWidth: true
+                                            text: String(modelData.start + 1)
+                                            validator: IntValidator { bottom: 1; top: editor.duration }
+                                            onEditingFinished: if (acceptableInput) editor.moveAudioClip(modelData.id, Number(text) - 1)
+                                            Accessible.name: "Audio clip start frame"
+                                        }
+                                        Label { text: "Gain"; font.pixelSize: 10; color: "#888888" }
+                                        C.CompactTextField {
+                                            Layout.preferredWidth: 48
+                                            text: Number(modelData.gain).toFixed(2)
+                                            validator: DoubleValidator { bottom: 0; top: 4; locale: "C" }
+                                            onEditingFinished: if (acceptableInput) editor.setAudioClipGain(modelData.id, Number(text))
+                                            Accessible.name: "Audio clip gain"
+                                        }
+                                    }
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        Label { text: "Samples"; font.pixelSize: 10; color: "#888888" }
+                                        C.CompactTextField {
+                                            id: audioIn
+                                            Layout.fillWidth: true
+                                            text: String(modelData.inSample)
+                                            validator: IntValidator { bottom: 0; top: 2147483647 }
+                                            Accessible.name: "Audio clip in sample"
+                                        }
+                                        Label { text: "–"; font.pixelSize: 10; color: "#888888" }
+                                        C.CompactTextField {
+                                            id: audioOut
+                                            Layout.fillWidth: true
+                                            text: String(modelData.outSample)
+                                            validator: IntValidator { bottom: 1; top: 2147483647 }
+                                            Accessible.name: "Audio clip out sample"
+                                        }
+                                        C.ToolButton {
+                                            text: "Set"
+                                            hint: "Apply nondestructive audio trim"
+                                            onClicked: editor.trimAudioClip(modelData.id, Number(audioIn.text), Number(audioOut.text))
+                                        }
+                                    }
+                                    C.ToolButton {
+                                        text: "Remove clip"
+                                        Layout.fillWidth: true
+                                        onClicked: editor.removeAudioClip(modelData.id)
+                                    }
+                                }
+                            }
+                        }
+                        Rectangle { Layout.fillWidth: true; height: 1; color: "#282828" }
                         RowLayout {
                             visible: editor.workspaceMode === "Rig"
                             Layout.leftMargin: 16
@@ -2507,7 +2591,7 @@ ApplicationWindow {
                 Layout.fillHeight: true
                 clip: true
                 contentWidth: root.xsheet ? Math.max(width, editor.layers.length * 100 + 48) : Math.max(width, editor.duration * root.timelineCell)
-                contentHeight: root.xsheet ? editor.duration * root.timelineRow + 30 : Math.max(height, editor.layers.length * root.timelineRow + 30)
+                contentHeight: root.xsheet ? editor.duration * root.timelineRow + 30 : Math.max(height, (editor.layers.length + editor.audioClips.length) * root.timelineRow + 30)
                 boundsBehavior: Flickable.StopAtBounds
                 ScrollBar.horizontal: ScrollBar {}
                 ScrollBar.vertical: ScrollBar {}
@@ -2602,6 +2686,30 @@ ApplicationWindow {
                                     ctx.arc(x + 8, y + 17, 2.5, 0, Math.PI * 2);
                                     ctx.fill();
                                 }
+                            }
+                            const clips = editor.audioClips;
+                            for (let r = 0; r < clips.length; r++) {
+                                const clip = clips[r];
+                                const y = 30 + (data.length + r) * root.timelineRow - oy;
+                                if (y + root.timelineRow < 0 || y > height)
+                                    continue;
+                                ctx.fillStyle = "#1e1e1e";
+                                ctx.fillRect(0, y, width, root.timelineRow);
+                                ctx.strokeStyle = "#313131";
+                                ctx.beginPath(); ctx.moveTo(0, y + root.timelineRow); ctx.lineTo(width, y + root.timelineRow); ctx.stroke();
+                                const first = Math.max(clip.start, Math.max(0, Math.floor(ox / root.timelineCell)));
+                                const last = Math.min(editor.duration, Math.ceil((ox + width) / root.timelineCell));
+                                const peaks = first < last ? editor.audioWaveform(clip.id, first, last - first) : [];
+                                for (let f = first; f < last; f++) {
+                                    const amplitude = peaks[f - first];
+                                    if (amplitude <= 0) continue;
+                                    const x = f * root.timelineCell - ox + 1;
+                                    const h = Math.max(1, amplitude * 12);
+                                    ctx.fillStyle = "#a8a8a8";
+                                    ctx.fillRect(x, y + 17 - h, Math.max(1, root.timelineCell - 2), h * 2);
+                                }
+                                ctx.fillStyle = "#eeeeee";
+                                ctx.fillText(clip.name, clip.start * root.timelineCell - ox + 3, y + 5);
                             }
                             for (let m = 0; m < editor.markers.length; ++m) {
                                 const marker = editor.markers[m];
@@ -2922,6 +3030,12 @@ ApplicationWindow {
         fileMode: FileDialog.OpenFiles
         nameFilters: ["PNG images (*.png)"]
         onAccepted: editor.importImageSequence(selectedFiles)
+    }
+    FileDialog {
+        id: audioDialog
+        title: "Import PCM16 WAV"
+        nameFilters: ["PCM WAV audio (*.wav)"]
+        onAccepted: editor.importAudio(selectedFile)
     }
     FolderDialog {
         id: exportDialog

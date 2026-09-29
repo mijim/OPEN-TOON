@@ -1,6 +1,7 @@
 #include "opentoon/document.h"
 #include "opentoon/animation.h"
 #include "opentoon/deformation.h"
+#include "opentoon/audio.h"
 #include <cmath>
 #include <limits>
 #include <set>
@@ -113,7 +114,7 @@ void Document::validate() const {
             "Scene dimensions must be between 1 and 8192.");
     require(duration > 0 && duration <= 1000000, "Scene duration is outside supported limits.");
     require(name.size() <= 4096 && layers.size() <= 2000 && drawings.size() <= 50000 &&
-                palette.size() <= 65536,
+                palette.size() <= 65536 && audioAssets.size() <= 64 && audioClips.size() <= 1000,
             "Document exceeds resource limits.");
     std::set<Id> ids, swatches;
     auto id = [&](Id value) {
@@ -365,6 +366,30 @@ void Document::validate() const {
     }
     for (const auto& m : markers)
         require(m.frame >= 0 && m.frame < duration && m.name.size() <= 4096, "Invalid scene marker.");
+    std::set<Id> assets;
+    std::size_t audioBytes = 0;
+    for (const auto& asset : audioAssets) {
+        id(asset.id);
+        assets.insert(asset.id);
+        audioBytes += asset.wav.size();
+        require(audioBytes <= 512 * 1024 * 1024, "Document audio budget exceeded.");
+        require(!asset.name.empty() && asset.name.size() <= 4096,
+                "Invalid audio asset name.");
+        const auto info = inspectPcm16Wav({asset.wav.data(), asset.wav.size()});
+        require(asset.sampleRate == info.sampleRate && asset.channels == info.channels &&
+                    asset.sampleFrames == info.sampleFrames,
+                "Audio metadata does not match its PCM source.");
+    }
+    for (const auto& clip : audioClips) {
+        id(clip.id);
+        require(assets.contains(clip.asset) && clip.start >= 0 && clip.start < duration &&
+                    bounded(clip.gain, 4) && clip.gain >= 0,
+                "Invalid audio clip placement or gain.");
+        const auto& asset = *std::find_if(audioAssets.begin(), audioAssets.end(),
+                                          [&](const auto& value) { return value.id == clip.asset; });
+        require(clip.inSample < clip.outSample && clip.outSample <= asset.sampleFrames,
+                "Invalid audio clip trim range.");
+    }
 }
 Document makeDocument() {
     Document d;
@@ -438,6 +463,9 @@ void insertFrames(Document& d, Frame at, Frame count) {
     for (auto& m : d.markers)
         if (m.frame >= at)
             m.frame += count;
+    for (auto& clip : d.audioClips)
+        if (clip.start >= at)
+            clip.start += count;
     d.duration += count;
 }
 void removeFrames(Document& d, Frame at, Frame count) {
@@ -476,6 +504,11 @@ void removeFrames(Document& d, Frame at, Frame count) {
     std::erase_if(d.markers, [=](const auto& m) { return m.frame >= at && m.frame < end; });
     for (auto& m : d.markers)
         m.frame = collapse(m.frame);
+    std::erase_if(d.audioClips, [=](const auto& clip) {
+        return clip.start >= at && clip.start < end;
+    });
+    for (auto& clip : d.audioClips)
+        clip.start = collapse(clip.start);
     d.duration -= count;
 }
 void eraseAt(Drawing& d, Point center, double radius, Id& nextId) {

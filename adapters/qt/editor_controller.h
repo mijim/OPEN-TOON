@@ -50,6 +50,7 @@ class EditorController final : public QObject {
     Q_PROPERTY(QVariantList characterViews READ characterViews NOTIFY changed)
     Q_PROPERTY(int selectedView READ selectedView NOTIFY viewSelectionChanged)
     Q_PROPERTY(QVariantList characterPoses READ characterPoses NOTIFY changed)
+    Q_PROPERTY(QVariantList audioClips READ audioClips NOTIFY changed)
     Q_PROPERTY(QVariantList characterControlGroups READ characterControlGroups NOTIFY changed)
     Q_PROPERTY(QString selectedControlGroup READ selectedControlGroup WRITE setSelectedControlGroup NOTIFY controlGroupChanged)
     Q_PROPERTY(QVariantList poseTransferTargets READ poseTransferTargets NOTIFY changed)
@@ -146,6 +147,8 @@ class EditorController final : public QObject {
     Q_INVOKABLE QString substitutionThumbnail(int drawing) const;
     Q_INVOKABLE void selectView(int view);
     QVariantList characterPoses() const;
+    QVariantList audioClips() const;
+    Q_INVOKABLE QVariantList audioWaveform(int clipId, int firstFrame, int frameCount) const;
     QVariantList characterControlGroups() const;
     QString selectedControlGroup() const;
     void setSelectedControlGroup(QString group);
@@ -302,6 +305,11 @@ class EditorController final : public QObject {
     Q_INVOKABLE void addSwatch(QColor);
     Q_INVOKABLE void setSwatchColor(int, QColor);
     Q_INVOKABLE void setScene(QString, int, int, int, int, int);
+    Q_INVOKABLE bool importAudio(QUrl url);
+    Q_INVOKABLE bool moveAudioClip(int clipId, int start);
+    Q_INVOKABLE bool trimAudioClip(int clipId, int inSample, int outSample);
+    Q_INVOKABLE bool setAudioClipGain(int clipId, double gain);
+    Q_INVOKABLE bool removeAudioClip(int clipId);
     Q_INVOKABLE void setTransform(QString, double);
     bool hasCopiedTransform() const { return transformClipboard_.has_value(); }
     Q_INVOKABLE void copyTransformPose();

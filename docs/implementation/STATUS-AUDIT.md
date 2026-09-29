@@ -15,11 +15,11 @@ complete.
 | Nonfunctional requirements | 15 `partial_evidence`, 12 `proposed_not_measured`, 0 verified | Bounded checks do not satisfy full performance, device, accessibility or release gates. |
 | Open-source libraries | 9 experimentally adopted, 5 selected for plan, 16 candidates | Adopted flags match installed records; future candidates still need their consumer-specific evidence. |
 
-The current macOS system build has 121 passing CTest entries, a passing native
-mouse/composition/camera/mesh workflow and 21 export integration cases within one
-CTest entry. The last Windows/Linux CI evidence belongs to an earlier source
-commit. The experimental.10 arm64 package was verified locally but publication
-was cancelled; experimental.15 remains source only. Physical tablet and
+The current macOS system build has 147 passing CTest entries, including native
+character-control and PCM16 audio integration. Native dashboard and audio
+timeline smoke checks pass. The last Windows/Linux CI evidence belongs to an
+earlier source commit. The experimental.10 arm64 package was verified locally
+but publication was cancelled; experimental.16 remains source only. Physical tablet and
 current cross-platform binary qualification remain open.
 
 This audit corrected camera delivery mistakenly listed under raster phase P05
