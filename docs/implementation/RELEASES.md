@@ -1,5 +1,15 @@
 # Experimental releases
 
+## 0.2.0-experimental.22 — working source, band-limited upsampling
+
+- Use the same bounded 32-tap, 1,024-phase rate-conversion kernel for
+  upsampling as for downsampling. Equal-rate PCM keeps its direct sample path.
+- An 8-to-48 kHz 3 kHz tone retains 0.560 RMS; split and whole output blocks
+  match. The existing 96-to-48 kHz anti-alias and callback-period checks pass.
+- The local macOS build passes 164 CTest entries and native audio smoke.
+  Source only; no new public binary or tag. Broader rate-ratio and hardware
+  presentation qualification remain open.
+
 ## 0.2.0-experimental.21 — working source, selected audio range
 
 - Export a selected half-open frame interval to PCM WAV. Its sample count

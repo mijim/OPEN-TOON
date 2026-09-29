@@ -17,9 +17,9 @@ and removes the clip. Every change is undoable; trim and gain do not rewrite
 the source. **Scene → Export PCM WAV mix** writes a 48 kHz stereo PCM16 mix
 from an immutable document snapshot. Multiple clips sum at exact scene sample
 positions. Export runs in the background, reports progress and atomically
-discards a cancelled temporary file. Downsampling uses a precomputed 32-tap
-anti-alias filter; equal-rate and upsampling paths retain bounded linear
-interpolation. **Scene → Export selected PCM WAV range** writes the selected
+discards a cancelled temporary file. Conversion between different sample
+rates uses a precomputed 32-tap band-limited filter, including upsampling;
+equal-rate sampling preserves source samples. **Scene → Export selected PCM WAV range** writes the selected
 half-open frame interval at exact rational 48 kHz sample boundaries. Its PCM
 payload equals the corresponding full-mix slice; invalid ranges and cancelled
 jobs do not replace an existing output.
@@ -43,7 +43,7 @@ source-version backup. See [ADR-036](../architecture/adr/036-pcm-audio-document.
 for interval and frame-edit semantics and [ADR-038](../architecture/adr/038-repeated-audio-clips.md)
 for sample-contiguous repeats.
 See [ADR-041](../architecture/adr/041-audio-downsampling-kernel.md) for the
-shared bounded downsampling kernel and callback memory boundary.
+shared bounded rate-conversion kernel and callback memory boundary.
 See [ADR-042](../architecture/adr/042-selected-audio-export-range.md) for
 selected frame-range export boundaries.
 
@@ -82,6 +82,8 @@ selected frame-range export boundaries.
   across the loop, and split versus whole output blocks were byte-identical.
   Two simultaneous 96 kHz tracks measured 0.232 ms p95 for a 1,024-frame
   block against a 21.33 ms callback period on the local M1 Pro Release build.
+- The same filter now reconstructs an 8-to-48 kHz source tone at 3 kHz (0.560 RMS);
+  whole and split output blocks agree. Equal-rate cue sampling remains direct.
 - A range-export integration test compares selected PCM payload with the
   full-scene mix slice at 24 and 24000/1001 fps, checks exact length and
   rejects invalid boundaries before writing. The native HM-10 smoke exports
@@ -99,7 +101,7 @@ selected frame-range export boundaries.
   and two skipped polled frames. Each drift is relative to the host monotonic
   clock after the first one-second baseline. These silent probes do not
   measure speaker delivery time, audible sync or hardware underruns.
-- Local macOS `build/locked`: 163/163 CTest entries pass. The native
+- Local macOS `build/locked`: 164/164 CTest entries pass. The native
   `--hm10-smoke` loaded the Qt Quick audio timeline, checked its cue sample,
   captured and visually inspected `build/hm10-audio-smoke.png`, exported an
   exactly sized WAV with its cue at the correct sample, advanced and sought
@@ -112,7 +114,7 @@ selected frame-range export boundaries.
 
 HM-10 remains incomplete. Device latency calibration, device-loss recovery,
 hardware underrun and presented-frame traces, complete rate-ratio and
-upsampling quality qualification, hardware audible scrub quality and a full
+broader rate-ratio quality qualification, hardware audible scrub quality and a full
 ten-minute audiovisual drift run with visual output are pending. The miniaudio adapter is adopted
 for this experimental desktop profile; hardware and cross-platform
 qualification remain open.

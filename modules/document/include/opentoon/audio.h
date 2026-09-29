@@ -70,6 +70,6 @@ class AudioMixPlan {
     std::int32_t outputRate_ = 0;
     std::vector<Source> sources_;
     // Built before playback; renderInto only reads these shared rate kernels.
-    std::map<std::int32_t, std::vector<float>> downsamplingKernels_;
+    std::map<std::int32_t, std::vector<float>> rateKernels_;
 };
 } // namespace opentoon

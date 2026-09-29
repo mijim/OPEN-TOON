@@ -95,6 +95,27 @@ TEST_CASE("Downsampled repeated cue keeps its source-sample seam") {
     REQUIRE(mix.renderBlock(49000, 1)[0] < second);
 }
 
+TEST_CASE("Upsampling retains upper source passband and stays block independent") {
+    auto scene = makeDocument();
+    (void)importPcm16Wav(scene, "8 kHz 3 kHz tone", toneWav(8000, 8000, 3000), 0);
+    AudioMixPlan mix(scene, 48000);
+    const auto interior = mix.renderBlock(480, 3840);
+    double energy = 0;
+    for (std::size_t i = 0; i < interior.size(); i += 2) {
+        const double sample = interior[i] / 32768.0;
+        energy += sample * sample;
+    }
+    const double rms = std::sqrt(energy / (interior.size() / 2));
+    std::cout << "8-to-48 kHz retained 3 kHz RMS: " << rms << '\n';
+    REQUIRE(rms > .43);
+    REQUIRE(rms < .6);
+    const auto whole = mix.renderBlock(0, 4800);
+    const auto first = mix.renderBlock(0, 1024);
+    const auto second = mix.renderBlock(1024, 3776);
+    REQUIRE(std::equal(first.begin(), first.end(), whole.begin()));
+    REQUIRE(std::equal(second.begin(), second.end(), whole.begin() + first.size()));
+}
+
 TEST_CASE("PCM16 import rejects broken media atomically and aligns waveform to the source sample") {
     Session session;
     auto source = wav(48000, 2002);
@@ -295,9 +316,10 @@ TEST_CASE("Two placed clips mix at the same rational sample with rate conversion
     REQUIRE(block.size() == 10);
     REQUIRE(block[2] == 0);
     REQUIRE(block[3] == 0);
-    REQUIRE(block[4] == 32767);
-    REQUIRE(block[5] == 32767);
-    REQUIRE(block[6] > 0); // Interpolated 44.1 kHz source after its first sample.
+    REQUIRE(block[4] > 30000); // Reconstructed 44.1 kHz impulse peaks at the rational cue.
+    REQUIRE(block[4] == block[5]);
+    REQUIRE(block[6] > 0);
+    REQUIRE(block[6] < block[4]);
     REQUIRE(block[6] == block[7]);
     REQUIRE_THROWS(mix.renderBlock(95999, 2));
     auto fractional = d;
@@ -306,7 +328,7 @@ TEST_CASE("Two placed clips mix at the same rational sample with rate conversion
     AudioMixPlan fractionalMix(fractional, 48000);
     REQUIRE(fractionalMix.sceneSamples() == 96096);
     const auto fractionalCue = fractionalMix.renderBlock(2002, 1);
-    REQUIRE(fractionalCue[0] > 16000);
+    REQUIRE(fractionalCue[0] > 14000);
 }
 TEST_CASE("Audio callback-sized mix stays below its playback period on a ten-minute scene") {
     auto scene = makeDocument();

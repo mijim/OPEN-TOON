@@ -28,7 +28,7 @@ constexpr int resamplerTaps = 32;
 constexpr int resamplerPhases = 1024;
 std::vector<float> lowpassKernel(std::int32_t sourceRate, std::int32_t outputRate) {
     std::vector<float> weights(resamplerTaps * resamplerPhases);
-    const double cutoff = .9 * double(outputRate) / sourceRate;
+    const double cutoff = .9 * std::min(1.0, double(outputRate) / sourceRate);
     for (int phase = 0; phase < resamplerPhases; ++phase) {
         const double fraction = double(phase) / resamplerPhases;
         double total = 0;
@@ -280,10 +280,10 @@ AudioMixPlan::AudioMixPlan(const Document& document, std::int32_t outputRate)
             throw std::invalid_argument("Invalid audio clip in mix plan.");
         sources_.push_back({&*asset, clip, info.dataOffset,
                             frameRate_.sampleAt(clip.start, outputRate_)});
-        if (asset->sampleRate > outputRate_ &&
-            !downsamplingKernels_.contains(asset->sampleRate))
-            downsamplingKernels_.emplace(asset->sampleRate,
-                                          lowpassKernel(asset->sampleRate, outputRate_));
+        if (asset->sampleRate != outputRate_ &&
+            !rateKernels_.contains(asset->sampleRate))
+            rateKernels_.emplace(asset->sampleRate,
+                                 lowpassKernel(asset->sampleRate, outputRate_));
     }
 }
 std::int64_t AudioMixPlan::sceneSamples() const {
@@ -299,8 +299,8 @@ void AudioMixPlan::renderInto(std::int64_t firstSample, std::span<std::int16_t> 
     for (const auto& source : sources_) {
         const auto& asset = *source.asset;
         const std::span bytes{asset.wav.data(), asset.wav.size()};
-        const auto kernel = downsamplingKernels_.find(asset.sampleRate);
-        const bool downsampling = kernel != downsamplingKernels_.end();
+        const auto kernel = rateKernels_.find(asset.sampleRate);
+        const bool rateConversion = kernel != rateKernels_.end();
         for (std::size_t index = 0; index < frameCount; ++index) {
             const auto sceneSample = firstSample + std::int64_t(index);
             if (sceneSample < source.startSample)
@@ -329,7 +329,7 @@ void AudioMixPlan::renderInto(std::int64_t firstSample, std::span<std::int16_t> 
             for (int channel = 0; channel < 2; ++channel) {
                 const int inputChannel = std::min(channel, asset.channels - 1);
                 double value = 0;
-                if (downsampling) {
+                if (rateConversion) {
                     const auto phase = std::size_t((subsecond % outputRate_) * resamplerPhases /
                                                    outputRate_);
                     const auto* weights = kernel->second.data() + phase * resamplerTaps;
