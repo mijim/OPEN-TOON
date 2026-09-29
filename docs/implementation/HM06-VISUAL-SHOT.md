@@ -14,15 +14,23 @@ change on the linked left hand. The character moves across the frame, and the
 orthographic camera pushes in from frames 336–360 before returning to rest.
 Frame 479 renders identically to frame zero.
 
-The render test checks all 480 frames at 480 × 270, five selected frames at
-1920 × 1080 with one connected character silhouette in each, 32
-bone-tip/follower positions across four parts and eight
-frames, source substitution choices, saved state and exact pixels
+The render test checks all 480 frames at 480 × 270 with one connected
+character silhouette in every preview, plus five selected frames at
+1920 × 1080 with the same connectivity. It checks 1,920 bone-tip/follower
+positions across four parts and every frame, source substitution choices,
+saved state and exact pixels
 after project reopen. The native Qt Quick smoke opens the project, visits six
 beats, checks the three hand choices and torso curve, presents the canvas, then
 saves and reopens an independent copy. The original 19-part intake fixture is
 unchanged. The continuous 48-frame example now identifies its initial leg as
 `leg_left` rather than the generic `Body` role.
+
+A full-frame continuity sweep caught a 5.47 px left-wrist step at frame 300:
+the incoming sleeve and outgoing sleeve had different evaluated angle curves.
+The visual shot now keys the incoming bone to the outgoing evaluated pose at
+that substitution boundary. Every linked tip advances under 4 px per frame;
+the left wrist advances under 2 px at frames 300 and 432. This is a property
+of the authored study, not an automatic cross-substitution matching feature.
 
 Representative saved frames: [front speech](hm06-visual-shot-0120.png),
 [pointing and bend](hm06-visual-shot-0240.png), and
@@ -32,16 +40,19 @@ Representative saved frames: [front speech](hm06-visual-shot-0120.png),
 
 The optimized `build/locked` build ran on macOS 15.5, Apple M1 Pro with
 16 GiB RAM. One complete 480-frame headless render at 1920 × 1080 averaged
-5.72 ms/frame. This measures renderer throughput, not input latency.
+5.45 ms/frame with the matched sleeve key. This measures renderer throughput,
+not input latency.
 
 The native Qt Quick benchmark used a 1140 × 491 canvas at device pixel ratio
 2. Each run discarded five warmup moves, then measured 40 input-to-
 `frameSwapped` drags of the left-arm tip without modifying the document.
+The harness reacquires the native window after macOS focus loss and retries
+an interrupted move outside the measured sample.
 
 | Sample frame | p95 in three runs | Peak resident bytes in three runs |
 |---:|---:|---:|
-| 12 | 17.50 / 18.10 / 17.51 ms | 283,000,832 / 283,852,800 / 285,179,904 |
-| 360 | 17.41 / 17.28 / 17.03 ms | 283,541,504 / 284,655,616 / 285,212,672 |
+| 12 | 18.50 / 19.10 / 16.93 ms | 283,656,192 / 284,901,376 / 281,919,488 |
+| 360 | 21.75 / 17.30 / 17.42 ms | 285,605,888 / 282,722,304 / 283,639,808 |
 
 Both sampled poses meet the proposed 50 ms p95 and 2 GiB resident limits on
 this host. Frame 360 includes the alternate sleeve, three-quarter face,

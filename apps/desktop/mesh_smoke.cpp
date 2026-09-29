@@ -14,6 +14,7 @@
 #include <QMouseEvent>
 #include <QQuickWindow>
 #include <QTemporaryDir>
+#include <QThread>
 #include <QTimer>
 #include <QUrl>
 #include <algorithm>
@@ -436,6 +437,18 @@ void meshInteractionBenchmark(EditorController& editor, CanvasItem& canvas,
     const auto before = window.grabWindow();
     if (before.isNull())
         throw std::runtime_error("HM-06 benchmark could not capture its initial canvas.");
+    auto activateWindow = [&] {
+        window.raise();
+        window.requestActivate();
+        QElapsedTimer activationTimer;
+        activationTimer.start();
+        while (!window.isActive() && activationTimer.elapsed() < 3000) {
+            QCoreApplication::processEvents();
+            QThread::msleep(10);
+        }
+        if (!window.isActive())
+            throw std::runtime_error("HM-06 benchmark window did not become active.");
+    };
     const QPointF tip = canvas.meshControlPosition(2);
     auto send = [&](QEvent::Type type, QPointF local, Qt::MouseButton button,
                     Qt::MouseButtons held) {
@@ -444,33 +457,63 @@ void meshInteractionBenchmark(EditorController& editor, CanvasItem& canvas,
                           Qt::NoModifier);
         QCoreApplication::sendEvent(&window, &event);
     };
-    send(QEvent::MouseButtonPress, tip, Qt::LeftButton, Qt::LeftButton);
     std::vector<double> samples;
     samples.reserve(40);
+    bool pressed = false;
     for (int index = 0; index < 45; ++index) {
-        QCoreApplication::processEvents();
-        QEventLoop loop;
-        QTimer timeout;
-        timeout.setSingleShot(true);
-        bool presented = false;
-        const auto connection = QObject::connect(&window, &QQuickWindow::frameSwapped,
-                                                  &loop, [&] {
-            presented = true;
-            loop.quit();
-        }, Qt::QueuedConnection);
-        QObject::connect(&timeout, &QTimer::timeout, &loop, &QEventLoop::quit);
-        QElapsedTimer timer;
-        timer.start();
-        const auto target = tip + (index % 2 ? QPointF(-5, 6) : QPointF(-3, 4));
-        send(QEvent::MouseMove, target, Qt::NoButton, Qt::LeftButton);
-        timeout.start(3000);
-        if (!presented)
-            loop.exec();
-        QObject::disconnect(connection);
-        if (!presented)
-            throw std::runtime_error("HM-06 preview did not present a frame after mouse input.");
-        if (index >= 5)
-            samples.push_back(timer.nsecsElapsed() / 1e6);
+        bool measured = false;
+        for (int attempt = 0; attempt < 5 && !measured; ++attempt) {
+            QCoreApplication::processEvents();
+            if (!window.isActive()) {
+                pressed = false;
+                activateWindow();
+            }
+            if (!pressed) {
+                send(QEvent::MouseButtonPress, tip, Qt::LeftButton, Qt::LeftButton);
+                pressed = true;
+                QCoreApplication::processEvents();
+                if (!window.isActive())
+                    continue;
+            }
+            QEventLoop loop;
+            QTimer timeout;
+            timeout.setSingleShot(true);
+            bool presented = false;
+            const auto frameConnection = QObject::connect(&window, &QQuickWindow::frameSwapped,
+                                                          &loop, [&] {
+                presented = true;
+                loop.quit();
+            }, Qt::QueuedConnection);
+            const auto focusConnection = QObject::connect(&window, &QWindow::activeChanged,
+                                                          &loop, [&] {
+                if (!window.isActive())
+                    loop.quit();
+            });
+            QObject::connect(&timeout, &QTimer::timeout, &loop, &QEventLoop::quit);
+            QElapsedTimer timer;
+            timer.start();
+            const auto target = tip + (index % 2 ? QPointF(-5, 6) : QPointF(-3, 4));
+            send(QEvent::MouseMove, target, Qt::NoButton, Qt::LeftButton);
+            timeout.start(3000);
+            if (!presented && window.isActive())
+                loop.exec();
+            QObject::disconnect(frameConnection);
+            QObject::disconnect(focusConnection);
+            if (!presented) {
+                if (!window.isActive()) {
+                    pressed = false;
+                    continue;
+                }
+                throw std::runtime_error("HM-06 preview did not present a frame after mouse input at move " +
+                                         std::to_string(index) + ".");
+            }
+            if (index >= 5)
+                samples.push_back(timer.nsecsElapsed() / 1e6);
+            measured = true;
+        }
+        if (!measured)
+            throw std::runtime_error("HM-06 benchmark lost focus during five attempts at move " +
+                                     std::to_string(index) + ".");
     }
     const auto during = window.grabWindow();
     if (during.isNull() || during == before ||

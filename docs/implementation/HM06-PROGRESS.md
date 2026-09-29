@@ -9,6 +9,9 @@ The [twenty-second visual shot study](HM06-VISUAL-SHOT.md) now exercises the
 continuous rig with camera, face/hand/mouth substitutions and a torso curve
 over the agreed 480-frame timing. Audio, mattes and published controls remain
 in their owning slices; the study does not claim the complete Harmony Moment.
+The 480-frame preview/connectivity sweep also found and corrected a visible
+angle mismatch at the alternate-sleeve change; the authored incoming key now
+matches the outgoing pose before the animation continues.
 
 ## Working subset
 

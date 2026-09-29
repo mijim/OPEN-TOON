@@ -1152,6 +1152,12 @@ TEST_CASE("Twenty-second visual shot combines deformers views mouth hands and ca
     REQUIRE(boneBindings.size() == 5);
     for (const auto [part, drawing] : boneBindings)
         recordBonePose(scene, part, drawing, 432, 0, 0);
+    const auto& outgoingBone = *meshBindingFor(scene.layer(arm), baseSleeve)->bone;
+    const auto& incomingBone = *meshBindingFor(scene.layer(arm), alternateSleeve)->bone;
+    REQUIRE(outgoingBone.restJoints == incomingBone.restJoints);
+    const auto matchedAngles = sampleBoneAngles(outgoingBone, 300);
+    recordBonePose(scene, arm, alternateSleeve, 300,
+                   matchedAngles[0], matchedAngles[1]);
     const Id torsoDrawing = scene.drawingAt(torso, 0)->id;
     bindRegularImageMesh(scene, torso, torsoDrawing, 4, 8);
     const std::array<MeshPoint, 4> restCurve{{{128, 35}, {126, 95},
@@ -1209,8 +1215,8 @@ TEST_CASE("Twenty-second visual shot combines deformers views mouth hands and ca
             .map(QPointF(restTip.x, restTip.y));
         const auto followerLocal = SceneRenderer::worldTransform(
             scene, scene.layer(followerId), 0).inverted().map(restWorld);
-        for (Frame frame : {Frame{0}, Frame{120}, Frame{240}, Frame{300},
-                            Frame{336}, Frame{360}, Frame{432}, Frame{479}}) {
+        QPointF previousTip;
+        for (Frame frame = 0; frame < scene.duration; ++frame) {
             INFO(sourceRole << " at frame " << frame);
             const auto& source = scene.layer(sourceId);
             const auto& bone = *meshBindingFor(source,
@@ -1218,6 +1224,14 @@ TEST_CASE("Twenty-second visual shot combines deformers views mouth hands and ca
             const auto tip = sampleBoneJoints(bone, frame)[2];
             const auto expected = SceneRenderer::worldTransform(scene, source, frame)
                 .map(QPointF(tip.x, tip.y));
+            if (frame > 0) {
+                const double movement = std::hypot(expected.x() - previousTip.x(),
+                                                   expected.y() - previousTip.y());
+                REQUIRE(movement < 4);
+                if (sourceId == arm && (frame == 300 || frame == 432))
+                    REQUIRE(movement < 2);
+            }
+            previousTip = expected;
             const auto actual = SceneRenderer::worldTransform(
                 scene, scene.layer(followerId), frame).map(followerLocal);
             REQUIRE(std::hypot(expected.x() - actual.x(), expected.y() - actual.y()) < 1e-8);
@@ -1231,8 +1245,14 @@ TEST_CASE("Twenty-second visual shot combines deformers views mouth hands and ca
     const QSize expectedSize = fullResolution ? QSize(1920, 1080) : previewSize;
     const auto renderStart = std::chrono::steady_clock::now();
     for (Frame frame = 0; frame < scene.duration; ++frame) {
+        INFO("Visual-shot preview frame " << frame);
         const auto preview = SceneRenderer::render(scene, frame, previewSize);
         REQUIRE(preview.size() == expectedSize);
+        if (!fullResolution) {
+            const auto [largest, ink] = connectedInk(preview);
+            REQUIRE(ink > 2000);
+            REQUIRE(largest == ink);
+        }
     }
     if (fullResolution) {
         const auto elapsed = std::chrono::duration<double, std::milli>(
