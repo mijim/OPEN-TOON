@@ -160,3 +160,6 @@ composite bypass with preserved cutter sources and inactive output dependencies.
 
 See [ADR-060](060-contiguous-composite-groups.md) for format-31 named contiguous
 composite groups, typed input/output ports and source-version backup behavior.
+
+See [ADR-061](061-persistent-composite-group-bypass.md) for format-32 saved
+group bypass with an input-image fallback and retained cutter sources.

@@ -513,8 +513,27 @@ TEST_CASE("Composite group ports preserve matte-only sources and exact rendered 
     REQUIRE(GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Write) == original);
     REQUIRE(GraphRenderer::renderNode(graph, document, 0, output->id, {1, 1}) == original);
     REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == original);
+    document.compositeGroups.front().bypassed = true;
+    document.validate();
+    const auto bypassed = SceneRenderer::render(document, 0);
+    REQUIRE(qAlpha(bypassed.pixel(0, 0)) == 0);
+    REQUIRE(GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Display) == bypassed);
+    REQUIRE(GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Write) == bypassed);
+    REQUIRE(GraphRenderer::renderNode(graph, document, 0, output->id, {1, 1}) == bypassed);
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == bypassed);
     document.compositeGroups.clear();
     REQUIRE(SceneRenderer::render(document, 0) == original);
+    document.compositeGroups.push_back({groupId, "Body and cutter",
+                                        {baseId, sourceId}, true});
+    document.validate();
+    const auto externalCut = SceneRenderer::render(document, 0);
+    REQUIRE(qAlpha(externalCut.pixel(0, 0)) == 128);
+    REQUIRE(qBlue(externalCut.pixel(0, 0)) == 0);
+    const auto externalGraph = CompositionGraph::orderedLayers(document);
+    REQUIRE(GraphRenderer::render(externalGraph, document, 0, {}, {}, GraphTarget::Display) ==
+            externalCut);
+    REQUIRE(GraphRenderer::render(externalGraph, document, 0, {}, {}, GraphTarget::Write) ==
+            externalCut);
 }
 TEST_CASE("Linear color chart keeps bounded alpha and premultiplied color across coverage levels") {
     auto document = makeDocument();

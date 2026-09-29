@@ -209,7 +209,8 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
     }
     for (const auto& group : d.compositeGroups)
         j["compositeGroups"].push_back({{"id", group.id}, {"name", group.name},
-                                         {"members", group.members}});
+                                         {"members", group.members},
+                                         {"bypassed", group.bypassed}});
     for (const auto& m : d.markers)
         j["markers"].push_back({m.frame, m.name});
     for (const auto& asset : d.audioAssets) {
@@ -552,8 +553,13 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
     if (j.at("version").get<int>() >= 31)
         for (const auto& group : j.at("compositeGroups")) {
             limit(group.at("members"), 256);
+            const bool bypassed = j.at("version").get<int>() >= 32
+                                      ? group.at("bypassed").get<bool>() : false;
+            if (j.at("version").get<int>() < 32 && group.contains("bypassed") &&
+                group.at("bypassed").get<bool>())
+                throw std::runtime_error("An older project contains unsupported group bypass.");
             d.compositeGroups.push_back({group.at("id"), group.at("name"),
-                                         group.at("members").get<std::vector<Id>>()});
+                                         group.at("members").get<std::vector<Id>>(), bypassed});
         }
     for (const Id childId : legacyLinked) {
         auto& child = d.layer(childId);

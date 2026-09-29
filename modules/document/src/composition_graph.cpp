@@ -63,8 +63,9 @@ std::vector<GraphPortType> inputTypes(GraphNodeKind kind) {
     case GraphNodeKind::DisplayOutput:
     case GraphNodeKind::WriteOutput:
     case GraphNodeKind::GroupInput:
-    case GraphNodeKind::GroupOutput:
         return {GraphPortType::Image};
+    case GraphNodeKind::GroupOutput:
+        return {GraphPortType::Image, GraphPortType::Image};
     }
     throw std::invalid_argument("Unknown compositor node kind.");
 }
@@ -77,6 +78,7 @@ CompositionGraph CompositionGraph::orderedLayers(const Document& document) {
     std::map<Id, GraphNodeId> sourceIds;
     std::set<Id> matteSources;
     std::map<Id, Id> groupStarts, groupEnds;
+    std::map<Id, GraphNodeId> groupEntries;
     for (const auto& group : document.compositeGroups) {
         if (group.members.size() < 2)
             throw std::invalid_argument("Composite group needs at least two drawing members.");
@@ -109,6 +111,7 @@ CompositionGraph CompositionGraph::orderedLayers(const Document& document) {
         if (const auto start = groupStarts.find(layer.id); start != groupStarts.end()) {
             const GraphNodeId port = next++;
             graph.nodes.push_back({port, GraphNodeKind::GroupInput, 0, {{image, 0}}, start->second});
+            groupEntries[start->second] = port;
             image = port;
         }
         if (!matteSources.contains(layer.id) || layer.paintMatteSource) {
@@ -157,7 +160,8 @@ CompositionGraph CompositionGraph::orderedLayers(const Document& document) {
         }
         if (const auto end = groupEnds.find(layer.id); end != groupEnds.end()) {
             const GraphNodeId port = next++;
-            graph.nodes.push_back({port, GraphNodeKind::GroupOutput, 0, {{image, 0}}, end->second});
+            graph.nodes.push_back({port, GraphNodeKind::GroupOutput, 0,
+                                   {{groupEntries.at(end->second), 0}, {image, 1}}, end->second});
             image = port;
         }
     }

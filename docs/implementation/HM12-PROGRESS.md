@@ -77,6 +77,11 @@ Drag a Group output card onto a Drawing or Part to move all its members
 together; Shift-drag places the group behind the target. Back and Front move
 the selected group by one neighboring Drawing or group. The single command
 preserves member order and port identity, with atomic undo and save/reopen.
+Format 32 adds **Bypass group** to a selected member and Alt-click on the Group
+output card. The output chooses the incoming image instead of the internal
+composite while retaining every member and cutter source. An external target
+can still use a cutter inside the bypassed group. The saved toggle undoes and
+reopens; see [ADR-061](../architecture/adr/061-persistent-composite-group-bypass.md).
 Alt-dragging a Drawing card onto another binds the first as the second's
 cutter source through the existing validated document command. Its fractional
 alpha, saved references and one-step undo use the same path as the inspector.
@@ -202,6 +207,11 @@ preview. This is diagnostic navigation, not a persisted graph edit.
 - A three-color group fixture moves the full group front and back, checks the
   top pixel, rejects a self-target, undoes and reopens the member order. Native
   Qt Quick Back/Front controls exercise group movement and reopened pixels.
+- A bypassed group returns its input image in both Display and Write while a
+  matte-only source inside it still clips an external target. Format-31 files
+  load bypass off, save a readable `.pre-v31.bak` on upgrade and reject active
+  bypass claimed by the old schema. Controller and native Qt Quick tests cover
+  the checkbox, undo/redo, save/reopen and restoration.
 - Native Qt Quick smoke Alt-drags a Drawing source onto a Drawing target,
   checks the target binding and output color, then undoes, redoes and reopens.
 - Native Qt Quick smoke Alt-clicks Apply matte to bypass, undoes, redoes and

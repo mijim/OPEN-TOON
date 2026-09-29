@@ -1000,6 +1000,34 @@ int main(int argc, char** argv) {
                         throw std::runtime_error("Composite group order changed after reopen.");
                     editor.setSelectedLayer(int(red));
                     QCoreApplication::processEvents();
+                    auto* bypassGroup = window->findChild<QQuickItem*>("nodeBypassGroup");
+                    if (!bypassGroup || !bypassGroup->isVisible() || !bypassGroup->isEnabled())
+                        throw std::runtime_error("Composite group bypass control is unavailable.");
+                    const auto bypassGroupPoint = bypassGroup->mapToScene(QPointF(
+                        bypassGroup->width() / 2, bypassGroup->height() / 2));
+                    movePoint(QEvent::MouseButtonPress, bypassGroupPoint, Qt::LeftButton);
+                    movePoint(QEvent::MouseButtonRelease, bypassGroupPoint, Qt::NoButton);
+                    if (!editor.document().compositeGroups.front().bypassed ||
+                        qGreen(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Bypass group did not remove its composite output.");
+                    editor.undo();
+                    if (qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Bypass group did not undo.");
+                    editor.redo();
+                    if (!editor.saveProject({}) || !editor.openProject(QUrl::fromLocalFile(behindPath)) ||
+                        !editor.document().compositeGroups.front().bypassed ||
+                        qGreen(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Bypass group changed after reopen.");
+                    editor.setSelectedLayer(int(red));
+                    QCoreApplication::processEvents();
+                    bypassGroup = window->findChild<QQuickItem*>("nodeBypassGroup");
+                    const auto restoreGroupPoint = bypassGroup->mapToScene(QPointF(
+                        bypassGroup->width() / 2, bypassGroup->height() / 2));
+                    movePoint(QEvent::MouseButtonPress, restoreGroupPoint, Qt::LeftButton);
+                    movePoint(QEvent::MouseButtonRelease, restoreGroupPoint, Qt::NoButton);
+                    if (editor.document().compositeGroups.front().bypassed ||
+                        qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Group processing did not restore from bypass.");
                     auto* back = window->findChild<QQuickItem*>("nodeBack");
                     if (!back || !back->isEnabled())
                         throw std::runtime_error("Composite group Back control is unavailable.");
@@ -1020,7 +1048,7 @@ int main(int argc, char** argv) {
                         qGreen(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
                         throw std::runtime_error("Ungroup did not restore the ungrouped graph and pixels.");
                     std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass, fractional cutter, "
-                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, group order and ungroup ports, Alt-drag cutter, Alt-click bypass, typed search, save/reopen and undo.\n";
+                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, group order, bypass and ungroup ports, Alt-drag cutter, Alt-click bypass, typed search, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

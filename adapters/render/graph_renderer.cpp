@@ -334,10 +334,20 @@ QImage renderGraphTerminal(const CompositionGraph& graph, const Document& docume
             break;
         case GraphNodeKind::BypassComposite:
         case GraphNodeKind::GroupInput:
-        case GraphNodeKind::GroupOutput:
             image = input(0);
             bound = inputBounds(0);
             break;
+        case GraphNodeKind::GroupOutput: {
+            const auto group = std::find_if(document.compositeGroups.begin(),
+                                            document.compositeGroups.end(),
+                                            [&](const auto& candidate) {
+                                                return candidate.id == node.group;
+                                            });
+            const int slot = group->bypassed ? 0 : 1;
+            image = input(slot);
+            bound = inputBounds(slot);
+            break;
+        }
         case GraphNodeKind::Over:
         case GraphNodeKind::BypassBlend:
             image = over(input(0), input(1), document.composition, options, inputBounds(1));

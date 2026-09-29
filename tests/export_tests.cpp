@@ -242,6 +242,18 @@ TEST_CASE("Composite grouping is one undoable edit with stable ports and reopene
     REQUIRE(editor.document().compositeGroups.front().members ==
             std::vector<opentoon::Id>{red, blue.id});
     REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    REQUIRE(editor.setCompositeGroupBypassed(int(groupId), true));
+    REQUIRE(qGreen(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    REQUIRE(editor.saveProject({}));
+    REQUIRE(editor.openProject(path));
+    REQUIRE(editor.document().compositeGroups.front().bypassed);
+    REQUIRE(qGreen(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    REQUIRE(editor.setCompositeGroupBypassed(int(groupId), false));
+    REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    editor.undo();
+    REQUIRE(editor.document().compositeGroups.front().bypassed);
+    editor.redo();
+    REQUIRE_FALSE(editor.document().compositeGroups.front().bypassed);
     REQUIRE(editor.ungroupDrawings(int(groupId)));
     REQUIRE(editor.document().compositeGroups.empty());
     REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);

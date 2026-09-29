@@ -1,5 +1,15 @@
 # Experimental releases
 
+## 0.2.0-experimental.55 — working source, group bypass
+
+- Format 32 saves a composite group's bypass state. Nodes offers a compact
+  checkbox and Alt-click on its Group output card; restoring the group retains
+  every member's settings and order.
+- Typed input/output routing preserves an internal cutter used by an external
+  target. Pixel, migration/backup, undo/redo, reopen and native Qt Quick checks
+  pass; the locked macOS suite passes 195/195 CTest entries. Source only; no
+  public binary or tag.
+
 ## 0.2.0-experimental.54 — working source, whole-group order
 
 - Drag a Group output card onto a Drawing/Part card to move all group members

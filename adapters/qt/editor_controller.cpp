@@ -147,9 +147,12 @@ bool EditorController::edit(const std::string& label, const std::function<void(D
 QVariantList EditorController::layers() const {
     QVariantList result;
     std::map<Id, Id> compositeGroupByLayer;
+    std::map<Id, bool> compositeGroupBypassByLayer;
     for (const auto& group : document().compositeGroups)
-        for (const auto member : group.members)
+        for (const auto member : group.members) {
             compositeGroupByLayer.emplace(member, group.id);
+            compositeGroupBypassByLayer.emplace(member, group.bypassed);
+        }
     for (auto it = document().layers.rbegin(); it != document().layers.rend(); ++it) {
         QVariantList spans;
         for (auto e : it->exposures)
@@ -173,6 +176,7 @@ QVariantList EditorController::layers() const {
                                      {"blendBypassed", it->blendBypassed},
                                      {"compositeBypassed", it->compositeBypassed},
                                      {"compositeGroup", int(compositeGroupByLayer[it->id])},
+                                     {"compositeGroupBypassed", compositeGroupBypassByLayer[it->id]},
                                      {"kind", int(it->kind)},
                                      {"role", QString::fromStdString(it->role)},
                                      {"spans", spans},
@@ -208,7 +212,14 @@ QVariantList EditorController::compositionNodes() const {
         case GraphNodeKind::DisplayOutput: kind = "Display"; break;
         case GraphNodeKind::WriteOutput: kind = "Write"; break;
         case GraphNodeKind::GroupInput: kind = "Group input"; break;
-        case GraphNodeKind::GroupOutput: kind = "Group output"; break;
+        case GraphNodeKind::GroupOutput: {
+            const auto found = std::find_if(document().compositeGroups.begin(),
+                                            document().compositeGroups.end(),
+                                            [&](const auto& group) { return group.id == node->group; });
+            kind = found != document().compositeGroups.end() && found->bypassed
+                       ? "Bypassed group" : "Group output";
+            break;
+        }
         }
         QVariantList inputs;
         for (const auto& input : node->inputs)
@@ -1217,6 +1228,22 @@ bool EditorController::moveCompositeGroup(int groupId, int targetLayer, bool beh
         for (auto& layer : d.layers)
             if (layer.kind == LayerKind::Drawing || layer.kind == LayerKind::Part)
                 layer = std::move(drawings[index++]);
+    });
+}
+bool EditorController::setCompositeGroupBypassed(int groupId, bool bypassed) {
+    if (groupId <= 0)
+        return false;
+    return edit("Bypass composite group", [&](Document& d) {
+        const auto group = std::find_if(d.compositeGroups.begin(), d.compositeGroups.end(),
+                                        [groupId](const auto& candidate) {
+                                            return candidate.id == Id(groupId);
+                                        });
+        if (group == d.compositeGroups.end())
+            throw std::runtime_error("The composite group is missing.");
+        for (const auto member : group->members)
+            if (d.layer(member).locked)
+                throw std::runtime_error("Unlock the composite group before bypassing it.");
+        group->bypassed = bypassed;
     });
 }
 void EditorController::setParent(int parent) {

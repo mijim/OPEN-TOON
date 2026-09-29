@@ -240,6 +240,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE bool ungroupDrawings(int groupId);
     Q_INVOKABLE bool renameCompositeGroup(int groupId, QString name);
     Q_INVOKABLE bool moveCompositeGroup(int groupId, int targetLayer, bool behind);
+    Q_INVOKABLE bool setCompositeGroupBypassed(int groupId, bool bypassed);
     Q_INVOKABLE void setParent(int);
     Q_INVOKABLE bool setLayerMatte(int sourceLayer);
     Q_INVOKABLE bool setMatteInverted(bool inverted);

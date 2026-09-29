@@ -11,13 +11,17 @@ it does not change the character parent hierarchy. Commands reject moving or
 deleting a member if that would leave invalid group membership. Ungroup first.
 
 The derived graph inserts typed `GroupInput` and `GroupOutput` image ports
-around the group's ordered composite segment. Both ports forward the same
-image bytes and bounds. Source image nodes and external cutter dependencies
+around the group's ordered composite segment. The input forwards the image
+before the group; the output forwards its composed image and bounds. Source
+image nodes and external cutter dependencies
 remain available, including a matte-only member inside the group. Grouping,
 ungrouping and renaming are transactional document commands. In Nodes,
 Shift-click two Drawing cards to group their inclusive span, edit the compact
 group name, or use Ungroup on a selected member. Reopening restores group IDs,
 names, members and ports.
+
+Format 32 extends Group output to choose between its input boundary and
+internal composite for saved bypass; see [ADR-061](061-persistent-composite-group-bypass.md).
 
 The renderer's isolated source copy clears groups before rendering, preventing
 recursive graph entry. Older formats load with no groups. The first format-31

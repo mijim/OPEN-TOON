@@ -12,7 +12,10 @@ Item {
     readonly property var selected: controller.layers.find(l => l.id === controller.selectedLayer)
     readonly property int selectedGroup: selected?.compositeGroup || 0
     readonly property var selectedGroupNode: controller.compositionNodes.find(n =>
-        n.kind === "Group output" && n.group === selectedGroup)
+        (n.kind === "Group output" || n.kind === "Bypassed group") &&
+        n.group === selectedGroup)
+    readonly property bool selectedGroupLocked: controller.layers.some(l =>
+        l.compositeGroup === selectedGroup && l.locked)
     property int groupStartLayer: 0
     property int previewNodeId: 0
     property string previewNodeKind: ""
@@ -31,6 +34,12 @@ Item {
             .map(n => n.id) : []
     }
     function toggleNodeBypass(node) {
+        if (node.group > 0 && (node.kind === "Group output" ||
+                               node.kind === "Bypassed group")) {
+            root.controller.setCompositeGroupBypassed(node.group,
+                                                       node.kind === "Group output")
+            return true
+        }
         if (node.layer <= 0)
             return false
         if (node.kind === "Opacity" || node.kind === "Bypassed opacity") {
@@ -146,6 +155,15 @@ Item {
                 visible: root.selectedGroup > 0
                 onClicked: root.controller.ungroupDrawings(root.selectedGroup)
                 Accessible.name: "Ungroup selected composite drawings"
+            }
+            CompactCheckBox {
+                objectName: "nodeBypassGroup"
+                text: "Bypass group"
+                visible: root.selectedGroup > 0
+                enabled: visible && !root.selectedGroupLocked
+                checked: root.selected?.compositeGroupBypassed || false
+                onClicked: root.controller.setCompositeGroupBypassed(root.selectedGroup, checked)
+                Accessible.name: "Bypass selected composite group"
             }
             CompactComboBox {
                 objectName: "nodeCutterPicker"
@@ -298,7 +316,9 @@ Item {
                     Rectangle {
                         required property var modelData
                         readonly property int drawingLayer: modelData.kind === "Drawing" ? modelData.layer : 0
-                        readonly property int movableGroup: modelData.kind === "Group output" ? modelData.group : 0
+                        readonly property int movableGroup: modelData.kind === "Group output" ||
+                                                            modelData.kind === "Bypassed group"
+                                                            ? modelData.group : 0
                         objectName: "compositionNode" + modelData.id
                         width: root.cardWidth
                         height: Math.max(110, graphScroll.height - 30)
@@ -355,7 +375,7 @@ Item {
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
-                            preventStealing: modelData.kind === "Drawing" || modelData.kind === "Group output"
+                            preventStealing: modelData.kind === "Drawing" || movableGroup > 0
                             property bool dragging: false
                             property bool dragCutter: false
                             property bool dragBehind: false
@@ -370,14 +390,12 @@ Item {
                                 downY = mouse.y
                             }
                             onPositionChanged: mouse => {
-                                if (!pressed || (modelData.kind !== "Drawing" &&
-                                                 modelData.kind !== "Group output"))
+                                if (!pressed || (modelData.kind !== "Drawing" && movableGroup === 0))
                                     return
                                 if (!dragging && Math.hypot(mouse.x - downX, mouse.y - downY) > 8) {
                                     dragging = true
                                     root.draggedLayer = modelData.layer
-                                    root.draggedGroup = modelData.kind === "Group output"
-                                                        ? modelData.group : 0
+                                    root.draggedGroup = movableGroup
                                 }
                                 if (dragging) {
                                     const point = mapToItem(graphRow, mouse.x, mouse.y)

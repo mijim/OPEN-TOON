@@ -1049,6 +1049,37 @@ TEST_CASE("Format thirty projects migrate to persistent composite groups with a 
                                    {"members", {original.layers.front().id, second.id}}}};
     REQUIRE_THROWS(deserializeDocument(legacy.dump()));
 }
+TEST_CASE("Format thirty-one groups migrate to saved bypass with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    auto second = original.layers.front();
+    second.id = original.allocateId();
+    second.name = "Second";
+    original.layers.push_back(second);
+    const auto groupId = original.allocateId();
+    original.compositeGroups.push_back({groupId, "Body",
+                                        {original.layers.front().id, second.id}});
+    original.validate();
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 31;
+    legacy["compositeGroups"][0].erase("bypassed");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=31");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    changed.compositeGroups.front().bypassed = true;
+    REQUIRE(ProjectStore::save(project.file, changed, "Bypass group", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v31.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    legacy["compositeGroups"][0]["bypassed"] = true;
+    REQUIRE_THROWS(deserializeDocument(legacy.dump()));
+}
 TEST_CASE("Format twenty-five audio clips default to unsoloed with a readable backup") {
     TemporaryProject project;
     auto original = makeDocument();

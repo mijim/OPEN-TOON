@@ -216,6 +216,7 @@ struct CompositeGroup {
     Id id = 0;
     std::string name;
     std::vector<Id> members;
+    bool bypassed = false;
     auto operator<=>(const CompositeGroup&) const = default;
 };
 struct Marker {
@@ -246,7 +247,7 @@ struct AudioClip {
     auto operator<=>(const AudioClip&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 31;
+    static constexpr int formatVersion = 32;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;

@@ -75,7 +75,8 @@ TEST_CASE("Composite groups expose typed input and output ports across adjacent 
     REQUIRE(input != graph.nodes.end());
     REQUIRE(output != graph.nodes.end());
     REQUIRE(input->inputs.size() == 1);
-    REQUIRE(output->inputs.size() == 1);
+    REQUIRE(output->inputs.size() == 2);
+    REQUIRE(output->inputs[0].source == input->id);
     const auto affected = graph.affectedByLayer(document, first);
     REQUIRE(std::find(affected.begin(), affected.end(), output->id) != affected.end());
     REQUIRE(std::find(affected.begin(), affected.end(), graph.write) != affected.end());

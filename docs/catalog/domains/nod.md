@@ -66,9 +66,9 @@ Encapsulate subgraphs with reusable inputs and outputs.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM12-PROGRESS.md](../../../docs/implementation/HM12-PROGRESS.md) — docs/architecture/adr/060-contiguous-composite-groups.md; group/matte pixel parity, invalid membership rejection, native Shift-click/rename/ungroup and format-30 backup.
+**Implementation evidence:** [docs/implementation/HM12-PROGRESS.md](../../../docs/implementation/HM12-PROGRESS.md) — docs/architecture/adr/060-contiguous-composite-groups.md; group/matte pixel parity, invalid membership rejection, native Shift-click/rename/ungroup/bypass, whole-group ordering, format-30 and format-31 migration backups.
 
-**Remaining scope:** Format-31 named contiguous Drawing/Part composite groups show typed image input/output ports and preserve exact pixels, matte references, undo and reopen; whole-group front/behind moves preserve member order. Nested or reusable general groups and published external bindings remain open.
+**Remaining scope:** Format-31 named contiguous Drawing/Part composite groups show typed image input/output ports and preserve exact pixels, matte references, undo and reopen; whole-group front/behind moves preserve member order and format-32 saved bypass preserves internal cutter sources. Nested or reusable general groups and published external bindings remain open.
 
 ## NOD-005 — Layer compositing
 
