@@ -34,7 +34,7 @@ This makes per-Part masks editable after capture.
   Parts, assembles a character, captures a selected Part, applies at another
   frame, refines/removes a second Part mapping, blends with several live
   updates, undoes/redoes once, saves and reopens.
-- Local macOS `build/locked`: 138/138 CTest entries pass. Native Qt Quick
+- Local macOS `build/locked`: 139/139 CTest entries pass. Native Qt Quick
   `--smoke-test` passes the mouse/input, window, deformation and reopen
   journeys. The new pose panel compiles and loads within that window; the
   controller journey exercises its backend rather than clicking its widgets.
@@ -58,6 +58,17 @@ project, publishes a view and pose, checks the visible QML dashboard and writes
 `build/hm07-dashboard-smoke.png`. The screenshot was inspected at 2880 × 1832;
 the connected character, view button and pose slider are visible.
 
+Format 14 also lets Rig publish individual named drawing substitutions.
+Animator groups the published choices by Part and switches only that Part at
+the playhead. The domain keeps publication in independent Character copies;
+format-13 projects load with publication off and their first format-14 save
+creates a `.pre-v13.bak` source backup. The editor integration uses a
+two-Part character to switch a published hand drawing, verify the other Part
+and existing keys, undo/redo and reopen. The native smoke visibly renders
+published mouth choices on the 15-Part continuous toon, switches one choice
+and undoes it. The screenshot was inspected with the connected silhouette and
+mouth picker visible.
+
 The same native smoke drags the published slider across the continuous
 15-Part character. Each run discards five warmup moves, measures 40 mouse
 move-to-`frameSwapped` samples, verifies that a mapped Part moves and that one
@@ -67,6 +78,11 @@ p95 **20.28 / 19.01 / 17.83 ms** and peak process resident memory
 50 ms and 2 GiB budgets on this host. The 48-frame scene excludes audio and
 matte nodes; the complete 480-frame Harmony Moment remains unqualified for
 control latency.
+
+After adding the drawing picker, three further native runs measured p95
+**18.48 / 18.10 / 18.09 ms** and peak process resident memory
+**333.2 / 331.3 / 339.3 MB** with the same 40 samples and five warmups per
+run. The published mouth command and one-step slider undo passed in each run.
 
 This remains a direct-command control subset. Persistent multi-driver
 evaluation, conflict/cycle handling, on-canvas widgets, control groups,

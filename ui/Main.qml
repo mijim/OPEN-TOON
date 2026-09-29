@@ -1287,6 +1287,13 @@ ApplicationWindow {
                                     onEditingFinished: editor.renameSubstitution(editor.selectedSubstitution, text)
                                     Accessible.name: "Substitution name"
                                 }
+                                C.CompactCheckBox {
+                                    text: "Show in Animator"
+                                    checked: editor.substitutions.find(s => s.id === editor.selectedSubstitution)?.published || false
+                                    enabled: editor.selectedSubstitution > 0
+                                    onClicked: editor.setSelectedSubstitutionPublished(checked)
+                                    Accessible.name: "Publish selected substitution"
+                                }
                                 Label { text: "Drawing mesh · current substitution"; color: "#999999"; font.pixelSize: 10 }
                                 RowLayout {
                                     Layout.fillWidth: true
@@ -1754,6 +1761,37 @@ ApplicationWindow {
                                 wrapMode: Text.WordWrap
                                 color: "#777777"
                                 font.pixelSize: 10
+                            }
+                            Label {
+                                visible: editor.publishedCharacterSubstitutions.length > 0
+                                text: "Published drawings"
+                                color: "#999999"
+                                font.pixelSize: 10
+                            }
+                            Repeater {
+                                model: editor.publishedCharacterSubstitutions
+                                ColumnLayout {
+                                    id: publishedPartGroup
+                                    objectName: "publishedDrawingGroup"
+                                    required property var modelData
+                                    Layout.fillWidth: true
+                                    spacing: 3
+                                    Label {
+                                        text: publishedPartGroup.modelData.name
+                                        color: "#aaaaaa"
+                                        font.pixelSize: 10
+                                    }
+                                    C.CompactComboBox {
+                                        Layout.fillWidth: true
+                                        model: publishedPartGroup.modelData.options
+                                        textRole: "name"
+                                        valueRole: "id"
+                                        currentIndex: model.findIndex(v => v.id === publishedPartGroup.modelData.selected)
+                                        onActivated: editor.applyPublishedSubstitution(publishedPartGroup.modelData.part,
+                                                                                        currentValue)
+                                        Accessible.name: "Published drawings for " + publishedPartGroup.modelData.name
+                                    }
+                                }
                             }
                             Label {
                                 visible: editor.characterId > 0

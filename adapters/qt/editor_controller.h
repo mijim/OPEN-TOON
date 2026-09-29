@@ -35,6 +35,7 @@ class EditorController final : public QObject {
     Q_PROPERTY(bool canRedo READ canRedo NOTIFY changed)
     Q_PROPERTY(QVariantList layers READ layers NOTIFY changed)
     Q_PROPERTY(QVariantList substitutions READ substitutions NOTIFY changed)
+    Q_PROPERTY(QVariantList publishedCharacterSubstitutions READ publishedCharacterSubstitutions NOTIFY frameChanged)
     Q_PROPERTY(int selectedSubstitution READ selectedSubstitution NOTIFY frameChanged)
     Q_PROPERTY(bool selectedMeshBound READ selectedMeshBound NOTIFY frameChanged)
     Q_PROPERTY(int selectedMeshDeformer READ selectedMeshDeformer NOTIFY frameChanged)
@@ -132,6 +133,7 @@ class EditorController final : public QObject {
     bool canRedo() const { return session_.canRedo(); }
     QVariantList layers() const;
     QVariantList substitutions() const;
+    QVariantList publishedCharacterSubstitutions() const;
     int selectedSubstitution() const;
     bool selectedMeshBound() const;
     int characterId() const;
@@ -227,6 +229,8 @@ class EditorController final : public QObject {
     Q_INVOKABLE void centerRestPivot();
     Q_INVOKABLE void createSubstitution(bool duplicate = false);
     Q_INVOKABLE void renameSubstitution(int drawing, QString name);
+    Q_INVOKABLE void setSelectedSubstitutionPublished(bool published);
+    Q_INVOKABLE bool applyPublishedSubstitution(int part, int drawing);
     Q_INVOKABLE void selectSubstitution(int drawing);
     Q_INVOKABLE void removeSubstitution(int drawing);
     Q_INVOKABLE void moveSubstitution(int drawing, int direction);

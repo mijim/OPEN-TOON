@@ -612,3 +612,31 @@ TEST_CASE("Format twelve pose scene upgrades published controls with a readable 
     FixtureDatabase current(project.file);
     REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
 }
+TEST_CASE("Format thirteen substitutes migrate published drawings with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    const Id part = original.layers.front().id;
+    (void)makeCharacter(original, part, "Hero");
+    const Id drawing = createSubstitution(original, part, 0, false, "Mouth A");
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 13;
+    for (auto& layer : legacy["layers"])
+        for (auto& variant : layer["variants"])
+            variant.erase("published");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=13");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    publishSubstitution(changed, part, drawing, true);
+    REQUIRE(ProjectStore::save(project.file, changed, "Publish drawing", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v13.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+}

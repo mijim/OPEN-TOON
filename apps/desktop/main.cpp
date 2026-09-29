@@ -137,6 +137,12 @@ int main(int argc, char** argv) {
                         throw std::runtime_error("Continuous-character torso is missing.");
                     const auto torsoId = torso->id;
                     const auto originalTorsoX = torso->transform.x;
+                    auto mouth = std::find_if(editor.document().layers.begin(), editor.document().layers.end(),
+                                              [](const auto& layer) { return layer.name == "mouth"; });
+                    if (mouth == editor.document().layers.end() || mouth->variants.size() < 2)
+                        throw std::runtime_error("Continuous-character mouth variants are missing.");
+                    const auto mouthId = mouth->id;
+                    const auto alternateMouth = mouth->variants[1].drawing;
                     editor.setAnimateMode(false);
                     editor.setSelectedLayer(int(torsoId));
                     editor.setTransform("x", originalTorsoX + 80);
@@ -147,14 +153,39 @@ int main(int argc, char** argv) {
                     editor.setSelectedLayer(int(rootId));
                     editor.setSelectedCharacterPosePublished(true);
                     editor.setSelectedViewPublished(true);
+                    editor.setSelectedLayer(int(mouthId));
+                    const auto originalMouth = editor.selectedSubstitution();
+                    editor.setSelectedSubstitutionPublished(true);
+                    editor.selectSubstitution(int(alternateMouth));
+                    editor.setSelectedSubstitutionPublished(true);
+                    editor.selectSubstitution(originalMouth);
+                    editor.setSelectedLayer(int(rootId));
                     const auto selected = editor.selectedLayer();
                     const auto frame = editor.frame();
                     editor.setWorkspaceMode("Animator");
                     QCoreApplication::processEvents();
+                    if (!window->grabWindow().save("build/hm07-dashboard-smoke.png"))
+                        throw std::runtime_error("Cannot save the Animator dashboard screenshot.");
+                    QCoreApplication::processEvents();
+                    const auto findVisualItem = [](auto&& self, QQuickItem* parent,
+                                                   const QString& name) -> QQuickItem* {
+                        if (!parent)
+                            return nullptr;
+                        if (parent->objectName() == name)
+                            return parent;
+                        for (auto* child : parent->childItems())
+                            if (auto* match = self(self, child, name))
+                                return match;
+                        return nullptr;
+                    };
+                    auto* drawingGroup = findVisualItem(findVisualItem, window->contentItem(),
+                                                        QStringLiteral("publishedDrawingGroup"));
                     if (editor.selectedLayer() != selected || editor.frame() != frame ||
                         !dashboard->isVisible() || !posePicker->isVisible() || !poseBlend->isVisible() ||
+                        !drawingGroup || !drawingGroup->isVisible() ||
                         !editor.characterPoses().front().toMap().value("published").toBool() ||
-                        !editor.characterViews().front().toMap().value("published").toBool())
+                        !editor.characterViews().front().toMap().value("published").toBool() ||
+                        editor.publishedCharacterSubstitutions().isEmpty())
                         throw std::runtime_error(
                             "Published Animator controls are not visible or changed selection: " +
                             editor.status().toStdString() + ", dashboard=" +
@@ -164,9 +195,24 @@ int main(int argc, char** argv) {
                             std::to_string(editor.characterPoses().size()) + ", views=" +
                             std::to_string(editor.characterViews().size()) + ", posePublished=" +
                             std::to_string(editor.characterPoses().front().toMap().value("published").toBool()) +
-                            ", poseId=" + std::to_string(editor.selectedCharacterPose()));
-                    if (!window->grabWindow().save("build/hm07-dashboard-smoke.png"))
-                        throw std::runtime_error("Cannot save the Animator dashboard screenshot.");
+                            ", poseId=" + std::to_string(editor.selectedCharacterPose()) +
+                            ", drawingGroups=" +
+                            std::to_string(editor.publishedCharacterSubstitutions().size()) +
+                            ", groupVisible=" +
+                            std::to_string(drawingGroup && drawingGroup->isVisible()) +
+                            ", groupSize=" +
+                            std::to_string(drawingGroup ? drawingGroup->width() : 0) + "x" +
+                            std::to_string(drawingGroup ? drawingGroup->height() : 0));
+                    const auto beforeMouth = editor.document();
+                    if (!editor.applyPublishedSubstitution(int(mouthId), int(alternateMouth)) ||
+                        editor.document().drawingAt(mouthId, frame)->id != alternateMouth)
+                        throw std::runtime_error("Published mouth switch did not change its target.");
+                    for (const auto& layer : beforeMouth.layers)
+                        if (layer.id != mouthId && editor.document().layer(layer.id) != layer)
+                            throw std::runtime_error("Published mouth switch changed another Part.");
+                    editor.undo();
+                    if (editor.document() != beforeMouth)
+                        throw std::runtime_error("Published mouth switch did not undo atomically.");
                     const auto baseline = editor.document();
                     window->raise();
                     window->requestActivate();
@@ -235,8 +281,9 @@ int main(int argc, char** argv) {
                                              {"sampleCount", int(samples.size())},
                                              {"p95Ms", samples[std::size_t(std::ceil(samples.size() * .95)) - 1]},
                                              {"peakProcessResidentBytes", peakBytes}};
-                    std::cout << "HM-07 dashboard smoke passed: continuous toon project, published view and pose, "
-                                 "workspace selection/frame, native QML screenshot, slider drag and undo.\n";
+                    std::cout << "HM-07 dashboard smoke passed: continuous toon project, published view, "
+                                 "mouth drawing and pose, workspace selection/frame, native QML screenshot, "
+                                 "mouth switch and slider drag with undo.\n";
                     std::cout << QJsonDocument(timing).toJson(QJsonDocument::Compact).constData() << '\n';
                     app.exit(0);
                 } catch (const std::exception& error) {

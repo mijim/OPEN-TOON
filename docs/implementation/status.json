@@ -58,7 +58,7 @@
     {
       "id": "P08",
       "status": "in_progress",
-      "available": "Accepted bounded HM-03 rigid-character contract: 19-part original-art assembly, coordinated views, pixel-equivalent reopen and independent copy. Parented layers and typed character roots, pegs and Parts; role editing, preserve-world rigid reparenting within shared animated ancestry, stable rest pivots, named held substitutions, renderer-backed thumbnails and coordinated view sets. Batch Part assembly, independent or explicitly linked-artwork Part/Peg branch copies, safe branch deletion, Part detachment, Peg dissolution and view-range edits preserve view membership through save/reopen. Format-12 named masked poses capture selected/all Parts and selected transform/drawing channels, apply with atomic undo, and save/reopen. The direct pose slider blends from the current evaluated pose with an explicit 50% drawing threshold and one undo per drag. Format-13 publication filters named poses/views into a compact Animator dashboard; a local Rig/Animator workspace switch preserves selection, frame and render pixels. Saved poses can replace or remove one selected Part mapping and mask after capture.",
+      "available": "Accepted bounded HM-03 rigid-character contract: 19-part original-art assembly, coordinated views, pixel-equivalent reopen and independent copy. Parented layers and typed character roots, pegs and Parts; role editing, preserve-world rigid reparenting within shared animated ancestry, stable rest pivots, named held substitutions, renderer-backed thumbnails and coordinated view sets. Batch Part assembly, independent or explicitly linked-artwork Part/Peg branch copies, safe branch deletion, Part detachment, Peg dissolution and view-range edits preserve view membership through save/reopen. Format-12 named masked poses capture selected/all Parts and selected transform/drawing channels, apply with atomic undo, and save/reopen. The direct pose slider blends from the current evaluated pose with an explicit 50% drawing threshold and one undo per drag. Format-14 publication filters named poses/views and per-Part drawing substitutions into a compact Animator dashboard; a local Rig/Animator workspace switch preserves selection, frame and render pixels. Saved poses can replace or remove one selected Part mapping and mask after capture.",
       "remaining": "Independent second-animator review, reparenting across differently animated branches, cross-rig pose transfer/mirroring, Quick Rig, general typed controls, conflict handling, complete workspace presets, portable assets/templates and production-scale qualification."
     },
     {
@@ -84,7 +84,7 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 138,
+      "count": 139,
       "command": "ctest --test-dir build/locked --output-on-failure -j6"
     },
     "native_input_workflow": {
@@ -248,7 +248,7 @@
         "animated orthographic camera matches reopened preview and two exported PNG frames"
       ]
     },
-    "total_local_ctest_entries": 138,
+    "total_local_ctest_entries": 139,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -391,11 +391,11 @@
         "Pose blend has exact endpoints, a half-way drawing threshold and one drag undo",
         "Pose entries can be refined per Part without broadening other masks"
       ],
-      "limits": "Cross-character transfer, mirroring, published controls and complete artist journey remain open."
+      "limits": "Cross-character transfer, mirroring, general control bindings and complete artist journey remain open."
     },
     "published_character_dashboard": {
       "status": "passed_subset",
-      "scope": "Format-13 published poses/views, independent copied bindings, format-12 migration backup, Rig/Animator view-state switching and native connected-toon QML screenshot",
+      "scope": "Format-14 published poses/views and per-Part drawing substitutions, independent copied bindings, format-12/13 migration backups, Rig/Animator view-state switching and native connected-toon QML screenshot, Part-scoped mouth switch and undo",
       "command": "build/locked/open-toon.app/Contents/MacOS/open-toon --hm07-smoke",
       "screenshot": "build/hm07-dashboard-smoke.png",
       "limits": "No on-canvas widget bindings, persistent multi-driver graph, conflict/cycle handling or complete workspace layout presets.",
@@ -404,18 +404,19 @@
         "warmup_moves": 5,
         "samples_per_run": 40,
         "p95_ms": [
-          20.28,
-          19.01,
-          17.83
+          18.48,
+          18.10,
+          18.09
         ],
         "peak_process_resident_bytes": [
-          325910528,
-          319422464,
-          319766528
+          333152256,
+          331317248,
+          339263488
         ],
         "checks": [
           "mapped Part changes on slider drag",
-          "one undo restores baseline"
+          "one undo restores baseline",
+          "published mouth choice changes only its Part and undoes atomically"
         ],
         "limits": "48-frame scene without audio or matte nodes; full 480-frame control latency not qualified"
       }

@@ -151,7 +151,31 @@ QVariantList EditorController::substitutions() const {
     for (const auto& substitution : selected.variants)
         result.push_back(QVariantMap{{"id", int(substitution.drawing)},
                                      {"name", QString::fromStdString(substitution.name)},
+                                     {"published", substitution.published},
                                      {"image", document().drawings.at(substitution.drawing).image.has_value()}});
+    return result;
+}
+QVariantList EditorController::publishedCharacterSubstitutions() const {
+    QVariantList result;
+    const int root = characterId();
+    if (!root)
+        return result;
+    for (const auto& layer : document().layers) {
+        if (layer.kind != LayerKind::Part || opentoon::characterFor(document(), layer.id) != Id(root))
+            continue;
+        QVariantList options;
+        for (const auto& variant : layer.variants)
+            if (variant.published)
+                options.push_back(QVariantMap{{"id", int(variant.drawing)},
+                                              {"name", QString::fromStdString(variant.name)}});
+        if (options.isEmpty())
+            continue;
+        const auto* selected = document().drawingAt(layer.id, frame_);
+        result.push_back(QVariantMap{{"part", int(layer.id)},
+                                     {"name", QString::fromStdString(layer.role)},
+                                     {"selected", selected ? int(selected->id) : 0},
+                                     {"options", options}});
+    }
     return result;
 }
 int EditorController::selectedSubstitution() const {
@@ -936,6 +960,27 @@ void EditorController::renameSubstitution(int drawing, QString name) {
         edit("Rename substitution", [&](Document& d) {
             opentoon::renameSubstitution(d, layer_, drawing, name.toStdString());
         });
+}
+void EditorController::setSelectedSubstitutionPublished(bool published) {
+    const int drawing = selectedSubstitution();
+    if (layer_ && drawing)
+        edit(published ? "Publish substitution" : "Unpublish substitution", [&](Document& d) {
+            opentoon::publishSubstitution(d, layer_, drawing, published);
+        });
+}
+bool EditorController::applyPublishedSubstitution(int partId, int drawing) {
+    const int root = characterId();
+    if (!root || partId <= 0 || drawing <= 0)
+        return false;
+    return edit("Apply published substitution", [&](Document& d) {
+        const auto& part = d.layer(partId);
+        if (part.kind != LayerKind::Part || opentoon::characterFor(d, partId) != Id(root) ||
+            std::none_of(part.variants.begin(), part.variants.end(), [drawing](const auto& item) {
+                return item.drawing == Id(drawing) && item.published;
+            }))
+            throw std::invalid_argument("Select a published substitution of this character.");
+        opentoon::selectSubstitution(d, partId, frame_, drawing);
+    });
 }
 void EditorController::selectSubstitution(int drawing) {
     if (layer_)

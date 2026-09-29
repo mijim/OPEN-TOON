@@ -92,6 +92,7 @@ enum class LayerKind : std::uint8_t { Drawing, Character, Peg, Part, Camera };
 struct Substitution {
     Id drawing = 0;
     std::string name;
+    bool published = false;
     auto operator<=>(const Substitution&) const = default;
 };
 struct ViewChoice {
@@ -207,7 +208,7 @@ struct Marker {
     auto operator<=>(const Marker&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 13;
+    static constexpr int formatVersion = 14;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;

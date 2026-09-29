@@ -366,6 +366,13 @@ void renameSubstitution(Document& document, Id partId, Id drawing, std::string n
                            [drawing](const auto& item) { return item.drawing == drawing; });
     it->name = std::move(name);
 }
+void publishSubstitution(Document& document, Id partId, Id drawing, bool published) {
+    auto& layer = part(document, partId);
+    checkVariant(layer, drawing);
+    auto it = std::find_if(layer.variants.begin(), layer.variants.end(),
+                           [drawing](const auto& item) { return item.drawing == drawing; });
+    it->published = published;
+}
 void selectSubstitution(Document& document, Id partId, Frame frame, Id drawing) {
     auto& layer = part(document, partId);
     require(frame >= 0 && frame < document.duration, "Substitution frame is outside the scene.");

@@ -119,7 +119,8 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
         for (auto e : l.exposures)
             x["exposures"].push_back({e.start, e.end, e.drawing});
         for (const auto& variant : l.variants)
-            x["variants"].push_back({{"drawing", variant.drawing}, {"name", variant.name}});
+            x["variants"].push_back({{"drawing", variant.drawing}, {"name", variant.name},
+                                      {"published", variant.published}});
         for (const auto& view : l.views) {
             Json choices = Json::array();
             for (const auto& choice : view.choices)
@@ -327,7 +328,8 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
             l.role = x.at("role").get<std::string>();
             limit(x.at("variants"), 10000);
             for (const auto& variant : x.at("variants"))
-                l.variants.push_back({variant.at("drawing"), variant.at("name")});
+                l.variants.push_back({variant.at("drawing"), variant.at("name"),
+                    j.at("version").get<int>() >= 14 ? variant.at("published").get<bool>() : false});
         }
         if (j.at("version").get<int>() >= 5) {
             limit(x.at("views"), 1000);

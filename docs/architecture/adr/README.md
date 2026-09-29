@@ -103,3 +103,6 @@ atomic application and stable Part/substitution references.
 
 See [ADR-033](033-published-character-controls.md) for format-13 published
 poses/views and the local Animator/Rig workspace boundary.
+
+See [ADR-034](034-published-drawing-substitutions.md) for format-14 published
+drawing choices scoped to one Part in the Animator dashboard.
