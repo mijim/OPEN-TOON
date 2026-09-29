@@ -194,6 +194,14 @@ Item {
                 Accessible.name: "Move selected drawing or group forward in composite order"
             }
             ToolButton {
+                objectName: "nodeDuplicateGroup"
+                text: "Duplicate"
+                visible: root.selectedGroup > 0
+                enabled: visible && !root.selectedGroupLocked
+                onClicked: root.controller.duplicateCompositeGroup(root.selectedGroup)
+                Accessible.name: "Duplicate selected composite group with independent artwork"
+            }
+            ToolButton {
                 objectName: "nodeUngroup"
                 text: "Ungroup"
                 visible: root.selectedGroup > 0

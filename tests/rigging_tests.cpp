@@ -184,6 +184,105 @@ TEST_CASE("Rig copies and deletion keep composite groups dependency-closed") {
     REQUIRE(session.redo());
     REQUIRE(session.document().compositeGroups.size() == 1);
 }
+TEST_CASE("Composite group duplication owns artwork and remaps internal cutters atomically") {
+    Session session;
+    const Id target = session.document().layers.front().id;
+    Id cutter = 0, group = 0;
+    REQUIRE(session.apply("Build reusable cutter group", [&](Document& d) {
+        auto& artwork = d.editableDrawing(target, 0);
+        artwork.strokes.push_back({d.allocateId(), d.palette.front().id, 4,
+                                   Shape::Stroke, false, 2, {{5, 5}, {20, 20}}});
+        Layer source;
+        source.id = d.allocateId();
+        cutter = source.id;
+        source.name = "Cutter";
+        d.layers.push_back(source);
+        d.editableDrawing(cutter, 0).strokes.push_back(
+            {d.allocateId(), d.palette.front().id, 5, Shape::Stroke, false, 2,
+             {{0, 0}, {30, 30}}});
+        d.layer(target).matte = cutter;
+        group = d.allocateId();
+        d.compositeGroups.push_back({group, "Cut composition", {target, cutter}, true});
+    }));
+    const Document original = session.document();
+    Id duplicate = 0;
+    REQUIRE(session.apply("Duplicate group", [&](Document& d) {
+        duplicate = duplicateCompositeGroup(d, group);
+    }));
+    const auto& copied = session.document();
+    REQUIRE(copied.compositeGroups.size() == 2);
+    const auto& newGroup = copied.compositeGroups.back();
+    REQUIRE(newGroup.id == duplicate);
+    REQUIRE(newGroup.name == "Cut composition copy");
+    REQUIRE(newGroup.bypassed);
+    REQUIRE(copied.layer(newGroup.members.front()).matte == newGroup.members.back());
+    REQUIRE(copied.layer(newGroup.members.front()).transform.x == 32);
+    REQUIRE(copied.layer(newGroup.members.back()).transform.x == 32);
+    const Id originalDrawing = copied.drawingAt(target, 0)->id;
+    const Id copiedDrawing = copied.drawingAt(newGroup.members.front(), 0)->id;
+    REQUIRE(copiedDrawing != originalDrawing);
+    REQUIRE(copied.drawings.at(copiedDrawing).strokes.front().id !=
+            copied.drawings.at(originalDrawing).strokes.front().id);
+    REQUIRE(deserializeDocument(serializeDocument(copied)) == copied);
+    REQUIRE(session.apply("Edit copied artwork", [&](Document& d) {
+        d.drawings.at(copiedDrawing).strokes.front().width = 12;
+    }));
+    REQUIRE(session.document().drawings.at(originalDrawing).strokes.front().width == 4);
+    REQUIRE(session.undo());
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == original);
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == copied);
+    REQUIRE_THROWS(session.apply("Copy without internal cutter", [&](Document& d) {
+        d.layer(target).matte = 0;
+        d.layer(cutter).matte = newGroup.members.back();
+        (void)duplicateCompositeGroup(d, group);
+    }));
+    REQUIRE(session.document() == copied);
+}
+TEST_CASE("Composite group duplication registers copied Parts in character views") {
+    Session session;
+    const Id body = session.document().layers.front().id;
+    Id root = 0, sleeve = 0, group = 0;
+    REQUIRE(session.apply("Build grouped character parts", [&](Document& d) {
+        (void)d.editableDrawing(body, 0);
+        root = makeCharacter(d, body, "Actor");
+        Layer source;
+        source.id = d.allocateId();
+        sleeve = source.id;
+        source.name = "Sleeve";
+        d.layers.push_back(source);
+        (void)d.editableDrawing(sleeve, 0);
+        attachDrawingAsPart(d, sleeve, root, "Sleeve");
+        d.layer(body).matte = sleeve;
+        (void)captureCharacterView(d, root, 0, "Front");
+        group = d.allocateId();
+        d.compositeGroups.push_back({group, "Arm", {body, sleeve}});
+    }));
+    Id duplicated = 0;
+    REQUIRE(session.apply("Duplicate Part group", [&](Document& d) {
+        duplicated = duplicateCompositeGroup(d, group);
+    }));
+    const auto& copied = session.document();
+    const auto& members = copied.compositeGroups.back().members;
+    REQUIRE(copied.compositeGroups.back().id == duplicated);
+    REQUIRE(characterFor(copied, members.front()) == root);
+    REQUIRE(characterFor(copied, members.back()) == root);
+    REQUIRE(copied.layer(members.front()).matte == members.back());
+    REQUIRE(copied.layer(root).views.front().choices.size() == 4);
+    REQUIRE(deserializeDocument(serializeDocument(copied)) == copied);
+    const auto before = session.document();
+    REQUIRE_THROWS(session.apply("Reject partial Part hierarchy", [&](Document& d) {
+        Layer child;
+        child.id = d.allocateId();
+        child.kind = LayerKind::Peg;
+        child.parent = body;
+        child.name = "Child peg";
+        d.layers.push_back(child);
+        (void)duplicateCompositeGroup(d, group);
+    }));
+    REQUIRE(session.document() == before);
+}
 TEST_CASE("Pose transfer maps unique Part roles and drawing names without touching source") {
     Session session;
     const Id part = session.document().layers.front().id;

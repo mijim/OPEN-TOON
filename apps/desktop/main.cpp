@@ -1028,6 +1028,28 @@ int main(int argc, char** argv) {
                     if (editor.document().compositeGroups.front().bypassed ||
                         qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
                         throw std::runtime_error("Group processing did not restore from bypass.");
+                    (void)window->grabWindow();
+                    auto* duplicateGroup = window->findChild<QQuickItem*>("nodeDuplicateGroup");
+                    if (!duplicateGroup || !duplicateGroup->isVisible() || !duplicateGroup->isEnabled())
+                        throw std::runtime_error("Composite group Duplicate control is unavailable.");
+                    const auto duplicatePoint = duplicateGroup->mapToScene(QPointF(
+                        duplicateGroup->width() / 2, duplicateGroup->height() / 2));
+                    movePoint(QEvent::MouseButtonPress, duplicatePoint, Qt::LeftButton);
+                    movePoint(QEvent::MouseButtonRelease, duplicatePoint, Qt::NoButton);
+                    if (editor.document().compositeGroups.size() != 2 ||
+                        editor.document().compositeGroups.back().id == groupId ||
+                        editor.document().compositeGroups.back().members.front() !=
+                            opentoon::Id(editor.selectedLayer()))
+                        throw std::runtime_error("Duplicate did not select an independent group.");
+                    editor.undo();
+                    if (editor.document().compositeGroups.size() != 1)
+                        throw std::runtime_error("Duplicated group did not undo atomically.");
+                    editor.redo();
+                    if (editor.document().compositeGroups.size() != 2)
+                        throw std::runtime_error("Duplicated group did not redo atomically.");
+                    editor.undo();
+                    editor.setSelectedLayer(int(red));
+                    QCoreApplication::processEvents();
                     auto* back = window->findChild<QQuickItem*>("nodeBack");
                     if (!back || !back->isEnabled())
                         throw std::runtime_error("Composite group Back control is unavailable.");
@@ -1161,7 +1183,7 @@ int main(int argc, char** argv) {
                         editor.document().layer(blue).matte != 0)
                         throw std::runtime_error("Disconnected source deletion changed after reopen.");
                     std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass, fractional cutter, "
-                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, group order, bypass and ungroup ports, Alt-drag cutter, Alt-click bypass, operator library search/apply, explicit source deletion, typed node search, save/reopen and undo.\n";
+                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, group order, bypass, duplicate and ungroup ports, Alt-drag cutter, Alt-click bypass, operator library search/apply, explicit source deletion, typed node search, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

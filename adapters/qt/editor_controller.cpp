@@ -1158,6 +1158,18 @@ bool EditorController::ungroupDrawings(int groupId) {
                       [groupId](const auto& group) { return group.id == Id(groupId); });
     });
 }
+bool EditorController::duplicateCompositeGroup(int groupId) {
+    if (groupId <= 0)
+        return false;
+    Id selected = 0;
+    const bool copied = edit("Duplicate composite group", [&](Document& d) {
+        (void)opentoon::duplicateCompositeGroup(d, Id(groupId));
+        selected = d.compositeGroups.back().members.front();
+    });
+    if (copied)
+        setSelectedLayer(int(selected));
+    return copied;
+}
 bool EditorController::renameCompositeGroup(int groupId, QString name) {
     if (groupId <= 0)
         return false;

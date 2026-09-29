@@ -690,6 +690,93 @@ Id duplicateRigBranch(Document& document, Id branchId, bool linkedArtwork) {
     }
     return layers.at(branchId);
 }
+Id duplicateCompositeGroup(Document& document, Id groupId) {
+    const auto found = std::find_if(document.compositeGroups.begin(), document.compositeGroups.end(),
+                                    [groupId](const CompositeGroup& group) {
+                                        return group.id == groupId;
+                                    });
+    require(found != document.compositeGroups.end(), "The composite group is missing.");
+    const CompositeGroup original = *found;
+    const std::set<Id> selected(original.members.begin(), original.members.end());
+    for (const Id member : original.members) {
+        const auto& source = document.layer(member);
+        require(!source.locked, "Unlock every member before duplicating the group.");
+        require(!source.matte || selected.contains(source.matte),
+                "Include the matte source in the group before duplicating it.");
+    }
+    for (const auto& layer : document.layers)
+        if (!selected.contains(layer.id))
+            for (Id parent = layer.parent; parent; parent = document.layer(parent).parent)
+                require(!selected.contains(parent),
+                        "Include every descendant of grouped Parts before duplicating the group.");
+
+    std::map<Id, Id> layers, drawings;
+    for (const Id member : original.members)
+        layers[member] = document.allocateId();
+    const auto copyDrawing = [&](Id old) -> Id {
+        if (drawings.contains(old))
+            return drawings.at(old);
+        Drawing copy = document.drawings.at(old);
+        copy.id = document.allocateId();
+        for (auto& stroke : copy.strokes)
+            stroke.id = document.allocateId();
+        const Id id = copy.id;
+        document.drawings.emplace(id, std::move(copy));
+        drawings[old] = id;
+        return id;
+    };
+    std::vector<Layer> copies;
+    for (const Id member : original.members) {
+        Layer copy = document.layer(member);
+        copy.id = layers.at(member);
+        copy.name = copy.name.substr(0, 4091) + " copy";
+        const bool externalParent = !layers.contains(copy.parent);
+        if (!externalParent)
+            copy.parent = layers.at(copy.parent);
+        if (copy.matte)
+            copy.matte = layers.at(copy.matte);
+        if (externalParent) {
+            copy.transform.x += 32;
+            copy.transform.y += 32;
+            for (auto& key : copy.keys) {
+                key.value.x += 32;
+                key.value.y += 32;
+            }
+        }
+        for (auto& exposure : copy.exposures)
+            exposure.drawing = copyDrawing(exposure.drawing);
+        for (auto& variant : copy.variants)
+            variant.drawing = copyDrawing(variant.drawing);
+        for (auto& binding : copy.bindings)
+            binding.drawing = copyDrawing(binding.drawing);
+        copies.push_back(std::move(copy));
+    }
+    const Id last = original.members.back();
+    const auto insertAt = std::find_if(document.layers.begin(), document.layers.end(),
+                                       [last](const Layer& layer) { return layer.id == last; });
+    document.layers.insert(std::next(insertAt), copies.begin(), copies.end());
+    for (const Id member : original.members) {
+        const auto& source = document.layer(member);
+        if (source.kind != LayerKind::Part)
+            continue;
+        const Id rootId = characterFor(document, member);
+        for (auto& view : document.layer(rootId).views) {
+            const auto choice = std::find_if(view.choices.begin(), view.choices.end(),
+                                             [member](const ViewChoice& entry) {
+                                                 return entry.part == member;
+                                             });
+            if (choice != view.choices.end())
+                view.choices.push_back({layers.at(member), copyDrawing(choice->drawing)});
+        }
+    }
+    CompositeGroup duplicate = original;
+    duplicate.id = document.allocateId();
+    duplicate.name = duplicate.name.substr(0, 123) + " copy";
+    for (auto& member : duplicate.members)
+        member = layers.at(member);
+    document.compositeGroups.push_back(std::move(duplicate));
+    return document.compositeGroups.back().id;
+}
 void removeRigBranch(Document& document, Id branchId) {
     const auto& branch = document.layer(branchId);
     require(branch.kind == LayerKind::Part || branch.kind == LayerKind::Peg,

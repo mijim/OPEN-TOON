@@ -278,6 +278,18 @@ TEST_CASE("Composite grouping is one undoable edit with stable ports and reopene
     editor.toggleLayer(int(green.id), "locked");
     REQUIRE_FALSE(editor.moveCompositeGroup(int(frontGroup), int(yellow), true));
     REQUIRE(editor.document().compositeGroups.front().id == rearGroup);
+    REQUIRE(editor.duplicateCompositeGroup(int(frontGroup)));
+    REQUIRE(editor.document().compositeGroups.size() == 3);
+    const auto copiedGroup = editor.document().compositeGroups.back();
+    REQUIRE(copiedGroup.id != frontGroup);
+    REQUIRE(opentoon::Id(editor.selectedLayer()) == copiedGroup.members.front());
+    REQUIRE(editor.document().drawingAt(copiedGroup.members.front(), 0)->id !=
+            editor.document().drawingAt(red, 0)->id);
+    REQUIRE(editor.saveProject({}));
+    REQUIRE(editor.openProject(path));
+    REQUIRE(editor.document().compositeGroups.back() == copiedGroup);
+    REQUIRE(editor.document().drawingAt(copiedGroup.members.front(), 0)->id !=
+            editor.document().drawingAt(red, 0)->id);
 }
 TEST_CASE("Deleting a composition source uses the chosen reference policy atomically") {
     auto document = opentoon::makeDocument();

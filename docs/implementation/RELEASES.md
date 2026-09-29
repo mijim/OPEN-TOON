@@ -1,5 +1,18 @@
 # Experimental releases
 
+## 0.2.0-experimental.59 — working source, independent composite group copy
+
+- The Nodes toolbar duplicates a selected contiguous Drawing/Part group in the
+  same scene. New layer, group, stroke and drawing IDs preserve internal cutter
+  links, saved bypass and ordering. Copied artwork edits independently; Part
+  copies join their character's saved view sets.
+- An external cutter or a Part descendant outside the group blocks the copy
+  atomically. Domain and editor fixtures cover independence, views,
+  ProjectStore reopen and undo/redo; native Qt Quick smoke clicks Duplicate
+  and checks selection and undo/redo. The locked macOS suite passes 198/198
+  CTest entries and HM-12 native smoke. General reusable nested subgraphs and
+  published ports remain open. Source only; no public binary or tag.
+
 ## 0.2.0-experimental.58 — working source, explicit source deletion
 
 - A Drawing or Part source card offers **Delete source…** with Protect and
