@@ -26,6 +26,13 @@ an external matte source is rejected to avoid a dangling or unintended
 cross-character reference. The existing graph validates typed ports and
 cycles; a general graph editor remains a separate HM-12 contract.
 
+Alt+Shift-drag can create a private editable cutter from a Drawing or leaf
+Part in the same character boundary as the target. It copies artwork and Part
+mesh/view references with fresh IDs, then binds the target atomically. When
+this was the old source's sole matte use and it was not painted explicitly,
+the old source's composite output is bypassed so rebinding does not reveal
+previously hidden ink. This uses existing saved fields, without a new format.
+
 ## Evidence and limits
 
 Domain and render tests check invalid references, fractional coverage, source

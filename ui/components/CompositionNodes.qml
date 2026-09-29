@@ -165,7 +165,7 @@ Item {
             Label {
                 text: root.selectedGroup > 0
                       ? "Alt+Shift-click: edit members"
-                      : "Drag: front · Shift-drag: behind · Alt-drag: cutter · Shift-click: group"
+                      : "Drag: order · Shift: behind · Alt: cutter · Alt+Shift: private cutter · Shift-click: group"
                 color: "#777777"
                 font.pixelSize: 10
             }
@@ -437,6 +437,7 @@ Item {
                             preventStealing: modelData.kind === "Drawing" || movableGroup > 0
                             property bool dragging: false
                             property bool dragCutter: false
+                            property bool dragPrivateCutter: false
                             property bool dragBehind: false
                             property real downX: 0
                             property real downY: 0
@@ -444,6 +445,8 @@ Item {
                                 dragging = false
                                 dragCutter = modelData.kind === "Drawing" &&
                                              (mouse.modifiers & Qt.AltModifier) !== 0
+                                dragPrivateCutter = dragCutter &&
+                                                    (mouse.modifiers & Qt.ShiftModifier) !== 0
                                 dragBehind = !dragCutter && (mouse.modifiers & Qt.ShiftModifier) !== 0
                                 downX = mouse.x
                                 downY = mouse.y
@@ -467,6 +470,7 @@ Item {
                                 const source = root.draggedLayer
                                 const group = root.draggedGroup
                                 const target = root.dropLayer
+                                const privateCutter = dragPrivateCutter
                                 root.draggedLayer = 0
                                 root.draggedGroup = 0
                                 root.dropLayer = 0
@@ -474,8 +478,12 @@ Item {
                                     if (group > 0) {
                                         root.controller.moveCompositeGroup(group, target, dragBehind)
                                     } else if (dragCutter) {
-                                        root.layerChosen(target)
-                                        root.controller.setLayerMatte(source)
+                                        const panel = root
+                                        panel.layerChosen(target)
+                                        if (privateCutter)
+                                            panel.controller.copyPrivateCutter(source)
+                                        else
+                                            panel.controller.setLayerMatte(source)
                                     } else {
                                         root.layerChosen(source)
                                         if (dragBehind)

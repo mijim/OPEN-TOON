@@ -1,5 +1,18 @@
 # Experimental releases
 
+## 0.2.0-experimental.62 — working source, private editable cutters
+
+- Alt+Shift-drag a Drawing or leaf Part source card onto a target to create a
+  private cutter in one undoable command. The copy keeps exposure timing,
+  transforms, Part view choices and mesh bindings while receiving independent
+  drawing and stroke IDs. A source outside the target character or a Part with
+  children rejects.
+- Rebinding a sole matte user keeps the old source from unexpectedly painting
+  into the scene. Fractional Drawing and animated Part fixtures verify exact
+  before/after pixels, independent edits, undo/redo, ProjectStore reopen and
+  native pointer input. The locked macOS suite passes 201/201 CTest entries
+  and HM-12 smoke. Automatic joint repair remains open. Source only.
+
 ## 0.2.0-experimental.61 — working source, direct group member editing
 
 - Alt+Shift-click a Drawing card while a group is selected to add an adjacent

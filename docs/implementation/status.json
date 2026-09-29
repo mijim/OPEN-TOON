@@ -475,17 +475,17 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.61",
+  "version": "0.2.0-experimental.62",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
-    "release_artifacts": "Historical experimental.11 macOS arm64 ZIP and Ubuntu-built Linux x86_64 AppImage; current experimental.61 work is source only",
+    "release_artifacts": "Historical experimental.11 macOS arm64 ZIP and Ubuntu-built Linux x86_64 AppImage; current experimental.62 work is source only",
     "cross_platform_builds": "Manual release workflow; broader Linux, Windows and device qualification remain open"
   },
   "planning_priority": {
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
     "state": "HM-00_through_HM-05_and_HM-13_complete__HM-06_HM-07_HM-10_HM-12_in_progress",
-    "note": "Editor functionality is the current priority; Milo and Clockwork remain animation fixtures. HM-12 now supports fractional cutters, source painting, saved cutter/opacity/blend/composite bypass, Normal/Multiply/Screen/Add, direct front/behind Drawing and Part ordering, format-31 named contiguous groups, whole-group order and format-32 saved group bypass, Alt-drag cutter binding, node-owner selection, image/matte Display routing, node-scoped cache, node-instance search and the supported operator palette. Group ports preserve output pixels and cutter references with atomic undo and reopen; closed character/rig copies remap group IDs and partial copies reject. Drawing/Part source deletion offers Protect or Disconnect policies with atomic reference updates. Selected contiguous groups can now be duplicated with independent artwork, internal cutter remapping and Part view registration; external dependencies reject atomically. A Qt-free character dependency collector inventories artwork, swatches, groups and mattes; independent character copies reject external cutters. Alt+Shift-click edits adjacent group members at either edge with atomic undo and unchanged unbypassed pixels. The arbitrary editable graph, nested/reusable groups, published external ports, animated depth and joint recipes remain open. HM-06 artistic review, HM-07 general control bindings and HM-10 hardware presentation remain open. Full P07/P08/P09/P10 and feature acceptance remain open."
+    "note": "Editor functionality is the current priority; Milo and Clockwork remain animation fixtures. HM-12 now supports fractional cutters, source painting, saved cutter/opacity/blend/composite bypass, Normal/Multiply/Screen/Add, direct front/behind Drawing and Part ordering, format-31 named contiguous groups, whole-group order and format-32 saved group bypass, Alt-drag cutter binding, node-owner selection, image/matte Display routing, node-scoped cache, node-instance search and the supported operator palette. Group ports preserve output pixels and cutter references with atomic undo and reopen; closed character/rig copies remap group IDs and partial copies reject. Drawing/Part source deletion offers Protect or Disconnect policies with atomic reference updates. Selected contiguous groups can now be duplicated with independent artwork, internal cutter remapping and Part view registration; external dependencies reject atomically. A Qt-free character dependency collector inventories artwork, swatches, groups and mattes; independent character copies reject external cutters. Alt+Shift-click edits adjacent group members at either edge with atomic undo and unchanged unbypassed pixels. Alt+Shift-drag creates a private Drawing/leaf-Part cutter with copied art and Part bindings, preserving output while giving the target independent matte editing. The arbitrary editable graph, nested/reusable groups, published external ports, animated depth and joint recipes remain open. HM-06 artistic review, HM-07 general control bindings and HM-10 hardware presentation remain open. Full P07/P08/P09/P10 and feature acceptance remain open."
   }
 }

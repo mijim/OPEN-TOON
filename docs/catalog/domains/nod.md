@@ -98,9 +98,9 @@ Clip by matte with defined inversion and alpha handling.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — docs/implementation/HM12-PROGRESS.md; fractional source alpha, inversion, opacity, visible source, undo and reopen.
+**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — docs/implementation/HM12-PROGRESS.md; fractional source alpha, inversion, opacity, visible source, independent private cutter with pixel/Part/native drag evidence, undo and reopen.
 
-**Remaining scope:** Editable Drawing/Part cutters, fractional inside/outside inversion and optional source painting work; wider matte operators remain open.
+**Remaining scope:** Editable Drawing/Part cutters, fractional inside/outside inversion and optional source painting work. Alt+Shift-drag makes a private cutter copy with independent artwork and preserved Part motion/bindings; automatic joint repair and wider matte operators remain open.
 
 ## NOD-007 — Switches
 

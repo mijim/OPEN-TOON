@@ -794,6 +794,38 @@ int main(int argc, char** argv) {
                         editor.document().layer(blue).matte != red ||
                         qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
                         throw std::runtime_error("Alt-drag cutter changed after reopen.");
+                    strip->setProperty("contentX", 0);
+                    QCoreApplication::processEvents();
+                    (void)window->grabWindow();
+                    redCard = findDrawingCard(int(red));
+                    blueCard = findDrawingCard(int(blue));
+                    if (!redCard || !blueCard)
+                        throw std::runtime_error("Private cutter Drawing cards are unavailable.");
+                    const auto privateFrom = redCard->mapToScene(QPointF(redCard->width() / 2, 30));
+                    const auto privateTo = blueCard->mapToScene(QPointF(blueCard->width() / 2, 30));
+                    const auto privateMove = [&](QEvent::Type type, QPointF point,
+                                                 Qt::MouseButtons buttons) {
+                        QMouseEvent event(type, point, window->mapToGlobal(point.toPoint()),
+                                          type == QEvent::MouseMove ? Qt::NoButton : Qt::LeftButton,
+                                          buttons, Qt::AltModifier | Qt::ShiftModifier);
+                        QCoreApplication::sendEvent(window, &event);
+                        QCoreApplication::processEvents();
+                    };
+                    privateMove(QEvent::MouseButtonPress, privateFrom, Qt::LeftButton);
+                    privateMove(QEvent::MouseMove, privateFrom + QPointF(16, 0), Qt::LeftButton);
+                    privateMove(QEvent::MouseMove, privateTo, Qt::LeftButton);
+                    privateMove(QEvent::MouseButtonRelease, privateTo, Qt::NoButton);
+                    if (editor.document().layer(blue).matte == red ||
+                        !editor.document().layer(red).compositeBypassed ||
+                        qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Alt+Shift-drag did not create a private cutter.");
+                    editor.undo();
+                    if (editor.document().layer(blue).matte != red)
+                        throw std::runtime_error("Private cutter did not undo atomically.");
+                    editor.redo();
+                    if (editor.document().layer(blue).matte == red)
+                        throw std::runtime_error("Private cutter did not redo atomically.");
+                    editor.undo();
                     window->setWidth(1000);
                     QCoreApplication::processEvents();
                     (void)window->grabWindow();
@@ -1217,7 +1249,7 @@ int main(int argc, char** argv) {
                         editor.document().layer(blue).matte != 0)
                         throw std::runtime_error("Disconnected source deletion changed after reopen.");
                     std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass, fractional cutter, "
-                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, group order, member edits, bypass, duplicate and ungroup ports, Alt-drag cutter, Alt-click bypass, operator library search/apply, explicit source deletion, typed node search, save/reopen and undo.\n";
+                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, group order, member edits, bypass, duplicate and ungroup ports, Alt-drag cutter, Alt+Shift-drag private cutter, Alt-click bypass, operator library search/apply, explicit source deletion, typed node search, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

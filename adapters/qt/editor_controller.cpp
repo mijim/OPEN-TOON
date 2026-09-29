@@ -1416,6 +1416,13 @@ bool EditorController::setLayerMatte(int sourceLayer) {
             target.matteBypassed = false;
     });
 }
+bool EditorController::copyPrivateCutter(int sourceLayer) {
+    if (!layer_ || sourceLayer <= 0)
+        return false;
+    return edit("Copy private cutter", [&](Document& d) {
+        (void)opentoon::copyPrivateCutter(d, Id(sourceLayer), layer_);
+    });
+}
 bool EditorController::setMatteInverted(bool inverted) {
     if (!layer_)
         return false;

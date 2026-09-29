@@ -246,6 +246,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE bool deleteCompositionSource(int layerId, bool disconnectReferences);
     Q_INVOKABLE void setParent(int);
     Q_INVOKABLE bool setLayerMatte(int sourceLayer);
+    Q_INVOKABLE bool copyPrivateCutter(int sourceLayer);
     Q_INVOKABLE bool setMatteInverted(bool inverted);
     Q_INVOKABLE bool setMatteBypassed(bool bypassed);
     Q_INVOKABLE bool setOpacityBypassed(bool bypassed);

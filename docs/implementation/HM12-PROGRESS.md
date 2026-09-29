@@ -121,6 +121,13 @@ external cutter user and intersecting group boundary before deleting the
 source or complete Part branch. Locked users and child-bearing Drawings still
 reject. The chosen policy is one undoable command, with no new project-format
 field; see [ADR-062](../architecture/adr/062-composition-source-deletion-policy.md).
+Alt+Shift-drag now makes a private cutter from a Drawing or leaf Part source
+inside the target's character boundary. The source's exposures, animated
+transforms, Part mesh bindings and view choices survive with new artwork IDs.
+If rebinding would reveal a formerly matte-only source, its composite output
+is bypassed in the same command. This lets an animator edit a joint or eye
+silhouette independently; automatic seam repair and general Auto Patch remain
+open. See [ADR-039](../architecture/adr/039-layer-cutter-matte.md).
 Alt-dragging a Drawing card onto another binds the first as the second's
 cutter source through the existing validated document command. Its fractional
 alpha, saved references and one-step undo use the same path as the inspector.
@@ -268,6 +275,10 @@ preview. This is diagnostic navigation, not a persisted graph edit.
 - Group-member fixtures add at both edges, reject a nonadjacent target and an
   interior removal, verify pixel parity, undo/redo and ProjectStore reopen.
   Native Qt Quick smoke Alt+Shift-clicks an adjacent card in and out.
+- Private-cutter fixtures compare fractional pixels before and after copying,
+  edit only the copied art, check animated Part pixels and mesh/view references,
+  reject a child-bearing Part, undo/redo and reopen via ProjectStore. Native
+  Qt Quick smoke Alt+Shift-drags a source card onto a target.
 - Drawing and Part deletion fixtures verify Protect rejection, explicit
   disconnection of cutter users and group boundaries, locked-user refusal,
   changed pixels, atomic undo/redo and reopen. Native Qt Quick smoke clicks

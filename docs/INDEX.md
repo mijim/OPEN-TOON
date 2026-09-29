@@ -1,6 +1,6 @@
 # Documentation map
 
-**Updated: 2026-09-29.** The repository contains specifications, an execution roadmap and an experimental native editor. [Implementation status](implementation/STATUS.md) records the available subsets and open P00–P11 gates. HM-00–HM-05 and HM-13 are accepted bounded contracts; HM-06 animated deformation is in progress.
+**Updated: 2026-09-30.** The repository contains specifications, an execution roadmap and an experimental native editor. [Implementation status](implementation/STATUS.md) records the available subsets and open P00–P11 gates. HM-00–HM-05 and HM-13 are accepted bounded contracts; HM-06 animated deformation is in progress.
 
 ## Current decisions
 

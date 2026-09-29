@@ -60,6 +60,42 @@ TEST_CASE("Composition node presentation follows cutter edits and undo") {
     editor.undo();
     REQUIRE(editor.compositionNodes().size() == 7);
 }
+TEST_CASE("Editor copies an existing cutter privately and reopens its exact pixels") {
+    auto document = opentoon::makeDocument();
+    document.width = document.height = 1;
+    document.background = {0, 0, 0, 0};
+    const auto target = document.layers.front().id;
+    document.editableDrawing(target, 0).image = opentoon::ImageAsset{1, 1, {255, 0, 0, 255}};
+    auto source = document.layers.front();
+    source.id = document.allocateId();
+    source.name = "Joint silhouette";
+    auto drawing = document.drawings.at(source.exposures.front().drawing);
+    drawing.id = document.allocateId();
+    drawing.image = opentoon::ImageAsset{1, 1, {0, 0, 255, 128}};
+    document.drawings.emplace(drawing.id, drawing);
+    source.exposures.front().drawing = drawing.id;
+    document.layers.push_back(source);
+    document.layer(target).matte = source.id;
+    document.validate();
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto path = QUrl::fromLocalFile(directory.filePath("private-cutter.otoon"));
+    REQUIRE(opentoon::ProjectStore::save(
+        std::filesystem::path(path.toLocalFile().toStdString()), document) > 0);
+    EditorController editor;
+    REQUIRE(editor.openProject(path));
+    editor.setSelectedLayer(int(target));
+    const auto pixels = opentoon::SceneRenderer::render(editor.document(), 0);
+    REQUIRE(editor.copyPrivateCutter(int(source.id)));
+    const auto copied = editor.document().layer(target).matte;
+    REQUIRE(copied != source.id);
+    REQUIRE(editor.document().layer(source.id).compositeBypassed);
+    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 0) == pixels);
+    REQUIRE(editor.saveProject({}));
+    REQUIRE(editor.openProject(path));
+    REQUIRE(editor.document().layer(target).matte == copied);
+    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 0) == pixels);
+}
 TEST_CASE("Direct drawing reorder changes pixels atomically and survives reopen") {
     auto document = opentoon::makeDocument();
     document.width = document.height = 1;

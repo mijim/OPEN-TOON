@@ -1,5 +1,6 @@
 #include "opentoon/property_address.h"
 #include "opentoon/character_pose.h"
+#include "opentoon/deformation.h"
 #include "opentoon/rigging.h"
 #include "opentoon/session.h"
 #include "serialization.h"
@@ -328,6 +329,111 @@ TEST_CASE("Composite group duplication registers copied Parts in character views
         (void)duplicateCompositeGroup(d, group);
     }));
     REQUIRE(session.document() == before);
+}
+TEST_CASE("Private cutter copy keeps pixels and gives the target independent artwork") {
+    auto document = makeDocument();
+    document.width = document.height = 1;
+    document.background = {0, 0, 0, 0};
+    document.composition = CompositionProfile::LinearSrgb;
+    const Id target = document.layers.front().id;
+    document.editableDrawing(target, 0).image = ImageAsset{1, 1, {255, 0, 0, 255}};
+    Layer source;
+    source.id = document.allocateId();
+    const Id sourceId = source.id;
+    source.name = "Joint silhouette";
+    document.layers.push_back(source);
+    document.editableDrawing(sourceId, 0).image = ImageAsset{1, 1, {0, 0, 255, 128}};
+    document.layer(target).matte = sourceId;
+    document.validate();
+    Session session;
+    session.replace(document);
+    const auto baseline = session.document();
+    const auto pixels = SceneRenderer::render(baseline, 0);
+    REQUIRE(qAlpha(pixels.pixel(0, 0)) == 128);
+    Id privateId = 0;
+    REQUIRE(session.apply("Copy private cutter", [&](Document& d) {
+        privateId = copyPrivateCutter(d, sourceId, target);
+    }));
+    const auto& copied = session.document();
+    REQUIRE(copied.layer(target).matte == privateId);
+    REQUIRE(copied.layer(sourceId).compositeBypassed);
+    REQUIRE(SceneRenderer::render(copied, 0) == pixels);
+    const Id originalDrawing = copied.drawingAt(sourceId, 0)->id;
+    const Id privateDrawing = copied.drawingAt(privateId, 0)->id;
+    REQUIRE(privateDrawing != originalDrawing);
+    REQUIRE(deserializeDocument(serializeDocument(copied)) == copied);
+    REQUIRE(session.apply("Edit private cutter", [&](Document& d) {
+        d.drawings.at(privateDrawing).image = ImageAsset{1, 1, {0, 0, 255, 64}};
+    }));
+    REQUIRE(qAlpha(SceneRenderer::render(session.document(), 0).pixel(0, 0)) == 64);
+    REQUIRE(session.document().drawings.at(originalDrawing).image->rgba[3] == 128);
+    REQUIRE(session.undo());
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == baseline);
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == copied);
+}
+TEST_CASE("Private Part cutter copies its view choice and refuses a child branch") {
+    Session session;
+    const Id body = session.document().layers.front().id;
+    Id root = 0, sourceId = 0;
+    REQUIRE(session.apply("Build Part cutter", [&](Document& d) {
+        d.width = 2;
+        d.height = 1;
+        d.background = {0, 0, 0, 0};
+        d.editableDrawing(body, 0).image = ImageAsset{2, 1,
+            {255, 0, 0, 255, 255, 0, 0, 255}};
+        d.layer(body).exposures.front().end = d.duration;
+        root = makeCharacter(d, body, "Actor");
+        Layer source;
+        source.id = d.allocateId();
+        sourceId = source.id;
+        source.name = "Upper arm";
+        d.layers.push_back(source);
+        d.editableDrawing(sourceId, 0).image = ImageAsset{1, 1, {0, 0, 255, 128}};
+        d.layer(sourceId).exposures.front().end = d.duration;
+        attachDrawingAsPart(d, sourceId, root, "Upper arm");
+        bindRegularImageMesh(d, sourceId, d.layer(sourceId).exposures.front().drawing, 1, 1);
+        Keyframe rest;
+        rest.frame = 0;
+        rest.value = d.layer(sourceId).transform;
+        Keyframe moved = rest;
+        moved.frame = 12;
+        moved.value.x = 1;
+        d.layer(sourceId).keys = {rest, moved};
+        d.layer(body).matte = sourceId;
+        (void)captureCharacterView(d, root, 0, "Front");
+    }));
+    const auto restPixels = SceneRenderer::render(session.document(), 0);
+    const auto movedPixels = SceneRenderer::render(session.document(), 12);
+    Id privateId = 0;
+    REQUIRE(session.apply("Copy Part cutter", [&](Document& d) {
+        privateId = copyPrivateCutter(d, sourceId, body);
+    }));
+    const auto& copied = session.document();
+    REQUIRE(copied.layer(privateId).kind == LayerKind::Part);
+    REQUIRE(copied.layer(privateId).role == "Upper arm cutter");
+    REQUIRE(copied.layer(privateId).parent == root);
+    REQUIRE(copied.layer(privateId).keys == copied.layer(sourceId).keys);
+    REQUIRE(copied.layer(root).views.front().choices.size() == 3);
+    REQUIRE(copied.drawingAt(privateId, 0)->id != copied.drawingAt(sourceId, 0)->id);
+    REQUIRE(copied.layer(privateId).bindings.size() == 1);
+    REQUIRE(copied.layer(privateId).bindings.front().drawing ==
+            copied.drawingAt(privateId, 0)->id);
+    REQUIRE(SceneRenderer::render(copied, 0) == restPixels);
+    REQUIRE(SceneRenderer::render(copied, 12) == movedPixels);
+    REQUIRE(deserializeDocument(serializeDocument(copied)) == copied);
+    const auto baseline = session.document();
+    REQUIRE_THROWS(session.apply("Reject a Part with a child", [&](Document& d) {
+        Layer child;
+        child.id = d.allocateId();
+        child.name = "Hand peg";
+        child.kind = LayerKind::Peg;
+        child.parent = sourceId;
+        d.layers.push_back(child);
+        (void)copyPrivateCutter(d, sourceId, body);
+    }));
+    REQUIRE(session.document() == baseline);
 }
 TEST_CASE("Pose transfer maps unique Part roles and drawing names without touching source") {
     Session session;
