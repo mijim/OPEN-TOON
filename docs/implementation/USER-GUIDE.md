@@ -42,6 +42,14 @@ or **Paint cutter source** as needed. The last option keeps the source visible
 at its normal layer order while it masks the selected target; it is shared by
 other targets using that source. These edits undo and save. Shift-click two Drawing or Part cards to group their inclusive composite span. Select a member to rename it inline or use **Ungroup**. Drag the Group output card onto a Drawing or Part to move all members in front of it; Shift-drag moves them behind. With a group member selected, **Back** and **Front** move the whole group by one neighboring drawing or group. **Bypass group** temporarily removes its composite output while keeping its members and cutter sources; click again to restore it. Alt-click the Group output card for the same toggle. Group input/output cards preserve the result and source cutter references. Nested and reusable general graph groups, arbitrary node creation and wiring remain open.
 
+**Add operator** opens a searchable list of supported actions. Search by a name
+such as Multiply or a category such as Matte. Choosing Drawing adds a layer;
+Normal, Multiply, Screen and Add change the selected Drawing or Part's blend.
+Inside and Outside require an assigned cutter. To use Group span, Shift-click
+the first Drawing card, select the last Drawing or Part, then choose the action.
+Each successful choice can be undone. The palette currently applies these
+supported document operations; it does not create arbitrary graph nodes.
+
 ## Drawing and view controls
 
 - **Pencil:** sampled vector centerline with round segments and pressure-weighted width.

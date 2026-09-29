@@ -70,6 +70,11 @@ Format-32 **Bypass group** temporarily forwards the Group input image. Member
 settings and an internal cutter used outside the group remain available;
 restoring the saved toggle resumes the exact internal composite. Migration
 from format 31 retains a readable backup.
+Nodes now has an **Add operator** palette. Search finds the supported Source,
+Composite, Matte and Structure actions by name or category, and each result
+explains and applies an existing document command. Drawing creation and blend
+application pass native interaction checks. The full node inventory and
+arbitrary wiring remain open.
 
 An original 20-second integrated study now combines the connected toon, nine
 mouth substitutions, a visible eye cutter and sample-aligned synthetic audio
@@ -88,14 +93,15 @@ skipped polled playhead frames, respectively. These counters do not measure
 speaker underruns or actual
 presented-frame drops.
 
-The working source version is `0.2.0-experimental.55`; no new binary or source
+The working source version is `0.2.0-experimental.56`; no new binary or source
 tag has been published for it. The last locally qualified macOS preview and
 earlier binaries do not qualify these source changes.
 
-The owner resumed development after the earlier 10:30 CEST cutoff. The `.55`
+The owner resumed development after the earlier 10:30 CEST cutoff. The `.56`
 locked macOS build passes 195/195 CTest entries and native HM-12 smoke,
 including contiguous group input/output ports, matte-only source pixels,
-grouping/rename/ungroup, whole-group order and bypass, undo/redo and save/reopen. Earlier native smokes and
+grouping/rename/ungroup, whole-group order and bypass, operator search/apply,
+undo/redo and save/reopen. Earlier native smokes and
 artistic checks are recorded in prior
 release entries. HM-12 remains an unfinished bounded contract; next work can
 continue its graph grouping/part-overlap behavior.

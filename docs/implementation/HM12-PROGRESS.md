@@ -82,6 +82,13 @@ output card. The output chooses the incoming image instead of the internal
 composite while retaining every member and cutter source. An external target
 can still use a cutter inside the bypassed group. The saved toggle undoes and
 reopens; see [ADR-061](../architecture/adr/061-persistent-composite-group-bypass.md).
+The Nodes **Add operator** palette lists supported Source, Composite, Matte
+and Structure actions with short descriptions. Search matches names and
+categories. Choosing Drawing adds a source layer; blend choices edit the
+selected Drawing/Part, Inside/Outside changes an assigned cutter, and Group
+span uses the marked first Drawing and current selection. Each routes through
+the existing undoable command. This is a bounded operator-library subset;
+arbitrary graph nodes and user wiring remain open.
 Alt-dragging a Drawing card onto another binds the first as the second's
 cutter source through the existing validated document command. Its fractional
 alpha, saved references and one-step undo use the same path as the inspector.
@@ -212,6 +219,10 @@ preview. This is diagnostic navigation, not a persisted graph edit.
   load bypass off, save a readable `.pre-v31.bak` on upgrade and reject active
   bypass claimed by the old schema. Controller and native Qt Quick tests cover
   the checkbox, undo/redo, save/reopen and restoration.
+- Native Qt Quick smoke searches Matte and Source categories and the Multiply
+  name, applies Multiply to the selected Drawing and adds a new Drawing,
+  then undoes both edits. The catalog action uses the same command and
+  validation path as the inspector.
 - Native Qt Quick smoke Alt-drags a Drawing source onto a Drawing target,
   checks the target binding and output color, then undoes, redoes and reopens.
 - Native Qt Quick smoke Alt-clicks Apply matte to bypass, undoes, redoes and

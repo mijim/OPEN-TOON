@@ -1,5 +1,17 @@
 # Experimental releases
 
+## 0.2.0-experimental.56 — working source, operator library subset
+
+- Nodes now opens a compact operator library with descriptions and search by
+  operator name or category. Its supported actions add a Drawing, set a
+  Normal/Multiply/Screen/Add blend, choose Inside/Outside for an assigned
+  cutter, or group a marked Drawing span. Each action uses an existing
+  transactional editor command.
+- Native Qt Quick checks search Matte and Source categories, apply Multiply
+  and Drawing, and undo both changes. The locked macOS suite passes 195/195
+  CTest entries. This is a partial NOD-003 library; arbitrary graph-node
+  creation and wiring remain open. Source only; no public binary or tag.
+
 ## 0.2.0-experimental.55 — working source, group bypass
 
 - Format 32 saves a composite group's bypass state. Nodes offers a compact

@@ -52,9 +52,13 @@ Organize operators by category with search and descriptions.
 
 **Initial acceptance:** Search finds an operator by name and category.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM12-PROGRESS.md](../../../docs/implementation/HM12-PROGRESS.md) — native category/name search, Multiply and Drawing application with undo.
+
+**Remaining scope:** The Nodes palette searches supported Source, Composite, Matte and Structure actions by name or category and shows a short description. Choices use existing Drawing, blend, cutter or group commands. A comprehensive operator inventory and arbitrary graph-node creation remain open.
 
 ## NOD-004 — Groups and published ports
 

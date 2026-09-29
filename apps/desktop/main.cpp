@@ -1047,8 +1047,75 @@ int main(int argc, char** argv) {
                     if (!editor.document().compositeGroups.empty() ||
                         qGreen(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
                         throw std::runtime_error("Ungroup did not restore the ungrouped graph and pixels.");
+                    editor.setSelectedLayer(int(red));
+                    QCoreApplication::processEvents();
+                    auto* operatorButton = window->findChild<QQuickItem*>("nodeOperatorButton");
+                    if (!operatorButton || !operatorButton->isVisible())
+                        throw std::runtime_error("Composition operator library is unavailable.");
+                    const auto operatorPoint = operatorButton->mapToScene(QPointF(
+                        operatorButton->width() / 2, operatorButton->height() / 2));
+                    movePoint(QEvent::MouseButtonPress, operatorPoint, Qt::LeftButton);
+                    movePoint(QEvent::MouseButtonRelease, operatorPoint, Qt::NoButton);
+                    auto* operatorSearch = window->findChild<QQuickItem*>("nodeOperatorSearch");
+                    if (!operatorSearch || !operatorSearch->isVisible())
+                        throw std::runtime_error("Composition operator search did not open.");
+                    operatorSearch->setProperty("text", "Matte");
+                    QCoreApplication::processEvents();
+                    if (nodes->property("matchingOperators").toList().size() != 2)
+                        throw std::runtime_error("Operator category search did not find both mattes.");
+                    operatorSearch->setProperty("text", "Multiply");
+                    QCoreApplication::processEvents();
+                    (void)window->grabWindow();
+                    if (nodes->property("matchingOperators").toList().size() != 1)
+                        throw std::runtime_error("Operator name search did not find Multiply.");
+                    const auto findOperatorItem = [](auto&& self, QQuickItem* parent,
+                                                     const QString& name) -> QQuickItem* {
+                        if (!parent)
+                            return nullptr;
+                        if (parent->objectName() == name)
+                            return parent;
+                        for (auto* child : parent->childItems())
+                            if (auto* match = self(self, child, name))
+                                return match;
+                        return nullptr;
+                    };
+                    auto* multiplyOperator = findOperatorItem(findOperatorItem,
+                        window->contentItem(), "nodeOperatormultiply");
+                    if (!multiplyOperator || !multiplyOperator->isVisible())
+                        throw std::runtime_error("Multiply operator is unavailable.");
+                    const auto operatorMultiplyPoint = multiplyOperator->mapToScene(QPointF(
+                        multiplyOperator->width() / 2, multiplyOperator->height() / 2));
+                    movePoint(QEvent::MouseButtonPress, operatorMultiplyPoint, Qt::LeftButton);
+                    movePoint(QEvent::MouseButtonRelease, operatorMultiplyPoint, Qt::NoButton);
+                    if (editor.document().layer(red).blendMode != opentoon::LayerBlendMode::Multiply)
+                        throw std::runtime_error("Operator library did not apply Multiply.");
+                    editor.undo();
+                    if (editor.document().layer(red).blendMode != opentoon::LayerBlendMode::Normal)
+                        throw std::runtime_error("Operator library blend edit did not undo.");
+                    const auto beforeOperatorAdd = editor.document().layers.size();
+                    movePoint(QEvent::MouseButtonPress, operatorPoint, Qt::LeftButton);
+                    movePoint(QEvent::MouseButtonRelease, operatorPoint, Qt::NoButton);
+                    operatorSearch = window->findChild<QQuickItem*>("nodeOperatorSearch");
+                    operatorSearch->setProperty("text", "Source");
+                    QCoreApplication::processEvents();
+                    (void)window->grabWindow();
+                    if (nodes->property("matchingOperators").toList().size() != 1)
+                        throw std::runtime_error("Operator source category search is incorrect.");
+                    auto* drawingOperator = findOperatorItem(findOperatorItem,
+                        window->contentItem(), "nodeOperatordrawing");
+                    if (!drawingOperator || !drawingOperator->isVisible())
+                        throw std::runtime_error("Drawing source operator is unavailable.");
+                    const auto drawingOperatorPoint = drawingOperator->mapToScene(QPointF(
+                        drawingOperator->width() / 2, drawingOperator->height() / 2));
+                    movePoint(QEvent::MouseButtonPress, drawingOperatorPoint, Qt::LeftButton);
+                    movePoint(QEvent::MouseButtonRelease, drawingOperatorPoint, Qt::NoButton);
+                    if (editor.document().layers.size() != beforeOperatorAdd + 1)
+                        throw std::runtime_error("Drawing operator did not add a layer.");
+                    editor.undo();
+                    if (editor.document().layers.size() != beforeOperatorAdd)
+                        throw std::runtime_error("Drawing operator did not undo atomically.");
                     std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass, fractional cutter, "
-                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, group order, bypass and ungroup ports, Alt-drag cutter, Alt-click bypass, typed search, save/reopen and undo.\n";
+                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, group order, bypass and ungroup ports, Alt-drag cutter, Alt-click bypass, operator library search/apply, typed node search, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

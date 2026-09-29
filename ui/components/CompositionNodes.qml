@@ -27,6 +27,22 @@ Item {
     property int matchIndex: -1
     readonly property int cardWidth: 148
     readonly property int cardGap: 8
+    readonly property var operators: [
+        {id: "drawing", name: "Drawing", category: "Source", description: "Add an empty drawing layer."},
+        {id: "normal", name: "Normal", category: "Composite", description: "Use ordinary source-over blending."},
+        {id: "multiply", name: "Multiply", category: "Composite", description: "Darken overlapping colors."},
+        {id: "screen", name: "Screen", category: "Composite", description: "Lighten overlapping colors."},
+        {id: "add", name: "Add", category: "Composite", description: "Add overlapping colors with a clamp."},
+        {id: "inside", name: "Inside cutter", category: "Matte", description: "Keep coverage inside the assigned cutter."},
+        {id: "outside", name: "Outside cutter", category: "Matte", description: "Keep coverage outside the assigned cutter."},
+        {id: "group", name: "Group span", category: "Structure", description: "Group from the marked drawing to the selection."}
+    ]
+    readonly property var matchingOperators: {
+        const query = operatorSearch ? operatorSearch.text.trim().toLowerCase() : ""
+        return query ? operators.filter(op =>
+            op.name.toLowerCase().includes(query) ||
+            op.category.toLowerCase().includes(query)) : operators
+    }
     readonly property var matchingNodeIds: {
         const query = nodeSearch ? nodeSearch.text.trim().toLowerCase() : ""
         return query ? controller.compositionNodes.filter(n =>
@@ -59,6 +75,34 @@ Item {
             return false
         }
         return true
+    }
+    function canApplyOperator(id) {
+        if (id === "drawing")
+            return true
+        if (id === "group")
+            return groupStartLayer > 0 && selected && selected.id !== groupStartLayer &&
+                   (selected.kind === 0 || selected.kind === 3)
+        return selected && !selected.locked && (selected.kind === 0 || selected.kind === 3) &&
+               (id !== "inside" && id !== "outside" || selected.matte > 0)
+    }
+    function applyOperator(id) {
+        if (!canApplyOperator(id))
+            return false
+        if (id === "drawing") {
+            controller.addLayer()
+            return true
+        }
+        if (id === "group") {
+            const first = groupStartLayer
+            const grouped = controller.groupDrawings(first, selected.id)
+            if (grouped)
+                groupStartLayer = 0
+            return grouped
+        }
+        if (id === "inside" || id === "outside")
+            return controller.setMatteInverted(id === "outside")
+        const modes = {normal: 0, multiply: 1, screen: 2, add: 3}
+        return modes[id] === undefined ? false : controller.setLayerBlendMode(modes[id])
     }
     function nudgeSelectedGroup(direction) {
         const ordered = controller.layers.filter(l => l.kind === 0 || l.kind === 3).reverse()
@@ -269,6 +313,12 @@ Item {
                 Accessible.name: "Bypass selected drawing opacity"
             }
             Item { Layout.fillWidth: true }
+            ToolButton {
+                objectName: "nodeOperatorButton"
+                text: "Add operator"
+                onClicked: operatorPopup.open()
+                Accessible.name: "Open composition operator library"
+            }
             CompactTextField {
                 id: nodeSearch
                 objectName: "nodeSearch"
@@ -526,6 +576,85 @@ Item {
                 }
             }
         }
+        }
+    }
+    Popup {
+        id: operatorPopup
+        objectName: "nodeOperatorPopup"
+        parent: root
+        x: Math.max(8, root.width - width - 12)
+        y: 76
+        width: 340
+        height: Math.min(350, Math.max(170, root.height - 82))
+        padding: 8
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        onOpened: operatorSearch.forceActiveFocus()
+        background: Rectangle {
+            color: "#171717"
+            border.color: "#555555"
+            radius: 5
+        }
+        contentItem: ColumnLayout {
+            spacing: 6
+            Label {
+                text: "OPERATORS"
+                color: "#aaaaaa"
+                font.pixelSize: 10
+                font.letterSpacing: 1
+            }
+            CompactTextField {
+                id: operatorSearch
+                objectName: "nodeOperatorSearch"
+                Layout.fillWidth: true
+                placeholderText: "Find by name or category"
+                Accessible.name: "Search composition operators by name or category"
+            }
+            ListView {
+                objectName: "nodeOperatorList"
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                clip: true
+                model: root.matchingOperators
+                delegate: Rectangle {
+                    required property var modelData
+                    objectName: "nodeOperator" + modelData.id
+                    width: ListView.view.width
+                    height: 52
+                    color: operatorMouse.containsMouse ? "#292929" : "#1d1d1d"
+                    border.color: "#333333"
+                    Column {
+                        anchors.fill: parent
+                        anchors.margins: 6
+                        spacing: 2
+                        Label {
+                            text: modelData.category.toUpperCase() + "  /  " + modelData.name
+                            color: root.canApplyOperator(modelData.id) ? "#eeeeee" : "#777777"
+                            font.pixelSize: 11
+                        }
+                        Label {
+                            text: modelData.description
+                            color: "#888888"
+                            font.pixelSize: 10
+                            elide: Text.ElideRight
+                            width: parent.width
+                        }
+                    }
+                    MouseArea {
+                        id: operatorMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        enabled: root.canApplyOperator(modelData.id)
+                        cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                        onClicked: {
+                            const operatorId = modelData.id
+                            operatorPopup.close()
+                            root.applyOperator(operatorId)
+                        }
+                        Accessible.name: modelData.category + ": " + modelData.name + ". " + modelData.description
+                    }
+                }
+                ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
+            }
         }
     }
 }
