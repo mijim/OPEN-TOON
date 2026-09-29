@@ -154,3 +154,6 @@ Screen layer blending with premultiplied alpha and explicit color profiles.
 
 See [ADR-050](050-frame-aligned-audio-split.md) for an exact 48 kHz PCM clip
 split at a scene frame with shared source, fade boundaries and atomic undo.
+
+See [ADR-059](059-persistent-composite-bypass.md) for format-30 Drawing/Part
+composite bypass with preserved cutter sources and inactive output dependencies.

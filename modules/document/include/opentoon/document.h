@@ -199,6 +199,7 @@ struct Layer {
     bool opacityBypassed = false;
     LayerBlendMode blendMode = LayerBlendMode::Normal;
     bool blendBypassed = false;
+    bool compositeBypassed = false;
     Transform transform;
     std::vector<Exposure> exposures;
     std::vector<Keyframe> keys;
@@ -239,7 +240,7 @@ struct AudioClip {
     auto operator<=>(const AudioClip&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 29;
+    static constexpr int formatVersion = 30;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;

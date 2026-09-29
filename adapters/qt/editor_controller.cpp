@@ -167,6 +167,7 @@ QVariantList EditorController::layers() const {
                                      {"opacityBypassed", it->opacityBypassed},
                                      {"blendMode", int(it->blendMode)},
                                      {"blendBypassed", it->blendBypassed},
+                                     {"compositeBypassed", it->compositeBypassed},
                                      {"kind", int(it->kind)},
                                      {"role", QString::fromStdString(it->role)},
                                      {"spans", spans},
@@ -194,6 +195,7 @@ QVariantList EditorController::compositionNodes() const {
         case GraphNodeKind::Screen: kind = "Screen"; break;
         case GraphNodeKind::Add: kind = "Add"; break;
         case GraphNodeKind::BypassBlend: kind = "Bypassed blend"; break;
+        case GraphNodeKind::BypassComposite: kind = "Bypassed composite"; break;
         case GraphNodeKind::MatteFromImage: kind = "Cutter"; break;
         case GraphNodeKind::InvertMatte: kind = "Invert matte"; break;
         case GraphNodeKind::ApplyMatte: kind = "Apply matte"; break;
@@ -1154,6 +1156,18 @@ bool EditorController::setBlendBypassed(bool bypassed) {
             (target.kind != LayerKind::Drawing && target.kind != LayerKind::Part))
             throw std::runtime_error("Select an unlocked drawing or Part to bypass its blend mode.");
         target.blendBypassed = bypassed;
+    });
+}
+bool EditorController::setCompositeBypassed(bool bypassed) {
+    if (!layer_)
+        return false;
+    return edit(bypassed ? "Bypass layer composite" : "Enable layer composite",
+                [&](Document& d) {
+        auto& target = d.layer(layer_);
+        if (target.locked ||
+            (target.kind != LayerKind::Drawing && target.kind != LayerKind::Part))
+            throw std::runtime_error("Select an unlocked drawing or Part to bypass its composite node.");
+        target.compositeBypassed = bypassed;
     });
 }
 bool EditorController::setMatteSourceVisible(bool visible) {

@@ -8,6 +8,7 @@
 #include "vector_hit.h"
 #include <QPainter>
 #include <catch2/catch_test_macros.hpp>
+#include <algorithm>
 #include <cmath>
 #include <chrono>
 #include <future>
@@ -406,6 +407,72 @@ TEST_CASE("Inverted cutter keeps target ink outside its source bounds") {
     REQUIRE(qAlpha(output.pixel(0, 0)) == 96);
     REQUIRE(qAlpha(output.pixel(1, 0)) == 128);
     REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == output);
+}
+TEST_CASE("Composite bypass keeps a painted cutter usable without painting its layer") {
+    auto document = makeDocument();
+    document.width = document.height = 1;
+    document.background = {0, 0, 0, 0};
+    const Id baseId = document.layers.front().id;
+    document.editableDrawing(baseId, 0).image = ImageAsset{1, 1, {255, 0, 0, 255}};
+    const auto addImage = [&](std::string name, std::vector<std::uint8_t> pixels) {
+        Layer layer = document.layers.front();
+        layer.id = document.allocateId();
+        layer.name = std::move(name);
+        Drawing drawing;
+        drawing.id = document.allocateId();
+        drawing.image = ImageAsset{1, 1, std::move(pixels)};
+        document.drawings.emplace(drawing.id, drawing);
+        for (auto& exposure : layer.exposures)
+            exposure.drawing = drawing.id;
+        document.layers.push_back(layer);
+        return layer.id;
+    };
+    const Id sourceId = addImage("Blue cutter", {0, 0, 255, 128});
+    const Id targetId = addImage("Green target", {0, 255, 0, 255});
+    document.layer(sourceId).paintMatteSource = true;
+    document.layer(targetId).matte = sourceId;
+    document.validate();
+    const auto painted = SceneRenderer::render(document, 0);
+    REQUIRE(qBlue(painted.pixel(0, 0)) > 0);
+    Session session;
+    session.replace(document);
+    REQUIRE(session.apply("Bypass source composite", [&](Document& candidate) {
+        candidate.layer(sourceId).compositeBypassed = true;
+    }));
+    const auto& bypassed = session.document();
+    const auto graph = CompositionGraph::orderedLayers(bypassed);
+    REQUIRE_NOTHROW(graph.validate(bypassed));
+    const auto sourceAffected = graph.affectedByLayer(bypassed, sourceId);
+    REQUIRE(std::find(sourceAffected.begin(), sourceAffected.end(), graph.write) !=
+            sourceAffected.end());
+    const auto display = GraphRenderer::render(graph, bypassed, 0, {}, {}, GraphTarget::Display);
+    const auto write = GraphRenderer::render(graph, bypassed, 0, {}, {}, GraphTarget::Write);
+    REQUIRE(display == write);
+    REQUIRE(SceneRenderer::render(bypassed, 0) == write);
+    REQUIRE(qBlue(write.pixel(0, 0)) == 0);
+    REQUIRE(qGreen(write.pixel(0, 0)) > 0);
+    REQUIRE(qAlpha(write.pixel(0, 0)) == 255);
+    const auto matte = std::find_if(graph.nodes.begin(), graph.nodes.end(), [&](const auto& node) {
+        return node.kind == GraphNodeKind::MatteFromImage && node.layer == sourceId;
+    });
+    REQUIRE(matte != graph.nodes.end());
+    REQUIRE(qAlpha(GraphRenderer::renderNode(graph, bypassed, 0, matte->id, {1, 1}).pixel(0, 0)) == 128);
+    const auto reopened = deserializeDocument(serializeDocument(bypassed));
+    REQUIRE(reopened == bypassed);
+    REQUIRE(SceneRenderer::render(reopened, 0) == write);
+    REQUIRE(session.undo());
+    REQUIRE(SceneRenderer::render(session.document(), 0) == painted);
+    REQUIRE(session.redo());
+    REQUIRE(SceneRenderer::render(session.document(), 0) == write);
+
+    auto unmasked = makeDocument();
+    unmasked.width = unmasked.height = 1;
+    unmasked.background = {0, 0, 0, 0};
+    unmasked.editableDrawing(unmasked.layers.front().id, 0).image =
+        ImageAsset{1, 1, {255, 0, 0, 255}};
+    unmasked.layers.front().compositeBypassed = true;
+    unmasked.validate();
+    REQUIRE(qAlpha(SceneRenderer::render(unmasked, 0).pixel(0, 0)) == 0);
 }
 TEST_CASE("Linear color chart keeps bounded alpha and premultiplied color across coverage levels") {
     auto document = makeDocument();

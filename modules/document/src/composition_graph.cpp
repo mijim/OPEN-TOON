@@ -19,6 +19,7 @@ GraphPortType outputType(GraphNodeKind kind) {
     case GraphNodeKind::Screen:
     case GraphNodeKind::Add:
     case GraphNodeKind::BypassBlend:
+    case GraphNodeKind::BypassComposite:
     case GraphNodeKind::ApplyMatte:
     case GraphNodeKind::BypassMatte:
     case GraphNodeKind::DisplayOutput:
@@ -47,6 +48,8 @@ std::vector<GraphPortType> inputTypes(GraphNodeKind kind) {
     case GraphNodeKind::Add:
     case GraphNodeKind::BypassBlend:
         return {GraphPortType::Image, GraphPortType::Image};
+    case GraphNodeKind::BypassComposite:
+        return {GraphPortType::Image};
     case GraphNodeKind::MatteFromImage:
         return {GraphPortType::Image};
     case GraphNodeKind::InvertMatte:
@@ -116,6 +119,13 @@ CompositionGraph CompositionGraph::orderedLayers(const Document& document) {
                 source = masked;
             }
         }
+        if (layer.compositeBypassed) {
+            const GraphNodeId bypassed = next++;
+            graph.nodes.push_back({bypassed, GraphNodeKind::BypassComposite, layer.id,
+                                   {{image, 0}}});
+            image = bypassed;
+            continue;
+        }
         const GraphNodeId composite = next++;
         const auto kind = layer.blendBypassed && layer.blendMode != LayerBlendMode::Normal
                               ? GraphNodeKind::BypassBlend
@@ -159,7 +169,8 @@ void CompositionGraph::validate(const Document& document) const {
                 node.kind != GraphNodeKind::ApplyMatte &&
                 node.kind != GraphNodeKind::Over && node.kind != GraphNodeKind::Multiply &&
                 node.kind != GraphNodeKind::Screen && node.kind != GraphNodeKind::Add &&
-                node.kind != GraphNodeKind::BypassBlend)
+                node.kind != GraphNodeKind::BypassBlend &&
+                node.kind != GraphNodeKind::BypassComposite)
                 throw std::invalid_argument("This compositor node cannot reference a layer.");
             const auto& layer = document.layer(node.layer);
             if (layer.kind != LayerKind::Drawing && layer.kind != LayerKind::Part)
@@ -243,7 +254,8 @@ std::vector<GraphNodeId> CompositionGraph::affectedByLayer(const Document& docum
             consumers[input.source].push_back(node.id);
     std::queue<GraphNodeId> queue;
     for (const auto& node : nodes)
-        if (node.layer && layerBranch.contains(node.layer) && affected.insert(node.id).second)
+        if (node.layer && node.kind != GraphNodeKind::BypassComposite &&
+            layerBranch.contains(node.layer) && affected.insert(node.id).second)
             queue.push(node.id);
     while (!queue.empty()) {
         const auto id = queue.front();

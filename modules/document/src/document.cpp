@@ -233,6 +233,8 @@ void Document::validate() const {
                 "Only a drawing or Part may change its blend mode.");
         require(!l.blendBypassed || l.kind == LayerKind::Drawing || l.kind == LayerKind::Part,
                 "Only a drawing or Part may bypass its blend mode.");
+        require(!l.compositeBypassed || l.kind == LayerKind::Drawing || l.kind == LayerKind::Part,
+                "Only a drawing or Part may bypass its composite node.");
         std::set<Id> variants;
         for (const auto& variant : l.variants)
             require(drawings.contains(variant.drawing) && variant.name.size() > 0 &&

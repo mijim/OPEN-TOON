@@ -111,6 +111,7 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
                   {"opacityBypassed", l.opacityBypassed},
                   {"blendMode", static_cast<int>(l.blendMode)},
                   {"blendBypassed", l.blendBypassed},
+                  {"compositeBypassed", l.compositeBypassed},
                   {"kind", static_cast<int>(l.kind)},
                   {"role", l.role},
                   {"variants", Json::array()},
@@ -399,6 +400,8 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
         }
         if (j.at("version").get<int>() >= 29)
             l.blendBypassed = x.at("blendBypassed");
+        if (j.at("version").get<int>() >= 30)
+            l.compositeBypassed = x.at("compositeBypassed");
         if (j.at("version").get<int>() >= 11) {
             const auto& anchor = x.at("boneTipAnchor");
             if (!anchor.is_null())

@@ -264,6 +264,7 @@ QImage renderGraphTerminal(const CompositionGraph& graph, const Document& docume
         layer.opacityBypassed = false;
         layer.blendMode = LayerBlendMode::Normal;
         layer.blendBypassed = false;
+        layer.compositeBypassed = false;
     }
     for (const auto& node : graph.nodes)
         if (node.kind == GraphNodeKind::Opacity ||
@@ -327,6 +328,10 @@ QImage renderGraphTerminal(const CompositionGraph& graph, const Document& docume
             break;
         }
         case GraphNodeKind::BypassOpacity:
+            image = input(0);
+            bound = inputBounds(0);
+            break;
+        case GraphNodeKind::BypassComposite:
             image = input(0);
             bound = inputBounds(0);
             break;

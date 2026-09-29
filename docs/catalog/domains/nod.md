@@ -128,9 +128,9 @@ Temporarily bypass operators and reuse valid results.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — docs/implementation/HM12-PROGRESS.md; docs/architecture/adr/058-node-scoped-display-cache.md; revision-aware preview cache, intermediate-node separation, inactive cutter dependency isolation, keyed opacity/blend bypass, undo and reopen.
+**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — docs/implementation/HM12-PROGRESS.md; docs/architecture/adr/058-node-scoped-display-cache.md; docs/architecture/adr/059-persistent-composite-bypass.md; revision-aware preview cache, intermediate-node separation, inactive cutter/composite dependency isolation, keyed opacity/blend bypass, undo and reopen.
 
-**Remaining scope:** Revision-aware final and node-scoped Display caches, plus persistent cutter, opacity and blend bypass work. General user-controlled node bypass remains open.
+**Remaining scope:** Revision-aware final and node-scoped Display caches, plus persistent cutter, opacity, blend and layer-composite bypass work. General user-controlled node bypass remains open.
 
 ## NOD-010 — Notes and organization
 

@@ -47,6 +47,12 @@ Format 29 adds **Bypass blend** for a selected Drawing or Part. A typed
 `Bypassed blend` node renders Normal source-over while retaining the saved
 Multiply, Screen or Add choice. Re-enabling restores that choice without
 reselecting it. See [ADR-055](../architecture/adr/055-persistent-blend-bypass.md).
+Format 30 adds **Bypass layer** for a selected Drawing or Part. The typed
+`Bypassed composite` node forwards the prior image without painting that layer.
+Its source image remains available to cutter consumers and previews. The
+control and Alt-click on Composite cards share a saved, undoable command;
+older formats default to active composition. See
+[ADR-059](../architecture/adr/059-persistent-composite-bypass.md).
 Drawing cards can now be dragged onto another Drawing card to put the source
 immediately above the target in the saved composite order. The drop target
 highlights; the operation rejects missing, same and locked layers. The
@@ -155,7 +161,6 @@ preview. This is diagnostic navigation, not a persisted graph edit.
   retains Screen, writes a readable `.pre-v27.bak` and rejects Add claimed by
   an older file. Native Qt Quick smoke clicks Add on a painted cutter source,
   checks brighter pixels, undoes and reopens the result.
-- A three-opaque-color fixture checks exact order and rendered top color,
 - Fractional overlap now checks blend bypass against Normal pixels, the typed
   bypass node, Write parity, one-step undo/redo and save/reopen. Format-28
   migration preserves Add with bypass off and a readable backup. Native Qt
@@ -165,7 +170,6 @@ preview. This is diagnostic navigation, not a persisted graph edit.
   invalid/same/locked targets, one-step undo/redo and save/reopen. Native Qt
   Quick smoke drags a Drawing card onto a second card, observes the target
   highlight and checks the new output pixels before and after undo/reopen.
-- Native Qt Quick smoke types Write into the search field in a narrower window,
 - Native Qt Quick smoke Alt-drags a Drawing source onto a Drawing target,
   checks the target binding and output color, then undoes, redoes and reopens.
 - Native Qt Quick smoke Alt-clicks Apply matte to bypass, undoes, redoes and
@@ -182,6 +186,13 @@ preview. This is diagnostic navigation, not a persisted graph edit.
 - Native Qt Quick smoke types Write into the search field in a narrower window,
   checks that the graph scrolls to the result with unchanged output, then
   finds three Drawing cards and clicks Next to visit the second result.
+- A one-pixel cutter fixture proves that bypassing its painted source removes
+  that source's ink while the same fractional image still clips its target.
+  Graph invalidation, Display/Write parity, one-step undo/redo and save/reopen
+  pass. A format-29 file defaults to active composition, retains a readable
+  `.pre-v29.bak`, and rejects a format-30 field claimed by an older schema.
+  Native Qt Quick smoke clicks Bypass layer, checks output pixels, undo/redo,
+  reopen and Alt-click restoration from the Bypassed composite card.
 - A current three-frame original-art run with five Add layers measured
   50.93 ms/frame in Legacy and 45.22 ms/frame in Linear sRGB. The same host
   run measured Multiply/Screen at 45.79/45.18 ms and Normal at 1.84/42.99 ms.
@@ -195,6 +206,6 @@ preview. This is diagnostic navigation, not a persisted graph edit.
 
 ## Open contract
 
-The arbitrary editable node graph, general node bypass beyond opacity, broader transform
+The arbitrary editable node graph, other operator bypasses, broader transform
 presentation, group ports, group/ungroup and full arm/eye overlap recipe are pending. HM-12
 and its P10 owning phase remain open.

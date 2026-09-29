@@ -38,6 +38,9 @@ Item {
                    node.kind === "Add" || node.kind === "Bypassed blend") {
             root.layerChosen(node.layer)
             root.controller.setBlendBypassed(node.kind !== "Bypassed blend")
+        } else if (node.kind === "Composite" || node.kind === "Bypassed composite") {
+            root.layerChosen(node.layer)
+            root.controller.setCompositeBypassed(node.kind === "Composite")
         } else {
             return false
         }
@@ -184,6 +187,15 @@ Item {
                 onClicked: root.controller.setBlendBypassed(checked)
                 Accessible.name: "Bypass selected drawing blend mode"
             }
+            CompactCheckBox {
+                objectName: "nodeBypassComposite"
+                text: "Bypass layer"
+                visible: root.selected && (root.selected.kind === 0 || root.selected.kind === 3)
+                enabled: visible && !root.selected?.locked
+                checked: root.selected?.compositeBypassed || false
+                onClicked: root.controller.setCompositeBypassed(checked)
+                Accessible.name: "Bypass selected drawing in the composition"
+            }
             PropertyNumber {
                 objectName: "nodeOpacity"
                 implicitWidth: 88
@@ -267,6 +279,7 @@ Item {
                                       modelData.kind === "Screen" ||
                                       modelData.kind === "Add" ||
                                       modelData.kind === "Bypassed blend" ||
+                                      modelData.kind === "Bypassed composite" ||
                                       modelData.kind === "Bypassed cutter" ||
                                       modelData.kind === "Invert matte" ||
                                       modelData.kind === "Apply matte"

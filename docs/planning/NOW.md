@@ -12,15 +12,15 @@ The immediate objective is a complete, reliable character-animation **Harmony Mo
 
 **In-progress slice: [HM-10](HARMONY-MOMENT.md#hm-10).** Format-16 original PCM16 WAV assets, format-17 sample-contiguous repeats and format-22 source-sample fades and format-23 saved clip mute, format-26 per-clip solo and format-27 stereo balance, undoable clip placement/trim/gain and source-sharing duplication and exact 48 kHz single-pass clip splitting and direct frame-edge trimming including native waveform drag, indexed sample-aligned timeline waveforms, band-limited rate conversion, deterministic full/selected-range offline WAV mix/export, bounded miniaudio device preview and timeline fragment scrub pass local tests. An original 480-frame study joins the connected toon, nine mouth changes, eye cutter and exact synthetic audio cues with save/reopen and native Qt Quick checks. [The audio subset](../implementation/HM10-PROGRESS.md) includes two completed silent ten-minute CoreAudio scheduling probes at 24 and 24000/1001 fps. Hardware presentation latency/underruns and audible scrub-quality qualification plus broader rate-ratio quality remain.
 
-**Active slice: [HM-12](HARMONY-MOMENT.md#hm-12).** HM-03 character identity and HM-04 typed graph runtime have accepted bounded evidence. Format-18 cutter bindings, format-19 fractional inside/outside coverage, format-20 persistent cutter bypass, format-21 visible cutter sources, format-24 opacity bypass and format-25 Normal/Multiply/Screen and format-28 Add blending, format-29 blend bypass, direct Drawing-card order dragging, Alt-drag cutter binding, derived node-owner selection, direct card bypass, alternate image/matte Display, node-scoped cache and name/kind search pass tests and native smoke in the derived Nodes workspace with animated Opacity nodes and clicked output previews. The complete node editor and part-overlap contract remain open.
+**Active slice: [HM-12](HARMONY-MOMENT.md#hm-12).** HM-03 character identity and HM-04 typed graph runtime have accepted bounded evidence. Format-18 cutter bindings, format-19 fractional inside/outside coverage, format-20 persistent cutter bypass, format-21 visible cutter sources, format-24 opacity bypass and format-25 Normal/Multiply/Screen and format-28 Add blending, format-29 blend bypass and format-30 composite bypass, direct Drawing-card order dragging, Alt-drag cutter binding, derived node-owner selection, direct card bypass, alternate image/matte Display, node-scoped cache and name/kind search pass tests and native smoke in the derived Nodes workspace with animated Opacity nodes and clicked output previews. The complete node editor and part-overlap contract remain open.
 
 **Current gate:** HM-06 has animated bone/curve evaluation, bounded per-substitution binding, editable elbow influence and a refreshed original character fixture; broader extreme-bend quality and artistic interaction remain unaccepted. HM-07 and HM-10 remain working subsets. The owner resumed work after the earlier cutoff. Continue HM-12 graph grouping and part-overlap work after checking its current contract.
 
-**Current character:** use the owner's [Milo source and 17-Part continuous
-study](../implementation/HM06-MILO.md) for new animation work. All four
-arms/legs are single images with middle-joint bones and linked endpoints.
-Keep Clockwork projects as regression fixtures. Milo's broader artistic
-approval and complete animated shot are still open.
+**Animation fixture:** the owner's [Milo source and 17-Part continuous
+study](../implementation/HM06-MILO.md) is available for later animation work.
+The current priority is editor functionality. Keep Clockwork projects as
+regression fixtures. Milo's broader artistic approval and complete animated
+shot are still open.
 
 **Accepted HM-03 evidence:** the owner delegated review to the implementer. The original 19-part import/assembly/view journey, reference-pixel comparison, saved/reopened substitutions, independent copy, undo, negative/nonuniform reparenting and visual screenshot inspection are recorded in [HM03-ACCEPTANCE](../implementation/HM03-ACCEPTANCE.md). This bounded contract does not complete P08 or the independent second-animator HM-15 review.
 

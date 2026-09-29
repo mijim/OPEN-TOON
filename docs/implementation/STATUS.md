@@ -38,7 +38,7 @@ traversal previews bounded frame fragments without document edits. Hardware
 drift/underrun qualification and synchronized PNG/WAV delivery remain open.
 
 [HM-12](HM12-PROGRESS.md) now saves a Drawing/Part cutter matte binding in
-formats 18–21, 24, 25, 28 and 29. Fractional source alpha clips the target in the shared display and
+formats 18–21, 24, 25, 28–30. Fractional source alpha clips the target in the shared display and
 write graph; the compact inspector assigns the source, toggles a saved bypass,
 and can paint the cutter source in its normal layer order, all with undo.
 Reference validation, save/reopen and native Qt Quick smoke pass. General
@@ -47,7 +47,7 @@ Outside modes preserve fractional coverage; a typed inverse matte is saved and
 undoable. The bottom
 Nodes tab displays the derived typed graph, supports direct Drawing-card
 order dragging and offers selected-layer order,
-cutter, animated opacity edits, saved opacity bypass, Normal/Multiply/Screen/Add blend modes and saved blend bypass.
+cutter, animated opacity edits, saved opacity bypass, Normal/Multiply/Screen/Add blend modes, saved blend bypass and saved composite bypass.
 Ordinary card drag changes order; Alt-drag binds a cutter source. Both use
 native pointer input and are checked through pixels, undo/redo and save/reopen. Node search locates cards by name or
 kind, scrolls to matches and cycles without editing pixels. Cutter, matte and
@@ -74,15 +74,16 @@ skipped polled playhead frames, respectively. These counters do not measure
 speaker underruns or actual
 presented-frame drops.
 
-The working source version is `0.2.0-experimental.50`; no new binary or source
+The working source version is `0.2.0-experimental.51`; no new binary or source
 tag has been published for it. The last locally qualified macOS preview and
 earlier binaries do not qualify these source changes.
 
-The owner resumed development after the earlier 10:30 CEST cutoff. The `.50`
-locked macOS build passes 188/188 CTest entries and native Milo smoke,
-including blend bypass, Alt-drag cutter binding, source/target owner selection, node-card bypass, image/matte Display routing and node-scoped cache. Other earlier native
-smokes and artistic checks are recorded in prior release entries. HM-12 remains an unfinished bounded
-contract; next work can continue its graph grouping/part-overlap behavior.
+The owner resumed development after the earlier 10:30 CEST cutoff. The `.51`
+locked macOS build passes 191/191 CTest entries and native HM-12 smoke,
+including composite bypass pixels, cutter-source retention, undo/redo and
+save/reopen. Earlier native smokes and artistic checks are recorded in prior
+release entries. HM-12 remains an unfinished bounded contract; next work can
+continue its graph grouping/part-overlap behavior.
 HM-06 visual approval and HM-10 hardware presentation also remain open.
 
 ## Phase coverage

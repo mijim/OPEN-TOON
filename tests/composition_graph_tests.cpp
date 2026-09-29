@@ -21,6 +21,40 @@ TEST_CASE("Ordered composition has typed outputs and invalidates layer descendan
     REQUIRE(std::find(affected.begin(), affected.end(), graph.nodes.front().id) == affected.end());
 }
 
+TEST_CASE("Bypassed composite disconnects layer ink without removing its source node") {
+    auto document = makeDocument();
+    const Id drawing = document.layers.front().id;
+    document.layer(drawing).compositeBypassed = true;
+    const auto graph = CompositionGraph::orderedLayers(document);
+    REQUIRE_NOTHROW(graph.validate(document));
+    REQUIRE(std::count_if(graph.nodes.begin(), graph.nodes.end(), [&](const auto& node) {
+                return node.kind == GraphNodeKind::BypassComposite && node.layer == drawing &&
+                       node.inputs.size() == 1;
+            }) == 1);
+    REQUIRE(std::count_if(graph.nodes.begin(), graph.nodes.end(), [&](const auto& node) {
+                return node.kind == GraphNodeKind::LayerImage && node.layer == drawing;
+            }) == 1);
+    const auto affected = graph.affectedByLayer(document, drawing);
+    REQUIRE(std::find(affected.begin(), affected.end(), graph.write) == affected.end());
+    document.layer(drawing).compositeBypassed = false;
+    const auto enabled = CompositionGraph::orderedLayers(document);
+    const auto enabledAffected = enabled.affectedByLayer(document, drawing);
+    REQUIRE(std::find(enabledAffected.begin(), enabledAffected.end(), enabled.write) !=
+            enabledAffected.end());
+    auto characterDocument = makeDocument();
+    const auto root = makeCharacter(characterDocument, characterDocument.layers.front().id,
+                                    "Character");
+    Layer peg;
+    peg.id = characterDocument.allocateId();
+    peg.kind = LayerKind::Peg;
+    peg.name = "Peg";
+    peg.parent = root;
+    characterDocument.layers.push_back(peg);
+    REQUIRE_NOTHROW(characterDocument.validate());
+    characterDocument.layer(peg.id).compositeBypassed = true;
+    REQUIRE_THROWS(characterDocument.validate());
+}
+
 TEST_CASE("Composition rejects cycles, dangling edges, wrong ports and duplicate slots") {
     auto document = makeDocument();
     auto baseline = CompositionGraph::orderedLayers(document);

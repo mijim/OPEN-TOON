@@ -1,5 +1,15 @@
 # Experimental releases
 
+## 0.2.0-experimental.51 — working source, composite bypass
+
+- Format 30 saves a Drawing/Part composite bypass. The layer stops painting
+  while its image remains usable as a fractional cutter. Nodes exposes a
+  compact control and Alt-clickable composite card.
+- Graph, pixel, migration and native Qt Quick checks cover Display/Write,
+  dependency invalidation, undo/redo, save/reopen and an older-format backup.
+  The macOS suite passes 191/191 CTest entries. Source only; no public binary
+  or tag.
+
 ## 0.2.0-experimental.50 — working source, Milo continuous rig
 
 - Added the owner's Milo SVG/PNG artwork and a saved 17-Part animation study.

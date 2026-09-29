@@ -988,6 +988,32 @@ TEST_CASE("Format twenty-eight layers default to active blend with a readable ba
     invalidCurrent["version"] = Document::formatVersion;
     REQUIRE_THROWS(deserializeDocument(invalidCurrent.dump()));
 }
+TEST_CASE("Format twenty-nine layers default to active composite with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 29;
+    for (auto& layer : legacy["layers"])
+        layer.erase("compositeBypassed");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=29");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    changed.layers.front().compositeBypassed = true;
+    REQUIRE(ProjectStore::save(project.file, changed, "Bypass composite", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v29.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+    legacy["version"] = Document::formatVersion;
+    REQUIRE_THROWS(deserializeDocument(legacy.dump()));
+}
 TEST_CASE("Format twenty-five audio clips default to unsoloed with a readable backup") {
     TemporaryProject project;
     auto original = makeDocument();

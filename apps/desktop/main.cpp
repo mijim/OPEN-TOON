@@ -832,8 +832,62 @@ int main(int argc, char** argv) {
                     movePoint(QEvent::MouseButtonRelease, nextPoint, Qt::NoButton);
                     if (nodes->property("matchIndex").toInt() != 1)
                         throw std::runtime_error("Next did not navigate to the second Drawing match.");
+                    search->setProperty("text", "");
+                    editor.setSelectedLayer(int(blue));
+                    QCoreApplication::processEvents();
+                    auto* bypassComposite = window->findChild<QQuickItem*>("nodeBypassComposite");
+                    if (!bypassComposite || !bypassComposite->isVisible() ||
+                        !bypassComposite->isEnabled())
+                        throw std::runtime_error("Composite bypass control is unavailable.");
+                    const auto compositeBypassPoint = bypassComposite->mapToScene(QPointF(
+                        bypassComposite->width() / 2, bypassComposite->height() / 2));
+                    movePoint(QEvent::MouseButtonPress, compositeBypassPoint, Qt::LeftButton);
+                    movePoint(QEvent::MouseButtonRelease, compositeBypassPoint, Qt::NoButton);
+                    const auto bypassedImage = opentoon::SceneRenderer::render(editor.document(), 0);
+                    if (!editor.document().layer(blue).compositeBypassed ||
+                        qGreen(bypassedImage.pixel(0, 0)) != 255 ||
+                        qBlue(bypassedImage.pixel(0, 0)) != 0)
+                        throw std::runtime_error("Composite bypass did not remove the target output.");
+                    int bypassNode = 0;
+                    for (const auto& variant : editor.compositionNodes()) {
+                        const auto node = variant.toMap();
+                        if (node.value("kind").toString() == "Bypassed composite" &&
+                            node.value("layer").toInt() == int(blue))
+                            bypassNode = node.value("id").toInt();
+                    }
+                    if (!bypassNode)
+                        throw std::runtime_error("Bypassed composite card is missing.");
+                    editor.undo();
+                    if (editor.document().layer(blue).compositeBypassed ||
+                        qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Composite bypass did not undo atomically.");
+                    editor.redo();
+                    if (!editor.document().layer(blue).compositeBypassed ||
+                        opentoon::SceneRenderer::render(editor.document(), 0) != bypassedImage)
+                        throw std::runtime_error("Composite bypass did not redo atomically.");
+                    if (!editor.saveProject({}) || !editor.openProject(QUrl::fromLocalFile(reorderPath)) ||
+                        !editor.document().layer(blue).compositeBypassed ||
+                        opentoon::SceneRenderer::render(editor.document(), 0) != bypassedImage)
+                        throw std::runtime_error("Composite bypass changed after reopen.");
+                    nodes->setProperty("previewNodeId", 0);
+                    strip->setProperty("contentX", 0);
+                    search->setProperty("text", "Bypassed composite");
+                    QCoreApplication::processEvents();
+                    (void)window->grabWindow();
+                    strip->setProperty("contentX", std::max(0.0,
+                        strip->property("contentWidth").toDouble() - strip->width()));
+                    QCoreApplication::processEvents();
+                    clickNode(bypassNode, true);
+                    if (editor.document().layer(blue).compositeBypassed ||
+                        qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Alt-click did not restore the composite node: node=" +
+                            std::to_string(bypassNode) + " selected=" +
+                            std::to_string(editor.selectedLayer()) + " bypass=" +
+                            std::to_string(editor.document().layer(blue).compositeBypassed) +
+                            " search=" + search->property("text").toString().toStdString() +
+                            " scroll=" + std::to_string(strip->property("contentX").toDouble()));
                     std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass, fractional cutter, "
-                                 "painted-source Multiply/Add, blend bypass, alternate Display/Write, drawing drag order, Alt-drag cutter, Alt-click bypass, typed search, save/reopen and undo.\n";
+                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, drawing drag order, Alt-drag cutter, Alt-click bypass, typed search, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

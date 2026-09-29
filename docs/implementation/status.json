@@ -70,7 +70,7 @@
     {
       "id": "P10",
       "status": "in_progress",
-      "available": "Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. Format-18 Drawing/Part cutter matte bindings and format-19 inverted Outside coverage clip by fractional alpha through the shared graph, with compact inspector, resizable derived Nodes panel with clicked image/matte previews and direct Drawing-card order dragging and search, order/cutter/opacity edits, format-20 persistent cutter bypass, format-21 visible cutter-source painting, format-24 opacity bypass and format-25 Normal/Multiply/Screen and format-28 Add blending, format-29 saved blend bypass and Alt-drag cutter binding and derived source/target node-owner selection and direct Alt-click bypass and alternate image/matte canvas Display routing and node-scoped cache, reference validation, undo, save/reopen and character-copy remapping. A bounded revision cache reuses canvas frames and speculatively prepares the next frame from an immutable snapshot. Native playback/scrub, alpha/color charts and animated original artwork close bounded HM-04; orthographic camera output joins HM-13.",
+      "available": "Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. Format-18 Drawing/Part cutter matte bindings and format-19 inverted Outside coverage clip by fractional alpha through the shared graph, with compact inspector, resizable derived Nodes panel with clicked image/matte previews and direct Drawing-card order dragging and search, order/cutter/opacity edits, format-20 persistent cutter bypass, format-21 visible cutter-source painting, format-24 opacity bypass and format-25 Normal/Multiply/Screen and format-28 Add blending, format-29 saved blend bypass and format-30 saved composite bypass and Alt-drag cutter binding and derived source/target node-owner selection and direct Alt-click bypass and alternate image/matte canvas Display routing and node-scoped cache, reference validation, undo, save/reopen and character-copy remapping. A bounded revision cache reuses canvas frames and speculatively prepares the next frame from an immutable snapshot. Native playback/scrub, alpha/color charts and animated original artwork close bounded HM-04; orthographic camera output joins HM-13.",
       "remaining": "General editable node UI and group ports, joint recipes, useful effects, full ROI scheduling, production-scale performance and later deformer integration."
     },
     {
@@ -84,7 +84,7 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 188,
+      "count": 191,
       "command": "ctest --test-dir build/locked --output-on-failure -j8"
     },
     "native_input_workflow": {
@@ -248,7 +248,7 @@
         "animated orthographic camera matches reopened preview and two exported PNG frames"
       ]
     },
-    "total_local_ctest_entries": 188,
+    "total_local_ctest_entries": 191,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -431,7 +431,7 @@
     },
     "cutter_matte": {
       "status": "passed_subset",
-      "scope": "Format-18 Drawing/Part source binding and format-19 inversion, fractional inside/outside alpha, source exclusion, validated references, derived Nodes panel with clicked image/matte previews, direct Drawing-card order dragging, name/kind search and animated Opacity nodes, format-20 persistent cutter bypass, format-21 visible cutter-source painting, format-24 opacity bypass and format-25 Normal/Multiply/Screen and format-28 Add blending, format-29 saved blend bypass and Alt-drag cutter binding and derived source/target node-owner selection and direct Alt-click bypass and alternate image/matte canvas Display routing and node-scoped cache, save/reopen and undo",
+      "scope": "Format-18 Drawing/Part source binding and format-19 inversion, fractional inside/outside alpha, source exclusion, validated references, derived Nodes panel with clicked image/matte previews, direct Drawing-card order dragging, name/kind search and animated Opacity nodes, format-20 persistent cutter bypass, format-21 visible cutter-source painting, format-24 opacity bypass and format-25 Normal/Multiply/Screen and format-28 Add blending, format-29 saved blend bypass and format-30 saved composite bypass and Alt-drag cutter binding and derived source/target node-owner selection and direct Alt-click bypass and alternate image/matte canvas Display routing and node-scoped cache, save/reopen and undo",
       "command": "build/locked/open-toon.app/Contents/MacOS/open-toon --hm12-smoke",
       "screenshot": "build/hm12-matte-smoke.png",
       "limits": "General node editor, general node bypass, group/ungroup, arm/eye recipes and full 480-frame composition budgets remain open."
@@ -475,17 +475,17 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.50",
+  "version": "0.2.0-experimental.51",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
-    "release_artifacts": "Historical experimental.11 macOS arm64 ZIP and Ubuntu-built Linux x86_64 AppImage; current experimental.50 work is source only",
+    "release_artifacts": "Historical experimental.11 macOS arm64 ZIP and Ubuntu-built Linux x86_64 AppImage; current experimental.51 work is source only",
     "cross_platform_builds": "Manual release workflow; broader Linux, Windows and device qualification remain open"
   },
   "planning_priority": {
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
     "state": "HM-00_through_HM-05_and_HM-13_complete__HM-06_HM-07_HM-10_HM-12_in_progress",
-    "note": "HM-06 has resumed with Milo; HM-07 remains an unaccepted working subset. HM-12 has resumed after the prior cutoff and now includes fractional cutters, saved bypasses, visible cutter sources, clicked node previews, direct Drawing-card order dragging, name/kind search, Normal/Multiply/Screen/Add blend modes, saved blend bypass and Alt-drag cutter binding and derived source/target node-owner selection and direct Alt-click bypass and alternate image/matte canvas Display routing and node-scoped cache; the general editable graph remains open. The original HM-06 toon and editable studies now use sampled edges and a two-view cap over the continuous-limb rig; artistic acceptance remains open. HM-10 is parked after exact 48 kHz clip splitting, saved clip solo, direct frame-edge trimming and stereo balance; hardware presentation and audible quality remain unqualified. Full P07/P08/P09/P10 and feature acceptance remain open. The owner-provided Milo SVG/PNG source is now the character for new animation studies; its 17-Part continuous-limb example has four middle-joint bones, linked endpoints and tested save/reopen. Older Clockwork art remains regression coverage."
+    "note": "Editor functionality is the current priority; Milo remains a regression and later animation fixture. HM-07 remains an unaccepted working subset. HM-12 has resumed after the prior cutoff and now includes fractional cutters, saved bypasses, visible cutter sources, clicked node previews, direct Drawing-card order dragging, name/kind search, Normal/Multiply/Screen/Add blend modes, saved blend bypass, saved composite bypass and Alt-drag cutter binding and derived source/target node-owner selection and direct Alt-click bypass and alternate image/matte canvas Display routing and node-scoped cache and saved composite bypass; the general editable graph remains open. The original HM-06 toon and editable studies now use sampled edges and a two-view cap over the continuous-limb rig; artistic acceptance remains open. HM-10 is parked after exact 48 kHz clip splitting, saved clip solo, direct frame-edge trimming and stereo balance; hardware presentation and audible quality remain unqualified. Full P07/P08/P09/P10 and feature acceptance remain open. The owner-provided Milo SVG/PNG source is now the character for new animation studies; its 17-Part continuous-limb example has four middle-joint bones, linked endpoints and tested save/reopen. Older Clockwork art remains regression coverage."
   }
 }
