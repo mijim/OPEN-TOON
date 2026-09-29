@@ -2,6 +2,7 @@
 #include "opentoon/document.h"
 #include <span>
 #include <cstdint>
+#include <map>
 #include <vector>
 
 namespace opentoon {
@@ -68,5 +69,7 @@ class AudioMixPlan {
     Frame duration_ = 0;
     std::int32_t outputRate_ = 0;
     std::vector<Source> sources_;
+    // Built before playback; renderInto only reads these shared rate kernels.
+    std::map<std::int32_t, std::vector<float>> downsamplingKernels_;
 };
 } // namespace opentoon

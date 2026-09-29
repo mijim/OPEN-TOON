@@ -1,5 +1,17 @@
 # Experimental releases
 
+## 0.2.0-experimental.20 — working source, anti-alias audio downsampling
+
+- Precompute a bounded 32-tap, 1,024-phase low-pass table for each unique
+  source rate above the 48 kHz output rate. Preview and WAV export share
+  this deterministic path; original WAV assets and saved format 19 stay
+  unchanged.
+- A 96-to-48 kHz signal test suppresses a 30 kHz source while preserving a
+  1 kHz tone. Repeated cues and split output blocks match; two simultaneous
+  96 kHz tracks fit the local callback period. HM-10 hardware presentation
+  and broader rate-quality gates remain open.
+- Source only; no new public binary or tag.
+
 ## 0.2.0-experimental.19 — working source, outside cutters
 
 - Save an inverted cutter choice in format 19. Inside and outside coverage

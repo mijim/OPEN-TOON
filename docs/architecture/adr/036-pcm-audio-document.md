@@ -50,12 +50,12 @@ format, and is rebuilt if a scene replaces an asset with the same ID.
 The headless `AudioMixPlan` borrows validated immutable source buffers from a
 document snapshot. Its output is 48 kHz stereo PCM16. For each output sample,
 the plan converts elapsed output samples to source-sample position with
-integer quotient/remainder arithmetic, uses linear interpolation between
-adjacent source samples, duplicates mono into both channels and sums every
+integer quotient/remainder arithmetic, originally used linear interpolation
+between adjacent source samples, duplicates mono into both channels and sums every
 active clip after its linear gain. The final sum is clamped to PCM16. Each block
 is addressed by absolute output sample, so no floating-point clock is
-accumulated between blocks. Higher-quality sample-rate conversion remains a
-separate qualification need.
+accumulated between blocks. [ADR-041](041-audio-downsampling-kernel.md)
+subsequently replaces the downsampling path with a bounded anti-alias filter.
 
 The Qt media adapter writes a standard RIFF/WAVE header and blocks to a
 `QSaveFile` from an immutable scene snapshot. The exported sample count is
@@ -78,5 +78,7 @@ captures `build/hm10-audio-smoke.png`, checks the exported cue, and undoes impor
 
 The experimental desktop now uses the same `AudioMixPlan` for a miniaudio
 device callback and offline export. See [ADR-037](037-miniaudio-preview-clock.md).
-Hardware clock qualification, higher-quality rate conversion, audible
-scrubbing and clip repeat remain HM-10 work.
+Downsampling now uses the bounded anti-alias filter in
+[ADR-041](041-audio-downsampling-kernel.md); equal-rate and upsampling paths
+retain linear interpolation. Hardware presentation qualification, broader
+rate-conversion quality and audible scrubbing remain HM-10 work.

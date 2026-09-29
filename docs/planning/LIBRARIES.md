@@ -142,7 +142,7 @@ Cross-platform audio device playback, mixing and capture infrastructure.
 
 **Boundary:** One real-time audio engine; FFmpeg handles media formats outside it. No allocations or document locks in the audio callback.
 
-**Evaluation:** Mac M1 Pro Release two-source 1024-frame callback mix p95 0.014 ms versus 21.33 ms output period; null backend start/seek/stop and exact 600-second fractional-rate scene mapping pass. Hardware latency, underrun, device replacement, ten-minute audiovisual drift and cross-platform qualification remain open.
+**Evaluation:** Mac M1 Pro Release two-source 1024-frame callback mix p95 0.014 ms for 44.1/48 kHz and 0.232 ms for two anti-aliased 96 kHz sources versus a 21.33 ms output period; null backend start/seek/stop and exact 600-second fractional-rate scene mapping pass. Silent ten-minute CoreAudio probes at 24 and 24000/1001 fps measured zero callback processing overruns, with 569/262 final drift samples relative to the host monotonic clock. Hardware presentation latency/underruns, device replacement, full audiovisual drift and cross-platform qualification remain open.
 
 **Fallback:** Retain deterministic offline PCM WAV and silent visual preview; evaluate Qt Multimedia behind the same audio-device boundary if hardware qualification fails.
 

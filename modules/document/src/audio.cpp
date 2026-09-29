@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <numbers>
 #include <stdexcept>
 
 namespace opentoon {
@@ -22,6 +23,35 @@ AudioClip& clip(Document& document, Id id) {
     if (found == document.audioClips.end())
         throw std::invalid_argument("Audio clip does not exist.");
     return *found;
+}
+constexpr int resamplerTaps = 32;
+constexpr int resamplerPhases = 1024;
+std::vector<float> lowpassKernel(std::int32_t sourceRate, std::int32_t outputRate) {
+    std::vector<float> weights(resamplerTaps * resamplerPhases);
+    const double cutoff = .9 * double(outputRate) / sourceRate;
+    for (int phase = 0; phase < resamplerPhases; ++phase) {
+        const double fraction = double(phase) / resamplerPhases;
+        double total = 0;
+        for (int tap = 0; tap < resamplerTaps; ++tap) {
+            const double distance = tap - 15 - fraction;
+            double value = 0;
+            if (std::abs(distance) < 16) {
+                const double argument = std::numbers::pi * distance;
+                const double sinc = std::abs(distance) < 1e-12
+                                        ? cutoff
+                                        : std::sin(argument * cutoff) / argument;
+                const double window = .42 + .5 * std::cos(argument / 16) +
+                                      .08 * std::cos(argument / 8);
+                value = sinc * window;
+            }
+            weights[phase * resamplerTaps + tap] = float(value);
+            total += value;
+        }
+        for (int tap = 0; tap < resamplerTaps; ++tap)
+            weights[phase * resamplerTaps + tap] =
+                float(weights[phase * resamplerTaps + tap] / total);
+    }
+    return weights;
 }
 } // namespace
 PcmWavInfo inspectPcm16Wav(std::span<const std::uint8_t> bytes) {
@@ -250,6 +280,10 @@ AudioMixPlan::AudioMixPlan(const Document& document, std::int32_t outputRate)
             throw std::invalid_argument("Invalid audio clip in mix plan.");
         sources_.push_back({&*asset, clip, info.dataOffset,
                             frameRate_.sampleAt(clip.start, outputRate_)});
+        if (asset->sampleRate > outputRate_ &&
+            !downsamplingKernels_.contains(asset->sampleRate))
+            downsamplingKernels_.emplace(asset->sampleRate,
+                                          lowpassKernel(asset->sampleRate, outputRate_));
     }
 }
 std::int64_t AudioMixPlan::sceneSamples() const {
@@ -265,6 +299,8 @@ void AudioMixPlan::renderInto(std::int64_t firstSample, std::span<std::int16_t> 
     for (const auto& source : sources_) {
         const auto& asset = *source.asset;
         const std::span bytes{asset.wav.data(), asset.wav.size()};
+        const auto kernel = downsamplingKernels_.find(asset.sampleRate);
+        const bool downsampling = kernel != downsamplingKernels_.end();
         for (std::size_t index = 0; index < frameCount; ++index) {
             const auto sceneSample = firstSample + std::int64_t(index);
             if (sceneSample < source.startSample)
@@ -292,9 +328,24 @@ void AudioMixPlan::renderInto(std::int64_t firstSample, std::span<std::int16_t> 
             };
             for (int channel = 0; channel < 2; ++channel) {
                 const int inputChannel = std::min(channel, asset.channels - 1);
-                const double a = read(sourceFrame, inputChannel);
-                const double b = read(nextFrame, inputChannel);
-                scratch[index * 2 + channel] += (a + (b - a) * fraction) * source.clip.gain;
+                double value = 0;
+                if (downsampling) {
+                    const auto phase = std::size_t((subsecond % outputRate_) * resamplerPhases /
+                                                   outputRate_);
+                    const auto* weights = kernel->second.data() + phase * resamplerTaps;
+                    const auto total = std::int64_t(length * std::uint64_t(source.clip.repeats));
+                    for (int tap = 0; tap < resamplerTaps; ++tap) {
+                        const auto offset = std::clamp(std::int64_t(sourceOffset) + tap - 15,
+                                                       std::int64_t(0), total - 1);
+                        const auto frame = source.clip.inSample + std::uint64_t(offset) % length;
+                        value += read(frame, inputChannel) * weights[tap];
+                    }
+                } else {
+                    const double a = read(sourceFrame, inputChannel);
+                    const double b = read(nextFrame, inputChannel);
+                    value = a + (b - a) * fraction;
+                }
+                scratch[index * 2 + channel] += value * source.clip.gain;
             }
         }
     }

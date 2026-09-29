@@ -124,3 +124,6 @@ bindings, fractional graph evaluation and reference validation.
 
 See [ADR-040](040-inverted-cutter-matte.md) for format-19 fractional outside
 coverage and typed matte inversion.
+
+See [ADR-041](041-audio-downsampling-kernel.md) for the bounded precomputed
+anti-alias filter used when PCM source rates exceed the output rate.

@@ -5,9 +5,11 @@
 #include <catch2/catch_test_macros.hpp>
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <filesystem>
 #include <array>
 #include <iostream>
+#include <numbers>
 #include <nlohmann/json.hpp>
 
 using namespace opentoon;
@@ -38,7 +40,60 @@ std::vector<std::uint8_t> wav(std::uint32_t samples, std::uint32_t cue,
         write16(result, i == cue ? 32767 : 0);
     return result;
 }
+std::vector<std::uint8_t> toneWav(std::uint32_t samples, std::uint32_t sampleRate,
+                                  double frequency) {
+    auto result = wav(samples, samples, sampleRate);
+    for (std::uint32_t i = 0; i < samples; ++i) {
+        const auto value = std::int16_t(std::lround(26000 *
+            std::sin(2 * std::numbers::pi * frequency * i / sampleRate)));
+        result[44 + i * 2] = std::uint8_t(value);
+        result[45 + i * 2] = std::uint8_t(std::uint16_t(value) >> 8);
+    }
+    return result;
+}
 } // namespace
+
+TEST_CASE("Downsampling suppresses aliased treble and keeps audible passband") {
+    auto scene = makeDocument();
+    (void)importPcm16Wav(scene, "30 kHz", toneWav(9600, 96000, 30000), 0);
+    auto mix = AudioMixPlan(scene, 48000);
+    const auto rejected = mix.renderBlock(480, 3840);
+    auto rms = [](const std::vector<std::int16_t>& values) {
+        double energy = 0;
+        for (std::size_t i = 0; i < values.size(); i += 2) {
+            const double sample = values[i] / 32768.0;
+            energy += sample * sample;
+        }
+        return std::sqrt(energy / (values.size() / 2));
+    };
+    const auto rejectedRms = rms(rejected);
+    REQUIRE(rejectedRms < .02);
+    scene = makeDocument();
+    (void)importPcm16Wav(scene, "1 kHz", toneWav(9600, 96000, 1000), 0);
+    mix = AudioMixPlan(scene, 48000);
+    const auto retained = mix.renderBlock(480, 3840);
+    const auto retainedRms = rms(retained);
+    std::cout << "96-to-48 kHz RMS: rejected 30 kHz=" << rejectedRms
+              << ", retained 1 kHz=" << retainedRms << '\n';
+    REQUIRE(retainedRms > .5);
+    REQUIRE(retainedRms < .6);
+    const auto whole = mix.renderBlock(0, 4800);
+    const auto first = mix.renderBlock(0, 2400);
+    const auto second = mix.renderBlock(2400, 2400);
+    REQUIRE(std::equal(first.begin(), first.end(), whole.begin()));
+    REQUIRE(std::equal(second.begin(), second.end(), whole.begin() + first.size()));
+}
+TEST_CASE("Downsampled repeated cue keeps its source-sample seam") {
+    auto scene = makeDocument();
+    const auto clip = importPcm16Wav(scene, "96 kHz cue", wav(96000, 2002, 96000), 0);
+    setAudioClipRepeats(scene, clip, 2);
+    AudioMixPlan mix(scene, 48000);
+    const auto first = mix.renderBlock(1001, 1)[0];
+    const auto second = mix.renderBlock(49001, 1)[0];
+    REQUIRE(first > 10000);
+    REQUIRE(second == first);
+    REQUIRE(mix.renderBlock(49000, 1)[0] < second);
+}
 
 TEST_CASE("PCM16 import rejects broken media atomically and aligns waveform to the source sample") {
     Session session;
@@ -278,4 +333,28 @@ TEST_CASE("Audio callback-sized mix stays below its playback period on a ten-min
               << (1000.0 * 1024 / 48000) << " ms\n";
     REQUIRE(p95 < 1000.0 * 1024 / 48000);
     REQUIRE(mix.renderBlock(2002, 1)[0] != 0);
+}
+TEST_CASE("Two downsampled tracks fit the realtime callback period") {
+    auto scene = makeDocument();
+    const auto source = toneWav(96000, 96000, 1000);
+    const auto first = importPcm16Wav(scene, "96 kHz A", source, 0);
+    const auto second = importPcm16Wav(scene, "96 kHz B", source, 0);
+    setAudioClipRepeats(scene, first, 2);
+    setAudioClipRepeats(scene, second, 2);
+    AudioMixPlan mix(scene, 48000);
+    std::array<std::int16_t, 1024 * 2> output{};
+    std::array<double, 1024 * 2> scratch{};
+    std::vector<double> durations;
+    durations.reserve(80);
+    for (int block = 0; block < 80; ++block) {
+        const auto before = std::chrono::steady_clock::now();
+        mix.renderInto(std::int64_t(block) * 1024, output, scratch);
+        const auto after = std::chrono::steady_clock::now();
+        durations.push_back(std::chrono::duration<double, std::milli>(after - before).count());
+    }
+    std::sort(durations.begin(), durations.end());
+    const auto p95 = durations[75];
+    std::cout << "Two 96-to-48 kHz downsampled tracks p95: " << p95
+              << " ms; callback period: " << (1000.0 * 1024 / 48000) << " ms\n";
+    REQUIRE(p95 < 1000.0 * 1024 / 48000);
 }

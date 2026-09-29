@@ -18,7 +18,9 @@ the source. **Scene → Export PCM WAV mix** writes a 48 kHz stereo PCM16 mix
 from an immutable document snapshot. Multiple clips sum at exact scene sample
 positions; source-rate conversion uses bounded linear interpolation. Export
 runs in the background, reports progress and atomically discards a cancelled
-temporary file. **Play** uses a miniaudio output device when placed clips exist.
+temporary file. Downsampling uses a precomputed 32-tap anti-alias filter;
+equal-rate and upsampling paths retain bounded linear interpolation.
+**Play** uses a miniaudio output device when placed clips exist.
 The callback mixes the immutable scene snapshot into bounded stack buffers;
 submitted sample position drives the playhead. Seeking during playback resets
 the sample cursor. The scene loops at its exact rational sample boundary.
@@ -37,6 +39,8 @@ clips load with one repeat. First saves of an older schema create a readable
 source-version backup. See [ADR-036](../architecture/adr/036-pcm-audio-document.md)
 for interval and frame-edit semantics and [ADR-038](../architecture/adr/038-repeated-audio-clips.md)
 for sample-contiguous repeats.
+See [ADR-041](../architecture/adr/041-audio-downsampling-kernel.md) for the
+shared bounded downsampling kernel and callback memory boundary.
 
 ## Verification
 
@@ -68,6 +72,11 @@ for sample-contiguous repeats.
   measured p95 **0.014 ms** against a 21.33 ms output period on the local
   M1 Pro macOS Release build. It checks the exact scene sample count and a
   rendered cue; this is a mixer cost sample, not a hardware underrun trace.
+- A 96-to-48 kHz tone check suppressed 30 kHz input to 0.000089 output RMS
+  while retaining 1 kHz at 0.561 RMS. A repeated 96 kHz cue remained aligned
+  across the loop, and split versus whole output blocks were byte-identical.
+  Two simultaneous 96 kHz tracks measured 0.232 ms p95 for a 1,024-frame
+  block against a 21.33 ms callback period on the local M1 Pro Release build.
 - `opentoon_audio_sync_benchmark` drives a silent repeated clip through the
   same adapter and samples its cursor every 8 ms. A two-second CoreAudio probe
   at 24 fps recorded 328 callbacks, zero callbacks over period, 0.043 ms
@@ -93,8 +102,8 @@ for sample-contiguous repeats.
 ## Open contract
 
 HM-10 remains incomplete. Device latency calibration, device-loss recovery,
-hardware underrun and presented-frame traces, production-quality rate
-conversion, hardware audible scrub quality and a full
+hardware underrun and presented-frame traces, complete rate-ratio and
+upsampling quality qualification, hardware audible scrub quality and a full
 ten-minute audiovisual drift run with visual output are pending. The miniaudio adapter is adopted
 for this experimental desktop profile; hardware and cross-platform
 qualification remain open.
