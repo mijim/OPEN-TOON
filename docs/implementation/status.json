@@ -58,8 +58,8 @@
     {
       "id": "P08",
       "status": "in_progress",
-      "available": "Accepted bounded HM-03 rigid-character contract: 19-part original-art assembly, coordinated views, pixel-equivalent reopen and independent copy. Parented layers and typed character roots, pegs and Parts; role editing, preserve-world rigid reparenting within shared animated ancestry, stable rest pivots, named held substitutions, renderer-backed thumbnails and coordinated view sets. Batch Part assembly, independent or explicitly linked-artwork Part/Peg branch copies, safe branch deletion, Part detachment, Peg dissolution and view-range edits preserve view membership through save/reopen. Format-12 named masked poses capture selected/all Parts and selected transform/drawing channels, apply with atomic undo, and save/reopen. The direct pose slider blends from the current evaluated pose with an explicit 50% drawing threshold and one undo per drag.",
-      "remaining": "Independent second-animator review, reparenting across differently animated branches, cross-rig pose transfer/mirroring, Quick Rig, declarative controls, portable assets/templates and production-scale qualification."
+      "available": "Accepted bounded HM-03 rigid-character contract: 19-part original-art assembly, coordinated views, pixel-equivalent reopen and independent copy. Parented layers and typed character roots, pegs and Parts; role editing, preserve-world rigid reparenting within shared animated ancestry, stable rest pivots, named held substitutions, renderer-backed thumbnails and coordinated view sets. Batch Part assembly, independent or explicitly linked-artwork Part/Peg branch copies, safe branch deletion, Part detachment, Peg dissolution and view-range edits preserve view membership through save/reopen. Format-12 named masked poses capture selected/all Parts and selected transform/drawing channels, apply with atomic undo, and save/reopen. The direct pose slider blends from the current evaluated pose with an explicit 50% drawing threshold and one undo per drag. Format-13 publication filters named poses/views into a compact Animator dashboard; a local Rig/Animator workspace switch preserves selection, frame and render pixels.",
+      "remaining": "Independent second-animator review, reparenting across differently animated branches, cross-rig pose transfer/mirroring, Quick Rig, general typed controls, conflict handling, complete workspace presets, portable assets/templates and production-scale qualification."
     },
     {
       "id": "P09",
@@ -84,7 +84,7 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 135,
+      "count": 137,
       "command": "ctest --test-dir build/locked --output-on-failure -j6"
     },
     "native_input_workflow": {
@@ -248,7 +248,7 @@
         "animated orthographic camera matches reopened preview and two exported PNG frames"
       ]
     },
-    "total_local_ctest_entries": 135,
+    "total_local_ctest_entries": 137,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -391,6 +391,13 @@
         "Pose blend has exact endpoints, a half-way drawing threshold and one drag undo"
       ],
       "limits": "Cross-character transfer, mirroring, published controls and complete artist journey remain open."
+    },
+    "published_character_dashboard": {
+      "status": "passed_subset",
+      "scope": "Format-13 published poses/views, independent copied bindings, format-12 migration backup, Rig/Animator view-state switching and native connected-toon QML screenshot",
+      "command": "build/locked/open-toon.app/Contents/MacOS/open-toon --hm07-smoke",
+      "screenshot": "build/hm07-dashboard-smoke.png",
+      "limits": "No on-canvas widget bindings, persistent multi-driver graph, conflict/cycle handling or complete workspace layout presets."
     }
   },
   "ownership": {
@@ -414,7 +421,7 @@
   "planning_priority": {
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
-    "state": "HM-00_through_HM-05_and_HM-13_complete__HM-06_in_progress",
-    "note": "HM-06 format-11 bone/curve controls and bounded bone-tip attachment are a working subset; complete quality and interaction evidence before accepting the contract. HM-07, HM-10 and HM-12 remain independently eligible; P09 and full DEF features remain open."
+    "state": "HM-00_through_HM-05_and_HM-13_complete__HM-06_parked_in_progress__HM-07_active_in_progress",
+    "note": "HM-06 continuous deformation remains an unaccepted working subset; owner-directed HM-07 named poses and published controls are active. HM-10 and HM-12 remain eligible independent slices after the current bounded block. Full P08/P09 feature and phase acceptance remain open."
   }
 }

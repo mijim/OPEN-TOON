@@ -28,15 +28,38 @@ the first format-12 save preserves a source-version backup.
 - `tests/export_tests.cpp`: actual editor imports original registered PNG
   Parts, assembles a character, captures a selected Part, applies at another
   frame, blends with several live updates, undoes/redoes once, saves and reopens.
-- Local macOS `build/locked`: 135/135 CTest entries pass. Native Qt Quick
+- Local macOS `build/locked`: 137/137 CTest entries pass. Native Qt Quick
   `--smoke-test` passes the mouse/input, window, deformation and reopen
   journeys. The new pose panel compiles and loads within that window; the
   controller journey exercises its backend rather than clicking its widgets.
 
+## Published controls and workspaces
+
+Format 13 lets a rigger publish a saved pose or coordinated view set. Rig
+exposes their complete records and publication toggles; Animator shows only
+published view buttons and a published pose picker with the 0–1 blend slider.
+Both workspaces operate on the same document. The workspace mode is local Qt
+view state, while publication is saved with each Character. Switching modes
+keeps selection, frame and rendered output unchanged. Duplicating a Character
+retains publication choices with new independent pose/view/Part IDs.
+
+`tests/rigging_tests.cpp` checks publication and independent bindings without
+render changes. `tests/storage_tests.cpp` checks format-12 loading with
+publication off and a readable `.pre-v12.bak` after format-13 save.
+`tests/export_tests.cpp` checks workspace selection/frame/pixel preservation
+and save/reopen. The native `--hm07-smoke` opens the original continuous toon
+project, publishes a view and pose, checks the visible QML dashboard and writes
+`build/hm07-dashboard-smoke.png`. The screenshot was inspected at 2880 × 1832;
+the connected character, view button and pose slider are visible.
+
+This remains a direct-command control subset. Persistent multi-driver
+evaluation, conflict/cycle handling, on-canvas widgets, control groups,
+cross-character mapping and a complete artist journey remain open. HM-07 is
+still in progress.
+
 ## Remaining contract
 
-Saved pose masks support explicit Part IDs within one character. Cross-rig
-stable role mappings, mirroring, published controls/switches, dashboard and
-Animator/Rig workspace
-views remain open. RIG-012 and HM-07 are partial; the recorded tests do not
-claim artist acceptance of the complete control workflow.
+Saved pose masks use explicit Part IDs within one character. Cross-rig stable
+role mapping, mirroring, full published controls, direct widgets, control
+groups, conflict/cycle handling, complete workspace layout presets and artist
+acceptance remain open. RIG-012 and HM-07 are partial.

@@ -100,3 +100,6 @@ bone-tip link, evaluation order, validation and migration boundary.
 
 See [ADR-032](032-named-character-poses.md) for format-12 named masked poses,
 atomic application and stable Part/substitution references.
+
+See [ADR-033](033-published-character-controls.md) for format-13 published
+poses/views and the local Animator/Rig workspace boundary.

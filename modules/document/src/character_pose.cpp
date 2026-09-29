@@ -136,4 +136,7 @@ void removeCharacterPose(Document& document, Id rootId, Id poseId) {
     auto& poses = document.layer(rootId).poses;
     std::erase_if(poses, [poseId](const auto& item) { return item.id == poseId; });
 }
+void publishCharacterPose(Document& document, Id rootId, Id poseId, bool published) {
+    pose(document, rootId, poseId).published = published;
+}
 } // namespace opentoon

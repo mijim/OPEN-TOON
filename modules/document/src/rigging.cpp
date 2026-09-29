@@ -507,6 +507,9 @@ void reorderCharacterView(Document& document, Id rootId, Id viewId, int directio
     if (target >= 0 && target < std::ptrdiff_t(root.views.size()))
         std::iter_swap(root.views.begin() + position, root.views.begin() + target);
 }
+void publishCharacterView(Document& document, Id rootId, Id viewId, bool published) {
+    findView(character(document, rootId), viewId).published = published;
+}
 Id duplicateCharacter(Document& document, Id rootId, double offsetX, double offsetY) {
     const auto& root = document.layer(rootId);
     require(root.kind == LayerKind::Character && std::isfinite(offsetX) && std::isfinite(offsetY),

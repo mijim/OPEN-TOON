@@ -456,6 +456,14 @@ ApplicationWindow {
                     Layout.preferredWidth: 220
                     Layout.maximumWidth: 350
                 }
+                C.CompactComboBox {
+                    objectName: "workspacePicker"
+                    model: ["Rig", "Animator"]
+                    currentIndex: editor.workspaceMode === "Animator" ? 1 : 0
+                    onActivated: editor.workspaceMode = currentText
+                    Accessible.name: "Workspace"
+                    implicitWidth: 112
+                }
                 Rectangle {
                     Layout.preferredWidth: stateLabel.implicitWidth + 16
                     height: 22
@@ -864,13 +872,13 @@ ApplicationWindow {
                         Text {
                             Layout.leftMargin: 16
                             Layout.topMargin: 18
-                            text: "PROPERTIES"
+                            text: editor.workspaceMode === "Animator" ? "CHARACTER" : "PROPERTIES"
                             color: "#888888"
                             font.pixelSize: 10
                             font.letterSpacing: 1.4
                         }
                         Label {
-                            visible: canvas.objectProperties.kind === "none" && root.inspectorMode !== "layer"
+                            visible: editor.workspaceMode === "Rig" && canvas.objectProperties.kind === "none" && root.inspectorMode !== "layer"
                             Layout.leftMargin: 16
                             Layout.rightMargin: 16
                             Layout.fillWidth: true
@@ -879,7 +887,7 @@ ApplicationWindow {
                             color: "#999999"
                         }
                         C.SelectionProperties {
-                            visible: canvas.objectProperties.kind !== "none"
+                            visible: editor.workspaceMode === "Rig" && canvas.objectProperties.kind !== "none"
                             Layout.leftMargin: 16
                             Layout.rightMargin: 16
                             Layout.fillWidth: true
@@ -888,7 +896,7 @@ ApplicationWindow {
                         }
                         ColumnLayout {
                             id: layerInspector
-                            visible: root.inspectorMode === "layer" && canvas.objectProperties.kind === "none"
+                            visible: editor.workspaceMode === "Rig" && root.inspectorMode === "layer" && canvas.objectProperties.kind === "none"
                             Layout.fillWidth: true
                             property var rigLayer: editor.layers.find(l => l.id === editor.selectedLayer)
                             Label {
@@ -1530,6 +1538,13 @@ ApplicationWindow {
                                     onEditingFinished: editor.renameCharacterView(text)
                                     Accessible.name: "Character view set name"
                                 }
+                                C.CompactCheckBox {
+                                    text: "Show in Animator"
+                                    checked: editor.characterViews.find(v => v.id === editor.selectedView)?.published || false
+                                    enabled: editor.selectedView > 0
+                                    onClicked: editor.setSelectedViewPublished(checked)
+                                    Accessible.name: "Publish character view"
+                                }
                                 Rectangle { Layout.fillWidth: true; height: 1; color: "#282828" }
                                 Label { text: "Character poses"; color: "#999999"; font.pixelSize: 10 }
                                 C.CompactComboBox {
@@ -1650,14 +1665,153 @@ ApplicationWindow {
                                     onEditingFinished: editor.renameSelectedCharacterPose(text)
                                     Accessible.name: "Character pose name"
                                 }
+                                C.CompactCheckBox {
+                                    text: "Show in Animator"
+                                    checked: editor.characterPoses.find(p => p.id === editor.selectedCharacterPose)?.published || false
+                                    enabled: editor.selectedCharacterPose > 0
+                                    onClicked: editor.setSelectedCharacterPosePublished(checked)
+                                    Accessible.name: "Publish character pose"
+                                }
+                            }
+                        }
+                        ColumnLayout {
+                            objectName: "animatorDashboard"
+                            visible: editor.workspaceMode === "Animator"
+                            Layout.leftMargin: 16
+                            Layout.rightMargin: 16
+                            Layout.fillWidth: true
+                            spacing: 8
+                            Label {
+                                Layout.fillWidth: true
+                                text: editor.characterId > 0
+                                      ? (editor.layers.find(l => l.id === editor.characterId)?.name || "Character")
+                                      : "Select a character or one of its parts"
+                                color: "#eeeeee"
+                                font.pixelSize: 13
+                                font.bold: true
+                                wrapMode: Text.WordWrap
+                            }
+                            Label {
+                                visible: editor.characterId > 0
+                                text: "Published views"
+                                color: "#999999"
+                                font.pixelSize: 10
+                            }
+                            Repeater {
+                                model: editor.characterViews.filter(v => v.published)
+                                C.CompactButton {
+                                    required property var modelData
+                                    Layout.fillWidth: true
+                                    text: modelData.name
+                                    Accessible.name: "Apply view " + modelData.name
+                                    onClicked: {
+                                        editor.selectView(modelData.id)
+                                        editor.applyCharacterView()
+                                    }
+                                }
+                            }
+                            Label {
+                                visible: editor.characterId > 0 &&
+                                         editor.characterViews.filter(v => v.published).length === 0
+                                text: "Publish view sets in Rig to show them here."
+                                wrapMode: Text.WordWrap
+                                color: "#777777"
+                                font.pixelSize: 10
+                            }
+                            Label {
+                                visible: editor.characterId > 0
+                                text: "Published poses"
+                                color: "#999999"
+                                font.pixelSize: 10
+                            }
+                            C.CompactComboBox {
+                                objectName: "animatorPosePicker"
+                                Layout.fillWidth: true
+                                visible: editor.characterPoses.some(p => p.published)
+                                model: editor.characterPoses.filter(p => p.published)
+                                textRole: "name"
+                                valueRole: "id"
+                                currentIndex: model.findIndex(p => p.id === editor.selectedCharacterPose)
+                                onActivated: editor.selectCharacterPose(currentValue)
+                                Accessible.name: "Published character pose"
+                            }
+                            RowLayout {
+                                Layout.fillWidth: true
+                                visible: editor.characterPoses.some(p => p.published)
+                                C.CompactButton {
+                                    text: "Apply"
+                                    enabled: editor.characterPoses.some(p => p.id === editor.selectedCharacterPose && p.published)
+                                    onClicked: editor.applySelectedCharacterPose()
+                                }
+                                Slider {
+                                    id: animatorPoseBlend
+                                    objectName: "animatorPoseBlend"
+                                    Layout.fillWidth: true
+                                    implicitHeight: 24
+                                    from: 0
+                                    to: 1
+                                    value: 0
+                                    enabled: editor.characterPoses.some(p => p.id === editor.selectedCharacterPose && p.published)
+                                    onPressedChanged: {
+                                        if (pressed)
+                                            editor.beginSelectedCharacterPoseBlend()
+                                        else
+                                            editor.endSelectedCharacterPoseBlend()
+                                    }
+                                    onMoved: editor.updateSelectedCharacterPoseBlend(value)
+                                    Accessible.name: "Blend published character pose"
+                                    background: Rectangle {
+                                        x: animatorPoseBlend.leftPadding
+                                        y: animatorPoseBlend.topPadding + animatorPoseBlend.availableHeight / 2 - height / 2
+                                        width: animatorPoseBlend.availableWidth
+                                        height: 3
+                                        radius: 2
+                                        color: "#303030"
+                                        Rectangle {
+                                            width: animatorPoseBlend.visualPosition * parent.width
+                                            height: parent.height
+                                            radius: parent.radius
+                                            color: "#b8b8b8"
+                                        }
+                                    }
+                                    handle: Rectangle {
+                                        x: animatorPoseBlend.leftPadding + animatorPoseBlend.visualPosition *
+                                           (animatorPoseBlend.availableWidth - width)
+                                        y: animatorPoseBlend.topPadding + animatorPoseBlend.availableHeight / 2 - height / 2
+                                        width: 12
+                                        height: 12
+                                        radius: 6
+                                        color: "#e8e8e8"
+                                        border.color: "#171717"
+                                    }
+                                }
+                                Label {
+                                    text: Math.round(animatorPoseBlend.value * 100) + "%"
+                                    font.pixelSize: 10
+                                    color: "#aaaaaa"
+                                }
+                            }
+                            Connections {
+                                target: editor
+                                function onPoseSelectionChanged() { animatorPoseBlend.value = 0 }
+                            }
+                            Label {
+                                visible: editor.characterId > 0 &&
+                                         editor.characterPoses.filter(p => p.published).length === 0
+                                text: "Publish poses in Rig to show them here."
+                                wrapMode: Text.WordWrap
+                                color: "#777777"
+                                font.pixelSize: 10
                             }
                         }
                         Rectangle {
                             Layout.fillWidth: true
                             height: 1
                             color: "#282828"
+                            visible: editor.workspaceMode === "Rig"
                         }
                         RowLayout {
+                            visible: editor.workspaceMode === "Rig"
                             Layout.leftMargin: 16
                             Layout.rightMargin: 12
                             Layout.fillWidth: true
@@ -1679,6 +1833,7 @@ ApplicationWindow {
                             }
                         }
                         Flow {
+                            visible: editor.workspaceMode === "Rig"
                             Layout.leftMargin: 16
                             Layout.rightMargin: 16
                             Layout.fillWidth: true
@@ -1707,6 +1862,7 @@ ApplicationWindow {
                             }
                         }
                         Text {
+                            visible: editor.workspaceMode === "Rig"
                             Layout.leftMargin: 16
                             Layout.rightMargin: 16
                             Layout.fillWidth: true
@@ -1719,8 +1875,10 @@ ApplicationWindow {
                             Layout.fillWidth: true
                             height: 1
                             color: "#282828"
+                            visible: editor.workspaceMode === "Rig"
                         }
                         ColumnLayout {
+                            visible: editor.workspaceMode === "Rig"
                             Layout.leftMargin: 12
                             Layout.rightMargin: 12
                             Layout.fillWidth: true

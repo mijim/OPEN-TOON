@@ -33,4 +33,5 @@ void renameCharacterView(Document&, Id character, Id view, std::string name);
 Id duplicateCharacterView(Document&, Id character, Id view);
 void removeCharacterView(Document&, Id character, Id view);
 void reorderCharacterView(Document&, Id character, Id view, int direction);
+void publishCharacterView(Document&, Id character, Id view, bool published);
 } // namespace opentoon

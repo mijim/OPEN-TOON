@@ -22,12 +22,15 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QQuickStyle>
+#include <QQuickItem>
 #include <QQuickWindow>
 #include <QStandardPaths>
 #include <QTabletEvent>
 #include <QTemporaryDir>
 #include <QThread>
 #include <QTimer>
+#include <QUrl>
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <stdexcept>
@@ -42,10 +45,14 @@ int main(int argc, char** argv) {
         std::cout << OPENTOON_VERSION << '\n';
         return 0;
     }
-    if (args.contains("--smoke-test") || args.contains("--hm06-benchmark")) {
+    if (args.contains("--smoke-test") || args.contains("--hm06-benchmark") ||
+        args.contains("--hm07-smoke")) {
         QStandardPaths::setTestModeEnabled(true);
         QCoreApplication::setApplicationName(args.contains("--smoke-test")
-                                                 ? "OPEN-TOON-smoke" : "OPEN-TOON-benchmark");
+                                                 ? "OPEN-TOON-smoke"
+                                                 : args.contains("--hm07-smoke")
+                                                       ? "OPEN-TOON-hm07-smoke"
+                                                       : "OPEN-TOON-benchmark");
     }
     try {
         if (args.contains("--render-demo")) {
@@ -98,6 +105,62 @@ int main(int argc, char** argv) {
         engine.loadFromModule("OpenToon", "Main");
         if (args.contains("--demo"))
             editor.loadDemo();
+        if (args.contains("--hm07-smoke")) {
+            QTimer::singleShot(1200, &app, [&] {
+                try {
+                    if (engine.rootObjects().isEmpty())
+                        throw std::runtime_error("No QML window for HM-07 smoke.");
+                    auto* window = qobject_cast<QQuickWindow*>(engine.rootObjects().first());
+                    auto* dashboard = window->findChild<QQuickItem*>("animatorDashboard");
+                    auto* posePicker = window->findChild<QQuickItem*>("animatorPosePicker");
+                    auto* poseBlend = window->findChild<QQuickItem*>("animatorPoseBlend");
+                    if (!dashboard || !posePicker || !poseBlend)
+                        throw std::runtime_error("Animator dashboard controls are missing.");
+                    editor.setWorkspaceMode("Rig");
+                    const auto scene = QDir::currentPath() + "/examples/clockwork-continuous.otoon";
+                    if (!editor.openProject(QUrl::fromLocalFile(scene)))
+                        throw std::runtime_error("Cannot open the original continuous-character project.");
+                    editor.setOnionSkin(false);
+                    editor.setTool("Select");
+                    auto root = std::find_if(editor.document().layers.begin(), editor.document().layers.end(),
+                                             [](const auto& layer) {
+                                                 return layer.kind == opentoon::LayerKind::Character;
+                                             });
+                    if (root == editor.document().layers.end())
+                        throw std::runtime_error("Continuous-character root is missing.");
+                    editor.setSelectedLayer(int(root->id));
+                    editor.captureSelectedCharacterPose(opentoon::PoseChannels::Rotation, true);
+                    editor.setSelectedCharacterPosePublished(true);
+                    editor.setSelectedViewPublished(true);
+                    const auto selected = editor.selectedLayer();
+                    const auto frame = editor.frame();
+                    editor.setWorkspaceMode("Animator");
+                    QCoreApplication::processEvents();
+                    if (editor.selectedLayer() != selected || editor.frame() != frame ||
+                        !dashboard->isVisible() || !posePicker->isVisible() || !poseBlend->isVisible() ||
+                        !editor.characterPoses().front().toMap().value("published").toBool() ||
+                        !editor.characterViews().front().toMap().value("published").toBool())
+                        throw std::runtime_error(
+                            "Published Animator controls are not visible or changed selection: " +
+                            editor.status().toStdString() + ", dashboard=" +
+                            std::to_string(dashboard->isVisible()) + ", picker=" +
+                            std::to_string(posePicker->isVisible()) + ", slider=" +
+                            std::to_string(poseBlend->isVisible()) + ", poses=" +
+                            std::to_string(editor.characterPoses().size()) + ", views=" +
+                            std::to_string(editor.characterViews().size()) + ", posePublished=" +
+                            std::to_string(editor.characterPoses().front().toMap().value("published").toBool()) +
+                            ", poseId=" + std::to_string(editor.selectedCharacterPose()));
+                    if (!window->grabWindow().save("build/hm07-dashboard-smoke.png"))
+                        throw std::runtime_error("Cannot save the Animator dashboard screenshot.");
+                    std::cout << "HM-07 dashboard smoke passed: continuous toon project, published view and pose, "
+                                 "workspace selection/frame and native QML screenshot.\n";
+                    app.exit(0);
+                } catch (const std::exception& error) {
+                    std::cerr << error.what() << '\n';
+                    app.exit(1);
+                }
+            });
+        }
         if (args.contains("--hm06-benchmark")) {
             const int index = args.indexOf("--hm06-benchmark");
             if (index + 1 >= args.size())

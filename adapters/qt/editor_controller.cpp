@@ -48,6 +48,8 @@ EditorController::EditorController(QObject* parent) : QObject(parent) {
     auto recoveryDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/recovery";
     QDir().mkpath(recoveryDir);
     QSettings settings;
+    const auto workspace = settings.value("workspaceMode", "Rig").toString();
+    workspaceMode_ = workspace == "Animator" ? workspace : "Rig";
     previousRecovery_ = settings.value("recoveryPath").toString();
     if (!QFileInfo::exists(previousRecovery_))
         previousRecovery_.clear();
@@ -169,7 +171,8 @@ QVariantList EditorController::characterViews() const {
     for (const auto& view : document().layer(root).views)
         result.push_back(QVariantMap{{"id", int(view.id)},
                                      {"name", QString::fromStdString(view.name)},
-                                     {"parts", int(view.choices.size())}});
+                                     {"parts", int(view.choices.size())},
+                                     {"published", view.published}});
     return result;
 }
 int EditorController::selectedView() const {
@@ -198,7 +201,8 @@ QVariantList EditorController::characterPoses() const {
     for (const auto& pose : document().layer(root).poses)
         result.push_back(QVariantMap{{"id", int(pose.id)},
                                      {"name", QString::fromStdString(pose.name)},
-                                     {"parts", int(pose.parts.size())}});
+                                     {"parts", int(pose.parts.size())},
+                                     {"published", pose.published}});
     return result;
 }
 int EditorController::selectedCharacterPose() const {
@@ -207,9 +211,15 @@ int EditorController::selectedCharacterPose() const {
         return 0;
     const auto& poses = document().layer(root).poses;
     if (std::any_of(poses.begin(), poses.end(), [&](const auto& item) {
-            return item.id == selectedCharacterPose_;
+            return item.id == selectedCharacterPose_ &&
+                   (workspaceMode_ != "Animator" || item.published);
         }))
         return int(selectedCharacterPose_);
+    if (workspaceMode_ == "Animator") {
+        const auto found = std::find_if(poses.begin(), poses.end(),
+                                         [](const auto& item) { return item.published; });
+        return found == poses.end() ? 0 : int(found->id);
+    }
     return poses.empty() ? 0 : int(poses.front().id);
 }
 void EditorController::selectCharacterPose(int poseId) {
@@ -221,6 +231,15 @@ void EditorController::selectCharacterPose(int poseId) {
         selectedCharacterPose_ = poseId;
         emit poseSelectionChanged();
     }
+}
+void EditorController::setWorkspaceMode(QString mode) {
+    if ((mode != "Rig" && mode != "Animator") || mode == workspaceMode_)
+        return;
+    endSelectedCharacterPoseBlend();
+    workspaceMode_ = std::move(mode);
+    QSettings().setValue("workspaceMode", workspaceMode_);
+    emit workspaceModeChanged();
+    emit poseSelectionChanged();
 }
 QString EditorController::substitutionThumbnail(int drawingId) const {
     if (!layer_ || drawingId <= 0)
@@ -1163,6 +1182,20 @@ void EditorController::removeSelectedCharacterPose() {
         selectedCharacterPose_ = 0;
         emit poseSelectionChanged();
     }
+}
+void EditorController::setSelectedCharacterPosePublished(bool published) {
+    const int root = characterId(), poseId = selectedCharacterPose();
+    if (root && poseId)
+        edit(published ? "Publish character pose" : "Unpublish character pose", [&](Document& d) {
+            opentoon::publishCharacterPose(d, root, poseId, published);
+        });
+}
+void EditorController::setSelectedViewPublished(bool published) {
+    const int root = characterId(), viewId = selectedView();
+    if (root && viewId)
+        edit(published ? "Publish character view" : "Unpublish character view", [&](Document& d) {
+            opentoon::publishCharacterView(d, root, viewId, published);
+        });
 }
 void EditorController::beginSelectedCharacterPoseBlend() {
     endSelectedCharacterPoseBlend();

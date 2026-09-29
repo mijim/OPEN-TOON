@@ -1846,7 +1846,7 @@
     {
       "feature_id": "UI-002",
       "completion_phase": "P03",
-      "status": "planned",
+      "status": "in_progress",
       "disposition": "planned_delivery",
       "delivery_slices": [
         "HM-07"
@@ -3198,7 +3198,7 @@
     {
       "feature_id": "CTL-002",
       "completion_phase": "P08",
-      "status": "planned",
+      "status": "in_progress",
       "disposition": "planned_delivery",
       "delivery_slices": [
         "HM-07"
@@ -3218,7 +3218,7 @@
     {
       "feature_id": "CTL-004",
       "completion_phase": "P08",
-      "status": "planned",
+      "status": "in_progress",
       "disposition": "planned_delivery",
       "delivery_slices": [
         "HM-07"
@@ -3229,7 +3229,7 @@
     {
       "feature_id": "CTL-005",
       "completion_phase": "P08",
-      "status": "planned",
+      "status": "in_progress",
       "disposition": "planned_delivery",
       "delivery_slices": [
         "HM-07",
@@ -5257,7 +5257,7 @@
   ],
   "execution_policy": {
     "primary_objective": "HM: reliable character animation Harmony Moment",
-    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06 bone/curve deformation is in progress with a format-11 animated backend, saved rest anchors and native controls and bounded bone-tip links; its quality and interaction budgets are still unaccepted. HM-07, HM-10 and HM-12 remain eligible independent branches. P09 and all other owning full phases remain open.",
+    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06 remains in progress with format-11 animated bone/curve controls and continuous-limb evidence; its wider quality and artistic gate is open. The owner directed the single implementer to advance other functionality, so HM-06 is parked while HM-07 named poses and published controls are active. HM-10 and HM-12 remain independently eligible after the active bounded block. P08/P09 and full feature acceptance remain open.",
     "phase_dependency_semantics": "Phase depends_on constrains full epic completion, not entry into an implementation slice. Only the explicit delivery-slice contract DAG gates the Harmony Moment. Domain dependencies are scope relationships, not all-features barriers.",
     "entry_rule": "Start a slice only when each required contract has accepted evidence. Baseline reuse is partial and must be qualified; planned is not ready. Independent spikes may run without claiming their consumer ready.",
     "wip_limit": 2,
@@ -5320,7 +5320,7 @@
       "Physical tablet, Intel, Linux/Windows or clean-machine qualification",
       "Measured superiority over Harmony before comparative artist study"
     ],
-    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06 bone/curve deformation is in progress with a format-11 animated backend, saved rest anchors and native controls and bounded bone-tip links; its quality and interaction budgets are still unaccepted. HM-07, HM-10 and HM-12 remain eligible independent branches. P09 and all other owning full phases remain open."
+    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06 remains in progress with format-11 animated bone/curve controls and continuous-limb evidence; its wider quality and artistic gate is open. The owner directed the single implementer to advance other functionality, so HM-06 is parked while HM-07 named poses and published controls are active. HM-10 and HM-12 remain independently eligible after the active bounded block. P08/P09 and full feature acceptance remain open."
   },
   "estimate_revision": {
     "basis": "Whole-program phase envelopes retain prior scope and are not estimates of remaining HM work. HM slice estimates cover remaining bounded work once, including integration; never add them to phase totals.",

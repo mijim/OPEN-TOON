@@ -13,4 +13,5 @@ void applyCharacterPose(Document&, Id character, Id pose, Frame);
 void blendCharacterPose(Document&, Id character, Id pose, Frame, double amount);
 void renameCharacterPose(Document&, Id character, Id pose, std::string name);
 void removeCharacterPose(Document&, Id character, Id pose);
+void publishCharacterPose(Document&, Id character, Id pose, bool published);
 } // namespace opentoon

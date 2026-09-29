@@ -50,6 +50,7 @@ class EditorController final : public QObject {
     Q_PROPERTY(int selectedView READ selectedView NOTIFY viewSelectionChanged)
     Q_PROPERTY(QVariantList characterPoses READ characterPoses NOTIFY changed)
     Q_PROPERTY(int selectedCharacterPose READ selectedCharacterPose NOTIFY poseSelectionChanged)
+    Q_PROPERTY(QString workspaceMode READ workspaceMode WRITE setWorkspaceMode NOTIFY workspaceModeChanged)
     Q_PROPERTY(qulonglong documentRevision READ documentRevision NOTIFY changed)
     Q_PROPERTY(QVariantList palette READ palette NOTIFY changed)
     Q_PROPERTY(QVariantList revisions READ revisions NOTIFY changed)
@@ -142,6 +143,8 @@ class EditorController final : public QObject {
     QVariantList characterPoses() const;
     int selectedCharacterPose() const;
     Q_INVOKABLE void selectCharacterPose(int pose);
+    QString workspaceMode() const { return workspaceMode_; }
+    void setWorkspaceMode(QString mode);
     QVariantList palette() const;
     QVariantList revisions() const;
     QVariantMap transform() const;
@@ -266,6 +269,8 @@ class EditorController final : public QObject {
     Q_INVOKABLE void applySelectedCharacterPose();
     Q_INVOKABLE void renameSelectedCharacterPose(QString name);
     Q_INVOKABLE void removeSelectedCharacterPose();
+    Q_INVOKABLE void setSelectedCharacterPosePublished(bool published);
+    Q_INVOKABLE void setSelectedViewPublished(bool published);
     Q_INVOKABLE void beginSelectedCharacterPoseBlend();
     Q_INVOKABLE bool updateSelectedCharacterPoseBlend(double amount);
     Q_INVOKABLE void endSelectedCharacterPoseBlend();
@@ -306,6 +311,7 @@ class EditorController final : public QObject {
     void poseClipboardChanged();
     void viewSelectionChanged();
     void poseSelectionChanged();
+    void workspaceModeChanged();
     void animationModeChanged();
     void rangeChanged();
     void changed();
@@ -327,6 +333,7 @@ class EditorController final : public QObject {
     std::optional<opentoon::Transform> transformClipboard_;
     opentoon::Id selectedView_ = 0;
     opentoon::Id selectedCharacterPose_ = 0;
+    QString workspaceMode_ = "Rig";
     std::uint64_t poseBlendSerial_ = 0;
     std::uint64_t poseBlendGesture_ = 0;
     opentoon::Id poseBlendRoot_ = 0;

@@ -207,7 +207,7 @@
         "Switching workspaces preserves the selection and current frame."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "workspace",
@@ -215,7 +215,8 @@
         "PRJ"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; bounded published pose/view dashboard subset, full catalog acceptance open"
     },
     {
       "id": "UI-003",
@@ -3034,7 +3035,7 @@
         "At each sample position, the controller reproduces the captured pose exactly."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "advanced",
       "owner_module": "controllers",
@@ -3043,7 +3044,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; bounded published pose/view dashboard subset, full catalog acceptance open"
     },
     {
       "id": "CTL-003",
@@ -3074,7 +3076,7 @@
         "A switch can show a control set without altering the render."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "advanced",
       "owner_module": "controllers",
@@ -3083,7 +3085,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; bounded published pose/view dashboard subset, full catalog acceptance open"
     },
     {
       "id": "CTL-005",
@@ -3094,7 +3097,7 @@
         "Duplicating the character creates independent bindings."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "advanced",
       "owner_module": "controllers",
@@ -3103,7 +3106,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; bounded published pose/view dashboard subset, full catalog acceptance open"
     },
     {
       "id": "CTL-006",

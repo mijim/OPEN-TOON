@@ -34,9 +34,13 @@ Save and switch layouts for drawing, animation, rigging and compositing.
 
 **Initial acceptance:** Switching workspaces preserves the selection and current frame.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM07-PROGRESS.md](../../../docs/implementation/HM07-PROGRESS.md) — bounded published pose/view dashboard subset, full catalog acceptance open.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## UI-003 — Customizable toolbars
 

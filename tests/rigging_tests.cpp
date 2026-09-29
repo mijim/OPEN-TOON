@@ -58,14 +58,38 @@ TEST_CASE("Named poses survive duplication and remove stale part references") {
     const Id root = makeCharacter(document, part, "Hero");
     const Id pose = captureCharacterPose(document, root, 0,
         std::vector<PoseCaptureTarget>{{part, PoseChannels::AllTransforms}}, "Stand");
+    publishCharacterPose(document, root, pose, true);
     const Id copy = duplicateCharacter(document, root);
     REQUIRE(document.layer(copy).poses.size() == 1);
     REQUIRE(document.layer(copy).poses.front().id != pose);
+    REQUIRE(document.layer(copy).poses.front().published);
     REQUIRE(document.layer(copy).poses.front().parts.front().part != part);
     document.validate();
     removeRigBranch(document, part);
     REQUIRE(document.layer(root).poses.empty());
     REQUIRE(document.layer(copy).poses.size() == 1);
+    document.validate();
+}
+TEST_CASE("Published view and pose bindings stay local and outside rendered output") {
+    auto document = makeDocument();
+    const Id part = document.layers.front().id;
+    const Id root = makeCharacter(document, part, "Hero");
+    (void)createSubstitution(document, part, 0, false, "Mouth A");
+    const Id view = captureCharacterView(document, root, 0, "Talk");
+    const Id pose = captureCharacterPose(document, root, 0,
+        std::vector<PoseCaptureTarget>{{part, PoseChannels::Rotation}}, "Turn");
+    const auto before = SceneRenderer::render(document, 0, {320, 180});
+    publishCharacterView(document, root, view, true);
+    publishCharacterPose(document, root, pose, true);
+    REQUIRE(SceneRenderer::render(document, 0, {320, 180}) == before);
+    const Id copy = duplicateCharacter(document, root);
+    REQUIRE(document.layer(copy).views.front().published);
+    REQUIRE(document.layer(copy).poses.front().published);
+    REQUIRE(document.layer(copy).views.front().id != view);
+    REQUIRE(document.layer(copy).poses.front().id != pose);
+    const auto original = document.layer(root).views.front();
+    publishCharacterView(document, copy, document.layer(copy).views.front().id, false);
+    REQUIRE(document.layer(root).views.front() == original);
     document.validate();
 }
 TEST_CASE("Pose blend has exact endpoints, a half-way drawing threshold and one drag undo") {

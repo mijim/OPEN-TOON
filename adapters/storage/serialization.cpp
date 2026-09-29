@@ -124,14 +124,16 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
             Json choices = Json::array();
             for (const auto& choice : view.choices)
                 choices.push_back({choice.part, choice.drawing});
-            x["views"].push_back({{"id", view.id}, {"name", view.name}, {"choices", choices}});
+            x["views"].push_back({{"id", view.id}, {"name", view.name},
+                                  {"choices", choices}, {"published", view.published}});
         }
         for (const auto& pose : l.poses) {
             Json parts = Json::array();
             for (const auto& part : pose.parts)
                 parts.push_back({{"part", part.part}, {"channels", part.channels},
                                  {"transform", transform(part.transform)}, {"drawing", part.drawing}});
-            x["poses"].push_back({{"id", pose.id}, {"name", pose.name}, {"parts", parts}});
+            x["poses"].push_back({{"id", pose.id}, {"name", pose.name},
+                                  {"parts", parts}, {"published", pose.published}});
         }
         for (const auto& binding : l.bindings) {
             Json vertices = Json::array();
@@ -333,6 +335,8 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
                 CharacterView entry;
                 entry.id = view.at("id");
                 entry.name = view.at("name");
+                if (j.at("version").get<int>() >= 13)
+                    entry.published = view.at("published");
                 limit(view.at("choices"), 2000);
                 for (const auto& choice : view.at("choices"))
                     entry.choices.push_back({choice.at(0), choice.at(1)});
@@ -345,6 +349,8 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
                 CharacterPose entry;
                 entry.id = pose.at("id");
                 entry.name = pose.at("name");
+                if (j.at("version").get<int>() >= 13)
+                    entry.published = pose.at("published");
                 limit(pose.at("parts"), 2000);
                 for (const auto& part : pose.at("parts"))
                     entry.parts.push_back({part.at("part"), part.at("channels"),

@@ -35,7 +35,7 @@ TEST_CASE("Projects round trip Unicode names keys and images with stable identit
     REQUIRE(loaded.document == d);
     REQUIRE(loaded.revision == revision);
 }
-TEST_CASE("Format 12 persists masked character poses and loads format 11 without them") {
+TEST_CASE("Format 13 persists published pose controls and loads older pose schemas") {
     auto d = makeDocument();
     const Id part = d.layers.front().id;
     const Id root = makeCharacter(d, part, "Hero");
@@ -43,10 +43,19 @@ TEST_CASE("Format 12 persists masked character poses and loads format 11 without
     const Id pose = captureCharacterPose(d, root, 0,
         std::vector<PoseCaptureTarget>{{part, PoseChannels::PositionX | PoseChannels::Drawing}},
         "Reach");
+    publishCharacterPose(d, root, pose, true);
     REQUIRE(deserializeDocument(serializeDocument(d)) == d);
     TemporaryProject project;
     (void)ProjectStore::save(project.file, d);
     REQUIRE(ProjectStore::load(project.file).document == d);
+    auto version12 = nlohmann::json::parse(serializeDocument(d));
+    version12["version"] = 12;
+    for (auto& layer : version12["layers"])
+        for (auto& entry : layer["poses"])
+            entry.erase("published");
+    const auto oldPose = deserializeDocument(version12.dump());
+    REQUIRE(oldPose.layer(root).poses.size() == 1);
+    REQUIRE_FALSE(oldPose.layer(root).poses.front().published);
     auto previous = nlohmann::json::parse(serializeDocument(d));
     previous["version"] = 11;
     for (auto& layer : previous["layers"])
@@ -565,6 +574,41 @@ TEST_CASE("Format ten linked rig migrates explicit rest anchors with a readable 
     auto backup = project.file;
     backup += ".pre-v10.bak";
     REQUIRE(ProjectStore::load(backup).document == original.document);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+}
+TEST_CASE("Format twelve pose scene upgrades published controls with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    const Id part = original.layers.front().id;
+    const Id root = makeCharacter(original, part, "Hero");
+    (void)createSubstitution(original, part, 0, false, "Mouth A");
+    const Id pose = captureCharacterPose(original, root, 0,
+        std::vector<PoseCaptureTarget>{{part, PoseChannels::Rotation}}, "Turn");
+    const Id view = captureCharacterView(original, root, 0, "Front");
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 12;
+    for (auto& layer : legacy["layers"]) {
+        for (auto& entry : layer["poses"])
+            entry.erase("published");
+        for (auto& entry : layer["views"])
+            entry.erase("published");
+    }
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=12");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    publishCharacterPose(changed, root, pose, true);
+    publishCharacterView(changed, root, view, true);
+    REQUIRE(ProjectStore::save(project.file, changed, "Publish controls", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v12.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
     FixtureDatabase current(project.file);
     REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
 }

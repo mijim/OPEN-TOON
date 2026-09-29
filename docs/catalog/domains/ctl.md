@@ -34,9 +34,13 @@ Generate a one-dimensional control from compatible poses.
 
 **Initial acceptance:** At each sample position, the controller reproduces the captured pose exactly.
 
-**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM07-PROGRESS.md](../../../docs/implementation/HM07-PROGRESS.md) — bounded published pose/view dashboard subset, full catalog acceptance open.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## CTL-003 — Pose grid
 
@@ -54,9 +58,13 @@ Connect controls to attributes, activation and visibility without writing every 
 
 **Initial acceptance:** A switch can show a control set without altering the render.
 
-**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM07-PROGRESS.md](../../../docs/implementation/HM07-PROGRESS.md) — bounded published pose/view dashboard subset, full catalog acceptance open.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## CTL-005 — Character dashboard
 
@@ -64,9 +72,13 @@ Group identifiable controls for character manipulation.
 
 **Initial acceptance:** Duplicating the character creates independent bindings.
 
-**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM07-PROGRESS.md](../../../docs/implementation/HM07-PROGRESS.md) — bounded published pose/view dashboard subset, full catalog acceptance open.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## CTL-006 — Scripted controller
 
