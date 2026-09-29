@@ -18,8 +18,9 @@ the source. Format 22 adds linear fade-in/out durations in original source
 samples across the complete repeated clip. The two values are set atomically;
 shorter trims or repeat counts clamp them to the new length. They shape
 preview and export through the same mix plan without changing source bytes.
-The waveform still shows source peaks and gain; it does not draw the fade
-envelope. **Scene → Export PCM WAV mix** writes a 48 kHz stereo PCM16 mix
+The waveform retains source peaks and gain, with visible upper/lower fade
+guides over the repeated clip; these guides indicate the envelope endpoints
+without replacing the exact source-peak trace. **Scene → Export PCM WAV mix** writes a 48 kHz stereo PCM16 mix
 from an immutable document snapshot. Multiple clips sum at exact scene sample
 positions. Export runs in the background, reports progress and atomically
 discards a cancelled temporary file. Conversion between different sample
@@ -96,7 +97,9 @@ source-sample fades and trim/repeat clamping.
   and source-byte preservation. A format-21 project loads with zero fades,
   saves chosen values and retains a readable `.pre-v21.bak`. Native HM-10
   smoke finds both controls, exports a faded mix and verifies an attenuated
-  first cue with the second cue unchanged.
+  first cue with the second cue unchanged. The native screenshot
+  `build/hm10-fade-smoke.png` was inspected: both endpoint guides appear on
+  the repeated clip, and smoke compares the timeline row before/after the edit.
 - A range-export integration test compares selected PCM payload with the
   full-scene mix slice at 24 and 24000/1001 fps, checks exact length and
   rejects invalid boundaries before writing. The native HM-10 smoke exports

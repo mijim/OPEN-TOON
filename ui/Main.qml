@@ -2848,6 +2848,37 @@ ApplicationWindow {
                                     ctx.fillStyle = delta ? "#ffffff" : "#a8a8a8";
                                     ctx.fillRect(x, y + 17 - h, Math.max(1, root.timelineCell - 2), h * 2);
                                 }
+                                if (clip.fadeInSamples > 0 || clip.fadeOutSamples > 0) {
+                                    const pixelsPerSample = root.timelineCell * editor.fps / clip.sampleRate;
+                                    const beginX = (clip.start + delta) * root.timelineCell - ox;
+                                    const endX = beginX + (clip.outSample - clip.inSample) *
+                                                 clip.repeats * pixelsPerSample;
+                                    ctx.save();
+                                    ctx.beginPath();
+                                    ctx.rect(0, y, width, root.timelineRow);
+                                    ctx.clip();
+                                    ctx.strokeStyle = "#eeeeee";
+                                    ctx.lineWidth = 1;
+                                    if (clip.fadeInSamples > 0) {
+                                        const fullX = beginX + clip.fadeInSamples * pixelsPerSample;
+                                        ctx.beginPath();
+                                        ctx.moveTo(beginX, y + 17);
+                                        ctx.lineTo(fullX, y + 6);
+                                        ctx.moveTo(beginX, y + 17);
+                                        ctx.lineTo(fullX, y + 28);
+                                        ctx.stroke();
+                                    }
+                                    if (clip.fadeOutSamples > 0) {
+                                        const fullX = endX - clip.fadeOutSamples * pixelsPerSample;
+                                        ctx.beginPath();
+                                        ctx.moveTo(fullX, y + 6);
+                                        ctx.lineTo(endX, y + 17);
+                                        ctx.moveTo(fullX, y + 28);
+                                        ctx.lineTo(endX, y + 17);
+                                        ctx.stroke();
+                                    }
+                                    ctx.restore();
+                                }
                                 ctx.fillStyle = "#eeeeee";
                                 ctx.fillText(clip.name, (clip.start + delta) * root.timelineCell - ox + 3, y + 5);
                             }

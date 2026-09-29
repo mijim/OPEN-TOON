@@ -201,8 +201,9 @@ Enter both sample endpoints and choose **Set** to trim. **Remove clip** removes
 its placement, while the source remains embedded in the project for reuse.
 **Linear fades · source samples** sets fade-in and fade-out lengths across
 the whole repeated clip; a repeat boundary does not restart the envelope.
-The waveform shows source peaks and gain, while preview and WAV export apply
-the fades. Shortening a trim or repeat count clamps fades to fit.
+The waveform shows source peaks and gain with fade guides over the clip;
+preview and WAV export apply the fades. Shortening a trim or repeat count
+clamps fades to fit.
 Import, move, trim, gain and removal are undoable and survive save/reopen.
 
 The format accepts up to 128 MiB per WAV, 512 MiB total audio, 64 assets and 1,000 clips. Clips

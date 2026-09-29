@@ -1,5 +1,14 @@
 # Experimental releases
 
+## 0.2.0-experimental.29 — working source, audio fade guides
+
+- Draw the saved fade-in and fade-out endpoints over a clip's timeline row,
+  including the full repeated length. The source-peak waveform remains visible.
+- Native Qt Quick smoke compares the timeline row before and after setting
+  fades; the screenshot was inspected alongside the 169-entry macOS suite.
+- Source only; no new public binary or tag. The guides are a visual envelope;
+  source peaks do not yet include sample-weighted fade amplitude.
+
 ## 0.2.0-experimental.28 — working source, source-sample audio fades
 
 - Set linear fade-in and fade-out durations on a repeated clip in source
@@ -9,7 +18,7 @@
   Exact PCM, undo/redo, trim clamping, 169 CTest entries and native HM-10
   smoke pass on macOS.
 - Source only; no new public binary or tag. Audible hardware quality remains
-  unqualified and the waveform does not yet draw the fade envelope.
+  unqualified; the next source build adds the visible fade guides.
 
 ## 0.2.0-experimental.27 — working source, node output preview
 

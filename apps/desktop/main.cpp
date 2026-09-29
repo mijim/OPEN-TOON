@@ -423,7 +423,7 @@ int main(int argc, char** argv) {
                         selected.size() != 44 + 4000 * 4 ||
                         selected.readAll().mid(44) != mix.mid(44 + 2000 * 4, 4000 * 4))
                         throw std::runtime_error("Native selected WAV range shifted or changed duration.");
-                    (void)window->grabWindow();
+                    const auto beforeFadeWindow = window->grabWindow();
                     const auto findVisualItem = [](auto&& self, QQuickItem* parent,
                                                    const QString& name) -> QQuickItem* {
                         if (!parent)
@@ -445,6 +445,20 @@ int main(int argc, char** argv) {
                         throw std::runtime_error("Native audio fades were rejected.");
                     if (editor.audioClips().front().toMap().value("fadeInSamples").toInt() != 4000)
                         throw std::runtime_error("Native audio fade did not reach the document.");
+                    const auto afterFadeWindow = window->grabWindow();
+                    if (!afterFadeWindow.save("build/hm10-fade-smoke.png"))
+                        throw std::runtime_error("Cannot capture the native fade guide.");
+                    const auto rowTop = timelineInput->mapToScene(QPointF(
+                        0, 30 + editor.layers().size() * 34));
+                    const auto scale = afterFadeWindow.devicePixelRatio();
+                    const int left = int(std::floor(rowTop.x() * scale));
+                    const int top = int(std::floor(rowTop.y() * scale));
+                    int changedPixels = 0;
+                    for (int y = top; y < top + int(34 * scale) && y < afterFadeWindow.height(); ++y)
+                        for (int x = left; x < left + int(44 * scale) && x < afterFadeWindow.width(); ++x)
+                            changedPixels += beforeFadeWindow.pixel(x, y) != afterFadeWindow.pixel(x, y);
+                    if (changedPixels < 5)
+                        throw std::runtime_error("The audio fade guide did not appear on the timeline.");
                     editor.undo();
                     if (editor.audioClips().front().toMap().value("fadeInSamples").toInt() != 0)
                         throw std::runtime_error("Native audio fade undo failed.");
