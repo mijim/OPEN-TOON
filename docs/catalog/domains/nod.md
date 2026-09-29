@@ -114,9 +114,9 @@ Separate preview output from exportable final outputs.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — docs/implementation/HM12-PROGRESS.md; docs/architecture/adr/057-alternate-display-node.md; native canvas pixel, unchanged Write/revision and stale-node invalidation evidence.
+**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — docs/implementation/HM12-PROGRESS.md; docs/architecture/adr/057-alternate-display-node.md; native image/matte canvas pixels, unchanged Write/revision and stale-node invalidation evidence.
 
-**Remaining scope:** Display and Write exist in the derived graph. A selected image node can temporarily feed the canvas Display without changing Write, saved state or export. Multiple Write outputs and arbitrary wiring remain open.
+**Remaining scope:** Display and Write exist in the derived graph. A selected image or matte node can temporarily feed the canvas Display without changing Write, saved state or export; matte alpha is shown as grayscale. Multiple Write outputs and arbitrary wiring remain open.
 
 ## NOD-009 — Bypass and cache
 
@@ -128,9 +128,9 @@ Temporarily bypass operators and reuse valid results.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — docs/implementation/HM12-PROGRESS.md; revision-aware preview cache, inactive cutter dependency isolation, keyed opacity bypass, undo and reopen.
+**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — docs/implementation/HM12-PROGRESS.md; docs/architecture/adr/058-node-scoped-display-cache.md; revision-aware preview cache, intermediate-node separation, inactive cutter dependency isolation, keyed opacity/blend bypass, undo and reopen.
 
-**Remaining scope:** Revision-aware cache and persistent cutter and layer-opacity bypass work. General user-controlled node bypass remains open.
+**Remaining scope:** Revision-aware final and node-scoped Display caches, plus persistent cutter, opacity and blend bypass work. General user-controlled node bypass remains open.
 
 ## NOD-010 — Notes and organization
 

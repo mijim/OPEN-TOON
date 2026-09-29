@@ -569,6 +569,27 @@ TEST_CASE("Revision render cache reuses frames and separates view options") {
     (void)cache.resolve(key, render);
     REQUIRE(evaluations == 6);
 }
+TEST_CASE("Intermediate Display cache separates node outputs across edits") {
+    RevisionRenderCache cache(16);
+    RenderCacheKey key{2, 3, 0, 1, 1, CompositionProfile::LinearSrgb};
+    int evaluations = 0;
+    auto image = [&](QColor color) {
+        ++evaluations;
+        QImage result(1, 1, QImage::Format_ARGB32_Premultiplied);
+        result.fill(color);
+        return result;
+    };
+    key.node = 2;
+    REQUIRE(cache.resolve(key, [&] { return image(Qt::red); }).pixelColor(0, 0) == Qt::red);
+    key.node = 3;
+    REQUIRE(cache.resolve(key, [&] { return image(Qt::blue); }).pixelColor(0, 0) == Qt::blue);
+    key.node = 2;
+    REQUIRE(cache.resolve(key, [&] { return image(Qt::green); }).pixelColor(0, 0) == Qt::red);
+    REQUIRE(evaluations == 2);
+    key.revision = 4;
+    REQUIRE(cache.resolve(key, [&] { return image(Qt::green); }).pixelColor(0, 0) == Qt::green);
+    REQUIRE(evaluations == 3);
+}
 TEST_CASE("Late render results cannot publish after a new request or document revision") {
     RevisionRenderCache cache(4);
     RenderCacheKey old{1, 1, 0, 1, 1, CompositionProfile::LinearSrgb};

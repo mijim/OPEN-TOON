@@ -70,6 +70,10 @@ Display source. **Show final output** restores the ordinary scene. The
 selection is view state, clears when its node identity changes, and never
 alters the saved graph or Write/export terminal. See
 [ADR-057](../architecture/adr/057-alternate-display-node.md).
+Matte cards use the same canvas action but show source or inverted fractional
+alpha as opaque grayscale. Intermediate Display images use the bounded
+revision-aware cache with node ID in its key; see
+[ADR-058](../architecture/adr/058-node-scoped-display-cache.md).
 Cutter source, Invert matte, Apply matte and composite cards now carry their
 owning Drawing or Part. Clicking one selects that exact source or target in
 the inspector while preserving its image/matte preview. The metadata is
@@ -169,6 +173,9 @@ preview. This is diagnostic navigation, not a persisted graph edit.
 - Native Qt Quick smoke routes an isolated blue Drawing to the canvas while
   final Write stays the fractional red target, checks pixels and document
   revision, restores the final view and rejects a stale node after reorder.
+- Native Qt Quick smoke samples 64/255 source and 191/255 inverse matte
+  grayscale on the canvas, with unchanged final Write alpha. A cache test
+  distinguishes two node outputs and invalidates after document revision.
 - Graph tests check derived cutter, matte and composite owner IDs and reject
   dangling owners. Native Qt Quick smoke clicks the Cutter, Apply matte and
   Composite cards and checks that the intended layer becomes selected.

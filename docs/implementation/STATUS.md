@@ -50,8 +50,9 @@ native pointer input and are checked through pixels, undo/redo and save/reopen. 
 kind, scrolls to matches and cycles without editing pixels. Cutter, matte and
 composite cards select their owning source or target for the inspector; arbitrary
 graph wiring is still open. Alt-click bypassable node cards to toggle their
-saved processing state. An image node may temporarily feed the canvas Display
-while Write and export keep the final composition.
+saved processing state. Image and matte nodes may temporarily feed the canvas Display; mattes appear
+as grayscale while Write and export keep the final composition. The bounded
+revision cache distinguishes intermediate nodes.
 
 An original 20-second integrated study now combines the connected toon, nine
 mouth substitutions, a visible eye cutter and sample-aligned synthetic audio
@@ -70,13 +71,13 @@ skipped polled playhead frames, respectively. These counters do not measure
 speaker underruns or actual
 presented-frame drops.
 
-The working source version is `0.2.0-experimental.48`; no new binary or source
+The working source version is `0.2.0-experimental.49`; no new binary or source
 tag has been published for it. The last locally qualified macOS preview and
 earlier binaries do not qualify these source changes.
 
-The owner resumed development after the earlier 10:30 CEST cutoff. The `.48`
-locked macOS build passes 186/186 CTest entries and native HM-12 pointer smoke,
-including blend bypass, Alt-drag cutter binding, source/target owner selection, node-card bypass and alternate Display routing. Other earlier native
+The owner resumed development after the earlier 10:30 CEST cutoff. The `.49`
+locked macOS build passes 187/187 CTest entries and native HM-12 pointer smoke,
+including blend bypass, Alt-drag cutter binding, source/target owner selection, node-card bypass, image/matte Display routing and node-scoped cache. Other earlier native
 smokes and artistic checks are recorded in prior release entries. HM-12 remains an unfinished bounded
 contract; next work can continue its graph grouping/part-overlap behavior.
 HM-06 visual approval and HM-10 hardware presentation also remain open.

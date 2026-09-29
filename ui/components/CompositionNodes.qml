@@ -407,8 +407,6 @@ Item {
                     objectName: "nodeDisplayButton"
                     Layout.fillWidth: true
                     visible: root.previewNodeId > 0 &&
-                             root.previewNodeKind !== "Cutter" &&
-                             root.previewNodeKind !== "Invert matte" &&
                              root.previewNodeKind !== "Transform"
                     text: root.displayedNodeId === root.previewNodeId
                           ? "Show final output" : "Show on canvas"

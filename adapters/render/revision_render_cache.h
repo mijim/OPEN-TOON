@@ -22,6 +22,7 @@ struct RenderCacheKey {
     bool onionSkin = false;
     int onionRange = 1;
     bool ignoreCamera = false;
+    GraphNodeId node = 0; // Zero is the final Display/Write terminal.
     bool operator==(const RenderCacheKey&) const = default;
 };
 struct RenderTicket {

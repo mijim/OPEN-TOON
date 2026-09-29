@@ -28,8 +28,9 @@ view; editing or switching scenes refreshes them. Open the bottom **Nodes**
 tab to inspect the derived graph. Click an image or matte card to see its
 output at the current frame; matte alpha appears as grayscale. Clicking a
 source, matte or composite card also selects its owning Drawing or Part for
-the inspector. For an image node, **Show on canvas** temporarily routes its
-output to the main canvas; **Show final output** returns to the scene. This is
+the inspector. **Show on canvas** temporarily routes a node's output to the
+main canvas, showing matte alpha in grayscale; **Show final output** returns
+to the scene. This is
 view state: saving and exporting still use the final Write output. Type a layer
 name or node kind in **Find node** to highlight and scroll to a match; press
 Enter or **Next** for the following match. Search does not edit the project. The tab can

@@ -261,9 +261,9 @@ int main(int argc, char** argv) {
                                                       int(canvasCenter.y() * grab.devicePixelRatio())));
                     };
                     const auto finalPixel = canvasPixel();
-                    const auto displayPoint = displayButton->mapToScene(QPointF(
-                        displayButton->width() / 2, displayButton->height() / 2));
                     auto clickDisplay = [&] {
+                        const auto displayPoint = displayButton->mapToScene(QPointF(
+                            displayButton->width() / 2, displayButton->height() / 2));
                         QMouseEvent press(QEvent::MouseButtonPress, displayPoint,
                             window->mapToGlobal(displayPoint.toPoint()),
                             Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
@@ -295,7 +295,7 @@ int main(int argc, char** argv) {
                         throw std::runtime_error("Show final output did not restore the canvas.");
                     auto* drawingCanvas = qobject_cast<CanvasItem*>(canvasView);
                     if (!drawingCanvas ||
-                        drawingCanvas->showCompositionNode(4, int(opentoon::GraphNodeKind::MatteFromImage),
+                        drawingCanvas->showCompositionNode(4, int(opentoon::GraphNodeKind::LayerTransform),
                                                            int(source.id)) ||
                         drawingCanvas->showCompositionNode(99999, int(opentoon::GraphNodeKind::LayerImage),
                                                            int(source.id)) ||
@@ -330,6 +330,17 @@ int main(int argc, char** argv) {
                         qRed(matteImage.pixel(matteImage.width() / 2,
                                               matteImage.height() / 2)) != 64)
                         throw std::runtime_error("Matte preview did not show fractional alpha.");
+                    clickDisplay();
+                    const auto matteCanvasPixel = canvasPixel();
+                    if (drawingCanvas->displayNodeId() != 4 ||
+                        std::abs(matteCanvasPixel.red() - 64) > 3 ||
+                        std::abs(matteCanvasPixel.green() - 64) > 3 ||
+                        std::abs(matteCanvasPixel.blue() - 64) > 3 ||
+                        qAlpha(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 32)
+                        throw std::runtime_error("Matte Display did not show fractional alpha as grayscale.");
+                    clickDisplay();
+                    if (drawingCanvas->displayNodeId() != 0)
+                        throw std::runtime_error("Matte Display did not return to final output.");
                     (void)window->grabWindow();
                     clickNode(5);
                     if (editor.selectedLayer() != int(document.layers.front().id) ||
@@ -372,6 +383,17 @@ int main(int argc, char** argv) {
                     if (qAlpha(outside.pixel(0, 0)) != 96 ||
                         editor.compositionNodes().size() != 9)
                         throw std::runtime_error("Inverted cutter does not retain fractional coverage.");
+                    (void)window->grabWindow();
+                    clickNode(5);
+                    clickDisplay();
+                    const auto inverseCanvasPixel = canvasPixel();
+                    if (drawingCanvas->displayNodeId() != 5 ||
+                        std::abs(inverseCanvasPixel.red() - 191) > 3 ||
+                        std::abs(inverseCanvasPixel.green() - 191) > 3 ||
+                        std::abs(inverseCanvasPixel.blue() - 191) > 3 ||
+                        qAlpha(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 96)
+                        throw std::runtime_error("Inverted matte Display did not show outside alpha.");
+                    clickDisplay();
                     QCoreApplication::processEvents();
                     if (!window->grabWindow().save("build/hm12-matte-smoke.png"))
                         throw std::runtime_error("Cannot capture HM-12 inspector.");

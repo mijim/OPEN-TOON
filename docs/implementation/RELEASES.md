@@ -1,5 +1,15 @@
 # Experimental releases
 
+## 0.2.0-experimental.49 — working source, matte Display and node cache
+
+- Show source and inverse matte alpha as full-canvas grayscale without
+  changing Write or export. The native smoke samples 64/255 and 191/255,
+  alongside unchanged fractional final output.
+- The bounded revision cache keys intermediate Display images by node ID as
+  well as frame, revision and view options. A focused test checks switching
+  nodes, reuse and revision invalidation. The locked macOS suite passes
+  187/187 CTest entries. Source only; no new public binary or tag.
+
 ## 0.2.0-experimental.48 — working source, alternate Display node
 
 - Show a selected image node's output on the main canvas, then return to final

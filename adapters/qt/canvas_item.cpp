@@ -123,9 +123,7 @@ bool CanvasItem::showCompositionNode(int id, int kind, int layer) {
         kind > int(GraphNodeKind::WriteOutput))
         return false;
     const auto nodeKind = GraphNodeKind(kind);
-    if (nodeKind == GraphNodeKind::LayerTransform ||
-        nodeKind == GraphNodeKind::MatteFromImage ||
-        nodeKind == GraphNodeKind::InvertMatte)
+    if (nodeKind == GraphNodeKind::LayerTransform)
         return false;
     const auto graph = CompositionGraph::orderedLayers(editor_->document());
     const auto found = std::find_if(graph.nodes.begin(), graph.nodes.end(), [id](const auto& node) {
@@ -267,9 +265,26 @@ void CanvasItem::paint(QPainter* p) {
     if (displayNodeId_ && !posePreview_ && !options.previewDrawing &&
         displayNodeValid(displayDocument)) {
         const auto graph = CompositionGraph::orderedLayers(displayDocument);
-        auto image = GraphRenderer::renderNode(graph, displayDocument, editor_->frame(),
-                                               GraphNodeId(displayNodeId_),
-                                               {displayDocument.width, displayDocument.height}, options);
+        RenderCacheKey key{editor_->sceneGeneration(), editor_->documentRevision(), editor_->frame(),
+                           displayDocument.width, displayDocument.height, displayDocument.composition,
+                           GraphTarget::Display, options.background, options.onionSkin,
+                           options.onionRange, options.ignoreCamera, GraphNodeId(displayNodeId_)};
+        auto image = previewCache_.resolve(key, [&] {
+            auto rendered = GraphRenderer::renderNode(graph, displayDocument, editor_->frame(),
+                                                      GraphNodeId(displayNodeId_),
+                                                      {displayDocument.width, displayDocument.height}, options);
+            if (displayNodeKind_ == int(GraphNodeKind::MatteFromImage) ||
+                displayNodeKind_ == int(GraphNodeKind::InvertMatte)) {
+                for (int y = 0; y < rendered.height(); ++y) {
+                    auto* pixels = reinterpret_cast<QRgb*>(rendered.scanLine(y));
+                    for (int x = 0; x < rendered.width(); ++x) {
+                        const int alpha = qAlpha(pixels[x]);
+                        pixels[x] = qRgba(alpha, alpha, alpha, 255);
+                    }
+                }
+            }
+            return rendered;
+        });
         p->drawImage(QPointF(0, 0), image);
     } else if (displayDocument.composition == CompositionProfile::LinearSrgb && !posePreview_ &&
         !options.previewDrawing) {
