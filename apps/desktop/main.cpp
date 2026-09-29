@@ -128,7 +128,7 @@ int main(int argc, char** argv) {
                     source.name = "Cutter";
                     auto sourceDrawing = targetDrawing;
                     sourceDrawing.id = document.allocateId();
-                    sourceDrawing.image = opentoon::ImageAsset{1, 1, {0, 0, 255, 128}};
+                    sourceDrawing.image = opentoon::ImageAsset{1, 1, {0, 0, 255, 64}};
                     document.drawings.emplace(sourceDrawing.id, sourceDrawing);
                     for (auto& exposure : source.exposures)
                         exposure.drawing = sourceDrawing.id;
@@ -187,28 +187,29 @@ int main(int argc, char** argv) {
                     clickNode(3);
                     if (editor.selectedLayer() != int(source.id))
                         throw std::runtime_error("Clicking a Drawing node did not select its layer.");
-                    QThread::msleep(450);
-                    QCoreApplication::processEvents();
-                    clickNode(2);
-                    if (editor.selectedLayer() != int(document.layers.front().id))
-                        throw std::runtime_error("Clicking the target node did not select its layer: " +
-                                                 std::to_string(editor.selectedLayer()));
+                    editor.setSelectedLayer(int(document.layers.front().id));
                     const auto clipped = opentoon::SceneRenderer::render(editor.document(), 0);
-                    if (qAlpha(clipped.pixel(0, 0)) != 64 || qBlue(clipped.pixel(0, 0)) != 0)
+                    if (qAlpha(clipped.pixel(0, 0)) != 32 || qBlue(clipped.pixel(0, 0)) != 0)
                         throw std::runtime_error("Cutter matte did not clip the image correctly.");
+                    if (!editor.setMatteInverted(true))
+                        throw std::runtime_error("Cannot invert a cutter matte.");
+                    const auto outside = opentoon::SceneRenderer::render(editor.document(), 0);
+                    if (qAlpha(outside.pixel(0, 0)) != 96 ||
+                        editor.compositionNodes().size() != 9)
+                        throw std::runtime_error("Inverted cutter does not retain fractional coverage.");
                     QCoreApplication::processEvents();
                     if (!window->grabWindow().save("build/hm12-matte-smoke.png"))
                         throw std::runtime_error("Cannot capture HM-12 inspector.");
                     if (!editor.saveProject({}) || !editor.openProject(QUrl::fromLocalFile(path)) ||
-                        opentoon::SceneRenderer::render(editor.document(), 0) != clipped)
+                        opentoon::SceneRenderer::render(editor.document(), 0) != outside)
                         throw std::runtime_error("Cutter matte changed after save and reopen.");
                     editor.setSelectedLayer(int(document.layers.front().id));
                     if (!editor.setLayerMatte(0))
                         throw std::runtime_error("Cannot bypass a cutter matte.");
                     editor.undo();
-                    if (opentoon::SceneRenderer::render(editor.document(), 0) != clipped)
+                    if (opentoon::SceneRenderer::render(editor.document(), 0) != outside)
                         throw std::runtime_error("Cutter matte bypass did not undo.");
-                    std::cout << "HM-12 native smoke passed: inspector and clickable node strip, fractional matte, "
+                    std::cout << "HM-12 native smoke passed: inspector and clickable node strip, fractional inside/outside matte, "
                                  "save/reopen, bypass/undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {

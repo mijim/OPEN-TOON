@@ -215,6 +215,8 @@ void Document::validate() const {
                         source->matte == 0 && source->visible,
                     "Matte source must be a visible drawing or Part without its own matte.");
         }
+        require(!l.invertMatte || l.matte,
+                "An inverted cutter needs a matte source.");
         std::set<Id> variants;
         for (const auto& variant : l.variants)
             require(drawings.contains(variant.drawing) && variant.name.size() > 0 &&

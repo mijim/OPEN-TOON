@@ -1,5 +1,15 @@
 # Experimental releases
 
+## 0.2.0-experimental.19 — working source, outside cutters
+
+- Save an inverted cutter choice in format 19. Inside and outside coverage
+  preserve fractional alpha, share the typed display/write graph and remain
+  undoable in the inspector and Nodes workspace.
+- Formats 1–18 load with inside coverage; a first current-format save keeps
+  a readable source-version backup. Native smoke checks pixel values,
+  save/reopen and bypass/undo. HM-12 remains in progress.
+- Source only; no new public binary or tag.
+
 ## 0.2.0-experimental.18 — working source, cutter mattes
 
 - Save a Drawing or Part cutter matte binding in format 18. The inspector

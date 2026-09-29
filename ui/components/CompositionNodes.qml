@@ -57,6 +57,15 @@ Item {
                 onActivated: root.controller.setLayerMatte(currentValue)
                 Accessible.name: "Selected drawing cutter matte"
             }
+            CompactCheckBox {
+                objectName: "nodeInvertMatte"
+                text: "Outside"
+                visible: root.selected?.matte > 0
+                enabled: visible && !root.selected?.locked
+                checked: root.selected?.invertMatte || false
+                onClicked: root.controller.setMatteInverted(checked)
+                Accessible.name: "Invert selected cutter matte"
+            }
         }
         Rectangle { Layout.fillWidth: true; height: 1; color: "#303030" }
         Flickable {
@@ -83,7 +92,9 @@ Item {
                         radius: 5
                         color: modelData.layer === root.controller.selectedLayer && modelData.layer > 0
                                ? "#292929" : "#181818"
-                        border.color: modelData.kind === "Cutter" || modelData.kind === "Apply matte"
+                        border.color: modelData.kind === "Cutter" ||
+                                      modelData.kind === "Invert matte" ||
+                                      modelData.kind === "Apply matte"
                                       ? "#7b7b7b" : "#393939"
                         Column {
                             anchors.fill: parent

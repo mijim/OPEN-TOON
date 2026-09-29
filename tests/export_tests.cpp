@@ -44,6 +44,12 @@ TEST_CASE("Composition node presentation follows cutter edits and undo") {
     }) == 1);
     REQUIRE(nodes.back().toMap().value("kind").toString() == "Write");
     REQUIRE(nodes.front().toMap().value("kind").toString() == "Background");
+    REQUIRE(editor.setMatteInverted(true));
+    REQUIRE(editor.compositionNodes().size() == 9);
+    REQUIRE(editor.document().layer(target).invertMatte);
+    editor.undo();
+    REQUIRE(editor.compositionNodes().size() == 8);
+    REQUIRE_FALSE(editor.document().layer(target).invertMatte);
     editor.undo();
     REQUIRE(editor.compositionNodes().size() == 7);
 }

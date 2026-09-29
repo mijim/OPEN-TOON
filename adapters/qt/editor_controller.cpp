@@ -160,6 +160,7 @@ QVariantList EditorController::layers() const {
                                      {"solo", it->solo},
                                      {"parent", int(it->parent)},
                                      {"matte", int(it->matte)},
+                                     {"invertMatte", it->invertMatte},
                                      {"kind", int(it->kind)},
                                      {"role", QString::fromStdString(it->role)},
                                      {"spans", spans},
@@ -182,6 +183,7 @@ QVariantList EditorController::compositionNodes() const {
         case GraphNodeKind::LayerTransform: kind = "Transform"; break;
         case GraphNodeKind::Over: kind = "Composite"; break;
         case GraphNodeKind::MatteFromImage: kind = "Cutter"; break;
+        case GraphNodeKind::InvertMatte: kind = "Invert matte"; break;
         case GraphNodeKind::ApplyMatte: kind = "Apply matte"; break;
         case GraphNodeKind::DisplayOutput: kind = "Display"; break;
         case GraphNodeKind::WriteOutput: kind = "Write"; break;
@@ -1016,6 +1018,18 @@ bool EditorController::setLayerMatte(int sourceLayer) {
                 throw std::runtime_error("Choose a visible drawing or part without its own matte.");
         }
         target.matte = Id(sourceLayer);
+        if (!sourceLayer)
+            target.invertMatte = false;
+    });
+}
+bool EditorController::setMatteInverted(bool inverted) {
+    if (!layer_)
+        return false;
+    return edit(inverted ? "Invert cutter matte" : "Use cutter matte inside", [&](Document& d) {
+        auto& target = d.layer(layer_);
+        if (target.locked || !target.matte)
+            throw std::runtime_error("Select an unlocked layer with a cutter matte.");
+        target.invertMatte = inverted;
     });
 }
 bool EditorController::selectedCanFollowBoneTip() const {

@@ -121,3 +121,6 @@ sample-contiguous looping and format-16 migration.
 
 See [ADR-039](039-layer-cutter-matte.md) for format-18 saved cutter matte
 bindings, fractional graph evaluation and reference validation.
+
+See [ADR-040](040-inverted-cutter-matte.md) for format-19 fractional outside
+coverage and typed matte inversion.

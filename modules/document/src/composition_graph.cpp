@@ -20,6 +20,7 @@ GraphPortType outputType(GraphNodeKind kind) {
     case GraphNodeKind::LayerTransform:
         return GraphPortType::Transform;
     case GraphNodeKind::MatteFromImage:
+    case GraphNodeKind::InvertMatte:
         return GraphPortType::Matte;
     }
     throw std::invalid_argument("Unknown compositor node kind.");
@@ -34,6 +35,8 @@ std::vector<GraphPortType> inputTypes(GraphNodeKind kind) {
         return {GraphPortType::Image, GraphPortType::Image};
     case GraphNodeKind::MatteFromImage:
         return {GraphPortType::Image};
+    case GraphNodeKind::InvertMatte:
+        return {GraphPortType::Matte};
     case GraphNodeKind::ApplyMatte:
         return {GraphPortType::Image, GraphPortType::Matte};
     case GraphNodeKind::DisplayOutput:
@@ -65,9 +68,14 @@ CompositionGraph CompositionGraph::orderedLayers(const Document& document) {
             continue;
         GraphNodeId source = sourceIds.at(layer.id);
         if (layer.matte) {
-            const GraphNodeId matte = next++;
+            GraphNodeId matte = next++;
             graph.nodes.push_back({matte, GraphNodeKind::MatteFromImage, 0,
                                    {{sourceIds.at(layer.matte), 0}}});
+            if (layer.invertMatte) {
+                const GraphNodeId inverted = next++;
+                graph.nodes.push_back({inverted, GraphNodeKind::InvertMatte, 0, {{matte, 0}}});
+                matte = inverted;
+            }
             const GraphNodeId masked = next++;
             graph.nodes.push_back({masked, GraphNodeKind::ApplyMatte, 0,
                                    {{source, 0}, {matte, 1}}});

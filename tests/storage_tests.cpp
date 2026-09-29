@@ -710,6 +710,35 @@ TEST_CASE("Format seventeen cutter matte migration keeps a readable source backu
     FixtureDatabase current(project.file);
     REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
 }
+TEST_CASE("Format eighteen cutter inversion migrates with a readable source backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    Layer source = original.layers.front();
+    source.id = original.allocateId();
+    source.name = "Cutter";
+    original.layers.push_back(source);
+    original.layers.front().matte = source.id;
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 18;
+    for (auto& layer : legacy["layers"])
+        layer.erase("invertMatte");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=18");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    changed.layers.front().invertMatte = true;
+    REQUIRE(ProjectStore::save(project.file, changed, "Invert cutter", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v18.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+}
 TEST_CASE("Format fifteen audio migration preserves a readable source backup") {
     TemporaryProject project;
     auto original = makeDocument();

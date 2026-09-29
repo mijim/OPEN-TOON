@@ -12,7 +12,7 @@ The immediate objective is a complete, reliable character-animation **Harmony Mo
 
 **Parked slice: [HM-10](HARMONY-MOMENT.md#hm-10).** Format-16 original PCM16 WAV assets and format-17 sample-contiguous repeats, undoable clip placement/trim/gain including native waveform drag, indexed sample-aligned timeline waveforms, deterministic offline WAV mix/export, bounded miniaudio device preview and timeline fragment scrub pass local tests. [The audio subset](../implementation/HM10-PROGRESS.md) includes two completed silent ten-minute CoreAudio scheduling probes at 24 and 24000/1001 fps. Hardware presentation latency/underruns and audible scrub-quality qualification plus higher-quality rate conversion remain.
 
-**Active slice: [HM-12](HARMONY-MOMENT.md#hm-12).** HM-03 character identity and HM-04 typed graph runtime have accepted bounded evidence. Format-18 reversible cutter mattes and a derived Nodes workspace pass tests and native smoke. The complete node editor and part-overlap contract remain open.
+**Active slice: [HM-12](HARMONY-MOMENT.md#hm-12).** HM-03 character identity and HM-04 typed graph runtime have accepted bounded evidence. Format-18 cutter bindings, format-19 fractional inside/outside coverage and a derived Nodes workspace pass tests and native smoke. The complete node editor and part-overlap contract remain open.
 
 **Current gate:** HM-06 has animated bone/curve evaluation, bounded per-substitution binding and editable elbow influence; broader extreme-bend quality and artistic interaction remain unaccepted. HM-07 and HM-10 remain working subsets. The single implementer is advancing HM-12 nodes and mattes.
 

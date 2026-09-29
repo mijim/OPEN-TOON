@@ -60,6 +60,14 @@ TEST_CASE("Cutter matte requires an independent visible drawing source") {
     REQUIRE(std::count_if(graph.nodes.begin(), graph.nodes.end(), [](const auto& node) {
                 return node.kind == GraphNodeKind::ApplyMatte;
             }) == 1);
+    document.layer(target).invertMatte = true;
+    REQUIRE_NOTHROW(document.validate());
+    const auto outside = CompositionGraph::orderedLayers(document);
+    REQUIRE(std::count_if(outside.nodes.begin(), outside.nodes.end(), [](const auto& node) {
+                return node.kind == GraphNodeKind::InvertMatte;
+            }) == 1);
+    REQUIRE_NOTHROW(outside.validate(document));
+    document.layer(target).invertMatte = false;
     document.layer(target).matte = target;
     REQUIRE_THROWS(document.validate());
     document.layer(target).matte = 999999;
@@ -69,6 +77,10 @@ TEST_CASE("Cutter matte requires an independent visible drawing source") {
     REQUIRE_THROWS(document.validate());
     document.layer(source.id).visible = true;
     document.layer(source.id).matte = target;
+    REQUIRE_THROWS(document.validate());
+    document.layer(source.id).matte = 0;
+    document.layer(target).matte = 0;
+    document.layer(target).invertMatte = true;
     REQUIRE_THROWS(document.validate());
 }
 TEST_CASE("Deep composition chains order and invalidate without recursive traversal") {

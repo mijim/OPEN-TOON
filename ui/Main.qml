@@ -1286,6 +1286,15 @@ ApplicationWindow {
                                 onActivated: editor.setLayerMatte(currentValue)
                                 Accessible.name: "Cutter matte source"
                             }
+                            C.CompactCheckBox {
+                                Layout.leftMargin: 16
+                                visible: layerInspector.rigLayer?.matte > 0
+                                enabled: visible && !layerInspector.rigLayer?.locked
+                                text: "Use outside of cutter"
+                                checked: layerInspector.rigLayer?.invertMatte || false
+                                onClicked: editor.setMatteInverted(checked)
+                                Accessible.name: "Invert cutter matte"
+                            }
                             RowLayout {
                                 Layout.leftMargin: 12
                                 Layout.rightMargin: 16

@@ -111,6 +111,17 @@ QImage matteFromImage(const QImage& image, const RenderOptions& options) {
     }
     return matte;
 }
+QImage invertMatte(const QImage& matte, const RenderOptions& options) {
+    QImage result(matte.size(), QImage::Format_ARGB32_Premultiplied);
+    for (int y = 0; y < result.height(); ++y) {
+        checkCancelled(options);
+        auto* target = reinterpret_cast<QRgb*>(result.scanLine(y));
+        const auto* source = reinterpret_cast<const QRgb*>(matte.constScanLine(y));
+        for (int x = 0; x < result.width(); ++x)
+            target[x] = qRgba(0, 0, 0, 255 - qAlpha(source[x]));
+    }
+    return result;
+}
 QImage applyMatte(const QImage& image, const QImage& matte, const RenderOptions& options) {
     if (image.size() != matte.size())
         throw std::invalid_argument("Matte and image sizes differ.");
@@ -222,6 +233,10 @@ QImage GraphRenderer::render(const CompositionGraph& graph, const Document& docu
         case GraphNodeKind::MatteFromImage:
             image = matteFromImage(input(0), options);
             bound = inputBounds(0);
+            break;
+        case GraphNodeKind::InvertMatte:
+            image = invertMatte(input(0), options);
+            bound = QRect(QPoint(0, 0), size);
             break;
         case GraphNodeKind::ApplyMatte:
             image = applyMatte(input(0), input(1), options);

@@ -104,11 +104,46 @@ TEST_CASE("Saved cutter matte clips a layer without painting its source") {
     REQUIRE(GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Write) == expected);
     REQUIRE(deserializeDocument(serializeDocument(document)) == document);
     REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == expected);
+    document.drawings.at(sourceDrawing.id).image = ImageAsset{1, 1, {0, 0, 255, 64}};
+    document.layers.front().invertMatte = true;
+    document.validate();
+    const auto inverted = SceneRenderer::render(document, 0);
+    REQUIRE(qAlpha(inverted.pixel(0, 0)) == 96);
+    REQUIRE(qBlue(inverted.pixel(0, 0)) == 0);
+    REQUIRE(GraphRenderer::render(CompositionGraph::orderedLayers(document), document, 0,
+                                  {}, {}, GraphTarget::Write) == inverted);
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == inverted);
     document.layers.front().matte = 0;
+    document.layers.front().invertMatte = false;
     REQUIRE(qAlpha(SceneRenderer::render(document, 0).pixel(0, 0)) > 128);
     document.layers.front().matte = source.id;
     document.layers.back().visible = false;
     REQUIRE_THROWS(document.validate());
+}
+TEST_CASE("Inverted cutter keeps target ink outside its source bounds") {
+    auto document = makeDocument();
+    document.width = 2;
+    document.height = 1;
+    document.background = {0, 0, 0, 0};
+    auto& target = document.editableDrawing(document.layers.front().id, 0);
+    target.image = ImageAsset{2, 1, {255, 0, 0, 128, 255, 0, 0, 128}};
+    Layer cutter = document.layers.front();
+    cutter.id = document.allocateId();
+    cutter.name = "Cutter";
+    Drawing source = target;
+    source.id = document.allocateId();
+    source.image = ImageAsset{2, 1, {0, 0, 255, 64, 0, 0, 0, 0}};
+    document.drawings.emplace(source.id, source);
+    for (auto& exposure : cutter.exposures)
+        exposure.drawing = source.id;
+    document.layers.push_back(cutter);
+    document.layers.front().matte = cutter.id;
+    document.layers.front().invertMatte = true;
+    document.validate();
+    const auto output = SceneRenderer::render(document, 0);
+    REQUIRE(qAlpha(output.pixel(0, 0)) == 96);
+    REQUIRE(qAlpha(output.pixel(1, 0)) == 128);
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == output);
 }
 TEST_CASE("Linear color chart keeps bounded alpha and premultiplied color across coverage levels") {
     auto document = makeDocument();
