@@ -23,6 +23,8 @@
 #include <algorithm>
 #include <cstdint>
 #include <cmath>
+#include <map>
+#include <set>
 #include <stdexcept>
 using namespace opentoon;
 namespace {
@@ -90,6 +92,7 @@ void EditorController::resetSelection() {
     emit selectionChanged();
     emit frameChanged();
     emit changed();
+    emit controlGroupChanged();
 }
 bool EditorController::edit(const std::string& label, const std::function<void(Document&)>& operation) {
     endSelectedCharacterPoseBlend();
@@ -107,6 +110,7 @@ bool EditorController::edit(const std::string& label, const std::function<void(D
                 emit rangeChanged();
             }
             emit changed();
+            emit controlGroupChanged();
             emit frameChanged();
             emit viewSelectionChanged();
             emit poseSelectionChanged();
@@ -152,6 +156,7 @@ QVariantList EditorController::substitutions() const {
         result.push_back(QVariantMap{{"id", int(substitution.drawing)},
                                      {"name", QString::fromStdString(substitution.name)},
                                      {"published", substitution.published},
+                                     {"controlGroup", QString::fromStdString(substitution.controlGroup)},
                                      {"image", document().drawings.at(substitution.drawing).image.has_value()}});
     return result;
 }
@@ -163,18 +168,18 @@ QVariantList EditorController::publishedCharacterSubstitutions() const {
     for (const auto& layer : document().layers) {
         if (layer.kind != LayerKind::Part || opentoon::characterFor(document(), layer.id) != Id(root))
             continue;
-        QVariantList options;
+        std::map<std::string, QVariantList> groups;
         for (const auto& variant : layer.variants)
             if (variant.published)
-                options.push_back(QVariantMap{{"id", int(variant.drawing)},
-                                              {"name", QString::fromStdString(variant.name)}});
-        if (options.isEmpty())
-            continue;
+                groups[variant.controlGroup].push_back(QVariantMap{{"id", int(variant.drawing)},
+                                                                 {"name", QString::fromStdString(variant.name)}});
         const auto* selected = document().drawingAt(layer.id, frame_);
-        result.push_back(QVariantMap{{"part", int(layer.id)},
-                                     {"name", QString::fromStdString(layer.role)},
-                                     {"selected", selected ? int(selected->id) : 0},
-                                     {"options", options}});
+        for (const auto& [group, options] : groups)
+            result.push_back(QVariantMap{{"part", int(layer.id)},
+                                         {"name", QString::fromStdString(layer.role)},
+                                         {"group", QString::fromStdString(group)},
+                                         {"selected", selected ? int(selected->id) : 0},
+                                         {"options", options}});
     }
     return result;
 }
@@ -196,7 +201,8 @@ QVariantList EditorController::characterViews() const {
         result.push_back(QVariantMap{{"id", int(view.id)},
                                      {"name", QString::fromStdString(view.name)},
                                      {"parts", int(view.choices.size())},
-                                     {"published", view.published}});
+                                     {"published", view.published},
+                                     {"controlGroup", QString::fromStdString(view.controlGroup)}});
     return result;
 }
 int EditorController::selectedView() const {
@@ -210,8 +216,12 @@ int EditorController::selectedView() const {
 }
 void EditorController::selectView(int view) {
     const auto options = characterViews();
-    if (std::any_of(options.begin(), options.end(), [view](const QVariant& option) {
-            return option.toMap().value("id").toInt() == view;
+    if (std::any_of(options.begin(), options.end(), [&](const QVariant& option) {
+            const auto item = option.toMap();
+            return item.value("id").toInt() == view &&
+                   (workspaceMode_ != "Animator" ||
+                    (item.value("published").toBool() &&
+                     item.value("controlGroup").toString() == selectedControlGroup()));
         })) {
         selectedView_ = view;
         emit viewSelectionChanged();
@@ -233,9 +243,48 @@ QVariantList EditorController::characterPoses() const {
                                      {"name", QString::fromStdString(pose.name)},
                                      {"parts", int(pose.parts.size())},
                                      {"published", pose.published},
+                                     {"controlGroup", QString::fromStdString(pose.controlGroup)},
                                      {"entries", entries}});
     }
     return result;
+}
+QVariantList EditorController::characterControlGroups() const {
+    QVariantList result;
+    const int root = characterId();
+    if (!root)
+        return result;
+    std::set<std::string> groups;
+    const auto& character = document().layer(root);
+    for (const auto& view : character.views)
+        if (view.published)
+            groups.insert(view.controlGroup);
+    for (const auto& pose : character.poses)
+        if (pose.published)
+            groups.insert(pose.controlGroup);
+    for (const auto& layer : document().layers)
+        if (layer.kind == LayerKind::Part && opentoon::characterFor(document(), layer.id) == Id(root))
+            for (const auto& variant : layer.variants)
+                if (variant.published)
+                    groups.insert(variant.controlGroup);
+    if (groups.erase("Main"))
+        result.push_back(QStringLiteral("Main"));
+    for (const auto& group : groups)
+        result.push_back(QString::fromStdString(group));
+    return result;
+}
+QString EditorController::selectedControlGroup() const {
+    const auto groups = characterControlGroups();
+    return groups.contains(selectedControlGroup_) ? selectedControlGroup_
+                                                  : (groups.isEmpty() ? QStringLiteral("Main")
+                                                                      : groups.front().toString());
+}
+void EditorController::setSelectedControlGroup(QString group) {
+    if (!characterControlGroups().contains(group) || selectedControlGroup_ == group)
+        return;
+    endSelectedCharacterPoseBlend();
+    selectedControlGroup_ = std::move(group);
+    emit controlGroupChanged();
+    emit poseSelectionChanged();
 }
 QVariantList EditorController::poseTransferTargets() const {
     QVariantList result;
@@ -253,22 +302,30 @@ int EditorController::selectedCharacterPose() const {
     if (!root)
         return 0;
     const auto& poses = document().layer(root).poses;
+    const auto group = selectedControlGroup().toStdString();
     if (std::any_of(poses.begin(), poses.end(), [&](const auto& item) {
             return item.id == selectedCharacterPose_ &&
-                   (workspaceMode_ != "Animator" || item.published);
+                   (workspaceMode_ != "Animator" ||
+                    (item.published && item.controlGroup == group));
         }))
         return int(selectedCharacterPose_);
     if (workspaceMode_ == "Animator") {
         const auto found = std::find_if(poses.begin(), poses.end(),
-                                         [](const auto& item) { return item.published; });
+                                         [&](const auto& item) {
+                                             return item.published && item.controlGroup == group;
+                                         });
         return found == poses.end() ? 0 : int(found->id);
     }
     return poses.empty() ? 0 : int(poses.front().id);
 }
 void EditorController::selectCharacterPose(int poseId) {
     const auto options = characterPoses();
-    if (std::any_of(options.begin(), options.end(), [poseId](const QVariant& option) {
-            return option.toMap().value("id").toInt() == poseId;
+    if (std::any_of(options.begin(), options.end(), [&](const QVariant& option) {
+            const auto item = option.toMap();
+            return item.value("id").toInt() == poseId &&
+                   (workspaceMode_ != "Animator" ||
+                    (item.value("published").toBool() &&
+                     item.value("controlGroup").toString() == selectedControlGroup()));
         })) {
         endSelectedCharacterPoseBlend();
         selectedCharacterPose_ = poseId;
@@ -414,6 +471,7 @@ void EditorController::setSelectedLayer(int value) {
         emit selectionChanged();
         emit frameChanged();
         emit changed();
+        emit controlGroupChanged();
     } catch (...) {
     }
 }
@@ -662,6 +720,7 @@ void EditorController::undo() {
                          [&](const auto& swatch) { return swatch.id == swatch_; }))
             swatch_ = document().palette.empty() ? 0 : document().palette.front().id;
         emit changed();
+        emit controlGroupChanged();
         emit frameChanged();
         emit viewSelectionChanged();
         emit poseSelectionChanged();
@@ -683,6 +742,7 @@ void EditorController::redo() {
                          [&](const auto& swatch) { return swatch.id == swatch_; }))
             swatch_ = document().palette.empty() ? 0 : document().palette.front().id;
         emit changed();
+        emit controlGroupChanged();
         emit frameChanged();
         emit viewSelectionChanged();
         emit poseSelectionChanged();
@@ -979,6 +1039,13 @@ void EditorController::setSelectedSubstitutionPublished(bool published) {
             opentoon::publishSubstitution(d, layer_, drawing, published);
         });
 }
+void EditorController::setSelectedSubstitutionControlGroup(QString group) {
+    const int drawing = selectedSubstitution();
+    if (layer_ && drawing)
+        edit("Set drawing control group", [&](Document& d) {
+            opentoon::setSubstitutionControlGroup(d, layer_, drawing, group.toStdString());
+        });
+}
 bool EditorController::applyPublishedSubstitution(int partId, int drawing) {
     const int root = characterId();
     if (!root || partId <= 0 || drawing <= 0)
@@ -986,8 +1053,10 @@ bool EditorController::applyPublishedSubstitution(int partId, int drawing) {
     return edit("Apply published substitution", [&](Document& d) {
         const auto& part = d.layer(partId);
         if (part.kind != LayerKind::Part || opentoon::characterFor(d, partId) != Id(root) ||
-            std::none_of(part.variants.begin(), part.variants.end(), [drawing](const auto& item) {
-                return item.drawing == Id(drawing) && item.published;
+            std::none_of(part.variants.begin(), part.variants.end(), [&](const auto& item) {
+                return item.drawing == Id(drawing) && item.published &&
+                       (workspaceMode_ != "Animator" ||
+                        QString::fromStdString(item.controlGroup) == selectedControlGroup());
             }))
             throw std::invalid_argument("Select a published substitution of this character.");
         opentoon::selectSubstitution(d, partId, frame_, drawing);
@@ -1254,11 +1323,25 @@ void EditorController::setSelectedCharacterPosePublished(bool published) {
             opentoon::publishCharacterPose(d, root, poseId, published);
         });
 }
+void EditorController::setSelectedCharacterPoseControlGroup(QString group) {
+    const int root = characterId(), poseId = selectedCharacterPose();
+    if (root && poseId)
+        edit("Set pose control group", [&](Document& d) {
+            opentoon::setCharacterPoseControlGroup(d, root, poseId, group.toStdString());
+        });
+}
 void EditorController::setSelectedViewPublished(bool published) {
     const int root = characterId(), viewId = selectedView();
     if (root && viewId)
         edit(published ? "Publish character view" : "Unpublish character view", [&](Document& d) {
             opentoon::publishCharacterView(d, root, viewId, published);
+        });
+}
+void EditorController::setSelectedViewControlGroup(QString group) {
+    const int root = characterId(), viewId = selectedView();
+    if (root && viewId)
+        edit("Set view control group", [&](Document& d) {
+            opentoon::setCharacterViewControlGroup(d, root, viewId, group.toStdString());
         });
 }
 void EditorController::setSelectedPartInCharacterPose(int channels) {
@@ -1367,6 +1450,13 @@ void EditorController::captureCharacterView() {
 }
 void EditorController::applyCharacterView() {
     const int root = characterId(), view = selectedView();
+    if (root && view && workspaceMode_ == "Animator" &&
+        std::none_of(document().layer(root).views.begin(), document().layer(root).views.end(),
+                     [&](const auto& item) {
+                         return item.id == Id(view) && item.published &&
+                                QString::fromStdString(item.controlGroup) == selectedControlGroup();
+                     }))
+        return;
     if (root && view)
         edit("Apply character view", [&](Document& d) {
             opentoon::applyCharacterView(d, root, view, frame_);

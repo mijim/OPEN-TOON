@@ -44,7 +44,7 @@ without mutation. Unmasked channels retain destination rest values.
   Parts, assembles a character, captures a selected Part, applies at another
   frame, refines/removes a second Part mapping, blends with several live
   updates, undoes/redoes once, saves and reopens.
-- Local macOS `build/locked`: 141/141 CTest entries pass. Native Qt Quick
+- Local macOS `build/locked`: 143/143 CTest entries pass. Native Qt Quick
   `--smoke-test` passes the mouse/input, window, deformation and reopen
   journeys. The new pose panel compiles and loads within that window; the
   controller journey exercises its backend rather than clicking its widgets.
@@ -87,6 +87,25 @@ position, verifies the mouth drawing, torso rotation, selection and frame are
 unchanged, and restores the document with one undo. The visually inspected
 `build/hm07-canvas-controls-smoke.png` shows the control panel beside the
 connected character rather than over its silhouette.
+
+Format 15 lets Rig assign each published view, pose or drawing substitution
+to a named control group. The default `Main` preserves older projects.
+Animator offers the available published groups in the side dashboard and
+viewport panel; switching among Face, Body and Stage changes only which
+controls are visible and applicable. It does not edit artwork, frame,
+selection or rendered pixels. A hidden group's pose, view or drawing cannot
+be applied through Animator controller actions. Independent Character copies
+retain group names with new internal IDs. Format-14 loading defaults to Main;
+the first format-15 save creates a readable `.pre-v14.bak` source backup.
+
+`tests/rigging_tests.cpp` covers group validation, undo/redo, copied bindings
+and unchanged render output. `tests/storage_tests.cpp` covers the format-14
+migration and backup. `tests/export_tests.cpp` switches groups on an actual
+imported Part and verifies hidden commands, save and reopen. The native smoke
+shows Face's mouth control in both QML locations, Body's pose and Stage's
+view-only state, then checks unchanged document/output. The visually inspected
+`build/hm07-groups-smoke.png` shows the connected character with only the
+Face control set.
 
 `tests/rigging_tests.cpp` now transfers a pose across an independent character
 copy, applies the mapped drawing and numeric channel, checks source isolation,

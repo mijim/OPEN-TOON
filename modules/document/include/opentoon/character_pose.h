@@ -14,6 +14,7 @@ void blendCharacterPose(Document&, Id character, Id pose, Frame, double amount);
 void renameCharacterPose(Document&, Id character, Id pose, std::string name);
 void removeCharacterPose(Document&, Id character, Id pose);
 void publishCharacterPose(Document&, Id character, Id pose, bool published);
+void setCharacterPoseControlGroup(Document&, Id character, Id pose, std::string group);
 void setCharacterPosePart(Document&, Id character, Id pose, Id part, Frame, std::uint16_t channels);
 void removeCharacterPosePart(Document&, Id character, Id pose, Id part);
 Id transferCharacterPose(Document&, Id sourceCharacter, Id pose, Id targetCharacter);

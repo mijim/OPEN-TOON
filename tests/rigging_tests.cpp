@@ -237,6 +237,49 @@ TEST_CASE("Published view and pose bindings stay local and outside rendered outp
     REQUIRE(document.layer(part).variants.front().published);
     document.validate();
 }
+TEST_CASE("Published control groups survive independent copies without rendering") {
+    Session session;
+    const Id part = session.document().layers.front().id;
+    Id root = 0, view = 0, pose = 0, mouth = 0;
+    REQUIRE(session.apply("Create published controls", [&](Document& d) {
+        root = makeCharacter(d, part, "Hero");
+        mouth = createSubstitution(d, part, 0, false, "Smile");
+        view = captureCharacterView(d, root, 0, "Front");
+        pose = captureCharacterPose(d, root, 0,
+            std::vector<PoseCaptureTarget>{{part, PoseChannels::PositionX}}, "Reach");
+        publishSubstitution(d, part, mouth, true);
+        publishCharacterView(d, root, view, true);
+        publishCharacterPose(d, root, pose, true);
+    }));
+    const auto pixels = SceneRenderer::render(session.document(), 0, {320, 180});
+    const auto baseline = session.document();
+    REQUIRE(session.apply("Assign control groups", [&](Document& d) {
+        setSubstitutionControlGroup(d, part, mouth, "Face");
+        setCharacterViewControlGroup(d, root, view, "Stage");
+        setCharacterPoseControlGroup(d, root, pose, "Body");
+    }));
+    REQUIRE(SceneRenderer::render(session.document(), 0, {320, 180}) == pixels);
+    REQUIRE(session.document().layer(part).variants.back().controlGroup == "Face");
+    REQUIRE(session.document().layer(root).views.front().controlGroup == "Stage");
+    REQUIRE(session.document().layer(root).poses.front().controlGroup == "Body");
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == baseline);
+    REQUIRE(session.redo());
+    auto copy = session.document();
+    const Id copiedRoot = duplicateCharacter(copy, root);
+    const auto copiedPart = copy.layer(copiedRoot).views.front().choices.front().part;
+    REQUIRE(copy.layer(copiedPart).variants.back().controlGroup == "Face");
+    REQUIRE(copy.layer(copiedRoot).views.front().controlGroup == "Stage");
+    REQUIRE(copy.layer(copiedRoot).poses.front().controlGroup == "Body");
+    const auto beforeInvalid = copy;
+    REQUIRE_THROWS(setCharacterPoseControlGroup(copy, copiedRoot,
+                   copy.layer(copiedRoot).poses.front().id, ""));
+    REQUIRE_THROWS(setCharacterViewControlGroup(copy, copiedRoot,
+                   copy.layer(copiedRoot).views.front().id, std::string(65, 'x')));
+    REQUIRE_THROWS(setSubstitutionControlGroup(copy, copiedPart,
+                   copy.layer(copiedPart).variants.back().drawing, ""));
+    REQUIRE(copy == beforeInvalid);
+}
 TEST_CASE("Pose entries can be refined per Part without broadening other masks") {
     Session session;
     const Id body = session.document().layers.front().id;

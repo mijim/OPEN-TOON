@@ -50,6 +50,8 @@ class EditorController final : public QObject {
     Q_PROPERTY(QVariantList characterViews READ characterViews NOTIFY changed)
     Q_PROPERTY(int selectedView READ selectedView NOTIFY viewSelectionChanged)
     Q_PROPERTY(QVariantList characterPoses READ characterPoses NOTIFY changed)
+    Q_PROPERTY(QVariantList characterControlGroups READ characterControlGroups NOTIFY changed)
+    Q_PROPERTY(QString selectedControlGroup READ selectedControlGroup WRITE setSelectedControlGroup NOTIFY controlGroupChanged)
     Q_PROPERTY(QVariantList poseTransferTargets READ poseTransferTargets NOTIFY changed)
     Q_PROPERTY(int selectedCharacterPose READ selectedCharacterPose NOTIFY poseSelectionChanged)
     Q_PROPERTY(QString workspaceMode READ workspaceMode WRITE setWorkspaceMode NOTIFY workspaceModeChanged)
@@ -144,6 +146,9 @@ class EditorController final : public QObject {
     Q_INVOKABLE QString substitutionThumbnail(int drawing) const;
     Q_INVOKABLE void selectView(int view);
     QVariantList characterPoses() const;
+    QVariantList characterControlGroups() const;
+    QString selectedControlGroup() const;
+    void setSelectedControlGroup(QString group);
     QVariantList poseTransferTargets() const;
     int selectedCharacterPose() const;
     Q_INVOKABLE void selectCharacterPose(int pose);
@@ -232,6 +237,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE void createSubstitution(bool duplicate = false);
     Q_INVOKABLE void renameSubstitution(int drawing, QString name);
     Q_INVOKABLE void setSelectedSubstitutionPublished(bool published);
+    Q_INVOKABLE void setSelectedSubstitutionControlGroup(QString group);
     Q_INVOKABLE bool applyPublishedSubstitution(int part, int drawing);
     Q_INVOKABLE void selectSubstitution(int drawing);
     Q_INVOKABLE void removeSubstitution(int drawing);
@@ -277,6 +283,8 @@ class EditorController final : public QObject {
     Q_INVOKABLE void removeSelectedCharacterPose();
     Q_INVOKABLE void setSelectedCharacterPosePublished(bool published);
     Q_INVOKABLE void setSelectedViewPublished(bool published);
+    Q_INVOKABLE void setSelectedCharacterPoseControlGroup(QString group);
+    Q_INVOKABLE void setSelectedViewControlGroup(QString group);
     Q_INVOKABLE void setSelectedPartInCharacterPose(int channels);
     Q_INVOKABLE void removeSelectedPartFromCharacterPose();
     Q_INVOKABLE bool transferSelectedCharacterPose(int targetCharacter);
@@ -322,6 +330,7 @@ class EditorController final : public QObject {
     void viewSelectionChanged();
     void poseSelectionChanged();
     void workspaceModeChanged();
+    void controlGroupChanged();
     void animationModeChanged();
     void rangeChanged();
     void changed();
@@ -344,6 +353,7 @@ class EditorController final : public QObject {
     opentoon::Id selectedView_ = 0;
     opentoon::Id selectedCharacterPose_ = 0;
     QString workspaceMode_ = "Rig";
+    QString selectedControlGroup_ = "Main";
     std::uint64_t poseBlendSerial_ = 0;
     std::uint64_t poseBlendGesture_ = 0;
     opentoon::Id poseBlendRoot_ = 0;

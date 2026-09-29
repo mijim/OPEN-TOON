@@ -21,6 +21,7 @@ void setPivotPreservingArtwork(Document&, Id layer, double x, double y);
 Id createSubstitution(Document&, Id part, Frame frame, bool duplicateCurrent, std::string name);
 void renameSubstitution(Document&, Id part, Id drawing, std::string name);
 void publishSubstitution(Document&, Id part, Id drawing, bool published);
+void setSubstitutionControlGroup(Document&, Id part, Id drawing, std::string group);
 void selectSubstitution(Document&, Id part, Frame frame, Id drawing);
 void removeSubstitution(Document&, Id part, Id drawing);
 void reorderSubstitution(Document&, Id part, Id drawing, int direction);
@@ -35,4 +36,5 @@ Id duplicateCharacterView(Document&, Id character, Id view);
 void removeCharacterView(Document&, Id character, Id view);
 void reorderCharacterView(Document&, Id character, Id view, int direction);
 void publishCharacterView(Document&, Id character, Id view, bool published);
+void setCharacterViewControlGroup(Document&, Id character, Id view, std::string group);
 } // namespace opentoon

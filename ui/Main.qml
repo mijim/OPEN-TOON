@@ -49,6 +49,12 @@ ApplicationWindow {
     property string pendingAction: ""
     property bool allowClose: false
     property bool textEditing: activeFocusItem instanceof TextInput || activeFocusItem instanceof TextEdit
+    readonly property var activePublishedViews: editor.characterViews.filter(v =>
+        v.published && v.controlGroup === editor.selectedControlGroup)
+    readonly property var activePublishedPoses: editor.characterPoses.filter(p =>
+        p.published && p.controlGroup === editor.selectedControlGroup)
+    readonly property var activePublishedDrawings: editor.publishedCharacterSubstitutions.filter(d =>
+        d.group === editor.selectedControlGroup)
     readonly property bool drawingSelectionTool: ["Select", "Marquee", "Lasso"].includes(editor.tool)
     readonly property bool canvasEditingFocused: canvas.activeFocus && drawingSelectionTool
     property bool xsheet: false
@@ -844,8 +850,7 @@ ApplicationWindow {
                     height: Math.min(canvasControlsContent.implicitHeight + 20,
                                      Math.max(120, parent.height - 32))
                     visible: editor.workspaceMode === "Animator" && editor.characterId > 0 &&
-                             (editor.characterPoses.some(p => p.published) ||
-                              editor.publishedCharacterSubstitutions.length > 0)
+                             (root.activePublishedPoses.length > 0 || root.activePublishedDrawings.length > 0)
                     z: 2
                     radius: 6
                     color: "#ee151515"
@@ -866,10 +871,19 @@ ApplicationWindow {
                                 font.letterSpacing: 1.1
                             }
                             C.CompactComboBox {
+                                objectName: "canvasControlGroupPicker"
+                                Layout.fillWidth: true
+                                visible: editor.characterControlGroups.length > 1
+                                model: editor.characterControlGroups
+                                currentIndex: model.indexOf(editor.selectedControlGroup)
+                                onActivated: editor.selectedControlGroup = currentText
+                                Accessible.name: "Canvas control group"
+                            }
+                            C.CompactComboBox {
                                 objectName: "canvasPosePicker"
                                 Layout.fillWidth: true
-                                visible: editor.characterPoses.some(p => p.published)
-                                model: editor.characterPoses.filter(p => p.published)
+                                visible: root.activePublishedPoses.length > 0
+                                model: root.activePublishedPoses
                                 textRole: "name"
                                 valueRole: "id"
                                 currentIndex: model.findIndex(p => p.id === editor.selectedCharacterPose)
@@ -878,10 +892,10 @@ ApplicationWindow {
                             }
                             RowLayout {
                                 Layout.fillWidth: true
-                                visible: editor.characterPoses.some(p => p.published)
+                                visible: root.activePublishedPoses.length > 0
                                 C.CompactButton {
                                     text: "Apply"
-                                    enabled: editor.characterPoses.some(p => p.id === editor.selectedCharacterPose && p.published)
+                                    enabled: root.activePublishedPoses.some(p => p.id === editor.selectedCharacterPose)
                                     onClicked: editor.applySelectedCharacterPose()
                                     Accessible.name: "Apply canvas pose"
                                 }
@@ -893,7 +907,7 @@ ApplicationWindow {
                                     from: 0
                                     to: 1
                                     value: 0
-                                    enabled: editor.characterPoses.some(p => p.id === editor.selectedCharacterPose && p.published)
+                                    enabled: root.activePublishedPoses.some(p => p.id === editor.selectedCharacterPose)
                                     onPressedChanged: {
                                         if (pressed)
                                             editor.beginSelectedCharacterPoseBlend()
@@ -939,7 +953,7 @@ ApplicationWindow {
                                 function onPoseSelectionChanged() { canvasPoseBlend.value = 0 }
                             }
                             Repeater {
-                                model: editor.publishedCharacterSubstitutions
+                                model: root.activePublishedDrawings
                                 ColumnLayout {
                                     id: canvasDrawingGroup
                                     required property var modelData
@@ -1426,6 +1440,14 @@ ApplicationWindow {
                                     onClicked: editor.setSelectedSubstitutionPublished(checked)
                                     Accessible.name: "Publish selected substitution"
                                 }
+                                C.CompactTextField {
+                                    Layout.fillWidth: true
+                                    text: editor.substitutions.find(s => s.id === editor.selectedSubstitution)?.controlGroup || "Main"
+                                    placeholderText: "Control group"
+                                    enabled: editor.selectedSubstitution > 0
+                                    onEditingFinished: editor.setSelectedSubstitutionControlGroup(text)
+                                    Accessible.name: "Drawing control group"
+                                }
                                 Label { text: "Drawing mesh · current substitution"; color: "#999999"; font.pixelSize: 10 }
                                 RowLayout {
                                     Layout.fillWidth: true
@@ -1684,6 +1706,14 @@ ApplicationWindow {
                                     onClicked: editor.setSelectedViewPublished(checked)
                                     Accessible.name: "Publish character view"
                                 }
+                                C.CompactTextField {
+                                    Layout.fillWidth: true
+                                    text: editor.characterViews.find(v => v.id === editor.selectedView)?.controlGroup || "Main"
+                                    placeholderText: "Control group"
+                                    enabled: editor.selectedView > 0
+                                    onEditingFinished: editor.setSelectedViewControlGroup(text)
+                                    Accessible.name: "View control group"
+                                }
                                 Rectangle { Layout.fillWidth: true; height: 1; color: "#282828" }
                                 Label { text: "Character poses"; color: "#999999"; font.pixelSize: 10 }
                                 C.CompactComboBox {
@@ -1875,6 +1905,14 @@ ApplicationWindow {
                                     onClicked: editor.setSelectedCharacterPosePublished(checked)
                                     Accessible.name: "Publish character pose"
                                 }
+                                C.CompactTextField {
+                                    Layout.fillWidth: true
+                                    text: editor.characterPoses.find(p => p.id === editor.selectedCharacterPose)?.controlGroup || "Main"
+                                    placeholderText: "Control group"
+                                    enabled: editor.selectedCharacterPose > 0
+                                    onEditingFinished: editor.setSelectedCharacterPoseControlGroup(text)
+                                    Accessible.name: "Pose control group"
+                                }
                             }
                         }
                         ColumnLayout {
@@ -1894,14 +1932,23 @@ ApplicationWindow {
                                 font.bold: true
                                 wrapMode: Text.WordWrap
                             }
+                            C.CompactComboBox {
+                                objectName: "animatorControlGroupPicker"
+                                Layout.fillWidth: true
+                                visible: editor.characterControlGroups.length > 1
+                                model: editor.characterControlGroups
+                                currentIndex: model.indexOf(editor.selectedControlGroup)
+                                onActivated: editor.selectedControlGroup = currentText
+                                Accessible.name: "Animator control group"
+                            }
                             Label {
-                                visible: editor.characterId > 0
+                                visible: root.activePublishedViews.length > 0
                                 text: "Published views"
                                 color: "#999999"
                                 font.pixelSize: 10
                             }
                             Repeater {
-                                model: editor.characterViews.filter(v => v.published)
+                                model: root.activePublishedViews
                                 C.CompactButton {
                                     required property var modelData
                                     Layout.fillWidth: true
@@ -1914,21 +1961,20 @@ ApplicationWindow {
                                 }
                             }
                             Label {
-                                visible: editor.characterId > 0 &&
-                                         editor.characterViews.filter(v => v.published).length === 0
-                                text: "Publish view sets in Rig to show them here."
+                                visible: editor.characterId > 0 && root.activePublishedViews.length === 0
+                                text: "No published views in this group."
                                 wrapMode: Text.WordWrap
                                 color: "#777777"
                                 font.pixelSize: 10
                             }
                             Label {
-                                visible: editor.publishedCharacterSubstitutions.length > 0
+                                visible: root.activePublishedDrawings.length > 0
                                 text: "Published drawings"
                                 color: "#999999"
                                 font.pixelSize: 10
                             }
                             Repeater {
-                                model: editor.publishedCharacterSubstitutions
+                                model: root.activePublishedDrawings
                                 ColumnLayout {
                                     id: publishedPartGroup
                                     objectName: "publishedDrawingGroup"
@@ -1953,7 +1999,7 @@ ApplicationWindow {
                                 }
                             }
                             Label {
-                                visible: editor.characterId > 0
+                                visible: root.activePublishedPoses.length > 0
                                 text: "Published poses"
                                 color: "#999999"
                                 font.pixelSize: 10
@@ -1961,8 +2007,8 @@ ApplicationWindow {
                             C.CompactComboBox {
                                 objectName: "animatorPosePicker"
                                 Layout.fillWidth: true
-                                visible: editor.characterPoses.some(p => p.published)
-                                model: editor.characterPoses.filter(p => p.published)
+                                visible: root.activePublishedPoses.length > 0
+                                model: root.activePublishedPoses
                                 textRole: "name"
                                 valueRole: "id"
                                 currentIndex: model.findIndex(p => p.id === editor.selectedCharacterPose)
@@ -1971,10 +2017,10 @@ ApplicationWindow {
                             }
                             RowLayout {
                                 Layout.fillWidth: true
-                                visible: editor.characterPoses.some(p => p.published)
+                                visible: root.activePublishedPoses.length > 0
                                 C.CompactButton {
                                     text: "Apply"
-                                    enabled: editor.characterPoses.some(p => p.id === editor.selectedCharacterPose && p.published)
+                                    enabled: root.activePublishedPoses.some(p => p.id === editor.selectedCharacterPose)
                                     onClicked: editor.applySelectedCharacterPose()
                                 }
                                 Slider {
@@ -1985,7 +2031,7 @@ ApplicationWindow {
                                     from: 0
                                     to: 1
                                     value: 0
-                                    enabled: editor.characterPoses.some(p => p.id === editor.selectedCharacterPose && p.published)
+                                    enabled: root.activePublishedPoses.some(p => p.id === editor.selectedCharacterPose)
                                     onPressedChanged: {
                                         if (pressed)
                                             editor.beginSelectedCharacterPoseBlend()
@@ -2030,9 +2076,8 @@ ApplicationWindow {
                                 function onPoseSelectionChanged() { animatorPoseBlend.value = 0 }
                             }
                             Label {
-                                visible: editor.characterId > 0 &&
-                                         editor.characterPoses.filter(p => p.published).length === 0
-                                text: "Publish poses in Rig to show them here."
+                                visible: editor.characterId > 0 && root.activePublishedPoses.length === 0
+                                text: "No published poses in this group."
                                 wrapMode: Text.WordWrap
                                 color: "#777777"
                                 font.pixelSize: 10

@@ -154,6 +154,11 @@ void removeCharacterPose(Document& document, Id rootId, Id poseId) {
 void publishCharacterPose(Document& document, Id rootId, Id poseId, bool published) {
     pose(document, rootId, poseId).published = published;
 }
+void setCharacterPoseControlGroup(Document& document, Id rootId, Id poseId, std::string group) {
+    if (group.empty() || group.size() > 64)
+        throw std::invalid_argument("Control group name must be 1–64 bytes.");
+    pose(document, rootId, poseId).controlGroup = std::move(group);
+}
 void setCharacterPosePart(Document& document, Id rootId, Id poseId, Id partId,
                           Frame frame, std::uint16_t channels) {
     auto& saved = pose(document, rootId, poseId);

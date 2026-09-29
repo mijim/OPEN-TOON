@@ -373,6 +373,14 @@ void publishSubstitution(Document& document, Id partId, Id drawing, bool publish
                            [drawing](const auto& item) { return item.drawing == drawing; });
     it->published = published;
 }
+void setSubstitutionControlGroup(Document& document, Id partId, Id drawing, std::string group) {
+    require(!group.empty() && group.size() <= 64, "Control group name must be 1–64 bytes.");
+    auto& layer = part(document, partId);
+    checkVariant(layer, drawing);
+    auto it = std::find_if(layer.variants.begin(), layer.variants.end(),
+                           [drawing](const auto& item) { return item.drawing == drawing; });
+    it->controlGroup = std::move(group);
+}
 void selectSubstitution(Document& document, Id partId, Frame frame, Id drawing) {
     auto& layer = part(document, partId);
     require(frame >= 0 && frame < document.duration, "Substitution frame is outside the scene.");
@@ -516,6 +524,10 @@ void reorderCharacterView(Document& document, Id rootId, Id viewId, int directio
 }
 void publishCharacterView(Document& document, Id rootId, Id viewId, bool published) {
     findView(character(document, rootId), viewId).published = published;
+}
+void setCharacterViewControlGroup(Document& document, Id rootId, Id viewId, std::string group) {
+    require(!group.empty() && group.size() <= 64, "Control group name must be 1–64 bytes.");
+    findView(character(document, rootId), viewId).controlGroup = std::move(group);
 }
 Id duplicateCharacter(Document& document, Id rootId, double offsetX, double offsetY) {
     const auto& root = document.layer(rootId);

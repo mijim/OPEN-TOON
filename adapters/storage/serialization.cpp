@@ -120,13 +120,15 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
             x["exposures"].push_back({e.start, e.end, e.drawing});
         for (const auto& variant : l.variants)
             x["variants"].push_back({{"drawing", variant.drawing}, {"name", variant.name},
-                                      {"published", variant.published}});
+                                      {"published", variant.published},
+                                      {"controlGroup", variant.controlGroup}});
         for (const auto& view : l.views) {
             Json choices = Json::array();
             for (const auto& choice : view.choices)
                 choices.push_back({choice.part, choice.drawing});
             x["views"].push_back({{"id", view.id}, {"name", view.name},
-                                  {"choices", choices}, {"published", view.published}});
+                                  {"choices", choices}, {"published", view.published},
+                                  {"controlGroup", view.controlGroup}});
         }
         for (const auto& pose : l.poses) {
             Json parts = Json::array();
@@ -134,7 +136,8 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
                 parts.push_back({{"part", part.part}, {"channels", part.channels},
                                  {"transform", transform(part.transform)}, {"drawing", part.drawing}});
             x["poses"].push_back({{"id", pose.id}, {"name", pose.name},
-                                  {"parts", parts}, {"published", pose.published}});
+                                  {"parts", parts}, {"published", pose.published},
+                                  {"controlGroup", pose.controlGroup}});
         }
         for (const auto& binding : l.bindings) {
             Json vertices = Json::array();
@@ -329,7 +332,9 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
             limit(x.at("variants"), 10000);
             for (const auto& variant : x.at("variants"))
                 l.variants.push_back({variant.at("drawing"), variant.at("name"),
-                    j.at("version").get<int>() >= 14 ? variant.at("published").get<bool>() : false});
+                    j.at("version").get<int>() >= 14 ? variant.at("published").get<bool>() : false,
+                    j.at("version").get<int>() >= 15 ? variant.at("controlGroup").get<std::string>()
+                                                      : "Main"});
         }
         if (j.at("version").get<int>() >= 5) {
             limit(x.at("views"), 1000);
@@ -339,6 +344,8 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
                 entry.name = view.at("name");
                 if (j.at("version").get<int>() >= 13)
                     entry.published = view.at("published");
+                if (j.at("version").get<int>() >= 15)
+                    entry.controlGroup = view.at("controlGroup");
                 limit(view.at("choices"), 2000);
                 for (const auto& choice : view.at("choices"))
                     entry.choices.push_back({choice.at(0), choice.at(1)});
@@ -353,6 +360,8 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
                 entry.name = pose.at("name");
                 if (j.at("version").get<int>() >= 13)
                     entry.published = pose.at("published");
+                if (j.at("version").get<int>() >= 15)
+                    entry.controlGroup = pose.at("controlGroup");
                 limit(pose.at("parts"), 2000);
                 for (const auto& part : pose.at("parts"))
                     entry.parts.push_back({part.at("part"), part.at("channels"),

@@ -66,7 +66,7 @@ Connect controls to attributes, activation and visibility without writing every 
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM07-PROGRESS.md](../../../docs/implementation/HM07-PROGRESS.md) — published pose/view/drawing controls filter Animator visibility, general binding wizard remains open.
+**Implementation evidence:** [docs/implementation/HM07-PROGRESS.md](../../../docs/implementation/HM07-PROGRESS.md) — named groups filter published pose/view/drawing controls in Animator, general binding wizard remains open.
 
 **Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
@@ -80,7 +80,7 @@ Group identifiable controls for character manipulation.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM07-PROGRESS.md](../../../docs/implementation/HM07-PROGRESS.md) — published pose/view/drawing dashboard and compact viewport controls, full catalog acceptance open.
+**Implementation evidence:** [docs/implementation/HM07-PROGRESS.md](../../../docs/implementation/HM07-PROGRESS.md) — grouped published pose/view/drawing dashboard and compact viewport controls, full catalog acceptance open.
 
 **Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 

@@ -93,6 +93,7 @@ struct Substitution {
     Id drawing = 0;
     std::string name;
     bool published = false;
+    std::string controlGroup = "Main";
     auto operator<=>(const Substitution&) const = default;
 };
 struct ViewChoice {
@@ -105,6 +106,7 @@ struct CharacterView {
     std::string name;
     std::vector<ViewChoice> choices;
     bool published = false;
+    std::string controlGroup = "Main";
     auto operator<=>(const CharacterView&) const = default;
 };
 namespace PoseChannels {
@@ -132,6 +134,7 @@ struct CharacterPose {
     std::string name;
     std::vector<PosePart> parts;
     bool published = false;
+    std::string controlGroup = "Main";
     auto operator<=>(const CharacterPose&) const = default;
 };
 struct MeshPoint {
@@ -208,7 +211,7 @@ struct Marker {
     auto operator<=>(const Marker&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 14;
+    static constexpr int formatVersion = 15;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;

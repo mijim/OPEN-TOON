@@ -95,6 +95,7 @@ TEST_CASE("Registered PNG parts preserve a shared canvas and undo as one edit") 
 TEST_CASE("Editor captures a selected Part pose, applies its mask, undoes and reopens") {
     EditorController editor;
     editor.newScene();
+    editor.setWorkspaceMode("Rig");
     REQUIRE(editor.importParts(paths({partFixture + "hand_right__open.png",
                                       partFixture + "torso__base.png"})));
     const int torso = editor.selectedLayer();
@@ -228,6 +229,65 @@ TEST_CASE("Editor copies a named pose to another character and reopens independe
     REQUIRE(reopened.openProject(path));
     REQUIRE(reopened.document() == editor.document());
     REQUIRE(reopened.document().layer(target).poses.front().parts.front().part == opentoon::Id(targetPart));
+}
+TEST_CASE("Animator switches published control groups without changing the scene") {
+    EditorController editor;
+    editor.newScene();
+    editor.setWorkspaceMode("Rig");
+    REQUIRE(editor.importParts(paths({partFixture + "hand_right__open.png"})));
+    const int part = editor.selectedLayer();
+    editor.makeCharacter();
+    const int root = editor.characterId();
+    editor.captureCharacterView();
+    const int stageView = editor.selectedView();
+    editor.setSelectedViewPublished(true);
+    editor.setSelectedViewControlGroup("Stage");
+    editor.captureSelectedCharacterPose(opentoon::PoseChannels::PositionX, true);
+    const int bodyPose = editor.selectedCharacterPose();
+    editor.setSelectedCharacterPosePublished(true);
+    editor.setSelectedCharacterPoseControlGroup("Body");
+    editor.setSelectedLayer(part);
+    const int original = editor.selectedSubstitution();
+    editor.setSelectedSubstitutionPublished(true);
+    editor.setSelectedSubstitutionControlGroup("Face");
+    editor.createSubstitution(true);
+    const int faceDrawing = editor.selectedSubstitution();
+    editor.setSelectedSubstitutionPublished(true);
+    editor.setSelectedSubstitutionControlGroup("Face");
+    editor.selectSubstitution(original);
+    editor.setSelectedLayer(root);
+    REQUIRE(editor.characterControlGroups().size() == 3);
+    const auto before = editor.document();
+    const auto pixels = opentoon::SceneRenderer::render(before, 0, {320, 180});
+    editor.setWorkspaceMode("Animator");
+    editor.setSelectedControlGroup("Face");
+    REQUIRE(editor.selectedControlGroup() == "Face");
+    REQUIRE(editor.selectedCharacterPose() == 0);
+    editor.selectCharacterPose(bodyPose);
+    REQUIRE(editor.selectedCharacterPose() == 0);
+    const auto face = editor.publishedCharacterSubstitutions();
+    REQUIRE(face.size() == 1);
+    REQUIRE(face.front().toMap().value("group").toString() == "Face");
+    editor.selectView(stageView);
+    editor.applyCharacterView();
+    REQUIRE(editor.document() == before);
+    editor.setSelectedControlGroup("Body");
+    REQUIRE(editor.selectedCharacterPose() > 0);
+    REQUIRE(!editor.applyPublishedSubstitution(part, faceDrawing));
+    REQUIRE(editor.document() == before);
+    editor.setSelectedControlGroup("Stage");
+    REQUIRE(editor.selectedCharacterPose() == 0);
+    REQUIRE(editor.selectedLayer() == root);
+    REQUIRE(editor.frame() == 0);
+    REQUIRE(editor.document() == before);
+    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 0, {320, 180}) == pixels);
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto path = QUrl::fromLocalFile(directory.filePath("grouped-controls.otoon"));
+    REQUIRE(editor.saveProject(path));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(path));
+    REQUIRE(reopened.document() == before);
 }
 TEST_CASE("Composition profile edits are undoable and persist through project save") {
     EditorController editor;
@@ -397,6 +457,7 @@ TEST_CASE("Nineteen imported parts complete the inspector view and substitution 
     const auto roles = shot.value("part_roles").toArray();
     EditorController editor;
     editor.newScene();
+    editor.setWorkspaceMode("Rig");
     editor.setScene("Clockwork Hello review", 1920, 1080, 480, 24, 1);
     QVariantList imports;
     std::map<std::string, int> partIds;

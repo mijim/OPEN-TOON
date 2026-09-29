@@ -206,7 +206,8 @@ void Document::validate() const {
         std::set<Id> variants;
         for (const auto& variant : l.variants)
             require(drawings.contains(variant.drawing) && variant.name.size() > 0 &&
-                        variant.name.size() <= 128 && variants.insert(variant.drawing).second,
+                        variant.name.size() <= 128 && !variant.controlGroup.empty() &&
+                        variant.controlGroup.size() <= 64 && variants.insert(variant.drawing).second,
                     "Part references a missing or duplicate substitution.");
         if (l.kind == LayerKind::Part)
             require(!l.role.empty(), "Character part needs a role.");
@@ -313,6 +314,7 @@ void Document::validate() const {
         for (const auto& view : root.views) {
             id(view.id);
             require(!view.name.empty() && view.name.size() <= 128 && names.insert(view.name).second &&
+                        !view.controlGroup.empty() && view.controlGroup.size() <= 64 &&
                         view.choices.size() <= 2000,
                     "Invalid or duplicate character view set.");
             std::set<Id> parts;
@@ -335,6 +337,7 @@ void Document::validate() const {
         for (const auto& pose : root.poses) {
             id(pose.id);
             require(!pose.name.empty() && pose.name.size() <= 128 &&
+                        !pose.controlGroup.empty() && pose.controlGroup.size() <= 64 &&
                         poseNames.insert(pose.name).second && !pose.parts.empty() &&
                         pose.parts.size() <= 2000,
                     "Invalid or duplicate character pose.");

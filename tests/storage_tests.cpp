@@ -640,3 +640,44 @@ TEST_CASE("Format thirteen substitutes migrate published drawings with a readabl
     FixtureDatabase current(project.file);
     REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
 }
+TEST_CASE("Format fourteen control groups migrate with a readable source backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    const Id part = original.layers.front().id;
+    const Id root = makeCharacter(original, part, "Hero");
+    const Id drawing = createSubstitution(original, part, 0, false, "Smile");
+    const Id view = captureCharacterView(original, root, 0, "Front");
+    const Id pose = captureCharacterPose(original, root, 0,
+        std::vector<PoseCaptureTarget>{{part, PoseChannels::PositionX}}, "Reach");
+    publishSubstitution(original, part, drawing, true);
+    publishCharacterView(original, root, view, true);
+    publishCharacterPose(original, root, pose, true);
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 14;
+    for (auto& layer : legacy["layers"]) {
+        for (auto& variant : layer["variants"])
+            variant.erase("controlGroup");
+        for (auto& entry : layer["views"])
+            entry.erase("controlGroup");
+        for (auto& entry : layer["poses"])
+            entry.erase("controlGroup");
+    }
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=14");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    setSubstitutionControlGroup(changed, part, drawing, "Face");
+    setCharacterViewControlGroup(changed, root, view, "Stage");
+    setCharacterPoseControlGroup(changed, root, pose, "Body");
+    REQUIRE(ProjectStore::save(project.file, changed, "Group controls", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v14.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+}

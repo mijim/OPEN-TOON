@@ -360,9 +360,40 @@ int main(int argc, char** argv) {
                     editor.undo();
                     if (editor.document() != beforeMirror)
                         throw std::runtime_error("HM-07 mirror pose did not undo atomically.");
+                    editor.toggleLayer(targetCharacter, "visible");
+                    editor.setSelectedCharacterPoseControlGroup("Body");
+                    editor.setSelectedViewControlGroup("Stage");
+                    editor.setSelectedLayer(int(mouthId));
+                    editor.setSelectedSubstitutionControlGroup("Face");
+                    editor.selectSubstitution(int(alternateMouth));
+                    editor.setSelectedSubstitutionControlGroup("Face");
+                    editor.selectSubstitution(originalMouth);
+                    editor.setSelectedLayer(int(rootId));
+                    const auto beforeGroupSwitch = editor.document();
+                    const auto groupPixels = opentoon::SceneRenderer::render(beforeGroupSwitch, frame, {320, 180});
+                    editor.setWorkspaceMode("Animator");
+                    if (editor.characterControlGroups().size() != 3)
+                        throw std::runtime_error("HM-07 published control groups are missing.");
+                    editor.setSelectedControlGroup("Face");
+                    QCoreApplication::processEvents();
+                    auto* groupPicker = findVisualItem(findVisualItem, window->contentItem(),
+                                                       QStringLiteral("canvasControlGroupPicker"));
+                    if (!groupPicker || !groupPicker->isVisible() ||
+                        !canvasControls->isVisible() || editor.selectedCharacterPose() != 0 ||
+                        !window->grabWindow().save("build/hm07-groups-smoke.png"))
+                        throw std::runtime_error("HM-07 Face control group is not visible and isolated.");
+                    editor.setSelectedControlGroup("Body");
+                    if (editor.selectedCharacterPose() != poseId || !canvasControls->isVisible())
+                        throw std::runtime_error("HM-07 Body control group did not expose its pose.");
+                    editor.setSelectedControlGroup("Stage");
+                    if (editor.selectedCharacterPose() != 0 || canvasControls->isVisible() ||
+                        editor.document() != beforeGroupSwitch ||
+                        opentoon::SceneRenderer::render(editor.document(), frame, {320, 180}) != groupPixels)
+                        throw std::runtime_error("HM-07 control group switch changed document output.");
                     std::cout << "HM-07 dashboard smoke passed: continuous toon project, published view, "
                                  "mouth drawing and pose, workspace selection/frame, native QML screenshot, "
-                                 "mouth switch, canvas and panel sliders, pose transfer and mirroring with undo.\n";
+                                 "mouth switch, canvas and panel sliders, pose transfer, mirroring and "
+                                 "control groups with undo.\n";
                     std::cout << QJsonDocument(timing).toJson(QJsonDocument::Compact).constData() << '\n';
                     app.exit(0);
                 } catch (const std::exception& error) {

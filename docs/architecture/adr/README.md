@@ -106,3 +106,6 @@ poses/views and the local Animator/Rig workspace boundary.
 
 See [ADR-034](034-published-drawing-substitutions.md) for format-14 published
 drawing choices scoped to one Part in the Animator dashboard.
+
+See [ADR-035](035-character-control-groups.md) for format-15 grouped published
+controls and view-only group switching in Animator.
