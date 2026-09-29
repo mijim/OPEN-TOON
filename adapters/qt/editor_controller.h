@@ -12,7 +12,9 @@
 #include <QUrl>
 #include <QVariantList>
 #include <atomic>
+#include <memory>
 #include <thread>
+namespace opentoon { class AudioDevice; }
 class EditorController final : public QObject {
     Q_OBJECT
     Q_PROPERTY(bool animateMode READ animateMode WRITE setAnimateMode NOTIFY animationModeChanged)
@@ -387,6 +389,7 @@ class EditorController final : public QObject {
     QTimer playTimer_, autosaveTimer_;
     QElapsedTimer playClock_;
     int playStart_ = 0;
+    std::unique_ptr<opentoon::AudioDevice> audioDevice_;
     std::int64_t diskRevision_ = -1;
     bool exporting_ = false;
     double exportProgress_ = 0;

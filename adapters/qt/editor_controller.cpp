@@ -10,6 +10,7 @@
 #include "image_batch_importer.h"
 #include "scene_renderer.h"
 #include "audio_wav_writer.h"
+#include "audio_device.h"
 #include <QColorSpace>
 #include <QBuffer>
 #include <QDateTime>
@@ -47,8 +48,19 @@ EditorController::EditorController(QObject* parent) : QObject(parent) {
     playTimer_.setTimerType(Qt::PreciseTimer);
     playTimer_.setInterval(8);
     connect(&playTimer_, &QTimer::timeout, this, [this] {
-        auto elapsed = playClock_.elapsed() / 1000.0;
-        setFrame((playStart_ + int(std::floor(elapsed * fps()))) % duration());
+        if (audioDevice_ && audioDevice_->interrupted()) {
+            stopPlayback();
+            report("Audio output was interrupted. Playback stopped.");
+            return;
+        }
+        const int next = audioDevice_
+                             ? audioDevice_->currentFrame()
+                             : (playStart_ + int(std::floor(playClock_.elapsed() / 1000.0 * fps()))) % duration();
+        if (next != frame_) {
+            endSelectedCharacterPoseBlend();
+            frame_ = next;
+            emit frameChanged();
+        }
     });
     auto recoveryDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/recovery";
     QDir().mkpath(recoveryDir);
@@ -64,6 +76,7 @@ EditorController::EditorController(QObject* parent) : QObject(parent) {
     autosaveTimer_.start();
 }
 EditorController::~EditorController() {
+    stopPlayback();
     cancelExport_ = true;
     if (exportThread_.joinable())
         exportThread_.join();
@@ -99,6 +112,7 @@ void EditorController::resetSelection() {
 }
 bool EditorController::edit(const std::string& label, const std::function<void(Document&)>& operation) {
     endSelectedCharacterPoseBlend();
+    stopPlayback();
     try {
         bool result = session_.apply(label, operation);
         if (result) {
@@ -494,6 +508,12 @@ QVariantMap EditorController::transform() const {
 }
 void EditorController::setFrame(int value) {
     value = std::clamp(value, 0, duration() - 1);
+    if (audioDevice_)
+        audioDevice_->seek(value);
+    else if (playing()) {
+        playStart_ = value;
+        playClock_.restart();
+    }
     if (value == frame_)
         return;
     endSelectedCharacterPoseBlend();
@@ -1767,6 +1787,10 @@ void EditorController::deleteKey() {
     });
 }
 void EditorController::stopPlayback() {
+    if (audioDevice_) {
+        audioDevice_->stop();
+        audioDevice_.reset();
+    }
     if (playing()) {
         playTimer_.stop();
         emit playbackChanged();
@@ -1779,6 +1803,16 @@ void EditorController::togglePlayback() {
     }
     playStart_ = frame_;
     playClock_.start();
+    if (!document().audioClips.empty()) {
+        try {
+            audioDevice_ = std::make_unique<opentoon::AudioDevice>(
+                session_.snapshot(), qEnvironmentVariableIntValue("OPENTOON_TEST_NULL_AUDIO_BACKEND") == 1);
+            audioDevice_->start(frame_);
+        } catch (const std::exception& e) {
+            audioDevice_.reset();
+            report("Audio output unavailable; preview continues silently: " + QString::fromUtf8(e.what()));
+        }
+    }
     playTimer_.start();
     emit playbackChanged();
 }

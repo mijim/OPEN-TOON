@@ -66,6 +66,7 @@ linear conversion and stereo output. Editor export tests check exact 24 and
 reopen. Native Qt Quick smoke inspects the audio row and control panel,
 captures `build/hm10-audio-smoke.png`, checks the exported cue, and undoes import.
 
-Playback, device time, higher-quality rate conversion, real-time mixing,
-scrubbing, waveform pyramids and repeat remain HM-10 work. The miniaudio
-package is not linked or claimed as adopted by this subset.
+The experimental desktop now uses the same `AudioMixPlan` for a miniaudio
+device callback and offline export. See [ADR-037](037-miniaudio-preview-clock.md).
+Hardware clock qualification, higher-quality rate conversion, audible
+scrubbing, waveform pyramids and clip repeat remain HM-10 work.

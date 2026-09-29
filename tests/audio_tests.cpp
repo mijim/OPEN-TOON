@@ -3,8 +3,11 @@
 #include "project_store.h"
 #include "serialization.h"
 #include <catch2/catch_test_macros.hpp>
+#include <algorithm>
 #include <chrono>
 #include <filesystem>
+#include <array>
+#include <iostream>
 #include <nlohmann/json.hpp>
 
 using namespace opentoon;
@@ -140,4 +143,30 @@ TEST_CASE("Two placed clips mix at the same rational sample with rate conversion
     REQUIRE(fractionalMix.sceneSamples() == 96096);
     const auto fractionalCue = fractionalMix.renderBlock(2002, 1);
     REQUIRE(fractionalCue[0] > 16000);
+}
+TEST_CASE("Audio callback-sized mix stays below its playback period on a ten-minute scene") {
+    auto scene = makeDocument();
+    scene.duration = 14386; // Slightly more than ten minutes at 24000/1001.
+    scene.rate = {24000, 1001};
+    (void)importPcm16Wav(scene, "48k", wav(96000, 2002), 0);
+    (void)importPcm16Wav(scene, "44.1k", wav(88200, 1839, 44100), 0);
+    scene.validate();
+    AudioMixPlan mix(scene, 48000);
+    REQUIRE(mix.sceneSamples() == scene.rate.sampleAt(scene.duration, 48000));
+    std::array<std::int16_t, 1024 * 2> output{};
+    std::array<double, 1024 * 2> scratch{};
+    std::vector<double> durations;
+    durations.reserve(80);
+    for (int block = 0; block < 80; ++block) {
+        const auto before = std::chrono::steady_clock::now();
+        mix.renderInto(std::int64_t(block) * 1024, output, scratch);
+        const auto after = std::chrono::steady_clock::now();
+        durations.push_back(std::chrono::duration<double, std::milli>(after - before).count());
+    }
+    std::sort(durations.begin(), durations.end());
+    const auto p95 = durations[75];
+    std::cout << "Two-track 1024-frame audio mix p95: " << p95 << " ms; device period: "
+              << (1000.0 * 1024 / 48000) << " ms\n";
+    REQUIRE(p95 < 1000.0 * 1024 / 48000);
+    REQUIRE(mix.renderBlock(2002, 1)[0] != 0);
 }

@@ -26,6 +26,8 @@ class AudioMixPlan {
   public:
     AudioMixPlan(const Document& document, std::int32_t outputRate);
     [[nodiscard]] std::int64_t sceneSamples() const;
+    void renderInto(std::int64_t firstSample, std::span<std::int16_t> output,
+                    std::span<double> scratch) const;
     // Interleaved stereo PCM16. The plan borrows immutable asset bytes from
     // the document, which must outlive it.
     [[nodiscard]] std::vector<std::int16_t> renderBlock(std::int64_t firstSample,

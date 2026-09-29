@@ -149,12 +149,13 @@ AudioMixPlan::AudioMixPlan(const Document& document, std::int32_t outputRate)
 std::int64_t AudioMixPlan::sceneSamples() const {
     return frameRate_.sampleAt(duration_, outputRate_);
 }
-std::vector<std::int16_t> AudioMixPlan::renderBlock(std::int64_t firstSample,
-                                                    std::size_t frameCount) const {
-    if (firstSample < 0 || frameCount > 65536 ||
-        std::uint64_t(firstSample) + frameCount > std::uint64_t(sceneSamples()))
+void AudioMixPlan::renderInto(std::int64_t firstSample, std::span<std::int16_t> output,
+                              std::span<double> scratch) const {
+    if (output.size() % 2 || scratch.size() < output.size() || firstSample < 0 ||
+        std::uint64_t(firstSample) + output.size() / 2 > std::uint64_t(sceneSamples()))
         throw std::invalid_argument("Audio render block is outside the scene.");
-    std::vector<double> mixed(frameCount * 2, 0);
+    const auto frameCount = output.size() / 2;
+    std::fill_n(scratch.begin(), output.size(), 0.0);
     for (const auto& source : sources_) {
         const auto& asset = *source.asset;
         const std::span bytes{asset.wav.data(), asset.wav.size()};
@@ -182,14 +183,21 @@ std::vector<std::int16_t> AudioMixPlan::renderBlock(std::int64_t firstSample,
                 const int inputChannel = std::min(channel, asset.channels - 1);
                 const double a = read(sourceFrame, inputChannel);
                 const double b = read(nextFrame, inputChannel);
-                mixed[index * 2 + channel] += (a + (b - a) * fraction) * source.clip.gain;
+                scratch[index * 2 + channel] += (a + (b - a) * fraction) * source.clip.gain;
             }
         }
     }
-    std::vector<std::int16_t> output(mixed.size());
-    for (std::size_t i = 0; i < mixed.size(); ++i)
-        output[i] = std::int16_t(std::lround(std::clamp(mixed[i], -1.0,
+    for (std::size_t i = 0; i < output.size(); ++i)
+        output[i] = std::int16_t(std::lround(std::clamp(scratch[i], -1.0,
                                                          32767.0 / 32768.0) * 32768.0));
+}
+std::vector<std::int16_t> AudioMixPlan::renderBlock(std::int64_t firstSample,
+                                                    std::size_t frameCount) const {
+    if (frameCount > 65536)
+        throw std::invalid_argument("Audio render block exceeds its supported size.");
+    std::vector<std::int16_t> output(frameCount * 2);
+    std::vector<double> scratch(output.size());
+    renderInto(firstSample, output, scratch);
     return output;
 }
 } // namespace opentoon

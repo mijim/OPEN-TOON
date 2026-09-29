@@ -112,3 +112,6 @@ controls and view-only group switching in Animator.
 
 See [ADR-036](036-pcm-audio-document.md) for format-16 original PCM16 WAV
 assets, sample-range clips and rational frame-to-sample waveform mapping.
+
+See [ADR-037](037-miniaudio-preview-clock.md) for experimental PCM16 device
+preview, immutable callback mixing and the submitted-sample playhead boundary.

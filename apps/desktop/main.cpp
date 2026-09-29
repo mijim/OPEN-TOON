@@ -147,6 +147,21 @@ int main(int argc, char** argv) {
                     QCoreApplication::processEvents();
                     if (!window->grabWindow().save("build/hm10-audio-smoke.png"))
                         throw std::runtime_error("Cannot capture the audio timeline.");
+                    qputenv("OPENTOON_TEST_NULL_AUDIO_BACKEND", "1");
+                    editor.togglePlayback();
+                    QElapsedTimer playbackWait;
+                    playbackWait.start();
+                    while (editor.frame() == 0 && playbackWait.elapsed() < 1000) {
+                        QCoreApplication::processEvents();
+                        QThread::msleep(5);
+                    }
+                    if (!editor.playing() || editor.frame() == 0)
+                        throw std::runtime_error("Audio device did not advance the native playhead.");
+                    editor.setFrame(18);
+                    if (editor.frame() != 18)
+                        throw std::runtime_error("Native audio playhead seek failed.");
+                    editor.togglePlayback();
+                    qunsetenv("OPENTOON_TEST_NULL_AUDIO_BACKEND");
                     const auto output = directory.filePath("mix.wav");
                     editor.exportAudio(QUrl::fromLocalFile(output));
                     QElapsedTimer timeout;
@@ -167,7 +182,7 @@ int main(int argc, char** argv) {
                     if (editor.document() != baseline)
                         throw std::runtime_error("WAV import did not undo atomically.");
                     std::cout << "HM-10 audio smoke passed: native PCM16 import, cue waveform, "
-                                 "exact WAV mix export, timeline screenshot and atomic undo.\n";
+                                 "device-clock playhead/seek, exact WAV mix export, timeline screenshot and atomic undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

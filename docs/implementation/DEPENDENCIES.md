@@ -12,11 +12,12 @@ This records what the implementation actually uses. It is not a release SBOM. Se
 | json-c | 0.18, Conan lock | MyPaint brush settings parser; MIT. |
 | Zstandard | 1.5.7, Conan lock | Resource compression; BSD-3-Clause (dual-license upstream). |
 | OpenSSL Crypto | 3.5.8, Conan lock | Resource SHA-256; Apache-2.0. No TLS/network functionality in the storage adapter. |
+| miniaudio | 0.11.25, Conan recipe `bb742f61dfe4946a1c8635c3b364bf31` | PCM16 output device behind `opentoon_audio_device`; MIT No Attribution (MIT-0) license option, upstream `LICENSE` reviewed. Header compiled into the adapter with decoder, encoder, resource manager and engine disabled. |
 | CMake / Ninja / Conan | 4.4.3 / 1.13.2 / 2.20.1 locally | Build tooling, not application runtime. BSD-3-Clause / Apache-2.0 / MIT respectively; transitive tool notices remain separate. |
 
 The Conan lock pins recipe revisions; it is not a byte-identical OS/toolchain/Qt lock. The local compiler is AppleClang 17, the SDK is macOS 15.5, and all builds in the initial evidence are arm64. No production latency or large-scene benchmark has qualified these choices yet.
 
-Qt Test is discovered by the desktop build but is not a runtime dependency of the editor. The smoke workflow uses native events directly. qtmultimedia, Eigen and FFmpeg are available on the development machine but are **not linked into or used by this implementation**. Clipper2, Skia, OCIO, miniaudio, deformation libraries and other roadmap candidates remain unadopted.
+Qt Test is discovered by the desktop build but is not a runtime dependency of the editor. The smoke workflow uses native events directly. qtmultimedia, Eigen and FFmpeg are available on the development machine but are **not linked into or used by this implementation**. Clipper2, Skia, OCIO, deformation libraries and other roadmap candidates remain unadopted. Miniaudio is experimentally adopted for desktop PCM playback; hardware drift and other platform profiles remain unqualified.
 
 ## macOS preview redistribution preparation
 
@@ -53,7 +54,8 @@ The MyPaint archive hash and minimal upstream build are in `cmake/MyPaint.cmake`
 The source cache is build-only; configure downloads once and verifies SHA-256. Programmatic
 presets are original code. The fallback is to retain raster tiles and disable unsupported
 brush authoring rather than changing stored pixels. Current evidence is the replay and UI
-workflow corpus; production brush latency remains an open gate. miniaudio is resolved in
-Conan for the upcoming media adapter but is not currently linked or used.
+workflow corpus; production brush latency remains an open gate. Miniaudio links only the
+new playback adapter; [ADR-037](../architecture/adr/037-miniaudio-preview-clock.md)
+records the measured callback workload and offline-WAV fallback.
 
 The lock also includes Windows-only NASM and Strawberry Perl build requirements used by OpenSSL. They are build tools, not linked application libraries.

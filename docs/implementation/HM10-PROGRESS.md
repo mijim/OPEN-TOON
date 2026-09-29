@@ -14,7 +14,12 @@ the source. **Scene → Export PCM WAV mix** writes a 48 kHz stereo PCM16 mix
 from an immutable document snapshot. Multiple clips sum at exact scene sample
 positions; source-rate conversion uses bounded linear interpolation. Export
 runs in the background, reports progress and atomically discards a cancelled
-temporary file. Audio does not yet play inside the app.
+temporary file. **Play** uses a miniaudio output device when placed clips exist.
+The callback mixes the immutable scene snapshot into bounded stack buffers;
+submitted sample position drives the playhead. Seeking during playback resets
+the sample cursor. The scene loops at its exact rational sample boundary.
+Editing or device interruption stops playback; a failed device open leaves the
+visual preview available and reports the failure.
 
 The saved document supports up to 64 audio assets, 1,000 clips, 512 MiB total
 audio and 128 MiB per WAV asset. Formats 1–15 load without audio. The first format-16 save creates a
@@ -33,17 +38,27 @@ frame-edit semantics.
 - `tests/export_tests.cpp` imports an actual WAV through `EditorController`,
   samples the visible cue, edits, saves/reopens and rejects a missing file.
   It checks exact 24/fractional WAV lengths, cancellation preservation and
-  byte-identical output before/after project reopen.
-- Local macOS `build/locked`: 148/148 CTest entries pass. The native
+  byte-identical output before/after project reopen. A null device test starts,
+  seeks and stops playback from an immutable scene without reaching speakers.
+  A controller test verifies that Play follows this cursor, a manual seek
+  updates it and an edit stops preview before changing the document. The
+  local host output device also opened successfully without starting playback.
+- A 600-second fractional-rate, two-source 1024-frame callback workload
+  measured p95 **0.014 ms** against a 21.33 ms output period on the local
+  M1 Pro macOS Release build. It checks the exact scene sample count and a
+  rendered cue; this is a mixer cost sample, not a hardware underrun trace.
+- Local macOS `build/locked`: 149/149 CTest entries pass. The native
   `--hm10-smoke` loaded the Qt Quick audio timeline, checked its cue sample,
   captured and visually inspected `build/hm10-audio-smoke.png`, exported an
-  exactly sized WAV with its cue at the correct sample, then undid import.
+  exactly sized WAV with its cue at the correct sample, advanced and sought
+  its native playhead through the null backend, then undid import.
   The pre-existing HM-07 native dashboard smoke still passes.
 
 ## Open contract
 
-HM-10 remains incomplete. Device-backed playback, an audio-driven playhead,
-seek/loop/device-loss recovery, production-quality rate conversion,
-real-time mixing, waveform pyramids, frame scrubbing, repeat and a full ten-minute
-audiovisual drift run are pending. Miniaudio remains a registered candidate,
-not an adopted playback dependency in this subset.
+HM-10 remains incomplete. Device latency calibration, device-loss recovery,
+hardware underrun and dropped-frame traces, production-quality rate
+conversion, waveform pyramids, audible frame scrubbing, clip repeat and a full
+ten-minute audiovisual drift run are pending. The miniaudio adapter is adopted
+for this experimental desktop profile; hardware and cross-platform
+qualification remain open.

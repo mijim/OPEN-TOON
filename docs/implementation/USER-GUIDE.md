@@ -197,8 +197,12 @@ start on whole scene frames, and source-sample trim uses a half-open interval.
 Unsupported or damaged files leave the project unchanged. **Scene → Export PCM
 WAV mix** writes a 48 kHz stereo mix from all placed clips. It runs in the
 background and can be cancelled without replacing an existing destination.
-Audio playback, scrubbing, real-time mixing and repeat are not implemented
-yet; the waveform is a visual timing guide. [HM-10 progress](HM10-PROGRESS.md) records
+**Play** previews the placed clips through the output device, follows its
+submitted sample cursor, and loops at the scene end. Clicking or dragging the
+playhead while playing seeks the audio; editing stops playback so the next
+preview uses the new document. If the device cannot open, the visual preview
+continues silently and shows an error. Audible frame scrubbing, clip repeat
+and device-loss recovery are still open. [HM-10 progress](HM10-PROGRESS.md) records
 the current test evidence and remaining work.
 
 ## Animation edits and curves

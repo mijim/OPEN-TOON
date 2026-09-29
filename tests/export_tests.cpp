@@ -5,6 +5,7 @@
 #include "project_store.h"
 #include "scene_renderer.h"
 #include "audio_wav_writer.h"
+#include "audio_device.h"
 #include <QBuffer>
 #include <QCoreApplication>
 #include <QColorSpace>
@@ -167,6 +168,61 @@ TEST_CASE("Editor exports a reopened PCM cue at its exact output sample") {
     REQUIRE(quint8(bytes[atCue]) == 255);
     REQUIRE(quint8(bytes[atCue + 1]) == 127);
     REQUIRE(bytes.mid(atCue, 2) == bytes.mid(atCue + 2, 2));
+}
+TEST_CASE("Null audio device advances, seeks and stops against one immutable scene") {
+    EditorController editor;
+    editor.newScene();
+    const auto scene = editor.snapshot();
+    opentoon::AudioDevice device(scene, true);
+    device.start(5);
+    QElapsedTimer timeout;
+    timeout.start();
+    while (device.currentSample() <= scene->rate.sampleAt(5, 48000) &&
+           timeout.elapsed() < 1000)
+        QThread::msleep(5);
+    REQUIRE(device.running());
+    REQUIRE(device.currentSample() > scene->rate.sampleAt(5, 48000));
+    device.seek(25);
+    REQUIRE(device.currentSample() >= scene->rate.sampleAt(25, 48000));
+    REQUIRE(device.currentFrame() >= 25);
+    device.stop();
+    REQUIRE_FALSE(device.running());
+    const auto stoppedAt = device.currentSample();
+    QThread::msleep(30);
+    REQUIRE(device.currentSample() == stoppedAt);
+    REQUIRE(editor.snapshot() == scene);
+    if (qEnvironmentVariableIsSet("OPENTOON_TEST_HOST_AUDIO")) {
+        opentoon::AudioDevice host(scene);
+        REQUIRE_FALSE(host.running());
+    }
+}
+TEST_CASE("Editor audio preview follows the device cursor and stops before an edit") {
+    qputenv("OPENTOON_TEST_NULL_AUDIO_BACKEND", "1");
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto input = directory.filePath("preview.wav");
+    QFile source(input);
+    REQUIRE(source.open(QIODevice::WriteOnly));
+    REQUIRE(source.write(audioCueWav()) == 44 + 48000 * 2);
+    source.close();
+    EditorController editor;
+    editor.newScene();
+    REQUIRE(editor.importAudio(QUrl::fromLocalFile(input)));
+    editor.togglePlayback();
+    REQUIRE(editor.playing());
+    QElapsedTimer timeout;
+    timeout.start();
+    while (editor.frame() == 0 && timeout.elapsed() < 1000) {
+        QCoreApplication::processEvents();
+        QThread::msleep(5);
+    }
+    REQUIRE(editor.frame() > 0);
+    editor.setFrame(18);
+    REQUIRE(editor.frame() == 18);
+    editor.setAudioClipGain(editor.audioClips().front().toMap().value("id").toInt(), 0.5);
+    REQUIRE_FALSE(editor.playing());
+    REQUIRE(editor.document().audioClips.front().gain == 0.5);
+    qunsetenv("OPENTOON_TEST_NULL_AUDIO_BACKEND");
 }
 TEST_CASE("Registered PNG parts preserve a shared canvas and undo as one edit") {
     EditorController editor;

@@ -70,7 +70,7 @@ Control volume and play multiple synchronized tracks.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — saved clip gain and deterministic stereo offline mix of overlapping clips, device playback remains open.
+**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — saved clip gain and deterministic stereo mix of overlapping clips drive offline WAV and bounded miniaudio preview; hardware sync remains open.
 
 **Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
