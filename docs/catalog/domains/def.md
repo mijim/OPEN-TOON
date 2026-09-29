@@ -24,9 +24,13 @@ Articulate a drawing through a chain of joints and influences.
 
 **Initial acceptance:** A limb bends while maintaining connections between segments.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM06-PROGRESS.md](../../../docs/implementation/HM06-PROGRESS.md) — tests/deformer_tests.cpp; tests/mesh_render_tests.cpp; apps/desktop/mesh_smoke.cpp.
+
+**Remaining scope:** Format-9 two-segment local bone chain, saved per-vertex distal weights and frame keys bend one substitution with connected joints and direct canvas handles. Joint seam and extreme-bend quality remain HM-06 gates.
 
 ## DEF-002 — Game bones
 
@@ -44,9 +48,13 @@ Control shape through curve segments and tangents.
 
 **Initial acceptance:** Moving a tangent produces a continuous transition.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM06-PROGRESS.md](../../../docs/implementation/HM06-PROGRESS.md) — tests/deformer_tests.cpp; tests/mesh_render_tests.cpp; apps/desktop/mesh_smoke.cpp.
+
+**Remaining scope:** Format-9 cubic control points animate a fixed rest-parameter displacement field. Direct tangent drag, interpolation, undo and reopen work; broad-shape quality and multiple segments remain open.
 
 ## DEF-004 — Envelope deformation
 
@@ -98,9 +106,9 @@ Separate bind/rest pose from animated state and update it explicitly.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM05-ACCEPTANCE.md](../../../docs/implementation/HM05-ACCEPTANCE.md) — tests/mesh_render_tests.cpp; apps/desktop/mesh_smoke.cpp.
+**Implementation evidence:** [docs/implementation/HM05-ACCEPTANCE.md](../../../docs/implementation/HM05-ACCEPTANCE.md) — docs/implementation/HM06-PROGRESS.md; apps/desktop/mesh_smoke.cpp.
 
-**Remaining scope:** Format-8 per-substitution rest and static pose preview are editable, resettable and undoable. Animated deformer state and reset-with-keys acceptance remain HM-06 work.
+**Remaining scope:** Format-9 animated bone/curve state retains a separate rest mesh; Rest key returns the current frame to rest without deleting other keys. Full rest rebind and broad rig acceptance remain open.
 
 ## DEF-009 — Influence regions
 
@@ -118,9 +126,13 @@ Assign deformation chains to compatible substitutions.
 
 **Initial acceptance:** Changing drawings activates the correct chain without orphaned references.
 
-**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM06-PROGRESS.md](../../../docs/implementation/HM06-PROGRESS.md) — tests/deformer_tests.cpp; tests/mesh_render_tests.cpp; apps/desktop/mesh_smoke.cpp.
+
+**Remaining scope:** A Part substitution owns its bone or curve binding independently. Switching and reopening restore the correct animated chain. At a drawing change, an explicit undoable command matches the incoming pose to the outgoing evaluated pose when control types and rest geometry agree; broader mapping across different rest shapes and complete rig workflows remain open.
 
 ## DEF-011 — Kinematic output
 
@@ -128,9 +140,13 @@ Attach other elements to the evaluated result of a deformer.
 
 **Initial acceptance:** An accessory follows the end of a deformed arm.
 
-**Scope:** `base` · **Level:** `advanced` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `advanced` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM06-PROGRESS.md](../../../docs/implementation/HM06-PROGRESS.md) — tests/mesh_render_tests.cpp; apps/desktop/mesh_smoke.cpp.
+
+**Remaining scope:** A child Part can follow its parent Part's two-segment bone tip through the active bound substitution. The link persists, undoes and reopens; broader deformer attachments and guided rig controls remain open.
 
 ## DEF-012 — Point kinematic output
 

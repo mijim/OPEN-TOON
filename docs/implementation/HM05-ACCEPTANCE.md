@@ -54,6 +54,14 @@ uses the original 256×256 registered transparent parts; their alpha-bounded
 meshes reduce processed pixels. Vector proxies and larger/full-opacity meshes
 need their own workload qualification before production claims.
 
+The 2026-09-28 toon-art revision retained the same 19 registered parts and
+exact rest-pixel checks. Four optimized scene-renderer runs of its 19 posed
+parts took 6.56–6.88 ms/frame (mean 6.69 ms) at 1920×1080 on the same host.
+The original 4.79 ms measurement above remains historical for the prior art.
+After the owner supplied a clearer hand-drawn rig direction, the independently
+redrawn hoodie character measured 5.69–6.21 ms/frame (mean 5.91 ms) in four
+further optimized runs. Rest-pixel and 19-part render checks still pass.
+
 The accepted path uses the existing Qt 6 QPainter adapter plus small owned CPU
 triangle/UV math. No additional dependency or license obligation was added.
 Eigen and tessellation candidates stay unadopted until HM-06 has a measured

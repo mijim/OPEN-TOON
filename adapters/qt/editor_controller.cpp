@@ -3,6 +3,7 @@
 #include "opentoon/property_address.h"
 #include "opentoon/rigging.h"
 #include "opentoon/deformation.h"
+#include "opentoon/deformer.h"
 #include "project_store.h"
 #include "image_batch_importer.h"
 #include "scene_renderer.h"
@@ -140,7 +141,8 @@ QVariantList EditorController::substitutions() const {
         return result;
     for (const auto& substitution : selected.variants)
         result.push_back(QVariantMap{{"id", int(substitution.drawing)},
-                                     {"name", QString::fromStdString(substitution.name)}});
+                                     {"name", QString::fromStdString(substitution.name)},
+                                     {"image", document().drawings.at(substitution.drawing).image.has_value()}});
     return result;
 }
 int EditorController::selectedSubstitution() const {
@@ -719,6 +721,46 @@ void EditorController::setParent(int parent) {
             layer.parent = parent;
     });
 }
+bool EditorController::selectedCanFollowBoneTip() const {
+    if (!layer_)
+        return false;
+    const auto& layer = document().layer(layer_);
+    if (layer.kind != LayerKind::Part || layer.locked || !layer.parent ||
+        document().layer(layer.parent).kind != LayerKind::Part)
+        return false;
+    if (layer.boneTipAnchor)
+        return true;
+    const auto& source = document().layer(layer.parent);
+    if (source.locked || !layer.keys.empty())
+        return false;
+    Frame covered = 0;
+    for (const auto& exposure : source.exposures) {
+        const auto* binding = opentoon::meshBindingFor(source, exposure.drawing);
+        if (exposure.start != covered || !binding || !binding->bone)
+            return false;
+        const auto& keys = binding->bone->keys;
+        if (!keys.empty() && keys.front().frame == 0 &&
+            (keys.front().shoulderAngle != 0 || keys.front().elbowAngle != 0))
+            return false;
+        covered = exposure.end;
+    }
+    return covered == document().duration;
+}
+bool EditorController::selectedFollowsBoneTip() const {
+    return layer_ && document().layer(layer_).boneTipAnchor.has_value();
+}
+bool EditorController::toggleSelectedBoneTipAttachment() {
+    if (!selectedCanFollowBoneTip())
+        return false;
+    return edit(selectedFollowsBoneTip() ? "Detach from bone tip" : "Follow parent bone tip",
+                [&](Document& d) {
+                    const auto& child = d.layer(layer_);
+                    if (child.boneTipAnchor)
+                        opentoon::detachPartFromBoneTip(d, layer_);
+                    else
+                        opentoon::attachPartToBoneTip(d, layer_, child.parent);
+                });
+}
 void EditorController::makeCharacter() {
     if (layer_)
         edit("Create character", [&](Document& d) {
@@ -850,6 +892,146 @@ bool EditorController::selectedMeshBound() const {
         return false;
     return opentoon::meshBindingFor(document().layer(layer_), selectedSubstitution()) != nullptr;
 }
+int EditorController::selectedMeshDeformer() const {
+    if (!selectedMeshBound())
+        return 0;
+    const auto* mesh = opentoon::meshBindingFor(document().layer(layer_), selectedSubstitution());
+    return mesh->bone ? 1 : mesh->curve ? 2 : 0;
+}
+bool EditorController::selectedCanMatchPreviousDeformerPose() const {
+    return layer_ && opentoon::canMatchPreviousDeformerPose(document(), layer_, frame_);
+}
+int EditorController::selectedMeshColumns() const {
+    if (!selectedMeshBound())
+        return 0;
+    return opentoon::meshBindingFor(document().layer(layer_), selectedSubstitution())->columns;
+}
+int EditorController::selectedMeshRows() const {
+    if (!selectedMeshBound())
+        return 0;
+    return opentoon::meshBindingFor(document().layer(layer_), selectedSubstitution())->rows;
+}
+double EditorController::selectedBoneTransition() const {
+    if (selectedMeshDeformer() != 1)
+        return 0;
+    return opentoon::meshBindingFor(document().layer(layer_), selectedSubstitution())->bone->elbowTransition;
+}
+double EditorController::selectedBoneMaxTransition() const {
+    if (selectedMeshDeformer() != 1)
+        return 0;
+    const auto& joints = opentoon::meshBindingFor(document().layer(layer_),
+                                                  selectedSubstitution())->bone->restJoints;
+    return std::hypot(joints[1].x - joints[0].x, joints[1].y - joints[0].y) +
+           std::hypot(joints[2].x - joints[1].x, joints[2].y - joints[1].y);
+}
+bool EditorController::bindSelectedBone() {
+    const Id drawing = selectedSubstitution();
+    if (!layer_ || !drawing || !selectedMeshBound())
+        return false;
+    return edit("Bind bone chain", [&](Document& d) {
+        const auto* mesh = opentoon::meshBindingFor(d.layer(layer_), drawing);
+        double minX = 1e100, minY = 1e100, maxX = -1e100, maxY = -1e100;
+        for (const auto& vertex : mesh->vertices) {
+            minX = std::min(minX, vertex.rest.x); minY = std::min(minY, vertex.rest.y);
+            maxX = std::max(maxX, vertex.rest.x); maxY = std::max(maxY, vertex.rest.y);
+        }
+        const bool horizontal = maxX - minX >= maxY - minY;
+        const double middleX = (minX + maxX) / 2, middleY = (minY + maxY) / 2;
+        const std::array<opentoon::MeshPoint, 3> joints = horizontal
+            ? std::array<opentoon::MeshPoint, 3>{{{minX, middleY}, {middleX, middleY}, {maxX, middleY}}}
+            : std::array<opentoon::MeshPoint, 3>{{{middleX, minY}, {middleX, middleY}, {middleX, maxY}}};
+        const double axis = horizontal ? maxX - minX : maxY - minY;
+        const double cross = horizontal ? maxY - minY : maxX - minX;
+        const double transition = std::min(axis,
+            std::max(0.01, std::max(axis * 0.15, cross * 0.5)));
+        opentoon::bindBoneChain(d, layer_, drawing, joints, transition);
+    });
+}
+bool EditorController::bindSelectedCurve() {
+    const Id drawing = selectedSubstitution();
+    if (!layer_ || !drawing || !selectedMeshBound())
+        return false;
+    return edit("Bind curve deformer", [&](Document& d) {
+        const auto* mesh = opentoon::meshBindingFor(d.layer(layer_), drawing);
+        double minX = 1e100, minY = 1e100, maxX = -1e100, maxY = -1e100;
+        for (const auto& vertex : mesh->vertices) {
+            minX = std::min(minX, vertex.rest.x); minY = std::min(minY, vertex.rest.y);
+            maxX = std::max(maxX, vertex.rest.x); maxY = std::max(maxY, vertex.rest.y);
+        }
+        const bool horizontal = maxX - minX >= maxY - minY;
+        const double middleX = (minX + maxX) / 2, middleY = (minY + maxY) / 2;
+        const opentoon::MeshPoint first = horizontal ? opentoon::MeshPoint{minX, middleY}
+                                                     : opentoon::MeshPoint{middleX, minY};
+        const opentoon::MeshPoint last = horizontal ? opentoon::MeshPoint{maxX, middleY}
+                                                    : opentoon::MeshPoint{middleX, maxY};
+        std::array<opentoon::MeshPoint, 4> controls;
+        for (int index = 0; index < 4; ++index)
+            controls[index] = {first.x + (last.x - first.x) * index / 3,
+                               first.y + (last.y - first.y) * index / 3};
+        opentoon::bindCurveDeformer(d, layer_, drawing, controls);
+    });
+}
+bool EditorController::recordSelectedBonePose(double shoulder, double elbow) {
+    const Id drawing = selectedSubstitution();
+    return layer_ && drawing && edit("Pose bone chain", [&](Document& d) {
+        opentoon::recordBonePose(d, layer_, drawing, frame_, shoulder, elbow);
+    });
+}
+bool EditorController::moveSelectedBoneRestJoint(int joint, double x, double y) {
+    const Id drawing = selectedSubstitution();
+    return layer_ && drawing && edit("Move bone rest joint", [&](Document& d) {
+        opentoon::moveBoneRestJoint(d, layer_, drawing, joint, {x, y});
+    });
+}
+bool EditorController::setSelectedBoneTransition(double radius) {
+    const Id drawing = selectedSubstitution();
+    return layer_ && drawing && edit("Set elbow transition", [&](Document& d) {
+        opentoon::setBoneElbowTransition(d, layer_, drawing, radius);
+    });
+}
+bool EditorController::moveSelectedCurveControl(int control, double x, double y) {
+    const Id drawing = selectedSubstitution();
+    return layer_ && drawing && control >= 0 && control < 4 &&
+        edit("Pose curve control", [&](Document& d) {
+            const auto* mesh = opentoon::meshBindingFor(d.layer(layer_), drawing);
+            if (!mesh || !mesh->curve)
+                throw std::invalid_argument("This mesh has no curve deformer.");
+            auto controls = opentoon::sampleCurveControls(*mesh->curve, frame_);
+            controls[control] = {x, y};
+            opentoon::recordCurvePose(d, layer_, drawing, frame_, controls);
+        });
+}
+bool EditorController::moveSelectedCurveRestControl(int control, double x, double y) {
+    const Id drawing = selectedSubstitution();
+    return layer_ && drawing && edit("Move curve rest control", [&](Document& d) {
+        opentoon::moveCurveRestControl(d, layer_, drawing, control, {x, y});
+    });
+}
+bool EditorController::resetSelectedDeformerPose() {
+    const Id drawing = selectedSubstitution();
+    return layer_ && drawing && edit("Key deformer rest pose", [&](Document& d) {
+        const auto* mesh = opentoon::meshBindingFor(d.layer(layer_), drawing);
+        if (!mesh)
+            throw std::invalid_argument("This drawing has no mesh binding.");
+        if (mesh->bone)
+            opentoon::recordBonePose(d, layer_, drawing, frame_, 0, 0);
+        else if (mesh->curve)
+            opentoon::recordCurvePose(d, layer_, drawing, frame_, mesh->curve->restControls);
+        else
+            throw std::invalid_argument("This mesh has no deformer.");
+    });
+}
+bool EditorController::matchSelectedPreviousDeformerPose() {
+    return layer_ && edit("Match previous deformer pose", [&](Document& d) {
+        opentoon::matchPreviousDeformerPose(d, layer_, frame_);
+    });
+}
+bool EditorController::removeSelectedDeformer() {
+    const Id drawing = selectedSubstitution();
+    return layer_ && drawing && edit("Remove mesh deformer", [&](Document& d) {
+        opentoon::removeMeshDeformer(d, layer_, drawing);
+    });
+}
 bool EditorController::bindSelectedMesh(int columns, int rows) {
     const Id drawing = selectedSubstitution();
     return layer_ && drawing && edit("Bind drawing mesh", [&](Document& d) {
@@ -857,6 +1039,12 @@ bool EditorController::bindSelectedMesh(int columns, int rows) {
             opentoon::bindRegularImageMesh(d, layer_, drawing, columns, rows);
         else
             opentoon::bindRegularVectorMesh(d, layer_, drawing, columns, rows);
+    });
+}
+bool EditorController::bindSelectedContourMesh(int columns, int rows) {
+    const Id drawing = selectedSubstitution();
+    return layer_ && drawing && edit("Bind contour mesh", [&](Document& d) {
+        opentoon::bindContourImageMesh(d, layer_, drawing, columns, rows);
     });
 }
 bool EditorController::moveSelectedMeshVertex(int vertex, double x, double y, bool rest) {

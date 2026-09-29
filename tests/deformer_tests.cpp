@@ -1,0 +1,386 @@
+#include "opentoon/deformer.h"
+#include "opentoon/deformation.h"
+#include "opentoon/rigging.h"
+#include "opentoon/session.h"
+#include "opentoon/timeline.h"
+#include "serialization.h"
+#include <catch2/catch_test_macros.hpp>
+#include <cmath>
+#include <limits>
+#include <numbers>
+
+using namespace opentoon;
+
+namespace {
+struct PartFixture {
+    Document document = makeDocument();
+    Id part = document.layers.front().id;
+    Id root = makeCharacter(document, part, "Chain");
+    Id drawing = createSubstitution(document, part, 0, false, "Front");
+    PartFixture() {
+        document.drawings.at(drawing).image =
+            ImageAsset{16, 16, std::vector<std::uint8_t>(16 * 16 * 4, 255)};
+        bindRegularImageMesh(document, part, drawing, 4, 2);
+        document.validate();
+    }
+};
+} // namespace
+
+TEST_CASE("Two-segment bone keys retain elbow connection, rest and undo") {
+    PartFixture fixture;
+    Session session;
+    session.replace(fixture.document);
+    REQUIRE(session.apply("Bind bone", [&](Document& document) {
+        bindBoneChain(document, fixture.part, fixture.drawing,
+                      {{{0, 8}, {8, 8}, {16, 8}}}, 3);
+    }));
+    REQUIRE(session.apply("Bend elbow", [&](Document& document) {
+        recordBonePose(document, fixture.part, fixture.drawing, 12, 0, 30);
+    }));
+    const auto& binding = *meshBindingFor(session.document().layer(fixture.part), fixture.drawing);
+    REQUIRE(binding.bone->keys.size() == 2);
+    REQUIRE(binding.bone->keys.front().frame == 0);
+    REQUIRE(binding.bone->keys.back().frame == 12);
+    REQUIRE(evaluateMeshBinding(binding, 0).vertices == binding.vertices);
+    const auto posed = evaluateMeshBinding(binding, 12);
+    REQUIRE(posed.vertices[7].pose == MeshPoint{8, 8});
+    REQUIRE(std::abs(posed.vertices[9].pose.x - (8 + 8 * std::cos(std::numbers::pi / 6))) < 1e-9);
+    REQUIRE(std::abs(posed.vertices[9].pose.y - 12) < 1e-9);
+    const auto jointsAtRest = sampleBoneJoints(*binding.bone, 0);
+    REQUIRE(jointsAtRest == binding.bone->restJoints);
+    const auto jointsAtBend = sampleBoneJoints(*binding.bone, 12);
+    REQUIRE(jointsAtBend[1] == MeshPoint{8, 8});
+    REQUIRE(std::abs(jointsAtBend[2].x - posed.vertices[9].pose.x) < 1e-9);
+    REQUIRE(std::abs(jointsAtBend[2].y - posed.vertices[9].pose.y) < 1e-9);
+    const auto middleWeight = binding.bone->distalWeights[2];
+    REQUIRE(middleWeight > 0);
+    REQUIRE(middleWeight < 1);
+    const auto middleRadius = std::hypot(posed.vertices[2].pose.x - 8,
+                                          posed.vertices[2].pose.y - 8);
+    REQUIRE(std::abs(middleRadius - 8) < 1e-9);
+    const auto middle = evaluateMeshBinding(binding, 6);
+    REQUIRE(middle.vertices[9].pose.y > 8);
+    REQUIRE(middle.vertices[9].pose.y < posed.vertices[9].pose.y);
+    REQUIRE(deserializeDocument(serializeDocument(session.document())) == session.document());
+    REQUIRE(session.undo());
+    REQUIRE(meshBindingFor(session.document().layer(fixture.part), fixture.drawing)->bone->keys.empty());
+    REQUIRE(session.redo());
+    REQUIRE(meshBindingFor(session.document().layer(fixture.part), fixture.drawing)->bone->keys.size() == 2);
+}
+
+TEST_CASE("Bone rest joints can be retargeted without changing rest pixels or corrupting keys") {
+    PartFixture fixture;
+    bindBoneChain(fixture.document, fixture.part, fixture.drawing,
+                  {{{0, 8}, {8, 8}, {16, 8}}}, 3);
+    recordBonePose(fixture.document, fixture.part, fixture.drawing, 12, 0, 30);
+    Session session;
+    session.replace(fixture.document);
+    const auto before = *meshBindingFor(session.document().layer(fixture.part), fixture.drawing);
+    const auto bentBefore = evaluateMeshBinding(before, 12);
+    REQUIRE(session.apply("Place elbow", [&](Document& document) {
+        moveBoneRestJoint(document, fixture.part, fixture.drawing, 1, {9, 8});
+    }));
+    const auto& adjusted = *meshBindingFor(session.document().layer(fixture.part), fixture.drawing);
+    REQUIRE(adjusted.vertices == before.vertices);
+    REQUIRE(adjusted.bone->restJoints[1] == MeshPoint{9, 8});
+    REQUIRE(adjusted.bone->distalWeights != before.bone->distalWeights);
+    REQUIRE(evaluateMeshBinding(adjusted, 0).vertices == before.vertices);
+    REQUIRE(evaluateMeshBinding(adjusted, 12).vertices != bentBefore.vertices);
+    const auto valid = session.document();
+    REQUIRE_THROWS(session.apply("Collapse bone", [&](Document& document) {
+        moveBoneRestJoint(document, fixture.part, fixture.drawing, 1, {0, 8});
+    }));
+    REQUIRE(session.document() == valid);
+    REQUIRE_THROWS(session.apply("Invalid joint", [&](Document& document) {
+        moveBoneRestJoint(document, fixture.part, fixture.drawing, 3, {8, 8});
+    }));
+    REQUIRE(session.document() == valid);
+    REQUIRE(deserializeDocument(serializeDocument(session.document())) == session.document());
+    REQUIRE(session.undo());
+    REQUIRE(*meshBindingFor(session.document().layer(fixture.part), fixture.drawing) == before);
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == valid);
+}
+
+TEST_CASE("Bone influence radius retargets existing bends atomically and survives reopen") {
+    PartFixture fixture;
+    bindBoneChain(fixture.document, fixture.part, fixture.drawing,
+                  {{{0, 8}, {8, 8}, {16, 8}}}, 3);
+    recordBonePose(fixture.document, fixture.part, fixture.drawing, 12, 0, 30);
+    Session session;
+    session.replace(fixture.document);
+    const auto before = *meshBindingFor(session.document().layer(fixture.part), fixture.drawing);
+    REQUIRE(session.apply("Widen elbow influence", [&](Document& document) {
+        setBoneElbowTransition(document, fixture.part, fixture.drawing, 5);
+    }));
+    const auto& adjusted = *meshBindingFor(session.document().layer(fixture.part), fixture.drawing);
+    REQUIRE(adjusted.bone->elbowTransition == 5);
+    REQUIRE(adjusted.bone->distalWeights != before.bone->distalWeights);
+    REQUIRE(adjusted.bone->keys == before.bone->keys);
+    REQUIRE(adjusted.vertices == before.vertices);
+    REQUIRE(evaluateMeshBinding(adjusted, 0).vertices == before.vertices);
+    REQUIRE(evaluateMeshBinding(adjusted, 12).vertices !=
+            evaluateMeshBinding(before, 12).vertices);
+    const auto valid = session.document();
+    for (double radius : {0.0, 17.0, std::numeric_limits<double>::quiet_NaN()}) {
+        REQUIRE_THROWS(session.apply("Invalid radius", [&](Document& document) {
+            setBoneElbowTransition(document, fixture.part, fixture.drawing, radius);
+        }));
+        REQUIRE(session.document() == valid);
+    }
+    REQUIRE(deserializeDocument(serializeDocument(valid)) == valid);
+    REQUIRE(session.undo());
+    REQUIRE(*meshBindingFor(session.document().layer(fixture.part), fixture.drawing) == before);
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == valid);
+}
+
+TEST_CASE("Compatible sleeve change matches the outgoing bone pose with one undoable key") {
+    PartFixture fixture;
+    bindBoneChain(fixture.document, fixture.part, fixture.drawing,
+                  {{{0, 8}, {8, 8}, {16, 8}}}, 3);
+    recordBonePose(fixture.document, fixture.part, fixture.drawing, 24, 0, 30);
+    const Id sleeve = createSubstitution(fixture.document, fixture.part, 12, true, "Sleeve");
+    bindRegularImageMesh(fixture.document, fixture.part, sleeve, 4, 2);
+    bindBoneChain(fixture.document, fixture.part, sleeve,
+                  {{{0, 8}, {8, 8}, {16, 8}}}, 3);
+    recordBonePose(fixture.document, fixture.part, sleeve, 36, 0, 0);
+    Session session;
+    session.replace(fixture.document);
+    REQUIRE(canMatchPreviousDeformerPose(session.document(), fixture.part, 12));
+    REQUIRE_FALSE(canMatchPreviousDeformerPose(session.document(), fixture.part, 13));
+    REQUIRE_FALSE(canMatchPreviousDeformerPose(session.document(), fixture.part, 0));
+    const auto before = session.document();
+    const auto outgoing = sampleBoneAngles(
+        *meshBindingFor(before.layer(fixture.part), fixture.drawing)->bone, 12);
+    REQUIRE(outgoing[1] == 15);
+    REQUIRE(session.apply("Match previous pose", [&](Document& document) {
+        matchPreviousDeformerPose(document, fixture.part, 12);
+    }));
+    const auto& matched = *meshBindingFor(session.document().layer(fixture.part), sleeve)->bone;
+    REQUIRE(sampleBoneAngles(matched, 12) == outgoing);
+    REQUIRE(matched.keys.size() == 3);
+    REQUIRE(matched.keys[1].frame == 12);
+    REQUIRE(session.document().drawingAt(fixture.part, 11)->id == fixture.drawing);
+    REQUIRE(session.document().drawingAt(fixture.part, 12)->id == sleeve);
+    REQUIRE(deserializeDocument(serializeDocument(session.document())) == session.document());
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == before);
+    REQUIRE(session.redo());
+    REQUIRE(sampleBoneAngles(*meshBindingFor(session.document().layer(fixture.part), sleeve)->bone,
+                                    12) == outgoing);
+    const auto valid = session.document();
+    REQUIRE_THROWS(session.apply("Wrong frame", [&](Document& document) {
+        matchPreviousDeformerPose(document, fixture.part, 13);
+    }));
+    REQUIRE(session.document() == valid);
+    auto existingKey = before;
+    recordBonePose(existingKey, fixture.part, sleeve, 12, 0, 2, Interpolation::Smooth);
+    matchPreviousDeformerPose(existingKey, fixture.part, 12);
+    const auto& preserved = *meshBindingFor(existingKey.layer(fixture.part), sleeve)->bone;
+    REQUIRE(preserved.keys[1].interpolation == Interpolation::Smooth);
+    REQUIRE(sampleBoneAngles(preserved, 12) == outgoing);
+    auto incompatible = before;
+    moveBoneRestJoint(incompatible, fixture.part, sleeve, 2, {15, 8});
+    REQUIRE_FALSE(canMatchPreviousDeformerPose(incompatible, fixture.part, 12));
+    REQUIRE_THROWS(matchPreviousDeformerPose(incompatible, fixture.part, 12));
+    auto locked = before;
+    locked.layer(fixture.part).locked = true;
+    REQUIRE_FALSE(canMatchPreviousDeformerPose(locked, fixture.part, 12));
+    REQUIRE_THROWS(matchPreviousDeformerPose(locked, fixture.part, 12));
+}
+
+TEST_CASE("Cubic curve tangent keys move a field continuously without altering rest") {
+    PartFixture fixture;
+    const std::array<MeshPoint, 4> straight{{{0, 8}, {16.0 / 3, 8},
+                                            {32.0 / 3, 8}, {16, 8}}};
+    bindCurveDeformer(fixture.document, fixture.part, fixture.drawing, straight);
+    auto lifted = straight;
+    lifted[1].y = 3;
+    lifted[2].y = 10;
+    recordCurvePose(fixture.document, fixture.part, fixture.drawing, 12, lifted);
+    const auto& binding = *meshBindingFor(fixture.document.layer(fixture.part), fixture.drawing);
+    REQUIRE(binding.curve->keys.size() == 2);
+    REQUIRE(evaluateMeshBinding(binding, 0).vertices == binding.vertices);
+    const auto atSix = evaluateMeshBinding(binding, 6);
+    const auto atTwelve = evaluateMeshBinding(binding, 12);
+    REQUIRE(atTwelve.vertices[6].pose.y < atSix.vertices[6].pose.y);
+    REQUIRE(atSix.vertices[6].pose.y < binding.vertices[6].rest.y);
+    REQUIRE(atTwelve.vertices[6].rest == binding.vertices[6].rest);
+    REQUIRE(deserializeDocument(serializeDocument(fixture.document)) == fixture.document);
+}
+
+TEST_CASE("Compatible curve drawing change matches four evaluated controls") {
+    PartFixture fixture;
+    const std::array<MeshPoint, 4> straight{{{0, 8}, {16.0 / 3, 8},
+                                            {32.0 / 3, 8}, {16, 8}}};
+    bindCurveDeformer(fixture.document, fixture.part, fixture.drawing, straight);
+    auto lifted = straight;
+    lifted[1].y = 5;
+    lifted[2].y = 10;
+    recordCurvePose(fixture.document, fixture.part, fixture.drawing, 24, lifted);
+    const Id alternate = createSubstitution(fixture.document, fixture.part, 12, true, "Alternate");
+    bindRegularImageMesh(fixture.document, fixture.part, alternate, 4, 2);
+    bindCurveDeformer(fixture.document, fixture.part, alternate, straight);
+    recordCurvePose(fixture.document, fixture.part, alternate, 36, straight);
+    const auto before = fixture.document;
+    REQUIRE(canMatchPreviousDeformerPose(before, fixture.part, 12));
+    const auto expected = sampleCurveControls(
+        *meshBindingFor(before.layer(fixture.part), fixture.drawing)->curve, 12);
+    matchPreviousDeformerPose(fixture.document, fixture.part, 12);
+    const auto& incoming = *meshBindingFor(fixture.document.layer(fixture.part), alternate)->curve;
+    REQUIRE(sampleCurveControls(incoming, 12) == expected);
+    REQUIRE(incoming.keys.size() == 3);
+    REQUIRE(incoming.keys[1].frame == 12);
+    REQUIRE(deserializeDocument(serializeDocument(fixture.document)) == fixture.document);
+    auto existingKey = before;
+    recordCurvePose(existingKey, fixture.part, alternate, 12, straight, Interpolation::Step);
+    matchPreviousDeformerPose(existingKey, fixture.part, 12);
+    const auto& preserved = *meshBindingFor(existingKey.layer(fixture.part), alternate)->curve;
+    REQUIRE(preserved.keys[1].interpolation == Interpolation::Step);
+    REQUIRE(sampleCurveControls(preserved, 12) == expected);
+    auto incompatible = before;
+    moveCurveRestControl(incompatible, fixture.part, alternate, 1, {16.0 / 3, 9});
+    REQUIRE_FALSE(canMatchPreviousDeformerPose(incompatible, fixture.part, 12));
+    REQUIRE_THROWS(matchPreviousDeformerPose(incompatible, fixture.part, 12));
+    REQUIRE(meshBindingFor(incompatible.layer(fixture.part), alternate)->curve->keys.size() == 2);
+}
+
+TEST_CASE("Curve rest controls retarget keyed offsets without changing rest artwork") {
+    PartFixture fixture;
+    const std::array<MeshPoint, 4> straight{{{0, 8}, {16.0 / 3, 8},
+                                            {32.0 / 3, 8}, {16, 8}}};
+    bindCurveDeformer(fixture.document, fixture.part, fixture.drawing, straight);
+    auto lifted = straight;
+    lifted[1].y = 3;
+    recordCurvePose(fixture.document, fixture.part, fixture.drawing, 12, lifted);
+    Session session;
+    session.replace(fixture.document);
+    const auto before = *meshBindingFor(session.document().layer(fixture.part), fixture.drawing);
+    REQUIRE(session.apply("Move rest tangent", [&](Document& document) {
+        moveCurveRestControl(document, fixture.part, fixture.drawing, 1,
+                             {16.0 / 3, 9});
+    }));
+    const auto& adjusted = *meshBindingFor(session.document().layer(fixture.part), fixture.drawing);
+    REQUIRE(adjusted.vertices == before.vertices);
+    REQUIRE(adjusted.curve->restControls[1] == MeshPoint{16.0 / 3, 9});
+    REQUIRE(adjusted.curve->keys.front().controls == adjusted.curve->restControls);
+    REQUIRE(adjusted.curve->keys.back().controls[1].y == 4);
+    REQUIRE(evaluateMeshBinding(adjusted, 0).vertices == before.vertices);
+    REQUIRE(evaluateMeshBinding(adjusted, 12).vertices !=
+            evaluateMeshBinding(before, 12).vertices);
+    const auto valid = session.document();
+    REQUIRE_THROWS(session.apply("Collapse curve", [&](Document& document) {
+        moveCurveRestControl(document, fixture.part, fixture.drawing, 3, {0, 8});
+    }));
+    REQUIRE(session.document() == valid);
+    REQUIRE_THROWS(session.apply("Invalid control", [&](Document& document) {
+        moveCurveRestControl(document, fixture.part, fixture.drawing, 4, {8, 8});
+    }));
+    REQUIRE(session.document() == valid);
+    REQUIRE(deserializeDocument(serializeDocument(session.document())) == session.document());
+    REQUIRE(session.undo());
+    REQUIRE(*meshBindingFor(session.document().layer(fixture.part), fixture.drawing) == before);
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == valid);
+}
+
+TEST_CASE("Deformer binding rejects invalid controls and protected static edits atomically") {
+    PartFixture fixture;
+    const auto before = fixture.document;
+    REQUIRE_THROWS(bindBoneChain(fixture.document, fixture.part, fixture.drawing,
+                                  {{{0, 0}, {0, 0}, {16, 8}}}, 3));
+    REQUIRE(fixture.document == before);
+    bindBoneChain(fixture.document, fixture.part, fixture.drawing,
+                  {{{0, 8}, {8, 8}, {16, 8}}}, 3);
+    const auto bound = fixture.document;
+    REQUIRE_THROWS(moveMeshRestVertex(fixture.document, fixture.part, fixture.drawing, 0, {1, 1}));
+    REQUIRE_THROWS(moveMeshPoseVertex(fixture.document, fixture.part, fixture.drawing, 0, {1, 1}));
+    REQUIRE_THROWS(bindRegularImageMesh(fixture.document, fixture.part, fixture.drawing, 2, 2));
+    REQUIRE_THROWS(recordBonePose(fixture.document, fixture.part, fixture.drawing, 12,
+                                   std::numeric_limits<double>::quiet_NaN(), 0));
+    REQUIRE_THROWS(recordBonePose(fixture.document, fixture.part, fixture.drawing, 12,
+                                   0, 180));
+    REQUIRE(fixture.document == bound);
+    auto damaged = bound;
+    damaged.layer(fixture.part).bindings.front().bone->distalWeights[0] = 1.5;
+    REQUIRE_THROWS(damaged.validate());
+    removeMeshDeformer(fixture.document, fixture.part, fixture.drawing);
+    REQUIRE_FALSE(meshBindingFor(fixture.document.layer(fixture.part), fixture.drawing)->bone);
+    fixture.document.validate();
+}
+
+TEST_CASE("Deformer keys survive frame edits and same-Part range transfer") {
+    PartFixture fixture;
+    bindBoneChain(fixture.document, fixture.part, fixture.drawing,
+                  {{{0, 8}, {8, 8}, {16, 8}}}, 3);
+    recordBonePose(fixture.document, fixture.part, fixture.drawing, 12, 0, 20);
+    const Id side = createSubstitution(fixture.document, fixture.part, 0, true, "Side");
+    bindRegularImageMesh(fixture.document, fixture.part, side, 4, 2);
+    const std::array<MeshPoint, 4> straight{{{0, 8}, {16.0 / 3, 8},
+                                            {32.0 / 3, 8}, {16, 8}}};
+    bindCurveDeformer(fixture.document, fixture.part, side, straight);
+    auto curved = straight;
+    curved[1].y += 2;
+    recordCurvePose(fixture.document, fixture.part, side, 16, curved);
+    const auto before = fixture.document;
+    auto clip = copyRange(fixture.document, {fixture.part}, 10, 17);
+    REQUIRE(clip.tracks.front().deformerKeys.size() == 2);
+    REQUIRE(clip.tracks.front().boundDrawings.size() == 1);
+    REQUIRE_THROWS(pasteRange(fixture.document, {fixture.part}, 20, clip,
+                              PasteContent::IndependentDrawings));
+    auto pasted = before;
+    pasteRange(pasted, {fixture.part}, 20, clip, PasteContent::All, true);
+    REQUIRE(meshBindingFor(pasted.layer(fixture.part), fixture.drawing)->bone->keys.back().frame == 22);
+    REQUIRE(meshBindingFor(pasted.layer(fixture.part), side)->curve->keys.back().frame == 26);
+    REQUIRE(evaluateMeshBinding(*meshBindingFor(pasted.layer(fixture.part), fixture.drawing), 22).vertices ==
+            evaluateMeshBinding(*meshBindingFor(before.layer(fixture.part), fixture.drawing), 12).vertices);
+    REQUIRE(evaluateMeshBinding(*meshBindingFor(pasted.layer(fixture.part), side), 26).vertices ==
+            evaluateMeshBinding(*meshBindingFor(before.layer(fixture.part), side), 16).vertices);
+    pasted.validate();
+    auto retimed = before;
+    retimeRange(retimed, {fixture.part}, 10, 17, 10);
+    REQUIRE(meshBindingFor(retimed.layer(fixture.part), fixture.drawing)->bone->keys.back().frame == 13);
+    REQUIRE(meshBindingFor(retimed.layer(fixture.part), side)->curve->keys.back().frame == 19);
+    REQUIRE(evaluateMeshBinding(*meshBindingFor(retimed.layer(fixture.part), fixture.drawing), 13).vertices ==
+            evaluateMeshBinding(*meshBindingFor(before.layer(fixture.part), fixture.drawing), 12).vertices);
+    retimed.validate();
+    auto moved = before;
+    clearRange(moved, {fixture.part}, 10, 17, true);
+    pasteRange(moved, {fixture.part}, 25, clip, PasteContent::All);
+    REQUIRE(meshBindingFor(moved.layer(fixture.part), fixture.drawing)->bone->keys.back().frame == 27);
+    REQUIRE(meshBindingFor(moved.layer(fixture.part), side)->curve->keys.back().frame == 31);
+    REQUIRE(evaluateMeshBinding(*meshBindingFor(moved.layer(fixture.part), side), 31).vertices ==
+            evaluateMeshBinding(*meshBindingFor(before.layer(fixture.part), side), 16).vertices);
+    moved.validate();
+    REQUIRE_THROWS(pasteRange(fixture.document, {fixture.part}, 20, clip,
+                              PasteContent::Keys, true, false));
+    auto rebound = before;
+    removeMeshDeformer(rebound, fixture.part, fixture.drawing);
+    bindBoneChain(rebound, fixture.part, fixture.drawing,
+                  {{{0, 6}, {8, 6}, {16, 6}}}, 3);
+    const auto reboundBefore = rebound;
+    REQUIRE_THROWS(pasteRange(rebound, {fixture.part}, 20, clip, PasteContent::Keys));
+    REQUIRE(rebound == reboundBefore);
+    auto collision = before;
+    recordBonePose(collision, fixture.part, fixture.drawing, 13, 0, 21);
+    REQUIRE_THROWS(retimeRange(collision, {fixture.part}, 10, 17, 1));
+    REQUIRE(fixture.document == before);
+    insertFrames(fixture.document, 10, 3);
+    const auto& inserted = fixture.document.layer(fixture.part);
+    REQUIRE(meshBindingFor(inserted, fixture.drawing)->bone->keys.back().frame == 15);
+    REQUIRE(meshBindingFor(inserted, side)->curve->keys.back().frame == 19);
+    removeFrames(fixture.document, 14, 2);
+    const auto& removed = fixture.document.layer(fixture.part);
+    REQUIRE(meshBindingFor(removed, fixture.drawing)->bone->keys.size() == 1);
+    REQUIRE(meshBindingFor(removed, side)->curve->keys.back().frame == 17);
+    fixture.document.validate();
+    Session session;
+    session.replace(fixture.document);
+    REQUIRE(session.apply("Clear deformation", [&](Document& document) {
+        clearRange(document, {fixture.part}, 16, 18, true);
+    }));
+    REQUIRE(meshBindingFor(session.document().layer(fixture.part), side)->curve->keys.size() == 1);
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == fixture.document);
+}

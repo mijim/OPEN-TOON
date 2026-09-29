@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "source": "Original GPL-3.0-or-later limb and trouser-waist artwork drawn by scripts/generate_harmony_continuous_limbs.py; the 19-part Harmony Moment fixture remains the registered intake reference.",
+  "registration": {"image_size": [512, 512], "origin_px": [256, 256], "alpha": "straight RGBA8", "color_profile": "sRGB"},
+  "joined_waist": {"center_px": [960, 665]},
+  "limbs": {
+    "arm_left": {"center_px": [850, 640], "joints_scene_px": [[860, 512], [850, 630], [830, 755]], "transition_px": 65},
+    "arm_right": {"center_px": [1070, 640], "joints_scene_px": [[1060, 512], [1070, 630], [1090, 755]], "transition_px": 65},
+    "leg_left": {"center_px": [905, 810], "joints_scene_px": [[920, 680], [905, 805], [900, 939]], "transition_px": 65},
+    "leg_right": {"center_px": [1015, 810], "joints_scene_px": [[1000, 680], [1015, 805], [1020, 939]], "transition_px": 65}
+  }
+}

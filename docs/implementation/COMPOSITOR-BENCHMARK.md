@@ -53,3 +53,17 @@ yielded a **39.19 ms/frame** median linear cost (38.55–39.79 ms) and a
 **1.86 ms/frame** legacy median (1.73–1.95 ms). No renderer optimization is
 inferred from this measurement. The native canvas smoke also confirms that a
 prefetched frame publishes and that timed playback and rapid scrubbing work.
+
+## Revised toon artwork, 2026-09-28 follow-up
+
+The original 19-part fixture was redrawn as a colored toon without changing its
+256 × 256 registered-part format. Three optimized `build/desktop` process runs
+of `--original-art` on the same M1 Pro host sampled animated frames 0, 120 and
+240. Direct legacy cost was 1.50, 2.06 and 1.78 ms/frame; linear-sRGB graph
+cost was 37.82, 37.94 and 38.60 ms/frame. This follow-up replaces the artwork
+profile, not the historical experimental.14 measurements or a full-shot budget.
+
+The later independently drawn hoodie revision was measured in three further
+optimized `build/desktop` process runs on the same host. Direct legacy cost
+was 1.62, 1.95 and 1.81 ms/frame; linear-sRGB graph cost was 37.40, 39.11
+and 38.19 ms/frame. This is a fixture change rather than a rendering speedup.

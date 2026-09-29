@@ -1,8 +1,10 @@
 #include "opentoon/deformation.h"
+#include "opentoon/deformer.h"
 #include "opentoon/drawing_selection.h"
 #include <algorithm>
 #include <cmath>
 #include <stdexcept>
+#include <utility>
 
 namespace opentoon {
 namespace {
@@ -51,7 +53,8 @@ bool posed(const MeshBinding& binding) {
                        [](const MeshVertex& vertex) { return vertex.pose != vertex.rest; });
 }
 void installGrid(Document& document, Layer& part, Id drawing, int columns, int rows,
-                 int sourceWidth, int sourceHeight, int left, int top, int right, int bottom) {
+                 int sourceWidth, int sourceHeight, int left, int top, int right, int bottom,
+                 const std::vector<std::pair<double, double>>* contour = nullptr) {
     require(columns >= 1 && columns <= 32 && rows >= 1 && rows <= 32,
             "Mesh grid needs between one and 32 cells per axis.");
     require(part.bindings.size() < 256 || meshBindingFor(part, drawing),
@@ -65,7 +68,9 @@ void installGrid(Document& document, Layer& part, Id drawing, int columns, int r
     next.vertices.reserve(std::size_t(columns + 1) * (rows + 1));
     for (int row = 0; row <= rows; ++row)
         for (int column = 0; column <= columns; ++column) {
-            const MeshPoint rest{left + (right - left) * double(column) / columns,
+            const double rowLeft = contour ? (*contour)[std::size_t(row)].first : left;
+            const double rowRight = contour ? (*contour)[std::size_t(row)].second : right;
+            const MeshPoint rest{rowLeft + (rowRight - rowLeft) * double(column) / columns,
                                  top + (bottom - top) * double(row) / rows};
             const MeshPoint uv{rest.x / sourceWidth, rest.y / sourceHeight};
             next.vertices.push_back({rest, rest, uv});
@@ -76,8 +81,8 @@ void installGrid(Document& document, Layer& part, Id drawing, int columns, int r
                                 return binding.drawing == drawing;
                             });
     if (old != part.bindings.end()) {
-        require(!posed(*old),
-                "Rebinding would discard an edited mesh pose; reset or remove it first.");
+        require(!posed(*old) && !old->bone && !old->curve,
+                "Rebinding would discard a mesh pose or deformer animation; reset/remove it first.");
         *old = std::move(next);
     } else
         part.bindings.push_back(std::move(next));
@@ -140,6 +145,7 @@ void validateMeshBinding(const Document& document, const Layer& part, const Mesh
     require(std::ceil(maxX) - std::floor(minX) <= 4096 &&
                 std::ceil(maxY) - std::floor(minY) <= 4096,
             "Mesh pose exceeds its 4096-pixel render proxy.");
+    validateMeshDeformer(document, binding);
 }
 
 void bindRegularImageMesh(Document& document, Id partId, Id drawing, int columns, int rows) {
@@ -161,6 +167,52 @@ void bindRegularImageMesh(Document& document, Id partId, Id drawing, int columns
     require(right > left && bottom > top, "Bind a substitution with visible image pixels.");
     installGrid(document, part, drawing, columns, rows, image.width, image.height,
                 left, top, right, bottom);
+}
+
+void bindContourImageMesh(Document& document, Id partId, Id drawing, int columns, int rows) {
+    auto& part = editablePart(document, partId);
+    const auto source = document.drawings.find(drawing);
+    require(source != document.drawings.end() && source->second.image.has_value() &&
+                source->second.strokes.empty() && !source->second.raster,
+            "Bind an image-only substitution.");
+    require(columns >= 1 && columns <= 32 && rows >= 1 && rows <= 32,
+            "Mesh grid needs between one and 32 cells per axis.");
+    const auto& image = *source->second.image;
+    std::vector<int> scanLeft(std::size_t(image.height), image.width);
+    std::vector<int> scanRight(std::size_t(image.height), 0);
+    int left = image.width, top = image.height, right = 0, bottom = 0;
+    for (int y = 0; y < image.height; ++y)
+        for (int x = 0; x < image.width; ++x)
+            if (image.rgba[(std::size_t(y) * image.width + x) * 4 + 3] != 0) {
+                scanLeft[std::size_t(y)] = std::min(scanLeft[std::size_t(y)], x);
+                scanRight[std::size_t(y)] = std::max(scanRight[std::size_t(y)], x + 1);
+                left = std::min(left, x);
+                top = std::min(top, y);
+                right = std::max(right, x + 1);
+                bottom = std::max(bottom, y + 1);
+            }
+    require(right > left && bottom > top, "Bind a substitution with visible image pixels.");
+    std::vector<std::pair<double, double>> contour;
+    contour.reserve(std::size_t(rows + 1));
+    const double cellHeight = double(bottom - top) / rows;
+    for (int row = 0; row <= rows; ++row) {
+        const double y = top + cellHeight * row;
+        const int first = std::max(0, int(std::floor(y - cellHeight)) - 1);
+        const int last = std::min(image.height - 1, int(std::ceil(y + cellHeight)) + 1);
+        int rowLeft = image.width, rowRight = 0;
+        for (int scan = first; scan <= last; ++scan) {
+            rowLeft = std::min(rowLeft, scanLeft[std::size_t(scan)]);
+            rowRight = std::max(rowRight, scanRight[std::size_t(scan)]);
+        }
+        if (rowRight <= rowLeft) {
+            rowLeft = left;
+            rowRight = right;
+        }
+        contour.emplace_back(std::max(0, rowLeft - 1),
+                             std::min(image.width, rowRight + 1));
+    }
+    installGrid(document, part, drawing, columns, rows, image.width, image.height,
+                left, top, right, bottom, &contour);
 }
 
 void bindRegularVectorMesh(Document& document, Id partId, Id drawing, int columns, int rows) {
@@ -188,6 +240,8 @@ void moveMeshRestVertex(Document& document, Id partId, Id drawing, std::size_t i
                         MeshPoint position) {
     auto& part = editablePart(document, partId);
     auto candidate = bindingFor(part, drawing);
+    require(!candidate.bone && !candidate.curve,
+            "Remove the deformer before editing mesh rest vertices.");
     require(index < candidate.vertices.size(), "Mesh vertex does not exist.");
     require(!posed(candidate), "Reset the mesh pose before editing its rest shape.");
     candidate.vertices[index].rest = position;
@@ -200,6 +254,8 @@ void moveMeshPoseVertex(Document& document, Id partId, Id drawing, std::size_t i
                         MeshPoint position) {
     auto& part = editablePart(document, partId);
     auto candidate = bindingFor(part, drawing);
+    require(!candidate.bone && !candidate.curve,
+            "Remove the deformer before editing static mesh pose vertices.");
     require(index < candidate.vertices.size(), "Mesh vertex does not exist.");
     candidate.vertices[index].pose = position;
     validateMeshBinding(document, part, candidate);
@@ -209,6 +265,8 @@ void moveMeshPoseVertex(Document& document, Id partId, Id drawing, std::size_t i
 void resetMeshPose(Document& document, Id partId, Id drawing) {
     auto& part = editablePart(document, partId);
     auto& binding = bindingFor(part, drawing);
+    require(!binding.bone && !binding.curve,
+            "Animated deformer keys need their own reset command.");
     for (auto& vertex : binding.vertices)
         vertex.pose = vertex.rest;
 }

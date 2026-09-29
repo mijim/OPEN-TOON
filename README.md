@@ -25,7 +25,9 @@ The [build instructions](docs/implementation/BUILD.md) cover running from source
 the [implementation status](docs/implementation/STATUS.md) lists current limitations.
 
 The [user guide](docs/implementation/USER-GUIDE.md) covers drawing, animation and
-project workflows. Developers preparing a macOS package can use the
+project workflows. An [editable continuous toon rig](examples/clockwork-continuous.otoon)
+is included for the current source build as an experimental character study.
+Developers preparing a macOS package can use the
 [packaging notes](docs/implementation/MACOS-PREVIEW.md).
 
 ## Features

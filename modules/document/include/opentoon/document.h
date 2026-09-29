@@ -113,12 +113,48 @@ struct MeshVertex {
     MeshPoint rest, pose, uv;
     auto operator<=>(const MeshVertex&) const = default;
 };
+struct BonePoseKey {
+    Frame frame = 0;
+    double shoulderAngle = 0, elbowAngle = 0;
+    Interpolation interpolation = Interpolation::Linear;
+    auto operator<=>(const BonePoseKey&) const = default;
+};
+struct BoneChain {
+    std::array<MeshPoint, 3> restJoints;
+    double elbowTransition = 1;
+    std::vector<double> distalWeights;
+    std::vector<BonePoseKey> keys;
+    auto operator<=>(const BoneChain&) const = default;
+};
+struct CurveCoordinate {
+    double t = 0;
+    auto operator<=>(const CurveCoordinate&) const = default;
+};
+struct CurvePoseKey {
+    Frame frame = 0;
+    std::array<MeshPoint, 4> controls;
+    Interpolation interpolation = Interpolation::Linear;
+    auto operator<=>(const CurvePoseKey&) const = default;
+};
+struct CurveDeformer {
+    std::array<MeshPoint, 4> restControls;
+    std::vector<CurveCoordinate> coordinates;
+    std::vector<CurvePoseKey> keys;
+    auto operator<=>(const CurveDeformer&) const = default;
+};
 struct MeshBinding {
     Id drawing = 0;
     int sourceWidth = 0, sourceHeight = 0;
     int columns = 0, rows = 0;
     std::vector<MeshVertex> vertices;
+    std::optional<BoneChain> bone;
+    std::optional<CurveDeformer> curve;
     auto operator<=>(const MeshBinding&) const = default;
+};
+struct BoneTipAnchor {
+    MeshPoint tip;
+    MeshPoint distalAxis;
+    auto operator<=>(const BoneTipAnchor&) const = default;
 };
 struct Layer {
     Id id = 0;
@@ -133,6 +169,7 @@ struct Layer {
     std::vector<Substitution> variants;
     std::vector<CharacterView> views;
     std::vector<MeshBinding> bindings;
+    std::optional<BoneTipAnchor> boneTipAnchor;
     auto operator<=>(const Layer&) const = default;
 };
 struct Marker {
@@ -141,7 +178,7 @@ struct Marker {
     auto operator<=>(const Marker&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 8;
+    static constexpr int formatVersion = 11;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;

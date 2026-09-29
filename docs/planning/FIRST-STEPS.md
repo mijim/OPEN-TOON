@@ -38,7 +38,7 @@ Producing the complete animated shot belongs to HM-15; it does not gate HM-01.
 
 | Recommended priority | Work | Hard join | Parallel work once its prerequisites pass |
 |---|---|---|---|
-| 9 / next | HM-06 bone/curve authoring, animation and variant binding | HM-05 accepted | HM-07 poses/declarative controls; HM-10 audio |
+| 9 / active | HM-06 bone/curve authoring, animation and variant binding; finish quality and interaction gates | HM-05 accepted | HM-07 poses/declarative controls; HM-10 audio |
 | 10 | HM-07 character poses, widgets, one-dimensional sliders and Animator/Rig views | HM-03 + HM-04 | HM-06; no scripting needed |
 | 11 | HM-08 Quick Rig FK recipe: assign roles, place guides, preview/correct/commit | HM-03 + HM-07 | HM-06 or HM-10 |
 | 12 | HM-09 attachments, limited two-bone IK, optional rig recipes and dependency-closed templates | HM-06 + HM-07 + HM-08 | HM-10/11 and HM-12/13 branches |
@@ -72,7 +72,7 @@ contract or a later full-phase exit criterion; do not redo existing work blindly
 
 ```yaml
 id: HM-06-A
-status: planned
+status: in_progress
 slice: HM-06
 phase: P09
 feature_ids: [DEF-001, DEF-003, DEF-008, DEF-010]
@@ -84,8 +84,8 @@ acceptance:
   - Bend and reset the fixture without changing the rest source.
   - Switch compatible drawings and preserve their binding references.
   - Preview, undo, reopen and export produce the same evaluated pose.
-evidence: []
-known_limits: [no_envelope_or_shape_aware_solver]
+evidence: [docs/implementation/HM06-PROGRESS.md]
+known_limits: [extreme_bend_and_interaction_budget_pending, no_envelope_or_shape_aware_solver]
 ```
 
 Pin new library versions only when the consumer spike justifies adoption. Run relevant

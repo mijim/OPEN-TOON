@@ -10,8 +10,8 @@ specification ownership for **193 node/family entries**. RIG-015 adds Quick Rig 
 the previous 282 requirements. No old feature was removed or declared complete.
 Implementation proceeds under these contracts; bounded HM-03 rigid character,
 HM-04 composition, HM-05 rest-binding/rendering and HM-13 output-camera
-contracts are accepted. HM-06 animated bone/curve deformation is next on the
-critical path.
+contracts are accepted. HM-06 animated bone/curve deformation is in progress
+with a tested subset; its quality and interaction budgets remain open.
 
 ## Start here — one execution route
 
@@ -94,6 +94,7 @@ characters, substitutions and coordinated view sets with
 and [HM-13](../implementation/HM13-ACCEPTANCE.md) are accepted bounded contracts;
 the [HM-05 rest mesh/render](../implementation/HM05-ACCEPTANCE.md) contract is
 also accepted;
+the [HM-06 bone/curve subset](../implementation/HM06-PROGRESS.md) is in progress;
 their owning full phases remain open. The second-animator working-shot review
 remains an HM-15 gate.
 

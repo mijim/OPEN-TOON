@@ -32,6 +32,8 @@ ApplicationWindow {
     }
     property bool showCurves: false
     property bool showTimingTools: false
+    property int meshBindColumns: 4
+    property int meshBindRows: 4
     property string inspectorMode: "none"
     property real bottomHeight: 280
     readonly property real maximumBottomHeight: Math.max(140, workspace.height - appHeader.height - canvasToolbar.height - bottomSplitter.height - bottomTabs.height - statusBar.height - (timingTools.visible ? timingTools.height : 0) - canvasWorkspace.Layout.minimumHeight - 2)
@@ -1077,7 +1079,8 @@ ApplicationWindow {
                                         return false;
                                     }
                                     const rootId = ancestor(selected.id);
-                                    return layers.filter(l => (l.kind === 1 || l.kind === 2) &&
+                                    return layers.filter(l => (l.kind === 1 || l.kind === 2 ||
+                                                               (selected.kind === 3 && l.kind === 3)) &&
                                                            l.id !== selected.id && ancestor(l.id) === rootId &&
                                                            !beneath(l, selected.id));
                                 }
@@ -1118,6 +1121,13 @@ ApplicationWindow {
                                             text: "Add parent peg"
                                             enabled: layerInspector.rigLayer?.kind === 2 || layerInspector.rigLayer?.kind === 3
                                             onTriggered: editor.addPeg()
+                                        }
+                                        MenuItem {
+                                            text: "Follow parent bone tip"
+                                            enabled: editor.selectedCanFollowBoneTip
+                                            checkable: true
+                                            checked: editor.selectedFollowsBoneTip
+                                            onTriggered: editor.toggleSelectedBoneTipAttachment()
                                         }
                                         MenuItem {
                                             text: "Center rest pivot on drawing"
@@ -1272,20 +1282,53 @@ ApplicationWindow {
                                 Label { text: "Drawing mesh · current substitution"; color: "#999999"; font.pixelSize: 10 }
                                 RowLayout {
                                     Layout.fillWidth: true
+                                    visible: !editor.selectedMeshBound
+                                    Label { text: "Grid"; color: "#aaaaaa"; font.pixelSize: 10 }
+                                    C.CompactSpinBox {
+                                        id: meshColumnsInput
+                                        Layout.preferredWidth: 62
+                                        from: 1; to: 32
+                                        value: root.meshBindColumns
+                                        editable: true
+                                        onValueModified: root.meshBindColumns = value
+                                        Accessible.name: "Mesh columns, one to 32"
+                                    }
+                                    Label { text: "×"; color: "#aaaaaa"; font.pixelSize: 10 }
+                                    C.CompactSpinBox {
+                                        id: meshRowsInput
+                                        Layout.preferredWidth: 62
+                                        from: 1; to: 32
+                                        value: root.meshBindRows
+                                        editable: true
+                                        onValueModified: root.meshBindRows = value
+                                        Accessible.name: "Mesh rows, one to 32"
+                                    }
+                                    Item { Layout.fillWidth: true }
                                     C.CompactButton {
-                                        text: "Bind 2×2"
-                                        enabled: editor.selectedSubstitution > 0 && !editor.selectedMeshBound
-                                        onClicked: { if (editor.bindSelectedMesh(2, 2)) { canvas.meshRestEditing = false; editor.tool = "Mesh"; } }
+                                        text: "Bind"
+                                        enabled: editor.selectedSubstitution > 0
+                                        onClicked: { if (editor.bindSelectedMesh(root.meshBindColumns, root.meshBindRows)) { canvas.meshRestEditing = false; editor.tool = "Mesh"; } }
                                     }
                                     C.CompactButton {
-                                        text: "Bind 4×4"
-                                        enabled: editor.selectedSubstitution > 0 && !editor.selectedMeshBound
-                                        onClicked: { if (editor.bindSelectedMesh(4, 4)) { canvas.meshRestEditing = false; editor.tool = "Mesh"; } }
+                                        text: "Contour"
+                                        visible: editor.substitutions.find(s => s.id === editor.selectedSubstitution)?.image === true
+                                        Accessible.name: "Bind contour mesh to image substitution"
+                                        ToolTip.text: "Fit the mesh rows to the image silhouette"
+                                        ToolTip.visible: hovered
+                                        onClicked: { if (editor.bindSelectedContourMesh(root.meshBindColumns, root.meshBindRows)) { canvas.meshRestEditing = false; editor.tool = "Mesh"; } }
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    visible: editor.selectedMeshBound
+                                    Label {
+                                        text: "Grid " + editor.selectedMeshColumns + " × " + editor.selectedMeshRows + " · max 32 per axis"
+                                        color: "#999999"
+                                        font.pixelSize: 10
                                     }
                                     Item { Layout.fillWidth: true }
                                     C.CompactButton {
                                         text: "Remove"
-                                        enabled: editor.selectedMeshBound
                                         onClicked: editor.removeSelectedMesh()
                                     }
                                 }
@@ -1294,15 +1337,104 @@ ApplicationWindow {
                                     visible: editor.selectedMeshBound
                                     C.CompactButton {
                                         text: "Pose vertices"
+                                        enabled: editor.selectedMeshDeformer === 0
                                         onClicked: { canvas.meshRestEditing = false; editor.tool = "Mesh"; }
                                     }
                                     C.CompactButton {
                                         text: "Rest vertices"
+                                        enabled: editor.selectedMeshDeformer === 0
                                         onClicked: { canvas.meshRestEditing = true; editor.tool = "Mesh"; }
                                     }
                                     C.CompactButton {
                                         text: "Reset pose"
+                                        enabled: editor.selectedMeshDeformer === 0
                                         onClicked: editor.resetSelectedMeshPose()
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    visible: editor.selectedMeshBound
+                                    C.CompactButton {
+                                        text: "Bone chain"
+                                        enabled: editor.selectedMeshDeformer === 0
+                                        onClicked: { if (editor.bindSelectedBone()) { canvas.meshRestEditing = false; editor.tool = "Mesh"; } }
+                                    }
+                                    C.CompactButton {
+                                        text: "Curve"
+                                        enabled: editor.selectedMeshDeformer === 0
+                                        onClicked: { if (editor.bindSelectedCurve()) { canvas.meshRestEditing = false; editor.tool = "Mesh"; } }
+                                    }
+                                    Item { Layout.fillWidth: true }
+                                    C.CompactButton {
+                                        text: "Remove control"
+                                        enabled: editor.selectedMeshDeformer > 0
+                                        onClicked: editor.removeSelectedDeformer()
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    visible: editor.selectedMeshDeformer > 0
+                                    C.CompactButton {
+                                        text: editor.selectedMeshDeformer === 1 ? "Pose joints" : "Pose curve"
+                                        onClicked: { canvas.meshRestEditing = false; editor.tool = "Mesh"; }
+                                    }
+                                    C.CompactButton {
+                                        text: editor.selectedMeshDeformer === 1 ? "Rest joints" : "Rest curve"
+                                        onClicked: { canvas.meshRestEditing = true; editor.tool = "Mesh"; }
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    visible: editor.selectedMeshDeformer === 1
+                                    Label { text: "Elbow influence (px)"; color: "#999999"; font.pixelSize: 10 }
+                                    Item { Layout.fillWidth: true }
+                                    C.CompactSpinBox {
+                                        Layout.preferredWidth: 72
+                                        from: 1
+                                        to: Math.max(1, Math.floor(editor.selectedBoneMaxTransition))
+                                        value: Math.round(editor.selectedBoneTransition)
+                                        editable: true
+                                        onValueModified: {
+                                            if (!editor.setSelectedBoneTransition(value))
+                                                value = Math.round(editor.selectedBoneTransition)
+                                        }
+                                        Accessible.name: "Elbow influence radius in pixels"
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    visible: editor.selectedMeshDeformer > 0
+                                    Label {
+                                        text: canvas.meshRestEditing
+                                              ? (editor.selectedMeshDeformer === 1
+                                                 ? "Drag joints or influence handle · Esc cancels"
+                                                 : "Drag rest controls on canvas · Esc cancels")
+                                              : "Drag pose controls on canvas · Esc cancels"
+                                        color: "#999999"
+                                        font.pixelSize: 10
+                                        Layout.fillWidth: true
+                                        wrapMode: Text.Wrap
+                                    }
+                                    C.CompactButton {
+                                        text: "Rest key"
+                                        onClicked: editor.resetSelectedDeformerPose()
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    visible: editor.selectedCanMatchPreviousDeformerPose
+                                    Label {
+                                        text: "Drawing change at this frame"
+                                        color: "#999999"
+                                        font.pixelSize: 10
+                                    }
+                                    Item { Layout.fillWidth: true }
+                                    C.CompactButton {
+                                        text: "Match previous pose"
+                                        Accessible.name: "Match previous drawing's deformer pose"
+                                        ToolTip.text: "Key the incoming drawing to the outgoing bone or curve pose"
+                                        ToolTip.visible: hovered
+                                        onClicked: editor.matchSelectedPreviousDeformerPose()
                                     }
                                 }
                             }

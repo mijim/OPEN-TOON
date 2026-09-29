@@ -2,9 +2,19 @@
 #include "opentoon/document.h"
 namespace opentoon {
 enum class PasteContent { Exposures, IndependentDrawings, Keys, All };
+struct DeformerClipboardKeys {
+    Id drawing = 0;
+    std::optional<BoneChain> boneBasis;
+    std::optional<CurveDeformer> curveBasis;
+    std::vector<BonePoseKey> bone;
+    std::vector<CurvePoseKey> curve;
+};
 struct ClipboardTrack {
+    Id sourceLayer = 0;
     std::vector<Exposure> exposures;
+    std::vector<Id> boundDrawings;
     std::vector<Keyframe> keys;
+    std::vector<DeformerClipboardKeys> deformerKeys;
 };
 struct ExposureClipboard {
     Frame duration = 0;

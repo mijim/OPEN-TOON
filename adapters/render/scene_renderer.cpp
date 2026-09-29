@@ -2,9 +2,11 @@
 #include "mesh_warp.h"
 #include "graph_renderer.h"
 #include "opentoon/deformation.h"
+#include "opentoon/deformer.h"
 #include "opentoon/drawing_selection.h"
 #include <QPainterPath>
 #include <cmath>
+#include <numbers>
 #include <stdexcept>
 #include <unordered_map>
 namespace opentoon {
@@ -19,6 +21,28 @@ QTransform localTransform(Transform t) {
     m.scale(t.scaleX, t.scaleY);
     m.translate(-t.pivotX, -t.pivotY);
     return m;
+}
+QTransform boneTipTransform(const Document& document, const Layer& source,
+                            const BoneTipAnchor& anchor, Frame frame) {
+    const auto* drawing = document.drawingAt(source.id, frame);
+    const auto* binding = drawing ? meshBindingFor(source, drawing->id) : nullptr;
+    if (!binding || !binding->bone)
+        throw std::runtime_error("Bone tip attachment has no active source bone.");
+    const auto& bone = *binding->bone;
+    const auto rest = anchor.tip;
+    const auto posed = sampleBoneJoints(bone, frame)[2];
+    const auto angles = sampleBoneAngles(bone, frame);
+    const auto& joints = bone.restJoints;
+    const double baselineDirection = std::atan2(anchor.distalAxis.y,
+                                                anchor.distalAxis.x);
+    const double activeDirection = std::atan2(joints[2].y - joints[1].y,
+                                              joints[2].x - joints[1].x);
+    const double radians = activeDirection - baselineDirection +
+                           (angles[0] + angles[1]) * std::numbers::pi / 180.0;
+    const double cosine = std::cos(radians), sine = std::sin(radians);
+    return QTransform(cosine, sine, -sine, cosine,
+                      posed.x - cosine * rest.x + sine * rest.y,
+                      posed.y - sine * rest.x - cosine * rest.y);
 }
 QImage rasterTile(const SharedBuffer<std::uint16_t>& tile) {
     struct Entry {
@@ -45,7 +69,12 @@ QImage rasterTile(const SharedBuffer<std::uint16_t>& tile) {
     return image;
 }
 void drawing(QPainter& painter, const Drawing& d, const std::vector<Swatch>& palette,
-             const MeshBinding* binding, const std::function<bool()>& cancelled) {
+             const MeshBinding* binding, Frame frame, const std::function<bool()>& cancelled) {
+    std::optional<MeshBinding> evaluated;
+    if (binding && (binding->bone || binding->curve)) {
+        evaluated = evaluateMeshBinding(*binding, frame);
+        binding = &*evaluated;
+    }
     if (binding && !d.image && !d.strokes.empty()) {
         QImage proxy(binding->sourceWidth, binding->sourceHeight, QImage::Format_RGBA8888);
         if (proxy.isNull())
@@ -93,11 +122,15 @@ void drawing(QPainter& painter, const Drawing& d, const std::vector<Swatch>& pal
 } // namespace
 QTransform SceneRenderer::worldTransform(const Document& d, const Layer& layer, Frame frame) {
     QTransform result = localTransform(evaluateTransform(layer, frame));
-    Id parent = layer.parent;
+    const Layer* child = &layer;
+    Id parent = child->parent;
     std::size_t depth = 0;
     while (parent && depth++ < d.layers.size()) {
         const auto& p = d.layer(parent);
+        if (child->boneTipAnchor)
+            result = result * boneTipTransform(d, p, *child->boneTipAnchor, frame);
         result = result * localTransform(evaluateTransform(p, frame));
+        child = &p;
         parent = p.parent;
     }
     return result;
@@ -132,6 +165,11 @@ QRect SceneRenderer::layerInkBounds(const Document& document, const Layer& layer
         hasInk = true;
     };
     const auto* binding = meshBindingFor(layer, source->id);
+    std::optional<MeshBinding> evaluated;
+    if (binding && (binding->bone || binding->curve)) {
+        evaluated = evaluateMeshBinding(*binding, frame);
+        binding = &*evaluated;
+    }
     if (binding) {
         double minX = binding->vertices.front().pose.x;
         double minY = binding->vertices.front().pose.y;
@@ -278,7 +316,7 @@ void SceneRenderer::paint(QPainter& painter, const Document& d, Frame frame, Ren
                     ++count;
                     painter.setOpacity(opacity * 0.15 / (count));
                     drawing(painter, *ghost, d.palette,
-                            meshBindingFor(l, ghost->id), options.cancelled);
+                            meshBindingFor(l, ghost->id), f, options.cancelled);
                 }
             }
             painter.setOpacity(opacity);
@@ -288,7 +326,7 @@ void SceneRenderer::paint(QPainter& painter, const Document& d, Frame frame, Ren
                                   : d.drawingAt(l.id, frame);
         if (current)
             drawing(painter, *current, d.palette,
-                    meshBindingFor(l, current->id), options.cancelled);
+                    meshBindingFor(l, current->id), frame, options.cancelled);
         painter.restore();
     }
     painter.restore();

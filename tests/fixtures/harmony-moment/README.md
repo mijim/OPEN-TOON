@@ -18,6 +18,23 @@ artist-approved dialogue recording is required to judge actual lip-sync quality.
 The 41 source PNGs are also checked in under `parts/` so import and render tests
 can use real encoded images without generating them at build time. The test verifies
 that each checked-in asset exactly matches the generator.
+The 2026-09-28 art revision replaces the earlier geometric placeholder with an
+original color toon character: a shaped face, asymmetric hair, expressive eyes,
+tailored jacket, cuffed sleeves, distinct hand silhouettes and shoes. The
+registered 256×256 canvases, 19 part roles, 41 variant names, timing and license
+remain stable. The owner's visual direction is still being refined; this art
+revision is a stronger deformation and substitution fixture, not a claim of
+final production character approval. After the owner supplied Toon Boom rig
+examples, the character was redrawn again with an original hoodie silhouette,
+simpler expressive face, continuous sleeve edges, tapered trousers and
+integrated hand shapes. Those third-party reference images were used only for
+visual direction and are not included in the fixture or copied into its
+artwork. Visual approval of this candidate remains open.
+The 2026-09-29 three-quarter contour revision removes an unintended point
+behind the visible ear. It changes only that head substitution and the three
+reference poses that expose it; the registered dimensions and drawing IDs are
+unchanged. The continuous-rig example and its frame-36 capture were regenerated
+from the corrected source.
 `--previews` renders five full-resolution reference poses for visual review; they
 are external acceptance targets, not frames from the OPEN-TOON evaluator.
 

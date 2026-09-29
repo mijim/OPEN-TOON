@@ -3136,6 +3136,7 @@
       "status": "planned",
       "disposition": "planned_delivery",
       "delivery_slices": [
+        "HM-06",
         "HM-09"
       ],
       "delivery_priority": "harmony_moment_subset",
@@ -4800,7 +4801,7 @@
       "owner_phase": "P09",
       "work_package": "P09-W1",
       "owner_module": "deformation/animation",
-      "status": "planned",
+      "status": "in_progress",
       "effort_engineer_weeks": [
         6,
         12
@@ -4811,6 +4812,7 @@
         "DEF-008",
         "DEF-009",
         "DEF-010",
+        "DEF-011",
         "DEF-015"
       ],
       "requires": [
@@ -4819,9 +4821,10 @@
           "contract": "Accepted rest mesh/UV/binding representation and measured deformation render path"
         }
       ],
-      "scope": "Deliver editable bone chains and curve chains with defined local/rest spaces, stable weights, predictable joint/tangent behavior and saved animated properties. Controls drag on canvas with cancellable previews; variant changes resolve their own binding.",
+      "scope": "Deliver editable bone chains and curve chains with defined local/rest spaces, stable weights, predictable joint/tangent behavior and saved animated properties. Controls drag on canvas with cancellable previews; variant changes resolve their own binding. A bounded Part child may follow its parent two-segment bone tip with one saved link; broader attachments, IK and templates remain HM-09.",
       "acceptance": [
         "Animate a bent arm and curved torso/tail with rest reset, key interpolation, undo and saved/rendered equivalence.",
+        "A linked hand or foot follows the active parent bone tip across frames and compatible substitutions without duplicate follower keys; undo and reopen preserve the link.",
         "Extreme bends, zero-length bones and invalid weights give bounded behavior without NaNs or corrupting rest data; proxy resolution limits are visible.",
         "Pass the bounded B4/HM shot quality and interaction budgets; unresolved seam/texture artifacts block the deformer claim."
       ],
@@ -5254,7 +5257,7 @@
   ],
   "execution_policy": {
     "primary_objective": "HM: reliable character animation Harmony Moment",
-    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06 bone/curve deformation is the next critical-path contract, using the accepted format-8 rest/UV representation and measured warp path. HM-07 controls, HM-10 audio and HM-12 nodes are also eligible; one implementer follows HM-06 first. P09 and all other owning full phases remain open.",
+    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06 bone/curve deformation is in progress with a format-11 animated backend, saved rest anchors and native controls and bounded bone-tip links; its quality and interaction budgets are still unaccepted. HM-07, HM-10 and HM-12 remain eligible independent branches. P09 and all other owning full phases remain open.",
     "phase_dependency_semantics": "Phase depends_on constrains full epic completion, not entry into an implementation slice. Only the explicit delivery-slice contract DAG gates the Harmony Moment. Domain dependencies are scope relationships, not all-features barriers.",
     "entry_rule": "Start a slice only when each required contract has accepted evidence. Baseline reuse is partial and must be qualified; planned is not ready. Independent spikes may run without claiming their consumer ready.",
     "wip_limit": 2,
@@ -5316,7 +5319,8 @@
       "All P00-P11 phase exit criteria",
       "Physical tablet, Intel, Linux/Windows or clean-machine qualification",
       "Measured superiority over Harmony before comparative artist study"
-    ]
+    ],
+    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06 bone/curve deformation is in progress with a format-11 animated backend, saved rest anchors and native controls and bounded bone-tip links; its quality and interaction budgets are still unaccepted. HM-07, HM-10 and HM-12 remain eligible independent branches. P09 and all other owning full phases remain open."
   },
   "estimate_revision": {
     "basis": "Whole-program phase envelopes retain prior scope and are not estimates of remaining HM work. HM slice estimates cover remaining bounded work once, including integration; never add them to phase totals.",

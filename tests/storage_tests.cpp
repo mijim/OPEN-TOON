@@ -2,7 +2,9 @@
 #include "serialization.h"
 #include "opentoon/rigging.h"
 #include "opentoon/deformation.h"
+#include "opentoon/deformer.h"
 #include <catch2/catch_test_macros.hpp>
+#include <algorithm>
 #include <chrono>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -61,9 +63,11 @@ TEST_CASE("Saving a stale revision cannot overwrite another writer") {
 }
 TEST_CASE("Unknown versions and excessive nesting do not enter the document model") {
     auto text = serializeDocument(makeDocument());
-    auto position = text.find("\"version\":8");
+    const auto currentVersion = "\"version\":" + std::to_string(Document::formatVersion);
+    auto position = text.find(currentVersion);
     REQUIRE(position != std::string::npos);
-    text.replace(position, 11, "\"version\":9");
+    text.replace(position, currentVersion.size(),
+                 "\"version\":" + std::to_string(Document::formatVersion + 1));
     REQUIRE_THROWS(deserializeDocument(text));
     REQUIRE_THROWS(deserializeDocument(std::string(40, '[') + "0" + std::string(40, ']')));
 }
@@ -128,7 +132,7 @@ TEST_CASE("Future database versions are rejected before saving and missing loads
     {
         std::fstream stream(p.file, std::ios::binary | std::ios::in | std::ios::out);
         stream.seekp(60);
-        const char futureVersion[] = {0, 0, 0, 9};
+        const char futureVersion[] = {0, 0, 0, char(Document::formatVersion + 1)};
         stream.write(futureVersion, 4);
     }
     auto size = std::filesystem::file_size(p.file);
@@ -277,7 +281,7 @@ TEST_CASE("Schema two upgrades preserve an original backup and protect Bezier me
     }
     {
         FixtureDatabase db(p.file);
-        REQUIRE(db.count("PRAGMA user_version") == 8);
+        REQUIRE(db.count("PRAGMA user_version") == Document::formatVersion);
     }
 }
 TEST_CASE("Format three scene migrates through typed characters with an original backup") {
@@ -323,7 +327,7 @@ TEST_CASE("Format three scene migrates through typed characters with an original
     REQUIRE(ProjectStore::load(p.file).document == upgraded);
     REQUIRE(ProjectStore::load(backup).document == legacy);
     FixtureDatabase current(p.file);
-    REQUIRE(current.count("PRAGMA user_version") == 8);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
 }
 TEST_CASE("Format four character scene migrates to view sets with a preserved backup") {
     TemporaryProject p;
@@ -360,7 +364,7 @@ TEST_CASE("Format four character scene migrates to view sets with a preserved ba
     REQUIRE(ProjectStore::load(p.file).document == upgraded);
     REQUIRE(ProjectStore::load(backup).document == legacy);
     FixtureDatabase current(p.file);
-    REQUIRE(current.count("PRAGMA user_version") == 8);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
 }
 TEST_CASE("Format five scenes default to legacy appearance and migrate with a backup") {
     TemporaryProject project;
@@ -390,7 +394,7 @@ TEST_CASE("Format five scenes default to legacy appearance and migrate with a ba
     REQUIRE(ProjectStore::save(project.file, next, "Linear composition", revision) > revision);
     REQUIRE(ProjectStore::load(project.file).document == next);
     FixtureDatabase current(project.file);
-    REQUIRE(current.count("PRAGMA user_version") == 8);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
 }
 TEST_CASE("Format six scene gains an output camera with a readable original backup") {
     TemporaryProject project;
@@ -420,7 +424,7 @@ TEST_CASE("Format six scene gains an output camera with a readable original back
     backup += ".pre-v6.bak";
     REQUIRE(ProjectStore::load(backup).document == original);
     FixtureDatabase current(project.file);
-    REQUIRE(current.count("PRAGMA user_version") == 8);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
 }
 
 TEST_CASE("Format seven mesh binding migration preserves the original project") {
@@ -456,5 +460,89 @@ TEST_CASE("Format seven mesh binding migration preserves the original project") 
     backup += ".pre-v7.bak";
     REQUIRE(ProjectStore::load(backup).document == original);
     FixtureDatabase current(project.file);
-    REQUIRE(current.count("PRAGMA user_version") == 8);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+}
+
+TEST_CASE("Format eight mesh scene migrates to animated controls with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    const Id part = original.layers.front().id;
+    makeCharacter(original, part, "Hero");
+    const Id drawing = createSubstitution(original, part, 0, false, "Arm");
+    original.drawings.at(drawing).image =
+        ImageAsset{16, 16, std::vector<std::uint8_t>(16 * 16 * 4, 255)};
+    bindRegularImageMesh(original, part, drawing, 4, 2);
+    const auto revision = ProjectStore::save(project.file, original);
+    auto oldJson = nlohmann::json::parse(serializeDocument(original));
+    oldJson["version"] = 8;
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(oldJson.dump());
+        db.execute("PRAGMA user_version=8");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto next = original;
+    bindBoneChain(next, part, drawing, {{{0, 8}, {8, 8}, {16, 8}}}, 3);
+    recordBonePose(next, part, drawing, 12, 0, 30);
+    REQUIRE(ProjectStore::save(project.file, next, "Bend arm", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == next);
+    auto backup = project.file;
+    backup += ".pre-v8.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+}
+
+TEST_CASE("Format nine scene migrates to bone tip links with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    const auto revision = ProjectStore::save(project.file, original);
+    auto oldJson = nlohmann::json::parse(serializeDocument(original));
+    oldJson["version"] = 9;
+    for (auto& layer : oldJson["layers"])
+        layer.erase("boneTipAnchor");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(oldJson.dump());
+        db.execute("PRAGMA user_version=9");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto next = original;
+    next.name = "Current rig";
+    REQUIRE(ProjectStore::save(project.file, next, "Upgrade rig", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == next);
+    auto backup = project.file;
+    backup += ".pre-v9.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+}
+
+TEST_CASE("Format ten linked rig migrates explicit rest anchors with a readable backup") {
+    TemporaryProject project;
+    std::filesystem::copy_file(std::filesystem::path(OPENTOON_SOURCE_DIR) /
+        "tests/fixtures/harmony-continuous-limbs/format10-linked.otoon", project.file);
+    {
+        FixtureDatabase legacy(project.file);
+        REQUIRE(legacy.count("PRAGMA user_version") == 10);
+    }
+    const auto original = ProjectStore::load(project.file);
+    REQUIRE(std::count_if(original.document.layers.begin(), original.document.layers.end(),
+        [](const Layer& layer) { return layer.boneTipAnchor.has_value(); }) == 4);
+    auto invalid = original.document;
+    auto linked = std::find_if(invalid.layers.begin(), invalid.layers.end(),
+        [](const Layer& layer) { return layer.boneTipAnchor.has_value(); });
+    REQUIRE(linked != invalid.layers.end());
+    linked->boneTipAnchor->distalAxis = {0, 0};
+    REQUIRE_THROWS_AS(invalid.validate(), std::invalid_argument);
+    auto changed = original.document;
+    changed.name = "Upgraded continuous rig";
+    REQUIRE(ProjectStore::save(project.file, changed, "Store stable anchors",
+                               original.revision) > original.revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v10.bak";
+    REQUIRE(ProjectStore::load(backup).document == original.document);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
 }

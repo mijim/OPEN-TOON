@@ -26,6 +26,7 @@
 #include <QStandardPaths>
 #include <QTabletEvent>
 #include <QTemporaryDir>
+#include <QThread>
 #include <QTimer>
 #include <cmath>
 #include <iostream>
@@ -41,9 +42,10 @@ int main(int argc, char** argv) {
         std::cout << OPENTOON_VERSION << '\n';
         return 0;
     }
-    if (args.contains("--smoke-test")) {
+    if (args.contains("--smoke-test") || args.contains("--hm06-benchmark")) {
         QStandardPaths::setTestModeEnabled(true);
-        QCoreApplication::setApplicationName("OPEN-TOON-smoke");
+        QCoreApplication::setApplicationName(args.contains("--smoke-test")
+                                                 ? "OPEN-TOON-smoke" : "OPEN-TOON-benchmark");
     }
     try {
         if (args.contains("--render-demo")) {
@@ -96,6 +98,27 @@ int main(int argc, char** argv) {
         engine.loadFromModule("OpenToon", "Main");
         if (args.contains("--demo"))
             editor.loadDemo();
+        if (args.contains("--hm06-benchmark")) {
+            const int index = args.indexOf("--hm06-benchmark");
+            if (index + 1 >= args.size())
+                throw std::runtime_error("Usage: open-toon --hm06-benchmark PROJECT");
+            const QString project = args[index + 1];
+            QTimer::singleShot(1200, &app, [&, project] {
+                try {
+                    if (engine.rootObjects().isEmpty())
+                        throw std::runtime_error("No QML window for HM-06 benchmark.");
+                    auto* window = qobject_cast<QQuickWindow*>(engine.rootObjects().first());
+                    auto* canvas = window->findChild<CanvasItem*>("drawingCanvas");
+                    if (!canvas || canvas->height() < 200)
+                        throw std::runtime_error("HM-06 benchmark canvas is not usable.");
+                    meshInteractionBenchmark(editor, *canvas, *window, project);
+                    app.exit(0);
+                } catch (const std::exception& error) {
+                    std::cerr << error.what() << '\n';
+                    app.exit(1);
+                }
+            });
+        }
         if (args.contains("--smoke-test")) {
             QTimer::singleShot(1200, &app, [&] {
                 try {
@@ -105,6 +128,16 @@ int main(int argc, char** argv) {
                     auto* canvas = window->findChild<CanvasItem*>("drawingCanvas");
                     if (!canvas || canvas->height() < 200)
                         throw std::runtime_error("Canvas layout is not usable.");
+                    window->raise();
+                    window->requestActivate();
+                    QElapsedTimer activationTimer;
+                    activationTimer.start();
+                    while (!window->isActive() && activationTimer.elapsed() < 3000) {
+                        QCoreApplication::processEvents();
+                        QThread::msleep(10);
+                    }
+                    if (!window->isActive())
+                        throw std::runtime_error("Native smoke window did not become active.");
                     editor.newScene();
                     auto start = canvas->mapToScene(QPointF(canvas->width() / 2 - 80, canvas->height() / 2));
                     auto send = [&](QEvent::Type type, QPointF point, Qt::MouseButton button,
@@ -474,8 +507,8 @@ int main(int argc, char** argv) {
                                                  "and undo.\n";
                                     std::cout << "Camera smoke passed: direct pan/rotate/zoom, atomic undo, "
                                                  "guides, viewport isolation and save/reopen.\n";
-                                    std::cout << "Mesh smoke passed: mouse pose/rest drag, preview, "
-                                                 "undo/redo, unsafe rebind, reset and save/reopen.\n";
+                                    std::cout << "Mesh smoke passed: vertex, bone and curve mouse drags, "
+                                                 "cancellable preview, range key paste/move, undo/redo and reopen.\n";
                                     QTimer::singleShot(150, &app, [&, window] {
                                         auto image = window->grabWindow();
                                         std::cout << "Visual animation smoke passed: thin picking, cursor "

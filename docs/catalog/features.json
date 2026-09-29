@@ -2722,7 +2722,7 @@
         "A limb bends while maintaining connections between segments."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "deformation",
@@ -2730,7 +2730,8 @@
         "RIG"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "Format-9 two-segment local bone chain, saved per-vertex distal weights and frame keys bend one substitution with connected joints and direct canvas handles. Joint seam and extreme-bend quality remain HM-06 gates.",
+      "implementation_evidence": "docs/implementation/HM06-PROGRESS.md; tests/deformer_tests.cpp; tests/mesh_render_tests.cpp; apps/desktop/mesh_smoke.cpp"
     },
     {
       "id": "DEF-002",
@@ -2760,7 +2761,7 @@
         "Moving a tangent produces a continuous transition."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "deformation",
@@ -2768,7 +2769,8 @@
         "RIG"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "Format-9 cubic control points animate a fixed rest-parameter displacement field. Direct tangent drag, interpolation, undo and reopen work; broad-shape quality and multiple segments remain open.",
+      "implementation_evidence": "docs/implementation/HM06-PROGRESS.md; tests/deformer_tests.cpp; tests/mesh_render_tests.cpp; apps/desktop/mesh_smoke.cpp"
     },
     {
       "id": "DEF-004",
@@ -2863,8 +2865,8 @@
         "RIG"
       ],
       "specification_status": "analysis_draft",
-      "notes": "Format-8 per-substitution rest and static pose preview are editable, resettable and undoable. Animated deformer state and reset-with-keys acceptance remain HM-06 work.",
-      "implementation_evidence": "docs/implementation/HM05-ACCEPTANCE.md; tests/mesh_render_tests.cpp; apps/desktop/mesh_smoke.cpp"
+      "notes": "Format-9 animated bone/curve state retains a separate rest mesh; Rest key returns the current frame to rest without deleting other keys. Full rest rebind and broad rig acceptance remain open.",
+      "implementation_evidence": "docs/implementation/HM05-ACCEPTANCE.md; docs/implementation/HM06-PROGRESS.md; apps/desktop/mesh_smoke.cpp"
     },
     {
       "id": "DEF-009",
@@ -2894,7 +2896,7 @@
         "Changing drawings activates the correct chain without orphaned references."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "advanced",
       "owner_module": "deformation",
@@ -2902,7 +2904,8 @@
         "RIG"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "A Part substitution owns its bone or curve binding independently. Switching and reopening restore the correct animated chain. At a drawing change, an explicit undoable command matches the incoming pose to the outgoing evaluated pose when control types and rest geometry agree; broader mapping across different rest shapes and complete rig workflows remain open.",
+      "implementation_evidence": "docs/implementation/HM06-PROGRESS.md; tests/deformer_tests.cpp; tests/mesh_render_tests.cpp; apps/desktop/mesh_smoke.cpp"
     },
     {
       "id": "DEF-011",
@@ -2913,7 +2916,7 @@
         "An accessory follows the end of a deformed arm."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "advanced",
       "owner_module": "deformation",
@@ -2921,7 +2924,8 @@
         "RIG"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "A child Part can follow its parent Part's two-segment bone tip through the active bound substitution. The link persists, undoes and reopens; broader deformer attachments and guided rig controls remain open.",
+      "implementation_evidence": "docs/implementation/HM06-PROGRESS.md; tests/mesh_render_tests.cpp; apps/desktop/mesh_smoke.cpp"
     },
     {
       "id": "DEF-012",

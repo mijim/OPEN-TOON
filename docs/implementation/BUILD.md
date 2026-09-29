@@ -49,6 +49,12 @@ build/locked/open-toon.app/Contents/MacOS/open-toon \
 
 `--smoke-test` creates a separate test application profile, sends mouse and synthetic tablet events through the native window, checks undo/redo and save/reopen, and writes `build/ui-smoke.png`. Run from the repository root with an available display. `--render-demo` writes a synthetic scene and 48 PNG frames; use a fresh output directory. It is a verification command, not a general render-farm interface.
 
+For the original 19-part HM-06 native input benchmark, generate the temporary
+project with the named render test and run `--hm06-benchmark PROJECT`. The
+exact commands, sample definition and measured Mac profile are in the
+[HM-06 interaction record](HM06-INTERACTION.md). This benchmark needs a
+foreground display and is not a headless renderer timing test.
+
 ## Packaging
 
 CMake contains Qt deployment rules. A local development bundle is not a signed/notarized release or evidence of clean-machine compatibility. Split Homebrew Qt formulae can require explicit library/import paths for `macdeployqt`; validate the resulting bundle independently. CI currently builds/tests source and does not publish installers.

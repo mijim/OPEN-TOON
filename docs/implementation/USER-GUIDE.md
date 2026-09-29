@@ -13,6 +13,11 @@ OPEN-TOON currently supports an offline vector and raster animation workflow. It
 
 The built-in bouncing-ball example provides 24 distinct drawings exposed on twos. It contains only project-generated geometry and may be reused under the repository license.
 
+For a character rig in the current source build, open the
+[continuous toon study](../../examples/clockwork-continuous.otoon) from
+**Scene → Open**. Its four complete limb meshes, linked hands and feet,
+face view change and hand substitution can be inspected across 48 frames.
+
 **View → Composition** selects **Legacy appearance** or **Linear sRGB**. The first
 keeps the established Qt scene appearance and is the default for old projects.
 Linear sRGB composites drawing layers in linear light and can look brighter at
@@ -44,7 +49,7 @@ The four art categories are Underlay, Color, Line and Overlay. Their drawing ord
 
 Click a swatch to select it. Double-click to edit its color; all strokes referencing that ID update. The document retains color IDs across save/reopen. Palette import, variants, gradients and managed color are pending.
 
-The inspector edits position, rotation, scale, opacity and pivot. Add transform keys with Linear, Hold or Smooth interpolation. If a layer already has keys, editing a transform inserts or updates a key at the current frame. Parent layers apply inherited transforms and opacity. Character parts and pegs preserve the visible image when reparented within one character, provided the result has no shear or singular transform and the moved layer and the branches whose parentage changes are not animated. Motion above their shared ancestor is preserved. Curves can be edited in the main workspace. IK and animated bone/curve deformation remain pending.
+The inspector edits position, rotation, scale, opacity and pivot. Add transform keys with Linear, Hold or Smooth interpolation. If a layer already has keys, editing a transform inserts or updates a key at the current frame. Parent layers apply inherited transforms and opacity. Character parts and pegs preserve the visible image when reparented within one character, provided the result has no shear or singular transform and the moved layer and the branches whose parentage changes are not animated. Motion above their shared ancestor is preserved. Curves can be edited in the main workspace. IK remains pending.
 
 **Scene → Add output camera** creates one orthographic camera. Choose the Camera
 tool to see the shot frame: drag inside it to pan, drag the round top handle to
@@ -64,23 +69,69 @@ Each Part shows its named substitutions as thumbnail tiles in Properties. **+ Bl
 
 **Apply range** places the selected view across the selected half-open timeline range while preserving the exposures before and after it. **Set this part** updates just the selected Part's choice in the selected view from the current frame. Arrow controls beside the view selector step through or reorder view sets. Navigation changes selection only; applying a view is the explicit document edit.
 
-## Static mesh binding preview
+## Mesh binding and animated controls
 
 Select a Part with an exposed image-only or vector-only drawing. In its
-Properties, choose **Bind 2×2** or **Bind 4×4**. The Mesh tool appears with
-handles over that Part. **Pose vertices** lets you drag a handle to preview
+Properties, choose a mesh grid from 1 to 32 columns and rows, then select
+**Bind**. A tall continuous sleeve or trouser leg can use 6 × 16. The Mesh
+tool appears with handles over that Part. **Pose vertices** lets you drag a handle to preview
 the warp; **Rest vertices** edits the saved bind shape after resetting any
 pose. **Reset pose** returns the handles to rest, and **Remove** returns the
 Part to its unbound artwork. Each completed drag is one undo step. Switching
-substitutions loads that drawing's own binding.
+substitutions loads that drawing's own binding. Properties shows the saved grid
+resolution of the selected substitution.
 
-The mesh pose is a saved static preview: it applies at every frame for that
-substitution. Animated bone/curve controls and influence weights belong to a
-later contract. Image grids start at visible alpha bounds; vector drawings
+The vertex pose is a saved static preview that applies at every frame. Reset
+it before choosing **Bone chain** or **Curve**. These bounded controls use the
+selected drawing's mesh: drag a bone joint or curve point on canvas at the
+current frame to record an animated pose. Escape cancels a drag. **Rest key**
+records the original shape at the playhead without deleting other keys;
+**Remove control** removes the deformer and leaves the rest mesh. One Part
+substitution can have one control type; another substitution may use its own.
+The mesh grid follows the rendered pose while a control moves. Static vertices
+cannot be edited while a control is attached.
+
+At the first frame of a substitution change, **Match previous pose** keys the
+incoming bone or curve to the outgoing drawing's evaluated pose at that frame.
+The button appears when both bindings use the same control type and identical
+rest joints or curve controls. The edit is undoable and preserves an existing
+key's interpolation. For a drawing with different rest geometry, place and
+animate its controls directly.
+
+Use **Rest joints** or **Rest curve** to place the saved control geometry on
+canvas. **Pose joints** or **Pose curve** returns to animation editing.
+**Elbow influence (px)** adjusts how far the bend blends into either segment;
+the existing keys and rest artwork stay in place. A value that folds the mesh
+is rejected. In **Rest joints**, the dashed circle and square handle at the
+elbow show the same radius. Drag the square to tune it on canvas; Escape
+cancels. To avoid a visible cut at the elbow or knee, use one continuous
+image and mesh for the whole limb. Hands and feet may remain separate for
+substitutions.
+
+To keep a hand or foot attached while its one-piece limb bends, select the
+hand/foot Part. In **Parent**, choose the bone-bound limb Part, then choose
+**Rig → Follow parent bone tip**. The link is saved and undoable; the child's
+drawing and substitutions remain independent. The source limb needs a bound
+two-segment bone on every exposed drawing and rest at frame zero. Attach before
+adding transform keys to the child. If a source substitution uses a different
+rest wrist or ankle, the child follows that variant's evaluated endpoint and
+direction, even when that variant is later selected at frame zero. The same
+Rig action detaches it; detach
+before reparenting. Curve attachments, IK and automatic limb setup remain open.
+
+Insert/remove frames and Clear include bone/curve keys. Copy/paste, move and
+stretch of a range within the same Part transfer its substitution keys.
+Cross-scene and different-Part deformer-key paste report that a portable rig
+copy is needed; the source range remains intact. Independent drawing paste
+also rejects a bound Part until its mesh can be cloned with the drawing.
+
+Image grids start at visible alpha bounds; vector drawings
 remain editable and use a scene-resolution raster proxy. Raster-tile and mixed
 media drawings cannot bind yet. Mesh proxies are limited to 4096 pixels per
 axis. If a binding no longer matches its source, the edit is rejected; remove
-the binding before deleting its substitution or detaching the Part.
+the binding before deleting its substitution or detaching the Part. The
+animated control profile is still being qualified for extreme bends and the
+complete character shot.
 
 ## Saving and recovery
 
@@ -88,7 +139,7 @@ Each manual save appends a complete revision. Scene history can restore a saved 
 
 Every 60 seconds, a modified document is saved to a recovery file. On a later launch, recovery can open that snapshot as an unsaved scene. Save it under a chosen name. Autosave runs from an immutable snapshot in a worker, so newer edits stay unsaved until the next save. Manual saves remain synchronous. Recovery from operating-system power loss and multiple simultaneous application instances has not been qualified.
 
-Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and total decoded media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening formats 1–7 remains supported. Format 3 added channel Bézier easing, format 4 added typed character layers and named substitutions, format 5 added character view sets, format 6 saves the composition profile, format 7 added the output camera, and format 8 saves mesh bindings. The first save of an older schema creates a backup named for its source version, such as `.pre-v7.bak`, before upgrading. Older editors require that backup to reopen the original format.
+Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and total decoded media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening formats 1–10 remains supported. Format 3 added channel Bézier easing, format 4 added typed character layers and named substitutions, format 5 added character view sets, format 6 saves the composition profile, format 7 added the output camera, format 8 saves mesh bindings, format 9 saves bone/curve controls and animation keys, format 10 introduced parent bone-tip links, and format 11 saves their rest tip and distal direction at attachment time. The first save of an older schema creates a backup named for its source version, such as `.pre-v9.bak`, before upgrading. Older editors require that backup to reopen the original format.
 
 **Scene → Compact project history** retains the chosen number of newest saved revisions and removes unreachable media, after creating a full `.pre-compact.bak` backup. Save pending edits first. This is an explicit operation and is not part of autosave.
 

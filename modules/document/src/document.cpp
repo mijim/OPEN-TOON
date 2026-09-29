@@ -262,6 +262,32 @@ void Document::validate() const {
         if (l.parent)
             require(layer(l.parent).kind != LayerKind::Camera,
                     "Artwork cannot be parented to the output camera.");
+        if (l.boneTipAnchor) {
+            require(l.kind == LayerKind::Part && l.parent &&
+                        layer(l.parent).kind == LayerKind::Part,
+                    "Bone tip attachment needs a parent Part.");
+            const auto& anchor = *l.boneTipAnchor;
+            require(bounded(anchor.tip.x, 1e6) && bounded(anchor.tip.y, 1e6) &&
+                        bounded(anchor.distalAxis.x, 1e6) &&
+                        bounded(anchor.distalAxis.y, 1e6) &&
+                        std::hypot(anchor.distalAxis.x, anchor.distalAxis.y) > 1e-6,
+                    "Bone tip attachment has an invalid rest anchor.");
+            const auto& source = layer(l.parent);
+            Frame covered = 0;
+            for (const auto& exposure : source.exposures) {
+                const auto* binding = meshBindingFor(source, exposure.drawing);
+                require(exposure.start == covered && binding && binding->bone,
+                        "Bone tip attachment needs a bound bone throughout the scene.");
+                const auto& bone = *binding->bone;
+                require(bone.keys.empty() || bone.keys.front().frame != 0 ||
+                            (bone.keys.front().shoulderAngle == 0 &&
+                             bone.keys.front().elbowAngle == 0),
+                        "Bone tip attachment needs rest at frame zero.");
+                covered = exposure.end;
+            }
+            require(covered == duration,
+                    "Bone tip attachment needs a bound bone throughout the scene.");
+        }
         std::set<Id> chain{l.id};
         Id parent = l.parent;
         while (parent) {
@@ -364,6 +390,16 @@ void insertFrames(Document& d, Frame at, Frame count) {
         for (auto& k : l.keys)
             if (k.frame >= at)
                 k.frame += count;
+        for (auto& binding : l.bindings) {
+            if (binding.bone)
+                for (auto& key : binding.bone->keys)
+                    if (key.frame >= at)
+                        key.frame += count;
+            if (binding.curve)
+                for (auto& key : binding.curve->keys)
+                    if (key.frame >= at)
+                        key.frame += count;
+        }
     }
     for (auto& m : d.markers)
         if (m.frame >= at)
@@ -386,6 +422,22 @@ void removeFrames(Document& d, Frame at, Frame count) {
         std::erase_if(l.keys, [=](auto k) { return k.frame >= at && k.frame < end; });
         for (auto& k : l.keys)
             k.frame = collapse(k.frame);
+        for (auto& binding : l.bindings) {
+            if (binding.bone) {
+                std::erase_if(binding.bone->keys, [=](const auto& key) {
+                    return key.frame >= at && key.frame < end;
+                });
+                for (auto& key : binding.bone->keys)
+                    key.frame = collapse(key.frame);
+            }
+            if (binding.curve) {
+                std::erase_if(binding.curve->keys, [=](const auto& key) {
+                    return key.frame >= at && key.frame < end;
+                });
+                for (auto& key : binding.curve->keys)
+                    key.frame = collapse(key.frame);
+            }
+        }
     }
     std::erase_if(d.markers, [=](const auto& m) { return m.frame >= at && m.frame < end; });
     for (auto& m : d.markers)

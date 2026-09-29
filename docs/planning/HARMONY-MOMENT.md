@@ -281,9 +281,9 @@ Prove the complete bind-to-render route before authoring tools: rest mesh/UVs, e
 
 ## HM-06
 
-**Bone and curve deformers** — `planned`; owner `deformation/animation`, work package `P09-W1`.
+**Bone and curve deformers** — `in_progress`; owner `deformation/animation`, work package `P09-W1`.
 
-Deliver editable bone chains and curve chains with defined local/rest spaces, stable weights, predictable joint/tangent behavior and saved animated properties. Controls drag on canvas with cancellable previews; variant changes resolve their own binding.
+Deliver editable bone chains and curve chains with defined local/rest spaces, stable weights, predictable joint/tangent behavior and saved animated properties. Controls drag on canvas with cancellable previews; variant changes resolve their own binding. A bounded Part child may follow its parent two-segment bone tip with one saved link; broader attachments, IK and templates remain HM-09.
 
 **Required delivered contracts:**
 
@@ -292,6 +292,7 @@ Deliver editable bone chains and curve chains with defined local/rest spaces, st
 **Acceptance:**
 
 - Animate a bent arm and curved torso/tail with rest reset, key interpolation, undo and saved/rendered equivalence.
+- A linked hand or foot follows the active parent bone tip across frames and compatible substitutions without duplicate follower keys; undo and reopen preserve the link.
 - Extreme bends, zero-length bones and invalid weights give bounded behavior without NaNs or corrupting rest data; proxy resolution limits are visible.
 - Pass the bounded B4/HM shot quality and interaction budgets; unresolved seam/texture artifacts block the deformer claim.
 
@@ -299,7 +300,7 @@ Deliver editable bone chains and curve chains with defined local/rest spaces, st
 
 - Envelope/automatic envelope, free-form, shape-aware and deformer-on-deformer remain long-term requirements.
 
-**Catalog subsets:** DEF-001, DEF-003, DEF-008, DEF-009, DEF-010, DEF-015.
+**Catalog subsets:** DEF-001, DEF-003, DEF-008, DEF-009, DEF-010, DEF-011, DEF-015.
 
 **Library boundaries:** LIB-EIGEN.
 
