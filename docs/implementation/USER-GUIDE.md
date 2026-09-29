@@ -28,7 +28,9 @@ view; editing or switching scenes refreshes them. Open the bottom **Nodes**
 tab to inspect the derived graph. Click an image or matte card to see its
 output at the current frame; matte alpha appears as grayscale. Clicking a
 source, matte or composite card also selects its owning Drawing or Part for
-the inspector. Type a layer
+the inspector. For an image node, **Show on canvas** temporarily routes its
+output to the main canvas; **Show final output** returns to the scene. This is
+view state: saving and exporting still use the final Write output. Type a layer
 name or node kind in **Find node** to highlight and scroll to a match; press
 Enter or **Next** for the following match. Search does not edit the project. The tab can
 change drawing order, opacity, opacity bypass, Normal/Multiply/Screen/Add blend mode, blend bypass and cutter settings. Drag a Drawing card onto another to place it immediately above that target in composite order. Hold Alt while dragging to use the first Drawing as the target's cutter. Alt-click an Opacity, Apply matte or non-Normal blend card to toggle its saved bypass. The target card highlights during a drag. Invalid or locked references reject the edit. Select a Drawing or Part,

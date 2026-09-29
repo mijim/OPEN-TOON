@@ -3589,8 +3589,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "Display and Write exist in the derived graph. User-configurable alternate outputs remain open.",
-      "implementation_evidence": "docs/implementation/HM04-ACCEPTANCE.md; explicit internal Display and Write outputs with matched evaluated pixels"
+      "notes": "Display and Write exist in the derived graph. A selected image node can temporarily feed the canvas Display without changing Write, saved state or export. Multiple Write outputs and arbitrary wiring remain open.",
+      "implementation_evidence": "docs/implementation/HM04-ACCEPTANCE.md; docs/implementation/HM12-PROGRESS.md; docs/architecture/adr/057-alternate-display-node.md; native canvas pixel, unchanged Write/revision and stale-node invalidation evidence"
     },
     {
       "id": "NOD-009",

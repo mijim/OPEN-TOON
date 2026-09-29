@@ -25,6 +25,7 @@ class CanvasItem : public QQuickPaintedItem {
     Q_PROPERTY(double zoom READ zoom WRITE setZoom NOTIFY viewChanged)
     Q_PROPERTY(bool mirrored READ mirrored WRITE setMirrored NOTIFY viewChanged)
     Q_PROPERTY(double rotationAngle READ rotationAngle WRITE setRotationAngle NOTIFY viewChanged)
+    Q_PROPERTY(int displayNodeId READ displayNodeId NOTIFY viewChanged)
   public:
     QVariantMap objectProperties() const;
     Q_INVOKABLE void setObjectProperty(QString, double);
@@ -64,6 +65,9 @@ class CanvasItem : public QQuickPaintedItem {
     void setMirrored(bool);
     double rotationAngle() const { return angle_; }
     void setRotationAngle(double);
+    int displayNodeId() const { return displayNodeId_; }
+    Q_INVOKABLE bool showCompositionNode(int id, int kind, int layer);
+    Q_INVOKABLE void showFinalComposition();
     void paint(QPainter*) override;
     Q_INVOKABLE void fit();
     Q_INVOKABLE void smoothSelection();
@@ -182,6 +186,11 @@ class CanvasItem : public QQuickPaintedItem {
     QPointer<QQuickWindow> filteredWindow_;
     double zoom_ = 1, angle_ = 0;
     bool mirrored_ = false, drawing_ = false, panning_ = false, tablet_ = false;
+    int displayNodeId_ = 0;
+    int displayNodeKind_ = 0;
+    opentoon::Id displayNodeLayer_ = 0;
+    std::uint64_t displayNodeScene_ = 0;
+    bool displayNodeValid(const opentoon::Document&) const;
     QPointF pan_, panStart_, last_, selectionDelta_;
     opentoon::Id selectedStroke_ = 0;
     int selectedPoint_ = -1;

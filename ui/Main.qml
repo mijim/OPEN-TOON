@@ -2629,6 +2629,7 @@ ApplicationWindow {
             objectName: "compositionNodesPanel"
             visible: root.showNodes
             controller: editor
+            displayedNodeId: canvas.displayNodeId
             Layout.fillWidth: true
             Layout.preferredHeight: root.effectiveBottomHeight
             Layout.minimumHeight: root.effectiveBottomHeight
@@ -2638,6 +2639,9 @@ ApplicationWindow {
                 root.inspectorMode = "layer";
                 editor.selectedLayer = layer;
             }
+            onDisplayRequested: (nodeId, kindCode, layer) =>
+                canvas.showCompositionNode(nodeId, kindCode, layer)
+            onFinalDisplayRequested: canvas.showFinalComposition()
         }
         RowLayout {
             Layout.fillWidth: true

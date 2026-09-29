@@ -5,7 +5,10 @@ import QtQuick.Layouts
 Item {
     id: root
     required property var controller
+    required property int displayedNodeId
     signal layerChosen(int layer)
+    signal displayRequested(int nodeId, int kindCode, int layer)
+    signal finalDisplayRequested()
     readonly property var selected: controller.layers.find(l => l.id === controller.selectedLayer)
     property int previewNodeId: 0
     property string previewNodeKind: ""
@@ -399,6 +402,22 @@ Item {
                     text: "Matte preview shows alpha as grayscale"
                     color: "#777777"
                     font.pixelSize: 10
+                }
+                ToolButton {
+                    objectName: "nodeDisplayButton"
+                    Layout.fillWidth: true
+                    visible: root.previewNodeId > 0 &&
+                             root.previewNodeKind !== "Cutter" &&
+                             root.previewNodeKind !== "Invert matte" &&
+                             root.previewNodeKind !== "Transform"
+                    text: root.displayedNodeId === root.previewNodeId
+                          ? "Show final output" : "Show on canvas"
+                    onClicked: root.displayedNodeId === root.previewNodeId
+                               ? root.finalDisplayRequested()
+                               : root.displayRequested(root.previewNodeId,
+                                     root.controller.compositionNodes.find(n => n.id === root.previewNodeId)?.kindCode || 0,
+                                     root.previewLayerId)
+                    Accessible.name: text
                 }
             }
         }

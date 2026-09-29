@@ -1,5 +1,15 @@
 # Experimental releases
 
+## 0.2.0-experimental.48 — working source, alternate Display node
+
+- Show a selected image node's output on the main canvas, then return to final
+  output. The chosen Display source is view state; Write, saving and export
+  keep the final composition. Reordering that changes node identity clears
+  the alternate view.
+- Native Qt Quick smoke checks red/blue canvas pixels, unchanged Write pixels
+  and document revision, reset and stale-node invalidation. The locked macOS
+  suite passes 186/186 CTest entries. Source only; no new public binary or tag.
+
 ## 0.2.0-experimental.47 — working source, direct node bypass
 
 - Alt-click an Opacity, Apply matte or non-Normal blend card to toggle its

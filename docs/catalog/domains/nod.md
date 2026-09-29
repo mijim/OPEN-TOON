@@ -114,9 +114,9 @@ Separate preview output from exportable final outputs.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — explicit internal Display and Write outputs with matched evaluated pixels.
+**Implementation evidence:** [docs/implementation/HM04-ACCEPTANCE.md](../../../docs/implementation/HM04-ACCEPTANCE.md) — docs/implementation/HM12-PROGRESS.md; docs/architecture/adr/057-alternate-display-node.md; native canvas pixel, unchanged Write/revision and stale-node invalidation evidence.
 
-**Remaining scope:** Display and Write exist in the derived graph. User-configurable alternate outputs remain open.
+**Remaining scope:** Display and Write exist in the derived graph. A selected image node can temporarily feed the canvas Display without changing Write, saved state or export. Multiple Write outputs and arbitrary wiring remain open.
 
 ## NOD-009 — Bypass and cache
 

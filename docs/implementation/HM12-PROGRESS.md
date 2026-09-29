@@ -65,6 +65,11 @@ continue to reject the edit; the card label changes with graph evaluation.
 The Nodes search field locates cards by layer name or node kind without
 editing the document. It highlights matches, scrolls to the current result
 and cycles through them with Enter or Next; arbitrary graph edits remain open.
+An image node's preview can now be shown on the main canvas as an alternate
+Display source. **Show final output** restores the ordinary scene. The
+selection is view state, clears when its node identity changes, and never
+alters the saved graph or Write/export terminal. See
+[ADR-057](../architecture/adr/057-alternate-display-node.md).
 Cutter source, Invert matte, Apply matte and composite cards now carry their
 owning Drawing or Part. Clicking one selects that exact source or target in
 the inspector while preserving its image/matte preview. The metadata is
@@ -161,6 +166,9 @@ preview. This is diagnostic navigation, not a persisted graph edit.
   checks the target binding and output color, then undoes, redoes and reopens.
 - Native Qt Quick smoke Alt-clicks Apply matte to bypass, undoes, redoes and
   Alt-clicks the resulting Bypassed cutter card to re-enable the same binding.
+- Native Qt Quick smoke routes an isolated blue Drawing to the canvas while
+  final Write stays the fractional red target, checks pixels and document
+  revision, restores the final view and rejects a stale node after reorder.
 - Graph tests check derived cutter, matte and composite owner IDs and reject
   dangling owners. Native Qt Quick smoke clicks the Cutter, Apply matte and
   Composite cards and checks that the intended layer becomes selected.

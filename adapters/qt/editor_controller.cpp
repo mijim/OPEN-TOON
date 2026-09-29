@@ -207,7 +207,7 @@ QVariantList EditorController::compositionNodes() const {
         const QString name = node->layer
                                  ? QString::fromStdString(document().layer(node->layer).name)
                                  : kind;
-        result.push_back(QVariantMap{{"id", int(id)}, {"kind", kind}, {"name", name},
+        result.push_back(QVariantMap{{"id", int(id)}, {"kind", kind}, {"kindCode", int(node->kind)}, {"name", name},
                                      {"layer", int(node->layer)}, {"inputs", inputs}});
     }
     return result;

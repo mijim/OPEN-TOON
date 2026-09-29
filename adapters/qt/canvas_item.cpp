@@ -12,6 +12,7 @@
 #include <QQuickWindow>
 #include <QScopedValueRollback>
 #include <QTabletEvent>
+#include <algorithm>
 #include <cmath>
 #include <stdexcept>
 using namespace opentoon;
@@ -39,12 +40,15 @@ void CanvasItem::setEditor(EditorController* editor) {
     if (editor_)
         disconnect(editor_, nullptr, this, nullptr);
     editor_ = editor;
+    showFinalComposition();
     previewQueue_.cancel();
     previewCache_.clear();
     previousTool_ = editor ? editor->tool() : QString{};
     if (editor) {
         connect(editor, &EditorController::changed, this, [this] {
             previewQueue_.cancel();
+            if (displayNodeId_ && !displayNodeValid(editor_->document()))
+                showFinalComposition();
             if (committing_)
                 return;
             cancelGesture();
@@ -102,6 +106,49 @@ void CanvasItem::setEditor(EditorController* editor) {
         });
     }
     emit editorChanged();
+    update();
+}
+bool CanvasItem::displayNodeValid(const Document& document) const {
+    if (!editor_ || !displayNodeId_ || displayNodeScene_ != editor_->sceneGeneration())
+        return false;
+    const auto graph = CompositionGraph::orderedLayers(document);
+    const auto found = std::find_if(graph.nodes.begin(), graph.nodes.end(), [this](const auto& node) {
+        return int(node.id) == displayNodeId_;
+    });
+    return found != graph.nodes.end() && int(found->kind) == displayNodeKind_ &&
+           found->layer == displayNodeLayer_;
+}
+bool CanvasItem::showCompositionNode(int id, int kind, int layer) {
+    if (!editor_ || id <= 0 || layer < 0 || kind < 0 ||
+        kind > int(GraphNodeKind::WriteOutput))
+        return false;
+    const auto nodeKind = GraphNodeKind(kind);
+    if (nodeKind == GraphNodeKind::LayerTransform ||
+        nodeKind == GraphNodeKind::MatteFromImage ||
+        nodeKind == GraphNodeKind::InvertMatte)
+        return false;
+    const auto graph = CompositionGraph::orderedLayers(editor_->document());
+    const auto found = std::find_if(graph.nodes.begin(), graph.nodes.end(), [id](const auto& node) {
+        return int(node.id) == id;
+    });
+    if (found == graph.nodes.end() || found->kind != nodeKind || found->layer != Id(layer))
+        return false;
+    displayNodeId_ = id;
+    displayNodeKind_ = kind;
+    displayNodeLayer_ = Id(layer);
+    displayNodeScene_ = editor_->sceneGeneration();
+    emit viewChanged();
+    update();
+    return true;
+}
+void CanvasItem::showFinalComposition() {
+    if (!displayNodeId_)
+        return;
+    displayNodeId_ = 0;
+    displayNodeKind_ = 0;
+    displayNodeLayer_ = 0;
+    displayNodeScene_ = 0;
+    emit viewChanged();
     update();
 }
 void CanvasItem::schedulePreview(const RenderCacheKey& current) {
@@ -217,7 +264,14 @@ void CanvasItem::paint(QPainter* p) {
                               ? &pointDrawingPreview_
                               : (transforming_ && previewValid_ && !posePreview_ ? &transformPreview_ : nullptr)};
     options.ignoreCamera = editor_->tool() == "Camera";
-    if (displayDocument.composition == CompositionProfile::LinearSrgb && !posePreview_ &&
+    if (displayNodeId_ && !posePreview_ && !options.previewDrawing &&
+        displayNodeValid(displayDocument)) {
+        const auto graph = CompositionGraph::orderedLayers(displayDocument);
+        auto image = GraphRenderer::renderNode(graph, displayDocument, editor_->frame(),
+                                               GraphNodeId(displayNodeId_),
+                                               {displayDocument.width, displayDocument.height}, options);
+        p->drawImage(QPointF(0, 0), image);
+    } else if (displayDocument.composition == CompositionProfile::LinearSrgb && !posePreview_ &&
         !options.previewDrawing) {
         RenderCacheKey key{editor_->sceneGeneration(), editor_->documentRevision(), editor_->frame(),
                            displayDocument.width, displayDocument.height, displayDocument.composition,

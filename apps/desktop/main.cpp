@@ -1,5 +1,6 @@
 #include "authoring_smoke.h"
 #include "opentoon/audio.h"
+#include "opentoon/composition_graph.h"
 #include "camera_smoke.h"
 #include "canvas_item.h"
 #include "editor_controller.h"
@@ -248,6 +249,66 @@ int main(int argc, char** argv) {
                     if (previewImage.isNull() || qBlue(previewImage.pixel(previewImage.width() / 2,
                                                                            previewImage.height() / 2)) == 0)
                         throw std::runtime_error("Drawing node preview has the wrong pixels.");
+                    auto* canvasView = window->findChild<QQuickItem*>("drawingCanvas");
+                    auto* displayButton = window->findChild<QQuickItem*>("nodeDisplayButton");
+                    if (!canvasView || !displayButton || !displayButton->isVisible())
+                        throw std::runtime_error("Alternate Display control is unavailable.");
+                    const auto canvasCenter = canvasView->mapToScene(
+                        QPointF(canvasView->width() / 2, canvasView->height() / 2)).toPoint();
+                    const auto canvasPixel = [&] {
+                        const auto grab = window->grabWindow();
+                        return grab.pixelColor(QPoint(int(canvasCenter.x() * grab.devicePixelRatio()),
+                                                      int(canvasCenter.y() * grab.devicePixelRatio())));
+                    };
+                    const auto finalPixel = canvasPixel();
+                    const auto displayPoint = displayButton->mapToScene(QPointF(
+                        displayButton->width() / 2, displayButton->height() / 2));
+                    auto clickDisplay = [&] {
+                        QMouseEvent press(QEvent::MouseButtonPress, displayPoint,
+                            window->mapToGlobal(displayPoint.toPoint()),
+                            Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                        QMouseEvent release(QEvent::MouseButtonRelease, displayPoint,
+                            window->mapToGlobal(displayPoint.toPoint()),
+                            Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+                        QCoreApplication::sendEvent(window, &press);
+                        QCoreApplication::sendEvent(window, &release);
+                        QCoreApplication::processEvents();
+                    };
+                    const auto beforeDisplayRevision = editor.documentRevision();
+                    clickDisplay();
+                    const auto isolatedPixel = canvasPixel();
+                    if (canvasView->property("displayNodeId").toInt() != 3 ||
+                        editor.documentRevision() != beforeDisplayRevision ||
+                        isolatedPixel.blue() <= isolatedPixel.red() ||
+                        finalPixel.red() <= finalPixel.blue() ||
+                        qAlpha(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 32)
+                        throw std::runtime_error("Alternate Display did not isolate the source without changing Write: id=" +
+                            std::to_string(canvasView->property("displayNodeId").toInt()) +
+                            " before=" + std::to_string(finalPixel.red()) + "," + std::to_string(finalPixel.blue()) +
+                            " after=" + std::to_string(isolatedPixel.red()) + "," + std::to_string(isolatedPixel.blue()) +
+                            " revision=" + std::to_string(editor.documentRevision()) +
+                            " oldRevision=" + std::to_string(beforeDisplayRevision));
+                    clickDisplay();
+                    const auto restoredPixel = canvasPixel();
+                    if (canvasView->property("displayNodeId").toInt() != 0 ||
+                        restoredPixel.red() <= restoredPixel.blue())
+                        throw std::runtime_error("Show final output did not restore the canvas.");
+                    auto* drawingCanvas = qobject_cast<CanvasItem*>(canvasView);
+                    if (!drawingCanvas ||
+                        drawingCanvas->showCompositionNode(4, int(opentoon::GraphNodeKind::MatteFromImage),
+                                                           int(source.id)) ||
+                        drawingCanvas->showCompositionNode(99999, int(opentoon::GraphNodeKind::LayerImage),
+                                                           int(source.id)) ||
+                        drawingCanvas->displayNodeId() != 0)
+                        throw std::runtime_error("Invalid Display source was accepted.");
+                    clickDisplay();
+                    if (canvasView->property("displayNodeId").toInt() != 3 ||
+                        !editor.moveDrawingAfter(int(document.layers.front().id), int(source.id)) ||
+                        canvasView->property("displayNodeId").toInt() != 0)
+                        throw std::runtime_error("Alternate Display retained a stale node after reordering.");
+                    editor.undo();
+                    QCoreApplication::processEvents();
+                    clickNode(3);
                     (void)window->grabWindow();
                     auto* displayedPreview = window->findChild<QQuickItem*>("compositionNodePreviewImage");
                     QElapsedTimer previewWait;
@@ -698,7 +759,7 @@ int main(int argc, char** argv) {
                     if (nodes->property("matchIndex").toInt() != 1)
                         throw std::runtime_error("Next did not navigate to the second Drawing match.");
                     std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass, fractional cutter, "
-                                 "painted-source Multiply/Add, blend bypass, drawing drag order, Alt-drag cutter, Alt-click bypass, typed search, save/reopen and undo.\n";
+                                 "painted-source Multiply/Add, blend bypass, alternate Display/Write, drawing drag order, Alt-drag cutter, Alt-click bypass, typed search, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';
