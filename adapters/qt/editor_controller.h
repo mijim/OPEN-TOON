@@ -321,6 +321,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE bool importAudio(QUrl url);
     Q_INVOKABLE bool moveAudioClip(int clipId, int start);
     Q_INVOKABLE bool duplicateAudioClip(int clipId, int start);
+    Q_INVOKABLE bool splitAudioClip(int clipId, int frame);
     Q_INVOKABLE bool trimAudioClip(int clipId, int inSample, int outSample);
     Q_INVOKABLE bool setAudioClipGain(int clipId, double gain);
     Q_INVOKABLE bool setAudioClipRepeats(int clipId, int repeats);

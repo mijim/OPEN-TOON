@@ -1,5 +1,17 @@
 # Experimental releases
 
+## 0.2.0-experimental.37 — working source, exact 48 kHz clip split
+
+- Split a single-pass 48 kHz clip at an interior scene frame. The two clips
+  share the original WAV and preserve the exact canonical 48 kHz PCM mix,
+  gain, mute and outer fades with one undo step.
+- Domain tests compare complete PCM at 24 and 24000/1001 fps, reject
+  unsupported cuts, and reopen the saved project. Native Qt Quick smoke
+  clicks the button and verifies its PCM result and undo. The 179-entry
+  macOS CTest suite passes.
+- Source only; no new public binary or tag. Other source rates and playback
+  resampling continuity at the cut remain unqualified.
+
 ## 0.2.0-experimental.36 — working source, layer blend modes
 
 - Add saved Normal, Multiply and Screen blending for Drawing and Part layers

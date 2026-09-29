@@ -1887,6 +1887,11 @@ bool EditorController::duplicateAudioClip(int clipId, int start) {
         (void)opentoon::duplicateAudioClip(d, Id(clipId), start);
     });
 }
+bool EditorController::splitAudioClip(int clipId, int frame) {
+    return edit("Split audio clip", [&](Document& d) {
+        (void)opentoon::splitAudioClipAtFrame(d, Id(clipId), frame);
+    });
+}
 bool EditorController::trimAudioClip(int clipId, int inSample, int outSample) {
     if (inSample < 0 || outSample < 0)
         return false;

@@ -17,6 +17,7 @@ struct PcmWavInfo {
                                 std::vector<std::uint8_t> bytes, Frame start);
 void moveAudioClip(Document& document, Id clip, Frame start);
 [[nodiscard]] Id duplicateAudioClip(Document& document, Id clip, Frame start);
+[[nodiscard]] Id splitAudioClipAtFrame(Document& document, Id clip, Frame frame);
 void trimAudioClip(Document& document, Id clip, std::uint64_t inSample,
                    std::uint64_t outSample);
 void setAudioClipGain(Document& document, Id clip, double gain);

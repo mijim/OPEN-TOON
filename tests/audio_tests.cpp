@@ -102,6 +102,68 @@ TEST_CASE("Audio clip duplication reuses its source and restores exact cues afte
     REQUIRE(ProjectStore::load(path).document == duplicated);
     std::filesystem::remove_all(directory);
 }
+TEST_CASE("Frame-aligned clip split preserves the exact 48 kHz mix and original WAV") {
+    for (const auto rate : {FrameRate{24, 1}, FrameRate{24000, 1001}}) {
+        Session session;
+        Id first = 0, second = 0;
+        const auto bytes = toneWav(48000, 48000, 440);
+        REQUIRE(session.apply("Place source", [&](Document& d) {
+            d.rate = rate;
+            first = importPcm16Wav(d, "continuous tone", bytes, 0);
+            setAudioClipGain(d, first, .7);
+            setAudioClipFades(d, first, 1000, 1000);
+        }));
+        const auto before = session.document();
+        const AudioMixPlan beforeMix(before, 48000);
+        const auto beginning = beforeMix.renderBlock(0, 48000);
+        const auto ending = beforeMix.renderBlock(48000,
+            std::size_t(beforeMix.sceneSamples() - 48000));
+        REQUIRE(session.apply("Split at frame 12", [&](Document& d) {
+            second = splitAudioClipAtFrame(d, first, 12);
+        }));
+        const auto divided = session.document();
+        REQUIRE(divided.audioAssets.size() == 1);
+        REQUIRE(divided.audioAssets.front().wav.values() == bytes);
+        REQUIRE(divided.audioClips.size() == 2);
+        REQUIRE(divided.audioClips.back().id == second);
+        REQUIRE(divided.audioClips.back().asset == divided.audioClips.front().asset);
+        REQUIRE(divided.audioClips.back().start == 12);
+        REQUIRE(divided.audioClips.front().outSample == divided.audioClips.back().inSample);
+        REQUIRE(divided.audioClips.front().fadeInSamples == 1000);
+        REQUIRE(divided.audioClips.front().fadeOutSamples == 0);
+        REQUIRE(divided.audioClips.back().fadeInSamples == 0);
+        REQUIRE(divided.audioClips.back().fadeOutSamples == 1000);
+        const AudioMixPlan afterMix(divided, 48000);
+        REQUIRE(afterMix.renderBlock(0, 48000) == beginning);
+        REQUIRE(afterMix.renderBlock(48000,
+            std::size_t(afterMix.sceneSamples() - 48000)) == ending);
+        REQUIRE(session.undo());
+        REQUIRE(session.document() == before);
+        REQUIRE(session.redo());
+        REQUIRE(session.document() == divided);
+        REQUIRE_THROWS(session.apply("Split at start", [&](Document& d) {
+            (void)splitAudioClipAtFrame(d, first, 0);
+        }));
+        REQUIRE(session.document() == divided);
+        auto repeated = before;
+        setAudioClipRepeats(repeated, first, 2);
+        REQUIRE_THROWS(splitAudioClipAtFrame(repeated, first, 12));
+        auto faded = before;
+        setAudioClipFades(faded, first, 30000, 0);
+        REQUIRE_THROWS(splitAudioClipAtFrame(faded, first, 12));
+        const auto directory = std::filesystem::temp_directory_path() /
+            ("opentoon-audio-split-" + std::to_string(rate.denominator) + "-" +
+             std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
+        std::filesystem::create_directories(directory);
+        const auto path = directory / "split.otoon";
+        REQUIRE(ProjectStore::save(path, divided) > 0);
+        REQUIRE(ProjectStore::load(path).document == divided);
+        std::filesystem::remove_all(directory);
+    }
+    auto differentRate = makeDocument();
+    const Id clip = importPcm16Wav(differentRate, "44.1 kHz", toneWav(44100, 44100, 440), 0);
+    REQUIRE_THROWS(splitAudioClipAtFrame(differentRate, clip, 12));
+}
 
 TEST_CASE("Muting one shared audio clip removes only its mixed samples and reopens") {
     Session session;

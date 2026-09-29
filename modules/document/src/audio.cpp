@@ -134,6 +134,32 @@ Id duplicateAudioClip(Document& document, Id id, Frame start) {
     document.audioClips.push_back(copy);
     return copy.id;
 }
+Id splitAudioClipAtFrame(Document& document, Id id, Frame frame) {
+    const auto original = clip(document, id);
+    const auto asset = std::find_if(document.audioAssets.begin(), document.audioAssets.end(),
+                                    [&](const auto& item) { return item.id == original.asset; });
+    if (asset == document.audioAssets.end() || asset->sampleRate != 48000 ||
+        original.repeats != 1 || document.audioClips.size() >= 1000 ||
+        frame <= original.start || frame >= document.duration)
+        throw std::invalid_argument("Split requires a 48 kHz single-pass clip and an interior frame.");
+    const auto relative = document.rate.sampleAt(frame, asset->sampleRate) -
+                          document.rate.sampleAt(original.start, asset->sampleRate);
+    const auto length = original.outSample - original.inSample;
+    if (relative <= 0 || std::uint64_t(relative) >= length ||
+        original.fadeInSamples > std::uint64_t(relative) ||
+        original.fadeOutSamples > length - std::uint64_t(relative))
+        throw std::invalid_argument("Split must leave samples on both sides and not cross a fade.");
+    auto right = original;
+    right.id = document.allocateId();
+    right.start = frame;
+    right.inSample += std::uint64_t(relative);
+    right.fadeInSamples = 0;
+    auto& left = clip(document, id);
+    left.outSample = right.inSample;
+    left.fadeOutSamples = 0;
+    document.audioClips.push_back(right);
+    return right.id;
+}
 void trimAudioClip(Document& document, Id id, std::uint64_t inSample,
                    std::uint64_t outSample) {
     auto& target = clip(document, id);

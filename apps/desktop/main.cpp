@@ -1,4 +1,5 @@
 #include "authoring_smoke.h"
+#include "opentoon/audio.h"
 #include "camera_smoke.h"
 #include "canvas_item.h"
 #include "editor_controller.h"
@@ -496,6 +497,34 @@ int main(int argc, char** argv) {
                     editor.undo();
                     if (editor.audioClips().size() != 1)
                         throw std::runtime_error("Native audio duplication did not undo in one step.");
+                    editor.setFrame(12);
+                    QCoreApplication::processEvents();
+                    const auto beforeSplit = opentoon::AudioMixPlan(editor.document(), 48000)
+                                                 .renderBlock(0, 48000);
+                    auto* splitButton = findDuplicateItem(findDuplicateItem,
+                                                           window->contentItem(), "audioSplitClip");
+                    if (!splitButton || !splitButton->isVisible() ||
+                        !splitButton->property("enabled").toBool())
+                        throw std::runtime_error("Audio split button is unavailable at an interior frame.");
+                    const auto splitPoint = splitButton->mapToScene(QPointF(
+                        splitButton->width() / 2, splitButton->height() / 2));
+                    QMouseEvent splitPress(QEvent::MouseButtonPress, splitPoint,
+                                           window->mapToGlobal(splitPoint.toPoint()),
+                                           Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                    QMouseEvent splitRelease(QEvent::MouseButtonRelease, splitPoint,
+                                             window->mapToGlobal(splitPoint.toPoint()),
+                                             Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+                    QCoreApplication::sendEvent(window, &splitPress);
+                    QCoreApplication::sendEvent(window, &splitRelease);
+                    QCoreApplication::processEvents();
+                    if (editor.audioClips().size() != 2 ||
+                        editor.audioClips().back().toMap().value("start").toInt() != 12 ||
+                        opentoon::AudioMixPlan(editor.document(), 48000)
+                                .renderBlock(0, 48000) != beforeSplit)
+                        throw std::runtime_error("Native audio split changed the canonical mix.");
+                    editor.undo();
+                    if (editor.audioClips().size() != 1)
+                        throw std::runtime_error("Native audio split did not undo in one step.");
                     auto* muteButton = findDuplicateItem(findDuplicateItem,
                                                          window->contentItem(), "audioMuteClip");
                     if (!muteButton || !muteButton->isVisible())
@@ -705,7 +734,7 @@ int main(int argc, char** argv) {
                     editor.undo();
                     if (editor.document() != baseline)
                         throw std::runtime_error("WAV import did not undo atomically.");
-                    std::cout << "HM-10 audio smoke passed: native PCM16 import, shared-source clip duplication/undo, mute/undo, cue waveform, "
+                    std::cout << "HM-10 audio smoke passed: native PCM16 import, shared-source clip duplication/undo, exact split/undo, mute/undo, cue waveform, "
                                  "device-clock playhead/seek, waveform drag/undo, audio scrub/repeat, source-sample fades, exact full and selected-range WAV export, timeline screenshot and atomic undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {

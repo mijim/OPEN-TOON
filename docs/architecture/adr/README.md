@@ -151,3 +151,6 @@ opacity bypass with preserved keys and shared Display/Write graph evaluation.
 
 See [ADR-049](049-layer-blend-modes.md) for format-25 Normal, Multiply and
 Screen layer blending with premultiplied alpha and explicit color profiles.
+
+See [ADR-050](050-frame-aligned-audio-split.md) for an exact 48 kHz PCM clip
+split at a scene frame with shared source, fade boundaries and atomic undo.

@@ -2285,6 +2285,14 @@ ApplicationWindow {
                                             onClicked: editor.duplicateAudioClip(modelData.id, editor.frame)
                                         }
                                         C.ToolButton {
+                                            objectName: "audioSplitClip"
+                                            text: "Split"
+                                            hint: "Divide a 48 kHz single-pass clip at the current frame"
+                                            enabled: modelData.sampleRate === 48000 && modelData.repeats === 1 &&
+                                                     editor.frame > modelData.start && editor.frame < modelData.end
+                                            onClicked: editor.splitAudioClip(modelData.id, editor.frame)
+                                        }
+                                        C.ToolButton {
                                             objectName: "audioMuteClip"
                                             text: modelData.muted ? "Unmute" : "Mute"
                                             active: modelData.muted
