@@ -13,8 +13,8 @@ Original contributions are licensed GPL-3.0-or-later under the repository licens
 - `preview.png`: white-background visual preview; do not import this as a character part.
 - `png-parts/`: 21 transparent PNG pieces, all using the exact same 800 × 1080 canvas.
 - `parts.json`: suggested parent relationships and pivots in canvas pixels.
-- `milo-import-kit.zip`: optional packaged master, previews and registered
-  parts created by `export.py`; the source tree keeps the editable files.
+- `milo-import-kit.zip`: packaged master, previews, registered parts and this
+  guide created by `export.py`; the source tree keeps the editable files.
 - `continuous-parts/`: 17 registered PNGs for the editable Milo study. Each arm
   and leg is one image; the middle elbow or knee is a bone joint inside it.
 - `continuous-rig.json`: source grouping, rest joints, follower Parts and the
