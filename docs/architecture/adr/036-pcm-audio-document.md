@@ -30,6 +30,10 @@ the insertion; earlier clips keep their start and source range. Frame removal
 deletes clips whose start lies in the removed interval and shifts later starts;
 it does not time-stretch earlier clips. These semantics are deliberately
 bounded until the audio clock and richer timeline editing are implemented.
+The clip's visible end is the first scene frame whose rational source-sample
+offset reaches its exclusive `outSample`, clamped to scene duration. Timeline
+dragging previews an integer-frame start without changing the document and
+commits one placement command on release; Escape cancels it.
 
 The source WAV remains part of the project after a clip is removed, allowing
 future reuse. Media resources share immutable buffers across document undo

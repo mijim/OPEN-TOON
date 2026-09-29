@@ -2702,19 +2702,20 @@ ApplicationWindow {
                                 ctx.fillRect(0, y, width, root.timelineRow);
                                 ctx.strokeStyle = "#313131";
                                 ctx.beginPath(); ctx.moveTo(0, y + root.timelineRow); ctx.lineTo(width, y + root.timelineRow); ctx.stroke();
-                                const first = Math.max(clip.start, Math.max(0, Math.floor(ox / root.timelineCell)));
-                                const last = Math.min(editor.duration, Math.ceil((ox + width) / root.timelineCell));
+                                const delta = timelineInput.audioDragClipId === clip.id ? timelineInput.audioPreviewStart - clip.start : 0;
+                                const first = Math.max(clip.start, Math.max(0, Math.floor(ox / root.timelineCell) - delta));
+                                const last = Math.min(clip.end, Math.ceil((ox + width) / root.timelineCell) - delta);
                                 const peaks = first < last ? editor.audioWaveform(clip.id, first, last - first) : [];
                                 for (let f = first; f < last; f++) {
                                     const amplitude = peaks[f - first];
                                     if (amplitude <= 0) continue;
-                                    const x = f * root.timelineCell - ox + 1;
+                                    const x = (f + delta) * root.timelineCell - ox + 1;
                                     const h = Math.max(1, amplitude * 12);
-                                    ctx.fillStyle = "#a8a8a8";
+                                    ctx.fillStyle = delta ? "#ffffff" : "#a8a8a8";
                                     ctx.fillRect(x, y + 17 - h, Math.max(1, root.timelineCell - 2), h * 2);
                                 }
                                 ctx.fillStyle = "#eeeeee";
-                                ctx.fillText(clip.name, clip.start * root.timelineCell - ox + 3, y + 5);
+                                ctx.fillText(clip.name, (clip.start + delta) * root.timelineCell - ox + 3, y + 5);
                             }
                             for (let m = 0; m < editor.markers.length; ++m) {
                                 const marker = editor.markers[m];
@@ -2773,18 +2774,33 @@ ApplicationWindow {
                     }
                     MouseArea {
                         id: timelineInput
+                        objectName: "timelineInput"
                         hoverEnabled: true
                         property bool overRangeEnd: {
                             const row = rowAt(Qt.point(mouseX, mouseY));
                             const edge = root.xsheet ? 30 + editor.rangeEnd * root.timelineRow - timelineScroll.contentY : editor.rangeEnd * root.timelineCell - timelineScroll.contentX;
                             return !root.keyEditing && row >= 0 && row < editor.layers.length && editor.selectedLayers.indexOf(editor.layers[row].id) >= 0 && Math.abs((root.xsheet ? mouseY : mouseX) - edge) <= 5;
                         }
-                        cursorShape: keySource >= 0 ? Qt.ClosedHandCursor : resizing || overRangeEnd ? (root.xsheet ? Qt.SizeVerCursor : Qt.SizeHorCursor) : keyAt(Qt.point(mouseX, mouseY)) >= 0 ? Qt.OpenHandCursor : pressed && moving ? Qt.ClosedHandCursor : Qt.CrossCursor
+                        cursorShape: audioDragClipId >= 0 ? Qt.ClosedHandCursor : keySource >= 0 ? Qt.ClosedHandCursor : resizing || overRangeEnd ? (root.xsheet ? Qt.SizeVerCursor : Qt.SizeHorCursor) : audioAt(Qt.point(mouseX, mouseY)) || keyAt(Qt.point(mouseX, mouseY)) >= 0 ? Qt.OpenHandCursor : pressed && moving ? Qt.ClosedHandCursor : Qt.CrossCursor
                         preventStealing: true
                         anchors.fill: parent
                         property int keySource: -1
                         property bool duplicateKeys: false
                         property bool canceled: false
+                        property int audioDragClipId: -1
+                        property int audioDragStart: 0
+                        property int audioPreviewStart: 0
+                        function audioAt(mouse) {
+                            if (root.xsheet)
+                                return null;
+                            const index = rowAt(mouse) - editor.layers.length;
+                            const clips = editor.audioClips;
+                            if (index < 0 || index >= clips.length)
+                                return null;
+                            const clip = clips[index];
+                            const frame = frameAt(mouse);
+                            return frame >= clip.start && frame < clip.end ? clip : null;
+                        }
                         function keyAt(mouse) {
                             const row = rowAt(mouse);
                             if (row < 0 || row >= editor.layers.length)
@@ -2802,6 +2818,7 @@ ApplicationWindow {
                         function cancel() {
                             canceled = true;
                             keySource = -1;
+                            audioDragClipId = -1;
                             resizing = false;
                             moving = false;
                             previewFrame = -1;
@@ -2824,6 +2841,14 @@ ApplicationWindow {
                             canceled = false;
                             anchorFrame = frameAt(mouse);
                             anchorRow = rowAt(mouse);
+                            const audio = audioAt(mouse);
+                            if (audio) {
+                                audioDragClipId = audio.id;
+                                audioDragStart = audio.start;
+                                audioPreviewStart = audio.start;
+                                editor.frame = anchorFrame;
+                                return;
+                            }
                             const edge = root.xsheet ? 30 + editor.rangeEnd * root.timelineRow - timelineScroll.contentY : editor.rangeEnd * root.timelineCell - timelineScroll.contentX;
                             const coordinate = root.xsheet ? mouse.y : mouse.x;
                             resizing = !root.keyEditing && anchorRow >= 0 && anchorRow < editor.layers.length && editor.selectedLayers.indexOf(editor.layers[anchorRow].id) >= 0 && Math.abs(coordinate - edge) <= 5;
@@ -2862,6 +2887,11 @@ ApplicationWindow {
                         onPositionChanged: function (mouse) {
                             if (!pressed || canceled)
                                 return;
+                            if (audioDragClipId >= 0) {
+                                audioPreviewStart = Math.max(0, Math.min(editor.duration - 1, audioDragStart + frameAt(mouse) - anchorFrame));
+                                timeline.requestPaint();
+                                return;
+                            }
                             if (keySource >= 0) {
                                 const selected = editor.selectedPoseFrames;
                                 const offset = Math.max(-selected[0], Math.min(editor.duration - 1 - selected[selected.length - 1], frameAt(mouse) - anchorFrame));
@@ -2888,6 +2918,14 @@ ApplicationWindow {
                         onReleased: {
                             if (canceled)
                                 return;
+                            if (audioDragClipId >= 0) {
+                                const clipId = audioDragClipId, start = audioPreviewStart, oldStart = audioDragStart;
+                                audioDragClipId = -1;
+                                if (start !== oldStart)
+                                    editor.moveAudioClip(clipId, start);
+                                timeline.requestPaint();
+                                return;
+                            }
                             if (keySource >= 0) {
                                 const offset = previewFrame - keySource, duplicate = duplicateKeys;
                                 cancel();
@@ -2906,6 +2944,8 @@ ApplicationWindow {
                         }
                         onCanceled: cancel()
                         onDoubleClicked: mouse => {
+                            if (!root.xsheet && rowAt(mouse) >= editor.layers.length)
+                                return;
                             if (root.keyEditing) {
                                 const row = rowAt(mouse), frame = frameAt(mouse);
                                 cancel();
@@ -2917,10 +2957,10 @@ ApplicationWindow {
                             } else
                                 editor.newDrawing(false);
                         }
-                        Accessible.name: "Timeline. Drag diamonds to retime poses. Enable Keys to add keys by double-clicking. Alt-drag moves an exposure range."
+                        Accessible.name: "Timeline. Drag audio waveforms to move clips. Drag diamonds to retime poses. Enable Keys to add keys by double-clicking. Alt-drag moves an exposure range."
                     }
                     Keys.onEscapePressed: {
-                        if (timelineInput.keySource >= 0 || timelineInput.moving || timelineInput.resizing)
+                        if (timelineInput.audioDragClipId >= 0 || timelineInput.keySource >= 0 || timelineInput.moving || timelineInput.resizing)
                             timelineInput.cancel();
                         else
                             editor.clearPoseSelection();

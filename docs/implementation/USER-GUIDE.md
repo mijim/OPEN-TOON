@@ -186,8 +186,10 @@ production installers remain pending. Consult the [phase status](STATUS.md).
 
 Choose **Scene → Import PCM16 WAV** to place a local mono or stereo 16-bit PCM
 file at the current frame. A separate row below the drawing layers shows its
-waveform; its exact peak index follows the timeline's frame width. The Audio section in the
-right panel edits the clip's start frame, source in/out samples and linear gain.
+waveform; its exact peak index follows the timeline's frame width. Drag the
+waveform to move its clip by whole frames; release commits one undo step and
+Escape cancels. The Audio section in the right panel edits the clip's start
+frame, source in/out samples and linear gain.
 Enter both sample endpoints and choose **Set** to trim. **Remove clip** removes
 its placement, while the source remains embedded in the project for reuse.
 Import, move, trim, gain and removal are undoable and survive save/reopen.

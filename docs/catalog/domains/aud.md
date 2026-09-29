@@ -56,7 +56,7 @@ Move clip start, adjust in/out points and repeat clips nondestructively.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — undoable clip start and half-open source-sample trim, no repeat.
+**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — undoable clip start and half-open source-sample trim, native waveform drag previews then commits one frame-aligned move, no repeat.
 
 **Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 

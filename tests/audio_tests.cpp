@@ -107,6 +107,23 @@ TEST_CASE("Audio edits retain original PCM through undo and format-16 project re
         throw;
     }
 }
+TEST_CASE("Audio clip visible end uses exact rational sample bounds") {
+    auto scene = makeDocument();
+    const auto id = importPcm16Wav(scene, "one second", wav(48000, 2002), 4);
+    auto& clip = scene.audioClips.front();
+    const auto& asset = scene.audioAssets.front();
+    REQUIRE(clip.id == id);
+    REQUIRE(audioClipEndFrame(scene, clip, asset) == 28);
+    trimAudioClip(scene, id, 2002, 4000);
+    REQUIRE(audioClipEndFrame(scene, clip, asset) == 5);
+    scene.rate = {24000, 1001};
+    trimAudioClip(scene, id, 0, 48000);
+    REQUIRE(audioClipEndFrame(scene, clip, asset) == 28);
+    trimAudioClip(scene, id, 0, 2003);
+    REQUIRE(audioClipEndFrame(scene, clip, asset) == 6);
+    moveAudioClip(scene, id, 47);
+    REQUIRE(audioClipEndFrame(scene, clip, asset) == 48);
+}
 
 TEST_CASE("Rational audio cue positions remain exact across integer and fractional frame rates") {
     for (auto rate : {FrameRate{24, 1}, FrameRate{24000, 1001}}) {

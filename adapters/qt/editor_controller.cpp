@@ -274,6 +274,7 @@ QVariantList EditorController::audioClips() const {
         result.push_back(QVariantMap{{"id", int(clip.id)},
                                      {"name", QString::fromStdString(asset.name)},
                                      {"start", int(clip.start)},
+                                     {"end", int(opentoon::audioClipEndFrame(document(), clip, asset))},
                                      {"inSample", qint64(clip.inSample)},
                                      {"outSample", qint64(clip.outSample)},
                                      {"sampleRate", asset.sampleRate},

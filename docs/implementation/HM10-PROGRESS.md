@@ -8,9 +8,10 @@ corrupt WAV files report an error and leave the document unchanged.
 The timeline draws a separate waveform row for each clip. A derived 256-sample
 peak tree answers exact source-sample intervals, including partial edge bins,
 from the scene's rational frame rate. It reuses immutable media while panning
-or changing frame width, and rebuilds when a scene reuses an asset ID. The
-Audio panel moves a clip
-by frame, edits its half-open source-sample in/out range, changes linear gain,
+or changing frame width, and rebuilds when a scene reuses an asset ID. Dragging
+a waveform previews a new frame position and commits one undoable move on
+release; Escape cancels. The Audio panel also moves a clip by frame, edits its
+half-open source-sample in/out range, changes linear gain,
 and removes the clip. Every change is undoable; trim and gain do not rewrite
 the source. **Scene → Export PCM WAV mix** writes a 48 kHz stereo PCM16 mix
 from an immutable document snapshot. Multiple clips sum at exact scene sample
@@ -49,15 +50,17 @@ frame-edit semantics.
   updates it and an edit stops preview before changing the document. The
   local host output device also opened successfully without starting playback.
   A new-scene test verifies that a reused asset ID cannot expose old peaks.
+  A rational-end test checks trimmed clips at 24 and 24000/1001 fps.
 - A 600-second fractional-rate, two-source 1024-frame callback workload
   measured p95 **0.014 ms** against a 21.33 ms output period on the local
   M1 Pro macOS Release build. It checks the exact scene sample count and a
   rendered cue; this is a mixer cost sample, not a hardware underrun trace.
-- Local macOS `build/locked`: 151/151 CTest entries pass. The native
+- Local macOS `build/locked`: 152/152 CTest entries pass. The native
   `--hm10-smoke` loaded the Qt Quick audio timeline, checked its cue sample,
   captured and visually inspected `build/hm10-audio-smoke.png`, exported an
   exactly sized WAV with its cue at the correct sample, advanced and sought
-  its native playhead through the null backend, then undid import.
+  its native playhead through the null backend, dragged a waveform four frames
+  and undid it, then undid import.
   The pre-existing HM-07 native dashboard smoke still passes.
 
 ## Open contract

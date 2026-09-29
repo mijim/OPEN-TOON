@@ -19,6 +19,8 @@ void trimAudioClip(Document& document, Id clip, std::uint64_t inSample,
                    std::uint64_t outSample);
 void setAudioClipGain(Document& document, Id clip, double gain);
 void removeAudioClip(Document& document, Id clip);
+[[nodiscard]] Frame audioClipEndFrame(const Document& document, const AudioClip& clip,
+                                      const AudioAsset& asset);
 // Maximum absolute PCM amplitude within a source-sample interval. This is
 // independent of the current timeline zoom and leaves the source unchanged.
 [[nodiscard]] double audioPeak(const AudioAsset& asset, std::uint64_t begin,

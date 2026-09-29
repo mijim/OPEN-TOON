@@ -113,6 +113,22 @@ void removeAudioClip(Document& document, Id id) {
     if (oldSize == document.audioClips.size())
         throw std::invalid_argument("Audio clip does not exist.");
 }
+Frame audioClipEndFrame(const Document& document, const AudioClip& clip,
+                        const AudioAsset& asset) {
+    if (clip.start < 0 || clip.start >= document.duration ||
+        clip.inSample >= clip.outSample || clip.outSample > asset.sampleFrames)
+        throw std::invalid_argument("Invalid audio clip interval.");
+    const auto samples = clip.outSample - clip.inSample;
+    Frame low = 0, high = document.duration - clip.start;
+    while (low < high) {
+        const Frame mid = low + (high - low) / 2;
+        if (std::uint64_t(document.rate.sampleAt(mid, asset.sampleRate)) >= samples)
+            high = mid;
+        else
+            low = mid + 1;
+    }
+    return clip.start + low;
+}
 double audioPeak(const AudioAsset& asset, std::uint64_t begin, std::uint64_t end) {
     const auto info = inspectPcm16Wav({asset.wav.data(), asset.wav.size()});
     if (begin > end || end > info.sampleFrames)

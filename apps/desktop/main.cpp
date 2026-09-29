@@ -162,6 +162,28 @@ int main(int argc, char** argv) {
                         throw std::runtime_error("Native audio playhead seek failed.");
                     editor.togglePlayback();
                     qunsetenv("OPENTOON_TEST_NULL_AUDIO_BACKEND");
+                    editor.setFrame(0);
+                    auto* timelineInput = window->findChild<QQuickItem*>("timelineInput");
+                    if (!timelineInput)
+                        throw std::runtime_error("Native audio drag target is missing.");
+                    const auto rowY = 30 + editor.layers().size() * 34 + 17;
+                    const auto startPoint = timelineInput->mapToScene(QPointF(11, rowY));
+                    const auto endPoint = timelineInput->mapToScene(QPointF(4 * 22 + 11, rowY));
+                    const auto sendDrag = [&](QEvent::Type type, QPointF point,
+                                              Qt::MouseButton button, Qt::MouseButtons held) {
+                        QMouseEvent event(type, point, window->mapToGlobal(point.toPoint()),
+                                          button, held, Qt::NoModifier);
+                        QCoreApplication::sendEvent(window, &event);
+                        QCoreApplication::processEvents();
+                    };
+                    sendDrag(QEvent::MouseButtonPress, startPoint, Qt::LeftButton, Qt::LeftButton);
+                    sendDrag(QEvent::MouseMove, endPoint, Qt::NoButton, Qt::LeftButton);
+                    sendDrag(QEvent::MouseButtonRelease, endPoint, Qt::LeftButton, Qt::NoButton);
+                    if (editor.audioClips().front().toMap().value("start").toInt() != 4)
+                        throw std::runtime_error("Dragging the native waveform did not move its clip.");
+                    editor.undo();
+                    if (editor.audioClips().front().toMap().value("start").toInt() != 0)
+                        throw std::runtime_error("Native waveform drag did not undo atomically.");
                     const auto output = directory.filePath("mix.wav");
                     editor.exportAudio(QUrl::fromLocalFile(output));
                     QElapsedTimer timeout;
@@ -182,7 +204,7 @@ int main(int argc, char** argv) {
                     if (editor.document() != baseline)
                         throw std::runtime_error("WAV import did not undo atomically.");
                     std::cout << "HM-10 audio smoke passed: native PCM16 import, cue waveform, "
-                                 "device-clock playhead/seek, exact WAV mix export, timeline screenshot and atomic undo.\n";
+                                 "device-clock playhead/seek, waveform drag/undo, exact WAV mix export, timeline screenshot and atomic undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';
