@@ -2207,6 +2207,21 @@ ApplicationWindow {
                                     }
                                     RowLayout {
                                         Layout.fillWidth: true
+                                        Label { text: "Balance"; font.pixelSize: 10; color: "#888888" }
+                                        C.CompactTextField {
+                                            objectName: "audioBalance"
+                                            Layout.preferredWidth: 56
+                                            text: Number(modelData.balance).toFixed(2)
+                                            validator: DoubleValidator { bottom: -1; top: 1; locale: "C" }
+                                            onEditingFinished: if (acceptableInput)
+                                                                   editor.setAudioClipBalance(modelData.id, Number(text))
+                                            Accessible.name: "Audio clip balance, minus one left, zero center, plus one right"
+                                        }
+                                        Item { Layout.fillWidth: true }
+                                        Label { text: "−1 L   0 C   +1 R"; font.pixelSize: 10; color: "#777777" }
+                                    }
+                                    RowLayout {
+                                        Layout.fillWidth: true
                                         Label { text: "Samples"; font.pixelSize: 10; color: "#888888" }
                                         C.CompactTextField {
                                             id: audioIn

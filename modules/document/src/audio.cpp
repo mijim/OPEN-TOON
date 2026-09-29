@@ -225,6 +225,11 @@ void setAudioClipMuted(Document& document, Id id, bool muted) {
 void setAudioClipSolo(Document& document, Id id, bool solo) {
     clip(document, id).solo = solo;
 }
+void setAudioClipBalance(Document& document, Id id, double balance) {
+    if (!std::isfinite(balance) || balance < -1 || balance > 1)
+        throw std::invalid_argument("Audio balance must be between -1 and 1.");
+    clip(document, id).balance = balance;
+}
 void removeAudioClip(Document& document, Id id) {
     const auto oldSize = document.audioClips.size();
     std::erase_if(document.audioClips, [=](const auto& item) { return item.id == id; });
@@ -362,6 +367,7 @@ AudioMixPlan::AudioMixPlan(const Document& document, std::int32_t outputRate)
         if (clip.inSample >= clip.outSample || clip.outSample > info.sampleFrames ||
             clip.start < 0 || clip.start >= duration_ || !std::isfinite(clip.gain) ||
             clip.gain < 0 || clip.gain > 4 || clip.repeats < 1 || clip.repeats > 64 ||
+            !std::isfinite(clip.balance) || clip.balance < -1 || clip.balance > 1 ||
             clip.fadeInSamples > (clip.outSample - clip.inSample) * std::uint64_t(clip.repeats) ||
             clip.fadeOutSamples > (clip.outSample - clip.inSample) *
                                       std::uint64_t(clip.repeats) - clip.fadeInSamples)
@@ -369,7 +375,9 @@ AudioMixPlan::AudioMixPlan(const Document& document, std::int32_t outputRate)
         if (clip.muted || (anySolo && !clip.solo))
             continue;
         sources_.push_back({&*asset, clip, info.dataOffset,
-                            frameRate_.sampleAt(clip.start, outputRate_)});
+                            frameRate_.sampleAt(clip.start, outputRate_),
+                            {std::min(1.0, 1.0 - clip.balance),
+                             std::min(1.0, 1.0 + clip.balance)}});
         if (asset->sampleRate != outputRate_ &&
             !rateKernels_.contains(asset->sampleRate))
             rateKernels_.emplace(asset->sampleRate,
@@ -447,7 +455,8 @@ void AudioMixPlan::renderInto(std::int64_t firstSample, std::span<std::int16_t> 
                     const double b = read(nextFrame, inputChannel);
                     value = a + (b - a) * fraction;
                 }
-                scratch[index * 2 + channel] += value * source.clip.gain * envelope;
+                scratch[index * 2 + channel] += value * source.clip.gain *
+                                                 source.balanceGains[channel] * envelope;
             }
         }
     }

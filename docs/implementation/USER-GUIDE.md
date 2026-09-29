@@ -216,6 +216,9 @@ the placement and waveform visible in a dim state; **Unmute** restores it.
 **Solo** isolates that clip with any other soloed clips in playback, scrub and
 WAV export. Mute still silences a soloed clip. **Unsolo** restores the shared
 mix. Clips excluded by solo remain visible with dim waveforms.
+**Balance** ranges from -1 (left) through 0 (center) to +1 (right). It
+attenuates the opposite output channel without changing the original WAV;
+preview and WAV export use the saved setting.
 **Linear fades · source samples** sets fade-in and fade-out lengths across
 the whole repeated clip; a repeat boundary does not restart the envelope.
 The waveform shows source peaks and gain with fade guides over the clip;

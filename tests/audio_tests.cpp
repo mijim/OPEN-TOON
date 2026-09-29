@@ -254,6 +254,67 @@ TEST_CASE("Soloed audio clips isolate their mix while mute still takes precedenc
     std::filesystem::remove_all(directory);
 }
 
+TEST_CASE("Audio balance attenuates the opposite channel and survives undo and reopen") {
+    Session session;
+    Id id = 0;
+    const auto source = wav(48000, 2002);
+    REQUIRE(session.apply("Place mono cue", [&](Document& d) {
+        id = importPcm16Wav(d, "mono cue", source, 0);
+    }));
+    const auto centered = session.document();
+    const auto centeredCue = AudioMixPlan(centered, 48000).renderBlock(2002, 1);
+    REQUIRE(centeredCue[0] == 32767);
+    REQUIRE(centeredCue[1] == 32767);
+    REQUIRE(session.apply("Balance right", [&](Document& d) {
+        setAudioClipBalance(d, id, .5);
+    }));
+    const auto right = session.document();
+    const auto rightCue = AudioMixPlan(right, 48000).renderBlock(2002, 1);
+    REQUIRE(rightCue[0] == 16384);
+    REQUIRE(rightCue[1] == 32767);
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == centered);
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == right);
+    REQUIRE(session.apply("Balance left", [&](Document& d) {
+        setAudioClipBalance(d, id, -1);
+    }));
+    const auto left = session.document();
+    const auto leftCue = AudioMixPlan(left, 48000).renderBlock(2002, 1);
+    REQUIRE(leftCue[0] == 32767);
+    REQUIRE(leftCue[1] == 0);
+    REQUIRE_THROWS(session.apply("Reject invalid balance", [&](Document& d) {
+        setAudioClipBalance(d, id, 1.01);
+    }));
+    REQUIRE_THROWS(session.apply("Reject missing balance target", [&](Document& d) {
+        setAudioClipBalance(d, id + 100, 0);
+    }));
+    REQUIRE(session.document() == left);
+    auto copied = left;
+    const Id second = duplicateAudioClip(copied, id, 24);
+    REQUIRE(copied.audioClips.back().id == second);
+    REQUIRE(copied.audioClips.back().balance == -1);
+    setAudioClipBalance(copied, second, 1);
+    REQUIRE(copied.audioClips.front().balance == -1);
+    REQUIRE(copied.audioClips.back().balance == 1);
+    const auto directory = std::filesystem::temp_directory_path() /
+        ("opentoon-audio-balance-" +
+         std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
+    std::filesystem::create_directories(directory);
+    const auto path = directory / "balanced.otoon";
+    REQUIRE(ProjectStore::save(path, copied) > 0);
+    const auto reopened = ProjectStore::load(path).document;
+    REQUIRE(reopened == copied);
+    REQUIRE(reopened.audioAssets.front().wav.values() == source);
+    const auto reopenedFirst = AudioMixPlan(reopened, 48000).renderBlock(2002, 1);
+    const auto reopenedSecond = AudioMixPlan(reopened, 48000).renderBlock(50002, 1);
+    REQUIRE(reopenedFirst[0] == 32767);
+    REQUIRE(reopenedFirst[1] == 0);
+    REQUIRE(reopenedSecond[0] == 0);
+    REQUIRE(reopenedSecond[1] == 32767);
+    std::filesystem::remove_all(directory);
+}
+
 TEST_CASE("Frame-edge audio trim preserves surviving 48 kHz samples and reopens") {
     for (const auto rate : {FrameRate{24, 1}, FrameRate{24000, 1001}}) {
         Session session;

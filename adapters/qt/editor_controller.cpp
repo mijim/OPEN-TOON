@@ -362,7 +362,8 @@ QVariantList EditorController::audioClips() const {
                                      {"fadeInSamples", qint64(clip.fadeInSamples)},
                                      {"fadeOutSamples", qint64(clip.fadeOutSamples)},
                                      {"muted", clip.muted},
-                                     {"solo", clip.solo}});
+                                     {"solo", clip.solo},
+                                     {"balance", clip.balance}});
     }
     return result;
 }
@@ -1932,6 +1933,11 @@ bool EditorController::setAudioClipMuted(int clipId, bool muted) {
 bool EditorController::setAudioClipSolo(int clipId, bool solo) {
     return edit("Solo audio clip", [&](Document& d) {
         opentoon::setAudioClipSolo(d, Id(clipId), solo);
+    });
+}
+bool EditorController::setAudioClipBalance(int clipId, double balance) {
+    return edit("Set audio balance", [&](Document& d) {
+        opentoon::setAudioClipBalance(d, Id(clipId), balance);
     });
 }
 bool EditorController::removeAudioClip(int clipId) {

@@ -234,10 +234,11 @@ struct AudioClip {
     std::uint64_t fadeInSamples = 0, fadeOutSamples = 0;
     bool muted = false;
     bool solo = false;
+    double balance = 0;
     auto operator<=>(const AudioClip&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 26;
+    static constexpr int formatVersion = 27;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;

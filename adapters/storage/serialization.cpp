@@ -223,7 +223,8 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
                                    {"repeats", clip.repeats},
                                    {"fadeInSamples", clip.fadeInSamples},
                                    {"fadeOutSamples", clip.fadeOutSamples},
-                                   {"muted", clip.muted}, {"solo", clip.solo}});
+                                   {"muted", clip.muted}, {"solo", clip.solo},
+                                   {"balance", clip.balance}});
     return j.dump();
 }
 Document deserializeDocument(const std::string& text, ResourceReader read) {
@@ -287,7 +288,9 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
                                     j.at("version").get<int>() >= 23
                                         ? entry.at("muted").get<bool>() : false,
                                     j.at("version").get<int>() >= 26
-                                        ? entry.at("solo").get<bool>() : false});
+                                        ? entry.at("solo").get<bool>() : false,
+                                    j.at("version").get<int>() >= 27
+                                        ? entry.at("balance").get<double>() : 0});
     }
     for (const auto& s : j.at("palette"))
         d.palette.push_back({s.at("id"), s.at("name"), readColor(s.at("color"))});

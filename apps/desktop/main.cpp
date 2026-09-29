@@ -573,6 +573,43 @@ int main(int argc, char** argv) {
                     editor.undo();
                     if (editor.audioClips().front().toMap().value("solo").toBool())
                         throw std::runtime_error("Native audio solo did not undo in one step.");
+                    QCoreApplication::processEvents();
+                    (void)window->grabWindow();
+                    auto* balanceInput = findDuplicateItem(findDuplicateItem,
+                                                           window->contentItem(), "audioBalance");
+                    if (!balanceInput || !balanceInput->isVisible())
+                        throw std::runtime_error("Audio balance input is unavailable.");
+                    const auto balancePoint = balanceInput->mapToScene(QPointF(
+                        balanceInput->width() / 2, balanceInput->height() / 2));
+                    QMouseEvent balancePress(QEvent::MouseButtonPress, balancePoint,
+                                             window->mapToGlobal(balancePoint.toPoint()),
+                                             Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                    QMouseEvent balanceRelease(QEvent::MouseButtonRelease, balancePoint,
+                                               window->mapToGlobal(balancePoint.toPoint()),
+                                               Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+                    QCoreApplication::sendEvent(window, &balancePress);
+                    QCoreApplication::sendEvent(window, &balanceRelease);
+                    balanceInput->forceActiveFocus();
+                    if (!QMetaObject::invokeMethod(balanceInput, "selectAll"))
+                        throw std::runtime_error("Audio balance input could not select its current value.");
+                    QKeyEvent balanceMinus(QEvent::KeyPress, Qt::Key_Minus, Qt::NoModifier, "-");
+                    QKeyEvent balanceOne(QEvent::KeyPress, Qt::Key_1, Qt::NoModifier, "1");
+                    QKeyEvent balanceEnter(QEvent::KeyPress, Qt::Key_Return, Qt::NoModifier);
+                    QCoreApplication::sendEvent(window, &balanceMinus);
+                    QCoreApplication::sendEvent(window, &balanceOne);
+                    QCoreApplication::sendEvent(window, &balanceEnter);
+                    QCoreApplication::processEvents();
+                    if (editor.audioClips().front().toMap().value("balance").toDouble() != -1 ||
+                        opentoon::AudioMixPlan(editor.document(), 48000).renderBlock(2002, 1)[1] != 0)
+                        throw std::runtime_error("Native audio balance field did not isolate the left channel: text=" +
+                                                 balanceInput->property("text").toString().toStdString() +
+                                                 ", value=" + std::to_string(editor.audioClips().front()
+                                                                                .toMap().value("balance").toDouble()));
+                    if (!window->grabWindow().save("build/hm10-balance-smoke.png"))
+                        throw std::runtime_error("Cannot capture the balanced audio control.");
+                    editor.undo();
+                    if (editor.audioClips().front().toMap().value("balance").toDouble() != 0)
+                        throw std::runtime_error("Native audio balance did not undo in one step.");
                     editor.setFrame(0);
                     const auto peaks = editor.audioWaveform(clip, 0, 3);
                     if (peaks.size() != 3 || peaks[1].toDouble() < 0.99)
@@ -804,7 +841,7 @@ int main(int argc, char** argv) {
                     editor.undo();
                     if (editor.document() != baseline)
                         throw std::runtime_error("WAV import did not undo atomically.");
-                    std::cout << "HM-10 audio smoke passed: native PCM16 import, shared-source clip duplication/undo, exact split/undo, mute/undo, solo/undo, cue waveform, "
+                    std::cout << "HM-10 audio smoke passed: native PCM16 import, shared-source clip duplication/undo, exact split/undo, mute/undo, solo/undo, balance/undo, cue waveform, "
                                  "device-clock playhead/seek, waveform and edge-trim drags/undo, audio scrub/repeat, source-sample fades, exact full and selected-range WAV export, timeline screenshot and atomic undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {

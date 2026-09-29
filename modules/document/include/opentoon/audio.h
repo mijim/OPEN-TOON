@@ -1,5 +1,6 @@
 #pragma once
 #include "opentoon/document.h"
+#include <array>
 #include <span>
 #include <cstdint>
 #include <map>
@@ -27,6 +28,7 @@ void setAudioClipFades(Document& document, Id clip, std::uint64_t fadeInSamples,
                        std::uint64_t fadeOutSamples);
 void setAudioClipMuted(Document& document, Id clip, bool muted);
 void setAudioClipSolo(Document& document, Id clip, bool solo);
+void setAudioClipBalance(Document& document, Id clip, double balance);
 void removeAudioClip(Document& document, Id clip);
 [[nodiscard]] Frame audioClipEndFrame(const Document& document, const AudioClip& clip,
                                       const AudioAsset& asset);
@@ -71,6 +73,7 @@ class AudioMixPlan {
         AudioClip clip;
         std::size_t dataOffset = 0;
         std::int64_t startSample = 0;
+        std::array<double, 2> balanceGains{1, 1};
     };
     FrameRate frameRate_;
     Frame duration_ = 0;

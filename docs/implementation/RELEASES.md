@@ -1,5 +1,15 @@
 # Experimental releases
 
+## 0.2.0-experimental.41 — working source, per-clip stereo balance
+
+- Set a clip's left/right balance from the Audio inspector. Center retains
+  historical output; the opposite channel is attenuated toward either end.
+- Format 27 loads older clips centered and retains a readable backup on
+  first save. Exact PCM, invalid-input, copy, undo/reopen, migration and
+  native Qt Quick input checks pass on macOS.
+- Source only; no new public binary or tag. Hardware presentation and
+  broader device quality remain HM-10 gates.
+
 ## 0.2.0-experimental.40 — working source, direct frame-aligned audio trim
 
 - Drag the middle handles at either end of a 48 kHz single-pass clip to trim
