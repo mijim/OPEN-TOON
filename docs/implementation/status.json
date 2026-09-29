@@ -398,7 +398,27 @@
       "scope": "Format-13 published poses/views, independent copied bindings, format-12 migration backup, Rig/Animator view-state switching and native connected-toon QML screenshot",
       "command": "build/locked/open-toon.app/Contents/MacOS/open-toon --hm07-smoke",
       "screenshot": "build/hm07-dashboard-smoke.png",
-      "limits": "No on-canvas widget bindings, persistent multi-driver graph, conflict/cycle handling or complete workspace layout presets."
+      "limits": "No on-canvas widget bindings, persistent multi-driver graph, conflict/cycle handling or complete workspace layout presets.",
+      "interaction_samples": {
+        "profile": "macOS 15.5 arm64 M1 Pro, optimized native Qt Quick, 15-Part continuous character",
+        "warmup_moves": 5,
+        "samples_per_run": 40,
+        "p95_ms": [
+          20.28,
+          19.01,
+          17.83
+        ],
+        "peak_process_resident_bytes": [
+          325910528,
+          319422464,
+          319766528
+        ],
+        "checks": [
+          "mapped Part changes on slider drag",
+          "one undo restores baseline"
+        ],
+        "limits": "48-frame scene without audio or matte nodes; full 480-frame control latency not qualified"
+      }
     }
   },
   "ownership": {

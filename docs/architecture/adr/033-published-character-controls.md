@@ -37,7 +37,10 @@ publication off and verify a readable `.pre-v12.bak` after upgrading. The
 editor integration test switches workspaces without changing selection, frame
 or pixels, then saves and reopens the publication flags. The native Qt Quick
 dashboard smoke opens the original continuous-character project, publishes a
-view and a pose, checks visible controls and captures the actual window.
+view and a pose, checks visible controls and captures the actual window. It
+also measures a real mouse drag to `frameSwapped` and validates one-step undo;
+three 40-sample runs passed the proposed sampled interaction budget on the
+recorded M1 Pro host.
 
 The two workspace modes do not yet provide saved geometry/docking presets for
 drawing, compositing and other phase work. On-canvas control widgets, control

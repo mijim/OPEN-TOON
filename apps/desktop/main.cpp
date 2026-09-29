@@ -34,6 +34,8 @@
 #include <cmath>
 #include <iostream>
 #include <stdexcept>
+#include <sys/resource.h>
+#include <vector>
 int main(int argc, char** argv) {
     QGuiApplication app(argc, argv);
     QCoreApplication::setApplicationName("OPEN-TOON");
@@ -128,8 +130,21 @@ int main(int argc, char** argv) {
                                              });
                     if (root == editor.document().layers.end())
                         throw std::runtime_error("Continuous-character root is missing.");
-                    editor.setSelectedLayer(int(root->id));
-                    editor.captureSelectedCharacterPose(opentoon::PoseChannels::Rotation, true);
+                    const auto rootId = root->id;
+                    auto torso = std::find_if(editor.document().layers.begin(), editor.document().layers.end(),
+                                              [](const auto& layer) { return layer.name == "torso"; });
+                    if (torso == editor.document().layers.end())
+                        throw std::runtime_error("Continuous-character torso is missing.");
+                    const auto torsoId = torso->id;
+                    const auto originalTorsoX = torso->transform.x;
+                    editor.setAnimateMode(false);
+                    editor.setSelectedLayer(int(torsoId));
+                    editor.setTransform("x", originalTorsoX + 80);
+                    editor.setSelectedLayer(int(rootId));
+                    editor.captureSelectedCharacterPose(opentoon::PoseChannels::PositionX, true);
+                    editor.setSelectedLayer(int(torsoId));
+                    editor.setTransform("x", originalTorsoX);
+                    editor.setSelectedLayer(int(rootId));
                     editor.setSelectedCharacterPosePublished(true);
                     editor.setSelectedViewPublished(true);
                     const auto selected = editor.selectedLayer();
@@ -152,8 +167,77 @@ int main(int argc, char** argv) {
                             ", poseId=" + std::to_string(editor.selectedCharacterPose()));
                     if (!window->grabWindow().save("build/hm07-dashboard-smoke.png"))
                         throw std::runtime_error("Cannot save the Animator dashboard screenshot.");
+                    const auto baseline = editor.document();
+                    window->raise();
+                    window->requestActivate();
+                    QElapsedTimer activation;
+                    activation.start();
+                    while (!window->isActive() && activation.elapsed() < 3000) {
+                        QCoreApplication::processEvents();
+                        QThread::msleep(10);
+                    }
+                    if (!window->isActive() || poseBlend->width() < 100)
+                        throw std::runtime_error("HM-07 slider window is not active or usable.");
+                    auto sendSlider = [&](QEvent::Type type, double fraction,
+                                          Qt::MouseButton button, Qt::MouseButtons held) {
+                        const auto point = poseBlend->mapToScene(
+                            QPointF(poseBlend->width() * fraction, poseBlend->height() / 2));
+                        QMouseEvent event(type, point, window->mapToGlobal(point.toPoint()),
+                                          button, held, Qt::NoModifier);
+                        QCoreApplication::sendEvent(window, &event);
+                    };
+                    sendSlider(QEvent::MouseButtonPress, .05, Qt::LeftButton, Qt::LeftButton);
+                    QCoreApplication::processEvents();
+                    std::vector<double> samples;
+                    samples.reserve(40);
+                    for (int index = 0; index < 45; ++index) {
+                        QEventLoop loop;
+                        QTimer timeout;
+                        timeout.setSingleShot(true);
+                        bool presented = false;
+                        const auto connection = QObject::connect(window, &QQuickWindow::frameSwapped,
+                                                                 &loop, [&] {
+                            presented = true;
+                            loop.quit();
+                        }, Qt::QueuedConnection);
+                        QObject::connect(&timeout, &QTimer::timeout, &loop, &QEventLoop::quit);
+                        QElapsedTimer timer;
+                        timer.start();
+                        sendSlider(QEvent::MouseMove, index % 2 ? .2 : .8,
+                                   Qt::NoButton, Qt::LeftButton);
+                        timeout.start(3000);
+                        if (!presented)
+                            loop.exec();
+                        QObject::disconnect(connection);
+                        if (!presented)
+                            throw std::runtime_error("HM-07 slider did not present a frame after input.");
+                        if (index >= 5)
+                            samples.push_back(timer.nsecsElapsed() / 1e6);
+                    }
+                    if (opentoon::evaluateTransform(editor.document().layer(torsoId), 0).x <=
+                        originalTorsoX + 40)
+                        throw std::runtime_error("HM-07 slider did not move its mapped Part.");
+                    sendSlider(QEvent::MouseButtonRelease, .8, Qt::LeftButton, Qt::NoButton);
+                    editor.undo();
+                    if (editor.document() != baseline)
+                        throw std::runtime_error("HM-07 slider drag did not undo in one step.");
+                    std::sort(samples.begin(), samples.end());
+                    struct rusage usage {};
+                    if (getrusage(RUSAGE_SELF, &usage) != 0)
+                        throw std::runtime_error("HM-07 slider benchmark could not read memory.");
+#ifdef __APPLE__
+                    const auto peakBytes = qint64(usage.ru_maxrss);
+#else
+                    const auto peakBytes = qint64(usage.ru_maxrss) * 1024;
+#endif
+                    const QJsonObject timing{{"profile", "native published-pose mouse-to-frameSwapped"},
+                                             {"documentParts", 15},
+                                             {"sampleCount", int(samples.size())},
+                                             {"p95Ms", samples[std::size_t(std::ceil(samples.size() * .95)) - 1]},
+                                             {"peakProcessResidentBytes", peakBytes}};
                     std::cout << "HM-07 dashboard smoke passed: continuous toon project, published view and pose, "
-                                 "workspace selection/frame and native QML screenshot.\n";
+                                 "workspace selection/frame, native QML screenshot, slider drag and undo.\n";
+                    std::cout << QJsonDocument(timing).toJson(QJsonDocument::Compact).constData() << '\n';
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

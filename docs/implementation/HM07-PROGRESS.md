@@ -58,6 +58,16 @@ project, publishes a view and pose, checks the visible QML dashboard and writes
 `build/hm07-dashboard-smoke.png`. The screenshot was inspected at 2880 × 1832;
 the connected character, view button and pose slider are visible.
 
+The same native smoke drags the published slider across the continuous
+15-Part character. Each run discards five warmup moves, measures 40 mouse
+move-to-`frameSwapped` samples, verifies that a mapped Part moves and that one
+undo restores the baseline. Three optimized macOS 15.5 / M1 Pro runs measured
+p95 **20.28 / 19.01 / 17.83 ms** and peak process resident memory
+**325.9 / 319.4 / 319.8 MB**. These sampled controls meet the proposed
+50 ms and 2 GiB budgets on this host. The 48-frame scene excludes audio and
+matte nodes; the complete 480-frame Harmony Moment remains unqualified for
+control latency.
+
 This remains a direct-command control subset. Persistent multi-driver
 evaluation, conflict/cycle handling, on-canvas widgets, control groups,
 cross-character mapping and a complete artist journey remain open. HM-07 is
