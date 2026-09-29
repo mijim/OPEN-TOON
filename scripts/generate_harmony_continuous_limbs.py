@@ -41,13 +41,24 @@ def draw(role: str, center: list[int]) -> bytes:
             art.polygon(converted, color)
     def line(points: list[tuple[float, float]], radius: float, color: tuple[int, ...]) -> None:
         art.line([p(x, y) for x, y in points], radius, color)
+    def curve(start: tuple[float, float], commands: list[tuple],
+              color: tuple[int, ...], border: float = 0) -> None:
+        converted = []
+        for command in commands:
+            points = [p(command[index], command[index + 1])
+                      for index in range(1, len(command), 2)]
+            converted.append((command[0], *(coordinate for point in points for coordinate in point)))
+        art.curve_shape(p(*start), converted, color, border)
 
     if role.startswith('arm_'):
         # A single tapered sleeve silhouette: no image or outline boundary at the elbow.
-        poly([(845, 505), (862, 493), (892, 497), (925, 513),
-              (917, 541), (889, 594), (875, 622), (861, 690),
-              (852, 749), (849, 764), (812, 760), (813, 742),
-              (823, 686), (830, 623), (833, 586), (836, 535)], HOODIE, 4)
+        curve((845, 505), [('C', 853, 494, 866, 489, 878, 492),
+                           ('C', 898, 494, 916, 502, 925, 513),
+                           ('C', 918, 548, 889, 592, 875, 622),
+                           ('C', 865, 661, 858, 718, 849, 764),
+                           ('L', 812, 760),
+                           ('C', 816, 717, 825, 661, 830, 623),
+                           ('C', 834, 586, 830, 540, 845, 505)], HOODIE, 4)
         poly([(845, 510), (855, 502), (865, 505), (861, 552),
               (850, 611), (841, 673), (832, 730), (818, 743),
               (828, 672), (835, 601)], HOODIE_LIGHT)

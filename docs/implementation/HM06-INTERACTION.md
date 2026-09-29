@@ -78,6 +78,11 @@ All three meet the proposed subset limits. The first run had a higher frame
 tail, so this is qualification evidence for the changed art, not proof of a
 render-speed improvement. The complete B4/HM scene is still open.
 
+After rounding both sleeve silhouettes, three more 40-sample drags on the
+regenerated project measured p95 17.97, 16.69 and 16.98 ms. Peak resident
+memory was 277,725,184, 277,430,272 and 279,445,504 bytes. These runs again
+meet the subset limits; the full shot and physical tablet remain unmeasured.
+
 Reproduce after building the render tests and desktop app:
 
 ```sh

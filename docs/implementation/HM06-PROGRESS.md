@@ -123,9 +123,14 @@ does not yet satisfy the full HM-06 interaction and artistic quality gate.
   against the saved document. The updated 15-Part candidate passed 128/128
   CTest entries, the deterministic art test and native smoke; three 40-sample
   native drags measured p95 16.94–31.11 ms and peak resident memory below
-  279 MB on the same M1 Pro. This is a deformation stress image, not a
-  polished animation pose; shoulder integration and knee volume still need
-  artistic refinement.
+  279 MB on the same M1 Pro. A subsequent sleeve redraw replaced the pointed
+  shoulder caps and straight upper-arm edges with continuous cubic contours;
+  the registered joints, single-image limbs and saved binding structure are
+  unchanged. The updated rest and 90° images show a softer outer shoulder
+  silhouette. The updated candidate passed 128/128 CTest entries and native
+  smoke; three 40-sample drags measured p95 16.69–17.97 ms and peak resident
+  memory below 280 MB. This is a deformation stress image, not a polished animation
+  pose; the hood-to-sleeve seam and knee volume still need artistic refinement.
   The candidate has no elbow or knee image seam; owner visual approval is still
   open.
 - The native `--smoke-test` drags a bone tip and curve tangent, checks
