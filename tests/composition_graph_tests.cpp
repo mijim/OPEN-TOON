@@ -78,6 +78,16 @@ TEST_CASE("Cutter matte requires an independent visible drawing source") {
     const auto sourceAffected = bypassed.affectedByLayer(document, source.id);
     REQUIRE(std::find(sourceAffected.begin(), sourceAffected.end(), bypassed.write) ==
             sourceAffected.end());
+    document.layer(source.id).paintMatteSource = true;
+    const auto painted = CompositionGraph::orderedLayers(document);
+    REQUIRE_NOTHROW(painted.validate(document));
+    REQUIRE(std::count_if(painted.nodes.begin(), painted.nodes.end(), [](const auto& node) {
+                return node.kind == GraphNodeKind::Over;
+            }) == 2);
+    const auto paintedAffected = painted.affectedByLayer(document, source.id);
+    REQUIRE(std::find(paintedAffected.begin(), paintedAffected.end(), painted.write) !=
+            paintedAffected.end());
+    document.layer(source.id).paintMatteSource = false;
     document.layer(target).matteBypassed = false;
     document.layer(target).invertMatte = false;
     document.layer(target).matte = target;

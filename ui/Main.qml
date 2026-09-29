@@ -1309,6 +1309,17 @@ ApplicationWindow {
                                 onClicked: editor.setMatteInverted(checked)
                                 Accessible.name: "Invert cutter matte"
                             }
+                            C.CompactCheckBox {
+                                objectName: "paintCutterSource"
+                                Layout.leftMargin: 16
+                                visible: layerInspector.rigLayer?.matte > 0
+                                enabled: visible && !layerInspector.rigLayer?.locked &&
+                                         !editor.layers.find(l => l.id === layerInspector.rigLayer?.matte)?.locked
+                                text: "Paint cutter source"
+                                checked: editor.layers.find(l => l.id === layerInspector.rigLayer?.matte)?.paintMatteSource || false
+                                onClicked: editor.setMatteSourceVisible(checked)
+                                Accessible.name: "Paint cutter source in composition"
+                            }
                             RowLayout {
                                 Layout.leftMargin: 12
                                 Layout.rightMargin: 16

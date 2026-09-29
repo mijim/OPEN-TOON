@@ -136,3 +136,6 @@ node, its existing animated layer property and fractional cutter ordering.
 
 See [ADR-044](044-persistent-cutter-bypass.md) for format-20 cutter bypass,
 retained source references and inactive graph dependencies.
+
+See [ADR-045](045-visible-cutter-source.md) for format-21 source painting while
+the same image supplies fractional matte coverage.

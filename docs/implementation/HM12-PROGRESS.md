@@ -33,6 +33,12 @@ coverage. A derived `Bypassed cutter` node excludes the inactive source from
 the output dependency chain. Removing the binding clears bypass. Formats
 1–19 load with bypass off, and their first format-20 save retains a readable
 source-version backup. See [ADR-044](../architecture/adr/044-persistent-cutter-bypass.md).
+Format 21 adds **Paint cutter source** in Properties and Nodes. A cutter can
+now stay in the ordered composite while also masking one or more targets.
+The saved source flag defaults off for older projects. Source opacity feeds
+both its painted image and matte; target bypass leaves the painted source
+visible. The source and target must be unlocked to toggle it. See
+[ADR-045](../architecture/adr/045-visible-cutter-source.md).
 
 ## Verification
 
@@ -65,7 +71,11 @@ source-version backup. See [ADR-044](../architecture/adr/044-persistent-cutter-b
   without a source. A format-19 project migrates to bypass off; save/reopen
   retains a chosen bypass and `.pre-v19.bak` remains readable. Native Qt Quick
   smoke checks bypass, undo/redo, save/reopen and re-enable.
-- Local macOS `build/locked`: 166/166 CTest entries and native HM-12 smoke pass.
+- Fractional-alpha render and graph tests check visible cutter pixels,
+  Display/Write parity and a painted source that still reaches Write when its
+  target is bypassed. Format-20 migration preserves a readable `.pre-v20.bak`;
+  native smoke checks the visible control, undo/redo, save/reopen and disabling.
+- Local macOS `build/locked`: 167/167 CTest entries and native HM-12 smoke pass.
 
 ## Open contract
 

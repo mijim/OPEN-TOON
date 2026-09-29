@@ -104,6 +104,15 @@ TEST_CASE("Saved cutter matte clips a layer without painting its source") {
     REQUIRE(GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Write) == expected);
     REQUIRE(deserializeDocument(serializeDocument(document)) == document);
     REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == expected);
+    document.layers.back().paintMatteSource = true;
+    const auto paintedSource = SceneRenderer::render(document, 0);
+    REQUIRE(qAlpha(paintedSource.pixel(0, 0)) == 160);
+    REQUIRE(qBlue(paintedSource.pixel(0, 0)) > 0);
+    REQUIRE(GraphRenderer::render(CompositionGraph::orderedLayers(document), document, 0,
+                                  {}, {}, GraphTarget::Write) == paintedSource);
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == paintedSource);
+    document.layers.back().paintMatteSource = false;
+    REQUIRE(SceneRenderer::render(document, 0) == expected);
     document.layers.front().matteBypassed = true;
     const auto uncut = SceneRenderer::render(document, 0);
     REQUIRE(qAlpha(uncut.pixel(0, 0)) == 128);

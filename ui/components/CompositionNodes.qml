@@ -75,6 +75,16 @@ Item {
                 onClicked: root.controller.setMatteInverted(checked)
                 Accessible.name: "Invert selected cutter matte"
             }
+            CompactCheckBox {
+                objectName: "nodePaintCutter"
+                text: "Paint cutter"
+                visible: root.selected?.matte > 0
+                enabled: visible && !root.selected?.locked &&
+                         !root.controller.layers.find(l => l.id === root.selected?.matte)?.locked
+                checked: root.controller.layers.find(l => l.id === root.selected?.matte)?.paintMatteSource || false
+                onClicked: root.controller.setMatteSourceVisible(checked)
+                Accessible.name: "Paint cutter source in composition"
+            }
             PropertyNumber {
                 objectName: "nodeOpacity"
                 implicitWidth: 88

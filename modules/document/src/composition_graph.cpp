@@ -80,7 +80,7 @@ CompositionGraph CompositionGraph::orderedLayers(const Document& document) {
     for (const auto& layer : document.layers) {
         if (layer.kind != LayerKind::Drawing && layer.kind != LayerKind::Part)
             continue;
-        if (matteSources.contains(layer.id))
+        if (matteSources.contains(layer.id) && !layer.paintMatteSource)
             continue;
         GraphNodeId source = sourceIds.at(layer.id);
         if (layer.matte) {

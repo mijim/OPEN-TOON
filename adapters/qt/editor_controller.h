@@ -237,6 +237,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE bool setLayerMatte(int sourceLayer);
     Q_INVOKABLE bool setMatteInverted(bool inverted);
     Q_INVOKABLE bool setMatteBypassed(bool bypassed);
+    Q_INVOKABLE bool setMatteSourceVisible(bool visible);
     Q_INVOKABLE void makeCharacter();
     Q_INVOKABLE void attachUnparentedDrawings();
     Q_INVOKABLE void addPeg();

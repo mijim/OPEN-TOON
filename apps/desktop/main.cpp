@@ -245,13 +245,33 @@ int main(int argc, char** argv) {
                     if (!editor.setMatteBypassed(false) ||
                         opentoon::SceneRenderer::render(editor.document(), 0) != outside)
                         throw std::runtime_error("Re-enabled cutter did not restore coverage.");
+                    QCoreApplication::processEvents();
+                    auto* paintControl = window->findChild<QQuickItem*>("paintCutterSource");
+                    if (!paintControl || !paintControl->isVisible() ||
+                        !editor.setMatteSourceVisible(true))
+                        throw std::runtime_error("Paint cutter source control is unavailable.");
+                    const auto painted = opentoon::SceneRenderer::render(editor.document(), 0);
+                    if (qAlpha(painted.pixel(0, 0)) != 136 || qBlue(painted.pixel(0, 0)) == 0 ||
+                        editor.compositionNodes().size() != 10)
+                        throw std::runtime_error("Visible cutter does not paint with its own alpha.");
+                    editor.undo();
+                    if (opentoon::SceneRenderer::render(editor.document(), 0) != outside)
+                        throw std::runtime_error("Paint cutter source undo did not restore output.");
+                    editor.redo();
+                    if (!editor.saveProject({}) || !editor.openProject(QUrl::fromLocalFile(path)) ||
+                        opentoon::SceneRenderer::render(editor.document(), 0) != painted)
+                        throw std::runtime_error("Visible cutter changed after save and reopen.");
+                    editor.setSelectedLayer(int(document.layers.front().id));
+                    if (!editor.setMatteSourceVisible(false) ||
+                        opentoon::SceneRenderer::render(editor.document(), 0) != outside)
+                        throw std::runtime_error("Hiding cutter source did not restore output.");
                     if (!editor.setLayerMatte(0))
                         throw std::runtime_error("Cannot remove a cutter matte.");
                     editor.undo();
                     if (opentoon::SceneRenderer::render(editor.document(), 0) != outside)
                         throw std::runtime_error("Cutter matte removal did not undo.");
                     std::cout << "HM-12 native smoke passed: inspector and clickable node strip, opacity and fractional inside/outside matte, "
-                                 "persistent bypass/re-enable, save/reopen and undo.\n";
+                                 "persistent bypass/re-enable, painted source, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

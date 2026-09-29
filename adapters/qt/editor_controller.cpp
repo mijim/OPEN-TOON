@@ -162,6 +162,7 @@ QVariantList EditorController::layers() const {
                                      {"matte", int(it->matte)},
                                      {"invertMatte", it->invertMatte},
                                      {"matteBypassed", it->matteBypassed},
+                                     {"paintMatteSource", it->paintMatteSource},
                                      {"kind", int(it->kind)},
                                      {"role", QString::fromStdString(it->role)},
                                      {"spans", spans},
@@ -1047,6 +1048,19 @@ bool EditorController::setMatteBypassed(bool bypassed) {
         if (target.locked || !target.matte)
             throw std::runtime_error("Select an unlocked layer with a cutter matte.");
         target.matteBypassed = bypassed;
+    });
+}
+bool EditorController::setMatteSourceVisible(bool visible) {
+    if (!layer_)
+        return false;
+    return edit(visible ? "Show cutter source" : "Hide cutter source", [&](Document& d) {
+        const auto& target = d.layer(layer_);
+        if (target.locked || !target.matte)
+            throw std::runtime_error("Select an unlocked layer with a cutter matte.");
+        auto& source = d.layer(target.matte);
+        if (source.locked)
+            throw std::runtime_error("Unlock the cutter source before changing its visibility.");
+        source.paintMatteSource = visible;
     });
 }
 bool EditorController::selectedCanFollowBoneTip() const {

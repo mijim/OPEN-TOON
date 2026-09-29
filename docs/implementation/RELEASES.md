@@ -1,5 +1,16 @@
 # Experimental releases
 
+## 0.2.0-experimental.26 — working source, visible cutter source
+
+- Keep a Drawing or Part cutter visible at its ordered paint position while
+  its fractional alpha masks a target. The choice is saved in format 21,
+  undoable and available in Properties and Nodes; older projects default off.
+- Render/graph, format-20 migration with readable backup and native Qt Quick
+  smoke cover pixels, bypass, undo/redo and reopen. The local macOS build
+  passes 167 CTest entries.
+- Source only; no new public binary or tag. General graph editing and joint
+  recipes remain open.
+
 ## 0.2.0-experimental.25 — working source, continuous trouser contour
 
 - Redraw each leg as one cubic trouser silhouette with a smoother knee and
