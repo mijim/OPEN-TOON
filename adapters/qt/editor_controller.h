@@ -142,6 +142,7 @@ class EditorController final : public QObject {
     bool canRedo() const { return session_.canRedo(); }
     QVariantList layers() const;
     QVariantList compositionNodes() const;
+    Q_INVOKABLE QString compositionNodePreview(int nodeId) const;
     QVariantList substitutions() const;
     QVariantList publishedCharacterSubstitutions() const;
     int selectedSubstitution() const;

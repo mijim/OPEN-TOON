@@ -50,7 +50,7 @@ skipped polled playhead frames, respectively. These counters do not measure
 speaker underruns or actual
 presented-frame drops.
 
-The working source version is `0.2.0-experimental.26`; no new binary or source
+The working source version is `0.2.0-experimental.27`; no new binary or source
 tag has been published for it. The last locally qualified macOS preview and
 earlier binaries do not qualify this composition change.
 

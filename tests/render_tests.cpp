@@ -98,6 +98,29 @@ TEST_CASE("Saved cutter matte clips a layer without painting its source") {
     document.validate();
     const auto graph = CompositionGraph::orderedLayers(document);
     REQUIRE_NOTHROW(graph.validate(document));
+    const auto sourceNode = std::find_if(graph.nodes.begin(), graph.nodes.end(), [&](const auto& node) {
+        return node.kind == GraphNodeKind::LayerImage && node.layer == source.id;
+    });
+    const auto matteNode = std::find_if(graph.nodes.begin(), graph.nodes.end(), [](const auto& node) {
+        return node.kind == GraphNodeKind::MatteFromImage;
+    });
+    const auto appliedNode = std::find_if(graph.nodes.begin(), graph.nodes.end(), [](const auto& node) {
+        return node.kind == GraphNodeKind::ApplyMatte;
+    });
+    REQUIRE(sourceNode != graph.nodes.end());
+    REQUIRE(matteNode != graph.nodes.end());
+    REQUIRE(appliedNode != graph.nodes.end());
+    const auto sourcePreview = GraphRenderer::renderNode(graph, document, 0, sourceNode->id,
+                                                          QSize(1, 1));
+    const auto mattePreview = GraphRenderer::renderNode(graph, document, 0, matteNode->id,
+                                                         QSize(1, 1));
+    const auto appliedPreview = GraphRenderer::renderNode(graph, document, 0, appliedNode->id,
+                                                           QSize(1, 1));
+    REQUIRE(qBlue(sourcePreview.pixel(0, 0)) == 128);
+    REQUIRE(qAlpha(sourcePreview.pixel(0, 0)) == 128);
+    REQUIRE(qAlpha(mattePreview.pixel(0, 0)) == 128);
+    REQUIRE(qAlpha(appliedPreview.pixel(0, 0)) == 64);
+    REQUIRE_THROWS(GraphRenderer::renderNode(graph, document, 0, 999999, QSize(1, 1)));
     const auto expected = SceneRenderer::render(document, 0);
     REQUIRE(qAlpha(expected.pixel(0, 0)) == 64);
     REQUIRE(qBlue(expected.pixel(0, 0)) == 0);

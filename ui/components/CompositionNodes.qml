@@ -7,6 +7,26 @@ Item {
     required property var controller
     signal layerChosen(int layer)
     readonly property var selected: controller.layers.find(l => l.id === controller.selectedLayer)
+    property int previewNodeId: 0
+    property string previewNodeKind: ""
+    property int previewLayerId: 0
+    property string previewData: ""
+    function refreshPreview() {
+        if (previewNodeId <= 0)
+            return
+        const node = controller.compositionNodes.find(n => n.id === previewNodeId)
+        if (!node || node.kind !== previewNodeKind || node.layer !== previewLayerId) {
+            previewNodeId = 0
+            previewData = ""
+            return
+        }
+        previewData = controller.compositionNodePreview(previewNodeId)
+    }
+    Connections {
+        target: root.controller
+        function onChanged() { root.refreshPreview() }
+        function onFrameChanged() { root.refreshPreview() }
+    }
     implicitHeight: 280
 
     ColumnLayout {
@@ -97,6 +117,10 @@ Item {
             }
         }
         Rectangle { Layout.fillWidth: true; height: 1; color: "#303030" }
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            spacing: 0
         Flickable {
             id: graphScroll
             objectName: "compositionNodeStrip"
@@ -119,8 +143,7 @@ Item {
                         width: 148
                         height: Math.max(110, graphScroll.height - 30)
                         radius: 5
-                        color: modelData.layer === root.controller.selectedLayer && modelData.layer > 0
-                               ? "#292929" : "#181818"
+                        color: modelData.id === root.previewNodeId ? "#292929" : "#181818"
                         border.color: modelData.kind === "Cutter" ||
                                       modelData.kind === "Opacity" ||
                                       modelData.kind === "Bypassed cutter" ||
@@ -158,17 +181,60 @@ Item {
                         }
                         MouseArea {
                             anchors.fill: parent
-                            enabled: modelData.layer > 0
-                            cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            onClicked: root.layerChosen(modelData.layer)
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                root.previewNodeId = modelData.id
+                                root.previewNodeKind = modelData.kind
+                                root.previewLayerId = modelData.layer
+                                root.refreshPreview()
+                                if (modelData.layer > 0)
+                                    root.layerChosen(modelData.layer)
+                            }
                             Accessible.name: modelData.layer > 0
-                                             ? "Select " + modelData.name + " composition source"
-                                             : modelData.kind + " composition node"
+                                             ? "Preview and select " + modelData.name + " composition source"
+                                             : "Preview " + modelData.kind + " composition node"
                         }
                     }
                 }
             }
             ScrollBar.horizontal: ScrollBar { policy: ScrollBar.AsNeeded }
+        }
+        Rectangle {
+            objectName: "compositionNodePreviewPanel"
+            visible: root.previewNodeId > 0
+            Layout.preferredWidth: visible ? Math.min(274, root.width * 0.28) : 0
+            Layout.fillHeight: true
+            color: "#141414"
+            border.color: "#303030"
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: 10
+                spacing: 8
+                Label {
+                    text: "NODE #" + root.previewNodeId + " PREVIEW"
+                    color: "#999999"
+                    font.pixelSize: 10
+                    font.letterSpacing: 1
+                }
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    color: "#333333"
+                    Image {
+                        objectName: "compositionNodePreviewImage"
+                        anchors.fill: parent
+                        source: root.previewData
+                        fillMode: Image.PreserveAspectFit
+                        cache: false
+                    }
+                }
+                Label {
+                    text: "Matte preview shows alpha as grayscale"
+                    color: "#777777"
+                    font.pixelSize: 10
+                }
+            }
+        }
         }
     }
 }

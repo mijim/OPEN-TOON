@@ -10,6 +10,7 @@
 #include "project_store.h"
 #include "image_batch_importer.h"
 #include "scene_renderer.h"
+#include "graph_renderer.h"
 #include "audio_wav_writer.h"
 #include "audio_device.h"
 #include <QColorSpace>
@@ -202,6 +203,38 @@ QVariantList EditorController::compositionNodes() const {
                                      {"layer", int(node->layer)}, {"inputs", inputs}});
     }
     return result;
+}
+QString EditorController::compositionNodePreview(int nodeId) const {
+    try {
+        const auto graph = CompositionGraph::orderedLayers(document());
+        const auto found = std::find_if(graph.nodes.begin(), graph.nodes.end(),
+                                        [nodeId](const auto& node) { return node.id == GraphNodeId(nodeId); });
+        if (nodeId <= 0 || found == graph.nodes.end() ||
+            found->kind == GraphNodeKind::LayerTransform)
+            return {};
+        const QSize size = QSize(document().width, document().height)
+                               .scaled(256, 144, Qt::KeepAspectRatio);
+        auto preview = GraphRenderer::renderNode(graph, document(), frame_, GraphNodeId(nodeId),
+                                                  size, {.background = false});
+        if (found->kind == GraphNodeKind::MatteFromImage ||
+            found->kind == GraphNodeKind::InvertMatte) {
+            for (int y = 0; y < preview.height(); ++y) {
+                auto* pixels = reinterpret_cast<QRgb*>(preview.scanLine(y));
+                for (int x = 0; x < preview.width(); ++x) {
+                    const int alpha = qAlpha(pixels[x]);
+                    pixels[x] = qRgba(alpha, alpha, alpha, 255);
+                }
+            }
+        }
+        QByteArray bytes;
+        QBuffer buffer(&bytes);
+        if (!buffer.open(QIODevice::WriteOnly) || !preview.save(&buffer, "PNG"))
+            return {};
+        return QStringLiteral("data:image/png;base64,") +
+               QString::fromLatin1(bytes.toBase64());
+    } catch (const std::exception&) {
+        return {};
+    }
 }
 QVariantList EditorController::substitutions() const {
     QVariantList result;

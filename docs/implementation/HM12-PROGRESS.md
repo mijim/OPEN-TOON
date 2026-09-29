@@ -39,6 +39,12 @@ The saved source flag defaults off for older projects. Source opacity feeds
 both its painted image and matte; target bypass leaves the painted source
 visible. The source and target must be unlocked to toggle it. See
 [ADR-045](../architecture/adr/045-visible-cutter-source.md).
+Clicking any image or matte card now opens a non-mutating node preview beside
+the strip. The renderer evaluates only that node's dependency closure at a
+bounded size; matte alpha is shown as grayscale. The preview follows frame
+and document changes and clears if its node identity disappears. Drawing
+cards still select their source layer. Transform-only nodes have no image
+preview. This is diagnostic navigation, not a persisted graph edit.
 
 ## Verification
 
@@ -75,6 +81,10 @@ visible. The source and target must be unlocked to toggle it. See
   Display/Write parity and a painted source that still reaches Write when its
   target is bypassed. Format-20 migration preserves a readable `.pre-v20.bak`;
   native smoke checks the visible control, undo/redo, save/reopen and disabling.
+- A renderer test samples Drawing, Cutter and Apply matte node outputs and
+  rejects an unknown node. Native Qt Quick smoke clicks the Drawing and Cutter
+  cards, checks source and grayscale matte PNG pixels, and confirms the Image
+  actually loads in the panel.
 - Local macOS `build/locked`: 167/167 CTest entries and native HM-12 smoke pass.
 
 ## Open contract

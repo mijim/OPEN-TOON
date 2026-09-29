@@ -7,6 +7,7 @@
 #include <map>
 #include <set>
 #include <stdexcept>
+#include <utility>
 
 namespace opentoon {
 namespace {
@@ -163,9 +164,9 @@ QImage applyOpacity(const QImage& image, double opacity, QRect bounds,
     }
     return result;
 }
-} // namespace
-QImage GraphRenderer::render(const CompositionGraph& graph, const Document& document,
-                             Frame frame, QSize size, RenderOptions options, GraphTarget target) {
+QImage renderGraphTerminal(const CompositionGraph& graph, const Document& document,
+                           Frame frame, QSize size, RenderOptions options,
+                           GraphNodeId terminal) {
     graph.validate(document);
     checkCancelled(options);
     if (frame < 0 || frame >= document.duration)
@@ -174,12 +175,13 @@ QImage GraphRenderer::render(const CompositionGraph& graph, const Document& docu
         size = {document.width, document.height};
     if (size.width() <= 0 || size.height() <= 0 || size.width() > 8192 || size.height() > 8192)
         throw std::invalid_argument("Invalid compositor output size.");
-    const auto terminal = target == GraphTarget::Display ? graph.display : graph.write;
     const auto order = graph.topologicalOrder();
     std::map<GraphNodeId, const GraphNode*> nodes;
     for (const auto& node : graph.nodes) {
         nodes.emplace(node.id, &node);
     }
+    if (!nodes.contains(terminal) || nodes.at(terminal)->kind == GraphNodeKind::LayerTransform)
+        throw std::invalid_argument("Select an image or matte compositor node.");
     std::set<GraphNodeId> needed;
     std::vector<GraphNodeId> pending{terminal};
     while (!pending.empty()) {
@@ -255,7 +257,7 @@ QImage GraphRenderer::render(const CompositionGraph& graph, const Document& docu
             }
             break;
         case GraphNodeKind::LayerTransform:
-            (void)evaluatedTransform(node, document, frame);
+            (void)GraphRenderer::evaluatedTransform(node, document, frame);
             break;
         case GraphNodeKind::Opacity: {
             const double opacity = evaluateTransform(document.layer(node.layer), frame).opacity;
@@ -301,6 +303,17 @@ QImage GraphRenderer::render(const CompositionGraph& graph, const Document& docu
     }
     checkCancelled(options);
     return images.at(terminal);
+}
+} // namespace
+QImage GraphRenderer::render(const CompositionGraph& graph, const Document& document,
+                             Frame frame, QSize size, RenderOptions options, GraphTarget target) {
+    return renderGraphTerminal(graph, document, frame, size, std::move(options),
+                               target == GraphTarget::Display ? graph.display : graph.write);
+}
+QImage GraphRenderer::renderNode(const CompositionGraph& graph, const Document& document,
+                                 Frame frame, GraphNodeId node, QSize size,
+                                 RenderOptions options) {
+    return renderGraphTerminal(graph, document, frame, size, std::move(options), node);
 }
 Transform GraphRenderer::evaluatedTransform(const GraphNode& node, const Document& document,
                                             Frame frame) {

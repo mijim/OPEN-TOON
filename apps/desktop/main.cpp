@@ -193,9 +193,33 @@ int main(int argc, char** argv) {
                         QCoreApplication::sendEvent(window, &release);
                         QCoreApplication::processEvents();
                     };
+                    (void)window->grabWindow(); // Complete the newly shown panel's layout before native input.
                     clickNode(3);
                     if (editor.selectedLayer() != int(source.id))
                         throw std::runtime_error("Clicking a Drawing node did not select its layer.");
+                    auto* previewPanel = window->findChild<QQuickItem*>("compositionNodePreviewPanel");
+                    if (!previewPanel || !previewPanel->isVisible())
+                        throw std::runtime_error("Node preview panel is unavailable.");
+                    const auto previewUrl = nodes->property("previewData").toString();
+                    if (!previewUrl.startsWith("data:image/png;base64,"))
+                        throw std::runtime_error("Drawing node preview did not render.");
+                    const auto previewImage = QImage::fromData(
+                        QByteArray::fromBase64(previewUrl.mid(22).toLatin1()), "PNG");
+                    if (previewImage.isNull() || qBlue(previewImage.pixel(previewImage.width() / 2,
+                                                                           previewImage.height() / 2)) == 0)
+                        throw std::runtime_error("Drawing node preview has the wrong pixels.");
+                    (void)window->grabWindow();
+                    auto* displayedPreview = window->findChild<QQuickItem*>("compositionNodePreviewImage");
+                    if (!displayedPreview || displayedPreview->property("status").toInt() != 1)
+                        throw std::runtime_error("Drawing node preview did not appear in Qt Quick.");
+                    clickNode(4);
+                    const auto matteUrl = nodes->property("previewData").toString();
+                    const auto matteImage = QImage::fromData(
+                        QByteArray::fromBase64(matteUrl.mid(22).toLatin1()), "PNG");
+                    if (matteImage.isNull() ||
+                        qRed(matteImage.pixel(matteImage.width() / 2,
+                                              matteImage.height() / 2)) != 64)
+                        throw std::runtime_error("Matte preview did not show fractional alpha.");
                     editor.setSelectedLayer(int(document.layers.front().id));
                     const auto clipped = opentoon::SceneRenderer::render(editor.document(), 0);
                     if (qAlpha(clipped.pixel(0, 0)) != 32 || qBlue(clipped.pixel(0, 0)) != 0)
@@ -270,7 +294,7 @@ int main(int argc, char** argv) {
                     editor.undo();
                     if (opentoon::SceneRenderer::render(editor.document(), 0) != outside)
                         throw std::runtime_error("Cutter matte removal did not undo.");
-                    std::cout << "HM-12 native smoke passed: inspector and clickable node strip, opacity and fractional inside/outside matte, "
+                    std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity and fractional inside/outside matte, "
                                  "persistent bypass/re-enable, painted source, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {

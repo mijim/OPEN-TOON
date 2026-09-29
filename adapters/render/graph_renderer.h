@@ -7,6 +7,8 @@ class GraphRenderer {
   public:
     static QImage render(const CompositionGraph&, const Document&, Frame, QSize,
                          RenderOptions = {}, GraphTarget = GraphTarget::Write);
+    static QImage renderNode(const CompositionGraph&, const Document&, Frame, GraphNodeId,
+                             QSize, RenderOptions = {});
     static Transform evaluatedTransform(const GraphNode&, const Document&, Frame);
 };
 } // namespace opentoon

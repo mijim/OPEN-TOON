@@ -1,5 +1,15 @@
 # Experimental releases
 
+## 0.2.0-experimental.27 — working source, node output preview
+
+- Click a derived image or matte node to inspect its evaluated output at the
+  current frame. Matte alpha appears as grayscale; the selected preview
+  follows edits and frame changes without changing the document.
+- Renderer pixel checks and native Qt Quick card clicks verify Drawing,
+  Cutter and Apply matte previews. The local macOS suite passes 167 CTest
+  entries and HM-12 smoke.
+- Source only; no new public binary or tag. General editable nodes remain open.
+
 ## 0.2.0-experimental.26 — working source, visible cutter source
 
 - Keep a Drawing or Part cutter visible at its ordered paint position while

@@ -24,8 +24,15 @@ Linear sRGB composites drawing layers in linear light and can look brighter at
 semi-transparent overlaps. The choice is saved with the project, is undoable,
 and applies to canvas preview and PNG export. Current composition is 8-bit CPU
 rendering. Unchanged linear frames are reused while you pan, zoom or rotate the
-view; editing or switching scenes refreshes them. Node topology cannot yet be
-edited in the UI.
+view; editing or switching scenes refreshes them. Open the bottom **Nodes**
+tab to inspect the derived graph. Click an image or matte card to see its
+output at the current frame; matte alpha appears as grayscale. The tab can
+change drawing order, opacity and cutter settings. Select a Drawing or Part,
+choose a visible source in **Cutter matte**, then use **Outside**, **Bypass**
+or **Paint cutter source** as needed. The last option keeps the source visible
+at its normal layer order while it masks the selected target; it is shared by
+other targets using that source. These edits undo and save. Arbitrary node
+creation, wiring and grouping remain open.
 
 ## Drawing and view controls
 
@@ -145,7 +152,7 @@ Each manual save appends a complete revision. Scene history can restore a saved 
 
 Every 60 seconds, a modified document is saved to a recovery file. On a later launch, recovery can open that snapshot as an unsaved scene. Save it under a chosen name. Autosave runs from an immutable snapshot in a worker, so newer edits stay unsaved until the next save. Manual saves remain synchronous. Recovery from operating-system power loss and multiple simultaneous application instances has not been qualified.
 
-Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and decoded image media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening formats 1–16 remains supported. Format 3 added channel Bézier easing, format 4 added typed character layers and named substitutions, format 5 added character view sets, format 6 saves the composition profile, format 7 added the output camera, format 8 saves mesh bindings, format 9 saves bone/curve controls and animation keys, format 10 introduced parent bone-tip links, format 11 saves their rest tip and distal direction at attachment time, format 12 adds named masked character poses, format 13 adds publication flags for character poses and views, format 14 adds publication flags for drawing substitutions, format 15 adds published control groups, format 16 adds PCM16 WAV assets and placed clips, and format 17 adds nondestructive clip repeats. The first save of an older schema creates a backup named for its source version, such as `.pre-v16.bak`, before upgrading. Older editors require that backup to reopen the original format.
+Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and decoded image media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening formats 1–20 remains supported. Format 3 added channel Bézier easing, format 4 added typed character layers and named substitutions, format 5 added character view sets, format 6 saves the composition profile, format 7 added the output camera, format 8 saves mesh bindings, format 9 saves bone/curve controls and animation keys, format 10 introduced parent bone-tip links, format 11 saves their rest tip and distal direction at attachment time, format 12 adds named masked character poses, format 13 adds publication flags for character poses and views, format 14 adds publication flags for drawing substitutions, format 15 adds published control groups, format 16 adds PCM16 WAV assets and placed clips, format 17 adds nondestructive clip repeats, format 18 adds cutter bindings, format 19 adds Outside coverage, format 20 adds cutter bypass, and format 21 adds optional cutter-source painting. The first save of an older schema creates a backup named for its source version, such as `.pre-v20.bak`, before upgrading. Older editors require that backup to reopen the original format.
 
 **Scene → Compact project history** retains the chosen number of newest saved revisions and removes unreachable media, after creating a full `.pre-compact.bak` backup. Save pending edits first. This is an explicit operation and is not part of autosave.
 
