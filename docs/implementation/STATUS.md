@@ -41,6 +41,13 @@ undoable. The bottom
 Nodes tab displays the derived typed graph and offers selected-layer order
 cutter and animated opacity edits.
 
+An original 20-second integrated study now combines the connected toon, nine
+mouth substitutions, a visible eye cutter and sample-aligned synthetic audio
+cues. A native Qt Quick smoke opens the saved project and captures the visual
+frame; the CTest integration case verifies its exact exported cue positions
+and save/reopen. The tones are timing signals and do not establish dialogue or
+final artistic quality.
+
 Playback diagnostics expose mixer callbacks over their output period and
 playhead frames skipped by the 8 ms timer. A two-second silent CoreAudio probe
 measured zero callback-period overruns and 142 samples of final drift relative
@@ -51,7 +58,7 @@ skipped polled playhead frames, respectively. These counters do not measure
 speaker underruns or actual
 presented-frame drops.
 
-The working source version is `0.2.0-experimental.30`; no new binary or source
+The working source version is `0.2.0-experimental.31`; no new binary or source
 tag has been published for it. The last locally qualified macOS preview and
 earlier binaries do not qualify this composition change.
 
@@ -74,7 +81,7 @@ earlier binaries do not qualify this composition change.
 
 ## Verification
 
-- Current macOS system build: 169/169 CTest entries pass, including format-9/10/11/12/13/14/15/16/17/18/19/20/21 migration, named masked pose capture/Part refinement/apply/blend/undo/reopen, compatible cross-character transfer and left/right mirroring with role/drawing matching and atomic rejection, published-control duplication and workspace pixel preservation, Part-scoped drawing choice/undo/reopen, original assembled 19-part reference pixels, a connected 15-artwork-Part four-limb render with saved endpoint links, keyed bone/curve render, rest-control and influence-radius retargeting, substitution switching, frame insertion/removal/Clear of deformer keys, camera/PNG parity, coordinated view-set rejection/undo and immutable speculative preview publication. The 480-frame visual shot checks a connected silhouette and four linked tips on every frame, including sleeve-change continuity; compatible bone and curve substitutions can explicitly match the outgoing evaluated pose. Audio tests reject malformed WAV files, preserve original bytes and source-sample cue positions, exercise clip edit/undo/reopen and verify readable format-15/16 backups. Tests also cover typed properties, failed commands, rational time, hierarchy validation, registered PNG intake, stale writers, schema rejection, rollback failures and abrupt process termination with a large image. Native smoke matches an intentionally unmatched sleeve, undoes, redoes, saves and reopens it. A separate dashboard smoke opens the connected original toon and checks published view, mouth choice and pose controls, plus the Rig pose transfer and mirror controls, in the Qt Quick window. The viewport pose slider changes only masked properties and undoes in one step; its floating panel hides in Rig. Native group switching shows Face/Body/Stage controls without changing output. Native audio smoke captures the waveform row, checks the exact exported cue and atomic import undo. Offline mix tests cover overlapping 44.1/48 kHz clips, exact fractional-rate WAV length, cancellation preservation and byte-identical output after reopen.
+- Current macOS system build: 170/170 CTest entries pass, including format-9/10/11/12/13/14/15/16/17/18/19/20/21 migration, named masked pose capture/Part refinement/apply/blend/undo/reopen, compatible cross-character transfer and left/right mirroring with role/drawing matching and atomic rejection, published-control duplication and workspace pixel preservation, Part-scoped drawing choice/undo/reopen, original assembled 19-part reference pixels, a connected 15-artwork-Part four-limb render with saved endpoint links, keyed bone/curve render, rest-control and influence-radius retargeting, substitution switching, frame insertion/removal/Clear of deformer keys, camera/PNG parity, coordinated view-set rejection/undo and immutable speculative preview publication. The 480-frame visual shot checks a connected silhouette and four linked tips on every frame, including sleeve-change continuity; compatible bone and curve substitutions can explicitly match the outgoing evaluated pose. Audio tests reject malformed WAV files, preserve original bytes and source-sample cue positions, exercise clip edit/undo/reopen and verify readable format-15/16 backups. Tests also cover typed properties, failed commands, rational time, hierarchy validation, registered PNG intake, stale writers, schema rejection, rollback failures and abrupt process termination with a large image. Native smoke matches an intentionally unmatched sleeve, undoes, redoes, saves and reopens it. A separate dashboard smoke opens the connected original toon and checks published view, mouth choice and pose controls, plus the Rig pose transfer and mirror controls, in the Qt Quick window. The viewport pose slider changes only masked properties and undoes in one step; its floating panel hides in Rig. Native group switching shows Face/Body/Stage controls without changing output. Native audio smoke captures the waveform row, checks the exact exported cue and atomic import undo. Offline mix tests cover overlapping 44.1/48 kHz clips, exact fractional-rate WAV length, cancellation preservation and byte-identical output after reopen.
 - The 256-sample waveform peak tree preserves a right-channel-only cue and matches direct PCM scanning across 300 varied intervals. A 30-second source indexed in 3.52 ms; 1,000 varied interval queries took 0.52 ms versus 1.47 ms direct on this M1 Pro. Reusing an asset ID after a new scene rebuilds its cache.
 - Format-17 repeat tests check three sample-contiguous trim cues, looped waveform peaks, exact reopened/exported output, invalid-count rollback and readable format-16 migration backup. The native audio smoke shows and exports the second cue.
 - Native timeline mouse traversal starts, changes and stops an 80 ms audio fragment without mutating the scene. A null backend verifies the bounded sample end and repeated seek; actual loudspeaker fragment quality remains unqualified.

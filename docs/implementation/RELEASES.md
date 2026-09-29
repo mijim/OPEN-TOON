@@ -1,5 +1,16 @@
 # Experimental releases
 
+## 0.2.0-experimental.31 — working source, integrated shot study
+
+- Add an original 20-second editable project joining the continuous four-limb
+  toon, nine timed mouth changes, a visible head source cutter for the eyes,
+  output camera and a synthetic PCM cue track with sample-based fades.
+- An integration test checks exact audio/mouth cue positions, matte graph,
+  unchanged WAV bytes, 480-frame length, rendered frames and save/reopen. The
+  170-entry macOS suite and native Qt Quick open/screenshot smoke pass.
+- Source only; no new public binary or tag. Synthetic cues are timing signals,
+  and full audiovisual/artistic qualification remains open.
+
 ## 0.2.0-experimental.30 — working source, direct audio fade handles
 
 - Drag the upper fade guide handles on a waveform row to preview and commit

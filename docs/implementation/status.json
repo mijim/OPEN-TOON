@@ -435,6 +435,13 @@
       "screenshot": "build/hm12-matte-smoke.png",
       "limits": "General node editor, general node bypass, group/ungroup, arm/eye recipes and full 480-frame composition budgets remain open."
     },
+    "integrated_study": {
+      "status": "passed_subset",
+      "scope": "Original 480-frame connected toon with nine coordinated mouth and exact synthetic audio cues, visible head-source eye cutter, output camera, semantic save/reopen and exact 960000-sample WAV export; native Qt Quick project open, timeline and frame-change screenshot",
+      "command": "build/locked/open-toon.app/Contents/MacOS/open-toon --open examples/clockwork-integrated-study.otoon --hm-integrated-smoke",
+      "screenshot": "build/hm-integrated-shot-smoke.png",
+      "limits": "Synthetic timing tones are not dialogue. Full audiovisual budgets, artistic approval, voice lip sync and independent animator review remain open."
+    },
     "pcm_audio_timing": {
       "status": "passed_subset",
       "scope": "Format-16 original PCM16 WAV assets, format-17 repeated clips and format-22 source-sample fades, clip placement/trim/gain and native waveform and fade-handle drags with undo and cancellation, indexed sample-aligned timeline waveform with exact edge queries and visible fade guides, invalid import rejection, undo/redo, save/reopen and format-15/16 backups; deterministic stereo offline mix, 44.1/48 kHz source alignment, exact-length full and selected-frame-range WAV export after reopen and cancellation preservation; bounded miniaudio playback uses the same immutable mix, null-device seek/stop and native Qt Quick playhead smoke; native timeline traversal previews bounded 80 ms rational-sample scrub fragments without document changes; callback-period and skipped-playhead-frame diagnostics retained after preview stop; precomputed 32-tap band-limited rate conversion suppresses a 30 kHz 96 kHz-source tone to 0.000089 RMS while retaining 1 kHz at 0.561 RMS, retains 3 kHz at 0.560 RMS in 8-to-48 kHz upsampling and fits the local callback period; two silent ten-minute CoreAudio probes at 24 and 24000/1001 fps reported 65418/65417 callbacks, zero processing overruns, 569/262 final drift samples and one/two skipped polled frames",
@@ -454,7 +461,7 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.30",
+  "version": "0.2.0-experimental.31",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",

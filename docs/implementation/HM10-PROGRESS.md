@@ -121,7 +121,17 @@ source-sample fades and trim/repeat clamping.
   and two skipped polled frames. Each drift is relative to the host monotonic
   clock after the first one-second baseline. These silent probes do not
   measure speaker delivery time, audible sync or hardware underruns.
-- Local macOS `build/locked`: 169/169 CTest entries pass. The native
+- `tests/integrated_shot_tests.cpp` opens the original 480-frame continuous
+  toon, binds the eye Part to a visible head cutter, embeds nine original
+  synthetic cue tones at the mouth-change frames and saves the assembled
+  `examples/clockwork-integrated-study.otoon`. It checks exact cue samples,
+  mouth drawings, preserved source WAV bytes, graph validity, five rendered
+  frames, exact 960,000-sample stereo WAV export and semantic save/reopen.
+  Native `--open examples/clockwork-integrated-study.otoon
+  --hm-integrated-smoke` checks the opened project, timeline and visual frame
+  change in a Qt Quick window; its screenshot was inspected. These tones are
+  timing markers, not spoken dialogue or a lip-sync quality test.
+- Local macOS `build/locked`: 170/170 CTest entries pass. The native
   `--hm10-smoke` loaded the Qt Quick audio timeline, checked its cue sample,
   captured and visually inspected `build/hm10-audio-smoke.png`, exported an
   exactly sized WAV with its cue at the correct sample, advanced and sought

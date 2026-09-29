@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
     }
     if (args.contains("--smoke-test") || args.contains("--hm06-benchmark") ||
         args.contains("--hm07-smoke") || args.contains("--hm10-smoke") ||
-        args.contains("--hm12-smoke")) {
+        args.contains("--hm12-smoke") || args.contains("--hm-integrated-smoke")) {
         QStandardPaths::setTestModeEnabled(true);
         QCoreApplication::setApplicationName(args.contains("--smoke-test")
                                                  ? "OPEN-TOON-smoke"
@@ -61,7 +61,9 @@ int main(int argc, char** argv) {
                                                              ? "OPEN-TOON-hm10-smoke"
                                                        : args.contains("--hm12-smoke")
                                                              ? "OPEN-TOON-hm12-smoke"
-                                                       : "OPEN-TOON-benchmark");
+                                                       : args.contains("--hm-integrated-smoke")
+                                                             ? "OPEN-TOON-integrated-smoke"
+                                                             : "OPEN-TOON-benchmark");
     }
     try {
         if (args.contains("--render-demo")) {
@@ -122,6 +124,40 @@ int main(int argc, char** argv) {
         }
         if (args.contains("--demo"))
             editor.loadDemo();
+        if (args.contains("--hm-integrated-smoke")) {
+            QTimer::singleShot(1200, &app, [&] {
+                try {
+                    if (engine.rootObjects().isEmpty())
+                        throw std::runtime_error("No QML window for integrated shot smoke.");
+                    auto* window = qobject_cast<QQuickWindow*>(engine.rootObjects().first());
+                    if (!window || !window->findChild<QQuickItem*>("timelineCanvas"))
+                        throw std::runtime_error("The integrated shot has no native timeline.");
+                    const int openIndex = args.indexOf("--open");
+                    if (openIndex < 0 || openIndex + 1 >= args.size())
+                        throw std::runtime_error("Integrated smoke requires --open PROJECT.");
+                    const auto expected = opentoon::ProjectStore::load(std::filesystem::path(
+                        args[openIndex + 1].toStdString())).document;
+                    if (editor.document() != expected || editor.audioClips().size() != 1)
+                        throw std::runtime_error("The integrated project did not open intact in Qt Quick.");
+                    const auto initial = opentoon::SceneRenderer::render(editor.document(), 0,
+                                                                         QSize(480, 270));
+                    editor.setFrame(264);
+                    QCoreApplication::processEvents();
+                    if (editor.frame() != 264 ||
+                        opentoon::SceneRenderer::render(editor.document(), editor.frame(),
+                                                         QSize(480, 270)) == initial)
+                        throw std::runtime_error("The integrated shot did not advance visually.");
+                    if (!window->grabWindow().save("build/hm-integrated-shot-smoke.png"))
+                        throw std::runtime_error("Cannot capture the integrated shot window.");
+                    std::cout << "Integrated shot smoke passed: project reopen, native timeline, "
+                                 "audio track, visual frame change and Qt Quick screenshot.\n";
+                    app.exit(0);
+                } catch (const std::exception& error) {
+                    std::cerr << error.what() << '\n';
+                    app.exit(1);
+                }
+            });
+        }
         if (args.contains("--hm12-smoke")) {
             QTimer::singleShot(1200, &app, [&] {
                 try {
