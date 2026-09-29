@@ -89,6 +89,13 @@ selected Drawing/Part, Inside/Outside changes an assigned cutter, and Group
 span uses the marked first Drawing and current selection. Each routes through
 the existing undoable command. This is a bounded operator-library subset;
 arbitrary graph nodes and user wiring remain open.
+Full character copies and closed rig-branch copies now collect any composite
+group they fully own, assign a new group ID and remap its Drawing/Part members.
+The saved bypass state follows the copy, and existing internal cutter-source
+remapping remains intact. A branch deletion removes a fully contained group;
+copying or removing only part of one rejects atomically. This closes one
+in-project graph dependency path; a portable template dependency collector
+and general reusable subgraphs remain open.
 Alt-dragging a Drawing card onto another binds the first as the second's
 cutter source through the existing validated document command. Its fractional
 alpha, saved references and one-step undo use the same path as the inspector.
@@ -223,6 +230,9 @@ preview. This is diagnostic navigation, not a persisted graph edit.
   name, applies Multiply to the selected Drawing and adds a new Drawing,
   then undoes both edits. The catalog action uses the same command and
   validation path as the inspector.
+- A grouped two-Part rig fixture checks full character and branch copies,
+  remapped group/cutter IDs, saved bypass, serialization, atomic undo/redo,
+  closed-branch deletion and rejection when a group crosses the copy boundary.
 - Native Qt Quick smoke Alt-drags a Drawing source onto a Drawing target,
   checks the target binding and output color, then undoes, redoes and reopens.
 - Native Qt Quick smoke Alt-clicks Apply matte to bypass, undoes, redoes and

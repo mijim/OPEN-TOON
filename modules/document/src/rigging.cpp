@@ -155,6 +155,31 @@ bool inBranch(const Document& document, Id node, Id branch) {
             return true;
     return false;
 }
+std::vector<CompositeGroup> closedCompositeGroups(const Document& document,
+                                                   const std::set<Id>& selected) {
+    std::vector<CompositeGroup> result;
+    for (const auto& group : document.compositeGroups) {
+        const bool intersects = std::any_of(group.members.begin(), group.members.end(),
+                                            [&](Id member) { return selected.contains(member); });
+        if (!intersects)
+            continue;
+        require(std::all_of(group.members.begin(), group.members.end(),
+                            [&](Id member) { return selected.contains(member); }),
+                "Include every composite group member in the rig branch operation.");
+        result.push_back(group);
+    }
+    return result;
+}
+void appendRemappedGroups(Document& document, const std::vector<CompositeGroup>& groups,
+                          const std::map<Id, Id>& layers, const std::string& suffix) {
+    for (auto group : groups) {
+        group.id = document.allocateId();
+        group.name = group.name.substr(0, 128 - suffix.size()) + suffix;
+        for (auto& member : group.members)
+            member = layers.at(member);
+        document.compositeGroups.push_back(std::move(group));
+    }
+}
 } // namespace
 Id characterFor(const Document& document, Id layerId) {
     Id current = layerId;
@@ -537,6 +562,10 @@ Id duplicateCharacter(Document& document, Id rootId, double offsetX, double offs
     for (const auto& layer : document.layers)
         if (characterFor(document, layer.id) == rootId)
             original.push_back(layer);
+    std::set<Id> selected;
+    for (const auto& layer : original)
+        selected.insert(layer.id);
+    const auto groups = closedCompositeGroups(document, selected);
     std::map<Id, Id> layers, drawings;
     for (const auto& layer : original)
         layers[layer.id] = document.allocateId();
@@ -590,6 +619,7 @@ Id duplicateCharacter(Document& document, Id rootId, double offsetX, double offs
         }
         document.layers.push_back(std::move(source));
     }
+    appendRemappedGroups(document, groups, layers, " copy");
     return layers.at(rootId);
 }
 Id duplicateRigBranch(Document& document, Id branchId, bool linkedArtwork) {
@@ -603,6 +633,10 @@ Id duplicateRigBranch(Document& document, Id branchId, bool linkedArtwork) {
             require(!layer.locked, "Unlock every layer in the branch before duplicating.");
             originals.push_back(layer);
         }
+    std::set<Id> selected;
+    for (const auto& layer : originals)
+        selected.insert(layer.id);
+    const auto groups = closedCompositeGroups(document, selected);
     std::map<Id, Id> layers, drawings;
     for (const auto& source : originals)
         layers[source.id] = document.allocateId();
@@ -646,6 +680,7 @@ Id duplicateRigBranch(Document& document, Id branchId, bool linkedArtwork) {
             binding.drawing = mapDrawing(binding.drawing);
         document.layers.push_back(std::move(source));
     }
+    appendRemappedGroups(document, groups, layers, linkedArtwork ? " clone" : " copy");
     for (auto& view : document.layer(rootId).views) {
         std::vector<ViewChoice> additions;
         for (const auto& choice : view.choices)
@@ -666,6 +701,7 @@ void removeRigBranch(Document& document, Id branchId) {
             require(!layer.locked, "Unlock every layer in the branch before removing.");
             removed.insert(layer.id);
         }
+    const auto groups = closedCompositeGroups(document, removed);
     for (const auto& layer : document.layers)
         require(removed.contains(layer.id) || !removed.contains(layer.matte),
                 "Remove the matte binding before deleting its source.");
@@ -678,6 +714,9 @@ void removeRigBranch(Document& document, Id branchId) {
         std::erase_if(pose.parts, [&](const PosePart& entry) { return removed.contains(entry.part); });
     std::erase_if(poses, [](const CharacterPose& pose) { return pose.parts.empty(); });
     std::erase_if(document.layers, [&](const Layer& layer) { return removed.contains(layer.id); });
+    for (const auto& group : groups)
+        std::erase_if(document.compositeGroups,
+                      [&](const CompositeGroup& current) { return current.id == group.id; });
 }
 void detachPart(Document& document, Id partId) {
     auto& layer = part(document, partId);

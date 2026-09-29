@@ -75,6 +75,10 @@ Composite, Matte and Structure actions by name or category, and each result
 explains and applies an existing document command. Drawing creation and blend
 application pass native interaction checks. The full node inventory and
 arbitrary wiring remain open.
+Full character and closed rig-branch copies now remap contained group IDs and
+members. A branch removal removes its closed groups; partial group boundaries
+reject copy or deletion atomically. Portable template dependency collection
+remains open.
 
 An original 20-second integrated study now combines the connected toon, nine
 mouth substitutions, a visible eye cutter and sample-aligned synthetic audio
@@ -93,12 +97,12 @@ skipped polled playhead frames, respectively. These counters do not measure
 speaker underruns or actual
 presented-frame drops.
 
-The working source version is `0.2.0-experimental.56`; no new binary or source
+The working source version is `0.2.0-experimental.57`; no new binary or source
 tag has been published for it. The last locally qualified macOS preview and
 earlier binaries do not qualify these source changes.
 
-The owner resumed development after the earlier 10:30 CEST cutoff. The `.56`
-locked macOS build passes 195/195 CTest entries and native HM-12 smoke,
+The owner resumed development after the earlier 10:30 CEST cutoff. The `.57`
+locked macOS build passes 196/196 CTest entries and native HM-12 smoke,
 including contiguous group input/output ports, matte-only source pixels,
 grouping/rename/ungroup, whole-group order and bypass, operator search/apply,
 undo/redo and save/reopen. Earlier native smokes and

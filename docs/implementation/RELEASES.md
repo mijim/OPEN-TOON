@@ -1,5 +1,16 @@
 # Experimental releases
 
+## 0.2.0-experimental.57 — working source, group dependency closure
+
+- Full character and closed rig-branch copies now clone contained composite
+  groups with new IDs, remapped members and their saved bypass state. Removing
+  a closed rig branch removes its copied group in the same transaction.
+- A copy or deletion that would split a group is rejected before changing the
+  document. Domain and serialization checks cover internal cutter remapping,
+  cross-character rejection, undo/redo and reopen. The locked macOS suite
+  passes 196/196 CTest entries; native HM-12 smoke passes. Source only; no
+  public binary or tag. A portable template collector remains open.
+
 ## 0.2.0-experimental.56 — working source, operator library subset
 
 - Nodes now opens a compact operator library with descriptions and search by

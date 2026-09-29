@@ -109,6 +109,81 @@ TEST_CASE("Character copies remap cutter mattes and branch edits protect source 
     REQUIRE(session.undo());
     REQUIRE(session.document() == baseline);
 }
+TEST_CASE("Rig copies and deletion keep composite groups dependency-closed") {
+    Session session;
+    const Id body = session.document().layers.front().id;
+    Id root = 0, peg = 0, cutter = 0, groupId = 0;
+    REQUIRE(session.apply("Build grouped rig", [&](Document& d) {
+        root = makeCharacter(d, body, "Hero");
+        Layer source;
+        source.id = d.allocateId();
+        cutter = source.id;
+        source.name = "Joint cutter";
+        d.layers.push_back(source);
+        attachDrawingAsPart(d, cutter, root, "Joint cutter");
+        peg = addPeg(d, body, "Torso peg");
+        reparentPreservingWorld(d, cutter, peg);
+        d.layer(body).matte = cutter;
+        groupId = d.allocateId();
+        d.compositeGroups.push_back({groupId, "Joint", {body, cutter}, true});
+    }));
+    const auto baseline = session.document();
+    REQUIRE_THROWS(session.apply("Copy half a group", [&](Document& d) {
+        (void)duplicateRigBranch(d, body, false);
+    }));
+    REQUIRE_THROWS(session.apply("Delete half a group", [&](Document& d) {
+        removeRigBranch(d, body);
+    }));
+    REQUIRE(session.document() == baseline);
+    auto spanning = baseline;
+    spanning.compositeGroups.clear();
+    Layer external;
+    external.id = spanning.allocateId();
+    external.name = "External drawing";
+    spanning.layers.push_back(external);
+    spanning.compositeGroups.push_back({groupId, "Cross-character",
+                                        {cutter, external.id}});
+    spanning.validate();
+    const auto spanningBefore = spanning;
+    REQUIRE_THROWS(duplicateCharacter(spanning, root));
+    REQUIRE(spanning == spanningBefore);
+    Id copiedRoot = 0;
+    REQUIRE(session.apply("Copy grouped character", [&](Document& d) {
+        copiedRoot = duplicateCharacter(d, root);
+    }));
+    const auto& copiedCharacter = session.document();
+    REQUIRE(copiedCharacter.compositeGroups.size() == 2);
+    const auto& copiedGroup = copiedCharacter.compositeGroups.back();
+    REQUIRE(copiedGroup.id != groupId);
+    REQUIRE(copiedGroup.bypassed);
+    REQUIRE(copiedGroup.members.size() == 2);
+    REQUIRE(characterFor(copiedCharacter, copiedGroup.members.front()) == copiedRoot);
+    REQUIRE(characterFor(copiedCharacter, copiedGroup.members.back()) == copiedRoot);
+    REQUIRE(copiedCharacter.layer(copiedGroup.members.front()).matte ==
+            copiedGroup.members.back());
+    REQUIRE(deserializeDocument(serializeDocument(copiedCharacter)) == copiedCharacter);
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == baseline);
+    Id copiedPeg = 0;
+    REQUIRE(session.apply("Copy closed rig branch", [&](Document& d) {
+        copiedPeg = duplicateRigBranch(d, peg, false);
+    }));
+    REQUIRE(session.document().compositeGroups.size() == 2);
+    const auto& branchGroup = session.document().compositeGroups.back();
+    REQUIRE(branchGroup.id != groupId);
+    REQUIRE(branchGroup.bypassed);
+    REQUIRE(session.document().layer(branchGroup.members.front()).matte ==
+            branchGroup.members.back());
+    REQUIRE(session.apply("Remove copied branch", [&](Document& d) {
+        removeRigBranch(d, copiedPeg);
+    }));
+    REQUIRE(session.document().compositeGroups.size() == 1);
+    REQUIRE(session.document().compositeGroups.front().id == groupId);
+    REQUIRE(session.undo());
+    REQUIRE(session.document().compositeGroups.size() == 2);
+    REQUIRE(session.redo());
+    REQUIRE(session.document().compositeGroups.size() == 1);
+}
 TEST_CASE("Pose transfer maps unique Part roles and drawing names without touching source") {
     Session session;
     const Id part = session.document().layers.front().id;

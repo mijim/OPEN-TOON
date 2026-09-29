@@ -50,6 +50,12 @@ the first Drawing card, select the last Drawing or Part, then choose the action.
 Each successful choice can be undone. The palette currently applies these
 supported document operations; it does not create arbitrary graph nodes.
 
+Duplicating a full character or a rig branch also duplicates any composite
+group fully contained in that copy. The new group keeps its member order and
+bypass setting, and internal cutter bindings point to the new Parts. A copy
+or deletion that includes only some group members is rejected; ungroup first
+or select the complete branch.
+
 ## Drawing and view controls
 
 - **Pencil:** sampled vector centerline with round segments and pressure-weighted width.

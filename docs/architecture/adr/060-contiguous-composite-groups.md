@@ -19,6 +19,10 @@ ungrouping and renaming are transactional document commands. In Nodes,
 Shift-click two Drawing cards to group their inclusive span, edit the compact
 group name, or use Ungroup on a selected member. Reopening restores group IDs,
 names, members and ports.
+Character and rig-branch copies clone groups only when every member is inside
+the copied branch. Members receive the copied layer IDs and the group receives
+a new ID; partial groups reject copy or deletion. Removing a closed branch
+removes its contained groups in the same document command.
 
 Format 32 extends Group output to choose between its input boundary and
 internal composite for saved bypass; see [ADR-061](061-persistent-composite-group-bypass.md).
