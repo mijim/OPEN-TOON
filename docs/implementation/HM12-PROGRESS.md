@@ -49,6 +49,9 @@ highlights; the operation rejects missing, same and locked layers. The
 document command is atomic, with undo/redo and save/reopen. This edits layer
 order through the derived Nodes presentation; arbitrary node placement and
 wiring remain open.
+The Nodes search field locates cards by layer name or node kind without
+editing the document. It highlights matches, scrolls to the current result
+and cycles through them with Enter or Next; arbitrary graph edits remain open.
 Format 20 adds a persistent **Bypass cutter** control in Properties and Nodes.
 Bypass keeps its source and Inside/Outside choice but shows the uncut target;
 the source remains reserved and does not paint. Re-enable restores the exact
@@ -129,6 +132,9 @@ preview. This is diagnostic navigation, not a persisted graph edit.
   invalid/same/locked targets, one-step undo/redo and save/reopen. Native Qt
   Quick smoke drags a Drawing card onto a second card, observes the target
   highlight and checks the new output pixels before and after undo/reopen.
+- Native Qt Quick smoke types Write into the search field in a narrower window,
+  checks that the graph scrolls to the result with unchanged output, then
+  finds three Drawing cards and clicks Next to visit the second result.
 - A current three-frame original-art run with five Add layers measured
   50.93 ms/frame in Legacy and 45.22 ms/frame in Linear sRGB. The same host
   run measured Multiply/Screen at 45.79/45.18 ms and Normal at 1.84/42.99 ms.

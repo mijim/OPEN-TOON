@@ -13,6 +13,30 @@ Item {
     property string previewData: ""
     property int draggedLayer: 0
     property int dropLayer: 0
+    property int matchIndex: -1
+    readonly property int cardWidth: 148
+    readonly property int cardGap: 8
+    readonly property var matchingNodeIds: {
+        const query = nodeSearch ? nodeSearch.text.trim().toLowerCase() : ""
+        return query ? controller.compositionNodes.filter(n =>
+            n.name.toLowerCase().includes(query) || n.kind.toLowerCase().includes(query))
+            .map(n => n.id) : []
+    }
+    function showMatch(index) {
+        if (matchingNodeIds.length === 0) {
+            matchIndex = -1
+            return
+        }
+        matchIndex = (index + matchingNodeIds.length) % matchingNodeIds.length
+        const nodeIndex = controller.compositionNodes.findIndex(n =>
+            n.id === matchingNodeIds[matchIndex])
+        if (nodeIndex >= 0) {
+            const center = 12 + nodeIndex * (cardWidth + cardGap) + cardWidth / 2
+            graphScroll.contentX = Math.max(0, Math.min(
+                graphScroll.contentWidth - graphScroll.width,
+                center - graphScroll.width / 2))
+        }
+    }
     function refreshPreview() {
         if (previewNodeId <= 0)
             return
@@ -150,6 +174,28 @@ Item {
                 Accessible.name: "Bypass selected drawing opacity"
             }
             Item { Layout.fillWidth: true }
+            CompactTextField {
+                id: nodeSearch
+                objectName: "nodeSearch"
+                implicitWidth: 132
+                placeholderText: "Find node"
+                onTextChanged: root.showMatch(0)
+                onAccepted: root.showMatch(root.matchIndex + 1)
+                Accessible.name: "Find composition node by name or kind"
+            }
+            Label {
+                text: root.matchingNodeIds.length > 0
+                      ? (root.matchIndex + 1) + "/" + root.matchingNodeIds.length : ""
+                color: "#999999"
+                font.pixelSize: 10
+            }
+            ToolButton {
+                objectName: "nodeSearchNext"
+                text: "Next"
+                enabled: root.matchingNodeIds.length > 1
+                onClicked: root.showMatch(root.matchIndex + 1)
+                Accessible.name: "Find next matching composition node"
+            }
         }
         Rectangle { Layout.fillWidth: true; height: 1; color: "#303030" }
         RowLayout {
@@ -169,19 +215,22 @@ Item {
                 id: graphRow
                 x: 12
                 y: 14
-                spacing: 8
+                spacing: root.cardGap
                 Repeater {
                     model: root.controller.compositionNodes
                     Rectangle {
                         required property var modelData
                         readonly property int drawingLayer: modelData.kind === "Drawing" ? modelData.layer : 0
                         objectName: "compositionNode" + modelData.id
-                        width: 148
+                        width: root.cardWidth
                         height: Math.max(110, graphScroll.height - 30)
                         radius: 5
                         color: modelData.id === root.previewNodeId ? "#292929" : "#181818"
                         border.color: drawingLayer > 0 && root.dropLayer === drawingLayer
-                                      ? "#eeeeee" : modelData.kind === "Cutter" ||
+                                      ? "#eeeeee" : root.matchIndex >= 0 &&
+                                      root.matchingNodeIds[root.matchIndex] === modelData.id
+                                      ? "#dddddd" : root.matchingNodeIds.includes(modelData.id)
+                                      ? "#666666" : modelData.kind === "Cutter" ||
                                       modelData.kind === "Opacity" ||
                                       modelData.kind === "Bypassed opacity" ||
                                       modelData.kind === "Multiply" ||

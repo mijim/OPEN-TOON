@@ -1,5 +1,14 @@
 # Experimental releases
 
+## 0.2.0-experimental.44 — working source, node navigation
+
+- Search the derived Nodes graph by layer name or node kind. Matching cards
+  highlight, the view scrolls to the current result, and Next or Enter cycles
+  through matches. Search changes only view state.
+- Native Qt Quick smoke types a query, finds Write in a narrower window,
+  then clicks Next across three Drawing results without altering pixels.
+  Source only; no new public binary or tag.
+
 ## 0.2.0-experimental.43 — working source, direct node drawing order
 
 - Drag a Drawing card onto another in Nodes to place it immediately above

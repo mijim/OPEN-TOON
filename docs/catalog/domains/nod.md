@@ -28,9 +28,9 @@ Create, move, connect, search and delete nodes while navigating the graph.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/HM12-PROGRESS.md](../../../docs/implementation/HM12-PROGRESS.md) — native Drawing-card drag, pixel order, undo/reopen and invalid-target checks.
+**Implementation evidence:** [docs/implementation/HM12-PROGRESS.md](../../../docs/implementation/HM12-PROGRESS.md) — native Drawing-card drag, typed search/navigation, pixel order, undo/reopen and invalid-target checks.
 
-**Remaining scope:** The derived graph offers clickable image/matte previews and direct Drawing-card reordering of saved composite order. Arbitrary node creation, wiring, search, deletion and layout remain open.
+**Remaining scope:** The derived graph offers clickable image/matte previews, name/kind search and direct Drawing-card reordering of saved composite order. Arbitrary node creation, wiring, deletion and layout remain open.
 
 ## NOD-002 — Typed ports
 

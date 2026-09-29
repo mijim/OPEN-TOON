@@ -3445,8 +3445,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The derived graph offers clickable image/matte previews and direct Drawing-card reordering of saved composite order. Arbitrary node creation, wiring, search, deletion and layout remain open.",
-      "implementation_evidence": "docs/implementation/HM12-PROGRESS.md; native Drawing-card drag, pixel order, undo/reopen and invalid-target checks"
+      "notes": "The derived graph offers clickable image/matte previews, name/kind search and direct Drawing-card reordering of saved composite order. Arbitrary node creation, wiring, deletion and layout remain open.",
+      "implementation_evidence": "docs/implementation/HM12-PROGRESS.md; native Drawing-card drag, typed search/navigation, pixel order, undo/reopen and invalid-target checks"
     },
     {
       "id": "NOD-002",

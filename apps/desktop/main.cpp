@@ -552,8 +552,46 @@ int main(int argc, char** argv) {
                         !editor.openProject(QUrl::fromLocalFile(reorderPath)) ||
                         editor.document().layers.back().id != red)
                         throw std::runtime_error("Drawing drag order changed after reopen.");
+                    window->setWidth(1000);
+                    QCoreApplication::processEvents();
+                    (void)window->grabWindow();
+                    auto* search = window->findChild<QQuickItem*>("nodeSearch");
+                    if (!search || !search->isVisible())
+                        throw std::runtime_error("Node search is unavailable.");
+                    search->forceActiveFocus();
+                    for (const auto letter : QStringLiteral("Write")) {
+                        const auto key = Qt::Key(letter.toUpper().unicode());
+                        QKeyEvent press(QEvent::KeyPress, key, Qt::NoModifier, QString(letter));
+                        QKeyEvent release(QEvent::KeyRelease, key, Qt::NoModifier, QString(letter));
+                        QCoreApplication::sendEvent(window, &press);
+                        QCoreApplication::sendEvent(window, &release);
+                    }
+                    QCoreApplication::processEvents();
+                    if (search->property("text").toString() != "Write" ||
+                        nodes->property("matchingNodeIds").toList().size() != 1 ||
+                        strip->property("contentX").toDouble() <= 0 ||
+                        qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Typed node search did not navigate to Write without an edit: text=" +
+                            search->property("text").toString().toStdString() +
+                            " matches=" + std::to_string(nodes->property("matchingNodeIds").toList().size()) +
+                            " index=" + std::to_string(nodes->property("matchIndex").toInt()) +
+                            " scroll=" + std::to_string(strip->property("contentX").toDouble()) +
+                            " width=" + std::to_string(strip->width()) +
+                            " content=" + std::to_string(strip->property("contentWidth").toDouble()));
+                    search->setProperty("text", "Drawing");
+                    QCoreApplication::processEvents();
+                    auto* nextMatch = window->findChild<QQuickItem*>("nodeSearchNext");
+                    if (!nextMatch || !nextMatch->isVisible() ||
+                        nodes->property("matchingNodeIds").toList().size() != 3)
+                        throw std::runtime_error("Drawing search did not find all three cards.");
+                    const auto nextPoint = nextMatch->mapToScene(
+                        QPointF(nextMatch->width() / 2, nextMatch->height() / 2));
+                    movePoint(QEvent::MouseButtonPress, nextPoint, Qt::LeftButton);
+                    movePoint(QEvent::MouseButtonRelease, nextPoint, Qt::NoButton);
+                    if (nodes->property("matchIndex").toInt() != 1)
+                        throw std::runtime_error("Next did not navigate to the second Drawing match.");
                     std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass, fractional cutter, "
-                                 "painted-source Multiply/Add, drawing drag order, save/reopen and undo.\n";
+                                 "painted-source Multiply/Add, drawing drag order, typed search, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';
