@@ -2,6 +2,7 @@
 #include "opentoon/animation.h"
 #include "opentoon/property_address.h"
 #include "opentoon/rigging.h"
+#include "opentoon/character_pose.h"
 #include "opentoon/deformation.h"
 #include "opentoon/deformer.h"
 #include "project_store.h"
@@ -79,6 +80,8 @@ void EditorController::resetSelection() {
     layer_ = document().layers.empty() ? 0 : document().layers.back().id;
     selectedView_ = 0;
     emit viewSelectionChanged();
+    selectedCharacterPose_ = 0;
+    emit poseSelectionChanged();
     swatch_ = document().palette.empty() ? 0 : document().palette.front().id;
     frame_ = 0;
     emit selectionChanged();
@@ -95,12 +98,14 @@ bool EditorController::edit(const std::string& label, const std::function<void(D
                 layer_ = document().layers.empty() ? 0 : document().layers.back().id;
                 rangeLayers_.clear();
                 selectedView_ = 0;
+                selectedCharacterPose_ = 0;
                 emit selectionChanged();
                 emit rangeChanged();
             }
             emit changed();
             emit frameChanged();
             emit viewSelectionChanged();
+            emit poseSelectionChanged();
             report(QString::fromStdString(label));
         }
         return result;
@@ -181,6 +186,37 @@ void EditorController::selectView(int view) {
         })) {
         selectedView_ = view;
         emit viewSelectionChanged();
+    }
+}
+QVariantList EditorController::characterPoses() const {
+    QVariantList result;
+    const int root = characterId();
+    if (!root)
+        return result;
+    for (const auto& pose : document().layer(root).poses)
+        result.push_back(QVariantMap{{"id", int(pose.id)},
+                                     {"name", QString::fromStdString(pose.name)},
+                                     {"parts", int(pose.parts.size())}});
+    return result;
+}
+int EditorController::selectedCharacterPose() const {
+    const int root = characterId();
+    if (!root)
+        return 0;
+    const auto& poses = document().layer(root).poses;
+    if (std::any_of(poses.begin(), poses.end(), [&](const auto& item) {
+            return item.id == selectedCharacterPose_;
+        }))
+        return int(selectedCharacterPose_);
+    return poses.empty() ? 0 : int(poses.front().id);
+}
+void EditorController::selectCharacterPose(int poseId) {
+    const auto options = characterPoses();
+    if (std::any_of(options.begin(), options.end(), [poseId](const QVariant& option) {
+            return option.toMap().value("id").toInt() == poseId;
+        })) {
+        selectedCharacterPose_ = poseId;
+        emit poseSelectionChanged();
     }
 }
 QString EditorController::substitutionThumbnail(int drawingId) const {
@@ -302,6 +338,8 @@ void EditorController::setSelectedLayer(int value) {
         layer_ = value;
         selectedView_ = 0;
         emit viewSelectionChanged();
+        selectedCharacterPose_ = 0;
+        emit poseSelectionChanged();
         rangeLayers_ = {layer_};
         rangeStart_ = frame_;
         rangeEnd_ = frame_ + 1;
@@ -1067,6 +1105,55 @@ bool EditorController::removeSelectedMesh() {
     return layer_ && drawing && edit("Remove mesh binding", [&](Document& d) {
         opentoon::removeMeshBinding(d, layer_, drawing);
     });
+}
+void EditorController::captureSelectedCharacterPose(int channels, bool allParts) {
+    const int root = characterId();
+    if (!root)
+        return;
+    Id created = 0;
+    if (edit("Capture character pose", [&](Document& d) {
+            const auto& poses = d.layer(root).poses;
+            int number = 1;
+            auto name = "Pose " + std::to_string(number);
+            while (std::any_of(poses.begin(), poses.end(),
+                               [&](const auto& pose) { return pose.name == name; }))
+                name = "Pose " + std::to_string(++number);
+            std::vector<opentoon::PoseCaptureTarget> targets;
+            if (allParts) {
+                for (const auto& layer : d.layers)
+                    if (layer.kind == LayerKind::Part && opentoon::characterFor(d, layer.id) == Id(root))
+                        targets.push_back({layer.id, std::uint16_t(channels)});
+            } else {
+                targets.push_back({layer_, std::uint16_t(channels)});
+            }
+            created = opentoon::captureCharacterPose(d, root, frame_, targets, name);
+        })) {
+        selectedCharacterPose_ = created;
+        emit poseSelectionChanged();
+    }
+}
+void EditorController::applySelectedCharacterPose() {
+    const int root = characterId(), poseId = selectedCharacterPose();
+    if (root && poseId)
+        edit("Apply character pose", [&](Document& d) {
+            opentoon::applyCharacterPose(d, root, poseId, frame_);
+        });
+}
+void EditorController::renameSelectedCharacterPose(QString name) {
+    const int root = characterId(), poseId = selectedCharacterPose();
+    if (root && poseId)
+        edit("Rename character pose", [&](Document& d) {
+            opentoon::renameCharacterPose(d, root, poseId, name.toStdString());
+        });
+}
+void EditorController::removeSelectedCharacterPose() {
+    const int root = characterId(), poseId = selectedCharacterPose();
+    if (root && poseId && edit("Remove character pose", [&](Document& d) {
+            opentoon::removeCharacterPose(d, root, poseId);
+        })) {
+        selectedCharacterPose_ = 0;
+        emit poseSelectionChanged();
+    }
 }
 void EditorController::captureCharacterView() {
     const int root = characterId();

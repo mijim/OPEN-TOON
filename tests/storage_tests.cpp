@@ -3,6 +3,7 @@
 #include "opentoon/rigging.h"
 #include "opentoon/deformation.h"
 #include "opentoon/deformer.h"
+#include "opentoon/character_pose.h"
 #include <catch2/catch_test_macros.hpp>
 #include <algorithm>
 #include <chrono>
@@ -33,6 +34,27 @@ TEST_CASE("Projects round trip Unicode names keys and images with stable identit
     auto loaded = ProjectStore::load(p.file);
     REQUIRE(loaded.document == d);
     REQUIRE(loaded.revision == revision);
+}
+TEST_CASE("Format 12 persists masked character poses and loads format 11 without them") {
+    auto d = makeDocument();
+    const Id part = d.layers.front().id;
+    const Id root = makeCharacter(d, part, "Hero");
+    (void)createSubstitution(d, part, 0, false, "Default");
+    const Id pose = captureCharacterPose(d, root, 0,
+        std::vector<PoseCaptureTarget>{{part, PoseChannels::PositionX | PoseChannels::Drawing}},
+        "Reach");
+    REQUIRE(deserializeDocument(serializeDocument(d)) == d);
+    TemporaryProject project;
+    (void)ProjectStore::save(project.file, d);
+    REQUIRE(ProjectStore::load(project.file).document == d);
+    auto previous = nlohmann::json::parse(serializeDocument(d));
+    previous["version"] = 11;
+    for (auto& layer : previous["layers"])
+        layer.erase("poses");
+    const auto old = deserializeDocument(previous.dump());
+    REQUIRE(old.layer(root).poses.empty());
+    REQUIRE(old.nextId == d.nextId);
+    REQUIRE(d.layer(root).poses.front().id == pose);
 }
 TEST_CASE("Failure injection preserves the previous or fully committed revision") {
     for (auto point : {ProjectStore::SavePoint::BeforeTransaction, ProjectStore::SavePoint::AfterInsert,

@@ -2639,7 +2639,7 @@
         "Applying a pose does not overwrite properties outside its set."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "rigging",
@@ -2648,7 +2648,8 @@
         "VEC"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM07-PROGRESS.md; named same-character masked capture/apply subset, full transfer acceptance open"
     },
     {
       "id": "RIG-013",

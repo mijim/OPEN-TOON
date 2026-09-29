@@ -310,7 +310,7 @@ Deliver editable bone chains and curve chains with defined local/rest spaces, st
 
 ## HM-07
 
-**First-class poses and declarative animator controls** — `planned`; owner `controllers/rigging`, work package `P08-W3`.
+**First-class poses and declarative animator controls** — `in_progress`; owner `controllers/rigging`, work package `P08-W3`.
 
 Save named masked poses including discrete substitutions; apply/mirror only explicitly mapped parts. Add direct widgets, limited sliders/switches and a compact character dashboard. Pose interpolation blends compatible numeric properties; discrete variants use an explicit threshold rule. Animator and Rig workspaces expose the same document at different detail levels.
 

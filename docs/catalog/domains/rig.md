@@ -154,9 +154,13 @@ Save and transfer poses using stable part mappings.
 
 **Initial acceptance:** Applying a pose does not overwrite properties outside its set.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM07-PROGRESS.md](../../../docs/implementation/HM07-PROGRESS.md) — named same-character masked capture/apply subset, full transfer acceptance open.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## RIG-013 — Breakdown Assistant
 

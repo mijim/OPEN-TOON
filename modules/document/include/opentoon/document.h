@@ -105,6 +105,32 @@ struct CharacterView {
     std::vector<ViewChoice> choices;
     auto operator<=>(const CharacterView&) const = default;
 };
+namespace PoseChannels {
+constexpr std::uint16_t PositionX = 1u << 0;
+constexpr std::uint16_t PositionY = 1u << 1;
+constexpr std::uint16_t Rotation = 1u << 2;
+constexpr std::uint16_t ScaleX = 1u << 3;
+constexpr std::uint16_t ScaleY = 1u << 4;
+constexpr std::uint16_t Opacity = 1u << 5;
+constexpr std::uint16_t PivotX = 1u << 6;
+constexpr std::uint16_t PivotY = 1u << 7;
+constexpr std::uint16_t Drawing = 1u << 8;
+constexpr std::uint16_t AllTransforms = Drawing - 1;
+constexpr std::uint16_t All = AllTransforms | Drawing;
+} // namespace PoseChannels
+struct PosePart {
+    Id part = 0;
+    std::uint16_t channels = 0;
+    Transform transform;
+    Id drawing = 0;
+    auto operator<=>(const PosePart&) const = default;
+};
+struct CharacterPose {
+    Id id = 0;
+    std::string name;
+    std::vector<PosePart> parts;
+    auto operator<=>(const CharacterPose&) const = default;
+};
 struct MeshPoint {
     double x = 0, y = 0;
     auto operator<=>(const MeshPoint&) const = default;
@@ -168,6 +194,7 @@ struct Layer {
     std::string role;
     std::vector<Substitution> variants;
     std::vector<CharacterView> views;
+    std::vector<CharacterPose> poses;
     std::vector<MeshBinding> bindings;
     std::optional<BoneTipAnchor> boneTipAnchor;
     auto operator<=>(const Layer&) const = default;
@@ -178,7 +205,7 @@ struct Marker {
     auto operator<=>(const Marker&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 11;
+    static constexpr int formatVersion = 12;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;

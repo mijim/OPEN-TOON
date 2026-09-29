@@ -97,3 +97,6 @@ bone/curve animation contract, local weights and ephemeral pose evaluation.
 
 See [ADR-031](031-bone-tip-attachment.md) for the bounded format-10 parent
 bone-tip link, evaluation order, validation and migration boundary.
+
+See [ADR-032](032-named-character-poses.md) for format-12 named masked poses,
+atomic application and stable Part/substitution references.

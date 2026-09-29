@@ -1530,6 +1530,70 @@ ApplicationWindow {
                                     onEditingFinished: editor.renameCharacterView(text)
                                     Accessible.name: "Character view set name"
                                 }
+                                Rectangle { Layout.fillWidth: true; height: 1; color: "#282828" }
+                                Label { text: "Character poses"; color: "#999999"; font.pixelSize: 10 }
+                                C.CompactComboBox {
+                                    Layout.fillWidth: true
+                                    model: editor.characterPoses
+                                    textRole: "name"
+                                    valueRole: "id"
+                                    currentIndex: model.findIndex(p => p.id === editor.selectedCharacterPose)
+                                    onActivated: editor.selectCharacterPose(currentValue)
+                                    Accessible.name: "Selected character pose"
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    C.CompactComboBox {
+                                        id: poseTarget
+                                        Layout.fillWidth: true
+                                        model: ["Selected part", "All parts"]
+                                        Accessible.name: "Pose capture target"
+                                    }
+                                    C.CompactComboBox {
+                                        id: poseChannels
+                                        Layout.fillWidth: true
+                                        model: [
+                                            { name: "All channels", mask: 511 },
+                                            { name: "Transforms", mask: 255 },
+                                            { name: "Position", mask: 3 },
+                                            { name: "Rotation", mask: 4 },
+                                            { name: "Scale", mask: 24 },
+                                            { name: "Opacity", mask: 32 },
+                                            { name: "Pivot", mask: 192 },
+                                            { name: "Drawing", mask: 256 }
+                                        ]
+                                        textRole: "name"
+                                        valueRole: "mask"
+                                        Accessible.name: "Pose capture channels"
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    C.CompactButton {
+                                        text: "+ Capture"
+                                        enabled: poseTarget.currentIndex === 1 || layerInspector.rigLayer?.kind === 3
+                                        onClicked: editor.captureSelectedCharacterPose(poseChannels.currentValue, poseTarget.currentIndex === 1)
+                                    }
+                                    C.CompactButton {
+                                        text: "Apply"
+                                        enabled: editor.selectedCharacterPose > 0
+                                        onClicked: editor.applySelectedCharacterPose()
+                                    }
+                                    Item { Layout.fillWidth: true }
+                                    C.CompactButton {
+                                        text: "Remove"
+                                        enabled: editor.selectedCharacterPose > 0
+                                        onClicked: editor.removeSelectedCharacterPose()
+                                    }
+                                }
+                                C.CompactTextField {
+                                    Layout.fillWidth: true
+                                    text: editor.characterPoses.find(p => p.id === editor.selectedCharacterPose)?.name || ""
+                                    placeholderText: "Pose name"
+                                    enabled: editor.selectedCharacterPose > 0
+                                    onEditingFinished: editor.renameSelectedCharacterPose(text)
+                                    Accessible.name: "Character pose name"
+                                }
                             }
                         }
                         Rectangle {

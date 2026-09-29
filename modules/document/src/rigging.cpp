@@ -385,6 +385,11 @@ void removeSubstitution(Document& document, Id partId, Id drawing) {
         for (const auto& choice : view.choices)
             require(choice.part != partId || choice.drawing != drawing,
                     "Remove this substitution from character view sets first.");
+    for (const auto& pose : document.layer(root).poses)
+        for (const auto& entry : pose.parts)
+            require(entry.part != partId || !(entry.channels & PoseChannels::Drawing) ||
+                        entry.drawing != drawing,
+                    "Remove this substitution from character poses first.");
     std::erase_if(layer.variants, [drawing](const auto& item) { return item.drawing == drawing; });
     const Id replacement = layer.variants.empty() ? 0 : layer.variants.front().drawing;
     auto exposures = layer.exposures;
@@ -551,6 +556,14 @@ Id duplicateCharacter(Document& document, Id rootId, double offsetX, double offs
                 choice.drawing = copyDrawing(choice.drawing);
             }
         }
+        for (auto& pose : source.poses) {
+            pose.id = document.allocateId();
+            for (auto& entry : pose.parts) {
+                entry.part = layers.at(entry.part);
+                if (entry.channels & PoseChannels::Drawing)
+                    entry.drawing = copyDrawing(entry.drawing);
+            }
+        }
         document.layers.push_back(std::move(source));
     }
     return layers.at(rootId);
@@ -628,6 +641,10 @@ void removeRigBranch(Document& document, Id branchId) {
         std::erase_if(view.choices, [&](const ViewChoice& choice) {
             return removed.contains(choice.part);
         });
+    auto& poses = document.layer(rootId).poses;
+    for (auto& pose : poses)
+        std::erase_if(pose.parts, [&](const PosePart& entry) { return removed.contains(entry.part); });
+    std::erase_if(poses, [](const CharacterPose& pose) { return pose.parts.empty(); });
     std::erase_if(document.layers, [&](const Layer& layer) { return removed.contains(layer.id); });
 }
 void detachPart(Document& document, Id partId) {
@@ -646,6 +663,10 @@ void detachPart(Document& document, Id partId) {
             "Detaching cannot preserve opacity.");
     for (auto& view : document.layer(rootId).views)
         std::erase_if(view.choices, [partId](const ViewChoice& choice) { return choice.part == partId; });
+    auto& poses = document.layer(rootId).poses;
+    for (auto& pose : poses)
+        std::erase_if(pose.parts, [partId](const PosePart& entry) { return entry.part == partId; });
+    std::erase_if(poses, [](const CharacterPose& pose) { return pose.parts.empty(); });
     layer.transform = pose;
     layer.parent = 0;
     layer.kind = LayerKind::Drawing;

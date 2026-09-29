@@ -106,6 +106,7 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
                   {"role", l.role},
                   {"variants", Json::array()},
                   {"views", Json::array()},
+                  {"poses", Json::array()},
                   {"bindings", Json::array()},
                   {"transform", transform(l.transform)},
                   {"exposures", Json::array()},
@@ -124,6 +125,13 @@ std::string serializeDocument(const Document& d, ResourceWriter write) {
             for (const auto& choice : view.choices)
                 choices.push_back({choice.part, choice.drawing});
             x["views"].push_back({{"id", view.id}, {"name", view.name}, {"choices", choices}});
+        }
+        for (const auto& pose : l.poses) {
+            Json parts = Json::array();
+            for (const auto& part : pose.parts)
+                parts.push_back({{"part", part.part}, {"channels", part.channels},
+                                 {"transform", transform(part.transform)}, {"drawing", part.drawing}});
+            x["poses"].push_back({{"id", pose.id}, {"name", pose.name}, {"parts", parts}});
         }
         for (const auto& binding : l.bindings) {
             Json vertices = Json::array();
@@ -329,6 +337,19 @@ Document deserializeDocument(const std::string& text, ResourceReader read) {
                 for (const auto& choice : view.at("choices"))
                     entry.choices.push_back({choice.at(0), choice.at(1)});
                 l.views.push_back(std::move(entry));
+            }
+        }
+        if (j.at("version").get<int>() >= 12) {
+            limit(x.at("poses"), 1000);
+            for (const auto& pose : x.at("poses")) {
+                CharacterPose entry;
+                entry.id = pose.at("id");
+                entry.name = pose.at("name");
+                limit(pose.at("parts"), 2000);
+                for (const auto& part : pose.at("parts"))
+                    entry.parts.push_back({part.at("part"), part.at("channels"),
+                                           readTransform(part.at("transform")), part.at("drawing")});
+                l.poses.push_back(std::move(entry));
             }
         }
         if (j.at("version").get<int>() >= 8) {

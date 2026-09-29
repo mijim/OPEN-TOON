@@ -58,8 +58,8 @@
     {
       "id": "P08",
       "status": "in_progress",
-      "available": "Accepted bounded HM-03 rigid-character contract: 19-part original-art assembly, coordinated views, pixel-equivalent reopen and independent copy. Parented layers and typed character roots, pegs and Parts; role editing, preserve-world rigid reparenting within shared animated ancestry, stable rest pivots, named held substitutions, renderer-backed thumbnails and coordinated view sets. Batch Part assembly, independent or explicitly linked-artwork Part/Peg branch copies, safe branch deletion, Part detachment, Peg dissolution and view-range edits preserve view membership through save/reopen.",
-      "remaining": "Independent second-animator review, reparenting across differently animated branches, masked poses, Quick Rig, declarative controls, portable assets/templates and production-scale qualification."
+      "available": "Accepted bounded HM-03 rigid-character contract: 19-part original-art assembly, coordinated views, pixel-equivalent reopen and independent copy. Parented layers and typed character roots, pegs and Parts; role editing, preserve-world rigid reparenting within shared animated ancestry, stable rest pivots, named held substitutions, renderer-backed thumbnails and coordinated view sets. Batch Part assembly, independent or explicitly linked-artwork Part/Peg branch copies, safe branch deletion, Part detachment, Peg dissolution and view-range edits preserve view membership through save/reopen. Format-12 named masked poses capture selected/all Parts and selected transform/drawing channels, apply with atomic undo, and save/reopen.",
+      "remaining": "Independent second-animator review, reparenting across differently animated branches, cross-rig pose transfer/mirroring, pose sliders, Quick Rig, declarative controls, portable assets/templates and production-scale qualification."
     },
     {
       "id": "P09",
@@ -84,8 +84,8 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 128,
-      "command": "ctest --test-dir build/desktop --output-on-failure --parallel 4"
+      "count": 134,
+      "command": "ctest --test-dir build/locked --output-on-failure -j6"
     },
     "native_input_workflow": {
       "status": "passed",
@@ -248,7 +248,7 @@
         "animated orthographic camera matches reopened preview and two exported PNG frames"
       ]
     },
-    "total_local_ctest_entries": 128,
+    "total_local_ctest_entries": 134,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -379,6 +379,17 @@
       ],
       "scope": "Format-9 per-substitution two-segment bone and cubic curve keys, rest-preserving evaluation, posed canvas grid, direct mouse handles including bone and curve rest-control placement, undo/cancellation/reopen, original assembled 19-part pixels and four-run 3.18 ms/frame 1080p renderer measurement with the latest toon artwork. Format 10 introduced a parent bone-tip link for a child Part; format 11 persists its stable rest tip and distal axis, used by the continuous-limb candidate's hands and feet without duplicate follower motion keys. Properties exposes 1-32 mesh cells per axis and an undoable elbow influence radius; the radius also has an on-canvas rest-mode handle with isolated preview and cancellation. Existing keys are revalidated before weight changes. Scene frame insertion/removal and selected-range Clear maintain deformer keys; same-Part range copy/paste, move and stretch retain exact keyed poses. A separate 15-artwork-Part candidate uses four continuous arm/leg images, one mesh and middle elbow/knee joint per limb; its four posed limbs retain rest pixels and reopen identically. An openable 48-frame study combines the continuous rig with a coordinated face view and hand substitution; native tests check undo, redo and reopened frame parity. One native linked 15-part run measured p95 input-to-frameSwapped 17.18 ms and peak resident memory 275 MB on M1 Pro; four earlier 19-part subset runs measured p95 14.90-16.76 ms and memory below 273 MB. A 480-frame visual shot with face/hand/mouth timing, torso curve and camera push retains one connected silhouette and exact bone-tip/follower alignment throughout all 480 frames. An explicit boundary command matches compatible incoming bone or curve controls to the outgoing evaluated pose; native undo/redo/save/reopen passes on an intentionally unmatched sleeve. This removes the measured frame-300 wrist jump; sampled native interaction and memory meet proposed limits on M1 Pro. Full audio/matte/control shot budgets remain open.",
       "limitations": "HM-06 is not accepted: continuous limb bends and source alpha have been inspected, but owner art approval, broader influence/artifact review, linked complete-shot interaction/memory budgets and artist workflow remain. The bounded link requires a direct child Part, an active two-segment parent bone throughout the scene and rest at frame zero; arbitrary deformer attachments, IK and portable templates remain HM-09. Cross-scene and different-Part deformer-key paste reject until portable rig binding transfer is implemented. Independent drawing paste of a bound Part rejects until mesh clone semantics are defined. Format-10 links infer their initial anchor from the currently exposed frame-zero source during migration because the earlier flag did not store attachment-time coordinates."
+    },
+    "named_character_poses": {
+      "status": "passed_subset",
+      "scope": "Format-12 named Part/channel masks and drawing substitutions; editor import/capture/apply/undo/save/reopen; independent duplication and branch cleanup",
+      "tests": [
+        "Named character poses apply only masked channels and substitutions in one undo step",
+        "Named poses survive duplication and remove stale part references",
+        "Format 12 persists masked character poses and loads format 11 without them",
+        "export_workflows: Editor captures a selected Part pose, applies its mask, undoes and reopens"
+      ],
+      "limits": "Cross-character transfer, mirroring, sliders, published controls and complete artist journey remain open."
     }
   },
   "ownership": {

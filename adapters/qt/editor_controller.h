@@ -48,6 +48,8 @@ class EditorController final : public QObject {
     Q_PROPERTY(int characterId READ characterId NOTIFY changed)
     Q_PROPERTY(QVariantList characterViews READ characterViews NOTIFY changed)
     Q_PROPERTY(int selectedView READ selectedView NOTIFY viewSelectionChanged)
+    Q_PROPERTY(QVariantList characterPoses READ characterPoses NOTIFY changed)
+    Q_PROPERTY(int selectedCharacterPose READ selectedCharacterPose NOTIFY poseSelectionChanged)
     Q_PROPERTY(qulonglong documentRevision READ documentRevision NOTIFY changed)
     Q_PROPERTY(QVariantList palette READ palette NOTIFY changed)
     Q_PROPERTY(QVariantList revisions READ revisions NOTIFY changed)
@@ -137,6 +139,9 @@ class EditorController final : public QObject {
     qulonglong documentRevision() const { return session_.revision(); }
     Q_INVOKABLE QString substitutionThumbnail(int drawing) const;
     Q_INVOKABLE void selectView(int view);
+    QVariantList characterPoses() const;
+    int selectedCharacterPose() const;
+    Q_INVOKABLE void selectCharacterPose(int pose);
     QVariantList palette() const;
     QVariantList revisions() const;
     QVariantMap transform() const;
@@ -257,6 +262,10 @@ class EditorController final : public QObject {
     Q_INVOKABLE void removeCharacterView();
     Q_INVOKABLE void moveCharacterView(int direction);
     Q_INVOKABLE void stepCharacterView(int direction);
+    Q_INVOKABLE void captureSelectedCharacterPose(int channels, bool allParts);
+    Q_INVOKABLE void applySelectedCharacterPose();
+    Q_INVOKABLE void renameSelectedCharacterPose(QString name);
+    Q_INVOKABLE void removeSelectedCharacterPose();
     Q_INVOKABLE void duplicateCharacter();
     Q_INVOKABLE void newDrawing(bool duplicate = false);
     Q_INVOKABLE void holdDrawing(int);
@@ -293,6 +302,7 @@ class EditorController final : public QObject {
     void keySelectionChanged();
     void poseClipboardChanged();
     void viewSelectionChanged();
+    void poseSelectionChanged();
     void animationModeChanged();
     void rangeChanged();
     void changed();
@@ -313,6 +323,7 @@ class EditorController final : public QObject {
     opentoon::KeyBlock poseClipboard_;
     std::optional<opentoon::Transform> transformClipboard_;
     opentoon::Id selectedView_ = 0;
+    opentoon::Id selectedCharacterPose_ = 0;
     mutable std::uint64_t thumbnailRevision_ = 0;
     mutable QHash<qulonglong, QString> thumbnailCache_;
     void reconcilePoseSelection();

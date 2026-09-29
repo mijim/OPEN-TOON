@@ -190,12 +190,15 @@ void Document::validate() const {
         require(static_cast<int>(l.kind) >= 0 && static_cast<int>(l.kind) <= 4,
                 "Unknown layer kind.");
         require(l.role.size() <= 128 && l.variants.size() <= 10000 && l.views.size() <= 1000 &&
+                    l.poses.size() <= 1000 &&
                     l.bindings.size() <= 256,
                 "Invalid part metadata size.");
         if (l.kind != LayerKind::Part)
             require(l.role.empty() && l.variants.empty(), "Only parts may own roles and variants.");
         if (l.kind != LayerKind::Character)
             require(l.views.empty(), "Only character roots may own view sets.");
+        if (l.kind != LayerKind::Character)
+            require(l.poses.empty(), "Only character roots may own named poses.");
         if (l.kind != LayerKind::Part)
             require(l.bindings.empty(), "Only parts may own mesh bindings.");
         if (l.kind == LayerKind::Character || l.kind == LayerKind::Peg || l.kind == LayerKind::Camera)
@@ -326,6 +329,34 @@ void Document::validate() const {
                                             return variant.drawing == choice.drawing;
                                         }),
                         "View set references a part or substitution outside its character.");
+            }
+        }
+        std::set<std::string> poseNames;
+        for (const auto& pose : root.poses) {
+            id(pose.id);
+            require(!pose.name.empty() && pose.name.size() <= 128 &&
+                        poseNames.insert(pose.name).second && !pose.parts.empty() &&
+                        pose.parts.size() <= 2000,
+                    "Invalid or duplicate character pose.");
+            std::set<Id> parts;
+            for (const auto& entry : pose.parts) {
+                const auto& target = layer(entry.part);
+                require(target.kind == LayerKind::Part && parts.insert(entry.part).second &&
+                            entry.channels && !(entry.channels & ~PoseChannels::All),
+                        "Pose contains a missing, duplicate or invalid part mask.");
+                Id ancestor = target.parent;
+                while (ancestor && ancestor != root.id)
+                    ancestor = layer(ancestor).parent;
+                require(ancestor == root.id, "Pose part belongs to another character.");
+                validateTransform(entry.transform);
+                if (entry.channels & PoseChannels::Drawing)
+                    require(std::any_of(target.variants.begin(), target.variants.end(),
+                                        [&](const Substitution& variant) {
+                                            return variant.drawing == entry.drawing;
+                                        }),
+                            "Pose references a missing part substitution.");
+                else
+                    require(entry.drawing == 0, "Pose has an unmasked drawing reference.");
             }
         }
     }

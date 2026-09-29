@@ -91,6 +91,44 @@ TEST_CASE("Registered PNG parts preserve a shared canvas and undo as one edit") 
     editor.redo();
     REQUIRE(editor.document() == imported);
 }
+TEST_CASE("Editor captures a selected Part pose, applies its mask, undoes and reopens") {
+    EditorController editor;
+    editor.newScene();
+    REQUIRE(editor.importParts(paths({partFixture + "hand_right__open.png",
+                                      partFixture + "torso__base.png"})));
+    const int torso = editor.selectedLayer();
+    editor.makeCharacter();
+    REQUIRE(editor.characterId() > 0);
+    editor.attachUnparentedDrawings();
+    const int hand = int(std::find_if(editor.document().layers.begin(), editor.document().layers.end(),
+                                     [](const auto& layer) { return layer.name == "hand_right__open"; })->id);
+    editor.setSelectedLayer(hand);
+    editor.setTransform("x", 50);
+    editor.setTransform("rotation", 20);
+    editor.captureSelectedCharacterPose(opentoon::PoseChannels::PositionX, false);
+    REQUIRE(editor.characterPoses().size() == 1);
+    const int poseId = editor.selectedCharacterPose();
+    editor.setTransform("x", 80);
+    editor.setTransform("rotation", 70);
+    editor.setFrame(8);
+    const auto before = editor.document();
+    editor.applySelectedCharacterPose();
+    REQUIRE(opentoon::evaluateTransform(editor.document().layer(hand), 8).x == 50);
+    REQUIRE(opentoon::evaluateTransform(editor.document().layer(hand), 8).rotation == 70);
+    editor.undo();
+    REQUIRE(editor.document() == before);
+    editor.redo();
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto project = QUrl::fromLocalFile(directory.filePath("named-pose.otoon"));
+    REQUIRE(editor.saveProject(project));
+    EditorController reopened;
+    REQUIRE(reopened.openProject(project));
+    reopened.setSelectedLayer(torso);
+    REQUIRE(reopened.characterPoses().size() == 1);
+    REQUIRE(reopened.characterPoses().front().toMap().value("id").toInt() == poseId);
+    REQUIRE(reopened.document() == editor.document());
+}
 TEST_CASE("Composition profile edits are undoable and persist through project save") {
     EditorController editor;
     editor.newScene();

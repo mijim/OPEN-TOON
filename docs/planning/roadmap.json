@@ -2996,7 +2996,7 @@
     {
       "feature_id": "RIG-012",
       "completion_phase": "P08",
-      "status": "planned",
+      "status": "in_progress",
       "disposition": "planned_delivery",
       "delivery_slices": [
         "HM-07",
@@ -4843,7 +4843,7 @@
       "owner_phase": "P08",
       "work_package": "P08-W3",
       "owner_module": "controllers/rigging",
-      "status": "planned",
+      "status": "in_progress",
       "effort_engineer_weeks": [
         3,
         6

@@ -1,4 +1,5 @@
 #include "opentoon/property_address.h"
+#include "opentoon/character_pose.h"
 #include "opentoon/rigging.h"
 #include "opentoon/session.h"
 #include "serialization.h"
@@ -7,6 +8,66 @@
 #include <cmath>
 
 using namespace opentoon;
+
+TEST_CASE("Named character poses apply only masked channels and substitutions in one undo step") {
+    Session session;
+    const Id body = session.document().layers.front().id;
+    Id root = 0, hand = 0, alternate = 0, pose = 0;
+    REQUIRE(session.apply("Assemble pose fixture", [&](Document& d) {
+        root = makeCharacter(d, body, "Hero");
+        Layer part;
+        part.id = d.allocateId();
+        hand = part.id;
+        part.name = "Hand";
+        d.layers.push_back(part);
+        attachDrawingAsPart(d, hand, root, "Hand");
+        (void)createSubstitution(d, hand, 0, false, "Closed hand");
+        alternate = createSubstitution(d, hand, 0, true, "Open hand");
+        d.layer(hand).transform.x = 40;
+        d.layer(hand).transform.rotation = 20;
+        d.layer(hand).transform.opacity = .8;
+        pose = captureCharacterPose(d, root, 0,
+            std::vector<PoseCaptureTarget>{{hand, PoseChannels::PositionX | PoseChannels::Drawing},
+                                           {body, PoseChannels::Rotation}}, "Wave");
+    }));
+    REQUIRE(session.apply("Change pose", [&](Document& d) {
+        d.layer(hand).transform.x = 110;
+        d.layer(hand).transform.rotation = 70;
+        d.layer(hand).transform.opacity = .4;
+        d.layer(body).transform.rotation = 32;
+        selectSubstitution(d, hand, 0, d.layer(hand).variants.front().drawing);
+    }));
+    const auto before = session.document();
+    REQUIRE(session.apply("Apply pose", [&](Document& d) { applyCharacterPose(d, root, pose, 8); }));
+    const auto result = session.document();
+    REQUIRE(evaluateTransform(result.layer(hand), 8).x == 40);
+    REQUIRE(evaluateTransform(result.layer(hand), 8).rotation == 70);
+    REQUIRE(evaluateTransform(result.layer(hand), 8).opacity == .4);
+    REQUIRE(evaluateTransform(result.layer(body), 8).rotation == 0);
+    REQUIRE(result.drawingAt(hand, 8)->id == alternate);
+    REQUIRE(result.drawingAt(hand, 0)->id != alternate);
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == before);
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == result);
+}
+
+TEST_CASE("Named poses survive duplication and remove stale part references") {
+    auto document = makeDocument();
+    const Id part = document.layers.front().id;
+    const Id root = makeCharacter(document, part, "Hero");
+    const Id pose = captureCharacterPose(document, root, 0,
+        std::vector<PoseCaptureTarget>{{part, PoseChannels::AllTransforms}}, "Stand");
+    const Id copy = duplicateCharacter(document, root);
+    REQUIRE(document.layer(copy).poses.size() == 1);
+    REQUIRE(document.layer(copy).poses.front().id != pose);
+    REQUIRE(document.layer(copy).poses.front().parts.front().part != part);
+    document.validate();
+    removeRigBranch(document, part);
+    REQUIRE(document.layer(root).poses.empty());
+    REQUIRE(document.layer(copy).poses.size() == 1);
+    document.validate();
+}
 
 TEST_CASE("Character assembly preserves registered artwork through peg and pivot edits") {
     Session session;
