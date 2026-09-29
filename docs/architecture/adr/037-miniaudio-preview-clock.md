@@ -22,10 +22,19 @@ of advancing a second wall clock. An edit stops playback before publishing a
 new document revision. Device interruption or reroute stops playback and
 reports it; a failed output open falls back to silent visual preview.
 
+Timeline traversal opens the same adapter in scrub mode. A requested frame
+starts an 80 ms sample fragment, capped at scene end; remaining callback
+frames are silent. Moving to another frame atomically replaces the fragment
+cursor, and release stops the device. This uses the exact scene sample map,
+not a second timer. A drag that moves an audio clip itself does not scrub;
+it remains a document placement gesture.
+
 ## Evidence and limits
 
-The null backend test verifies start, advance, seek, stop and snapshot
-preservation. A 600-second 24000/1001 scene with overlapping 48 and 44.1 kHz
+The null backend test verifies start, advance, seek, bounded scrub, stop and
+snapshot preservation. Native Qt Quick events verify that timeline travel
+starts, changes and ends a scrub without document mutation. A 600-second
+24000/1001 scene with overlapping 48 and 44.1 kHz
 clips measures p95 0.014 ms to mix a 1024-frame block against a 21.33 ms
 output period on the M1 Pro Release profile. Offline WAV tests verify the
 same cue and exact rational sample counts. The selected license option is
@@ -33,7 +42,7 @@ MIT No Attribution (MIT-0); the package has `licenses/LICENSE`.
 
 The cursor represents frames submitted to the backend, not a calibrated
 speaker presentation timestamp. Device queue latency, real hardware
-underruns, device replacement, 10-minute audiovisual drift and other host
+underruns, device replacement, audible fragment quality, 10-minute audiovisual drift and other host
 profiles still need measurement. HM-10 remains in progress. If device
 qualification fails, retain the offline PCM WAV mix and silent visual
 preview while evaluating Qt Multimedia behind this adapter boundary.

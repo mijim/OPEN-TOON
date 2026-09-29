@@ -184,6 +184,17 @@ int main(int argc, char** argv) {
                     editor.undo();
                     if (editor.audioClips().front().toMap().value("start").toInt() != 0)
                         throw std::runtime_error("Native waveform drag did not undo atomically.");
+                    const auto rulerStart = timelineInput->mapToScene(QPointF(11, 15));
+                    const auto rulerEnd = timelineInput->mapToScene(QPointF(2 * 22 + 11, 15));
+                    sendDrag(QEvent::MouseButtonPress, rulerStart, Qt::LeftButton, Qt::LeftButton);
+                    if (!editor.audioScrubbing())
+                        throw std::runtime_error("Native timeline did not start audio scrubbing.");
+                    sendDrag(QEvent::MouseMove, rulerEnd, Qt::NoButton, Qt::LeftButton);
+                    if (editor.frame() != 2)
+                        throw std::runtime_error("Native audio scrub did not follow the marked frame.");
+                    sendDrag(QEvent::MouseButtonRelease, rulerEnd, Qt::LeftButton, Qt::NoButton);
+                    if (editor.audioScrubbing())
+                        throw std::runtime_error("Native audio scrub did not stop on release.");
                     const auto output = directory.filePath("mix.wav");
                     editor.exportAudio(QUrl::fromLocalFile(output));
                     QElapsedTimer timeout;
@@ -204,7 +215,7 @@ int main(int argc, char** argv) {
                     if (editor.document() != baseline)
                         throw std::runtime_error("WAV import did not undo atomically.");
                     std::cout << "HM-10 audio smoke passed: native PCM16 import, cue waveform, "
-                                 "device-clock playhead/seek, waveform drag/undo, exact WAV mix export, timeline screenshot and atomic undo.\n";
+                                 "device-clock playhead/seek, waveform drag/undo, audio scrub, exact WAV mix export, timeline screenshot and atomic undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

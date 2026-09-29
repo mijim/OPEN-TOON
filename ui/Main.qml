@@ -2816,6 +2816,7 @@ ApplicationWindow {
                             return nearest;
                         }
                         function cancel() {
+                            editor.endAudioScrub();
                             canceled = true;
                             keySource = -1;
                             audioDragClipId = -1;
@@ -2874,6 +2875,7 @@ ApplicationWindow {
                             if (root.keyEditing && !moving && anchorRow >= 0 && anchorRow < editor.layers.length) {
                                 editor.selectedLayer = editor.layers[anchorRow].id;
                                 editor.frame = anchorFrame;
+                                editor.beginAudioScrub();
                                 canceled = false;
                                 return;
                             }
@@ -2883,6 +2885,8 @@ ApplicationWindow {
                                 editor.selectTimelineRange(anchorFrame, anchorFrame, anchorRow, anchorRow);
                             else
                                 editor.frame = anchorFrame;
+                            if (!moving)
+                                editor.beginAudioScrub();
                         }
                         onPositionChanged: function (mouse) {
                             if (!pressed || canceled)
@@ -2916,6 +2920,7 @@ ApplicationWindow {
                                 editor.frame = frameAt(mouse);
                         }
                         onReleased: {
+                            editor.endAudioScrub();
                             if (canceled)
                                 return;
                             if (audioDragClipId >= 0) {

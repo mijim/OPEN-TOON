@@ -221,6 +221,17 @@ TEST_CASE("Null audio device advances, seeks and stops against one immutable sce
     const auto stoppedAt = device.currentSample();
     QThread::msleep(30);
     REQUIRE(device.currentSample() == stoppedAt);
+    device.scrub(10);
+    const auto scrubStart = scene->rate.sampleAt(10, 48000);
+    timeout.restart();
+    while (device.currentSample() == scrubStart && timeout.elapsed() < 1000)
+        QThread::msleep(5);
+    REQUIRE(device.currentSample() > scrubStart);
+    QThread::msleep(120);
+    REQUIRE(device.currentSample() == scrubStart + 3840);
+    device.scrub(12);
+    REQUIRE(device.currentSample() >= scene->rate.sampleAt(12, 48000));
+    device.stop();
     REQUIRE(editor.snapshot() == scene);
     if (qEnvironmentVariableIsSet("OPENTOON_TEST_HOST_AUDIO")) {
         opentoon::AudioDevice host(scene);
@@ -253,6 +264,30 @@ TEST_CASE("Editor audio preview follows the device cursor and stops before an ed
     editor.setAudioClipGain(editor.audioClips().front().toMap().value("id").toInt(), 0.5);
     REQUIRE_FALSE(editor.playing());
     REQUIRE(editor.document().audioClips.front().gain == 0.5);
+    qunsetenv("OPENTOON_TEST_NULL_AUDIO_BACKEND");
+}
+TEST_CASE("Editor scrubs short audio fragments while traversing frames") {
+    qputenv("OPENTOON_TEST_NULL_AUDIO_BACKEND", "1");
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto path = directory.filePath("scrub.wav");
+    QFile source(path);
+    REQUIRE(source.open(QIODevice::WriteOnly));
+    REQUIRE(source.write(audioCueWav()) == 44 + 48000 * 2);
+    source.close();
+    EditorController editor;
+    editor.newScene();
+    REQUIRE(editor.importAudio(QUrl::fromLocalFile(path)));
+    const auto before = editor.document();
+    editor.setFrame(1);
+    editor.beginAudioScrub();
+    REQUIRE(editor.audioScrubbing());
+    REQUIRE_FALSE(editor.playing());
+    editor.setFrame(5);
+    REQUIRE(editor.frame() == 5);
+    editor.endAudioScrub();
+    REQUIRE_FALSE(editor.audioScrubbing());
+    REQUIRE(editor.document() == before);
     qunsetenv("OPENTOON_TEST_NULL_AUDIO_BACKEND");
 }
 TEST_CASE("Registered PNG parts preserve a shared canvas and undo as one edit") {

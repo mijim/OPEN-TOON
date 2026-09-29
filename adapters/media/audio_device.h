@@ -13,6 +13,7 @@ class AudioDevice {
     AudioDevice(const AudioDevice&) = delete;
     AudioDevice& operator=(const AudioDevice&) = delete;
     void start(Frame frame);
+    void scrub(Frame frame);
     void stop();
     void seek(Frame frame);
     [[nodiscard]] Frame currentFrame() const;

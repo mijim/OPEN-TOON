@@ -201,9 +201,11 @@ WAV mix** writes a 48 kHz stereo mix from all placed clips. It runs in the
 background and can be cancelled without replacing an existing destination.
 **Play** previews the placed clips through the output device, follows its
 submitted sample cursor, and loops at the scene end. Clicking or dragging the
-playhead while playing seeks the audio; editing stops playback so the next
+playhead while playing seeks the audio. With playback stopped, press and drag
+across the timeline ruler or drawing rows to hear short fragments at each
+frame; release stops the sound. Editing stops playback so the next
 preview uses the new document. If the device cannot open, the visual preview
-continues silently and shows an error. Audible frame scrubbing, clip repeat
+continues silently and shows an error. Hardware scrub quality, clip repeat
 and device-loss recovery are still open. [HM-10 progress](HM10-PROGRESS.md) records
 the current test evidence and remaining work.
 

@@ -430,10 +430,10 @@
     },
     "pcm_audio_timing": {
       "status": "passed_subset",
-      "scope": "Format-16 original PCM16 WAV assets, clip placement/trim/gain and native waveform drag with undo, indexed sample-aligned timeline waveform with exact edge queries, invalid import rejection, undo/redo, save/reopen and format-15 backup; deterministic stereo offline mix, 44.1/48 kHz source alignment, exact-length WAV export after reopen and cancellation preservation; bounded miniaudio playback uses the same immutable mix, null-device seek/stop and native Qt Quick playhead smoke",
+      "scope": "Format-16 original PCM16 WAV assets, clip placement/trim/gain and native waveform drag with undo, indexed sample-aligned timeline waveform with exact edge queries, invalid import rejection, undo/redo, save/reopen and format-15 backup; deterministic stereo offline mix, 44.1/48 kHz source alignment, exact-length WAV export after reopen and cancellation preservation; bounded miniaudio playback uses the same immutable mix, null-device seek/stop and native Qt Quick playhead smoke; native timeline traversal previews bounded 80 ms rational-sample scrub fragments without document changes",
       "command": "build/locked/open-toon.app/Contents/MacOS/open-toon --hm10-smoke",
       "screenshot": "build/hm10-audio-smoke.png",
-      "limits": "Hardware queue latency, underruns, device replacement and ten-minute audiovisual drift unqualified; audible frame scrub, clip repeat and combined PNG/WAV delivery remain open."
+      "limits": "Hardware queue latency, underruns, device replacement and ten-minute audiovisual drift unqualified; hardware audible scrub quality, clip repeat and combined PNG/WAV delivery remain open."
     }
   },
   "ownership": {
@@ -458,6 +458,6 @@
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
     "state": "HM-00_through_HM-05_and_HM-13_complete__HM-06_and_HM-07_parked_in_progress__HM-10_active_in_progress",
-    "note": "HM-06 continuous deformation and HM-07 named controls remain unaccepted working subsets, parked while the single implementer advances HM-10. Format-16 PCM16 import, clip editing, indexed waveform, deterministic offline WAV mix and bounded miniaudio device preview pass locally; hardware sync and audible scrub remain open. HM-12 remains eligible. Full P07/P08/P09 feature and phase acceptance remain open."
+    "note": "HM-06 continuous deformation and HM-07 named controls remain unaccepted working subsets, parked while the single implementer advances HM-10. Format-16 PCM16 import, clip editing, indexed waveform, deterministic offline WAV mix and bounded miniaudio device preview pass locally; hardware sync and audible scrub quality remain open. HM-12 remains eligible. Full P07/P08/P09 feature and phase acceptance remain open."
   }
 }

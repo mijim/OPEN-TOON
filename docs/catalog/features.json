@@ -4265,7 +4265,7 @@
         "Dragging to the marked frame plays the expected fragment."
       ],
       "evidence": "proposal",
-      "implementation_status": "not_started",
+      "implementation_status": "partial",
       "scope": "base",
       "capability_level": "pro",
       "owner_module": "audio",
@@ -4274,7 +4274,8 @@
         "RIG"
       ],
       "specification_status": "analysis_draft",
-      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation."
+      "notes": "The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.",
+      "implementation_evidence": "docs/implementation/HM10-PROGRESS.md; mouse timeline traversal requests bounded 80 ms fragments at exact rational frame samples through miniaudio, null-backend and native event tests pass; audible hardware quality remains unqualified"
     },
     {
       "id": "AUD-006",

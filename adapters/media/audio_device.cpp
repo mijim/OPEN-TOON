@@ -21,6 +21,7 @@ struct AudioDevice::Impl {
     ma_device device{};
     bool contextReady = false, deviceReady = false;
     std::atomic<std::int64_t> cursor{0};
+    std::atomic<std::int64_t> scrubEnd{-1};
     std::atomic_bool interrupted{false};
     std::atomic_bool active{false};
 
@@ -32,14 +33,18 @@ struct AudioDevice::Impl {
         auto* output = static_cast<std::int16_t*>(destination);
         std::array<double, 4096 * 2> scratch;
         const auto sceneEnd = self->mix.sceneSamples();
+        const auto scrubEnd = self->scrubEnd.load(std::memory_order_acquire);
+        const auto boundary = scrubEnd >= 0 ? std::min(sceneEnd, scrubEnd) : sceneEnd;
         const auto origin = self->cursor.load(std::memory_order_relaxed);
         std::int64_t cursor = origin;
         ma_uint32 done = 0;
         while (done < frameCount) {
-            if (cursor >= sceneEnd)
+            if (scrubEnd < 0 && cursor >= sceneEnd)
                 cursor = 0;
+            if (cursor >= boundary)
+                break;
             const auto count = std::size_t(std::min<std::int64_t>(
-                {std::int64_t(frameCount - done), 4096, sceneEnd - cursor}));
+                {std::int64_t(frameCount - done), 4096, boundary - cursor}));
             if (count == 0)
                 break;
             try {
@@ -98,11 +103,26 @@ AudioDevice::~AudioDevice() {
         ma_context_uninit(&impl_->context);
 }
 void AudioDevice::start(Frame frame) {
+    impl_->scrubEnd.store(-1, std::memory_order_release);
     seek(frame);
     impl_->interrupted.store(false, std::memory_order_relaxed);
     if (ma_device_start(&impl_->device) != MA_SUCCESS)
         throw std::runtime_error("Could not start the audio output device.");
     impl_->active.store(true, std::memory_order_release);
+}
+void AudioDevice::scrub(Frame frame) {
+    if (frame < 0 || frame >= impl_->snapshot->duration)
+        throw std::invalid_argument("Audio scrub frame is outside the scene.");
+    const auto first = impl_->snapshot->rate.sampleAt(frame, 48000);
+    impl_->scrubEnd.store(std::min(impl_->mix.sceneSamples(), first + 3840),
+                          std::memory_order_release);
+    impl_->cursor.store(first, std::memory_order_release);
+    impl_->interrupted.store(false, std::memory_order_relaxed);
+    if (!impl_->active.load(std::memory_order_acquire)) {
+        if (ma_device_start(&impl_->device) != MA_SUCCESS)
+            throw std::runtime_error("Could not start audio scrubbing.");
+        impl_->active.store(true, std::memory_order_release);
+    }
 }
 void AudioDevice::stop() {
     if (impl_->active.exchange(false, std::memory_order_acq_rel))

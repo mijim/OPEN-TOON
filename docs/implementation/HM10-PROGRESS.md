@@ -21,6 +21,9 @@ temporary file. **Play** uses a miniaudio output device when placed clips exist.
 The callback mixes the immutable scene snapshot into bounded stack buffers;
 submitted sample position drives the playhead. Seeking during playback resets
 the sample cursor. The scene loops at its exact rational sample boundary.
+Dragging across the timeline ruler or drawing rows previews 80 ms audio
+fragments from each marked frame and stops on release. Moving a waveform
+continues to edit clip placement instead.
 Editing or device interruption stops playback; a failed device open leaves the
 visual preview available and reports the failure.
 
@@ -47,7 +50,8 @@ frame-edit semantics.
   byte-identical output before/after project reopen. A null device test starts,
   seeks and stops playback from an immutable scene without reaching speakers.
   A controller test verifies that Play follows this cursor, a manual seek
-  updates it and an edit stops preview before changing the document. The
+  updates it, a bounded scrub follows frame changes, and an edit stops preview
+  before changing the document. The
   local host output device also opened successfully without starting playback.
   A new-scene test verifies that a reused asset ID cannot expose old peaks.
   A rational-end test checks trimmed clips at 24 and 24000/1001 fps.
@@ -60,14 +64,14 @@ frame-edit semantics.
   captured and visually inspected `build/hm10-audio-smoke.png`, exported an
   exactly sized WAV with its cue at the correct sample, advanced and sought
   its native playhead through the null backend, dragged a waveform four frames
-  and undid it, then undid import.
+  and undid it, scrubbed the ruler through frame two, then undid import.
   The pre-existing HM-07 native dashboard smoke still passes.
 
 ## Open contract
 
 HM-10 remains incomplete. Device latency calibration, device-loss recovery,
 hardware underrun and dropped-frame traces, production-quality rate
-conversion, audible frame scrubbing, clip repeat and a full
+conversion, hardware audible scrub quality, clip repeat and a full
 ten-minute audiovisual drift run are pending. The miniaudio adapter is adopted
 for this experimental desktop profile; hardware and cross-platform
 qualification remain open.

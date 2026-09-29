@@ -80,9 +80,13 @@ Play audio fragments while traversing frames, including continuous scrubbing.
 
 **Initial acceptance:** Dragging to the marked frame plays the expected fragment.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM10-PROGRESS.md](../../../docs/implementation/HM10-PROGRESS.md) — mouse timeline traversal requests bounded 80 ms fragments at exact rational frame samples through miniaudio, null-backend and native event tests pass; audible hardware quality remains unqualified.
+
+**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
 
 ## AUD-006 — Lip-sync detection
 

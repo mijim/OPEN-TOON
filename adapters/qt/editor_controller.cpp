@@ -517,6 +517,8 @@ void EditorController::setFrame(int value) {
     value = std::clamp(value, 0, duration() - 1);
     if (audioDevice_)
         audioDevice_->seek(value);
+    else if (scrubDevice_ && scrubDevice_->running() && value != frame_)
+        scrubDevice_->scrub(value);
     else if (playing()) {
         playStart_ = value;
         playClock_.restart();
@@ -1794,6 +1796,8 @@ void EditorController::deleteKey() {
     });
 }
 void EditorController::stopPlayback() {
+    endAudioScrub();
+    scrubDevice_.reset();
     if (audioDevice_) {
         audioDevice_->stop();
         audioDevice_.reset();
@@ -1808,6 +1812,8 @@ void EditorController::togglePlayback() {
         stopPlayback();
         return;
     }
+    endAudioScrub();
+    scrubDevice_.reset();
     playStart_ = frame_;
     playClock_.start();
     if (!document().audioClips.empty()) {
@@ -1822,6 +1828,26 @@ void EditorController::togglePlayback() {
     }
     playTimer_.start();
     emit playbackChanged();
+}
+void EditorController::beginAudioScrub() {
+    if (playing() || document().audioClips.empty())
+        return;
+    try {
+        if (!scrubDevice_)
+            scrubDevice_ = std::make_unique<opentoon::AudioDevice>(
+                session_.snapshot(), qEnvironmentVariableIntValue("OPENTOON_TEST_NULL_AUDIO_BACKEND") == 1);
+        scrubDevice_->scrub(frame_);
+    } catch (const std::exception& e) {
+        scrubDevice_.reset();
+        report("Audio scrub unavailable: " + QString::fromUtf8(e.what()));
+    }
+}
+void EditorController::endAudioScrub() {
+    if (scrubDevice_)
+        scrubDevice_->stop();
+}
+bool EditorController::audioScrubbing() const {
+    return scrubDevice_ && scrubDevice_->running();
 }
 void EditorController::importImage(QUrl url) {
     QImageReader reader(local(url));
