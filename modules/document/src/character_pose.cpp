@@ -3,6 +3,7 @@
 #include "opentoon/property_address.h"
 #include "opentoon/rigging.h"
 #include <algorithm>
+#include <cmath>
 #include <set>
 #include <stdexcept>
 
@@ -83,9 +84,17 @@ Id captureCharacterPose(Document& document, Id rootId, Frame frame,
 }
 
 void applyCharacterPose(Document& document, Id rootId, Id poseId, Frame frame) {
+    blendCharacterPose(document, rootId, poseId, frame, 1.0);
+}
+
+void blendCharacterPose(Document& document, Id rootId, Id poseId, Frame frame, double amount) {
+    if (!std::isfinite(amount) || amount < 0 || amount > 1)
+        throw std::invalid_argument("Pose blend amount must be between zero and one.");
     const auto entries = pose(document, rootId, poseId).parts;
     if (frame < 0 || frame >= document.duration)
         throw std::invalid_argument("Pose frame is outside the scene.");
+    if (amount == 0)
+        return;
     std::vector<PropertyEdit> edits;
     for (const auto& entry : entries) {
         checkedPart(document, rootId, entry.part);
@@ -96,16 +105,20 @@ void applyCharacterPose(Document& document, Id rootId, Id poseId, Frame frame) {
                 }))
                 throw std::invalid_argument("Pose substitution is no longer registered.");
         }
+        const auto baseline = evaluateTransform(document.layer(entry.part), frame);
         for (unsigned index = 0; index < 8; ++index)
             if (entry.channels & (1u << index))
                 edits.push_back({{entry.part, static_cast<PropertyKind>(index)},
-                                 channelValue(entry.transform, index)});
+                                 amount == 1 ? channelValue(entry.transform, index)
+                                             : channelValue(baseline, index) + amount *
+                                                   (channelValue(entry.transform, index) -
+                                                    channelValue(baseline, index))});
     }
     // Validate the entire operation before publishing any key or exposure.
     Document candidate = document;
     editProperties(candidate, edits, frame, AnimationEditMode::Animate, true);
     for (const auto& entry : entries)
-        if (entry.channels & PoseChannels::Drawing)
+        if ((entry.channels & PoseChannels::Drawing) && amount >= .5)
             selectSubstitution(candidate, entry.part, frame, entry.drawing);
     candidate.validate();
     document = std::move(candidate);

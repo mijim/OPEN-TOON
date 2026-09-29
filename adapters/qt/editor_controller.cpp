@@ -71,6 +71,7 @@ void EditorController::report(QString message) {
     emit statusChanged();
 }
 void EditorController::resetSelection() {
+    endSelectedCharacterPoseBlend();
     clearPoseSelection();
     ++sceneGeneration_;
     rangeStart_ = 0;
@@ -89,6 +90,7 @@ void EditorController::resetSelection() {
     emit changed();
 }
 bool EditorController::edit(const std::string& label, const std::function<void(Document&)>& operation) {
+    endSelectedCharacterPoseBlend();
     try {
         bool result = session_.apply(label, operation);
         if (result) {
@@ -215,6 +217,7 @@ void EditorController::selectCharacterPose(int poseId) {
     if (std::any_of(options.begin(), options.end(), [poseId](const QVariant& option) {
             return option.toMap().value("id").toInt() == poseId;
         })) {
+        endSelectedCharacterPoseBlend();
         selectedCharacterPose_ = poseId;
         emit poseSelectionChanged();
     }
@@ -329,12 +332,14 @@ void EditorController::setFrame(int value) {
     value = std::clamp(value, 0, duration() - 1);
     if (value == frame_)
         return;
+    endSelectedCharacterPoseBlend();
     frame_ = value;
     emit frameChanged();
 }
 void EditorController::setSelectedLayer(int value) {
     try {
         (void)document().layer(value);
+        endSelectedCharacterPoseBlend();
         layer_ = value;
         selectedView_ = 0;
         emit viewSelectionChanged();
@@ -583,6 +588,7 @@ void EditorController::restoreRevision(int revision) {
 }
 void EditorController::undo() {
     stopPlayback();
+    endSelectedCharacterPoseBlend();
     if (session_.undo()) {
         frame_ = std::min(frame_, duration() - 1);
         try {
@@ -596,12 +602,14 @@ void EditorController::undo() {
         emit changed();
         emit frameChanged();
         emit viewSelectionChanged();
+        emit poseSelectionChanged();
         emit selectionChanged();
         report("Undone");
     }
 }
 void EditorController::redo() {
     stopPlayback();
+    endSelectedCharacterPoseBlend();
     if (session_.redo()) {
         frame_ = std::min(frame_, duration() - 1);
         try {
@@ -615,6 +623,7 @@ void EditorController::redo() {
         emit changed();
         emit frameChanged();
         emit viewSelectionChanged();
+        emit poseSelectionChanged();
         emit selectionChanged();
         report("Redone");
     }
@@ -1154,6 +1163,50 @@ void EditorController::removeSelectedCharacterPose() {
         selectedCharacterPose_ = 0;
         emit poseSelectionChanged();
     }
+}
+void EditorController::beginSelectedCharacterPoseBlend() {
+    endSelectedCharacterPoseBlend();
+    const int root = characterId(), poseId = selectedCharacterPose();
+    if (!root || !poseId)
+        return;
+    poseBlendGesture_ = ++poseBlendSerial_;
+    poseBlendRoot_ = root;
+    poseBlendPose_ = poseId;
+    poseBlendFrame_ = frame_;
+}
+bool EditorController::updateSelectedCharacterPoseBlend(double amount) {
+    const int root = characterId(), poseId = selectedCharacterPose();
+    if (!root || !poseId)
+        return false;
+    const bool temporary = !poseBlendGesture_;
+    if (!poseBlendGesture_ || poseBlendRoot_ != Id(root) || poseBlendPose_ != Id(poseId) ||
+        poseBlendFrame_ != frame_)
+        beginSelectedCharacterPoseBlend();
+    try {
+        const bool published = session_.applyCoalesced("Blend character pose", poseBlendGesture_,
+            [&](Document& document) {
+                opentoon::blendCharacterPose(document, root, poseId, frame_, amount);
+            });
+        if (published) {
+            emit changed();
+            emit frameChanged();
+            report("Blend character pose");
+        }
+        if (temporary)
+            endSelectedCharacterPoseBlend();
+        return published;
+    } catch (const std::exception& e) {
+        endSelectedCharacterPoseBlend();
+        report(QString::fromUtf8(e.what()));
+        return false;
+    }
+}
+void EditorController::endSelectedCharacterPoseBlend() {
+    if (poseBlendGesture_)
+        session_.endCoalesced(poseBlendGesture_);
+    poseBlendGesture_ = 0;
+    poseBlendRoot_ = 0;
+    poseBlendPose_ = 0;
 }
 void EditorController::captureCharacterView() {
     const int root = characterId();

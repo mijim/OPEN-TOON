@@ -1,5 +1,6 @@
 #include "editor_controller.h"
 #include "opentoon/rigging.h"
+#include "opentoon/character_pose.h"
 #include "project_store.h"
 #include "scene_renderer.h"
 #include <QCoreApplication>
@@ -117,6 +118,22 @@ TEST_CASE("Editor captures a selected Part pose, applies its mask, undoes and re
     REQUIRE(opentoon::evaluateTransform(editor.document().layer(hand), 8).rotation == 70);
     editor.undo();
     REQUIRE(editor.document() == before);
+    editor.redo();
+    editor.setFrame(16);
+    editor.setAnimateMode(true);
+    editor.setAutoKey(true);
+    editor.setTransform("x", 80);
+    REQUIRE(opentoon::evaluateTransform(editor.document().layer(hand), 16).x == 80);
+    const auto beforeBlend = editor.document();
+    editor.beginSelectedCharacterPoseBlend();
+    REQUIRE(editor.updateSelectedCharacterPoseBlend(.25));
+    REQUIRE(opentoon::evaluateTransform(editor.document().layer(hand), 16).x == 72.5);
+    REQUIRE(editor.updateSelectedCharacterPoseBlend(.75));
+    REQUIRE(editor.updateSelectedCharacterPoseBlend(1));
+    editor.endSelectedCharacterPoseBlend();
+    REQUIRE(opentoon::evaluateTransform(editor.document().layer(hand), 16).x == 50);
+    editor.undo();
+    REQUIRE(editor.document() == beforeBlend);
     editor.redo();
     QTemporaryDir directory;
     REQUIRE(directory.isValid());

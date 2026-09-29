@@ -58,8 +58,8 @@
     {
       "id": "P08",
       "status": "in_progress",
-      "available": "Accepted bounded HM-03 rigid-character contract: 19-part original-art assembly, coordinated views, pixel-equivalent reopen and independent copy. Parented layers and typed character roots, pegs and Parts; role editing, preserve-world rigid reparenting within shared animated ancestry, stable rest pivots, named held substitutions, renderer-backed thumbnails and coordinated view sets. Batch Part assembly, independent or explicitly linked-artwork Part/Peg branch copies, safe branch deletion, Part detachment, Peg dissolution and view-range edits preserve view membership through save/reopen. Format-12 named masked poses capture selected/all Parts and selected transform/drawing channels, apply with atomic undo, and save/reopen.",
-      "remaining": "Independent second-animator review, reparenting across differently animated branches, cross-rig pose transfer/mirroring, pose sliders, Quick Rig, declarative controls, portable assets/templates and production-scale qualification."
+      "available": "Accepted bounded HM-03 rigid-character contract: 19-part original-art assembly, coordinated views, pixel-equivalent reopen and independent copy. Parented layers and typed character roots, pegs and Parts; role editing, preserve-world rigid reparenting within shared animated ancestry, stable rest pivots, named held substitutions, renderer-backed thumbnails and coordinated view sets. Batch Part assembly, independent or explicitly linked-artwork Part/Peg branch copies, safe branch deletion, Part detachment, Peg dissolution and view-range edits preserve view membership through save/reopen. Format-12 named masked poses capture selected/all Parts and selected transform/drawing channels, apply with atomic undo, and save/reopen. The direct pose slider blends from the current evaluated pose with an explicit 50% drawing threshold and one undo per drag.",
+      "remaining": "Independent second-animator review, reparenting across differently animated branches, cross-rig pose transfer/mirroring, Quick Rig, declarative controls, portable assets/templates and production-scale qualification."
     },
     {
       "id": "P09",
@@ -84,7 +84,7 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 134,
+      "count": 135,
       "command": "ctest --test-dir build/locked --output-on-failure -j6"
     },
     "native_input_workflow": {
@@ -248,7 +248,7 @@
         "animated orthographic camera matches reopened preview and two exported PNG frames"
       ]
     },
-    "total_local_ctest_entries": 134,
+    "total_local_ctest_entries": 135,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -382,14 +382,15 @@
     },
     "named_character_poses": {
       "status": "passed_subset",
-      "scope": "Format-12 named Part/channel masks and drawing substitutions; editor import/capture/apply/undo/save/reopen; independent duplication and branch cleanup",
+      "scope": "Format-12 named Part/channel masks and drawing substitutions; editor import/capture/apply/undo/save/reopen; independent duplication and branch cleanup; numeric blend endpoints and 50% drawing threshold with coalesced slider undo",
       "tests": [
         "Named character poses apply only masked channels and substitutions in one undo step",
         "Named poses survive duplication and remove stale part references",
         "Format 12 persists masked character poses and loads format 11 without them",
-        "export_workflows: Editor captures a selected Part pose, applies its mask, undoes and reopens"
+        "export_workflows: Editor captures a selected Part pose, applies its mask, undoes and reopens",
+        "Pose blend has exact endpoints, a half-way drawing threshold and one drag undo"
       ],
-      "limits": "Cross-character transfer, mirroring, sliders, published controls and complete artist journey remain open."
+      "limits": "Cross-character transfer, mirroring, published controls and complete artist journey remain open."
     }
   },
   "ownership": {

@@ -23,8 +23,14 @@ operation. Editing a saved pose's name or deleting it also uses Session.
 
 The Properties panel offers capture for the selected Part or all Parts and a
 visible channel-group choice. A saved pose can be selected, applied, renamed
-or removed at the playhead. The domain model allows different masks for each
-Part; the current UI applies one chosen mask to the captured target set.
+or removed at the playhead. Its slider interpolates numeric channels from the
+gesture's initial evaluated pose. Zero leaves the document unchanged; one
+reaches the stored numeric and drawing endpoints exactly. A drawing selection
+changes at amount 0.5 and remains held through one. During a drag, Session
+recomputes each candidate from the same baseline, publishes each validated
+preview and coalesces the gesture into one undo entry. Other edits end the
+gesture. The domain model allows different masks for each Part; the current
+capture UI applies one chosen mask to the target set.
 
 Character duplication remaps pose, Part and drawing IDs into the independent
 copy. Branch deletion and Part detachment remove affected entries and empty
@@ -36,12 +42,13 @@ editor without restoring its backup.
 
 ## Verification and limits
 
-Domain tests cover mixed masks, discrete substitutions, excluded values,
-single-step undo/redo, independent character copy and stale-entry cleanup.
+Domain tests cover mixed masks, blend endpoints and the drawing threshold,
+excluded values, coalesced undo/redo, independent character copy and
+stale-entry cleanup.
 Storage tests cover format-12 SQLite/JSON round trips and format-11 loading.
 The controller test imports original registered PNG parts, captures a selected
 Part, applies it at another frame, undoes/redoes and reopens the project.
 
-Mirroring, cross-character stable role mappings, interpolated pose sliders,
-deformer channels, published controls and the Animator workspace remain
+Mirroring, cross-character stable role mappings, deformer channels, published
+controls and the Animator workspace remain
 unimplemented HM-07/HM-09 work. This ADR does not close RIG-012 or HM-07.

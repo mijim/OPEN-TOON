@@ -266,6 +266,9 @@ class EditorController final : public QObject {
     Q_INVOKABLE void applySelectedCharacterPose();
     Q_INVOKABLE void renameSelectedCharacterPose(QString name);
     Q_INVOKABLE void removeSelectedCharacterPose();
+    Q_INVOKABLE void beginSelectedCharacterPoseBlend();
+    Q_INVOKABLE bool updateSelectedCharacterPoseBlend(double amount);
+    Q_INVOKABLE void endSelectedCharacterPoseBlend();
     Q_INVOKABLE void duplicateCharacter();
     Q_INVOKABLE void newDrawing(bool duplicate = false);
     Q_INVOKABLE void holdDrawing(int);
@@ -324,6 +327,11 @@ class EditorController final : public QObject {
     std::optional<opentoon::Transform> transformClipboard_;
     opentoon::Id selectedView_ = 0;
     opentoon::Id selectedCharacterPose_ = 0;
+    std::uint64_t poseBlendSerial_ = 0;
+    std::uint64_t poseBlendGesture_ = 0;
+    opentoon::Id poseBlendRoot_ = 0;
+    opentoon::Id poseBlendPose_ = 0;
+    opentoon::Frame poseBlendFrame_ = 0;
     mutable std::uint64_t thumbnailRevision_ = 0;
     mutable QHash<qulonglong, QString> thumbnailCache_;
     void reconcilePoseSelection();

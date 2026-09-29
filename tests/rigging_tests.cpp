@@ -68,6 +68,55 @@ TEST_CASE("Named poses survive duplication and remove stale part references") {
     REQUIRE(document.layer(copy).poses.size() == 1);
     document.validate();
 }
+TEST_CASE("Pose blend has exact endpoints, a half-way drawing threshold and one drag undo") {
+    Session session;
+    const Id part = session.document().layers.front().id;
+    Id root = 0, pose = 0, open = 0, closed = 0;
+    REQUIRE(session.apply("Make blend fixture", [&](Document& d) {
+        root = makeCharacter(d, part, "Hero");
+        closed = createSubstitution(d, part, 0, false, "Closed");
+        open = createSubstitution(d, part, 0, true, "Open");
+        d.layer(part).transform.x = 100;
+        d.layer(part).transform.opacity = .7;
+        pose = captureCharacterPose(d, root, 0,
+            std::vector<PoseCaptureTarget>{{part, PoseChannels::PositionX | PoseChannels::Drawing}},
+            "Reach");
+        selectSubstitution(d, part, 0, closed);
+        d.layer(part).transform.x = 20;
+        d.layer(part).transform.opacity = .3;
+    }));
+    const auto baseline = session.document();
+    auto sample = [&](double amount) {
+        auto d = baseline;
+        blendCharacterPose(d, root, pose, 8, amount);
+        return d;
+    };
+    REQUIRE(sample(0) == baseline);
+    REQUIRE(evaluateTransform(sample(.25).layer(part), 8).x == 40);
+    REQUIRE(sample(.49).drawingAt(part, 8)->id == closed);
+    REQUIRE(sample(.5).drawingAt(part, 8)->id == open);
+    REQUIRE(evaluateTransform(sample(1).layer(part), 8).x == 100);
+    REQUIRE(evaluateTransform(sample(1).layer(part), 8).opacity == .3);
+    REQUIRE(sample(1).drawingAt(part, 8)->id == open);
+    auto invalid = baseline;
+    REQUIRE_THROWS(blendCharacterPose(invalid, root, pose, 8, 1.1));
+    REQUIRE(invalid == baseline);
+    REQUIRE(session.applyCoalesced("Blend pose", 17, [&](Document& d) {
+        blendCharacterPose(d, root, pose, 8, .25);
+    }));
+    REQUIRE(session.applyCoalesced("Blend pose", 17, [&](Document& d) {
+        blendCharacterPose(d, root, pose, 8, .75);
+    }));
+    REQUIRE(session.applyCoalesced("Blend pose", 17, [&](Document& d) {
+        blendCharacterPose(d, root, pose, 8, 1);
+    }));
+    session.endCoalesced(17);
+    REQUIRE(session.document() == sample(1));
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == baseline);
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == sample(1));
+}
 
 TEST_CASE("Character assembly preserves registered artwork through peg and pivot edits") {
     Session session;

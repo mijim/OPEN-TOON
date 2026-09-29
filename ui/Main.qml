@@ -1586,6 +1586,62 @@ ApplicationWindow {
                                         onClicked: editor.removeSelectedCharacterPose()
                                     }
                                 }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    Label { text: "Blend"; color: "#999999"; font.pixelSize: 10 }
+                                    Slider {
+                                        id: poseBlend
+                                        Layout.fillWidth: true
+                                        implicitHeight: 24
+                                        from: 0
+                                        to: 1
+                                        value: 0
+                                        enabled: editor.selectedCharacterPose > 0
+                                        onPressedChanged: {
+                                            if (pressed)
+                                                editor.beginSelectedCharacterPoseBlend()
+                                            else
+                                                editor.endSelectedCharacterPoseBlend()
+                                        }
+                                        onMoved: editor.updateSelectedCharacterPoseBlend(value)
+                                        Accessible.name: "Blend selected character pose"
+                                        background: Rectangle {
+                                            x: poseBlend.leftPadding
+                                            y: poseBlend.topPadding + poseBlend.availableHeight / 2 - height / 2
+                                            width: poseBlend.availableWidth
+                                            height: 3
+                                            radius: 2
+                                            color: "#303030"
+                                            Rectangle {
+                                                width: poseBlend.visualPosition * parent.width
+                                                height: parent.height
+                                                radius: parent.radius
+                                                color: "#b8b8b8"
+                                            }
+                                        }
+                                        handle: Rectangle {
+                                            x: poseBlend.leftPadding + poseBlend.visualPosition *
+                                               (poseBlend.availableWidth - width)
+                                            y: poseBlend.topPadding + poseBlend.availableHeight / 2 - height / 2
+                                            width: 12
+                                            height: 12
+                                            radius: 6
+                                            color: "#e8e8e8"
+                                            border.color: "#171717"
+                                        }
+                                    }
+                                    Label {
+                                        text: Math.round(poseBlend.value * 100) + "%"
+                                        color: "#aaaaaa"
+                                        font.pixelSize: 10
+                                        Layout.preferredWidth: 32
+                                        horizontalAlignment: Text.AlignRight
+                                    }
+                                }
+                                Connections {
+                                    target: editor
+                                    function onPoseSelectionChanged() { poseBlend.value = 0 }
+                                }
                                 C.CompactTextField {
                                     Layout.fillWidth: true
                                     text: editor.characterPoses.find(p => p.id === editor.selectedCharacterPose)?.name || ""
