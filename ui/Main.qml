@@ -2576,6 +2576,13 @@ ApplicationWindow {
                     onClicked: editor.togglePlayback()
                 }
                 C.ToolButton {
+                    objectName: "playbackLoopButton"
+                    text: "↻"
+                    active: editor.loopPlayback
+                    hint: editor.loopPlayback ? "Loop playback on" : "Loop playback off"
+                    onClicked: editor.loopPlayback = !editor.loopPlayback
+                }
+                C.ToolButton {
                     text: "›"
                     hint: "Next drawing"
                     onClicked: editor.nextDrawing(1)

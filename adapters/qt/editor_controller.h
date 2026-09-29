@@ -84,6 +84,7 @@ class EditorController final : public QObject {
     Q_PROPERTY(bool filled READ filled WRITE setFilled NOTIFY toolChanged)
     Q_PROPERTY(int artLayer READ artLayer WRITE setArtLayer NOTIFY toolChanged)
     Q_PROPERTY(bool playing READ playing NOTIFY playbackChanged)
+    Q_PROPERTY(bool loopPlayback READ loopPlayback WRITE setLoopPlayback NOTIFY playbackChanged)
     Q_PROPERTY(bool exporting READ exporting NOTIFY exportChanged)
     Q_PROPERTY(double exportProgress READ exportProgress NOTIFY exportChanged)
     Q_PROPERTY(QString recoveryPath READ recoveryPath CONSTANT)
@@ -169,6 +170,8 @@ class EditorController final : public QObject {
     QVariantMap transform() const;
     int frame() const { return frame_; }
     int duration() const { return document().duration; }
+    bool loopPlayback() const { return loopPlayback_; }
+    void setLoopPlayback(bool looping);
     int compositionProfile() const { return static_cast<int>(document().composition); }
     int activeCamera() const { return int(document().activeCamera); }
     double cameraZoom() const;
@@ -427,6 +430,7 @@ class EditorController final : public QObject {
     QTimer playTimer_, autosaveTimer_;
     QElapsedTimer playClock_;
     int playStart_ = 0;
+    bool loopPlayback_ = true;
     std::unique_ptr<opentoon::AudioDevice> audioDevice_;
     std::unique_ptr<opentoon::AudioDevice> scrubDevice_;
     std::uint64_t playbackCallbacks_ = 0, playbackProcessingOverruns_ = 0;

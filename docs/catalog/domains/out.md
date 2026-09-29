@@ -28,9 +28,9 @@ Play at the scene frame rate with range, loop and performance status.
 
 **Specification source:** `proposal`.
 
-**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — experimental subset only, catalog acceptance not closed.
+**Implementation evidence:** [docs/implementation/status.json](../../../docs/implementation/status.json) — docs/implementation/HM10-PROGRESS.md; play-once/loop toggle with exact sample boundary, native Qt Quick input and null-device tests; dropped-frame acceptance remains open.
 
-**Remaining scope:** The proposed behavior and acceptance test are OPEN-TOON requirements, not a claim of implementation.
+**Remaining scope:** Loop playback is on by default; an unsaved toolbar toggle stops once at the rational scene boundary and leaves the last frame visible. Device callback diagnostics and polled playhead skips are available; actual presented-frame drops remain unqualified.
 
 ## OUT-002 — Quality-controlled preview
 

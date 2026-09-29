@@ -55,9 +55,26 @@ EditorController::EditorController(QObject* parent) : QObject(parent) {
             report("Audio output was interrupted. Playback stopped.");
             return;
         }
+        if (audioDevice_ && audioDevice_->finished()) {
+            if (frame_ != duration() - 1) {
+                frame_ = duration() - 1;
+                emit frameChanged();
+            }
+            stopPlayback();
+            return;
+        }
+        const int elapsedFrames = int(std::floor(playClock_.elapsed() / 1000.0 * fps()));
+        if (!audioDevice_ && !loopPlayback_ && playStart_ + elapsedFrames >= duration()) {
+            if (frame_ != duration() - 1) {
+                frame_ = duration() - 1;
+                emit frameChanged();
+            }
+            stopPlayback();
+            return;
+        }
         const int next = audioDevice_
                              ? audioDevice_->currentFrame()
-                             : (playStart_ + int(std::floor(playClock_.elapsed() / 1000.0 * fps()))) % duration();
+                             : (playStart_ + elapsedFrames) % duration();
         if (next > frame_ + 1)
             skippedPlayheadFrames_ += std::uint64_t(next - frame_ - 1);
         if (next != frame_) {
@@ -2406,6 +2423,18 @@ void EditorController::stopPlayback() {
                        .arg(skippedPlayheadFrames_).arg(playbackProcessingOverruns_));
     }
 }
+void EditorController::setLoopPlayback(bool looping) {
+    if (loopPlayback_ == looping)
+        return;
+    loopPlayback_ = looping;
+    if (audioDevice_)
+        audioDevice_->setLooping(looping);
+    else if (playing()) {
+        playStart_ = frame_;
+        playClock_.restart();
+    }
+    emit playbackChanged();
+}
 void EditorController::togglePlayback() {
     if (playing()) {
         stopPlayback();
@@ -2421,6 +2450,7 @@ void EditorController::togglePlayback() {
         try {
             audioDevice_ = std::make_unique<opentoon::AudioDevice>(
                 session_.snapshot(), qEnvironmentVariableIntValue("OPENTOON_TEST_NULL_AUDIO_BACKEND") == 1);
+            audioDevice_->setLooping(loopPlayback_);
             audioDevice_->start(frame_);
         } catch (const std::exception& e) {
             audioDevice_.reset();

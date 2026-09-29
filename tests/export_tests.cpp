@@ -737,6 +737,24 @@ TEST_CASE("Null audio device advances, seeks and stops against one immutable sce
     device.scrub(12);
     REQUIRE(device.currentSample() >= scene->rate.sampleAt(12, 48000));
     device.stop();
+    device.setLooping(false);
+    device.start(scene->duration - 1);
+    timeout.restart();
+    while (!device.finished() && timeout.elapsed() < 1000)
+        QThread::msleep(5);
+    REQUIRE(device.finished());
+    REQUIRE(device.currentSample() == scene->rate.sampleAt(scene->duration, 48000));
+    REQUIRE(device.currentFrame() == scene->duration - 1);
+    device.stop();
+    device.setLooping(true);
+    device.start(scene->duration - 1);
+    const auto lastFrameSample = scene->rate.sampleAt(scene->duration - 1, 48000);
+    timeout.restart();
+    while (device.currentSample() >= lastFrameSample && timeout.elapsed() < 1000)
+        QThread::msleep(5);
+    REQUIRE(device.currentSample() < lastFrameSample);
+    REQUIRE_FALSE(device.finished());
+    device.stop();
     REQUIRE(editor.snapshot() == scene);
     if (qEnvironmentVariableIsSet("OPENTOON_TEST_HOST_AUDIO")) {
         opentoon::AudioDevice host(scene);
@@ -771,7 +789,58 @@ TEST_CASE("Editor audio preview follows the device cursor and stops before an ed
     REQUIRE(editor.playbackDiagnostics().value("callbacks").toULongLong() > 0);
     REQUIRE(editor.playbackDiagnostics().contains("skippedPlayheadFrames"));
     REQUIRE(editor.document().audioClips.front().gain == 0.5);
+    const auto beforeTransport = editor.document();
+    editor.setLoopPlayback(false);
+    editor.setFrame(editor.duration() - 1);
+    editor.togglePlayback();
+    timeout.restart();
+    while (editor.playing() && timeout.elapsed() < 1000) {
+        QCoreApplication::processEvents();
+        QThread::msleep(5);
+    }
+    REQUIRE_FALSE(editor.playing());
+    REQUIRE(editor.frame() == editor.duration() - 1);
+    REQUIRE(editor.document() == beforeTransport);
+    editor.setLoopPlayback(true);
+    editor.togglePlayback();
+    timeout.restart();
+    while (editor.frame() == editor.duration() - 1 && timeout.elapsed() < 1000) {
+        QCoreApplication::processEvents();
+        QThread::msleep(5);
+    }
+    REQUIRE(editor.playing());
+    REQUIRE(editor.frame() < editor.duration() - 1);
+    editor.togglePlayback();
     qunsetenv("OPENTOON_TEST_NULL_AUDIO_BACKEND");
+}
+TEST_CASE("Silent transport can stop once or loop without editing the scene") {
+    EditorController editor;
+    editor.newScene();
+    const auto before = editor.document();
+    const auto last = editor.duration() - 1;
+    QElapsedTimer timeout;
+    editor.setLoopPlayback(false);
+    editor.setFrame(last);
+    editor.togglePlayback();
+    timeout.start();
+    while (editor.playing() && timeout.elapsed() < 1000) {
+        QCoreApplication::processEvents();
+        QThread::msleep(5);
+    }
+    REQUIRE_FALSE(editor.playing());
+    REQUIRE(editor.frame() == last);
+    REQUIRE(editor.document() == before);
+    editor.setLoopPlayback(true);
+    editor.togglePlayback();
+    timeout.restart();
+    while (editor.frame() == last && timeout.elapsed() < 1000) {
+        QCoreApplication::processEvents();
+        QThread::msleep(5);
+    }
+    REQUIRE(editor.playing());
+    REQUIRE(editor.frame() < last);
+    editor.togglePlayback();
+    REQUIRE(editor.document() == before);
 }
 TEST_CASE("Editor scrubs short audio fragments while traversing frames") {
     qputenv("OPENTOON_TEST_NULL_AUDIO_BACKEND", "1");

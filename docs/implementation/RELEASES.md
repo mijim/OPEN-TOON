@@ -1,5 +1,17 @@
 # Experimental releases
 
+## 0.2.0-experimental.65 — working source, play-once transport
+
+- The transport now has a Loop playback toggle, on by default. With looping
+  off, the miniaudio cursor stops at the scene's exact rational end sample and
+  the UI stops on the last frame. Silent preview follows the same one-pass
+  behavior. The toggle is view state and does not edit the scene.
+- Null-device and controller tests check one-pass completion, looping wrap and
+  unchanged document state. Native Qt Quick smoke clicks the button and
+  verifies final-frame stop. The locked macOS suite passes 202/202 CTest
+  entries and HM-10 smoke. Source only; hardware underrun qualification stays
+  open.
+
 ## 0.2.0-experimental.64 — working source, direct joint patch gesture
 
 - Control+Alt-dragging a leaf Part card onto another Part in Nodes creates the

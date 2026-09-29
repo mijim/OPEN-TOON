@@ -21,6 +21,8 @@ class AudioDevice {
     void scrub(Frame frame);
     void stop();
     void seek(Frame frame);
+    void setLooping(bool looping);
+    [[nodiscard]] bool finished() const;
     [[nodiscard]] Frame currentFrame() const;
     [[nodiscard]] std::int64_t currentSample() const;
     [[nodiscard]] bool running() const;

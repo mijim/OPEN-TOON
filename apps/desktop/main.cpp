@@ -459,9 +459,13 @@ int main(int argc, char** argv) {
                     if (!opacityField || !opacityField->isVisible())
                         throw std::runtime_error("Node opacity control is unavailable.");
                     editor.setTransform("opacity", .5);
-                    if (qAlpha(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 112 ||
-                        editor.compositionNodes().size() != 10)
-                        throw std::runtime_error("Opacity node did not attenuate inverted cutter alpha.");
+                    const auto opacityAlpha = qAlpha(
+                        opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0));
+                    const auto opacityNodeCount = editor.compositionNodes().size();
+                    if (opacityAlpha != 112 || opacityNodeCount != 10)
+                        throw std::runtime_error("Opacity node did not attenuate inverted cutter alpha: alpha=" +
+                            std::to_string(opacityAlpha) + " nodes=" +
+                            std::to_string(opacityNodeCount));
                     QCoreApplication::processEvents();
                     auto* bypassOpacity = window->findChild<QQuickItem*>("nodeBypassOpacity");
                     if (!bypassOpacity || !bypassOpacity->isVisible())
@@ -1557,6 +1561,35 @@ int main(int argc, char** argv) {
                     if (editor.frame() != 18)
                         throw std::runtime_error("Native audio playhead seek failed.");
                     editor.togglePlayback();
+                    QCoreApplication::processEvents();
+                    (void)window->grabWindow();
+                    auto* loopButton = window->findChild<QQuickItem*>("playbackLoopButton");
+                    if (!loopButton || !loopButton->isVisible() || !editor.loopPlayback())
+                        throw std::runtime_error("Playback loop control is unavailable.");
+                    const auto loopPoint = loopButton->mapToScene(QPointF(
+                        loopButton->width() / 2, loopButton->height() / 2));
+                    QMouseEvent loopPress(QEvent::MouseButtonPress, loopPoint,
+                        window->mapToGlobal(loopPoint.toPoint()), Qt::LeftButton,
+                        Qt::LeftButton, Qt::NoModifier);
+                    QMouseEvent loopRelease(QEvent::MouseButtonRelease, loopPoint,
+                        window->mapToGlobal(loopPoint.toPoint()), Qt::LeftButton,
+                        Qt::NoButton, Qt::NoModifier);
+                    QCoreApplication::sendEvent(window, &loopPress);
+                    QCoreApplication::sendEvent(window, &loopRelease);
+                    QCoreApplication::processEvents();
+                    if (editor.loopPlayback())
+                        throw std::runtime_error("Native loop control did not select play once.");
+                    const auto transportScene = editor.document();
+                    editor.setFrame(editor.duration() - 1);
+                    editor.togglePlayback();
+                    playbackWait.restart();
+                    while (editor.playing() && playbackWait.elapsed() < 1000) {
+                        QCoreApplication::processEvents();
+                        QThread::msleep(5);
+                    }
+                    if (editor.playing() || editor.frame() != editor.duration() - 1 ||
+                        editor.document() != transportScene)
+                        throw std::runtime_error("Play once did not stop at the final frame.");
                     qunsetenv("OPENTOON_TEST_NULL_AUDIO_BACKEND");
                     if (editor.playbackDiagnostics().value("callbacks").toULongLong() == 0)
                         throw std::runtime_error("Native audio callback diagnostics are empty.");
@@ -1768,7 +1801,7 @@ int main(int argc, char** argv) {
                     if (editor.document() != baseline)
                         throw std::runtime_error("WAV import did not undo atomically.");
                     std::cout << "HM-10 audio smoke passed: native PCM16 import, shared-source clip duplication/undo, exact split/undo, mute/undo, solo/undo, balance/undo, cue waveform, "
-                                 "device-clock playhead/seek, waveform and edge-trim drags/undo, audio scrub/repeat, source-sample fades, exact full and selected-range WAV export, timeline screenshot and atomic undo.\n";
+                                 "device-clock playhead/seek, native play-once loop toggle, waveform and edge-trim drags/undo, audio scrub/repeat, source-sample fades, exact full and selected-range WAV export, timeline screenshot and atomic undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

@@ -71,6 +71,11 @@ jobs do not replace an existing output.
 The callback mixes the immutable scene snapshot into bounded stack buffers;
 submitted sample position drives the playhead. Seeking during playback resets
 the sample cursor. The scene loops at its exact rational sample boundary.
+**Loop playback** is on by default. Turning it off makes the device emit
+silence after the scene's exact end sample and stops the UI on the last frame;
+silent preview follows the same rule. The toggle is view state and leaves the
+document and original WAV untouched. See
+[ADR-064](../architecture/adr/064-playback-loop-boundary.md).
 Dragging across the timeline ruler or drawing rows previews 80 ms audio
 fragments from each marked frame and stops on release. Moving a waveform
 continues to edit clip placement instead.
@@ -156,6 +161,9 @@ source-sample fades and trim/repeat clamping.
   controller test saves, reopens and exports a two-repeat cue byte-identically.
   The null device test checks callback diagnostics and the controller retains
   those counts after stopping preview.
+- Null-device and editor transport tests now cover one-pass completion at the
+  exact rational end sample, loop wrap, final-frame stop and unchanged scene.
+  A silent transport test checks the same last-frame stop and wrap. Native HM-10 smoke clicks the loop toggle and checks play-once completion.
 - A 600-second fractional-rate, two-source 1024-frame callback workload
   measured p95 **0.014 ms** against a 21.33 ms output period on the local
   M1 Pro macOS Release build. It checks the exact scene sample count and a

@@ -25,6 +25,7 @@ struct AudioDevice::Impl {
     std::atomic<std::int64_t> scrubEnd{-1};
     std::atomic_bool interrupted{false};
     std::atomic_bool active{false};
+    std::atomic_bool looping{true};
     std::atomic<std::uint64_t> callbacks{0}, processingOverruns{0}, maximumCallbackNanoseconds{0};
 
     explicit Impl(std::shared_ptr<const Document> source)
@@ -42,8 +43,11 @@ struct AudioDevice::Impl {
         std::int64_t cursor = origin;
         ma_uint32 done = 0;
         while (done < frameCount) {
-            if (scrubEnd < 0 && cursor >= sceneEnd)
+            if (scrubEnd < 0 && cursor >= sceneEnd) {
+                if (!self->looping.load(std::memory_order_relaxed))
+                    break;
                 cursor = 0;
+            }
             if (cursor >= boundary)
                 break;
             const auto count = std::size_t(std::min<std::int64_t>(
@@ -146,9 +150,18 @@ void AudioDevice::seek(Frame frame) {
     impl_->cursor.store(impl_->snapshot->rate.sampleAt(frame, 48000),
                         std::memory_order_release);
 }
+void AudioDevice::setLooping(bool looping) {
+    impl_->looping.store(looping, std::memory_order_release);
+}
+bool AudioDevice::finished() const {
+    return !impl_->looping.load(std::memory_order_acquire) &&
+           impl_->scrubEnd.load(std::memory_order_acquire) < 0 &&
+           impl_->cursor.load(std::memory_order_acquire) >= impl_->mix.sceneSamples();
+}
 std::int64_t AudioDevice::currentSample() const {
     const auto value = impl_->cursor.load(std::memory_order_acquire);
-    return value == impl_->mix.sceneSamples() ? 0 : value;
+    return value == impl_->mix.sceneSamples() &&
+                   impl_->looping.load(std::memory_order_acquire) ? 0 : value;
 }
 Frame AudioDevice::currentFrame() const {
     const auto sample = currentSample();
