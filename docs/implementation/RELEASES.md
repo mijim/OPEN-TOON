@@ -1,5 +1,14 @@
 # Experimental releases
 
+## 0.2.0-experimental.30 — working source, direct audio fade handles
+
+- Drag the upper fade guide handles on a waveform row to preview and commit
+  source-sample fade lengths. Escape cancels; release creates one undo step.
+- Native Qt Quick mouse gestures check both handles, exact sample changes,
+  undo/redo and cancellation. The 169-entry macOS suite and audio smoke pass.
+- Source only; no new public binary or tag. Hardware audible quality remains
+  unqualified.
+
 ## 0.2.0-experimental.29 — working source, audio fade guides
 
 - Draw the saved fade-in and fade-out endpoints over a clip's timeline row,

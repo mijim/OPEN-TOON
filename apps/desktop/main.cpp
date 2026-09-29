@@ -18,6 +18,7 @@
 #include <QGuiApplication>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QKeyEvent>
 #include <QMouseEvent>
 #include <QPointingDevice>
 #include <QQmlApplicationEngine>
@@ -459,6 +460,43 @@ int main(int argc, char** argv) {
                             changedPixels += beforeFadeWindow.pixel(x, y) != afterFadeWindow.pixel(x, y);
                     if (changedPixels < 5)
                         throw std::runtime_error("The audio fade guide did not appear on the timeline.");
+                    const auto fadeHandle = timelineInput->mapToScene(QPointF(44, rowY - 11));
+                    const auto fadeDragged = timelineInput->mapToScene(QPointF(66, rowY - 11));
+                    sendDrag(QEvent::MouseButtonPress, fadeHandle, Qt::LeftButton, Qt::LeftButton);
+                    sendDrag(QEvent::MouseMove, fadeDragged, Qt::NoButton, Qt::LeftButton);
+                    sendDrag(QEvent::MouseButtonRelease, fadeDragged, Qt::LeftButton, Qt::NoButton);
+                    if (editor.audioClips().front().toMap().value("fadeInSamples").toInt() != 6000)
+                        throw std::runtime_error("Dragging the native fade handle did not adjust samples.");
+                    editor.undo();
+                    if (editor.audioClips().front().toMap().value("fadeInSamples").toInt() != 4000)
+                        throw std::runtime_error("Native fade-handle drag did not undo in one step.");
+                    editor.redo();
+                    if (editor.audioClips().front().toMap().value("fadeInSamples").toInt() != 6000)
+                        throw std::runtime_error("Native fade-handle drag did not redo.");
+                    editor.undo();
+                    const auto fadeCancelled = timelineInput->mapToScene(QPointF(88, rowY - 11));
+                    sendDrag(QEvent::MouseButtonPress, fadeHandle, Qt::LeftButton, Qt::LeftButton);
+                    sendDrag(QEvent::MouseMove, fadeCancelled, Qt::NoButton, Qt::LeftButton);
+                    QKeyEvent escape(QEvent::KeyPress, Qt::Key_Escape, Qt::NoModifier);
+                    QCoreApplication::sendEvent(window, &escape);
+                    QCoreApplication::processEvents();
+                    sendDrag(QEvent::MouseButtonRelease, fadeCancelled, Qt::LeftButton, Qt::NoButton);
+                    if (editor.audioClips().front().toMap().value("fadeInSamples").toInt() != 4000)
+                        throw std::runtime_error("Escape did not cancel the native fade-handle drag.");
+                    const auto fadeOutHandle = timelineInput->mapToScene(QPointF(1012, rowY - 11));
+                    const auto fadeOutDragged = timelineInput->mapToScene(QPointF(990, rowY - 11));
+                    sendDrag(QEvent::MouseButtonPress, fadeOutHandle, Qt::LeftButton, Qt::LeftButton);
+                    sendDrag(QEvent::MouseMove, fadeOutDragged, Qt::NoButton, Qt::LeftButton);
+                    sendDrag(QEvent::MouseButtonRelease, fadeOutDragged, Qt::LeftButton, Qt::NoButton);
+                    if (editor.audioClips().front().toMap().value("fadeOutSamples").toInt() != 6000)
+                        throw std::runtime_error("Dragging the native fade-out handle did not adjust samples.");
+                    editor.undo();
+                    if (editor.audioClips().front().toMap().value("fadeOutSamples").toInt() != 4000)
+                        throw std::runtime_error("Native fade-out handle did not undo in one step.");
+                    editor.redo();
+                    if (editor.audioClips().front().toMap().value("fadeOutSamples").toInt() != 6000)
+                        throw std::runtime_error("Native fade-out handle did not redo.");
+                    editor.undo();
                     editor.undo();
                     if (editor.audioClips().front().toMap().value("fadeInSamples").toInt() != 0)
                         throw std::runtime_error("Native audio fade undo failed.");

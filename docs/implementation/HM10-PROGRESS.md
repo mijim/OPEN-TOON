@@ -20,7 +20,9 @@ shorter trims or repeat counts clamp them to the new length. They shape
 preview and export through the same mix plan without changing source bytes.
 The waveform retains source peaks and gain, with visible upper/lower fade
 guides over the repeated clip; these guides indicate the envelope endpoints
-without replacing the exact source-peak trace. **Scene → Export PCM WAV mix** writes a 48 kHz stereo PCM16 mix
+without replacing the exact source-peak trace. Drag either small upper guide
+handle to preview a new fade length in source samples; release commits one
+undoable edit and Escape cancels. **Scene → Export PCM WAV mix** writes a 48 kHz stereo PCM16 mix
 from an immutable document snapshot. Multiple clips sum at exact scene sample
 positions. Export runs in the background, reports progress and atomically
 discards a cancelled temporary file. Conversion between different sample
@@ -100,6 +102,8 @@ source-sample fades and trim/repeat clamping.
   first cue with the second cue unchanged. The native screenshot
   `build/hm10-fade-smoke.png` was inspected: both endpoint guides appear on
   the repeated clip, and smoke compares the timeline row before/after the edit.
+  Native mouse gestures drag both upper handles by one frame, then check the
+  exact 2,000-sample change, one-step undo/redo and Escape cancellation.
 - A range-export integration test compares selected PCM payload with the
   full-scene mix slice at 24 and 24000/1001 fps, checks exact length and
   rejects invalid boundaries before writing. The native HM-10 smoke exports

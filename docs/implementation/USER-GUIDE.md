@@ -203,7 +203,8 @@ its placement, while the source remains embedded in the project for reuse.
 the whole repeated clip; a repeat boundary does not restart the envelope.
 The waveform shows source peaks and gain with fade guides over the clip;
 preview and WAV export apply the fades. Shortening a trim or repeat count
-clamps fades to fit.
+clamps fades to fit. Drag the small upper handle at either guide to adjust
+that fade directly; Escape cancels and release makes one undoable edit.
 Import, move, trim, gain and removal are undoable and survive save/reopen.
 
 The format accepts up to 128 MiB per WAV, 512 MiB total audio, 64 assets and 1,000 clips. Clips

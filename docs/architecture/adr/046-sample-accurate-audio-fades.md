@@ -21,8 +21,9 @@ position. One source-sample fade silences its endpoint sample. The same plan
 serves device preview, scrub and full or selected-range offline WAV output.
 No original WAV bytes are modified and the audio callback allocates no new
 memory. The timeline waveform remains a view of the original source peaks
-and saved gain. A later presentation-only guide draws the fade endpoints
-over this trace; it does not claim sample-weighted peak values.
+and saved gain. A presentation guide draws draggable fade endpoints over this
+trace; it does not claim sample-weighted peak values. Handle drags preview
+without mutation, commit one transaction on release and cancel with Escape.
 
 ## Evidence and limits
 

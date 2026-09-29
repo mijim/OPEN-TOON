@@ -2848,7 +2848,12 @@ ApplicationWindow {
                                     ctx.fillStyle = delta ? "#ffffff" : "#a8a8a8";
                                     ctx.fillRect(x, y + 17 - h, Math.max(1, root.timelineCell - 2), h * 2);
                                 }
-                                if (clip.fadeInSamples > 0 || clip.fadeOutSamples > 0) {
+                                const editingFade = timelineInput.audioFadeClipId === clip.id;
+                                const fadeIn = editingFade && timelineInput.audioFadeSide === "in"
+                                             ? timelineInput.audioFadePreviewSamples : clip.fadeInSamples;
+                                const fadeOut = editingFade && timelineInput.audioFadeSide === "out"
+                                              ? timelineInput.audioFadePreviewSamples : clip.fadeOutSamples;
+                                {
                                     const pixelsPerSample = root.timelineCell * editor.fps / clip.sampleRate;
                                     const beginX = (clip.start + delta) * root.timelineCell - ox;
                                     const endX = beginX + (clip.outSample - clip.inSample) *
@@ -2859,24 +2864,27 @@ ApplicationWindow {
                                     ctx.clip();
                                     ctx.strokeStyle = "#eeeeee";
                                     ctx.lineWidth = 1;
-                                    if (clip.fadeInSamples > 0) {
-                                        const fullX = beginX + clip.fadeInSamples * pixelsPerSample;
+                                    const inX = beginX + fadeIn * pixelsPerSample;
+                                    const outX = endX - fadeOut * pixelsPerSample;
+                                    if (fadeIn > 0) {
                                         ctx.beginPath();
                                         ctx.moveTo(beginX, y + 17);
-                                        ctx.lineTo(fullX, y + 6);
+                                        ctx.lineTo(inX, y + 6);
                                         ctx.moveTo(beginX, y + 17);
-                                        ctx.lineTo(fullX, y + 28);
+                                        ctx.lineTo(inX, y + 28);
                                         ctx.stroke();
                                     }
-                                    if (clip.fadeOutSamples > 0) {
-                                        const fullX = endX - clip.fadeOutSamples * pixelsPerSample;
+                                    if (fadeOut > 0) {
                                         ctx.beginPath();
-                                        ctx.moveTo(fullX, y + 6);
+                                        ctx.moveTo(outX, y + 6);
                                         ctx.lineTo(endX, y + 17);
-                                        ctx.moveTo(fullX, y + 28);
+                                        ctx.moveTo(outX, y + 28);
                                         ctx.lineTo(endX, y + 17);
                                         ctx.stroke();
                                     }
+                                    ctx.fillStyle = "#eeeeee";
+                                    ctx.fillRect(inX - 2, y + 4, 5, 5);
+                                    ctx.fillRect(outX - 2, y + 4, 5, 5);
                                     ctx.restore();
                                 }
                                 ctx.fillStyle = "#eeeeee";
@@ -2946,7 +2954,12 @@ ApplicationWindow {
                             const edge = root.xsheet ? 30 + editor.rangeEnd * root.timelineRow - timelineScroll.contentY : editor.rangeEnd * root.timelineCell - timelineScroll.contentX;
                             return !root.keyEditing && row >= 0 && row < editor.layers.length && editor.selectedLayers.indexOf(editor.layers[row].id) >= 0 && Math.abs((root.xsheet ? mouseY : mouseX) - edge) <= 5;
                         }
-                        cursorShape: audioDragClipId >= 0 ? Qt.ClosedHandCursor : keySource >= 0 ? Qt.ClosedHandCursor : resizing || overRangeEnd ? (root.xsheet ? Qt.SizeVerCursor : Qt.SizeHorCursor) : audioAt(Qt.point(mouseX, mouseY)) || keyAt(Qt.point(mouseX, mouseY)) >= 0 ? Qt.OpenHandCursor : pressed && moving ? Qt.ClosedHandCursor : Qt.CrossCursor
+                        cursorShape: audioFadeClipId >= 0 || fadeHandleAt(Qt.point(mouseX, mouseY))
+                                     ? Qt.SizeHorCursor : audioDragClipId >= 0 ? Qt.ClosedHandCursor :
+                                       keySource >= 0 ? Qt.ClosedHandCursor : resizing || overRangeEnd
+                                     ? (root.xsheet ? Qt.SizeVerCursor : Qt.SizeHorCursor) :
+                                       audioAt(Qt.point(mouseX, mouseY)) || keyAt(Qt.point(mouseX, mouseY)) >= 0
+                                     ? Qt.OpenHandCursor : pressed && moving ? Qt.ClosedHandCursor : Qt.CrossCursor
                         preventStealing: true
                         anchors.fill: parent
                         property int keySource: -1
@@ -2955,6 +2968,30 @@ ApplicationWindow {
                         property int audioDragClipId: -1
                         property int audioDragStart: 0
                         property int audioPreviewStart: 0
+                        property int audioFadeClipId: -1
+                        property string audioFadeSide: ""
+                        property int audioFadePreviewSamples: 0
+                        function fadeHandleAt(mouse) {
+                            if (root.xsheet)
+                                return null;
+                            const index = rowAt(mouse) - editor.layers.length;
+                            const clips = editor.audioClips;
+                            if (index < 0 || index >= clips.length)
+                                return null;
+                            const clip = clips[index];
+                            const y = 30 + (editor.layers.length + index) * root.timelineRow - timelineScroll.contentY;
+                            if (Math.abs(mouse.y - (y + 6)) > 8)
+                                return null;
+                            const pixelsPerSample = root.timelineCell * editor.fps / clip.sampleRate;
+                            const beginX = clip.start * root.timelineCell - timelineScroll.contentX;
+                            const endX = beginX + (clip.outSample - clip.inSample) *
+                                         clip.repeats * pixelsPerSample;
+                            const inDistance = Math.abs(mouse.x - (beginX + clip.fadeInSamples * pixelsPerSample));
+                            const outDistance = Math.abs(mouse.x - (endX - clip.fadeOutSamples * pixelsPerSample));
+                            if (Math.min(inDistance, outDistance) > 8)
+                                return null;
+                            return {clip: clip, side: inDistance <= outDistance ? "in" : "out"};
+                        }
                         function audioAt(mouse) {
                             if (root.xsheet)
                                 return null;
@@ -2985,6 +3022,8 @@ ApplicationWindow {
                             canceled = true;
                             keySource = -1;
                             audioDragClipId = -1;
+                            audioFadeClipId = -1;
+                            audioFadeSide = "";
                             resizing = false;
                             moving = false;
                             previewFrame = -1;
@@ -3007,6 +3046,14 @@ ApplicationWindow {
                             canceled = false;
                             anchorFrame = frameAt(mouse);
                             anchorRow = rowAt(mouse);
+                            const fade = fadeHandleAt(mouse);
+                            if (fade) {
+                                audioFadeClipId = fade.clip.id;
+                                audioFadeSide = fade.side;
+                                audioFadePreviewSamples = fade.side === "in"
+                                                        ? fade.clip.fadeInSamples : fade.clip.fadeOutSamples;
+                                return;
+                            }
                             const audio = audioAt(mouse);
                             if (audio) {
                                 audioDragClipId = audio.id;
@@ -3056,6 +3103,22 @@ ApplicationWindow {
                         onPositionChanged: function (mouse) {
                             if (!pressed || canceled)
                                 return;
+                            if (audioFadeClipId >= 0) {
+                                const clip = editor.audioClips.find(c => c.id === audioFadeClipId);
+                                if (!clip) { cancel(); return; }
+                                const total = (clip.outSample - clip.inSample) * clip.repeats;
+                                const pixelsPerSample = root.timelineCell * editor.fps / clip.sampleRate;
+                                const beginX = clip.start * root.timelineCell - timelineScroll.contentX;
+                                const endX = beginX + total * pixelsPerSample;
+                                const raw = audioFadeSide === "in"
+                                            ? (mouse.x - beginX) / pixelsPerSample
+                                            : (endX - mouse.x) / pixelsPerSample;
+                                const other = audioFadeSide === "in"
+                                              ? clip.fadeOutSamples : clip.fadeInSamples;
+                                audioFadePreviewSamples = Math.max(0, Math.min(total - other, Math.round(raw)));
+                                timeline.requestPaint();
+                                return;
+                            }
                             if (audioDragClipId >= 0) {
                                 audioPreviewStart = Math.max(0, Math.min(editor.duration - 1, audioDragStart + frameAt(mouse) - anchorFrame));
                                 timeline.requestPaint();
@@ -3088,6 +3151,19 @@ ApplicationWindow {
                             editor.endAudioScrub();
                             if (canceled)
                                 return;
+                            if (audioFadeClipId >= 0) {
+                                const clip = editor.audioClips.find(c => c.id === audioFadeClipId);
+                                const preview = audioFadePreviewSamples;
+                                const side = audioFadeSide;
+                                audioFadeClipId = -1;
+                                audioFadeSide = "";
+                                if (clip && preview !== (side === "in" ? clip.fadeInSamples : clip.fadeOutSamples))
+                                    editor.setAudioClipFades(clip.id,
+                                        side === "in" ? preview : clip.fadeInSamples,
+                                        side === "out" ? preview : clip.fadeOutSamples);
+                                timeline.requestPaint();
+                                return;
+                            }
                             if (audioDragClipId >= 0) {
                                 const clipId = audioDragClipId, start = audioPreviewStart, oldStart = audioDragStart;
                                 audioDragClipId = -1;
@@ -3127,10 +3203,10 @@ ApplicationWindow {
                             } else
                                 editor.newDrawing(false);
                         }
-                        Accessible.name: "Timeline. Drag audio waveforms to move clips. Drag diamonds to retime poses. Enable Keys to add keys by double-clicking. Alt-drag moves an exposure range."
+                        Accessible.name: "Timeline. Drag audio waveforms to move clips or their upper fade handles to adjust fades. Drag diamonds to retime poses. Enable Keys to add keys by double-clicking. Alt-drag moves an exposure range."
                     }
                     Keys.onEscapePressed: {
-                        if (timelineInput.audioDragClipId >= 0 || timelineInput.keySource >= 0 || timelineInput.moving || timelineInput.resizing)
+                        if (timelineInput.audioDragClipId >= 0 || timelineInput.audioFadeClipId >= 0 || timelineInput.keySource >= 0 || timelineInput.moving || timelineInput.resizing)
                             timelineInput.cancel();
                         else
                             editor.clearPoseSelection();
