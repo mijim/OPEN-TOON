@@ -179,6 +179,12 @@ TEST_CASE("Editor exports a reopened PCM cue at its exact output sample") {
     EditorController editor;
     editor.newScene();
     REQUIRE(editor.importAudio(QUrl::fromLocalFile(input)));
+    const auto clip = editor.audioClips().front().toMap().value("id").toInt();
+    REQUIRE(editor.setAudioClipRepeats(clip, 2));
+    REQUIRE(editor.audioWaveform(clip, 25, 1).front().toDouble() > 0.99);
+    editor.undo();
+    REQUIRE(editor.audioClips().front().toMap().value("repeats").toInt() == 1);
+    editor.redo();
     const auto project = QUrl::fromLocalFile(directory.filePath("sound.otoon"));
     REQUIRE(editor.saveProject(project));
     EditorController reopened;
@@ -199,6 +205,8 @@ TEST_CASE("Editor exports a reopened PCM cue at its exact output sample") {
     REQUIRE(quint8(bytes[atCue]) == 255);
     REQUIRE(quint8(bytes[atCue + 1]) == 127);
     REQUIRE(bytes.mid(atCue, 2) == bytes.mid(atCue + 2, 2));
+    const auto repeatedCue = 44 + 50002 * 4;
+    REQUIRE(bytes.mid(atCue, 4) == bytes.mid(repeatedCue, 4));
 }
 TEST_CASE("Null audio device advances, seeks and stops against one immutable scene") {
     EditorController editor;

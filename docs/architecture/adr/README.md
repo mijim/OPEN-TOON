@@ -115,3 +115,6 @@ assets, sample-range clips and rational frame-to-sample waveform mapping.
 
 See [ADR-037](037-miniaudio-preview-clock.md) for experimental PCM16 device
 preview, immutable callback mixing and the submitted-sample playhead boundary.
+
+See [ADR-038](038-repeated-audio-clips.md) for format-17 saved repeat counts,
+sample-contiguous looping and format-16 migration.

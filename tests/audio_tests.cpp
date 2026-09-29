@@ -124,6 +124,37 @@ TEST_CASE("Audio clip visible end uses exact rational sample bounds") {
     moveAudioClip(scene, id, 47);
     REQUIRE(audioClipEndFrame(scene, clip, asset) == 48);
 }
+TEST_CASE("Repeated trimmed audio stays sample-contiguous through mix and format migration") {
+    auto scene = makeDocument();
+    const auto id = importPcm16Wav(scene, "repeat cue", wav(48000, 2002), 0);
+    trimAudioClip(scene, id, 0, 4000);
+    setAudioClipRepeats(scene, id, 3);
+    REQUIRE(scene.audioClips.front().repeats == 3);
+    REQUIRE(audioClipEndFrame(scene, scene.audioClips.front(), scene.audioAssets.front()) == 6);
+    scene.validate();
+    AudioMixPlan mix(scene, 48000);
+    for (auto cue : {2002, 6002, 10002}) {
+        REQUIRE(mix.renderBlock(cue - 1, 1)[0] == 0);
+        REQUIRE(mix.renderBlock(cue, 1)[0] == 32767);
+    }
+    AudioPeakIndex peaks(scene.audioAssets.front());
+    REQUIRE(audioClipFramePeak(scene, scene.audioClips.front(), scene.audioAssets.front(), peaks, 1) > .99);
+    REQUIRE(audioClipFramePeak(scene, scene.audioClips.front(), scene.audioAssets.front(), peaks, 3) > .99);
+    REQUIRE(audioClipFramePeak(scene, scene.audioClips.front(), scene.audioAssets.front(), peaks, 5) > .99);
+    REQUIRE(deserializeDocument(serializeDocument(scene)) == scene);
+    auto previous = nlohmann::json::parse(serializeDocument(scene));
+    previous["version"] = 16;
+    for (auto& clip : previous["audioClips"])
+        clip.erase("repeats");
+    REQUIRE(deserializeDocument(previous.dump()).audioClips.front().repeats == 1);
+    Session session;
+    session.replace(scene);
+    REQUIRE(session.apply("Reduce repeats", [&](Document& d) { setAudioClipRepeats(d, id, 1); }));
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == scene);
+    REQUIRE_THROWS(session.apply("Invalid repeats", [&](Document& d) { setAudioClipRepeats(d, id, 65); }));
+    REQUIRE(session.document() == scene);
+}
 
 TEST_CASE("Rational audio cue positions remain exact across integer and fractional frame rates") {
     for (auto rate : {FrameRate{24, 1}, FrameRate{24000, 1001}}) {

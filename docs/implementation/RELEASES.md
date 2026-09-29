@@ -1,5 +1,17 @@
 # Experimental releases
 
+## 0.2.0-experimental.17 — working source, audio repeats and device preview
+
+- Save 1–64 sample-contiguous repeats per trimmed clip in format 17, with
+  format-16 migration and a readable source-version backup.
+- Preview audio through miniaudio, scrub frame fragments, drag clips in the
+  native timeline, reuse exact indexed waveform peaks and export the same
+  mix to PCM WAV. HM-10 remains in progress pending hardware synchronization
+  and audible-quality qualification.
+- The local macOS locked source build passes 154 CTest entries and native
+  HM-10 input/export smoke. This working source version has no new binary or
+  source tag.
+
 ## 0.2.0-experimental.16 — source milestone, audio timing subset
 
 - Save original mono/stereo PCM16 WAV assets and undoable scene clips in format 16.

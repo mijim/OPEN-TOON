@@ -195,6 +195,9 @@ int main(int argc, char** argv) {
                     sendDrag(QEvent::MouseButtonRelease, rulerEnd, Qt::LeftButton, Qt::NoButton);
                     if (editor.audioScrubbing())
                         throw std::runtime_error("Native audio scrub did not stop on release.");
+                    if (!editor.setAudioClipRepeats(clip, 2) ||
+                        editor.audioWaveform(clip, 25, 1).front().toDouble() < 0.99)
+                        throw std::runtime_error("Repeated native waveform lost its second cue.");
                     const auto output = directory.filePath("mix.wav");
                     editor.exportAudio(QUrl::fromLocalFile(output));
                     QElapsedTimer timeout;
@@ -209,13 +212,15 @@ int main(int argc, char** argv) {
                         throw std::runtime_error("Native PCM WAV export length is incorrect.");
                     const auto mix = rendered.readAll();
                     if (quint8(mix[44 + 2002 * 4]) != 255 ||
-                        quint8(mix[44 + 2002 * 4 + 1]) != 127)
+                        quint8(mix[44 + 2002 * 4 + 1]) != 127 ||
+                        mix.mid(44 + 50002 * 4, 4) != mix.mid(44 + 2002 * 4, 4))
                         throw std::runtime_error("Native PCM WAV cue shifted during export.");
+                    editor.undo(); // Repeat count.
                     editor.undo();
                     if (editor.document() != baseline)
                         throw std::runtime_error("WAV import did not undo atomically.");
                     std::cout << "HM-10 audio smoke passed: native PCM16 import, cue waveform, "
-                                 "device-clock playhead/seek, waveform drag/undo, audio scrub, exact WAV mix export, timeline screenshot and atomic undo.\n";
+                                 "device-clock playhead/seek, waveform drag/undo, audio scrub/repeat, exact WAV mix export, timeline screenshot and atomic undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

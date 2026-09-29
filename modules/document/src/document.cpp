@@ -383,7 +383,8 @@ void Document::validate() const {
     for (const auto& clip : audioClips) {
         id(clip.id);
         require(assets.contains(clip.asset) && clip.start >= 0 && clip.start < duration &&
-                    bounded(clip.gain, 4) && clip.gain >= 0,
+                    bounded(clip.gain, 4) && clip.gain >= 0 &&
+                    clip.repeats >= 1 && clip.repeats <= 64,
                 "Invalid audio clip placement or gain.");
         const auto& asset = *std::find_if(audioAssets.begin(), audioAssets.end(),
                                           [&](const auto& value) { return value.id == clip.asset; });

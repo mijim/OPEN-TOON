@@ -18,6 +18,7 @@ void moveAudioClip(Document& document, Id clip, Frame start);
 void trimAudioClip(Document& document, Id clip, std::uint64_t inSample,
                    std::uint64_t outSample);
 void setAudioClipGain(Document& document, Id clip, double gain);
+void setAudioClipRepeats(Document& document, Id clip, int repeats);
 void removeAudioClip(Document& document, Id clip);
 [[nodiscard]] Frame audioClipEndFrame(const Document& document, const AudioClip& clip,
                                       const AudioAsset& asset);
@@ -42,6 +43,9 @@ class AudioPeakIndex {
     [[nodiscard]] std::uint16_t samplePeak(std::uint64_t frame) const;
     [[nodiscard]] std::uint16_t edgePeak(std::uint64_t begin, std::uint64_t end) const;
 };
+[[nodiscard]] double audioClipFramePeak(const Document& document, const AudioClip& clip,
+                                        const AudioAsset& asset, const AudioPeakIndex& index,
+                                        Frame frame);
 class AudioMixPlan {
   public:
     AudioMixPlan(const Document& document, std::int32_t outputRate);

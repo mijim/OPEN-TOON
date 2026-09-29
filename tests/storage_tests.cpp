@@ -703,3 +703,23 @@ TEST_CASE("Format fifteen audio migration preserves a readable source backup") {
     backup += ".pre-v15.bak";
     REQUIRE(ProjectStore::load(backup).document == original);
 }
+TEST_CASE("Format sixteen clips migrate to one repeat with a readable source backup") {
+    TemporaryProject project;
+    const auto original = makeDocument();
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 16;
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=16");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    changed.name = "Repeat-ready scene";
+    REQUIRE(ProjectStore::save(project.file, changed, "Migrate repeat schema", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v16.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+}

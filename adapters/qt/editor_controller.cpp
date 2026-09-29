@@ -279,7 +279,8 @@ QVariantList EditorController::audioClips() const {
                                      {"outSample", qint64(clip.outSample)},
                                      {"sampleRate", asset.sampleRate},
                                      {"channels", asset.channels},
-                                     {"gain", clip.gain}});
+                                     {"gain", clip.gain},
+                                     {"repeats", clip.repeats}});
     }
     return result;
 }
@@ -306,11 +307,8 @@ QVariantList EditorController::audioWaveform(int clipId, int firstFrame, int fra
             result.push_back(0.0);
             continue;
         }
-        const auto begin = clip->inSample + document().rate.sampleAt(frame - clip->start, asset->sampleRate);
-        const auto end = std::min(clip->outSample,
-            clip->inSample + document().rate.sampleAt(frame - clip->start + 1, asset->sampleRate));
-        result.push_back(begin < clip->outSample ?
-            std::min(1.0, cached->second.peak(begin, std::max(begin, end)) * clip->gain) : 0.0);
+        result.push_back(std::min(1.0,
+            opentoon::audioClipFramePeak(document(), *clip, *asset, cached->second, frame) * clip->gain));
     }
     return result;
 }
@@ -1731,6 +1729,11 @@ bool EditorController::trimAudioClip(int clipId, int inSample, int outSample) {
 bool EditorController::setAudioClipGain(int clipId, double gain) {
     return edit("Set audio gain", [&](Document& d) {
         opentoon::setAudioClipGain(d, Id(clipId), gain);
+    });
+}
+bool EditorController::setAudioClipRepeats(int clipId, int repeats) {
+    return edit("Set audio repeats", [&](Document& d) {
+        opentoon::setAudioClipRepeats(d, Id(clipId), repeats);
     });
 }
 bool EditorController::removeAudioClip(int clipId) {

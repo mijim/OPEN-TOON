@@ -2169,6 +2169,20 @@ ApplicationWindow {
                                             onClicked: editor.trimAudioClip(modelData.id, Number(audioIn.text), Number(audioOut.text))
                                         }
                                     }
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        Label { text: "Repeats"; font.pixelSize: 10; color: "#888888" }
+                                        C.CompactSpinBox {
+                                            from: 1
+                                            to: 64
+                                            value: modelData.repeats
+                                            Layout.preferredWidth: 88
+                                            onValueModified: editor.setAudioClipRepeats(modelData.id, value)
+                                            Accessible.name: "Audio clip repeat count"
+                                        }
+                                        Item { Layout.fillWidth: true }
+                                        Label { text: "× trimmed range"; font.pixelSize: 10; color: "#777777" }
+                                    }
                                     C.ToolButton {
                                         text: "Remove clip"
                                         Layout.fillWidth: true

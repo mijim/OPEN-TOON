@@ -145,7 +145,7 @@ Each manual save appends a complete revision. Scene history can restore a saved 
 
 Every 60 seconds, a modified document is saved to a recovery file. On a later launch, recovery can open that snapshot as an unsaved scene. Save it under a chosen name. Autosave runs from an immutable snapshot in a worker, so newer edits stay unsaved until the next save. Manual saves remain synchronous. Recovery from operating-system power loss and multiple simultaneous application instances has not been qualified.
 
-Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and decoded image media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening formats 1–15 remains supported. Format 3 added channel Bézier easing, format 4 added typed character layers and named substitutions, format 5 added character view sets, format 6 saves the composition profile, format 7 added the output camera, format 8 saves mesh bindings, format 9 saves bone/curve controls and animation keys, format 10 introduced parent bone-tip links, format 11 saves their rest tip and distal direction at attachment time, format 12 adds named masked character poses, format 13 adds publication flags for character poses and views, format 14 adds publication flags for drawing substitutions, format 15 adds published control groups, and format 16 adds PCM16 WAV assets and placed clips. The first save of an older schema creates a backup named for its source version, such as `.pre-v15.bak`, before upgrading. Older editors require that backup to reopen the original format.
+Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and decoded image media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening formats 1–16 remains supported. Format 3 added channel Bézier easing, format 4 added typed character layers and named substitutions, format 5 added character view sets, format 6 saves the composition profile, format 7 added the output camera, format 8 saves mesh bindings, format 9 saves bone/curve controls and animation keys, format 10 introduced parent bone-tip links, format 11 saves their rest tip and distal direction at attachment time, format 12 adds named masked character poses, format 13 adds publication flags for character poses and views, format 14 adds publication flags for drawing substitutions, format 15 adds published control groups, format 16 adds PCM16 WAV assets and placed clips, and format 17 adds nondestructive clip repeats. The first save of an older schema creates a backup named for its source version, such as `.pre-v16.bak`, before upgrading. Older editors require that backup to reopen the original format.
 
 **Scene → Compact project history** retains the chosen number of newest saved revisions and removes unreachable media, after creating a full `.pre-compact.bak` backup. Save pending edits first. This is an explicit operation and is not part of autosave.
 
@@ -189,13 +189,15 @@ file at the current frame. A separate row below the drawing layers shows its
 waveform; its exact peak index follows the timeline's frame width. Drag the
 waveform to move its clip by whole frames; release commits one undo step and
 Escape cancels. The Audio section in the right panel edits the clip's start
-frame, source in/out samples and linear gain.
+frame, source in/out samples, linear gain and a repeat count from 1 to 64.
 Enter both sample endpoints and choose **Set** to trim. **Remove clip** removes
 its placement, while the source remains embedded in the project for reuse.
 Import, move, trim, gain and removal are undoable and survive save/reopen.
 
 The format accepts up to 128 MiB per WAV, 512 MiB total audio, 64 assets and 1,000 clips. Clips
 start on whole scene frames, and source-sample trim uses a half-open interval.
+Repeats join the trimmed source interval in sample time without editing the
+original WAV.
 Unsupported or damaged files leave the project unchanged. **Scene → Export PCM
 WAV mix** writes a 48 kHz stereo mix from all placed clips. It runs in the
 background and can be cancelled without replacing an existing destination.
@@ -205,8 +207,8 @@ playhead while playing seeks the audio. With playback stopped, press and drag
 across the timeline ruler or drawing rows to hear short fragments at each
 frame; release stops the sound. Editing stops playback so the next
 preview uses the new document. If the device cannot open, the visual preview
-continues silently and shows an error. Hardware scrub quality, clip repeat
-and device-loss recovery are still open. [HM-10 progress](HM10-PROGRESS.md) records
+continues silently and shows an error. Hardware scrub quality and device-loss
+recovery are still open. [HM-10 progress](HM10-PROGRESS.md) records
 the current test evidence and remaining work.
 
 ## Animation edits and curves

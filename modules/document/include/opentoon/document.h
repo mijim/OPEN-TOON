@@ -225,10 +225,11 @@ struct AudioClip {
     Frame start = 0;
     std::uint64_t inSample = 0, outSample = 0;
     double gain = 1;
+    int repeats = 1;
     auto operator<=>(const AudioClip&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 16;
+    static constexpr int formatVersion = 17;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;

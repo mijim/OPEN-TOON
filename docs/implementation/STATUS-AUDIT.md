@@ -19,7 +19,7 @@ The current macOS system build has 148 passing CTest entries, including native
 character-control and PCM16 audio integration. Native dashboard and audio
 timeline smoke checks pass. The last Windows/Linux CI evidence belongs to an
 earlier source commit. The experimental.10 arm64 package was verified locally
-but publication was cancelled; experimental.16 remains source only. Physical tablet and
+but publication was cancelled; experimental.17 remains working source only. Physical tablet and
 current cross-platform binary qualification remain open.
 
 This audit corrected camera delivery mistakenly listed under raster phase P05

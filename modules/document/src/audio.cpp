@@ -83,7 +83,7 @@ Id importPcm16Wav(Document& document, std::string name,
     const Id assetId = document.allocateId(), clipId = document.allocateId();
     document.audioAssets.push_back({assetId, std::move(name), info.sampleRate,
                                     info.channels, info.sampleFrames, std::move(bytes)});
-    document.audioClips.push_back({clipId, assetId, start, 0, info.sampleFrames, 1});
+    document.audioClips.push_back({clipId, assetId, start, 0, info.sampleFrames, 1, 1});
     return clipId;
 }
 void moveAudioClip(Document& document, Id id, Frame start) {
@@ -107,6 +107,11 @@ void setAudioClipGain(Document& document, Id id, double gain) {
         throw std::invalid_argument("Audio gain must be between zero and four.");
     clip(document, id).gain = gain;
 }
+void setAudioClipRepeats(Document& document, Id id, int repeats) {
+    if (repeats < 1 || repeats > 64)
+        throw std::invalid_argument("Audio repeat count must be between one and 64.");
+    clip(document, id).repeats = repeats;
+}
 void removeAudioClip(Document& document, Id id) {
     const auto oldSize = document.audioClips.size();
     std::erase_if(document.audioClips, [=](const auto& item) { return item.id == id; });
@@ -116,9 +121,10 @@ void removeAudioClip(Document& document, Id id) {
 Frame audioClipEndFrame(const Document& document, const AudioClip& clip,
                         const AudioAsset& asset) {
     if (clip.start < 0 || clip.start >= document.duration ||
-        clip.inSample >= clip.outSample || clip.outSample > asset.sampleFrames)
+        clip.inSample >= clip.outSample || clip.outSample > asset.sampleFrames ||
+        clip.repeats < 1 || clip.repeats > 64)
         throw std::invalid_argument("Invalid audio clip interval.");
-    const auto samples = clip.outSample - clip.inSample;
+    const auto samples = (clip.outSample - clip.inSample) * std::uint64_t(clip.repeats);
     Frame low = 0, high = document.duration - clip.start;
     while (low < high) {
         const Frame mid = low + (high - low) / 2;
@@ -203,6 +209,30 @@ double AudioPeakIndex::peak(std::uint64_t begin, std::uint64_t end) const {
     }
     return double(maximum) / 32768.0;
 }
+double audioClipFramePeak(const Document& document, const AudioClip& clip,
+                          const AudioAsset& asset, const AudioPeakIndex& index,
+                          Frame frame) {
+    if (frame < clip.start || frame >= document.duration)
+        return 0;
+    const auto length = clip.outSample - clip.inSample;
+    if (!length || clip.repeats < 1 || clip.repeats > 64)
+        throw std::invalid_argument("Invalid repeated audio clip.");
+    const auto total = length * std::uint64_t(clip.repeats);
+    const auto begin = std::min(total,
+        std::uint64_t(document.rate.sampleAt(frame - clip.start, asset.sampleRate)));
+    const auto end = std::min(total,
+        std::uint64_t(document.rate.sampleAt(frame - clip.start + 1, asset.sampleRate)));
+    if (begin >= end)
+        return 0;
+    if (end - begin >= length)
+        return index.peak(clip.inSample, clip.outSample);
+    const auto beginLoop = begin / length, endLoop = (end - 1) / length;
+    if (beginLoop == endLoop)
+        return index.peak(clip.inSample + begin % length,
+                          clip.inSample + (end - 1) % length + 1);
+    return std::max(index.peak(clip.inSample + begin % length, clip.outSample),
+                    index.peak(clip.inSample, clip.inSample + (end - 1) % length + 1));
+}
 AudioMixPlan::AudioMixPlan(const Document& document, std::int32_t outputRate)
     : frameRate_(document.rate), duration_(document.duration), outputRate_(outputRate) {
     frameRate_.validate();
@@ -216,7 +246,7 @@ AudioMixPlan::AudioMixPlan(const Document& document, std::int32_t outputRate)
         const auto info = inspectPcm16Wav({asset->wav.data(), asset->wav.size()});
         if (clip.inSample >= clip.outSample || clip.outSample > info.sampleFrames ||
             clip.start < 0 || clip.start >= duration_ || !std::isfinite(clip.gain) ||
-            clip.gain < 0 || clip.gain > 4)
+            clip.gain < 0 || clip.gain > 4 || clip.repeats < 1 || clip.repeats > 64)
             throw std::invalid_argument("Invalid audio clip in mix plan.");
         sources_.push_back({&*asset, clip, info.dataOffset,
                             frameRate_.sampleAt(clip.start, outputRate_)});
@@ -243,12 +273,17 @@ void AudioMixPlan::renderInto(std::int64_t firstSample, std::span<std::int16_t> 
             const auto wholeSeconds = relative / outputRate_;
             const auto remainder = relative % outputRate_;
             const auto subsecond = remainder * std::uint64_t(asset.sampleRate);
-            const auto sourceFrame = source.clip.inSample +
-                                     wholeSeconds * std::uint64_t(asset.sampleRate) +
-                                     subsecond / outputRate_;
-            if (sourceFrame >= source.clip.outSample)
+            const auto sourceOffset = wholeSeconds * std::uint64_t(asset.sampleRate) +
+                                      subsecond / outputRate_;
+            const auto length = source.clip.outSample - source.clip.inSample;
+            if (sourceOffset >= length * std::uint64_t(source.clip.repeats))
                 continue;
-            const auto nextFrame = std::min(sourceFrame + 1, source.clip.outSample - 1);
+            const auto cycle = sourceOffset / length;
+            const auto sourceFrame = source.clip.inSample + sourceOffset % length;
+            const auto nextFrame = sourceFrame + 1 < source.clip.outSample
+                                       ? sourceFrame + 1
+                                       : cycle + 1 < std::uint64_t(source.clip.repeats)
+                                             ? source.clip.inSample : sourceFrame;
             const double fraction = double(subsecond % outputRate_) / outputRate_;
             auto read = [&](std::uint64_t frame, int channel) {
                 const auto at = source.dataOffset + (frame * asset.channels + channel) * 2;
