@@ -109,6 +109,12 @@ TEST_CASE("Editor captures a selected Part pose, applies its mask, undoes and re
     editor.captureSelectedCharacterPose(opentoon::PoseChannels::PositionX, false);
     REQUIRE(editor.characterPoses().size() == 1);
     const int poseId = editor.selectedCharacterPose();
+    editor.setSelectedLayer(torso);
+    editor.setSelectedPartInCharacterPose(opentoon::PoseChannels::Rotation);
+    REQUIRE(editor.characterPoses().front().toMap().value("parts").toInt() == 2);
+    editor.removeSelectedPartFromCharacterPose();
+    REQUIRE(editor.characterPoses().front().toMap().value("parts").toInt() == 1);
+    editor.setSelectedLayer(hand);
     editor.setTransform("x", 80);
     editor.setTransform("rotation", 70);
     editor.setFrame(8);

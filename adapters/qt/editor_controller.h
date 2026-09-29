@@ -271,6 +271,8 @@ class EditorController final : public QObject {
     Q_INVOKABLE void removeSelectedCharacterPose();
     Q_INVOKABLE void setSelectedCharacterPosePublished(bool published);
     Q_INVOKABLE void setSelectedViewPublished(bool published);
+    Q_INVOKABLE void setSelectedPartInCharacterPose(int channels);
+    Q_INVOKABLE void removeSelectedPartFromCharacterPose();
     Q_INVOKABLE void beginSelectedCharacterPoseBlend();
     Q_INVOKABLE bool updateSelectedCharacterPoseBlend(double amount);
     Q_INVOKABLE void endSelectedCharacterPoseBlend();

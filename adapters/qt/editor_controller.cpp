@@ -198,11 +198,19 @@ QVariantList EditorController::characterPoses() const {
     const int root = characterId();
     if (!root)
         return result;
-    for (const auto& pose : document().layer(root).poses)
+    for (const auto& pose : document().layer(root).poses) {
+        QVariantList entries;
+        for (const auto& entry : pose.parts)
+            entries.push_back(QVariantMap{{"part", int(entry.part)},
+                                          {"name", QString::fromStdString(document().layer(entry.part).role)},
+                                          {"channels", int(entry.channels)},
+                                          {"drawing", int(entry.drawing)}});
         result.push_back(QVariantMap{{"id", int(pose.id)},
                                      {"name", QString::fromStdString(pose.name)},
                                      {"parts", int(pose.parts.size())},
-                                     {"published", pose.published}});
+                                     {"published", pose.published},
+                                     {"entries", entries}});
+    }
     return result;
 }
 int EditorController::selectedCharacterPose() const {
@@ -1195,6 +1203,21 @@ void EditorController::setSelectedViewPublished(bool published) {
     if (root && viewId)
         edit(published ? "Publish character view" : "Unpublish character view", [&](Document& d) {
             opentoon::publishCharacterView(d, root, viewId, published);
+        });
+}
+void EditorController::setSelectedPartInCharacterPose(int channels) {
+    const int root = characterId(), poseId = selectedCharacterPose();
+    if (root && poseId && layer_)
+        edit("Set Part in character pose", [&](Document& d) {
+            opentoon::setCharacterPosePart(d, root, poseId, layer_, frame_,
+                                           std::uint16_t(channels));
+        });
+}
+void EditorController::removeSelectedPartFromCharacterPose() {
+    const int root = characterId(), poseId = selectedCharacterPose();
+    if (root && poseId && layer_)
+        edit("Remove Part from character pose", [&](Document& d) {
+            opentoon::removeCharacterPosePart(d, root, poseId, layer_);
         });
 }
 void EditorController::beginSelectedCharacterPoseBlend() {

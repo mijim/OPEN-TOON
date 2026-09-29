@@ -31,6 +31,9 @@ recomputes each candidate from the same baseline, publishes each validated
 preview and coalesces the gesture into one undo entry. Other edits end the
 gesture. The domain model allows different masks for each Part; the current
 capture UI applies one chosen mask to the target set.
+Rig can later set or replace the selected Part's captured values and mask in
+that pose, or remove that Part while at least one mapping remains. This gives
+each Part an independent mask without requiring a separate pose asset.
 
 Character duplication remaps pose, Part and drawing IDs into the independent
 copy. Branch deletion and Part detachment remove affected entries and empty
@@ -44,7 +47,8 @@ editor without restoring its backup.
 
 Domain tests cover mixed masks, blend endpoints and the drawing threshold,
 excluded values, coalesced undo/redo, independent character copy and
-stale-entry cleanup.
+stale-entry cleanup. They also reject a drawing-channel capture without an
+exposure and removal of the final Part entry without mutating the document.
 Storage tests cover format-12 SQLite/JSON round trips and format-11 loading.
 The controller test imports original registered PNG parts, captures a selected
 Part, applies it at another frame, undoes/redoes and reopens the project.

@@ -1603,6 +1603,43 @@ ApplicationWindow {
                                 }
                                 RowLayout {
                                     Layout.fillWidth: true
+                                    visible: layerInspector.rigLayer?.kind === 3 && editor.selectedCharacterPose > 0
+                                    C.CompactButton {
+                                        text: "Set this part"
+                                        onClicked: editor.setSelectedPartInCharacterPose(poseChannels.currentValue)
+                                    }
+                                    C.CompactButton {
+                                        text: "Remove part"
+                                        enabled: {
+                                            const pose = editor.characterPoses.find(p => p.id === editor.selectedCharacterPose)
+                                            return pose?.parts > 1 && pose.entries.some(e => e.part === editor.selectedLayer)
+                                        }
+                                        onClicked: editor.removeSelectedPartFromCharacterPose()
+                                    }
+                                }
+                                Repeater {
+                                    model: editor.characterPoses.find(p => p.id === editor.selectedCharacterPose)?.entries || []
+                                    Label {
+                                        required property var modelData
+                                        Layout.fillWidth: true
+                                        text: {
+                                            const mask = modelData.channels
+                                            const names = []
+                                            if (mask & 3) names.push("Position")
+                                            if (mask & 4) names.push("Rotation")
+                                            if (mask & 24) names.push("Scale")
+                                            if (mask & 32) names.push("Opacity")
+                                            if (mask & 192) names.push("Pivot")
+                                            if (mask & 256) names.push("Drawing")
+                                            return modelData.name + " · " + names.join(", ")
+                                        }
+                                        color: "#777777"
+                                        font.pixelSize: 10
+                                        elide: Text.ElideRight
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
                                     Label { text: "Blend"; color: "#999999"; font.pixelSize: 10 }
                                     Slider {
                                         id: poseBlend

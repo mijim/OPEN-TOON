@@ -47,6 +47,24 @@ double channelValue(const Transform& value, unsigned index) {
     default: return value.pivotY;
     }
 }
+PosePart capturePart(const Document& document, Id root, Id partId, Frame frame,
+                     std::uint16_t channels) {
+    checkedPart(document, root, partId);
+    if (!channels || (channels & ~PoseChannels::All))
+        throw std::invalid_argument("Pose target has an invalid channel mask.");
+    const auto& layer = document.layer(partId);
+    PosePart entry;
+    entry.part = partId;
+    entry.channels = channels;
+    entry.transform = evaluateTransform(layer, frame);
+    if (channels & PoseChannels::Drawing) {
+        const auto* drawing = document.drawingAt(partId, frame);
+        if (!drawing)
+            throw std::invalid_argument("Pose drawing channel needs an exposed substitution.");
+        entry.drawing = drawing->id;
+    }
+    return entry;
+}
 } // namespace
 
 Id captureCharacterPose(Document& document, Id rootId, Frame frame,
@@ -60,22 +78,9 @@ Id captureCharacterPose(Document& document, Id rootId, Frame frame,
     result.name = std::move(name);
     std::set<Id> unique;
     for (const auto& target : targets) {
-        checkedPart(document, rootId, target.part);
-        if (!target.channels || (target.channels & ~PoseChannels::All) ||
-            !unique.insert(target.part).second)
-            throw std::invalid_argument("Pose target has a duplicate or invalid channel mask.");
-        const auto& layer = document.layer(target.part);
-        PosePart entry;
-        entry.part = target.part;
-        entry.channels = target.channels;
-        entry.transform = evaluateTransform(layer, frame);
-        if (target.channels & PoseChannels::Drawing) {
-            const auto* drawing = document.drawingAt(target.part, frame);
-            if (!drawing)
-                throw std::invalid_argument("Pose drawing channel needs an exposed substitution.");
-            entry.drawing = drawing->id;
-        }
-        result.parts.push_back(entry);
+        if (!unique.insert(target.part).second)
+            throw std::invalid_argument("Pose target is duplicated.");
+        result.parts.push_back(capturePart(document, rootId, target.part, frame, target.channels));
     }
     result.id = document.allocateId();
     const Id id = result.id;
@@ -138,5 +143,29 @@ void removeCharacterPose(Document& document, Id rootId, Id poseId) {
 }
 void publishCharacterPose(Document& document, Id rootId, Id poseId, bool published) {
     pose(document, rootId, poseId).published = published;
+}
+void setCharacterPosePart(Document& document, Id rootId, Id poseId, Id partId,
+                          Frame frame, std::uint16_t channels) {
+    auto& saved = pose(document, rootId, poseId);
+    if (frame < 0 || frame >= document.duration)
+        throw std::invalid_argument("Pose frame is outside the scene.");
+    const auto entry = capturePart(document, rootId, partId, frame, channels);
+    auto found = std::find_if(saved.parts.begin(), saved.parts.end(),
+                              [partId](const auto& item) { return item.part == partId; });
+    if (found != saved.parts.end())
+        *found = entry;
+    else {
+        if (saved.parts.size() >= 2000)
+            throw std::invalid_argument("Pose has too many Part entries.");
+        saved.parts.push_back(entry);
+    }
+}
+void removeCharacterPosePart(Document& document, Id rootId, Id poseId, Id partId) {
+    auto& saved = pose(document, rootId, poseId);
+    const auto found = std::find_if(saved.parts.begin(), saved.parts.end(),
+                                    [partId](const auto& item) { return item.part == partId; });
+    if (found == saved.parts.end() || saved.parts.size() == 1)
+        throw std::invalid_argument("Pose must retain at least one mapped Part.");
+    saved.parts.erase(found);
 }
 } // namespace opentoon

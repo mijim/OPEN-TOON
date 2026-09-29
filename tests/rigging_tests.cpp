@@ -92,6 +92,52 @@ TEST_CASE("Published view and pose bindings stay local and outside rendered outp
     REQUIRE(document.layer(root).views.front() == original);
     document.validate();
 }
+TEST_CASE("Pose entries can be refined per Part without broadening other masks") {
+    Session session;
+    const Id body = session.document().layers.front().id;
+    Id root = 0, hand = 0, pose = 0;
+    REQUIRE(session.apply("Build character", [&](Document& d) {
+        root = makeCharacter(d, body, "Hero");
+        Layer layer;
+        layer.id = d.allocateId();
+        hand = layer.id;
+        layer.name = "Hand";
+        d.layers.push_back(layer);
+        attachDrawingAsPart(d, hand, root, "Hand");
+        d.layer(body).transform.x = 12;
+        d.layer(hand).transform.rotation = 30;
+        pose = captureCharacterPose(d, root, 0,
+            std::vector<PoseCaptureTarget>{{body, PoseChannels::PositionX}}, "Reach");
+    }));
+    REQUIRE(session.apply("Add hand rotation", [&](Document& d) {
+        setCharacterPosePart(d, root, pose, hand, 0, PoseChannels::Rotation);
+    }));
+    REQUIRE(session.document().layer(root).poses.front().parts.size() == 2);
+    const auto before = session.document();
+    REQUIRE_THROWS(session.apply("Missing hand drawing", [&](Document& d) {
+        setCharacterPosePart(d, root, pose, hand, 0, PoseChannels::Drawing);
+    }));
+    REQUIRE(session.document() == before);
+    REQUIRE(session.apply("Change hand rotation", [&](Document& d) {
+        d.layer(hand).transform.rotation = 70;
+        d.layer(hand).transform.x = 25;
+        d.layer(body).transform.x = 42;
+    }));
+    REQUIRE(session.apply("Apply refined pose", [&](Document& d) {
+        applyCharacterPose(d, root, pose, 8);
+    }));
+    REQUIRE(evaluateTransform(session.document().layer(hand), 8).rotation == 30);
+    REQUIRE(evaluateTransform(session.document().layer(hand), 8).x == 25);
+    REQUIRE(evaluateTransform(session.document().layer(body), 8).x == 12);
+    REQUIRE(session.apply("Remove hand entry", [&](Document& d) {
+        removeCharacterPosePart(d, root, pose, hand);
+    }));
+    REQUIRE(session.document().layer(root).poses.front().parts.size() == 1);
+    REQUIRE_THROWS(session.apply("Remove final entry", [&](Document& d) {
+        removeCharacterPosePart(d, root, pose, body);
+    }));
+    REQUIRE(session.document().layer(root).poses.front().parts.size() == 1);
+}
 TEST_CASE("Pose blend has exact endpoints, a half-way drawing threshold and one drag undo") {
     Session session;
     const Id part = session.document().layers.front().id;

@@ -17,18 +17,24 @@ duplication remaps pose/Part/drawing IDs into an independent copy. Branch
 deletion and Part detachment prune affected entries. A referenced substitution
 cannot be removed while a pose still needs it. Format 11 loads with no poses;
 the first format-12 save preserves a source-version backup.
+Rig can set or replace the selected Part's saved values and channel mask in
+an existing pose, and remove a mapped Part while retaining at least one entry.
+This makes per-Part masks editable after capture.
 
 ## Evidence
 
 - `tests/rigging_tests.cpp`: mixed Part/channel masks, numeric blend endpoints,
   the 50% discrete drawing threshold, excluded channel preservation,
   single-step and coalesced undo/redo, independent copy and branch pruning.
+  Per-Part refinement rejects an absent drawing and final-entry removal
+  atomically.
 - `tests/storage_tests.cpp`: format-12 JSON and SQLite round trip and format-11
   load without poses.
 - `tests/export_tests.cpp`: actual editor imports original registered PNG
   Parts, assembles a character, captures a selected Part, applies at another
-  frame, blends with several live updates, undoes/redoes once, saves and reopens.
-- Local macOS `build/locked`: 137/137 CTest entries pass. Native Qt Quick
+  frame, refines/removes a second Part mapping, blends with several live
+  updates, undoes/redoes once, saves and reopens.
+- Local macOS `build/locked`: 138/138 CTest entries pass. Native Qt Quick
   `--smoke-test` passes the mouse/input, window, deformation and reopen
   journeys. The new pose panel compiles and loads within that window; the
   controller journey exercises its backend rather than clicking its widgets.
