@@ -94,6 +94,111 @@ TEST_CASE("Registered parts attach without jumps and reject singular or sheared 
     REQUIRE(d == animated);
 }
 
+TEST_CASE("Reparenting below a shared animated character preserves every rendered frame") {
+    Session session;
+    const Id body = session.document().layers.front().id;
+    Id root = 0, oldPeg = 0, newPeg = 0;
+    REQUIRE(session.apply("Assemble animated character", [&](Document& d) {
+        root = makeCharacter(d, body, "Hero");
+        auto& artwork = d.editableDrawing(body, 0);
+        artwork.strokes.push_back({d.allocateId(), d.palette.front().id, 8,
+                                   Shape::Rectangle, true, 2, {{25, 25}, {75, 75}}});
+        expose(d.layer(body), 0, d.duration, artwork.id);
+        oldPeg = addPeg(d, body, "Old peg");
+        d.layer(oldPeg).transform.x = 17;
+        d.layer(oldPeg).transform.y = 8;
+        Layer target;
+        target.id = d.allocateId();
+        newPeg = target.id;
+        target.name = "New peg";
+        target.kind = LayerKind::Peg;
+        target.parent = root;
+        target.transform.x = -12;
+        target.transform.y = 19;
+        d.layers.push_back(target);
+        d.layer(root).keys.push_back({0, {.x = 10, .y = 5, .rotation = -12},
+                                      Interpolation::Linear});
+        d.layer(root).keys.push_back({24, {.x = 65, .y = 12, .rotation = 24},
+                                      Interpolation::Linear});
+    }));
+    std::vector<QImage> before;
+    for (Frame frame = 0; frame < session.document().duration; ++frame)
+        before.push_back(SceneRenderer::render(session.document(), frame, {320, 180}));
+    auto differentlyAnimated = session.document();
+    differentlyAnimated.layer(newPeg).keys.push_back({0, {}, Interpolation::Linear});
+    const auto unchanged = differentlyAnimated;
+    REQUIRE_THROWS(reparentPreservingWorld(differentlyAnimated, body, newPeg));
+    REQUIRE(differentlyAnimated == unchanged);
+    REQUIRE(session.apply("Reparent inside animated character", [&](Document& d) {
+        reparentPreservingWorld(d, body, newPeg);
+    }));
+    REQUIRE(session.document().layer(body).parent == newPeg);
+    std::size_t index = 0;
+    for (Frame frame = 0; frame < session.document().duration; ++frame)
+        REQUIRE(SceneRenderer::render(session.document(), frame, {320, 180}) == before[index++]);
+    REQUIRE(session.undo());
+    REQUIRE(session.document().layer(body).parent == oldPeg);
+    REQUIRE(session.redo());
+    REQUIRE(deserializeDocument(serializeDocument(session.document())) == session.document());
+
+    auto incompatible = session.document();
+    incompatible.layer(newPeg).keys.push_back({0, {}, Interpolation::Linear});
+    const auto rejectedState = incompatible;
+    REQUIRE_THROWS(reparentPreservingWorld(incompatible, body, oldPeg));
+    REQUIRE(incompatible == rejectedState);
+}
+
+TEST_CASE("Failed opacity preserving reparent leaves the candidate unchanged") {
+    auto d = makeDocument();
+    const Id body = d.layers.front().id;
+    const Id root = makeCharacter(d, body, "Hero");
+    const Id peg = addPeg(d, body, "Opaque peg");
+    Layer target;
+    target.id = d.allocateId();
+    target.name = "Dim peg";
+    target.kind = LayerKind::Peg;
+    target.parent = root;
+    target.transform.opacity = 0.5;
+    const Id targetId = target.id;
+    d.layers.push_back(target);
+    d.layer(body).transform.opacity = 0.8;
+    d.layer(peg).transform.opacity = 0.8;
+    const auto before = d;
+    REQUIRE_THROWS(reparentPreservingWorld(d, body, targetId));
+    REQUIRE(d == before);
+}
+
+TEST_CASE("Rigid reparent preserves mirrored nonuniform artwork and rejects shear") {
+    auto d = makeDocument();
+    const Id body = d.layers.front().id;
+    const Id root = makeCharacter(d, body, "Hero");
+    auto& drawing = d.editableDrawing(body, 0);
+    drawing.strokes.push_back({d.allocateId(), d.palette.front().id, 6,
+                               Shape::Rectangle, true, 2, {{15, 20}, {45, 65}}});
+    expose(d.layer(body), 0, d.duration, drawing.id);
+    const Id mirror = addPeg(d, body, "Mirror");
+    d.layer(mirror).transform.x = 145;
+    d.layer(mirror).transform.y = 75;
+    d.layer(mirror).transform.scaleX = -1.5;
+    d.layer(mirror).transform.scaleY = 0.75;
+    d.layer(body).transform.x = 20;
+    d.layer(body).transform.y = 10;
+    const auto before = SceneRenderer::render(d, 0, {320, 180});
+    reparentPreservingWorld(d, body, root);
+    d.validate();
+    REQUIRE(SceneRenderer::render(d, 0, {320, 180}) == before);
+    REQUIRE(d.layer(body).transform.scaleX > 0);
+    REQUIRE(d.layer(body).transform.scaleY < 0);
+    reparentPreservingWorld(d, body, mirror);
+    REQUIRE(SceneRenderer::render(d, 0, {320, 180}) == before);
+    const auto stable = d;
+    d.layer(body).transform.rotation = 25;
+    const auto rotated = d;
+    REQUIRE_THROWS(reparentPreservingWorld(d, body, root));
+    REQUIRE(d == rotated);
+    REQUIRE(stable.layer(body).parent == mirror);
+}
+
 TEST_CASE("Named substitutions switch held drawings without changing pose and reopen identically") {
     Session session;
     const Id partId = session.document().layers.front().id;

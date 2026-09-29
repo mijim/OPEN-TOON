@@ -1,4 +1,4 @@
-# Status audit — 2026-09-23
+# Status audit — 2026-09-28
 
 This audit reconciles the canonical catalog, Harmony Moment slices, phase
 roadmap, implementation ledger and current local verification. Status refers
@@ -9,14 +9,14 @@ complete.
 | Record | Current classification | Meaning |
 |---|---:|---|
 | Catalog capabilities | 78 `partial`, 205 `not_started`, 0 complete | Working subsets have an evidence path and a stated remaining scope. |
-| Harmony Moment slices | 5 complete, 1 in progress, 10 planned | HM-00, HM-01, HM-02, HM-04 and HM-13 are accepted bounded contracts; HM-03 remains open. |
+| Harmony Moment slices | 6 complete, 0 in progress, 10 planned | HM-00, HM-01, HM-02, HM-03, HM-04 and HM-13 are accepted bounded contracts; HM-05 is next. |
 | Full phases P00–P22 | 9 in progress, 14 planned, 0 complete | The implementation ledger covers P00–P11; later phases remain in the roadmap. |
 | Node inventory | 193 `not_started` | Entries include families; internal HM-04 graph operators are not counted as specified, user-editable inventory effects. |
 | Nonfunctional requirements | 15 `partial_evidence`, 12 `proposed_not_measured`, 0 verified | Bounded checks do not satisfy full performance, device, accessibility or release gates. |
 | Open-source libraries | 9 experimentally adopted, 5 selected for plan, 16 candidates | Adopted flags match installed records; future candidates still need their consumer-specific evidence. |
 
-The current macOS locked build has 99 passing CTest entries, a passing native
-mouse/composition/camera workflow and 20 export integration cases within one
+The current macOS system build has 102 passing CTest entries, a passing native
+mouse/composition/camera workflow and 21 export integration cases within one
 CTest entry. The last Windows/Linux CI evidence belongs to an earlier source
 commit. The experimental.10 arm64 package was verified locally but publication
 was cancelled; experimental.15 remains source only. Physical tablet and
@@ -32,6 +32,12 @@ substitutions, coordinated views, internal alpha mattes, camera and graph
 subsets. Studio color configuration, editable nodes/cutters, full character
 poses, audio, deformers and multiplane remain unimplemented where their
 specific behavior has not been delivered.
+
+The owner delegated the HM-03 19-part visual workflow review to the implementer.
+The original PNG assembly matches reference pixels after paint-order setup;
+coordinated views, substitutions, reparenting, undo and reopened output have
+[bounded acceptance evidence](HM03-ACCEPTANCE.md). P08 and the independent
+second-animator HM-15 journey remain open.
 
 `scripts/validate_docs.py` now checks evidence files for nonempty partial
 statuses, library adoption flags, P00–P11 phase-status agreement, the source

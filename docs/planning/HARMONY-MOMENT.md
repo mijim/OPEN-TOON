@@ -191,7 +191,7 @@ Qualify existing drawing and still-image import; add ordered PNG sequence intake
 
 ## HM-03
 
-**Character identity, pegs and substitution sets** — `in_progress`; owner `rigging/document`, work package `P08-W1`.
+**Character identity, pegs and substitution sets** — `complete`; owner `rigging/document`, work package `P08-W1`.
 
 Create a character root and stable part roles; keep separate transform hierarchy and render order. Add preserve-world reparenting, rest pivots, named thumbnail substitutions, held selector tracks and coordinated variant sets.
 

@@ -37,13 +37,16 @@ The inspector creates a character from an unlocked root drawing, can place a
 peg above a part, attach another registered drawing to a character/peg, edit
 its role, and change a rest pivot while retaining artwork position. Reparenting
 within a character preserves the complete local affine image and opacity for
-the rest pose. It rejects singular matrices, introduced shear, opacity
-impossible to preserve, cross-character moves, animated ancestors and direct
-reparenting of an already animated part/peg. Permanent pivot placement and
+the rest pose. Motion above the old and new parents' shared ancestor cancels
+exactly, so reparenting within that moving branch preserves every frame
+without baking keys. It rejects singular matrices, introduced shear, opacity
+impossible to preserve, cross-character moves, motion on either changed branch
+and direct reparenting of an already animated part/peg. Permanent pivot placement and
 attaching a root drawing also require that layer to be unanimated. This avoids
 claiming that only key endpoints preserve the in-between artwork motion.
-Animation under moving parents and shear-preserving transform storage need a
-later contract. The first root and new peg are identity transforms; creating
+Moving a part between differently animated branches and shear-preserving
+transform storage need a later contract. The first root and new peg are
+identity transforms; creating
 them therefore does not jump registered artwork.
 
 The compact inspector creates blank or copied substitution drawings, names and
