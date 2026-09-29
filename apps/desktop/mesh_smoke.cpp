@@ -1,8 +1,10 @@
 #include "mesh_smoke.h"
 #include "canvas_item.h"
 #include "editor_controller.h"
+#include "opentoon/deformer.h"
 #include "opentoon/deformation.h"
 #include "opentoon/timeline.h"
+#include "project_store.h"
 #include "scene_renderer.h"
 #include <QCoreApplication>
 #include <QDir>
@@ -19,6 +21,7 @@
 #include <QUrl>
 #include <algorithm>
 #include <cmath>
+#include <filesystem>
 #include <iostream>
 #include <stdexcept>
 #include <sys/resource.h>
@@ -363,13 +366,14 @@ void meshSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& windo
                                  editor.status().toStdString());
     if (editor.document().duration != 480 || !editor.document().activeCamera)
         throw std::runtime_error("Visual shot lost its timing or output camera.");
-    Id visualHand = 0, visualTorso = 0, visualLeg = 0;
+    Id visualArm = 0, visualHand = 0, visualTorso = 0, visualLeg = 0;
     for (const auto& layer : editor.document().layers) {
+        if (layer.role == "arm_left") visualArm = layer.id;
         if (layer.role == "hand_left") visualHand = layer.id;
         if (layer.role == "torso") visualTorso = layer.id;
         if (layer.role == "leg_left") visualLeg = layer.id;
     }
-    if (!visualHand || !visualTorso || !visualLeg)
+    if (!visualArm || !visualHand || !visualTorso || !visualLeg)
         throw std::runtime_error("Visual shot lost its character roles or torso curve.");
     const auto* torsoMesh = meshBindingFor(editor.document().layer(visualTorso),
                                            editor.document().drawingAt(visualTorso, 0)->id);
@@ -400,6 +404,43 @@ void meshSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& windo
         editor.document() != visualDocument ||
         SceneRenderer::render(editor.document(), 360) != visualFrame)
         throw std::runtime_error("Visual-shot UI save/reopen changed the authored scene.");
+    auto unmatched = visualDocument;
+    const Id incoming = unmatched.drawingAt(visualArm, 300)->id;
+    for (auto& binding : unmatched.layer(visualArm).bindings)
+        if (binding.drawing == incoming && binding.bone)
+            std::erase_if(binding.bone->keys,
+                          [](const BonePoseKey& key) { return key.frame == 300; });
+    unmatched.validate();
+    const auto unmatchedPath = std::filesystem::path(
+        (temporary.path() + "/unmatched-sleeve.otoon").toStdString());
+    if (ProjectStore::save(unmatchedPath, unmatched) == 0)
+        throw std::runtime_error("Native smoke could not save the unmatched sleeve.");
+    if (!editor.openProject(QUrl::fromLocalFile(QString::fromStdString(unmatchedPath.string()))))
+        throw std::runtime_error("Native editor could not open the unmatched sleeve.");
+    editor.setSelectedLayer(int(visualArm));
+    editor.setFrame(300);
+    if (!editor.selectedCanMatchPreviousDeformerPose() ||
+        editor.document() != unmatched ||
+        !editor.matchSelectedPreviousDeformerPose())
+        throw std::runtime_error("Native pose matching did not key the incoming sleeve.");
+    const auto matched = editor.document();
+    const Id outgoing = matched.drawingAt(visualArm, 299)->id;
+    const auto outgoingAngles = sampleBoneAngles(
+        *meshBindingFor(matched.layer(visualArm), outgoing)->bone, 300);
+    const auto incomingAngles = sampleBoneAngles(
+        *meshBindingFor(matched.layer(visualArm), incoming)->bone, 300);
+    if (outgoingAngles != incomingAngles || matched == unmatched)
+        throw std::runtime_error("Native pose matching left a sleeve jump.");
+    editor.undo();
+    if (editor.document() != unmatched)
+        throw std::runtime_error("Undo did not restore the unmatched sleeve.");
+    editor.redo();
+    if (editor.document() != matched)
+        throw std::runtime_error("Redo did not restore the matched sleeve.");
+    const auto matchedCopy = QUrl::fromLocalFile(temporary.path() + "/matched-sleeve.otoon");
+    if (!editor.saveProject(matchedCopy) || !editor.openProject(matchedCopy) ||
+        editor.document() != matched)
+        throw std::runtime_error("Reopening changed the matched sleeve pose.");
 }
 
 void meshInteractionBenchmark(EditorController& editor, CanvasItem& canvas,

@@ -75,6 +75,17 @@ all keys and intermediate samples are validated before atomic publication.
 The drawing's frame-zero pixels remain unchanged. The native canvas drag uses
 an isolated preview and the same undoable command as other deformer edits.
 
+At the first frame of a drawing change, **Match previous pose** samples the
+outgoing binding at that frame and records one key on the incoming binding.
+It applies to two bone chains with identical drawing-local rest joints or two
+curves with identical rest controls. An existing key keeps its interpolation
+mode when its value is replaced. The command does not change the selected
+drawing, earlier exposures, source keys or rest artwork. A missing binding,
+different deformer type, incompatible rest geometry, locked Part or playhead
+away from the boundary disables the action; the domain rejects direct invalid
+calls atomically. This explicit authoring step avoids a hidden evaluation
+dependency between substitutions. Broader rest-shape retargeting remains open.
+
 The profile binds one two-segment chain to one source image. A continuous arm
 or leg should therefore be authored as **one image and one mesh**, with three
 anatomical rest joints; a separately pivoted upper/lower image pair does not

@@ -38,6 +38,7 @@ class EditorController final : public QObject {
     Q_PROPERTY(int selectedSubstitution READ selectedSubstitution NOTIFY frameChanged)
     Q_PROPERTY(bool selectedMeshBound READ selectedMeshBound NOTIFY frameChanged)
     Q_PROPERTY(int selectedMeshDeformer READ selectedMeshDeformer NOTIFY frameChanged)
+    Q_PROPERTY(bool selectedCanMatchPreviousDeformerPose READ selectedCanMatchPreviousDeformerPose NOTIFY frameChanged)
     Q_PROPERTY(int selectedMeshColumns READ selectedMeshColumns NOTIFY frameChanged)
     Q_PROPERTY(int selectedMeshRows READ selectedMeshRows NOTIFY frameChanged)
     Q_PROPERTY(double selectedBoneTransition READ selectedBoneTransition NOTIFY frameChanged)
@@ -225,6 +226,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE bool bindSelectedMesh(int columns = 2, int rows = 2);
     Q_INVOKABLE bool bindSelectedContourMesh(int columns = 2, int rows = 2);
     int selectedMeshDeformer() const;
+    bool selectedCanMatchPreviousDeformerPose() const;
     int selectedMeshColumns() const;
     int selectedMeshRows() const;
     double selectedBoneTransition() const;
@@ -240,6 +242,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE bool moveSelectedCurveRestControl(int control, double x, double y);
     Q_INVOKABLE bool moveSelectedCurveControl(int control, double x, double y);
     Q_INVOKABLE bool resetSelectedDeformerPose();
+    Q_INVOKABLE bool matchSelectedPreviousDeformerPose();
     Q_INVOKABLE bool removeSelectedDeformer();
     Q_INVOKABLE bool moveSelectedMeshVertex(int vertex, double x, double y, bool rest = false);
     Q_INVOKABLE bool resetSelectedMeshPose();

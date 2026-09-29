@@ -898,6 +898,9 @@ int EditorController::selectedMeshDeformer() const {
     const auto* mesh = opentoon::meshBindingFor(document().layer(layer_), selectedSubstitution());
     return mesh->bone ? 1 : mesh->curve ? 2 : 0;
 }
+bool EditorController::selectedCanMatchPreviousDeformerPose() const {
+    return layer_ && opentoon::canMatchPreviousDeformerPose(document(), layer_, frame_);
+}
 int EditorController::selectedMeshColumns() const {
     if (!selectedMeshBound())
         return 0;
@@ -1016,6 +1019,11 @@ bool EditorController::resetSelectedDeformerPose() {
             opentoon::recordCurvePose(d, layer_, drawing, frame_, mesh->curve->restControls);
         else
             throw std::invalid_argument("This mesh has no deformer.");
+    });
+}
+bool EditorController::matchSelectedPreviousDeformerPose() {
+    return layer_ && edit("Match previous deformer pose", [&](Document& d) {
+        opentoon::matchPreviousDeformerPose(d, layer_, frame_);
     });
 }
 bool EditorController::removeSelectedDeformer() {

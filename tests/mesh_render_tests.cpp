@@ -1152,12 +1152,8 @@ TEST_CASE("Twenty-second visual shot combines deformers views mouth hands and ca
     REQUIRE(boneBindings.size() == 5);
     for (const auto [part, drawing] : boneBindings)
         recordBonePose(scene, part, drawing, 432, 0, 0);
-    const auto& outgoingBone = *meshBindingFor(scene.layer(arm), baseSleeve)->bone;
-    const auto& incomingBone = *meshBindingFor(scene.layer(arm), alternateSleeve)->bone;
-    REQUIRE(outgoingBone.restJoints == incomingBone.restJoints);
-    const auto matchedAngles = sampleBoneAngles(outgoingBone, 300);
-    recordBonePose(scene, arm, alternateSleeve, 300,
-                   matchedAngles[0], matchedAngles[1]);
+    REQUIRE(canMatchPreviousDeformerPose(scene, arm, 300));
+    matchPreviousDeformerPose(scene, arm, 300);
     const Id torsoDrawing = scene.drawingAt(torso, 0)->id;
     bindRegularImageMesh(scene, torso, torsoDrawing, 4, 8);
     const std::array<MeshPoint, 4> restCurve{{{128, 35}, {126, 95},

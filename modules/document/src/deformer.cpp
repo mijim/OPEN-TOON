@@ -335,6 +335,52 @@ void recordCurvePose(Document& document, Id part, Id drawing, Frame frame,
     binding(document, part, drawing) = std::move(candidate);
 }
 
+bool canMatchPreviousDeformerPose(const Document& document, Id part, Frame frame) {
+    if (frame <= 0 || frame >= document.duration)
+        return false;
+    const auto layer = std::find_if(document.layers.begin(), document.layers.end(),
+                                    [part](const Layer& item) { return item.id == part; });
+    if (layer == document.layers.end() || layer->kind != LayerKind::Part || layer->locked)
+        return false;
+    const auto* previous = document.drawingAt(part, frame - 1);
+    const auto* current = document.drawingAt(part, frame);
+    if (!previous || !current || previous->id == current->id)
+        return false;
+    const auto* outgoing = meshBindingFor(*layer, previous->id);
+    const auto* incoming = meshBindingFor(*layer, current->id);
+    if (!outgoing || !incoming)
+        return false;
+    if (outgoing->bone && incoming->bone)
+        return outgoing->bone->restJoints == incoming->bone->restJoints;
+    if (outgoing->curve && incoming->curve)
+        return outgoing->curve->restControls == incoming->curve->restControls;
+    return false;
+}
+
+void matchPreviousDeformerPose(Document& document, Id part, Frame frame) {
+    require(canMatchPreviousDeformerPose(document, part, frame),
+            "Select the first frame of a compatible bone or curve substitution.");
+    const Id previous = document.drawingAt(part, frame - 1)->id;
+    const Id current = document.drawingAt(part, frame)->id;
+    const auto* outgoing = meshBindingFor(document.layer(part), previous);
+    const auto* incoming = meshBindingFor(document.layer(part), current);
+    if (outgoing->bone) {
+        const auto angles = sampleBoneAngles(*outgoing->bone, frame);
+        const auto key = std::find_if(incoming->bone->keys.begin(), incoming->bone->keys.end(),
+                                      [frame](const BonePoseKey& item) { return item.frame == frame; });
+        const auto interpolation = key == incoming->bone->keys.end()
+            ? Interpolation::Linear : key->interpolation;
+        recordBonePose(document, part, current, frame, angles[0], angles[1], interpolation);
+    } else {
+        const auto controls = sampleCurveControls(*outgoing->curve, frame);
+        const auto key = std::find_if(incoming->curve->keys.begin(), incoming->curve->keys.end(),
+                                      [frame](const CurvePoseKey& item) { return item.frame == frame; });
+        const auto interpolation = key == incoming->curve->keys.end()
+            ? Interpolation::Linear : key->interpolation;
+        recordCurvePose(document, part, current, frame, controls, interpolation);
+    }
+}
+
 void removeMeshDeformer(Document& document, Id part, Id drawing) {
     editable(document, part, drawing);
     auto& target = binding(document, part, drawing);

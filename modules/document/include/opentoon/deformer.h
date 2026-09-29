@@ -15,6 +15,8 @@ void moveCurveRestControl(Document&, Id part, Id drawing, int control, MeshPoint
 void recordCurvePose(Document&, Id part, Id drawing, Frame frame,
                      std::array<MeshPoint, 4> controls,
                      Interpolation interpolation = Interpolation::Linear);
+[[nodiscard]] bool canMatchPreviousDeformerPose(const Document&, Id part, Frame frame);
+void matchPreviousDeformerPose(Document&, Id part, Frame frame);
 void removeMeshDeformer(Document&, Id part, Id drawing);
 [[nodiscard]] bool hasDeformerKeys(const Layer&, Frame start, Frame end);
 [[nodiscard]] std::array<double, 2> sampleBoneAngles(const BoneChain&, Frame frame);

@@ -21,16 +21,19 @@ positions across four parts and every frame, source substitution choices,
 saved state and exact pixels
 after project reopen. The native Qt Quick smoke opens the project, visits six
 beats, checks the three hand choices and torso curve, presents the canvas, then
-saves and reopens an independent copy. The original 19-part intake fixture is
-unchanged. The continuous 48-frame example now identifies its initial leg as
-`leg_left` rather than the generic `Body` role.
+saves and reopens an independent copy. It also opens an intentionally unmatched
+sleeve, matches its incoming pose through the native controller, undoes, redoes,
+and reopens the correction. The original 19-part intake fixture is unchanged.
+The continuous 48-frame example identifies its initial leg as `leg_left`
+rather than the generic `Body` role.
 
 A full-frame continuity sweep caught a 5.47 px left-wrist step at frame 300:
 the incoming sleeve and outgoing sleeve had different evaluated angle curves.
-The visual shot now keys the incoming bone to the outgoing evaluated pose at
-that substitution boundary. Every linked tip advances under 4 px per frame;
-the left wrist advances under 2 px at frames 300 and 432. This is a property
-of the authored study, not an automatic cross-substitution matching feature.
+The visual shot uses **Match previous pose** to key the incoming bone to the
+outgoing evaluated pose at that substitution boundary. Every linked tip
+advances under 4 px per frame; the left wrist advances under 2 px at frames
+300 and 432. Matching is an explicit authoring command for compatible rest
+controls, not an automatic cross-substitution evaluation rule.
 
 Representative saved frames: [front speech](hm06-visual-shot-0120.png),
 [pointing and bend](hm06-visual-shot-0240.png), and

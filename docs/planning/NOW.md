@@ -1,12 +1,12 @@
 # Current work — Harmony Moment
 
-**Current execution guide; status snapshot as of 2026-09-28.** This page is a route into the [canonical delivery contracts](roadmap.json) and [recorded implementation evidence](../implementation/status.json), not another source of truth. Re-run `python3 scripts/roadmap.py next` before taking work; if this snapshot differs, use the canonical records and reconcile this page.
+**Current execution guide; status snapshot as of 2026-09-29.** This page is a route into the [canonical delivery contracts](roadmap.json) and [recorded implementation evidence](../implementation/status.json), not another source of truth. Re-run `python3 scripts/roadmap.py next` before taking work; if this snapshot differs, use the canonical records and reconcile this page.
 
 Read in order: **this page → [implementation status](../implementation/STATUS.md) → [next-task guide](FIRST-STEPS.md) → [the specific slice](HARMONY-MOMENT.md) → [full roadmap and references](README.md).**
 
 The immediate objective is a complete, reliable character-animation **Harmony Moment**, from artwork intake through rigging, deformation, controls, animation and audio, composition and camera to preview, save/reopen and export. This is a bounded workflow milestone; the full P00–P22 roadmap remains intact.
 
-**Active critical-path slice: [HM-06](HARMONY-MOMENT.md#hm-06).** HM-05 has accepted bounded [rest/UV and renderer evidence](../implementation/HM05-ACCEPTANCE.md). The [working HM-06 subset](../implementation/HM06-PROGRESS.md) now saves bone/curve controls, weights and keys, supports canvas drags and a continuous-limb candidate, and passes original-art rendering/reopen checks. Next, review more extreme bends and measure the complete reference shot before accepting the slice.
+**Active critical-path slice: [HM-06](HARMONY-MOMENT.md#hm-06).** HM-05 has accepted bounded [rest/UV and renderer evidence](../implementation/HM05-ACCEPTANCE.md). The [working HM-06 subset](../implementation/HM06-PROGRESS.md) now saves bone/curve controls, weights and keys, supports canvas drags, continuous limbs and explicit matching of compatible substitution poses. The 480-frame visual shot passes continuity, native input and reopen checks. Next, review further extreme bends and the complete reference shot before accepting the slice.
 
 **Current gate:** HM-06 has animated bone/curve evaluation, bounded per-substitution binding and editable elbow influence; broader extreme-bend quality and artistic interaction remain unaccepted. HM-07 controls, HM-10 audio and HM-12 nodes are independently eligible; with one implementer, follow the [recommended priority](FIRST-STEPS.md) and finish HM-06 first.
 

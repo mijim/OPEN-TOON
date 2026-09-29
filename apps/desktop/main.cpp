@@ -26,6 +26,7 @@
 #include <QStandardPaths>
 #include <QTabletEvent>
 #include <QTemporaryDir>
+#include <QThread>
 #include <QTimer>
 #include <cmath>
 #include <iostream>
@@ -127,6 +128,16 @@ int main(int argc, char** argv) {
                     auto* canvas = window->findChild<CanvasItem*>("drawingCanvas");
                     if (!canvas || canvas->height() < 200)
                         throw std::runtime_error("Canvas layout is not usable.");
+                    window->raise();
+                    window->requestActivate();
+                    QElapsedTimer activationTimer;
+                    activationTimer.start();
+                    while (!window->isActive() && activationTimer.elapsed() < 3000) {
+                        QCoreApplication::processEvents();
+                        QThread::msleep(10);
+                    }
+                    if (!window->isActive())
+                        throw std::runtime_error("Native smoke window did not become active.");
                     editor.newScene();
                     auto start = canvas->mapToScene(QPointF(canvas->width() / 2 - 80, canvas->height() / 2));
                     auto send = [&](QEvent::Type type, QPointF point, Qt::MouseButton button,

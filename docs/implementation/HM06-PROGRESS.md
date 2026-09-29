@@ -10,8 +10,10 @@ continuous rig with camera, face/hand/mouth substitutions and a torso curve
 over the agreed 480-frame timing. Audio, mattes and published controls remain
 in their owning slices; the study does not claim the complete Harmony Moment.
 The 480-frame preview/connectivity sweep also found and corrected a visible
-angle mismatch at the alternate-sleeve change; the authored incoming key now
-matches the outgoing pose before the animation continues.
+angle mismatch at the alternate-sleeve change. **Match previous pose** now
+records that incoming bone or curve key explicitly at a compatible drawing
+boundary; the visual shot uses it before the animation continues. The action
+is undoable and tested through native save/reopen.
 
 ## Working subset
 
@@ -182,11 +184,12 @@ matches the outgoing pose before the animation continues.
   camera or published controls.
   The later [visual shot study](HM06-VISUAL-SHOT.md) adds the animated camera,
   torso curve and timed face/hand/mouth choices over all 480 frames. It passes
-  129/129 CTest entries and native open/scrub/save/reopen smoke. At frames 12
-  and 360, six native drag runs measured p95 17.03–18.10 ms and peak resident
-  memory below 286 MB. One 480-frame 1080p renderer run averaged 5.72
-  ms/frame. This remains a visual HM-06 workload, with audio, mattes and
-  published controls pending their owning slices.
+  131/131 CTest entries and native open/scrub/save/reopen smoke, including an
+  explicit sleeve-pose match with undo/redo. At frames 12 and 360, six native
+  drag runs measured p95 16.93–21.75 ms and peak resident memory below 286 MB.
+  One 480-frame 1080p renderer run averaged 5.45 ms/frame. This remains a
+  visual HM-06 workload, with audio, mattes and published controls pending
+  their owning slices.
 
 ## Remaining acceptance
 

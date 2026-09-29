@@ -132,7 +132,7 @@ Assign deformation chains to compatible substitutions.
 
 **Implementation evidence:** [docs/implementation/HM06-PROGRESS.md](../../../docs/implementation/HM06-PROGRESS.md) — tests/deformer_tests.cpp; tests/mesh_render_tests.cpp; apps/desktop/mesh_smoke.cpp.
 
-**Remaining scope:** A Part substitution owns its bone or curve binding independently. Switching and reopening restore the correct animated chain; compatibility mapping across drawn poses and complete rig workflows remain open.
+**Remaining scope:** A Part substitution owns its bone or curve binding independently. Switching and reopening restore the correct animated chain. At a drawing change, an explicit undoable command matches the incoming pose to the outgoing evaluated pose when control types and rest geometry agree; broader mapping across different rest shapes and complete rig workflows remain open.
 
 ## DEF-011 — Kinematic output
 

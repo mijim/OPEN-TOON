@@ -135,6 +135,61 @@ TEST_CASE("Bone influence radius retargets existing bends atomically and survive
     REQUIRE(session.document() == valid);
 }
 
+TEST_CASE("Compatible sleeve change matches the outgoing bone pose with one undoable key") {
+    PartFixture fixture;
+    bindBoneChain(fixture.document, fixture.part, fixture.drawing,
+                  {{{0, 8}, {8, 8}, {16, 8}}}, 3);
+    recordBonePose(fixture.document, fixture.part, fixture.drawing, 24, 0, 30);
+    const Id sleeve = createSubstitution(fixture.document, fixture.part, 12, true, "Sleeve");
+    bindRegularImageMesh(fixture.document, fixture.part, sleeve, 4, 2);
+    bindBoneChain(fixture.document, fixture.part, sleeve,
+                  {{{0, 8}, {8, 8}, {16, 8}}}, 3);
+    recordBonePose(fixture.document, fixture.part, sleeve, 36, 0, 0);
+    Session session;
+    session.replace(fixture.document);
+    REQUIRE(canMatchPreviousDeformerPose(session.document(), fixture.part, 12));
+    REQUIRE_FALSE(canMatchPreviousDeformerPose(session.document(), fixture.part, 13));
+    REQUIRE_FALSE(canMatchPreviousDeformerPose(session.document(), fixture.part, 0));
+    const auto before = session.document();
+    const auto outgoing = sampleBoneAngles(
+        *meshBindingFor(before.layer(fixture.part), fixture.drawing)->bone, 12);
+    REQUIRE(outgoing[1] == 15);
+    REQUIRE(session.apply("Match previous pose", [&](Document& document) {
+        matchPreviousDeformerPose(document, fixture.part, 12);
+    }));
+    const auto& matched = *meshBindingFor(session.document().layer(fixture.part), sleeve)->bone;
+    REQUIRE(sampleBoneAngles(matched, 12) == outgoing);
+    REQUIRE(matched.keys.size() == 3);
+    REQUIRE(matched.keys[1].frame == 12);
+    REQUIRE(session.document().drawingAt(fixture.part, 11)->id == fixture.drawing);
+    REQUIRE(session.document().drawingAt(fixture.part, 12)->id == sleeve);
+    REQUIRE(deserializeDocument(serializeDocument(session.document())) == session.document());
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == before);
+    REQUIRE(session.redo());
+    REQUIRE(sampleBoneAngles(*meshBindingFor(session.document().layer(fixture.part), sleeve)->bone,
+                                    12) == outgoing);
+    const auto valid = session.document();
+    REQUIRE_THROWS(session.apply("Wrong frame", [&](Document& document) {
+        matchPreviousDeformerPose(document, fixture.part, 13);
+    }));
+    REQUIRE(session.document() == valid);
+    auto existingKey = before;
+    recordBonePose(existingKey, fixture.part, sleeve, 12, 0, 2, Interpolation::Smooth);
+    matchPreviousDeformerPose(existingKey, fixture.part, 12);
+    const auto& preserved = *meshBindingFor(existingKey.layer(fixture.part), sleeve)->bone;
+    REQUIRE(preserved.keys[1].interpolation == Interpolation::Smooth);
+    REQUIRE(sampleBoneAngles(preserved, 12) == outgoing);
+    auto incompatible = before;
+    moveBoneRestJoint(incompatible, fixture.part, sleeve, 2, {15, 8});
+    REQUIRE_FALSE(canMatchPreviousDeformerPose(incompatible, fixture.part, 12));
+    REQUIRE_THROWS(matchPreviousDeformerPose(incompatible, fixture.part, 12));
+    auto locked = before;
+    locked.layer(fixture.part).locked = true;
+    REQUIRE_FALSE(canMatchPreviousDeformerPose(locked, fixture.part, 12));
+    REQUIRE_THROWS(matchPreviousDeformerPose(locked, fixture.part, 12));
+}
+
 TEST_CASE("Cubic curve tangent keys move a field continuously without altering rest") {
     PartFixture fixture;
     const std::array<MeshPoint, 4> straight{{{0, 8}, {16.0 / 3, 8},
@@ -153,6 +208,42 @@ TEST_CASE("Cubic curve tangent keys move a field continuously without altering r
     REQUIRE(atSix.vertices[6].pose.y < binding.vertices[6].rest.y);
     REQUIRE(atTwelve.vertices[6].rest == binding.vertices[6].rest);
     REQUIRE(deserializeDocument(serializeDocument(fixture.document)) == fixture.document);
+}
+
+TEST_CASE("Compatible curve drawing change matches four evaluated controls") {
+    PartFixture fixture;
+    const std::array<MeshPoint, 4> straight{{{0, 8}, {16.0 / 3, 8},
+                                            {32.0 / 3, 8}, {16, 8}}};
+    bindCurveDeformer(fixture.document, fixture.part, fixture.drawing, straight);
+    auto lifted = straight;
+    lifted[1].y = 5;
+    lifted[2].y = 10;
+    recordCurvePose(fixture.document, fixture.part, fixture.drawing, 24, lifted);
+    const Id alternate = createSubstitution(fixture.document, fixture.part, 12, true, "Alternate");
+    bindRegularImageMesh(fixture.document, fixture.part, alternate, 4, 2);
+    bindCurveDeformer(fixture.document, fixture.part, alternate, straight);
+    recordCurvePose(fixture.document, fixture.part, alternate, 36, straight);
+    const auto before = fixture.document;
+    REQUIRE(canMatchPreviousDeformerPose(before, fixture.part, 12));
+    const auto expected = sampleCurveControls(
+        *meshBindingFor(before.layer(fixture.part), fixture.drawing)->curve, 12);
+    matchPreviousDeformerPose(fixture.document, fixture.part, 12);
+    const auto& incoming = *meshBindingFor(fixture.document.layer(fixture.part), alternate)->curve;
+    REQUIRE(sampleCurveControls(incoming, 12) == expected);
+    REQUIRE(incoming.keys.size() == 3);
+    REQUIRE(incoming.keys[1].frame == 12);
+    REQUIRE(deserializeDocument(serializeDocument(fixture.document)) == fixture.document);
+    auto existingKey = before;
+    recordCurvePose(existingKey, fixture.part, alternate, 12, straight, Interpolation::Step);
+    matchPreviousDeformerPose(existingKey, fixture.part, 12);
+    const auto& preserved = *meshBindingFor(existingKey.layer(fixture.part), alternate)->curve;
+    REQUIRE(preserved.keys[1].interpolation == Interpolation::Step);
+    REQUIRE(sampleCurveControls(preserved, 12) == expected);
+    auto incompatible = before;
+    moveCurveRestControl(incompatible, fixture.part, alternate, 1, {16.0 / 3, 9});
+    REQUIRE_FALSE(canMatchPreviousDeformerPose(incompatible, fixture.part, 12));
+    REQUIRE_THROWS(matchPreviousDeformerPose(incompatible, fixture.part, 12));
+    REQUIRE(meshBindingFor(incompatible.layer(fixture.part), alternate)->curve->keys.size() == 2);
 }
 
 TEST_CASE("Curve rest controls retarget keyed offsets without changing rest artwork") {

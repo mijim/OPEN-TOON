@@ -91,6 +91,13 @@ substitution can have one control type; another substitution may use its own.
 The mesh grid follows the rendered pose while a control moves. Static vertices
 cannot be edited while a control is attached.
 
+At the first frame of a substitution change, **Match previous pose** keys the
+incoming bone or curve to the outgoing drawing's evaluated pose at that frame.
+The button appears when both bindings use the same control type and identical
+rest joints or curve controls. The edit is undoable and preserves an existing
+key's interpolation. For a drawing with different rest geometry, place and
+animate its controls directly.
+
 Use **Rest joints** or **Rest curve** to place the saved control geometry on
 canvas. **Pose joints** or **Pose curve** returns to animation editing.
 **Elbow influence (px)** adjusts how far the bend blends into either segment;

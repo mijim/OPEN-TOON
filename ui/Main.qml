@@ -1420,6 +1420,23 @@ ApplicationWindow {
                                         onClicked: editor.resetSelectedDeformerPose()
                                     }
                                 }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    visible: editor.selectedCanMatchPreviousDeformerPose
+                                    Label {
+                                        text: "Drawing change at this frame"
+                                        color: "#999999"
+                                        font.pixelSize: 10
+                                    }
+                                    Item { Layout.fillWidth: true }
+                                    C.CompactButton {
+                                        text: "Match previous pose"
+                                        Accessible.name: "Match previous drawing's deformer pose"
+                                        ToolTip.text: "Key the incoming drawing to the outgoing bone or curve pose"
+                                        ToolTip.visible: hovered
+                                        onClicked: editor.matchSelectedPreviousDeformerPose()
+                                    }
+                                }
                             }
                             ColumnLayout {
                                 visible: editor.characterId > 0
