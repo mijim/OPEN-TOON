@@ -1,5 +1,16 @@
 # Experimental releases
 
+## 0.2.0-experimental.18 — working source, cutter mattes
+
+- Save a Drawing or Part cutter matte binding in format 18. The inspector
+  assigns or bypasses a visible source with atomic undo; fractional alpha
+  clips the target without painting the source into the final image.
+- The same typed graph evaluates preview and write output, with validation
+  for source references and character-copy remapping. HM-12 remains in
+  progress pending a general editable graph and joint recipes.
+- Local macOS tests and native smoke verify fractional pixels, save/reopen
+  and bypass/undo. Source only; no new public binary or tag.
+
 ## 0.2.0-experimental.17 — working source, audio repeats and device preview
 
 - Save 1–64 sample-contiguous repeats per trimmed clip in format 17, with

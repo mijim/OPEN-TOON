@@ -48,7 +48,8 @@ int main(int argc, char** argv) {
         return 0;
     }
     if (args.contains("--smoke-test") || args.contains("--hm06-benchmark") ||
-        args.contains("--hm07-smoke") || args.contains("--hm10-smoke")) {
+        args.contains("--hm07-smoke") || args.contains("--hm10-smoke") ||
+        args.contains("--hm12-smoke")) {
         QStandardPaths::setTestModeEnabled(true);
         QCoreApplication::setApplicationName(args.contains("--smoke-test")
                                                  ? "OPEN-TOON-smoke"
@@ -56,6 +57,8 @@ int main(int argc, char** argv) {
                                                        ? "OPEN-TOON-hm07-smoke"
                                                        : args.contains("--hm10-smoke")
                                                              ? "OPEN-TOON-hm10-smoke"
+                                                       : args.contains("--hm12-smoke")
+                                                             ? "OPEN-TOON-hm12-smoke"
                                                        : "OPEN-TOON-benchmark");
     }
     try {
@@ -109,6 +112,68 @@ int main(int argc, char** argv) {
         engine.loadFromModule("OpenToon", "Main");
         if (args.contains("--demo"))
             editor.loadDemo();
+        if (args.contains("--hm12-smoke")) {
+            QTimer::singleShot(1200, &app, [&] {
+                try {
+                    if (engine.rootObjects().isEmpty())
+                        throw std::runtime_error("No QML window for HM-12 smoke.");
+                    auto* window = qobject_cast<QQuickWindow*>(engine.rootObjects().first());
+                    auto document = opentoon::makeDocument();
+                    document.width = document.height = 1;
+                    document.background = {0, 0, 0, 0};
+                    auto& targetDrawing = document.editableDrawing(document.layers.front().id, 0);
+                    targetDrawing.image = opentoon::ImageAsset{1, 1, {255, 0, 0, 128}};
+                    opentoon::Layer source = document.layers.front();
+                    source.id = document.allocateId();
+                    source.name = "Cutter";
+                    auto sourceDrawing = targetDrawing;
+                    sourceDrawing.id = document.allocateId();
+                    sourceDrawing.image = opentoon::ImageAsset{1, 1, {0, 0, 255, 128}};
+                    document.drawings.emplace(sourceDrawing.id, sourceDrawing);
+                    for (auto& exposure : source.exposures)
+                        exposure.drawing = sourceDrawing.id;
+                    document.layers.push_back(source);
+                    document.validate();
+                    QTemporaryDir directory;
+                    if (!directory.isValid())
+                        throw std::runtime_error("Cannot create HM-12 project fixture.");
+                    const auto path = directory.filePath("cutter.otoon");
+                    (void)opentoon::ProjectStore::save(std::filesystem::path(path.toStdString()), document);
+                    if (!editor.openProject(QUrl::fromLocalFile(path)))
+                        throw std::runtime_error("Cannot open HM-12 project fixture.");
+                    editor.setWorkspaceMode("Rig");
+                    editor.setSelectedLayer(int(document.layers.front().id));
+                    window->setProperty("inspectorMode", "layer");
+                    QCoreApplication::processEvents();
+                    auto* picker = window->findChild<QQuickItem*>("cutterMattePicker");
+                    if (!picker || !picker->isVisible())
+                        throw std::runtime_error("Cutter matte inspector is unavailable.");
+                    if (!editor.setLayerMatte(int(source.id)))
+                        throw std::runtime_error("Cannot assign a cutter matte.");
+                    const auto clipped = opentoon::SceneRenderer::render(editor.document(), 0);
+                    if (qAlpha(clipped.pixel(0, 0)) != 64 || qBlue(clipped.pixel(0, 0)) != 0)
+                        throw std::runtime_error("Cutter matte did not clip the image correctly.");
+                    QCoreApplication::processEvents();
+                    if (!window->grabWindow().save("build/hm12-matte-smoke.png"))
+                        throw std::runtime_error("Cannot capture HM-12 inspector.");
+                    if (!editor.saveProject({}) || !editor.openProject(QUrl::fromLocalFile(path)) ||
+                        opentoon::SceneRenderer::render(editor.document(), 0) != clipped)
+                        throw std::runtime_error("Cutter matte changed after save and reopen.");
+                    editor.setSelectedLayer(int(document.layers.front().id));
+                    if (!editor.setLayerMatte(0))
+                        throw std::runtime_error("Cannot bypass a cutter matte.");
+                    editor.undo();
+                    if (opentoon::SceneRenderer::render(editor.document(), 0) != clipped)
+                        throw std::runtime_error("Cutter matte bypass did not undo.");
+                    std::cout << "HM-12 native smoke passed: visible inspector, fractional matte, "
+                                 "save/reopen, bypass/undo.\n";
+                    app.exit(0);
+                } catch (const std::exception& error) {
+                    std::cerr << error.what() << '\n';
+                    app.exit(1);
+                }
+            });
+        }
         if (args.contains("--hm10-smoke")) {
             QTimer::singleShot(1200, &app, [&] {
                 try {

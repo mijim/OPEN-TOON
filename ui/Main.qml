@@ -1260,6 +1260,28 @@ ApplicationWindow {
                                 onActivated: editor.setParent(currentValue)
                                 Accessible.name: "Parent layer"
                             }
+                            C.CompactComboBox {
+                                objectName: "cutterMattePicker"
+                                Layout.leftMargin: 16
+                                Layout.rightMargin: 16
+                                Layout.fillWidth: true
+                                implicitHeight: 30
+                                visible: layerInspector.rigLayer?.kind === 0 || layerInspector.rigLayer?.kind === 3
+                                enabled: visible && !layerInspector.rigLayer?.locked
+                                model: {
+                                    const selected = layerInspector.rigLayer;
+                                    if (!selected)
+                                        return [];
+                                    return [{id: 0, name: "No cutter matte"}].concat(
+                                        editor.layers.filter(l => (l.kind === 0 || l.kind === 3) &&
+                                                             l.id !== selected.id && l.visible && l.matte === 0));
+                                }
+                                currentIndex: Math.max(0, model.findIndex(l => l.id === layerInspector.rigLayer?.matte))
+                                textRole: "name"
+                                valueRole: "id"
+                                onActivated: editor.setLayerMatte(currentValue)
+                                Accessible.name: "Cutter matte source"
+                            }
                             RowLayout {
                                 Layout.leftMargin: 12
                                 Layout.rightMargin: 16

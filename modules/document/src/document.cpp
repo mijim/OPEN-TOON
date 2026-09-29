@@ -204,6 +204,17 @@ void Document::validate() const {
             require(l.bindings.empty(), "Only parts may own mesh bindings.");
         if (l.kind == LayerKind::Character || l.kind == LayerKind::Peg || l.kind == LayerKind::Camera)
             require(l.exposures.empty(), "Character roots, pegs and cameras cannot own drawings.");
+        if (l.matte) {
+            require((l.kind == LayerKind::Drawing || l.kind == LayerKind::Part) &&
+                        l.matte != l.id, "Only a drawing or Part may use another layer as its matte.");
+            const auto source = std::find_if(layers.begin(), layers.end(), [&](const Layer& other) {
+                return other.id == l.matte;
+            });
+            require(source != layers.end() &&
+                        (source->kind == LayerKind::Drawing || source->kind == LayerKind::Part) &&
+                        source->matte == 0 && source->visible,
+                    "Matte source must be a visible drawing or Part without its own matte.");
+        }
         std::set<Id> variants;
         for (const auto& variant : l.variants)
             require(drawings.contains(variant.drawing) && variant.name.size() > 0 &&

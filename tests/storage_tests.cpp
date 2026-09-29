@@ -681,6 +681,35 @@ TEST_CASE("Format fourteen control groups migrate with a readable source backup"
     FixtureDatabase current(project.file);
     REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
 }
+TEST_CASE("Format seventeen cutter matte migration keeps a readable source backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 17;
+    for (auto& layer : legacy["layers"])
+        layer.erase("matte");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=17");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    Layer source = changed.layers.front();
+    source.id = changed.allocateId();
+    source.name = "Cutter";
+    changed.layers.push_back(source);
+    changed.layers.front().matte = source.id;
+    changed.validate();
+    REQUIRE(ProjectStore::save(project.file, changed, "Add cutter matte", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v17.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+}
 TEST_CASE("Format fifteen audio migration preserves a readable source backup") {
     TemporaryProject project;
     auto original = makeDocument();

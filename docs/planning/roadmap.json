@@ -804,7 +804,7 @@
         {
           "id": "P10-W2",
           "description": "Build the node editor as a view over the document graph; implement basic blending, opacity, blur, glow, shadows, color correction and mattes.",
-          "status": "planned"
+          "status": "in_progress"
         },
         {
           "id": "P10-W3",
@@ -5067,7 +5067,7 @@
       "owner_phase": "P10",
       "work_package": "P10-W2",
       "owner_module": "compositing/presentation",
-      "status": "planned",
+      "status": "in_progress",
       "effort_engineer_weeks": [
         4,
         7
@@ -5257,7 +5257,7 @@
   ],
   "execution_policy": {
     "primary_objective": "HM: reliable character animation Harmony Moment",
-    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06 remains parked in progress with continuous-limb evidence and an open artistic gate. HM-07 remains parked in progress after format-15 grouped published controls. The single implementer is active on HM-10: format-16 PCM16 WAV assets, format-17 repeats, direct clip edits, indexed waveform, offline mix and bounded miniaudio device preview pass local tests; timeline fragment scrub passes; hardware sync and audible quality remain open. HM-12 remains independently eligible. P07/P08/P09 and full feature acceptance remain open.",
+    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06, HM-07 and HM-10 remain parked in progress; HM-10 has tested format-17 audio repeats, device preview, scrub and mix diagnostics while two ten-minute silent CoreAudio qualifications complete. The single implementer is active on eligible HM-12 matte/node editing. P07/P08/P09/P10 and full feature acceptance remain open.",
     "phase_dependency_semantics": "Phase depends_on constrains full epic completion, not entry into an implementation slice. Only the explicit delivery-slice contract DAG gates the Harmony Moment. Domain dependencies are scope relationships, not all-features barriers.",
     "entry_rule": "Start a slice only when each required contract has accepted evidence. Baseline reuse is partial and must be qualified; planned is not ready. Independent spikes may run without claiming their consumer ready.",
     "wip_limit": 2,
@@ -5320,7 +5320,7 @@
       "Physical tablet, Intel, Linux/Windows or clean-machine qualification",
       "Measured superiority over Harmony before comparative artist study"
     ],
-    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06 remains parked in progress with continuous-limb evidence and an open artistic gate. HM-07 remains parked in progress after format-15 grouped published controls. The single implementer is active on HM-10: format-16 PCM16 WAV assets, format-17 repeats, direct clip edits, indexed waveform, offline mix and bounded miniaudio device preview pass local tests; timeline fragment scrub passes; hardware sync and audible quality remain open. HM-12 remains independently eligible. P07/P08/P09 and full feature acceptance remain open."
+    "current_instruction": "HM-00 through bounded HM-05 and HM-13 are accepted. HM-06, HM-07 and HM-10 remain parked in progress; HM-10 has tested format-17 audio repeats, device preview, scrub and mix diagnostics while two ten-minute silent CoreAudio qualifications complete. The single implementer is active on eligible HM-12 matte/node editing. P07/P08/P09/P10 and full feature acceptance remain open."
   },
   "estimate_revision": {
     "basis": "Whole-program phase envelopes retain prior scope and are not estimates of remaining HM work. HM slice estimates cover remaining bounded work once, including integration; never add them to phase totals.",

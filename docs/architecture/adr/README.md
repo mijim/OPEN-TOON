@@ -118,3 +118,6 @@ preview, immutable callback mixing and the submitted-sample playhead boundary.
 
 See [ADR-038](038-repeated-audio-clips.md) for format-17 saved repeat counts,
 sample-contiguous looping and format-16 migration.
+
+See [ADR-039](039-layer-cutter-matte.md) for format-18 saved cutter matte
+bindings, fractional graph evaluation and reference validation.

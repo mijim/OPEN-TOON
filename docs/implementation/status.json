@@ -70,8 +70,8 @@
     {
       "id": "P10",
       "status": "in_progress",
-      "available": "Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. A bounded revision cache reuses canvas frames and speculatively prepares the next frame from an immutable snapshot. Native playback/scrub, alpha/color charts and animated original artwork close bounded HM-04; orthographic camera output joins HM-13. Legacy scenes keep their direct-painter appearance.",
-      "remaining": "Editable node UI, useful effects, full ROI scheduling, production-scale performance and later deformer integration."
+      "available": "Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. Format-18 Drawing/Part cutter matte bindings clip by fractional alpha through the shared graph, with compact inspector, reference validation, undo, save/reopen and character-copy remapping. A bounded revision cache reuses canvas frames and speculatively prepares the next frame from an immutable snapshot. Native playback/scrub, alpha/color charts and animated original artwork close bounded HM-04; orthographic camera output joins HM-13.",
+      "remaining": "General editable node UI, Opacity and group ports, joint recipes, useful effects, full ROI scheduling, production-scale performance and later deformer integration."
     },
     {
       "id": "P11",
@@ -84,7 +84,7 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 148,
+      "count": 158,
       "command": "ctest --test-dir build/locked --output-on-failure -j6"
     },
     "native_input_workflow": {
@@ -248,7 +248,7 @@
         "animated orthographic camera matches reopened preview and two exported PNG frames"
       ]
     },
-    "total_local_ctest_entries": 148,
+    "total_local_ctest_entries": 158,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -428,6 +428,13 @@
         "limits": "48-frame scene without audio or matte nodes; full 480-frame control latency not qualified"
       }
     },
+    "cutter_matte": {
+      "status": "passed_subset",
+      "scope": "Format-18 Drawing/Part source binding, fractional alpha application, source exclusion, validated references, save/reopen, bypass and undo",
+      "command": "build/locked/open-toon.app/Contents/MacOS/open-toon --hm12-smoke",
+      "screenshot": "build/hm12-matte-smoke.png",
+      "limits": "General node editor, group/ungroup, opacity nodes, arm/eye recipes and full 480-frame composition budgets remain open."
+    },
     "pcm_audio_timing": {
       "status": "passed_subset",
       "scope": "Format-16 original PCM16 WAV assets and format-17 repeated clips, clip placement/trim/gain and native waveform drag with undo, indexed sample-aligned timeline waveform with exact edge queries, invalid import rejection, undo/redo, save/reopen and format-15/16 backups; deterministic stereo offline mix, 44.1/48 kHz source alignment, exact-length WAV export after reopen and cancellation preservation; bounded miniaudio playback uses the same immutable mix, null-device seek/stop and native Qt Quick playhead smoke; native timeline traversal previews bounded 80 ms rational-sample scrub fragments without document changes; callback-period and skipped-playhead-frame diagnostics retained after preview stop; a two-second silent host probe reported 328 callbacks, zero processing overruns and 142 final drift samples",
@@ -447,7 +454,7 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.17",
+  "version": "0.2.0-experimental.18",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
@@ -457,7 +464,7 @@
   "planning_priority": {
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
-    "state": "HM-00_through_HM-05_and_HM-13_complete__HM-06_and_HM-07_parked_in_progress__HM-10_active_in_progress",
-    "note": "HM-06 continuous deformation and HM-07 named controls remain unaccepted working subsets, parked while the single implementer advances HM-10. Format-16 PCM16 import and format-17 repeat clips, clip editing, indexed waveform, deterministic offline WAV mix and bounded miniaudio device preview pass locally; hardware sync and audible scrub quality remain open. HM-12 remains eligible. Full P07/P08/P09 feature and phase acceptance remain open."
+    "state": "HM-00_through_HM-05_and_HM-13_complete__HM-06_HM-07_HM-10_parked_in_progress__HM-12_active_in_progress",
+    "note": "HM-06 and HM-07 are parked unaccepted subsets. HM-10 is parked after format-17 PCM audio, device preview, scrub, repeat and diagnostics; silent CoreAudio qualification is underway. The single implementer is advancing eligible HM-12 after format-18 cutter matte binding and native smoke. Full P07/P08/P09/P10 and feature acceptance remain open."
   }
 }

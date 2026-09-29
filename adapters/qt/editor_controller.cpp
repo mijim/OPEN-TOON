@@ -158,6 +158,7 @@ QVariantList EditorController::layers() const {
                                      {"locked", it->locked},
                                      {"solo", it->solo},
                                      {"parent", int(it->parent)},
+                                     {"matte", int(it->matte)},
                                      {"kind", int(it->kind)},
                                      {"role", QString::fromStdString(it->role)},
                                      {"spans", spans},
@@ -847,6 +848,9 @@ void EditorController::removeLayer() {
             for (const auto& l : d.layers)
                 if (l.parent == layer_)
                     throw std::runtime_error("Remove child layers before deleting their parent.");
+            for (const auto& l : d.layers)
+                if (l.matte == layer_)
+                    throw std::runtime_error("Remove the matte binding before deleting its source.");
             if (kind == LayerKind::Part) {
                 opentoon::removeRigBranch(d, layer_);
                 return;
@@ -962,6 +966,25 @@ void EditorController::setParent(int parent) {
             opentoon::attachDrawingAsPart(d, layer_, parent, layer.name);
         else
             layer.parent = parent;
+    });
+}
+bool EditorController::setLayerMatte(int sourceLayer) {
+    if (!layer_ || sourceLayer < 0)
+        return false;
+    return edit(sourceLayer ? "Set cutter matte" : "Remove cutter matte", [&](Document& d) {
+        auto& target = d.layer(layer_);
+        if (target.locked)
+            throw std::runtime_error("Unlock the layer before editing.");
+        if (target.kind != LayerKind::Drawing && target.kind != LayerKind::Part)
+            throw std::runtime_error("A cutter matte needs a drawing or part target.");
+        if (sourceLayer) {
+            const auto& source = d.layer(sourceLayer);
+            if (source.id == target.id ||
+                (source.kind != LayerKind::Drawing && source.kind != LayerKind::Part) ||
+                !source.visible || source.matte)
+                throw std::runtime_error("Choose a visible drawing or part without its own matte.");
+        }
+        target.matte = Id(sourceLayer);
     });
 }
 bool EditorController::selectedCanFollowBoneTip() const {

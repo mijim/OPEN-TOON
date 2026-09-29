@@ -48,11 +48,31 @@ CompositionGraph CompositionGraph::orderedLayers(const Document& document) {
     GraphNodeId next = 1;
     graph.nodes.push_back({next++, GraphNodeKind::Background, 0, {}});
     GraphNodeId image = graph.nodes.front().id;
+    std::map<Id, GraphNodeId> sourceIds;
+    std::set<Id> matteSources;
     for (const auto& layer : document.layers) {
         if (layer.kind != LayerKind::Drawing && layer.kind != LayerKind::Part)
             continue;
-        const GraphNodeId source = next++;
-        graph.nodes.push_back({source, GraphNodeKind::LayerImage, layer.id, {}});
+        sourceIds[layer.id] = next++;
+        graph.nodes.push_back({sourceIds[layer.id], GraphNodeKind::LayerImage, layer.id, {}});
+        if (layer.matte)
+            matteSources.insert(layer.matte);
+    }
+    for (const auto& layer : document.layers) {
+        if (layer.kind != LayerKind::Drawing && layer.kind != LayerKind::Part)
+            continue;
+        if (matteSources.contains(layer.id))
+            continue;
+        GraphNodeId source = sourceIds.at(layer.id);
+        if (layer.matte) {
+            const GraphNodeId matte = next++;
+            graph.nodes.push_back({matte, GraphNodeKind::MatteFromImage, 0,
+                                   {{sourceIds.at(layer.matte), 0}}});
+            const GraphNodeId masked = next++;
+            graph.nodes.push_back({masked, GraphNodeKind::ApplyMatte, 0,
+                                   {{source, 0}, {matte, 1}}});
+            source = masked;
+        }
         const GraphNodeId over = next++;
         graph.nodes.push_back({over, GraphNodeKind::Over, 0, {{image, 0}, {source, 1}}});
         image = over;

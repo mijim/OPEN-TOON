@@ -78,6 +78,38 @@ TEST_CASE("Linear composition preserves transparent alpha and agrees across outp
     document.layers.back().visible = false;
     REQUIRE(qRgba(0, 0, 0, 0) == SceneRenderer::render(document, 0).pixel(0, 0));
 }
+TEST_CASE("Saved cutter matte clips a layer without painting its source") {
+    auto document = makeDocument();
+    document.width = document.height = 1;
+    document.background = {0, 0, 0, 0};
+    auto& targetDrawing = document.editableDrawing(document.layers.front().id, 0);
+    targetDrawing.image = ImageAsset{1, 1, {255, 0, 0, 128}};
+    Layer source = document.layers.front();
+    source.id = document.allocateId();
+    source.name = "Cutter";
+    Drawing sourceDrawing = targetDrawing;
+    sourceDrawing.id = document.allocateId();
+    sourceDrawing.image = ImageAsset{1, 1, {0, 0, 255, 128}};
+    document.drawings.emplace(sourceDrawing.id, sourceDrawing);
+    for (auto& exposure : source.exposures)
+        exposure.drawing = sourceDrawing.id;
+    document.layers.push_back(source);
+    document.layers.front().matte = source.id;
+    document.validate();
+    const auto graph = CompositionGraph::orderedLayers(document);
+    REQUIRE_NOTHROW(graph.validate(document));
+    const auto expected = SceneRenderer::render(document, 0);
+    REQUIRE(qAlpha(expected.pixel(0, 0)) == 64);
+    REQUIRE(qBlue(expected.pixel(0, 0)) == 0);
+    REQUIRE(GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Write) == expected);
+    REQUIRE(deserializeDocument(serializeDocument(document)) == document);
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == expected);
+    document.layers.front().matte = 0;
+    REQUIRE(qAlpha(SceneRenderer::render(document, 0).pixel(0, 0)) > 128);
+    document.layers.front().matte = source.id;
+    document.layers.back().visible = false;
+    REQUIRE_THROWS(document.validate());
+}
 TEST_CASE("Linear color chart keeps bounded alpha and premultiplied color across coverage levels") {
     auto document = makeDocument();
     document.width = 8;

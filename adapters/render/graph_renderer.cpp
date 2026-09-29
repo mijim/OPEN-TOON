@@ -166,6 +166,8 @@ QImage GraphRenderer::render(const CompositionGraph& graph, const Document& docu
     std::map<GraphNodeId, QRect> bounds;
     Document legacy = document;
     legacy.composition = CompositionProfile::LegacyQt;
+    for (auto& layer : legacy.layers)
+        layer.matte = 0; // Isolated source render must not re-enter the graph.
     for (const auto id : order) {
         checkCancelled(options);
         if (!needed.contains(id))
@@ -197,7 +199,8 @@ QImage GraphRenderer::render(const CompositionGraph& graph, const Document& docu
                 bound = QRect(QPoint(0, 0), size);
             break;
         case GraphNodeKind::LayerImage:
-            if (!options.isolatedLayer || options.isolatedLayer == node.layer) {
+            if (!options.isolatedLayer || options.isolatedLayer == node.layer ||
+                document.layer(options.isolatedLayer).matte == node.layer) {
                 auto isolated = options;
                 isolated.background = false;
                 isolated.isolatedLayer = node.layer;

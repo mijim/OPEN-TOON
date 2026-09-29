@@ -46,6 +46,31 @@ TEST_CASE("Composition profile is a validated document property") {
     document.composition = static_cast<CompositionProfile>(99);
     REQUIRE_THROWS(document.validate());
 }
+TEST_CASE("Cutter matte requires an independent visible drawing source") {
+    auto document = makeDocument();
+    const Id target = document.layers.front().id;
+    Layer source = document.layers.front();
+    source.id = document.allocateId();
+    source.name = "Cutter";
+    document.layers.push_back(source);
+    document.layer(target).matte = source.id;
+    REQUIRE_NOTHROW(document.validate());
+    const auto graph = CompositionGraph::orderedLayers(document);
+    REQUIRE_NOTHROW(graph.validate(document));
+    REQUIRE(std::count_if(graph.nodes.begin(), graph.nodes.end(), [](const auto& node) {
+                return node.kind == GraphNodeKind::ApplyMatte;
+            }) == 1);
+    document.layer(target).matte = target;
+    REQUIRE_THROWS(document.validate());
+    document.layer(target).matte = 999999;
+    REQUIRE_THROWS(document.validate());
+    document.layer(target).matte = source.id;
+    document.layer(source.id).visible = false;
+    REQUIRE_THROWS(document.validate());
+    document.layer(source.id).visible = true;
+    document.layer(source.id).matte = target;
+    REQUIRE_THROWS(document.validate());
+}
 TEST_CASE("Deep composition chains order and invalidate without recursive traversal") {
     auto document = makeDocument();
     CompositionGraph graph;

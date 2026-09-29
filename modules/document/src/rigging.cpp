@@ -556,6 +556,8 @@ Id duplicateCharacter(Document& document, Id rootId, double offsetX, double offs
         const Id old = source.id;
         source.id = layers.at(old);
         source.parent = source.parent ? layers.at(source.parent) : 0;
+        if (layers.contains(source.matte))
+            source.matte = layers.at(source.matte);
         if (old == rootId) {
             source.name = source.name.substr(0, 4091) + " copy";
             source.transform.x += offsetX;
@@ -604,6 +606,9 @@ Id duplicateRigBranch(Document& document, Id branchId, bool linkedArtwork) {
     std::map<Id, Id> layers, drawings;
     for (const auto& source : originals)
         layers[source.id] = document.allocateId();
+    for (const auto& source : originals)
+        require(!source.matte || layers.contains(source.matte),
+                "Duplicate the matte source with its rig branch.");
     auto mapDrawing = [&](Id old) {
         if (linkedArtwork)
             return old;
@@ -622,6 +627,8 @@ Id duplicateRigBranch(Document& document, Id branchId, bool linkedArtwork) {
         const Id old = source.id;
         source.id = layers.at(old);
         source.parent = layers.contains(source.parent) ? layers.at(source.parent) : source.parent;
+        if (source.matte)
+            source.matte = layers.at(source.matte);
         if (old == branchId) {
             source.name = source.name.substr(0, 4091) + (linkedArtwork ? " clone" : " copy");
             source.transform.x += 32;
@@ -659,6 +666,9 @@ void removeRigBranch(Document& document, Id branchId) {
             require(!layer.locked, "Unlock every layer in the branch before removing.");
             removed.insert(layer.id);
         }
+    for (const auto& layer : document.layers)
+        require(removed.contains(layer.id) || !removed.contains(layer.matte),
+                "Remove the matte binding before deleting its source.");
     for (auto& view : document.layer(rootId).views)
         std::erase_if(view.choices, [&](const ViewChoice& choice) {
             return removed.contains(choice.part);

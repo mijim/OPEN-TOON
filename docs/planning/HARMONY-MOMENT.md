@@ -457,7 +457,7 @@ Map a small labelled viseme set to each character and edit held mouth timings ag
 
 ## HM-12
 
-**Useful nodes, cutters and part overlap** — `planned`; owner `compositing/presentation`, work package `P10-W2`.
+**Useful nodes, cutters and part overlap** — `in_progress`; owner `compositing/presentation`, work package `P10-W2`.
 
 Expose a small editable node graph: Drawing, Peg/Transform, ordered Composite, Opacity, Cutter/Matte, group ports, Display and Write. Add reversible front/back part ordering and manual joint matte recipes; a compact inspector hides graph complexity from animators.
 

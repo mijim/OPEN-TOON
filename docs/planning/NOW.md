@@ -10,9 +10,11 @@ The immediate objective is a complete, reliable character-animation **Harmony Mo
 
 **Parked slice: [HM-07](HARMONY-MOMENT.md#hm-07).** Format-12 named masked poses capture, apply and blend selected channels and substitutions with undo/reopen evidence. Format-15 publication exposes grouped views, per-Part drawing choices and poses in an Animator dashboard and compact camera viewport panel over the same document. Compatible in-project pose transfer maps unique roles and drawing names; paired left/right roles can create mirrored poses. [The tested subset](../implementation/HM07-PROGRESS.md) leaves general controls, broader retargeting and complete workspace presets open.
 
-**Active slice: [HM-10](HARMONY-MOMENT.md#hm-10).** Format-16 original PCM16 WAV assets and format-17 sample-contiguous repeats, undoable clip placement/trim/gain including native waveform drag, indexed sample-aligned timeline waveforms, deterministic offline WAV mix/export, bounded miniaudio device preview and timeline fragment scrub pass local tests. [The audio subset](../implementation/HM10-PROGRESS.md) still needs hardware drift/underrun and scrub-quality qualification plus higher-quality rate conversion.
+**Parked slice: [HM-10](HARMONY-MOMENT.md#hm-10).** Format-16 original PCM16 WAV assets and format-17 sample-contiguous repeats, undoable clip placement/trim/gain including native waveform drag, indexed sample-aligned timeline waveforms, deterministic offline WAV mix/export, bounded miniaudio device preview and timeline fragment scrub pass local tests. [The audio subset](../implementation/HM10-PROGRESS.md) still needs hardware drift/underrun and scrub-quality qualification plus higher-quality rate conversion. Two silent ten-minute CoreAudio runs are in progress.
 
-**Current gate:** HM-06 has animated bone/curve evaluation, bounded per-substitution binding and editable elbow influence; broader extreme-bend quality and artistic interaction remain unaccepted. HM-07 remains a working subset. The single implementer is advancing HM-10 audio; HM-12 nodes remain independently eligible.
+**Active slice: [HM-12](HARMONY-MOMENT.md#hm-12).** HM-03 character identity and HM-04 typed graph runtime have accepted bounded evidence. The next work adds a reversible matte binding and graph presentation over that runtime; the complete node editor and part-overlap contract remain open.
+
+**Current gate:** HM-06 has animated bone/curve evaluation, bounded per-substitution binding and editable elbow influence; broader extreme-bend quality and artistic interaction remain unaccepted. HM-07 and HM-10 remain working subsets. The single implementer is advancing HM-12 nodes and mattes.
 
 **Accepted HM-03 evidence:** the owner delegated review to the implementer. The original 19-part import/assembly/view journey, reference-pixel comparison, saved/reopened substitutions, independent copy, undo, negative/nonuniform reparenting and visual screenshot inspection are recorded in [HM03-ACCEPTANCE](../implementation/HM03-ACCEPTANCE.md). This bounded contract does not complete P08 or the independent second-animator HM-15 review.
 
@@ -29,9 +31,9 @@ Statuses and hard prerequisites below come from `roadmap.json`; acceptance and p
 | [HM-07](HARMONY-MOMENT.md#hm-07) | In progress | HM-03, HM-04 accepted | Published grouped dashboard and viewport controls, compatible transfer and paired-role mirroring pass; general bindings and workspace presets remain. |
 | [HM-08](HARMONY-MOMENT.md#hm-08) | Planned | HM-03, HM-07 | Wait for both contracts. |
 | [HM-09](HARMONY-MOMENT.md#hm-09) | Planned | HM-06, HM-07, HM-08 | Wait for all three contracts. |
-| [HM-10](HARMONY-MOMENT.md#hm-10) | In progress | HM-01 accepted | PCM16 import, saved repeats, direct clip drag, indexed waveform, offline mix/export, device preview and fragment scrub pass; hardware sync remains. |
+| [HM-10](HARMONY-MOMENT.md#hm-10) | Parked in progress | HM-01 accepted | PCM16 import, saved repeats, direct clip drag, indexed waveform, offline mix/export, device preview and fragment scrub pass; hardware sync remains. |
 | [HM-11](HARMONY-MOMENT.md#hm-11) | Planned | HM-03 accepted, HM-10 pending | Wait for HM-10. |
-| [HM-12](HARMONY-MOMENT.md#hm-12) | Planned; eligible | HM-04, HM-03 accepted | Node editing may follow HM-05 with one implementer. |
+| [HM-12](HARMONY-MOMENT.md#hm-12) | In progress | HM-04, HM-03 accepted | Matte binding and node presentation are underway; full graph workflow remains open. |
 | [HM-13](HARMONY-MOMENT.md#hm-13) | Bounded contract accepted | HM-04 accepted | P06 owning phase remains open. |
 | [HM-14](HARMONY-MOMENT.md#hm-14) | Planned | HM-10, HM-12, HM-13 | Wait for HM-10 and HM-12 acceptance. |
 | [HM-15](HARMONY-MOMENT.md#hm-15) | Planned | HM-09, HM-11, HM-14 | Wait for the three joining contracts. |

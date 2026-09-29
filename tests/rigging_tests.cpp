@@ -71,6 +71,44 @@ TEST_CASE("Named poses survive duplication and remove stale part references") {
     REQUIRE(document.layer(copy).poses.size() == 1);
     document.validate();
 }
+TEST_CASE("Character copies remap cutter mattes and branch edits protect source references") {
+    Session session;
+    const Id body = session.document().layers.front().id;
+    Id root = 0, cutter = 0;
+    REQUIRE(session.apply("Build masked character", [&](Document& d) {
+        root = makeCharacter(d, body, "Hero");
+        Layer source;
+        source.id = d.allocateId();
+        cutter = source.id;
+        source.name = "Joint cutter";
+        d.layers.push_back(source);
+        attachDrawingAsPart(d, cutter, root, "Joint cutter");
+        d.layer(body).matte = cutter;
+    }));
+    const auto baseline = session.document();
+    REQUIRE_THROWS(session.apply("Remove referenced cutter", [&](Document& d) {
+        removeRigBranch(d, cutter);
+    }));
+    REQUIRE(session.document() == baseline);
+    REQUIRE_THROWS(session.apply("Copy target without cutter", [&](Document& d) {
+        (void)duplicateRigBranch(d, body, false);
+    }));
+    REQUIRE(session.document() == baseline);
+    Id copyRoot = 0;
+    REQUIRE(session.apply("Copy masked character", [&](Document& d) {
+        copyRoot = duplicateCharacter(d, root);
+    }));
+    const auto& copied = session.document();
+    auto copiedBody = std::find_if(copied.layers.begin(), copied.layers.end(), [&](const Layer& l) {
+        return l.parent == copyRoot && l.name == copied.layer(body).name;
+    });
+    REQUIRE(copiedBody != copied.layers.end());
+    REQUIRE(copiedBody->matte != cutter);
+    REQUIRE(copied.layer(copiedBody->matte).parent == copyRoot);
+    REQUIRE_NOTHROW(copied.validate());
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == baseline);
+}
 TEST_CASE("Pose transfer maps unique Part roles and drawing names without touching source") {
     Session session;
     const Id part = session.document().layers.front().id;
