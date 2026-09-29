@@ -34,6 +34,7 @@
 #include <QTimer>
 #include <QUrl>
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <iostream>
 #include <stdexcept>
@@ -466,8 +467,93 @@ int main(int argc, char** argv) {
                     if (!editor.saveProject({}) || !editor.openProject(QUrl::fromLocalFile(path)) ||
                         opentoon::SceneRenderer::render(editor.document(), 0) != added)
                         throw std::runtime_error("Add blend changed after save and reopen.");
+
+                    auto reordered = opentoon::makeDocument();
+                    reordered.width = reordered.height = 1;
+                    reordered.background = {0, 0, 0, 0};
+                    const auto red = reordered.layers.front().id;
+                    reordered.editableDrawing(red, 0).image =
+                        opentoon::ImageAsset{1, 1, {255, 0, 0, 255}};
+                    auto addOpaqueLayer = [&](const char* name, std::array<std::uint8_t, 4> pixel) {
+                        auto layer = reordered.layers.front();
+                        layer.id = reordered.allocateId();
+                        layer.name = name;
+                        auto drawing = reordered.drawings.at(layer.exposures.front().drawing);
+                        drawing.id = reordered.allocateId();
+                        drawing.image = opentoon::ImageAsset{1, 1,
+                            {pixel[0], pixel[1], pixel[2], pixel[3]}};
+                        reordered.drawings.emplace(drawing.id, drawing);
+                        layer.exposures.front().drawing = drawing.id;
+                        reordered.layers.push_back(layer);
+                        return layer.id;
+                    };
+                    (void)addOpaqueLayer("Green", {0, 255, 0, 255});
+                    const auto blue = addOpaqueLayer("Blue", {0, 0, 255, 255});
+                    const auto reorderPath = directory.filePath("reorder.otoon");
+                    reordered.validate();
+                    (void)opentoon::ProjectStore::save(
+                        std::filesystem::path(reorderPath.toStdString()), reordered);
+                    if (!editor.openProject(QUrl::fromLocalFile(reorderPath)))
+                        throw std::runtime_error("Cannot open node reorder fixture.");
+                    nodes->setProperty("previewNodeId", 0);
+                    QCoreApplication::processEvents();
+                    (void)window->grabWindow();
+                    auto findDrawingCard = [&](int layer) -> QQuickItem* {
+                        const auto findVisualItem = [](auto&& self, QQuickItem* parent,
+                                                       const QString& name) -> QQuickItem* {
+                            if (!parent)
+                                return nullptr;
+                            if (parent->objectName() == name)
+                                return parent;
+                            for (auto* child : parent->childItems())
+                                if (auto* match = self(self, child, name))
+                                    return match;
+                            return nullptr;
+                        };
+                        for (const auto& variant : editor.compositionNodes()) {
+                            const auto node = variant.toMap();
+                            if (node.value("kind").toString() == "Drawing" &&
+                                node.value("layer").toInt() == layer)
+                                return findVisualItem(findVisualItem, window->contentItem(),
+                                    QString("compositionNode%1").arg(node.value("id").toInt()));
+                        }
+                        return nullptr;
+                    };
+                    auto* redCard = findDrawingCard(int(red));
+                    auto* blueCard = findDrawingCard(int(blue));
+                    if (!redCard || !blueCard || !redCard->isVisible() || !blueCard->isVisible())
+                        throw std::runtime_error("Drawing drag cards are unavailable.");
+                    const auto from = redCard->mapToScene(QPointF(redCard->width() / 2, 30));
+                    const auto to = blueCard->mapToScene(QPointF(blueCard->width() / 2, 30));
+                    const auto movePoint = [&](QEvent::Type type, QPointF point,
+                                               Qt::MouseButtons buttons) {
+                        QMouseEvent event(type, point, window->mapToGlobal(point.toPoint()),
+                                          type == QEvent::MouseMove ? Qt::NoButton : Qt::LeftButton,
+                                          buttons, Qt::NoModifier);
+                        QCoreApplication::sendEvent(window, &event);
+                        QCoreApplication::processEvents();
+                    };
+                    movePoint(QEvent::MouseButtonPress, from, Qt::LeftButton);
+                    movePoint(QEvent::MouseMove, from + QPointF(16, 0), Qt::LeftButton);
+                    movePoint(QEvent::MouseMove, to, Qt::LeftButton);
+                    if (nodes->property("draggedLayer").toInt() != int(red) ||
+                        nodes->property("dropLayer").toInt() != int(blue))
+                        throw std::runtime_error("Drawing drag did not target the visible card.");
+                    movePoint(QEvent::MouseButtonRelease, to, Qt::NoButton);
+                    if (editor.document().layers.back().id != red ||
+                        qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Dragging a Drawing did not place it above its target.");
+                    editor.undo();
+                    if (editor.document().layers.back().id != blue ||
+                        qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Drawing drag did not undo atomically.");
+                    editor.redo();
+                    if (!editor.saveProject({}) ||
+                        !editor.openProject(QUrl::fromLocalFile(reorderPath)) ||
+                        editor.document().layers.back().id != red)
+                        throw std::runtime_error("Drawing drag order changed after reopen.");
                     std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass, fractional cutter, "
-                                 "painted-source Multiply/Add, save/reopen and undo.\n";
+                                 "painted-source Multiply/Add, drawing drag order, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

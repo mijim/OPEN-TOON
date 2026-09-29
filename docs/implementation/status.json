@@ -70,7 +70,7 @@
     {
       "id": "P10",
       "status": "in_progress",
-      "available": "Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. Format-18 Drawing/Part cutter matte bindings and format-19 inverted Outside coverage clip by fractional alpha through the shared graph, with compact inspector, resizable derived Nodes panel with clicked image/matte previews, order/cutter/opacity edits, format-20 persistent cutter bypass, format-21 visible cutter-source painting, format-24 opacity bypass and format-25 Normal/Multiply/Screen and format-28 Add blending, reference validation, undo, save/reopen and character-copy remapping. A bounded revision cache reuses canvas frames and speculatively prepares the next frame from an immutable snapshot. Native playback/scrub, alpha/color charts and animated original artwork close bounded HM-04; orthographic camera output joins HM-13.",
+      "available": "Qt-free typed image/transform/matte graph, validated DAG, hierarchy-aware invalidation, explicit Display/Write outputs, alpha matte and opt-in saved linear-sRGB composition. Format-18 Drawing/Part cutter matte bindings and format-19 inverted Outside coverage clip by fractional alpha through the shared graph, with compact inspector, resizable derived Nodes panel with clicked image/matte previews and direct Drawing-card order dragging, order/cutter/opacity edits, format-20 persistent cutter bypass, format-21 visible cutter-source painting, format-24 opacity bypass and format-25 Normal/Multiply/Screen and format-28 Add blending, reference validation, undo, save/reopen and character-copy remapping. A bounded revision cache reuses canvas frames and speculatively prepares the next frame from an immutable snapshot. Native playback/scrub, alpha/color charts and animated original artwork close bounded HM-04; orthographic camera output joins HM-13.",
       "remaining": "General editable node UI and group ports, joint recipes, useful effects, full ROI scheduling, production-scale performance and later deformer integration."
     },
     {
@@ -431,7 +431,7 @@
     },
     "cutter_matte": {
       "status": "passed_subset",
-      "scope": "Format-18 Drawing/Part source binding and format-19 inversion, fractional inside/outside alpha, source exclusion, validated references, derived Nodes panel with clicked image/matte previews and animated Opacity nodes, format-20 persistent cutter bypass, format-21 visible cutter-source painting, format-24 opacity bypass and format-25 Normal/Multiply/Screen and format-28 Add blending, save/reopen and undo",
+      "scope": "Format-18 Drawing/Part source binding and format-19 inversion, fractional inside/outside alpha, source exclusion, validated references, derived Nodes panel with clicked image/matte previews, direct Drawing-card order dragging and animated Opacity nodes, format-20 persistent cutter bypass, format-21 visible cutter-source painting, format-24 opacity bypass and format-25 Normal/Multiply/Screen and format-28 Add blending, save/reopen and undo",
       "command": "build/locked/open-toon.app/Contents/MacOS/open-toon --hm12-smoke",
       "screenshot": "build/hm12-matte-smoke.png",
       "limits": "General node editor, general node bypass, group/ungroup, arm/eye recipes and full 480-frame composition budgets remain open."
@@ -462,7 +462,7 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.42",
+  "version": "0.2.0-experimental.43",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
@@ -473,6 +473,6 @@
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
     "state": "HM-00_through_HM-05_and_HM-13_complete__HM-06_HM-07_HM-10_parked_in_progress__HM-12_active_in_progress",
-    "note": "HM-06 and HM-07 are parked unaccepted subsets. HM-12 is active after fractional cutters, saved bypasses, visible cutter sources, clicked node previews and Normal/Multiply/Screen/Add blend modes; the general editable graph remains open. The original HM-06 toon and editable studies now use sampled edges and a two-view cap over the continuous-limb rig; artistic acceptance remains open. HM-10 is parked after exact 48 kHz clip splitting, saved clip solo, direct frame-edge trimming and stereo balance; hardware presentation and audible quality remain unqualified. Full P07/P08/P09/P10 and feature acceptance remain open."
+    "note": "HM-06 and HM-07 are parked unaccepted subsets. HM-12 is active after fractional cutters, saved bypasses, visible cutter sources, clicked node previews, direct Drawing-card order dragging and Normal/Multiply/Screen/Add blend modes; the general editable graph remains open. The original HM-06 toon and editable studies now use sampled edges and a two-view cap over the continuous-limb rig; artistic acceptance remains open. HM-10 is parked after exact 48 kHz clip splitting, saved clip solo, direct frame-edge trimming and stereo balance; hardware presentation and audible quality remain unqualified. Full P07/P08/P09/P10 and feature acceptance remain open."
   }
 }

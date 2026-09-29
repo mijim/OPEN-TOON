@@ -1,5 +1,14 @@
 # Experimental releases
 
+## 0.2.0-experimental.43 — working source, direct node drawing order
+
+- Drag a Drawing card onto another in Nodes to place it immediately above
+  the target in composite order. The drop target highlights; one document
+  command supports undo/redo and saved order. Locked drawings reject it.
+- A three-color pixel fixture checks stacking, invalid targets, undo and
+  reopen. Native Qt Quick smoke sends the actual pointer drag across cards
+  and verifies the rendered output. Source only; no new public binary or tag.
+
 ## 0.2.0-experimental.42 — working source, additive layer blend
 
 - Add saved Add blending for Drawing and Part layers in Nodes. Fractional

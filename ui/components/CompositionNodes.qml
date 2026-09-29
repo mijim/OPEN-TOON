@@ -11,6 +11,8 @@ Item {
     property string previewNodeKind: ""
     property int previewLayerId: 0
     property string previewData: ""
+    property int draggedLayer: 0
+    property int dropLayer: 0
     function refreshPreview() {
         if (previewNodeId <= 0)
             return
@@ -45,7 +47,7 @@ Item {
                 font.letterSpacing: 1
             }
             Label {
-                text: "Select a Drawing node to edit order or cutter"
+                text: "Drag a Drawing onto another to place it above; select to edit cutter"
                 color: "#777777"
                 font.pixelSize: 10
             }
@@ -172,12 +174,14 @@ Item {
                     model: root.controller.compositionNodes
                     Rectangle {
                         required property var modelData
+                        readonly property int drawingLayer: modelData.kind === "Drawing" ? modelData.layer : 0
                         objectName: "compositionNode" + modelData.id
                         width: 148
                         height: Math.max(110, graphScroll.height - 30)
                         radius: 5
                         color: modelData.id === root.previewNodeId ? "#292929" : "#181818"
-                        border.color: modelData.kind === "Cutter" ||
+                        border.color: drawingLayer > 0 && root.dropLayer === drawingLayer
+                                      ? "#eeeeee" : modelData.kind === "Cutter" ||
                                       modelData.kind === "Opacity" ||
                                       modelData.kind === "Bypassed opacity" ||
                                       modelData.kind === "Multiply" ||
@@ -219,7 +223,46 @@ Item {
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
+                            preventStealing: modelData.kind === "Drawing"
+                            property bool dragging: false
+                            property real downX: 0
+                            property real downY: 0
+                            onPressed: mouse => {
+                                dragging = false
+                                downX = mouse.x
+                                downY = mouse.y
+                            }
+                            onPositionChanged: mouse => {
+                                if (!pressed || modelData.kind !== "Drawing")
+                                    return
+                                if (!dragging && Math.hypot(mouse.x - downX, mouse.y - downY) > 8) {
+                                    dragging = true
+                                    root.draggedLayer = modelData.layer
+                                }
+                                if (dragging) {
+                                    const point = mapToItem(graphRow, mouse.x, mouse.y)
+                                    const card = graphRow.childAt(point.x, point.y)
+                                    root.dropLayer = card && card.drawingLayer !== root.draggedLayer
+                                                     ? card.drawingLayer : 0
+                                }
+                            }
+                            onReleased: {
+                                const source = root.draggedLayer
+                                const target = root.dropLayer
+                                root.draggedLayer = 0
+                                root.dropLayer = 0
+                                if (dragging && target > 0) {
+                                    root.layerChosen(source)
+                                    root.controller.moveDrawingAfter(source, target)
+                                }
+                            }
+                            onCanceled: {
+                                root.draggedLayer = 0
+                                root.dropLayer = 0
+                            }
                             onClicked: {
+                                if (dragging)
+                                    return
                                 root.previewNodeId = modelData.id
                                 root.previewNodeKind = modelData.kind
                                 root.previewLayerId = modelData.layer

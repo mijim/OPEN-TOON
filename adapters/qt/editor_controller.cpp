@@ -1030,6 +1030,33 @@ void EditorController::moveLayer(int direction) {
             std::iter_swap(it, d.layers.begin() + target);
     });
 }
+bool EditorController::moveDrawingAfter(int sourceLayer, int targetLayer) {
+    if (sourceLayer <= 0 || targetLayer <= 0 || sourceLayer == targetLayer)
+        return false;
+    const auto& current = document().layers;
+    const auto source = std::find_if(current.begin(), current.end(),
+                                     [sourceLayer](const auto& layer) { return layer.id == Id(sourceLayer); });
+    const auto target = std::find_if(current.begin(), current.end(),
+                                     [targetLayer](const auto& layer) { return layer.id == Id(targetLayer); });
+    if (source == current.end() || target == current.end() || source == target + 1)
+        return false;
+    return edit("Reorder drawing", [&](Document& d) {
+        auto from = std::find_if(d.layers.begin(), d.layers.end(),
+                                 [sourceLayer](const auto& layer) { return layer.id == Id(sourceLayer); });
+        auto to = std::find_if(d.layers.begin(), d.layers.end(),
+                               [targetLayer](const auto& layer) { return layer.id == Id(targetLayer); });
+        const auto isDrawing = [](const Layer& layer) {
+            return layer.kind == LayerKind::Drawing || layer.kind == LayerKind::Part;
+        };
+        if (!isDrawing(*from) || !isDrawing(*to) || from->locked || to->locked)
+            throw std::runtime_error("Reordering needs two unlocked drawings or Parts.");
+        Layer moving = std::move(*from);
+        d.layers.erase(from);
+        to = std::find_if(d.layers.begin(), d.layers.end(),
+                          [targetLayer](const auto& layer) { return layer.id == Id(targetLayer); });
+        d.layers.insert(to + 1, std::move(moving));
+    });
+}
 void EditorController::setParent(int parent) {
     if (!layer_)
         return;

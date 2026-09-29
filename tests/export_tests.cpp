@@ -26,6 +26,7 @@
 #include <catch2/catch_session.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <algorithm>
+#include <array>
 #include <cstring>
 #include <map>
 
@@ -52,6 +53,56 @@ TEST_CASE("Composition node presentation follows cutter edits and undo") {
     REQUIRE_FALSE(editor.document().layer(target).invertMatte);
     editor.undo();
     REQUIRE(editor.compositionNodes().size() == 7);
+}
+TEST_CASE("Direct drawing reorder changes pixels atomically and survives reopen") {
+    auto document = opentoon::makeDocument();
+    document.width = document.height = 1;
+    document.background = {0, 0, 0, 0};
+    const auto red = document.layers.front().id;
+    document.editableDrawing(red, 0).image = opentoon::ImageAsset{1, 1, {255, 0, 0, 255}};
+    auto append = [&](const char* name, std::array<std::uint8_t, 4> pixel) {
+        auto layer = document.layers.front();
+        layer.id = document.allocateId();
+        layer.name = name;
+        auto drawing = document.drawings.at(layer.exposures.front().drawing);
+        drawing.id = document.allocateId();
+        drawing.image = opentoon::ImageAsset{1, 1, {pixel[0], pixel[1], pixel[2], pixel[3]}};
+        document.drawings.emplace(drawing.id, drawing);
+        layer.exposures.front().drawing = drawing.id;
+        document.layers.push_back(layer);
+        return layer.id;
+    };
+    const auto green = append("Green", {0, 255, 0, 255});
+    const auto blue = append("Blue", {0, 0, 255, 255});
+    document.validate();
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto path = QUrl::fromLocalFile(directory.filePath("reorder.otoon"));
+    REQUIRE(opentoon::ProjectStore::save(std::filesystem::path(path.toLocalFile().toStdString()),
+                                         document) > 0);
+    EditorController editor;
+    REQUIRE(editor.openProject(path));
+    REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    REQUIRE_FALSE(editor.moveDrawingAfter(int(red), int(red)));
+    REQUIRE_FALSE(editor.moveDrawingAfter(999999, int(blue)));
+    REQUIRE(editor.moveDrawingAfter(int(red), int(blue)));
+    REQUIRE(editor.document().layers.back().id == red);
+    REQUIRE(qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    REQUIRE_FALSE(editor.moveDrawingAfter(int(red), int(blue)));
+    editor.undo();
+    REQUIRE(editor.document().layers.back().id == blue);
+    REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    editor.redo();
+    REQUIRE(editor.saveProject({}));
+    REQUIRE(editor.openProject(path));
+    REQUIRE(editor.document().layers.back().id == red);
+    REQUIRE(qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    editor.toggleLayer(int(green), "locked");
+    REQUIRE_FALSE(editor.moveDrawingAfter(int(green), int(red)));
+    REQUIRE(editor.document().layers.back().id == red);
+    editor.toggleLayer(int(red), "locked");
+    REQUIRE_FALSE(editor.moveDrawingAfter(int(blue), int(red)));
+    REQUIRE(editor.document().layers.back().id == red);
 }
 namespace {
 const QString partFixture = QStringLiteral(OPENTOON_SOURCE_DIR "/tests/fixtures/harmony-moment/parts/");

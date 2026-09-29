@@ -43,6 +43,12 @@ clamps the sum of the two straight-color channels before the existing
 premultiplied source-over calculation; fractional alpha and cutters keep
 their behavior. Legacy and Linear sRGB apply the sum in their respective
 spaces. See [ADR-054](../architecture/adr/054-additive-layer-blending.md).
+Drawing cards can now be dragged onto another Drawing card to put the source
+immediately above the target in the saved composite order. The drop target
+highlights; the operation rejects missing, same and locked layers. The
+document command is atomic, with undo/redo and save/reopen. This edits layer
+order through the derived Nodes presentation; arbitrary node placement and
+wiring remain open.
 Format 20 adds a persistent **Bypass cutter** control in Properties and Nodes.
 Bypass keeps its source and Inside/Outside choice but shows the uncut target;
 the source remains reserved and does not paint. Re-enable restores the exact
@@ -119,6 +125,10 @@ preview. This is diagnostic navigation, not a persisted graph edit.
   retains Screen, writes a readable `.pre-v27.bak` and rejects Add claimed by
   an older file. Native Qt Quick smoke clicks Add on a painted cutter source,
   checks brighter pixels, undoes and reopens the result.
+- A three-opaque-color fixture checks exact order and rendered top color,
+  invalid/same/locked targets, one-step undo/redo and save/reopen. Native Qt
+  Quick smoke drags a Drawing card onto a second card, observes the target
+  highlight and checks the new output pixels before and after undo/reopen.
 - A current three-frame original-art run with five Add layers measured
   50.93 ms/frame in Legacy and 45.22 ms/frame in Linear sRGB. The same host
   run measured Multiply/Screen at 45.79/45.18 ms and Normal at 1.84/42.99 ms.

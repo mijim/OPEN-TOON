@@ -27,7 +27,7 @@ rendering. Unchanged linear frames are reused while you pan, zoom or rotate the
 view; editing or switching scenes refreshes them. Open the bottom **Nodes**
 tab to inspect the derived graph. Click an image or matte card to see its
 output at the current frame; matte alpha appears as grayscale. The tab can
-change drawing order, opacity, opacity bypass, Normal/Multiply/Screen/Add blend mode and cutter settings. Select a Drawing or Part,
+change drawing order, opacity, opacity bypass, Normal/Multiply/Screen/Add blend mode and cutter settings. Drag a Drawing card onto another to place it immediately above that target in composite order; the target card highlights during the drag. Locked drawings reject the move. Select a Drawing or Part,
 choose a visible source in **Cutter matte**, then use **Outside**, **Bypass**
 or **Paint cutter source** as needed. The last option keeps the source visible
 at its normal layer order while it masks the selected target; it is shared by

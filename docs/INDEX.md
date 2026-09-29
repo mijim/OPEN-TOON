@@ -11,7 +11,7 @@
 | Language | English across first-party UI, assets, code, help and documentation | User requirement; previous documentation translated |
 | Technology | C++20, Qt 6 and Qt Quick/QML | Accepted by user; risky integration paths need spikes |
 | Renderer | CPU QPainter reference adapter; Qt RHI/Skia comparison remains open | Experimental |
-| Storage/media | SQLite revisions with compressed, checksummed immutable media; format-25 layer blending, format-24 opacity bypass, format-23 audio clip mute, format-22 source-sample audio fades, format-21 visible cutter sources, format-20 cutter bypass and format-19 inversion, format-17 repeatable PCM16 clips, source-version migration backups, band-limited rate conversion and experimental miniaudio preview | See ADR-025–050 and recovery tests |
+| Storage/media | SQLite revisions with compressed, checksummed immutable media; format-28 layer blending, format-27 clip stereo balance, format-26 clip solo, earlier saved cutters, opacity and PCM16 clips, source-version migration backups, band-limited rate conversion and experimental miniaudio preview | See current ADRs and recovery tests |
 | Open-source reuse | Prefer proven libraries through tested adapters | User requirement; 30 library/tool entries evaluated in the roadmap |
 | Initial license | GPL-3.0-or-later for original contributions | Adopted |
 | Implementation | Experimental editor; partial catalog coverage | No complete phase or production release |
