@@ -1467,6 +1467,49 @@ bool EditorController::moveCompositeGroup(int groupId, int targetLayer, bool beh
                 layer = std::move(drawings[index++]);
     });
 }
+bool EditorController::moveCompositeGroupMember(int sourceLayer, int targetLayer, bool behind) {
+    if (sourceLayer <= 0 || targetLayer <= 0 || sourceLayer == targetLayer)
+        return false;
+    const auto source = Id(sourceLayer), target = Id(targetLayer);
+    const auto currentGroup = std::find_if(document().compositeGroups.begin(),
+                                           document().compositeGroups.end(),
+                                           [source](const CompositeGroup& group) {
+                                               return std::find(group.members.begin(), group.members.end(), source) !=
+                                                      group.members.end();
+                                           });
+    if (currentGroup == document().compositeGroups.end() ||
+        std::find(currentGroup->members.begin(), currentGroup->members.end(), target) ==
+            currentGroup->members.end())
+        return false;
+    const auto sourceIndex = std::distance(currentGroup->members.begin(),
+        std::find(currentGroup->members.begin(), currentGroup->members.end(), source));
+    const auto targetIndex = std::distance(currentGroup->members.begin(),
+        std::find(currentGroup->members.begin(), currentGroup->members.end(), target));
+    if (behind ? sourceIndex + 1 == targetIndex : targetIndex + 1 == sourceIndex)
+        return false;
+    const Id groupId = currentGroup->id;
+    return edit("Reorder composite group member", [=](Document& d) {
+        auto group = std::find_if(d.compositeGroups.begin(), d.compositeGroups.end(),
+                                   [groupId](const CompositeGroup& candidate) {
+                                       return candidate.id == groupId;
+                                   });
+        for (const Id member : group->members)
+            if (d.layer(member).locked)
+                throw std::runtime_error("Unlock every group member before reordering.");
+        std::map<Id, Layer> original;
+        for (const Id member : group->members)
+            original.emplace(member, d.layer(member));
+        auto reordered = group->members;
+        reordered.erase(std::find(reordered.begin(), reordered.end(), source));
+        const auto destination = std::find(reordered.begin(), reordered.end(), target);
+        reordered.insert(behind ? destination : std::next(destination), source);
+        std::size_t index = 0;
+        for (auto& layer : d.layers)
+            if (original.contains(layer.id))
+                layer = original.at(reordered[index++]);
+        group->members = std::move(reordered);
+    });
+}
 bool EditorController::setCompositeGroupBypassed(int groupId, bool bypassed) {
     if (groupId <= 0)
         return false;

@@ -164,7 +164,7 @@ Item {
             }
             Label {
                 text: root.selectedGroup > 0
-                      ? "Alt+Shift-click: edit members"
+                      ? "Drag members: order · Shift: behind · Alt+Shift-click: edit members"
                       : "Drag: order · Shift: behind · Alt: cutter · Alt+Shift: private cutter · Shift-click: group"
                 color: "#777777"
                 font.pixelSize: 10
@@ -535,8 +535,13 @@ Item {
                                         else
                                             panel.controller.setLayerMatte(source)
                                     } else {
+                                        const sourceLayer = root.controller.layers.find(l => l.id === source)
+                                        const targetLayer = root.controller.layers.find(l => l.id === target)
                                         root.layerChosen(source)
-                                        if (dragBehind)
+                                        if (sourceLayer && targetLayer && sourceLayer.compositeGroup > 0 &&
+                                                sourceLayer.compositeGroup === targetLayer.compositeGroup)
+                                            root.controller.moveCompositeGroupMember(source, target, dragBehind)
+                                        else if (dragBehind)
                                             root.controller.moveDrawingBefore(source, target)
                                         else
                                             root.controller.moveDrawingAfter(source, target)

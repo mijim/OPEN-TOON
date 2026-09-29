@@ -77,6 +77,12 @@ Drag a Group output card onto a Drawing or Part to move all its members
 together; Shift-drag places the group behind the target. Back and Front move
 the selected group by one neighboring Drawing or group. The single command
 preserves member order and port identity, with atomic undo and save/reopen.
+Drag a Drawing or Part card onto another member of that same group to change
+its internal order; Shift places it behind. The one command updates the group
+member IDs and contiguous Drawing/Part layer order together. It rejects a
+locked member or a target outside the group, and keeps the group ID and ports.
+Undo/redo, one-pixel output and reopen checks pass. See
+[ADR-070](../architecture/adr/070-composite-group-member-order.md).
 Format 32 adds **Bypass group** to a selected member and Alt-click on the Group
 output card. The output chooses the incoming image instead of the internal
 composite while retaining every member and cutter source. An external target
@@ -189,6 +195,11 @@ preview. This is diagnostic navigation, not a persisted graph edit.
 
 ## Verification
 
+- `tests/export_tests.cpp` checks direct group-member order through resulting
+  red/blue pixels, matching group/layer sequences, no-op and outside-target
+  rejection, locked-member rollback, undo/redo and project reopen. Native
+  `--hm12-smoke` drags between grouped cards with actual pointer events and
+  checks the atomic undo.
 - `tests/composition_graph_tests.cpp` checks the generated matte nodes and
   rejects missing, self, hidden and chained references.
 - `tests/render_tests.cpp` checks 128/255 target alpha multiplied by 128/255

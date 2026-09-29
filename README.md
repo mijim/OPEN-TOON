@@ -13,12 +13,16 @@ Project website: [opentoon.org](http://opentoon.org/)
 
 ## Get started
 
-Download the current experimental build:
+The current source version is **0.2.0-experimental.71**. Build it using the
+[macOS instructions](docs/implementation/BUILD.md); it has been compiled and
+tested locally, but no `.71` binary has been published.
+
+The earlier experimental preview packages remain available:
 
 - [macOS 15+ — Apple Silicon (arm64) ZIP](https://github.com/mijim/OPEN-TOON/releases/download/v0.2.0-experimental.11/OPEN-TOON-0.2.0-experimental.11-macOS-arm64.zip)
 - [Linux — x86_64 AppImage](https://github.com/mijim/OPEN-TOON/releases/download/v0.2.0-experimental.11/OPEN-TOON-0.2.0-experimental.11-Linux-x86_64.AppImage)
 
-These packages are unsigned experimental previews, not supported 1.0 releases. The
+These older packages are unsigned experimental previews, not supported 1.0 releases. The
 macOS build is ad-hoc signed but not notarized; use **Privacy & Security → Open Anyway**
 if Gatekeeper blocks it. On Linux, make the AppImage executable before opening it.
 The [build instructions](docs/implementation/BUILD.md) cover running from source and

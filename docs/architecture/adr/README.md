@@ -187,3 +187,6 @@ last submitted audio frame after output interruption.
 
 See [ADR-069](069-resizable-inspector-layout.md) for the personal horizontal
 inspector splitter and its inclusion in named workspace layouts.
+
+See [ADR-070](070-composite-group-member-order.md) for direct, undoable
+reordering of Drawing/Part members inside one contiguous composite group.

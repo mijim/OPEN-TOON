@@ -71,6 +71,10 @@ Group output cards can move their entire group in front of or behind a Drawing
 or Part. Back and Front move a selected group across a neighboring drawing or
 group without splitting either; the command undoes and reopens with the same
 pixels and membership.
+Drawing and Part cards inside one group can also be dragged to reorder its
+members, with Shift for behind. One undo changes both member and layer order;
+locked or outside-group targets reject. Pixel, native pointer and reopen
+checks pass.
 Format-32 **Bypass group** temporarily forwards the Group input image. Member
 settings and an internal cutter used outside the group remain available;
 restoring the saved toggle resumes the exact internal composite. Migration
@@ -106,15 +110,17 @@ skipped polled playhead frames, respectively. These counters do not measure
 speaker underruns or actual
 presented-frame drops.
 
-The working source version is `0.2.0-experimental.70`; no new binary or source
+The working source version is `0.2.0-experimental.71`; no new binary or source
 tag has been published for it. The last locally qualified macOS preview and
 earlier binaries do not qualify these source changes.
 
-The owner resumed development after the earlier 10:30 CEST cutoff. The `.70`
-locked macOS build passes 202/202 CTest entries and native Workspace, HM-07,
-HM-10 and HM-12 smoke,
-including contiguous group input/output ports, matte-only source pixels,
-grouping/rename/ungroup, direct edge-member edits, whole-group order, bypass
+The owner resumed development after the earlier 10:30 CEST cutoff. The `.71`
+locked macOS build passes 202/202 CTest entries and native Workspace, HM-10,
+HM-12 and broad editor smoke. The HM-07 animator smoke is intermittent at
+slider presentation and inspector scrolling; its earlier `.70` evidence
+remains recorded but is not requalified by this build. HM-12 checks include
+contiguous group input/output ports, matte-only source pixels,
+grouping/rename/ungroup, direct edge-member and internal-order drags, whole-group order, bypass
 and independent duplication,
 operator search/apply, private editable cutter copies, a manual editable Part joint patch with direct Control+Alt card drag, dependency collection with closed matte/group references,
 undo/redo and save/reopen. Earlier native smokes and

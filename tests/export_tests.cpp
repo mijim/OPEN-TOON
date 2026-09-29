@@ -342,6 +342,67 @@ TEST_CASE("Composite grouping is one undoable edit with stable ports and reopene
     REQUIRE(editor.document().drawingAt(copiedGroup.members.front(), 0)->id !=
             editor.document().drawingAt(red, 0)->id);
 }
+TEST_CASE("Composite group members reorder atomically with layer order and saved pixels") {
+    auto document = opentoon::makeDocument();
+    document.width = document.height = 1;
+    document.background = {0, 0, 0, 0};
+    const auto red = document.layers.front().id;
+    document.editableDrawing(red, 0).image = opentoon::ImageAsset{1, 1, {255, 0, 0, 255}};
+    auto blue = document.layers.front();
+    blue.id = document.allocateId();
+    blue.name = "Blue";
+    auto drawing = document.drawings.at(blue.exposures.front().drawing);
+    drawing.id = document.allocateId();
+    drawing.image = opentoon::ImageAsset{1, 1, {0, 0, 255, 255}};
+    document.drawings.emplace(drawing.id, drawing);
+    blue.exposures.front().drawing = drawing.id;
+    document.layers.push_back(blue);
+    auto outsider = blue;
+    outsider.id = document.allocateId();
+    outsider.name = "Outsider";
+    outsider.visible = false;
+    document.layers.push_back(outsider);
+    document.validate();
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto path = QUrl::fromLocalFile(directory.filePath("group-member-order.otoon"));
+    REQUIRE(opentoon::ProjectStore::save(std::filesystem::path(path.toLocalFile().toStdString()),
+                                         document) > 0);
+    EditorController editor;
+    REQUIRE(editor.openProject(path));
+    REQUIRE(editor.groupDrawings(int(red), int(blue.id)));
+    const auto group = editor.document().compositeGroups.front().id;
+    const auto revision = editor.documentRevision();
+    REQUIRE_FALSE(editor.moveCompositeGroupMember(int(red), int(outsider.id), false));
+    REQUIRE_FALSE(editor.moveCompositeGroupMember(int(red), int(blue.id), true));
+    REQUIRE(editor.documentRevision() == revision);
+    REQUIRE(editor.moveCompositeGroupMember(int(red), int(blue.id), false));
+    REQUIRE(editor.document().compositeGroups.front().members ==
+            std::vector<opentoon::Id>{blue.id, red});
+    REQUIRE(editor.document().layers[0].id == blue.id);
+    REQUIRE(editor.document().layers[1].id == red);
+    REQUIRE(qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    editor.undo();
+    REQUIRE(editor.document().compositeGroups.front().members ==
+            std::vector<opentoon::Id>{red, blue.id});
+    REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    editor.redo();
+    REQUIRE(editor.saveProject({}));
+    REQUIRE(editor.openProject(path));
+    REQUIRE(editor.document().compositeGroups.front().id == group);
+    REQUIRE(editor.document().compositeGroups.front().members ==
+            std::vector<opentoon::Id>{blue.id, red});
+    REQUIRE(qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    editor.toggleLayer(int(blue.id), "locked");
+    const auto lockedRevision = editor.documentRevision();
+    REQUIRE_FALSE(editor.moveCompositeGroupMember(int(red), int(blue.id), true));
+    REQUIRE(editor.documentRevision() == lockedRevision);
+    REQUIRE(editor.document().compositeGroups.front().members ==
+            std::vector<opentoon::Id>{blue.id, red});
+    editor.toggleLayer(int(blue.id), "locked");
+    REQUIRE(editor.moveCompositeGroupMember(int(red), int(blue.id), true));
+    REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+}
 TEST_CASE("Composite group edges can be edited without changing unbypassed pixels") {
     auto document = opentoon::makeDocument();
     document.width = document.height = 1;

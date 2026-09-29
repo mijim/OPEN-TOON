@@ -268,6 +268,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE bool duplicateCompositeGroup(int groupId);
     Q_INVOKABLE bool renameCompositeGroup(int groupId, QString name);
     Q_INVOKABLE bool moveCompositeGroup(int groupId, int targetLayer, bool behind);
+    Q_INVOKABLE bool moveCompositeGroupMember(int sourceLayer, int targetLayer, bool behind);
     Q_INVOKABLE bool setCompositeGroupBypassed(int groupId, bool bypassed);
     Q_INVOKABLE bool deleteCompositionSource(int layerId, bool disconnectReferences);
     Q_INVOKABLE void setParent(int);

@@ -1,5 +1,22 @@
 # Experimental releases
 
+## 0.2.0-experimental.71 — working source, group member order and desktop entry cleanup
+
+- Drag a Drawing or Part card onto another member of the same composite group
+  to change their internal order; Shift places it behind. One command updates
+  the group membership and layer order together, with locked-member rejection,
+  undo/redo and saved pixel parity.
+- The desktop entry point now prepares the app and dispatches native checks to
+  focused workspace, character, composition, audio, animator, mesh benchmark
+  and editor modules. The straightforward checks share a delayed-run and
+  error-reporting helper. This is an internal change with no project migration.
+- The locked macOS suite passes 202/202 CTest entries. Native Workspace,
+  HM-10, HM-12 and broad editor smokes pass, including direct group-member
+  pointer dragging. The HM-07 animator smoke remains intermittent at its
+  slider presentation and inspector scrolling checks; no HM-07 acceptance is
+  claimed from this run. Source only; the general editable node graph remains
+  open.
+
 ## 0.2.0-experimental.70 — working source, resizable inspector
 
 - Drag the visible vertical divider to resize Properties/Character from 250
