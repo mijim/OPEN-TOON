@@ -122,10 +122,11 @@ continue its graph and automatic overlap behavior.
 The lower workspace tab, panel height, timeline cell width and Timing tools
 visibility now reopen from personal settings alongside Rig/Animator mode; View
 can reset them without changing the scene, selection or frame. Full dockable
-workspace presets and UI scale remain open. The broader legacy UI smoke still
-shows intermittent synthetic-input shortcut failures on this macOS session
-(latest: canvas copy), so its entire workflow is not claimed as passing for
-`.68`. The HM-07 dashboard smoke passed in this build, including native slider
+workspace presets and UI scale remain open. The broader UI smoke's intermittent
+clipboard shortcut failure came from using a synthetic Meta key that this Qt
+build does not match to `StandardKey.Copy`; it now queries the runtime binding
+and waits for active canvas focus. Five consecutive local full-smoke runs pass.
+The HM-07 dashboard smoke also passed in this build, including native slider
 input; its single measured p95 was 49.62 ms, close to the proposed 50 ms limit.
 
 Drawing, Animation, Rigging and Compositing now offer four overridable

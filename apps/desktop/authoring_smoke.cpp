@@ -2,10 +2,13 @@
 #include "canvas_item.h"
 #include "scene_renderer.h"
 #include <QCoreApplication>
+#include <QElapsedTimer>
 #include <QEventLoop>
 #include <QKeyEvent>
+#include <QKeySequence>
 #include <QMouseEvent>
 #include <QQuickWindow>
+#include <QThread>
 #include <QTemporaryDir>
 #include <QTimer>
 #include <cmath>
@@ -35,10 +38,20 @@ void authoringSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& 
         send(QEvent::MouseButtonRelease, b, Qt::LeftButton, Qt::NoButton, mods);
     };
     auto key = [&](int code, Qt::KeyboardModifiers mods = Qt::NoModifier) {
+        window.raise();
         window.requestActivate();
-        settle();
+        QElapsedTimer activation;
+        activation.start();
+        while (!window.isActive() && activation.elapsed() < 3000) {
+            QCoreApplication::processEvents();
+            QThread::msleep(10);
+        }
+        require(window.isActive(), "Authoring smoke window did not activate for shortcuts.");
         canvas.forceActiveFocus();
         settle();
+        require(canvas.hasActiveFocus() && window.property("canvasEditingFocused").toBool() &&
+                    !window.property("textEditing").toBool(),
+                "Authoring smoke canvas did not own shortcut focus.");
         QKeyEvent press(QEvent::KeyPress, code, mods), release(QEvent::KeyRelease, code, mods);
         QCoreApplication::sendEvent(&window, &press);
         QCoreApplication::sendEvent(&window, &release);
@@ -121,23 +134,24 @@ void authoringSmoke(EditorController& editor, CanvasItem& canvas, QQuickWindow& 
     require(editor.document() == beforeNudge, "Vector nudge undo failed.");
     editor.setTool("Select");
     canvas.selectAllVectors();
-    const auto clipboardModifier =
-#ifdef Q_OS_MACOS
-        Qt::MetaModifier;
-#else
-        Qt::ControlModifier;
-#endif
-    key(Qt::Key_C, clipboardModifier);
+    auto standardModifier = [&](int code, QKeySequence::StandardKey action) {
+        for (const auto modifier : {Qt::ControlModifier, Qt::MetaModifier}) {
+            if (QKeyEvent(QEvent::KeyPress, code, modifier).matches(action))
+                return modifier;
+        }
+        throw std::runtime_error("No native binding for a standard clipboard shortcut.");
+    };
+    key(Qt::Key_C, standardModifier(Qt::Key_C, QKeySequence::Copy));
     require(canvas.hasVectorClipboard(), "Canvas copy shortcut did not fill the vector clipboard.");
     const auto beforeCut = editor.document();
-    key(Qt::Key_X, clipboardModifier);
+    key(Qt::Key_X, standardModifier(Qt::Key_X, QKeySequence::Cut));
     require(strokes().empty(), "Canvas cut shortcut failed.");
     editor.undo();
     require(editor.document() == beforeCut, "Cut undo failed.");
     editor.addLayer();
     editor.setFrame(3);
     canvas.forceActiveFocus();
-    key(Qt::Key_V, clipboardModifier);
+    key(Qt::Key_V, standardModifier(Qt::Key_V, QKeySequence::Paste));
     require(count() == 3 && strokes().size() == 3,
             "Paste did not create and select independent vectors on an empty frame.");
     const auto beforeLock = editor.document();

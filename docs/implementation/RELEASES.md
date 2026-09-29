@@ -10,8 +10,9 @@
   malformed settings and unchanged scene, selection and frame. Docking and
   broader panel arrangements remain open. The locked macOS suite passes
   202/202 CTest entries and Workspace, HM-07, HM-10 and HM-12 native smokes.
-  The legacy broad UI smoke still fails intermittently on synthetic shortcuts;
-  source only.
+  The broad native UI smoke also passes after choosing the Qt platform's
+  StandardKey bindings and waiting for canvas focus; five consecutive local
+  runs passed its full workflow. Source only.
 
 ## 0.2.0-experimental.67 — working source, personal workspace layout
 
