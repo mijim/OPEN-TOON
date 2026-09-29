@@ -62,6 +62,10 @@ without changing final pixels or external cutter dependencies. Shift-click
 groups an inclusive Drawing/Part span; Nodes renames or ungroups it. Atomic
 undo, save/reopen and format-30 migration pass. Published external ports and
 general reusable graph groups remain open.
+Group output cards can move their entire group in front of or behind a Drawing
+or Part. Back and Front move a selected group across a neighboring drawing or
+group without splitting either; the command undoes and reopens with the same
+pixels and membership.
 
 An original 20-second integrated study now combines the connected toon, nine
 mouth substitutions, a visible eye cutter and sample-aligned synthetic audio
@@ -80,14 +84,14 @@ skipped polled playhead frames, respectively. These counters do not measure
 speaker underruns or actual
 presented-frame drops.
 
-The working source version is `0.2.0-experimental.53`; no new binary or source
+The working source version is `0.2.0-experimental.54`; no new binary or source
 tag has been published for it. The last locally qualified macOS preview and
 earlier binaries do not qualify these source changes.
 
-The owner resumed development after the earlier 10:30 CEST cutoff. The `.53`
+The owner resumed development after the earlier 10:30 CEST cutoff. The `.54`
 locked macOS build passes 194/194 CTest entries and native HM-12 smoke,
 including contiguous group input/output ports, matte-only source pixels,
-grouping/rename/ungroup, undo/redo and save/reopen. Earlier native smokes and
+grouping/rename/ungroup, whole-group order, undo/redo and save/reopen. Earlier native smokes and
 artistic checks are recorded in prior
 release entries. HM-12 remains an unfinished bounded contract; next work can
 continue its graph grouping/part-overlap behavior.

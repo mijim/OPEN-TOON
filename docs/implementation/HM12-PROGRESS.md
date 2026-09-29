@@ -73,6 +73,10 @@ Undo/redo and save/reopen preserve group identity and membership; invalid
 overlaps or edits that split a group reject atomically. See
 [ADR-060](../architecture/adr/060-contiguous-composite-groups.md). Nested or
 reusable general graph groups remain open.
+Drag a Group output card onto a Drawing or Part to move all its members
+together; Shift-drag places the group behind the target. Back and Front move
+the selected group by one neighboring Drawing or group. The single command
+preserves member order and port identity, with atomic undo and save/reopen.
 Alt-dragging a Drawing card onto another binds the first as the second's
 cutter source through the existing validated document command. Its fractional
 alpha, saved references and one-step undo use the same path as the inspector.
@@ -195,6 +199,9 @@ preview. This is diagnostic navigation, not a persisted graph edit.
   readable `.pre-v30.bak`. Application tests reject splitting a group, and
   native Qt Quick smoke Shift-clicks two cards, renames, undoes/redoes, reopens
   and ungroups without changing output.
+- A three-color group fixture moves the full group front and back, checks the
+  top pixel, rejects a self-target, undoes and reopens the member order. Native
+  Qt Quick Back/Front controls exercise group movement and reopened pixels.
 - Native Qt Quick smoke Alt-drags a Drawing source onto a Drawing target,
   checks the target binding and output color, then undoes, redoes and reopens.
 - Native Qt Quick smoke Alt-clicks Apply matte to bypass, undoes, redoes and

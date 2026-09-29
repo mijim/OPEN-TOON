@@ -1,5 +1,15 @@
 # Experimental releases
 
+## 0.2.0-experimental.54 — working source, whole-group order
+
+- Drag a Group output card onto a Drawing/Part card to move all group members
+  together. Shift-drag places it behind; Back and Front also move a selected
+  group as one unit, including across another group.
+- The transactional move preserves member order, typed ports, cutter references
+  and saved pixels. Controller and native Qt Quick checks cover overlap,
+  undo/redo and reopen; the locked macOS suite passes 194/194 CTest entries.
+  Source only; no public binary or tag.
+
 ## 0.2.0-experimental.53 — working source, composite groups
 
 - Format 31 saves named adjacent Drawing/Part groups. The derived Nodes graph

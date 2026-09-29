@@ -1160,6 +1160,65 @@ bool EditorController::renameCompositeGroup(int groupId, QString name) {
         found->name = name.trimmed().toStdString();
     });
 }
+bool EditorController::moveCompositeGroup(int groupId, int targetLayer, bool behind) {
+    if (groupId <= 0 || targetLayer <= 0)
+        return false;
+    return edit("Reorder composite group", [&](Document& d) {
+        const auto source = std::find_if(d.compositeGroups.begin(), d.compositeGroups.end(),
+                                         [groupId](const auto& group) { return group.id == Id(groupId); });
+        if (source == d.compositeGroups.end())
+            throw std::runtime_error("The composite group is missing.");
+        const auto target = std::find_if(d.layers.begin(), d.layers.end(),
+                                         [targetLayer](const auto& layer) {
+                                             return layer.id == Id(targetLayer);
+                                         });
+        if (target == d.layers.end() ||
+            (target->kind != LayerKind::Drawing && target->kind != LayerKind::Part))
+            throw std::runtime_error("Drop the group on a Drawing or Part.");
+        if (std::find(source->members.begin(), source->members.end(), target->id) !=
+            source->members.end())
+            throw std::runtime_error("Drop the group outside its own drawings.");
+        const auto targetGroup = std::find_if(d.compositeGroups.begin(), d.compositeGroups.end(),
+                                              [&](const auto& group) {
+                                                  return std::find(group.members.begin(),
+                                                                   group.members.end(), target->id) !=
+                                                         group.members.end();
+                                              });
+        const Id targetBoundary = targetGroup == d.compositeGroups.end()
+                                      ? target->id
+                                      : behind ? targetGroup->members.front()
+                                               : targetGroup->members.back();
+        for (const auto& layer : d.layers)
+            if ((std::find(source->members.begin(), source->members.end(), layer.id) !=
+                     source->members.end() ||
+                 (targetGroup == d.compositeGroups.end()
+                      ? layer.id == targetBoundary
+                      : std::find(targetGroup->members.begin(), targetGroup->members.end(),
+                                  layer.id) != targetGroup->members.end())) && layer.locked)
+                throw std::runtime_error("Unlock the group and target before reordering.");
+        std::vector<Layer> drawings;
+        for (const auto& layer : d.layers)
+            if (layer.kind == LayerKind::Drawing || layer.kind == LayerKind::Part)
+                drawings.push_back(layer);
+        const auto positionOf = [&](Id id) {
+            return std::size_t(std::distance(drawings.begin(),
+                std::find_if(drawings.begin(), drawings.end(),
+                             [id](const auto& layer) { return layer.id == id; })));
+        };
+        const std::size_t first = positionOf(source->members.front());
+        const std::size_t count = source->members.size();
+        std::size_t destination = positionOf(targetBoundary) + (behind ? 0 : 1);
+        std::vector<Layer> moving(drawings.begin() + first, drawings.begin() + first + count);
+        drawings.erase(drawings.begin() + first, drawings.begin() + first + count);
+        if (destination > first)
+            destination -= count;
+        drawings.insert(drawings.begin() + destination, moving.begin(), moving.end());
+        std::size_t index = 0;
+        for (auto& layer : d.layers)
+            if (layer.kind == LayerKind::Drawing || layer.kind == LayerKind::Part)
+                layer = std::move(drawings[index++]);
+    });
+}
 void EditorController::setParent(int parent) {
     if (!layer_)
         return;

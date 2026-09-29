@@ -980,6 +980,35 @@ int main(int argc, char** argv) {
                         throw std::runtime_error("Composite grouping changed after reopen.");
                     editor.setSelectedLayer(int(red));
                     QCoreApplication::processEvents();
+                    auto* front = window->findChild<QQuickItem*>("nodeFront");
+                    if (!front || !front->isEnabled())
+                        throw std::runtime_error("Composite group Front control is unavailable.");
+                    const auto frontPoint = front->mapToScene(QPointF(front->width() / 2,
+                                                                       front->height() / 2));
+                    movePoint(QEvent::MouseButtonPress, frontPoint, Qt::LeftButton);
+                    movePoint(QEvent::MouseButtonRelease, frontPoint, Qt::NoButton);
+                    if (editor.document().layers.back().id != red ||
+                        qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Front did not move the whole composite group.");
+                    editor.undo();
+                    if (qGreen(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Composite group order did not undo.");
+                    editor.redo();
+                    if (!editor.saveProject({}) || !editor.openProject(QUrl::fromLocalFile(behindPath)) ||
+                        editor.document().layers.back().id != red ||
+                        qRed(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Composite group order changed after reopen.");
+                    editor.setSelectedLayer(int(red));
+                    QCoreApplication::processEvents();
+                    auto* back = window->findChild<QQuickItem*>("nodeBack");
+                    if (!back || !back->isEnabled())
+                        throw std::runtime_error("Composite group Back control is unavailable.");
+                    const auto backPoint = back->mapToScene(QPointF(back->width() / 2,
+                                                                     back->height() / 2));
+                    movePoint(QEvent::MouseButtonPress, backPoint, Qt::LeftButton);
+                    movePoint(QEvent::MouseButtonRelease, backPoint, Qt::NoButton);
+                    if (qGreen(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
+                        throw std::runtime_error("Back did not move the whole composite group.");
                     auto* ungroup = window->findChild<QQuickItem*>("nodeUngroup");
                     if (!ungroup || !ungroup->isVisible() || !ungroup->isEnabled())
                         throw std::runtime_error("Composite Ungroup control is unavailable.");
@@ -991,7 +1020,7 @@ int main(int argc, char** argv) {
                         qGreen(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) != 255)
                         throw std::runtime_error("Ungroup did not restore the ungrouped graph and pixels.");
                     std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass, fractional cutter, "
-                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, group/ungroup ports, Alt-drag cutter, Alt-click bypass, typed search, save/reopen and undo.\n";
+                                 "painted-source Multiply/Add, blend and composite bypass, alternate Display/Write, front/behind drawing drag, group order and ungroup ports, Alt-drag cutter, Alt-click bypass, typed search, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

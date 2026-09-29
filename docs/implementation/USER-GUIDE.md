@@ -40,7 +40,7 @@ change drawing order, opacity, opacity bypass, Normal/Multiply/Screen/Add blend 
 choose a visible source in **Cutter matte**, then use **Outside**, **Bypass**
 or **Paint cutter source** as needed. The last option keeps the source visible
 at its normal layer order while it masks the selected target; it is shared by
-other targets using that source. These edits undo and save. Shift-click two Drawing or Part cards to group their inclusive composite span. Select a member to rename it inline or use **Ungroup**. Group input/output cards preserve the result and source cutter references. Nested and reusable general graph groups, arbitrary node creation and wiring remain open.
+other targets using that source. These edits undo and save. Shift-click two Drawing or Part cards to group their inclusive composite span. Select a member to rename it inline or use **Ungroup**. Drag the Group output card onto a Drawing or Part to move all members in front of it; Shift-drag moves them behind. With a group member selected, **Back** and **Front** move the whole group by one neighboring drawing or group. Group input/output cards preserve the result and source cutter references. Nested and reusable general graph groups, arbitrary node creation and wiring remain open.
 
 ## Drawing and view controls
 

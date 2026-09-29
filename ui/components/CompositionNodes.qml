@@ -19,6 +19,7 @@ Item {
     property int previewLayerId: 0
     property string previewData: ""
     property int draggedLayer: 0
+    property int draggedGroup: 0
     property int dropLayer: 0
     property int matchIndex: -1
     readonly property int cardWidth: 148
@@ -49,6 +50,16 @@ Item {
             return false
         }
         return true
+    }
+    function nudgeSelectedGroup(direction) {
+        const ordered = controller.layers.filter(l => l.kind === 0 || l.kind === 3).reverse()
+        const members = ordered.filter(l => l.compositeGroup === selectedGroup)
+        if (members.length === 0)
+            return
+        const boundary = direction < 0 ? members[0] : members[members.length - 1]
+        const neighbor = ordered[ordered.findIndex(l => l.id === boundary.id) + direction]
+        if (neighbor)
+            controller.moveCompositeGroup(selectedGroup, neighbor.id, direction < 0)
     }
     function showMatch(index) {
         if (matchingNodeIds.length === 0) {
@@ -114,16 +125,20 @@ Item {
             }
             Item { Layout.fillWidth: true }
             ToolButton {
+                objectName: "nodeBack"
                 text: "Back"
                 enabled: root.selected && (root.selected.kind === 0 || root.selected.kind === 3)
-                onClicked: root.controller.moveLayer(-1)
-                Accessible.name: "Move selected drawing backward in composite order"
+                onClicked: root.selectedGroup > 0 ? root.nudgeSelectedGroup(-1)
+                                                   : root.controller.moveLayer(-1)
+                Accessible.name: "Move selected drawing or group backward in composite order"
             }
             ToolButton {
+                objectName: "nodeFront"
                 text: "Front"
                 enabled: root.selected && (root.selected.kind === 0 || root.selected.kind === 3)
-                onClicked: root.controller.moveLayer(1)
-                Accessible.name: "Move selected drawing forward in composite order"
+                onClicked: root.selectedGroup > 0 ? root.nudgeSelectedGroup(1)
+                                                   : root.controller.moveLayer(1)
+                Accessible.name: "Move selected drawing or group forward in composite order"
             }
             ToolButton {
                 objectName: "nodeUngroup"
@@ -283,6 +298,7 @@ Item {
                     Rectangle {
                         required property var modelData
                         readonly property int drawingLayer: modelData.kind === "Drawing" ? modelData.layer : 0
+                        readonly property int movableGroup: modelData.kind === "Group output" ? modelData.group : 0
                         objectName: "compositionNode" + modelData.id
                         width: root.cardWidth
                         height: Math.max(110, graphScroll.height - 30)
@@ -339,7 +355,7 @@ Item {
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
-                            preventStealing: modelData.kind === "Drawing"
+                            preventStealing: modelData.kind === "Drawing" || modelData.kind === "Group output"
                             property bool dragging: false
                             property bool dragCutter: false
                             property bool dragBehind: false
@@ -347,17 +363,21 @@ Item {
                             property real downY: 0
                             onPressed: mouse => {
                                 dragging = false
-                                dragCutter = (mouse.modifiers & Qt.AltModifier) !== 0
+                                dragCutter = modelData.kind === "Drawing" &&
+                                             (mouse.modifiers & Qt.AltModifier) !== 0
                                 dragBehind = !dragCutter && (mouse.modifiers & Qt.ShiftModifier) !== 0
                                 downX = mouse.x
                                 downY = mouse.y
                             }
                             onPositionChanged: mouse => {
-                                if (!pressed || modelData.kind !== "Drawing")
+                                if (!pressed || (modelData.kind !== "Drawing" &&
+                                                 modelData.kind !== "Group output"))
                                     return
                                 if (!dragging && Math.hypot(mouse.x - downX, mouse.y - downY) > 8) {
                                     dragging = true
                                     root.draggedLayer = modelData.layer
+                                    root.draggedGroup = modelData.kind === "Group output"
+                                                        ? modelData.group : 0
                                 }
                                 if (dragging) {
                                     const point = mapToItem(graphRow, mouse.x, mouse.y)
@@ -368,11 +388,15 @@ Item {
                             }
                             onReleased: {
                                 const source = root.draggedLayer
+                                const group = root.draggedGroup
                                 const target = root.dropLayer
                                 root.draggedLayer = 0
+                                root.draggedGroup = 0
                                 root.dropLayer = 0
                                 if (dragging && target > 0) {
-                                    if (dragCutter) {
+                                    if (group > 0) {
+                                        root.controller.moveCompositeGroup(group, target, dragBehind)
+                                    } else if (dragCutter) {
                                         root.layerChosen(target)
                                         root.controller.setLayerMatte(source)
                                     } else {
@@ -386,6 +410,7 @@ Item {
                             }
                             onCanceled: {
                                 root.draggedLayer = 0
+                                root.draggedGroup = 0
                                 root.dropLayer = 0
                             }
                             onClicked: mouse => {

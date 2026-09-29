@@ -183,6 +183,15 @@ TEST_CASE("Composite grouping is one undoable edit with stable ports and reopene
     document.drawings.emplace(blueDrawing.id, blueDrawing);
     blue.exposures.front().drawing = blueDrawing.id;
     document.layers.push_back(blue);
+    auto green = blue;
+    green.id = document.allocateId();
+    green.name = "Green";
+    auto greenDrawing = blueDrawing;
+    greenDrawing.id = document.allocateId();
+    greenDrawing.image = opentoon::ImageAsset{1, 1, {0, 255, 0, 255}};
+    document.drawings.emplace(greenDrawing.id, greenDrawing);
+    green.exposures.front().drawing = greenDrawing.id;
+    document.layers.push_back(green);
     document.validate();
     QTemporaryDir directory;
     REQUIRE(directory.isValid());
@@ -198,9 +207,23 @@ TEST_CASE("Composite grouping is one undoable edit with stable ports and reopene
     REQUIRE(editor.document().compositeGroups.front().members ==
             std::vector<opentoon::Id>{red, blue.id});
     REQUIRE(opentoon::SceneRenderer::render(editor.document(), 0) == original);
+    REQUIRE_FALSE(editor.moveCompositeGroup(int(groupId), int(red), false));
+    REQUIRE(editor.moveCompositeGroup(int(groupId), int(green.id), false));
+    REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    REQUIRE(editor.document().compositeGroups.front().members ==
+            std::vector<opentoon::Id>{red, blue.id});
+    editor.undo();
+    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 0) == original);
+    editor.redo();
+    REQUIRE(editor.moveCompositeGroup(int(groupId), int(green.id), true));
+    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 0) == original);
     REQUIRE_FALSE(editor.groupDrawings(int(red), int(blue.id)));
     REQUIRE_FALSE(editor.moveDrawingBefore(int(blue.id), int(red)));
     REQUIRE(editor.document().compositeGroups.front().members.front() == red);
+    editor.undo();
+    REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    editor.undo();
+    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 0) == original);
     editor.undo();
     REQUIRE(editor.document().compositeGroups.empty());
     editor.redo();
@@ -212,13 +235,37 @@ TEST_CASE("Composite grouping is one undoable edit with stable ports and reopene
     REQUIRE(editor.openProject(path));
     REQUIRE(editor.document().compositeGroups.front().name == "Body");
     REQUIRE(opentoon::SceneRenderer::render(editor.document(), 0) == original);
+    REQUIRE(editor.moveCompositeGroup(int(groupId), int(green.id), false));
+    REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
+    REQUIRE(editor.saveProject({}));
+    REQUIRE(editor.openProject(path));
+    REQUIRE(editor.document().compositeGroups.front().members ==
+            std::vector<opentoon::Id>{red, blue.id});
+    REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
     REQUIRE(editor.ungroupDrawings(int(groupId)));
     REQUIRE(editor.document().compositeGroups.empty());
-    REQUIRE(opentoon::SceneRenderer::render(editor.document(), 0) == original);
+    REQUIRE(qBlue(opentoon::SceneRenderer::render(editor.document(), 0).pixel(0, 0)) == 255);
     editor.undo();
     REQUIRE(editor.document().compositeGroups.front().id == groupId);
     editor.redo();
     REQUIRE(editor.document().compositeGroups.empty());
+    editor.addLayer();
+    const auto yellow = opentoon::Id(editor.selectedLayer());
+    REQUIRE(editor.moveDrawingAfter(int(yellow), int(green.id)));
+    REQUIRE(editor.groupDrawings(int(green.id), int(yellow)));
+    const auto rearGroup = editor.document().compositeGroups.front().id;
+    REQUIRE(editor.groupDrawings(int(red), int(blue.id)));
+    const auto frontGroup = editor.document().compositeGroups.back().id;
+    REQUIRE(editor.moveCompositeGroup(int(frontGroup), int(green.id), true));
+    REQUIRE(editor.document().layers.front().id == red);
+    REQUIRE(editor.document().layers[1].id == blue.id);
+    REQUIRE(editor.document().layers[2].id == green.id);
+    REQUIRE(editor.moveCompositeGroup(int(frontGroup), int(yellow), false));
+    REQUIRE(editor.document().layers.front().id == green.id);
+    REQUIRE(editor.document().layers[1].id == yellow);
+    editor.toggleLayer(int(green.id), "locked");
+    REQUIRE_FALSE(editor.moveCompositeGroup(int(frontGroup), int(yellow), true));
+    REQUIRE(editor.document().compositeGroups.front().id == rearGroup);
 }
 namespace {
 const QString partFixture = QStringLiteral(OPENTOON_SOURCE_DIR "/tests/fixtures/harmony-moment/parts/");
