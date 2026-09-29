@@ -408,6 +408,28 @@ int main(int argc, char** argv) {
                     editor.undo();
                     if (editor.audioClips().size() != 1)
                         throw std::runtime_error("Native audio duplication did not undo in one step.");
+                    auto* muteButton = findDuplicateItem(findDuplicateItem,
+                                                         window->contentItem(), "audioMuteClip");
+                    if (!muteButton || !muteButton->isVisible())
+                        throw std::runtime_error("Audio mute button is unavailable.");
+                    const auto mutePoint = muteButton->mapToScene(QPointF(
+                        muteButton->width() / 2, muteButton->height() / 2));
+                    QMouseEvent mutePress(QEvent::MouseButtonPress, mutePoint,
+                                          window->mapToGlobal(mutePoint.toPoint()),
+                                          Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                    QMouseEvent muteRelease(QEvent::MouseButtonRelease, mutePoint,
+                                            window->mapToGlobal(mutePoint.toPoint()),
+                                            Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+                    QCoreApplication::sendEvent(window, &mutePress);
+                    QCoreApplication::sendEvent(window, &muteRelease);
+                    QCoreApplication::processEvents();
+                    if (!editor.audioClips().front().toMap().value("muted").toBool())
+                        throw std::runtime_error("Native audio mute button did not silence its clip.");
+                    if (!window->grabWindow().save("build/hm10-muted-smoke.png"))
+                        throw std::runtime_error("Cannot capture the muted audio timeline.");
+                    editor.undo();
+                    if (editor.audioClips().front().toMap().value("muted").toBool())
+                        throw std::runtime_error("Native audio mute did not undo in one step.");
                     editor.setFrame(0);
                     const auto peaks = editor.audioWaveform(clip, 0, 3);
                     if (peaks.size() != 3 || peaks[1].toDouble() < 0.99)
@@ -595,7 +617,7 @@ int main(int argc, char** argv) {
                     editor.undo();
                     if (editor.document() != baseline)
                         throw std::runtime_error("WAV import did not undo atomically.");
-                    std::cout << "HM-10 audio smoke passed: native PCM16 import, shared-source clip duplication/undo, cue waveform, "
+                    std::cout << "HM-10 audio smoke passed: native PCM16 import, shared-source clip duplication/undo, mute/undo, cue waveform, "
                                  "device-clock playhead/seek, waveform drag/undo, audio scrub/repeat, source-sample fades, exact full and selected-range WAV export, timeline screenshot and atomic undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {

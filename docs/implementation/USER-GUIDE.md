@@ -152,7 +152,7 @@ Each manual save appends a complete revision. Scene history can restore a saved 
 
 Every 60 seconds, a modified document is saved to a recovery file. On a later launch, recovery can open that snapshot as an unsaved scene. Save it under a chosen name. Autosave runs from an immutable snapshot in a worker, so newer edits stay unsaved until the next save. Manual saves remain synchronous. Recovery from operating-system power loss and multiple simultaneous application instances has not been qualified.
 
-Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and decoded image media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening formats 1–20 remains supported. Format 3 added channel Bézier easing, format 4 added typed character layers and named substitutions, format 5 added character view sets, format 6 saves the composition profile, format 7 added the output camera, format 8 saves mesh bindings, format 9 saves bone/curve controls and animation keys, format 10 introduced parent bone-tip links, format 11 saves their rest tip and distal direction at attachment time, format 12 adds named masked character poses, format 13 adds publication flags for character poses and views, format 14 adds publication flags for drawing substitutions, format 15 adds published control groups, format 16 adds PCM16 WAV assets and placed clips, format 17 adds nondestructive clip repeats, format 18 adds cutter bindings, format 19 adds Outside coverage, format 20 adds cutter bypass, and format 21 adds optional cutter-source painting. The first save of an older schema creates a backup named for its source version, such as `.pre-v20.bak`, before upgrading. Older editors require that backup to reopen the original format.
+Format 2 compresses and shares media between revisions. The metadata limit is 64 MiB and decoded image media is limited to 512 MiB. Undo snapshots share unchanged media; vector metadata is copied. Opening formats 1–22 remains supported. Format 3 added channel Bézier easing, format 4 added typed character layers and named substitutions, format 5 added character view sets, format 6 saves the composition profile, format 7 added the output camera, format 8 saves mesh bindings, format 9 saves bone/curve controls and animation keys, format 10 introduced parent bone-tip links, format 11 saves their rest tip and distal direction at attachment time, format 12 adds named masked character poses, format 13 adds publication flags for character poses and views, format 14 adds publication flags for drawing substitutions, format 15 adds published control groups, format 16 adds PCM16 WAV assets and placed clips, format 17 adds nondestructive clip repeats, format 18 adds cutter bindings, format 19 adds Outside coverage, format 20 adds cutter bypass, format 21 adds optional cutter-source painting, format 22 adds source-sample clip fades, and format 23 adds per-clip mute. The first save of an older schema creates a backup named for its source version, such as `.pre-v20.bak`, before upgrading. Older editors require that backup to reopen the original format.
 
 **Scene → Compact project history** retains the chosen number of newest saved revisions and removes unreachable media, after creating a full `.pre-compact.bak` backup. Save pending edits first. This is an explicit operation and is not part of autosave.
 
@@ -197,17 +197,19 @@ waveform; its exact peak index follows the timeline's frame width. Drag the
 waveform to move its clip by whole frames; release commits one undo step and
 Escape cancels. The Audio section in the right panel edits the clip's start
 frame, source in/out samples, linear gain and a repeat count from 1 to 64.
-Enter both sample endpoints and choose **Set** to trim. **Duplicate at
-playhead** creates another placement at the current frame with the same trim,
-gain, repeats and fades; both clips share the embedded source. **Remove clip**
+Enter both sample endpoints and choose **Set** to trim. **Duplicate** creates
+another placement at the playhead with the same trim, gain, repeats and fades;
+both clips share the embedded source. **Remove clip**
 removes its placement while leaving the source available to its other copies.
+**Mute** removes that clip from playback, scrub and WAV export while keeping
+the placement and waveform visible in a dim state; **Unmute** restores it.
 **Linear fades · source samples** sets fade-in and fade-out lengths across
 the whole repeated clip; a repeat boundary does not restart the envelope.
 The waveform shows source peaks and gain with fade guides over the clip;
 preview and WAV export apply the fades. Shortening a trim or repeat count
 clamps fades to fit. Drag the small upper handle at either guide to adjust
 that fade directly; Escape cancels and release makes one undoable edit.
-Import, duplication, move, trim, gain and removal are undoable and survive
+Import, duplication, mute, move, trim, gain and removal are undoable and survive
 save/reopen.
 
 The format accepts up to 128 MiB per WAV, 512 MiB total audio, 64 assets and 1,000 clips. Clips

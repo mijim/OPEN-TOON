@@ -229,10 +229,11 @@ struct AudioClip {
     double gain = 1;
     int repeats = 1;
     std::uint64_t fadeInSamples = 0, fadeOutSamples = 0;
+    bool muted = false;
     auto operator<=>(const AudioClip&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 22;
+    static constexpr int formatVersion = 23;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;

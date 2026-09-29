@@ -103,6 +103,46 @@ TEST_CASE("Audio clip duplication reuses its source and restores exact cues afte
     std::filesystem::remove_all(directory);
 }
 
+TEST_CASE("Muting one shared audio clip removes only its mixed samples and reopens") {
+    Session session;
+    Id first = 0, second = 0;
+    const auto bytes = wav(48000, 2002);
+    REQUIRE(session.apply("Place two cues", [&](Document& d) {
+        first = importPcm16Wav(d, "original cue", bytes, 0);
+        setAudioClipGain(d, first, .5);
+        second = duplicateAudioClip(d, first, 0);
+    }));
+    const auto paired = session.document();
+    REQUIRE(AudioMixPlan(paired, 48000).renderBlock(2002, 1)[0] == 32767);
+    REQUIRE(session.apply("Mute first cue", [&](Document& d) {
+        setAudioClipMuted(d, first, true);
+    }));
+    const auto oneMuted = session.document();
+    REQUIRE(oneMuted.audioClips.front().muted);
+    REQUIRE_FALSE(oneMuted.audioClips.back().muted);
+    REQUIRE(oneMuted.audioAssets.front().wav.values() == bytes);
+    REQUIRE(AudioMixPlan(oneMuted, 48000).renderBlock(2002, 1)[0] == 16384);
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == paired);
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == oneMuted);
+    REQUIRE(session.apply("Mute second cue", [&](Document& d) {
+        setAudioClipMuted(d, second, true);
+    }));
+    REQUIRE(AudioMixPlan(session.document(), 48000).renderBlock(2002, 1)[0] == 0);
+    REQUIRE(session.apply("Unmute first cue", [&](Document& d) {
+        setAudioClipMuted(d, first, false);
+    }));
+    REQUIRE(AudioMixPlan(session.document(), 48000).renderBlock(2002, 1)[0] == 16384);
+    auto independentCopy = session.document();
+    const Id third = duplicateAudioClip(independentCopy, second, 24);
+    REQUIRE(independentCopy.audioClips.back().muted);
+    setAudioClipMuted(independentCopy, third, false);
+    REQUIRE_FALSE(independentCopy.audioClips.back().muted);
+    REQUIRE(independentCopy.audioClips[1].muted);
+    REQUIRE(deserializeDocument(serializeDocument(session.document())) == session.document());
+}
+
 TEST_CASE("Downsampling suppresses aliased treble and keeps audible passband") {
     auto scene = makeDocument();
     (void)importPcm16Wav(scene, "30 kHz", toneWav(9600, 96000, 30000), 0);

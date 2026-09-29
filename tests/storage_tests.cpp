@@ -844,6 +844,41 @@ TEST_CASE("Format twenty-one audio clips migrate silent fades with a readable ba
     FixtureDatabase current(project.file);
     REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
 }
+TEST_CASE("Format twenty-two audio clips default to unmuted with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    std::vector<std::uint8_t> wav{'R', 'I', 'F', 'F', 52, 0, 0, 0,
+                                  'W', 'A', 'V', 'E', 'f', 'm', 't', ' ',
+                                  16, 0, 0, 0, 1, 0, 1, 0,
+                                  0x40, 0x1f, 0, 0, 0x80, 0x3e, 0, 0,
+                                  2, 0, 16, 0, 'd', 'a', 't', 'a',
+                                  16, 0, 0, 0};
+    wav.resize(60, 0);
+    const auto clipId = importPcm16Wav(original, "silence", wav, 0);
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 22;
+    for (auto& clip : legacy["audioClips"])
+        clip.erase("muted");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=22");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    setAudioClipMuted(changed, clipId, true);
+    REQUIRE(ProjectStore::save(project.file, changed, "Mute cue", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v22.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+    auto invalidCurrent = legacy;
+    invalidCurrent["version"] = Document::formatVersion;
+    REQUIRE_THROWS(deserializeDocument(invalidCurrent.dump()));
+}
 TEST_CASE("Format fifteen audio migration preserves a readable source backup") {
     TemporaryProject project;
     auto original = makeDocument();

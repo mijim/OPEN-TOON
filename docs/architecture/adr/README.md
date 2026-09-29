@@ -142,3 +142,6 @@ the same image supplies fractional matte coverage.
 
 See [ADR-046](046-sample-accurate-audio-fades.md) for format-22 source-sample
 clip envelopes shared by device playback and PCM WAV output.
+
+See [ADR-047](047-per-clip-audio-mute.md) for format-23 saved clip muting
+shared by device playback, scrub and PCM WAV export.

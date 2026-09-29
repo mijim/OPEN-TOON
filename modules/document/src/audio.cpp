@@ -171,6 +171,9 @@ void setAudioClipFades(Document& document, Id id, std::uint64_t fadeInSamples,
     target.fadeInSamples = fadeInSamples;
     target.fadeOutSamples = fadeOutSamples;
 }
+void setAudioClipMuted(Document& document, Id id, bool muted) {
+    clip(document, id).muted = muted;
+}
 void removeAudioClip(Document& document, Id id) {
     const auto oldSize = document.audioClips.size();
     std::erase_if(document.audioClips, [=](const auto& item) { return item.id == id; });
@@ -310,6 +313,8 @@ AudioMixPlan::AudioMixPlan(const Document& document, std::int32_t outputRate)
             clip.fadeOutSamples > (clip.outSample - clip.inSample) *
                                       std::uint64_t(clip.repeats) - clip.fadeInSamples)
             throw std::invalid_argument("Invalid audio clip in mix plan.");
+        if (clip.muted)
+            continue;
         sources_.push_back({&*asset, clip, info.dataOffset,
                             frameRate_.sampleAt(clip.start, outputRate_)});
         if (asset->sampleRate != outputRate_ &&

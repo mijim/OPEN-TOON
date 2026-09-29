@@ -2279,10 +2279,18 @@ ApplicationWindow {
                                         Layout.fillWidth: true
                                         C.ToolButton {
                                             objectName: "audioDuplicateClip"
-                                            text: "Duplicate at playhead"
+                                            text: "Duplicate"
                                             hint: "Copy this clip at the current frame using its original WAV"
                                             Layout.fillWidth: true
                                             onClicked: editor.duplicateAudioClip(modelData.id, editor.frame)
+                                        }
+                                        C.ToolButton {
+                                            objectName: "audioMuteClip"
+                                            text: modelData.muted ? "Unmute" : "Mute"
+                                            active: modelData.muted
+                                            hint: modelData.muted ? "Include this clip in playback and WAV export"
+                                                                  : "Silence this clip in playback and WAV export"
+                                            onClicked: editor.setAudioClipMuted(modelData.id, !modelData.muted)
                                         }
                                         C.ToolButton {
                                             text: "Remove clip"
@@ -2855,7 +2863,7 @@ ApplicationWindow {
                                     if (amplitude <= 0) continue;
                                     const x = (f + delta) * root.timelineCell - ox + 1;
                                     const h = Math.max(1, amplitude * 12);
-                                    ctx.fillStyle = delta ? "#ffffff" : "#a8a8a8";
+                                    ctx.fillStyle = clip.muted ? "#525252" : delta ? "#ffffff" : "#a8a8a8";
                                     ctx.fillRect(x, y + 17 - h, Math.max(1, root.timelineCell - 2), h * 2);
                                 }
                                 const editingFade = timelineInput.audioFadeClipId === clip.id;
@@ -2872,7 +2880,7 @@ ApplicationWindow {
                                     ctx.beginPath();
                                     ctx.rect(0, y, width, root.timelineRow);
                                     ctx.clip();
-                                    ctx.strokeStyle = "#eeeeee";
+                                    ctx.strokeStyle = clip.muted ? "#777777" : "#eeeeee";
                                     ctx.lineWidth = 1;
                                     const inX = beginX + fadeIn * pixelsPerSample;
                                     const outX = endX - fadeOut * pixelsPerSample;
@@ -2892,13 +2900,14 @@ ApplicationWindow {
                                         ctx.lineTo(endX, y + 17);
                                         ctx.stroke();
                                     }
-                                    ctx.fillStyle = "#eeeeee";
+                                    ctx.fillStyle = clip.muted ? "#777777" : "#eeeeee";
                                     ctx.fillRect(inX - 2, y + 4, 5, 5);
                                     ctx.fillRect(outX - 2, y + 4, 5, 5);
                                     ctx.restore();
                                 }
-                                ctx.fillStyle = "#eeeeee";
-                                ctx.fillText(clip.name, (clip.start + delta) * root.timelineCell - ox + 3, y + 5);
+                                ctx.fillStyle = clip.muted ? "#777777" : "#eeeeee";
+                                ctx.fillText(clip.name + (clip.muted ? " · Muted" : ""),
+                                             (clip.start + delta) * root.timelineCell - ox + 3, y + 5);
                             }
                             for (let m = 0; m < editor.markers.length; ++m) {
                                 const marker = editor.markers[m];

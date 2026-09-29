@@ -1,5 +1,15 @@
 # Experimental releases
 
+## 0.2.0-experimental.34 — working source, saved clip mute
+
+- Mute or unmute individual audio clips without changing their WAV resource,
+  placement, trim, gain, repeats or fades. The timeline retains a dim labeled
+  waveform. Device preview, scrub and both WAV exports share the saved mix.
+- Format 23 defaults older clips to unmuted and keeps a readable backup on
+  first save. Exact mix, undo/redo, migration, native click and 173 CTest
+  entries pass on macOS.
+- Source only; no new public binary or tag. Hardware recovery remains open.
+
 ## 0.2.0-experimental.33 — working source, contour-bound continuous toon
 
 - Rebind all four continuous arms/legs and the alternate sleeve in the saved
