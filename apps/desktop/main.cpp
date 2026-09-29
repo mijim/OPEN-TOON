@@ -525,6 +525,8 @@ int main(int argc, char** argv) {
                     editor.undo();
                     if (editor.audioClips().size() != 1)
                         throw std::runtime_error("Native audio split did not undo in one step.");
+                    QCoreApplication::processEvents();
+                    (void)window->grabWindow();
                     auto* muteButton = findDuplicateItem(findDuplicateItem,
                                                          window->contentItem(), "audioMuteClip");
                     if (!muteButton || !muteButton->isVisible())
@@ -547,6 +549,30 @@ int main(int argc, char** argv) {
                     editor.undo();
                     if (editor.audioClips().front().toMap().value("muted").toBool())
                         throw std::runtime_error("Native audio mute did not undo in one step.");
+                    QCoreApplication::processEvents();
+                    (void)window->grabWindow();
+                    auto* soloButton = findDuplicateItem(findDuplicateItem,
+                                                         window->contentItem(), "audioSoloClip");
+                    if (!soloButton || !soloButton->isVisible())
+                        throw std::runtime_error("Audio solo button is unavailable.");
+                    const auto soloPoint = soloButton->mapToScene(QPointF(
+                        soloButton->width() / 2, soloButton->height() / 2));
+                    QMouseEvent soloPress(QEvent::MouseButtonPress, soloPoint,
+                                          window->mapToGlobal(soloPoint.toPoint()),
+                                          Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                    QMouseEvent soloRelease(QEvent::MouseButtonRelease, soloPoint,
+                                            window->mapToGlobal(soloPoint.toPoint()),
+                                            Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+                    QCoreApplication::sendEvent(window, &soloPress);
+                    QCoreApplication::sendEvent(window, &soloRelease);
+                    QCoreApplication::processEvents();
+                    if (!editor.audioClips().front().toMap().value("solo").toBool())
+                        throw std::runtime_error("Native audio solo button did not isolate its clip.");
+                    if (!window->grabWindow().save("build/hm10-solo-smoke.png"))
+                        throw std::runtime_error("Cannot capture the soloed audio timeline.");
+                    editor.undo();
+                    if (editor.audioClips().front().toMap().value("solo").toBool())
+                        throw std::runtime_error("Native audio solo did not undo in one step.");
                     editor.setFrame(0);
                     const auto peaks = editor.audioWaveform(clip, 0, 3);
                     if (peaks.size() != 3 || peaks[1].toDouble() < 0.99)
@@ -734,7 +760,7 @@ int main(int argc, char** argv) {
                     editor.undo();
                     if (editor.document() != baseline)
                         throw std::runtime_error("WAV import did not undo atomically.");
-                    std::cout << "HM-10 audio smoke passed: native PCM16 import, shared-source clip duplication/undo, exact split/undo, mute/undo, cue waveform, "
+                    std::cout << "HM-10 audio smoke passed: native PCM16 import, shared-source clip duplication/undo, exact split/undo, mute/undo, solo/undo, cue waveform, "
                                  "device-clock playhead/seek, waveform drag/undo, audio scrub/repeat, source-sample fades, exact full and selected-range WAV export, timeline screenshot and atomic undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {

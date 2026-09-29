@@ -327,6 +327,7 @@ class EditorController final : public QObject {
     Q_INVOKABLE bool setAudioClipRepeats(int clipId, int repeats);
     Q_INVOKABLE bool setAudioClipFades(int clipId, int fadeInSamples, int fadeOutSamples);
     Q_INVOKABLE bool setAudioClipMuted(int clipId, bool muted);
+    Q_INVOKABLE bool setAudioClipSolo(int clipId, bool solo);
     Q_INVOKABLE bool removeAudioClip(int clipId);
     Q_INVOKABLE void exportAudio(QUrl url);
     Q_INVOKABLE void exportAudioRange(QUrl url, int start, int end);

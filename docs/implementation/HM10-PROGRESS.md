@@ -32,6 +32,11 @@ from playback, scrub and both WAV exports without modifying its source or
 other edits. The timeline dims and labels its retained source waveform;
 **Unmute** restores its previous mix contribution. See
 [ADR-047](../architecture/adr/047-per-clip-audio-mute.md).
+Format 26 adds an undoable per-clip **Solo** control. If any clip is soloed,
+only unmuted soloed clips enter preview, scrub and WAV export; mute takes
+precedence. Excluded waveforms stay visible and dim. Duplicate and split copy
+the solo flag without duplicating source bytes. Older clips load unsoloed.
+See [ADR-051](../architecture/adr/051-persistent-audio-clip-solo.md).
 **Split** divides a 48 kHz single-pass clip at the playhead without copying
 its WAV. The two placements meet at the exact source sample implied by the
 scene's rational frame rate; gain and mute survive, and the outer fades stay
@@ -77,6 +82,12 @@ See [ADR-046](../architecture/adr/046-sample-accurate-audio-fades.md) for
 source-sample fades and trim/repeat clamping.
 
 ## Verification
+
+- Two independent cue clips verify one and multiple solo selections, mute
+  precedence, exact mix samples, undo/redo, invalid-command rollback and
+  save/reopen. A format-25 fixture defaults to unsoloed, keeps a readable
+  backup and rejects a malformed format-26 solo field. Native Qt Quick smoke
+  clicks Solo and undoes it.
 
 - A 48 kHz tone with gain and outer fades splits at frame 12 at both 24 and
   24000/1001 fps. The complete before/after stereo PCM output is byte-identical;
@@ -168,7 +179,7 @@ source-sample fades and trim/repeat clamping.
   --hm-integrated-smoke` checks the opened project, timeline and visual frame
   change in a Qt Quick window; its screenshot was inspected. These tones are
   timing markers, not spoken dialogue or a lip-sync quality test.
-- Local macOS `build/locked`: 179/179 CTest entries pass. The native
+- Local macOS `build/locked`: 181/181 CTest entries pass. The native
   `--hm10-smoke` loaded the Qt Quick audio timeline, checked its cue sample,
   captured and visually inspected `build/hm10-audio-smoke.png`, exported an
   exactly sized WAV with its cue at the correct sample, advanced and sought

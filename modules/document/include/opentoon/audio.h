@@ -25,6 +25,7 @@ void setAudioClipRepeats(Document& document, Id clip, int repeats);
 void setAudioClipFades(Document& document, Id clip, std::uint64_t fadeInSamples,
                        std::uint64_t fadeOutSamples);
 void setAudioClipMuted(Document& document, Id clip, bool muted);
+void setAudioClipSolo(Document& document, Id clip, bool solo);
 void removeAudioClip(Document& document, Id clip);
 [[nodiscard]] Frame audioClipEndFrame(const Document& document, const AudioClip& clip,
                                       const AudioAsset& asset);

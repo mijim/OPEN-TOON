@@ -1,5 +1,15 @@
 # Experimental releases
 
+## 0.2.0-experimental.39 — working source, per-clip audio solo
+
+- Isolate one or more audio placements from the Audio panel. Mute still wins;
+  all other clip waveforms remain visible and dim when a solo is active.
+- Format 26 persists solo state and loads earlier clips unsoloed with a
+  readable source backup. Domain, migration and native Qt Quick tests check
+  exact mix selection, undo and reopen.
+- Source only; no new public binary or tag. HM-10 hardware presentation
+  qualification remains open.
+
 ## 0.2.0-experimental.38 — working source, refined connected toon
 
 - Redraw the original character's front and three-quarter headwear, and use

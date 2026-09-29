@@ -200,6 +200,9 @@ void setAudioClipFades(Document& document, Id id, std::uint64_t fadeInSamples,
 void setAudioClipMuted(Document& document, Id id, bool muted) {
     clip(document, id).muted = muted;
 }
+void setAudioClipSolo(Document& document, Id id, bool solo) {
+    clip(document, id).solo = solo;
+}
 void removeAudioClip(Document& document, Id id) {
     const auto oldSize = document.audioClips.size();
     std::erase_if(document.audioClips, [=](const auto& item) { return item.id == id; });
@@ -326,6 +329,8 @@ AudioMixPlan::AudioMixPlan(const Document& document, std::int32_t outputRate)
     frameRate_.validate();
     if (outputRate < 8000 || outputRate > 192000)
         throw std::invalid_argument("Unsupported audio output sample rate.");
+    const bool anySolo = std::any_of(document.audioClips.begin(), document.audioClips.end(),
+                                     [](const AudioClip& clip) { return clip.solo; });
     for (const auto& clip : document.audioClips) {
         const auto asset = std::find_if(document.audioAssets.begin(), document.audioAssets.end(),
                                         [&](const auto& value) { return value.id == clip.asset; });
@@ -339,7 +344,7 @@ AudioMixPlan::AudioMixPlan(const Document& document, std::int32_t outputRate)
             clip.fadeOutSamples > (clip.outSample - clip.inSample) *
                                       std::uint64_t(clip.repeats) - clip.fadeInSamples)
             throw std::invalid_argument("Invalid audio clip in mix plan.");
-        if (clip.muted)
+        if (clip.muted || (anySolo && !clip.solo))
             continue;
         sources_.push_back({&*asset, clip, info.dataOffset,
                             frameRate_.sampleAt(clip.start, outputRate_)});

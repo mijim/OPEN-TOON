@@ -2301,10 +2301,19 @@ ApplicationWindow {
                                             onClicked: editor.setAudioClipMuted(modelData.id, !modelData.muted)
                                         }
                                         C.ToolButton {
-                                            text: "Remove clip"
-                                            Layout.fillWidth: true
-                                            onClicked: editor.removeAudioClip(modelData.id)
+                                            objectName: "audioSoloClip"
+                                            text: modelData.solo ? "Unsolo" : "Solo"
+                                            active: modelData.solo
+                                            hint: modelData.solo ? "Return this clip to the shared mix"
+                                                                 : "Play this clip with other soloed clips only"
+                                            onClicked: editor.setAudioClipSolo(modelData.id, !modelData.solo)
                                         }
+                                    }
+                                    C.ToolButton {
+                                        text: "Remove clip"
+                                        Layout.fillWidth: true
+                                        hint: "Remove this clip placement without changing its source WAV"
+                                        onClicked: editor.removeAudioClip(modelData.id)
                                     }
                                 }
                             }
@@ -2853,8 +2862,10 @@ ApplicationWindow {
                                 }
                             }
                             const clips = editor.audioClips;
+                            const anySolo = clips.some(c => c.solo);
                             for (let r = 0; r < clips.length; r++) {
                                 const clip = clips[r];
+                                const inactive = clip.muted || (anySolo && !clip.solo);
                                 const y = 30 + (data.length + r) * root.timelineRow - oy;
                                 if (y + root.timelineRow < 0 || y > height)
                                     continue;
@@ -2871,7 +2882,7 @@ ApplicationWindow {
                                     if (amplitude <= 0) continue;
                                     const x = (f + delta) * root.timelineCell - ox + 1;
                                     const h = Math.max(1, amplitude * 12);
-                                    ctx.fillStyle = clip.muted ? "#525252" : delta ? "#ffffff" : "#a8a8a8";
+                                    ctx.fillStyle = inactive ? "#525252" : delta ? "#ffffff" : "#a8a8a8";
                                     ctx.fillRect(x, y + 17 - h, Math.max(1, root.timelineCell - 2), h * 2);
                                 }
                                 const editingFade = timelineInput.audioFadeClipId === clip.id;
@@ -2888,7 +2899,7 @@ ApplicationWindow {
                                     ctx.beginPath();
                                     ctx.rect(0, y, width, root.timelineRow);
                                     ctx.clip();
-                                    ctx.strokeStyle = clip.muted ? "#777777" : "#eeeeee";
+                                    ctx.strokeStyle = inactive ? "#777777" : "#eeeeee";
                                     ctx.lineWidth = 1;
                                     const inX = beginX + fadeIn * pixelsPerSample;
                                     const outX = endX - fadeOut * pixelsPerSample;
@@ -2908,13 +2919,13 @@ ApplicationWindow {
                                         ctx.lineTo(endX, y + 17);
                                         ctx.stroke();
                                     }
-                                    ctx.fillStyle = clip.muted ? "#777777" : "#eeeeee";
+                                    ctx.fillStyle = inactive ? "#777777" : "#eeeeee";
                                     ctx.fillRect(inX - 2, y + 4, 5, 5);
                                     ctx.fillRect(outX - 2, y + 4, 5, 5);
                                     ctx.restore();
                                 }
-                                ctx.fillStyle = clip.muted ? "#777777" : "#eeeeee";
-                                ctx.fillText(clip.name + (clip.muted ? " · Muted" : ""),
+                                ctx.fillStyle = inactive ? "#777777" : "#eeeeee";
+                                ctx.fillText(clip.name + (clip.muted ? " · Muted" : clip.solo ? " · Solo" : anySolo ? " · Other solo" : ""),
                                              (clip.start + delta) * root.timelineCell - ox + 3, y + 5);
                             }
                             for (let m = 0; m < editor.markers.length; ++m) {

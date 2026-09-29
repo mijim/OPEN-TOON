@@ -205,6 +205,55 @@ TEST_CASE("Muting one shared audio clip removes only its mixed samples and reope
     REQUIRE(deserializeDocument(serializeDocument(session.document())) == session.document());
 }
 
+TEST_CASE("Soloed audio clips isolate their mix while mute still takes precedence") {
+    Session session;
+    Id first = 0, second = 0;
+    REQUIRE(session.apply("Place independent cues", [&](Document& d) {
+        first = importPcm16Wav(d, "first cue", wav(48000, 2002), 0);
+        second = importPcm16Wav(d, "second cue", wav(48000, 4004), 0);
+    }));
+    const auto original = session.document();
+    REQUIRE(AudioMixPlan(original, 48000).renderBlock(2002, 1)[0] == 32767);
+    REQUIRE(AudioMixPlan(original, 48000).renderBlock(4004, 1)[0] == 32767);
+    REQUIRE(session.apply("Solo first", [&](Document& d) {
+        setAudioClipSolo(d, first, true);
+    }));
+    const auto firstSolo = session.document();
+    REQUIRE(AudioMixPlan(firstSolo, 48000).renderBlock(2002, 1)[0] == 32767);
+    REQUIRE(AudioMixPlan(firstSolo, 48000).renderBlock(4004, 1)[0] == 0);
+    REQUIRE(session.apply("Solo second", [&](Document& d) {
+        setAudioClipSolo(d, second, true);
+    }));
+    REQUIRE(AudioMixPlan(session.document(), 48000).renderBlock(4004, 1)[0] == 32767);
+    REQUIRE(session.apply("Mute first solo", [&](Document& d) {
+        setAudioClipMuted(d, first, true);
+    }));
+    const auto mutedSolo = session.document();
+    REQUIRE(AudioMixPlan(mutedSolo, 48000).renderBlock(2002, 1)[0] == 0);
+    REQUIRE(AudioMixPlan(mutedSolo, 48000).renderBlock(4004, 1)[0] == 32767);
+    REQUIRE(session.undo());
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == firstSolo);
+    REQUIRE(session.redo());
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == mutedSolo);
+    REQUIRE_THROWS(session.apply("Solo missing clip", [&](Document& d) {
+        setAudioClipSolo(d, second + 100, true);
+    }));
+    REQUIRE(session.document() == mutedSolo);
+    const auto directory = std::filesystem::temp_directory_path() /
+        ("opentoon-audio-solo-" +
+         std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
+    std::filesystem::create_directories(directory);
+    const auto path = directory / "solo-cues.otoon";
+    REQUIRE(ProjectStore::save(path, mutedSolo) > 0);
+    const auto reopened = ProjectStore::load(path).document;
+    REQUIRE(reopened == mutedSolo);
+    REQUIRE(AudioMixPlan(reopened, 48000).renderBlock(2002, 1)[0] == 0);
+    REQUIRE(AudioMixPlan(reopened, 48000).renderBlock(4004, 1)[0] == 32767);
+    std::filesystem::remove_all(directory);
+}
+
 TEST_CASE("Downsampling suppresses aliased treble and keeps audible passband") {
     auto scene = makeDocument();
     (void)importPcm16Wav(scene, "30 kHz", toneWav(9600, 96000, 30000), 0);
