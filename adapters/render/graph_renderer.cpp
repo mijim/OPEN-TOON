@@ -101,6 +101,59 @@ QImage over(const QImage& background, const QImage& foreground, CompositionProfi
     }
     return result;
 }
+QImage blendImages(const QImage& background, const QImage& foreground,
+                   CompositionProfile profile, GraphNodeKind mode,
+                   const RenderOptions& options, QRect foregroundBounds) {
+    if (background.size() != foreground.size())
+        throw std::invalid_argument("Compositor images have different sizes.");
+    foregroundBounds = foregroundBounds.intersected(QRect(QPoint(0, 0), foreground.size()));
+    if (foregroundBounds.isEmpty())
+        return background;
+    QImage result = background.copy();
+    const auto unpack = [profile](QRgb value) {
+        if (profile == CompositionProfile::LinearSrgb)
+            return decode(value);
+        constexpr float unit = 1.0f / 255.0f;
+        return Pixel{qRed(value) * unit, qGreen(value) * unit,
+                     qBlue(value) * unit, qAlpha(value) * unit};
+    };
+    const auto pack = [profile](Pixel value) {
+        if (profile == CompositionProfile::LinearSrgb)
+            return encode(value);
+        const auto channel = [](float component) {
+            return std::clamp(int(std::lround(component * 255.0f)), 0, 255);
+        };
+        return qRgba(channel(value.r), channel(value.g), channel(value.b), channel(value.a));
+    };
+    const auto blended = [mode](float front, float back) {
+        return mode == GraphNodeKind::Multiply ? front * back
+                                               : front + back - front * back;
+    };
+    for (int y = foregroundBounds.top(); y <= foregroundBounds.bottom(); ++y) {
+        checkCancelled(options);
+        auto* target = reinterpret_cast<QRgb*>(result.scanLine(y));
+        const auto* source = reinterpret_cast<const QRgb*>(foreground.constScanLine(y));
+        for (int x = foregroundBounds.left(); x <= foregroundBounds.right(); ++x) {
+            if (qAlpha(source[x]) == 0)
+                continue;
+            if (qAlpha(target[x]) == 0) {
+                target[x] = source[x];
+                continue;
+            }
+            const Pixel back = unpack(target[x]);
+            const Pixel front = unpack(source[x]);
+            const float overlap = front.a * back.a;
+            const auto color = [&](float frontPremul, float backPremul) {
+                return frontPremul * (1 - back.a) + backPremul * (1 - front.a) +
+                       overlap * blended(frontPremul / front.a, backPremul / back.a);
+            };
+            target[x] = pack({color(front.r, back.r), color(front.g, back.g),
+                              color(front.b, back.b),
+                              front.a + back.a - overlap});
+        }
+    }
+    return result;
+}
 QImage matteFromImage(const QImage& image, const RenderOptions& options) {
     QImage matte(image.size(), QImage::Format_ARGB32_Premultiplied);
     for (int y = 0; y < matte.height(); ++y) {
@@ -206,6 +259,7 @@ QImage renderGraphTerminal(const CompositionGraph& graph, const Document& docume
     for (auto& layer : legacy.layers) {
         layer.matte = 0; // Isolated source render must not re-enter the graph.
         layer.opacityBypassed = false;
+        layer.blendMode = LayerBlendMode::Normal;
     }
     for (const auto& node : graph.nodes)
         if (node.kind == GraphNodeKind::Opacity ||
@@ -274,6 +328,12 @@ QImage renderGraphTerminal(const CompositionGraph& graph, const Document& docume
             break;
         case GraphNodeKind::Over:
             image = over(input(0), input(1), document.composition, options, inputBounds(1));
+            bound = inputBounds(0).united(inputBounds(1));
+            break;
+        case GraphNodeKind::Multiply:
+        case GraphNodeKind::Screen:
+            image = blendImages(input(0), input(1), document.composition, node.kind,
+                                options, inputBounds(1));
             bound = inputBounds(0).united(inputBounds(1));
             break;
         case GraphNodeKind::MatteFromImage:

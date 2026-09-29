@@ -32,6 +32,12 @@ image unchanged. A cutter uses the same forwarded source image; Display and
 Write agree. The command undoes atomically and older projects default to
 enabled opacity. See
 [ADR-048](../architecture/adr/048-persistent-opacity-bypass.md).
+Format 25 adds saved **Normal**, **Multiply** and **Screen** layer blend modes.
+Nodes edits the selected Drawing or Part. The mode applies to the ordered
+composite after its cutter and opacity. A painted cutter source keeps its own
+mode; source alpha remains a fractional matte. Legacy and Linear sRGB use
+their respective color spaces, while alpha stays source-over. See
+[ADR-049](../architecture/adr/049-layer-blend-modes.md).
 Format 20 adds a persistent **Bypass cutter** control in Properties and Nodes.
 Bypass keeps its source and Inside/Outside choice but shows the uncut target;
 the source remains reserved and does not paint. Re-enable restores the exact
@@ -98,6 +104,15 @@ preview. This is diagnostic navigation, not a persisted graph edit.
   A format-23 migration retains a readable
   `.pre-v23.bak`; native Qt Quick smoke clicks bypass, undoes, redoes and
   reopens it.
+- Fractional overlapping image tests check Normal, Multiply and Screen in
+  both color profiles, Display/Write, invalid mode rejection, atomic undo,
+  save/reopen and format-24 migration backup. Native Qt Quick smoke selects
+  Multiply from the actual popup on a painted cutter source and checks its
+  pixel difference, undo and reopened output.
+- The original 20-layer 1080p fixture measured 49.36 ms/frame for five
+  alternating Multiply/Screen layers in Legacy and 43.59 ms/frame in Linear
+  sRGB, averaged over three frames on the M1 Pro. Normal measured 1.62 and
+  43.32 ms/frame respectively; these are renderer costs, not input latency.
 - Local macOS `build/locked`: full CTest and native HM-12 results are recorded
   in the current release entry.
 

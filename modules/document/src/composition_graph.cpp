@@ -15,6 +15,8 @@ GraphPortType outputType(GraphNodeKind kind) {
     case GraphNodeKind::Opacity:
     case GraphNodeKind::BypassOpacity:
     case GraphNodeKind::Over:
+    case GraphNodeKind::Multiply:
+    case GraphNodeKind::Screen:
     case GraphNodeKind::ApplyMatte:
     case GraphNodeKind::BypassMatte:
     case GraphNodeKind::DisplayOutput:
@@ -38,6 +40,8 @@ std::vector<GraphPortType> inputTypes(GraphNodeKind kind) {
     case GraphNodeKind::BypassOpacity:
         return {GraphPortType::Image};
     case GraphNodeKind::Over:
+    case GraphNodeKind::Multiply:
+    case GraphNodeKind::Screen:
         return {GraphPortType::Image, GraphPortType::Image};
     case GraphNodeKind::MatteFromImage:
         return {GraphPortType::Image};
@@ -108,9 +112,14 @@ CompositionGraph CompositionGraph::orderedLayers(const Document& document) {
                 source = masked;
             }
         }
-        const GraphNodeId over = next++;
-        graph.nodes.push_back({over, GraphNodeKind::Over, 0, {{image, 0}, {source, 1}}});
-        image = over;
+        const GraphNodeId composite = next++;
+        const auto kind = layer.blendMode == LayerBlendMode::Multiply
+                              ? GraphNodeKind::Multiply
+                              : layer.blendMode == LayerBlendMode::Screen
+                                    ? GraphNodeKind::Screen
+                                    : GraphNodeKind::Over;
+        graph.nodes.push_back({composite, kind, 0, {{image, 0}, {source, 1}}});
+        image = composite;
     }
     graph.display = next++;
     graph.nodes.push_back({graph.display, GraphNodeKind::DisplayOutput, 0, {{image, 0}}});

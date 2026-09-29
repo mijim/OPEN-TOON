@@ -69,6 +69,7 @@ Document originalArt() {
 int main(int argc, char** argv) {
     QGuiApplication app(argc, argv);
     const bool original = app.arguments().contains("--original-art");
+    const bool blend = app.arguments().contains("--blend");
     auto document = original ? originalArt() : makeDocument();
     document.width = 1920;
     document.height = 1080;
@@ -94,6 +95,11 @@ int main(int argc, char** argv) {
             document.layers.push_back(std::move(layer));
         }
     }
+    if (blend)
+        for (std::size_t index = 2; index < document.layers.size(); index += 4)
+            document.layers[index].blendMode = index % 8 == 2
+                                                    ? LayerBlendMode::Multiply
+                                                    : LayerBlendMode::Screen;
     document.validate();
     auto measure = [&](CompositionProfile profile) {
         document.composition = profile;
@@ -120,7 +126,8 @@ int main(int argc, char** argv) {
     }
     const auto cached = std::chrono::steady_clock::now() - start;
     std::cout << "scene=1920x1080, layers=" << document.layers.size()
-              << ", frames=3, fixture=" << (original ? "original-character-art" : "synthetic-rgba") << '\n'
+              << ", frames=3, fixture=" << (original ? "original-character-art" : "synthetic-rgba")
+              << ", blend=" << (blend ? "multiply-screen" : "normal") << '\n'
               << "legacy_ms_per_frame=" << legacy << '\n'
               << "linear_ms_per_frame=" << linear << '\n'
               << "cached_lookup_us="

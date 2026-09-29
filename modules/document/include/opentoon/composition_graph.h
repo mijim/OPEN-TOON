@@ -6,7 +6,8 @@ namespace opentoon {
 using GraphNodeId = std::uint32_t;
 enum class GraphPortType : std::uint8_t { Image, Transform, Matte };
 enum class GraphNodeKind : std::uint8_t {
-    Background, LayerImage, LayerTransform, Opacity, BypassOpacity, Over, MatteFromImage, InvertMatte,
+    Background, LayerImage, LayerTransform, Opacity, BypassOpacity, Over, Multiply, Screen,
+    MatteFromImage, InvertMatte,
     ApplyMatte, BypassMatte, DisplayOutput, WriteOutput
 };
 struct GraphConnection {

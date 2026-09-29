@@ -1,5 +1,16 @@
 # Experimental releases
 
+## 0.2.0-experimental.36 — working source, layer blend modes
+
+- Add saved Normal, Multiply and Screen blending for Drawing and Part layers
+  in Nodes. Fractional alpha, cutters and source painting pass through the
+  same Display/Write graph under Legacy or Linear sRGB composition.
+- Format 25 loads earlier layers as Normal and preserves a readable backup.
+  178 CTest entries, render/undo/migration tests and a native popup click
+  with save/reopen pass. The original 1080p blend study averaged 49.36 ms
+  per Legacy frame and 43.59 ms per Linear sRGB frame on the M1 Pro.
+- Source only; no new public binary or tag. Broader node editing remains open.
+
 ## 0.2.0-experimental.35 — working source, opacity node bypass
 
 - Bypass selected Drawing or Part opacity from Nodes while retaining its

@@ -292,6 +292,66 @@ TEST_CASE("Opacity bypass reaches legacy scenes without a matte") {
     REQUIRE(display == GraphRenderer::render(graph, document, 0, {}, {}, GraphTarget::Write));
     REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(document)), 0) == display);
 }
+TEST_CASE("Multiply and Screen blend fractional layers in both color profiles") {
+    auto document = makeDocument();
+    document.width = document.height = 1;
+    document.background = {0, 0, 0, 0};
+    auto& lower = document.editableDrawing(document.layers.front().id, 0);
+    lower.image = ImageAsset{1, 1, {50, 150, 200, 128}};
+    Layer upper = document.layers.front();
+    upper.id = document.allocateId();
+    upper.name = "Upper";
+    auto upperDrawing = lower;
+    upperDrawing.id = document.allocateId();
+    upperDrawing.image = ImageAsset{1, 1, {200, 100, 50, 128}};
+    document.drawings.emplace(upperDrawing.id, upperDrawing);
+    for (auto& exposure : upper.exposures)
+        exposure.drawing = upperDrawing.id;
+    document.layers.push_back(upper);
+    document.validate();
+    const auto normal = SceneRenderer::render(document, 0);
+    Session session;
+    session.replace(document);
+    REQUIRE(session.apply("Multiply", [&](Document& d) {
+        d.layer(upper.id).blendMode = LayerBlendMode::Multiply;
+    }));
+    const auto multiply = SceneRenderer::render(session.document(), 0);
+    REQUIRE(qAlpha(multiply.pixel(0, 0)) == qAlpha(normal.pixel(0, 0)));
+    REQUIRE(qRed(multiply.pixel(0, 0)) < qRed(normal.pixel(0, 0)));
+    REQUIRE(multiply == GraphRenderer::render(CompositionGraph::orderedLayers(session.document()),
+                                              session.document(), 0, {}, {}, GraphTarget::Write));
+    REQUIRE(session.apply("Screen", [&](Document& d) {
+        d.layer(upper.id).blendMode = LayerBlendMode::Screen;
+    }));
+    const auto screen = SceneRenderer::render(session.document(), 0);
+    REQUIRE(qAlpha(screen.pixel(0, 0)) == qAlpha(multiply.pixel(0, 0)));
+    REQUIRE(qRed(screen.pixel(0, 0)) > qRed(normal.pixel(0, 0)));
+    REQUIRE(screen == GraphRenderer::render(CompositionGraph::orderedLayers(session.document()),
+                                            session.document(), 0, {}, {}, GraphTarget::Display));
+    REQUIRE(SceneRenderer::render(deserializeDocument(serializeDocument(session.document())), 0) ==
+            screen);
+    REQUIRE_THROWS(session.apply("Invalid blend", [&](Document& d) {
+        d.layer(upper.id).blendMode = static_cast<LayerBlendMode>(99);
+    }));
+    REQUIRE(SceneRenderer::render(session.document(), 0) == screen);
+    REQUIRE(session.undo());
+    REQUIRE(SceneRenderer::render(session.document(), 0) == multiply);
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == document);
+    REQUIRE(session.redo());
+    REQUIRE(session.redo());
+    REQUIRE(SceneRenderer::render(session.document(), 0) == screen);
+    for (const auto mode : {LayerBlendMode::Multiply, LayerBlendMode::Screen}) {
+        auto linear = session.document();
+        linear.composition = CompositionProfile::LinearSrgb;
+        linear.layer(upper.id).blendMode = mode;
+        linear.validate();
+        const auto graph = CompositionGraph::orderedLayers(linear);
+        const auto display = GraphRenderer::render(graph, linear, 0, {}, {}, GraphTarget::Display);
+        REQUIRE(SceneRenderer::render(linear, 0) == display);
+        REQUIRE(GraphRenderer::render(graph, linear, 0, {}, {}, GraphTarget::Write) == display);
+    }
+}
 TEST_CASE("Inverted cutter keeps target ink outside its source bounds") {
     auto document = makeDocument();
     document.width = 2;

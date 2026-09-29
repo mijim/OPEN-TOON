@@ -45,7 +45,7 @@ Item {
                 font.letterSpacing: 1
             }
             Label {
-                text: "Select a Drawing node to edit order, opacity or cutter"
+                text: "Select a Drawing node to edit order or cutter"
                 color: "#777777"
                 font.pixelSize: 10
             }
@@ -105,6 +105,29 @@ Item {
                 onClicked: root.controller.setMatteSourceVisible(checked)
                 Accessible.name: "Paint cutter source in composition"
             }
+        }
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 34
+            Layout.leftMargin: 12
+            Layout.rightMargin: 12
+            spacing: 8
+            Label {
+                text: "BLEND"
+                color: "#999999"
+                font.pixelSize: 10
+                font.letterSpacing: 1
+            }
+            CompactComboBox {
+                objectName: "nodeBlendMode"
+                implicitWidth: 130
+                enabled: root.selected && !root.selected.locked &&
+                         (root.selected.kind === 0 || root.selected.kind === 3)
+                model: ["Normal", "Multiply", "Screen"]
+                currentIndex: root.selected?.blendMode || 0
+                onActivated: root.controller.setLayerBlendMode(currentIndex)
+                Accessible.name: "Selected drawing blend mode"
+            }
             PropertyNumber {
                 objectName: "nodeOpacity"
                 implicitWidth: 88
@@ -124,6 +147,7 @@ Item {
                 onClicked: root.controller.setOpacityBypassed(checked)
                 Accessible.name: "Bypass selected drawing opacity"
             }
+            Item { Layout.fillWidth: true }
         }
         Rectangle { Layout.fillWidth: true; height: 1; color: "#303030" }
         RowLayout {
@@ -156,6 +180,8 @@ Item {
                         border.color: modelData.kind === "Cutter" ||
                                       modelData.kind === "Opacity" ||
                                       modelData.kind === "Bypassed opacity" ||
+                                      modelData.kind === "Multiply" ||
+                                      modelData.kind === "Screen" ||
                                       modelData.kind === "Bypassed cutter" ||
                                       modelData.kind === "Invert matte" ||
                                       modelData.kind === "Apply matte"

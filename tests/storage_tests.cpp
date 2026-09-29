@@ -907,6 +907,33 @@ TEST_CASE("Format twenty-three layers default to enabled opacity with a readable
     invalidCurrent["version"] = Document::formatVersion;
     REQUIRE_THROWS(deserializeDocument(invalidCurrent.dump()));
 }
+TEST_CASE("Format twenty-four layers default to Normal blend with a readable backup") {
+    TemporaryProject project;
+    auto original = makeDocument();
+    const auto revision = ProjectStore::save(project.file, original);
+    auto legacy = nlohmann::json::parse(serializeDocument(original));
+    legacy["version"] = 24;
+    for (auto& layer : legacy["layers"])
+        layer.erase("blendMode");
+    {
+        FixtureDatabase db(project.file);
+        db.replaceDocument(legacy.dump());
+        db.execute("PRAGMA user_version=24");
+    }
+    REQUIRE(ProjectStore::load(project.file).document == original);
+    auto changed = original;
+    changed.layers.front().blendMode = LayerBlendMode::Multiply;
+    REQUIRE(ProjectStore::save(project.file, changed, "Multiply blend", revision) > revision);
+    REQUIRE(ProjectStore::load(project.file).document == changed);
+    auto backup = project.file;
+    backup += ".pre-v24.bak";
+    REQUIRE(ProjectStore::load(backup).document == original);
+    FixtureDatabase current(project.file);
+    REQUIRE(current.count("PRAGMA user_version") == Document::formatVersion);
+    auto invalidCurrent = legacy;
+    invalidCurrent["version"] = Document::formatVersion;
+    REQUIRE_THROWS(deserializeDocument(invalidCurrent.dump()));
+}
 TEST_CASE("Format fifteen audio migration preserves a readable source backup") {
     TemporaryProject project;
     auto original = makeDocument();

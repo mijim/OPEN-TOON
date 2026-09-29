@@ -165,6 +165,7 @@ QVariantList EditorController::layers() const {
                                      {"matteBypassed", it->matteBypassed},
                                      {"paintMatteSource", it->paintMatteSource},
                                      {"opacityBypassed", it->opacityBypassed},
+                                     {"blendMode", int(it->blendMode)},
                                      {"kind", int(it->kind)},
                                      {"role", QString::fromStdString(it->role)},
                                      {"spans", spans},
@@ -188,6 +189,8 @@ QVariantList EditorController::compositionNodes() const {
         case GraphNodeKind::Opacity: kind = "Opacity"; break;
         case GraphNodeKind::BypassOpacity: kind = "Bypassed opacity"; break;
         case GraphNodeKind::Over: kind = "Composite"; break;
+        case GraphNodeKind::Multiply: kind = "Multiply"; break;
+        case GraphNodeKind::Screen: kind = "Screen"; break;
         case GraphNodeKind::MatteFromImage: kind = "Cutter"; break;
         case GraphNodeKind::InvertMatte: kind = "Invert matte"; break;
         case GraphNodeKind::ApplyMatte: kind = "Apply matte"; break;
@@ -1097,6 +1100,17 @@ bool EditorController::setOpacityBypassed(bool bypassed) {
             (target.kind != LayerKind::Drawing && target.kind != LayerKind::Part))
             throw std::runtime_error("Select an unlocked drawing or Part to bypass opacity.");
         target.opacityBypassed = bypassed;
+    });
+}
+bool EditorController::setLayerBlendMode(int mode) {
+    if (!layer_ || mode < int(LayerBlendMode::Normal) || mode > int(LayerBlendMode::Screen))
+        return false;
+    return edit("Set layer blend mode", [&](Document& d) {
+        auto& target = d.layer(layer_);
+        if (target.locked ||
+            (target.kind != LayerKind::Drawing && target.kind != LayerKind::Part))
+            throw std::runtime_error("Select an unlocked drawing or Part to change its blend mode.");
+        target.blendMode = static_cast<LayerBlendMode>(mode);
     });
 }
 bool EditorController::setMatteSourceVisible(bool visible) {

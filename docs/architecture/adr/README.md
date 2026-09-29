@@ -148,3 +148,6 @@ shared by device playback, scrub and PCM WAV export.
 
 See [ADR-048](048-persistent-opacity-bypass.md) for format-24 Drawing/Part
 opacity bypass with preserved keys and shared Display/Write graph evaluation.
+
+See [ADR-049](049-layer-blend-modes.md) for format-25 Normal, Multiply and
+Screen layer blending with premultiplied alpha and explicit color profiles.

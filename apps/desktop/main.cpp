@@ -368,8 +368,59 @@ int main(int argc, char** argv) {
                     editor.undo();
                     if (opentoon::SceneRenderer::render(editor.document(), 0) != outside)
                         throw std::runtime_error("Cutter matte removal did not undo.");
-                    std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass and fractional inside/outside matte, "
-                                 "persistent bypass/re-enable, painted source, save/reopen and undo.\n";
+                    if (!editor.setMatteSourceVisible(true) ||
+                        opentoon::SceneRenderer::render(editor.document(), 0) != painted)
+                        throw std::runtime_error("Cannot prepare the painted-source blend fixture.");
+                    editor.setSelectedLayer(int(source.id));
+                    QCoreApplication::processEvents();
+                    auto* blendPicker = window->findChild<QQuickItem*>("nodeBlendMode");
+                    if (!blendPicker || !blendPicker->isVisible())
+                        throw std::runtime_error("Node blend mode control is unavailable.");
+                    const auto blendPoint = blendPicker->mapToScene(
+                        QPointF(blendPicker->width() / 2, blendPicker->height() / 2));
+                    QMouseEvent blendPress(QEvent::MouseButtonPress, blendPoint,
+                                           window->mapToGlobal(blendPoint.toPoint()),
+                                           Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                    QMouseEvent blendRelease(QEvent::MouseButtonRelease, blendPoint,
+                                             window->mapToGlobal(blendPoint.toPoint()),
+                                             Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+                    QCoreApplication::sendEvent(window, &blendPress);
+                    QCoreApplication::sendEvent(window, &blendRelease);
+                    QCoreApplication::processEvents();
+                    auto* blendPopup = blendPicker->property("popup").value<QObject*>();
+                    auto* blendList = blendPopup
+                                          ? blendPopup->property("contentItem").value<QQuickItem*>()
+                                          : nullptr;
+                    if (!blendPopup || !blendPopup->property("visible").toBool() || !blendList)
+                        throw std::runtime_error("Blend mode menu did not open.");
+                    const auto multiplyPoint = blendList->mapToScene(QPointF(blendList->width() / 2, 39));
+                    QMouseEvent multiplyPress(QEvent::MouseButtonPress, multiplyPoint,
+                                              window->mapToGlobal(multiplyPoint.toPoint()),
+                                              Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                    QMouseEvent multiplyRelease(QEvent::MouseButtonRelease, multiplyPoint,
+                                                window->mapToGlobal(multiplyPoint.toPoint()),
+                                                Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+                    QCoreApplication::sendEvent(window, &multiplyPress);
+                    QCoreApplication::sendEvent(window, &multiplyRelease);
+                    QCoreApplication::processEvents();
+                    const auto multiplied = opentoon::SceneRenderer::render(editor.document(), 0);
+                    if (editor.document().layer(source.id).blendMode !=
+                            opentoon::LayerBlendMode::Multiply ||
+                        qAlpha(multiplied.pixel(0, 0)) != qAlpha(painted.pixel(0, 0)) ||
+                        qBlue(multiplied.pixel(0, 0)) >= qBlue(painted.pixel(0, 0)))
+                        throw std::runtime_error("Selecting Multiply did not change the painted source: mode=" +
+                            std::to_string(int(editor.document().layer(source.id).blendMode)) +
+                            " blue=" + std::to_string(qBlue(multiplied.pixel(0, 0))) +
+                            " baseline=" + std::to_string(qBlue(painted.pixel(0, 0))));
+                    editor.undo();
+                    if (opentoon::SceneRenderer::render(editor.document(), 0) != painted)
+                        throw std::runtime_error("Blend mode undo did not restore Normal.");
+                    editor.redo();
+                    if (!editor.saveProject({}) || !editor.openProject(QUrl::fromLocalFile(path)) ||
+                        opentoon::SceneRenderer::render(editor.document(), 0) != multiplied)
+                        throw std::runtime_error("Blend mode changed after save and reopen.");
+                    std::cout << "HM-12 native smoke passed: inspector, clickable node preview, opacity bypass, fractional cutter, "
+                                 "painted-source Multiply, save/reopen and undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';

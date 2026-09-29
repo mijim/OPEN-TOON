@@ -3526,8 +3526,8 @@
         "ANI"
       ],
       "specification_status": "analysis_draft",
-      "notes": "Ordered Over, alpha, visible cutter-source painting and a derived animated Opacity node work. Depth modes and broader compositing operators remain open.",
-      "implementation_evidence": "docs/implementation/HM04-ACCEPTANCE.md; docs/implementation/HM12-PROGRESS.md; ordered premultiplied Over, alpha charts and keyed opacity/cutter/source-paint evidence"
+      "notes": "Ordered Over, alpha, visible cutter-source painting, derived animated Opacity and saved Normal/Multiply/Screen layer blending work. Depth modes and broader compositing operators remain open.",
+      "implementation_evidence": "docs/implementation/HM04-ACCEPTANCE.md; docs/implementation/HM12-PROGRESS.md; ordered premultiplied Over, fractional Multiply/Screen blends, alpha charts and keyed opacity/cutter/source-paint evidence"
     },
     {
       "id": "NOD-006",
