@@ -1,5 +1,6 @@
 #include "opentoon/document.h"
 #include "opentoon/animation.h"
+#include "opentoon/deformation.h"
 #include <cmath>
 #include <limits>
 #include <set>
@@ -188,12 +189,15 @@ void Document::validate() const {
         require(l.name.size() <= 4096, "Layer name is too long.");
         require(static_cast<int>(l.kind) >= 0 && static_cast<int>(l.kind) <= 4,
                 "Unknown layer kind.");
-        require(l.role.size() <= 128 && l.variants.size() <= 10000 && l.views.size() <= 1000,
+        require(l.role.size() <= 128 && l.variants.size() <= 10000 && l.views.size() <= 1000 &&
+                    l.bindings.size() <= 256,
                 "Invalid part metadata size.");
         if (l.kind != LayerKind::Part)
             require(l.role.empty() && l.variants.empty(), "Only parts may own roles and variants.");
         if (l.kind != LayerKind::Character)
             require(l.views.empty(), "Only character roots may own view sets.");
+        if (l.kind != LayerKind::Part)
+            require(l.bindings.empty(), "Only parts may own mesh bindings.");
         if (l.kind == LayerKind::Character || l.kind == LayerKind::Peg || l.kind == LayerKind::Camera)
             require(l.exposures.empty(), "Character roots, pegs and cameras cannot own drawings.");
         std::set<Id> variants;
@@ -203,6 +207,12 @@ void Document::validate() const {
                     "Part references a missing or duplicate substitution.");
         if (l.kind == LayerKind::Part)
             require(!l.role.empty(), "Character part needs a role.");
+        std::set<Id> boundDrawings;
+        for (const auto& binding : l.bindings) {
+            require(boundDrawings.insert(binding.drawing).second,
+                    "Part has duplicate mesh bindings for one substitution.");
+            validateMeshBinding(*this, l, binding);
+        }
         validateTransform(l.transform);
         if (l.kind == LayerKind::Camera) {
             require(l.parent == 0 && l.visible && !l.solo && l.transform.scaleX >= .05 &&

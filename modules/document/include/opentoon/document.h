@@ -105,6 +105,21 @@ struct CharacterView {
     std::vector<ViewChoice> choices;
     auto operator<=>(const CharacterView&) const = default;
 };
+struct MeshPoint {
+    double x = 0, y = 0;
+    auto operator<=>(const MeshPoint&) const = default;
+};
+struct MeshVertex {
+    MeshPoint rest, pose, uv;
+    auto operator<=>(const MeshVertex&) const = default;
+};
+struct MeshBinding {
+    Id drawing = 0;
+    int sourceWidth = 0, sourceHeight = 0;
+    int columns = 0, rows = 0;
+    std::vector<MeshVertex> vertices;
+    auto operator<=>(const MeshBinding&) const = default;
+};
 struct Layer {
     Id id = 0;
     std::string name;
@@ -117,6 +132,7 @@ struct Layer {
     std::string role;
     std::vector<Substitution> variants;
     std::vector<CharacterView> views;
+    std::vector<MeshBinding> bindings;
     auto operator<=>(const Layer&) const = default;
 };
 struct Marker {
@@ -125,7 +141,7 @@ struct Marker {
     auto operator<=>(const Marker&) const = default;
 };
 struct Document {
-    static constexpr int formatVersion = 7;
+    static constexpr int formatVersion = 8;
     std::string name = "Untitled scene";
     int width = 1920, height = 1080;
     Frame duration = 48;

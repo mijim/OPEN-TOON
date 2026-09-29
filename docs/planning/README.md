@@ -9,14 +9,15 @@ The roadmap retains **23 phases**, **70 work packages**, **283 capabilities** an
 specification ownership for **193 node/family entries**. RIG-015 adds Quick Rig to
 the previous 282 requirements. No old feature was removed or declared complete.
 Implementation proceeds under these contracts; bounded HM-03 rigid character,
-HM-04 composition and HM-13 output-camera contracts are accepted. HM-05 rest
-binding and deformation rendering is next on the critical path.
+HM-04 composition, HM-05 rest-binding/rendering and HM-13 output-camera
+contracts are accepted. HM-06 animated bone/curve deformation is next on the
+critical path.
 
 ## Start here — one execution route
 
 1. [NOW](NOW.md): current objective, active contract, next task and stop rule.
 2. [Implementation status](../implementation/STATUS.md) and [machine-readable evidence](../implementation/status.json): what actually works and what has been accepted.
-3. [FIRST-STEPS](FIRST-STEPS.md), then `python3 scripts/roadmap.py slice HM-03` or the [specific generated slice](HARMONY-MOMENT.md): recommended execution order, hard prerequisites and observable acceptance.
+3. [FIRST-STEPS](FIRST-STEPS.md), then `python3 scripts/roadmap.py slice HM-06` or the [specific generated slice](HARMONY-MOMENT.md): recommended execution order, hard prerequisites and observable acceptance.
 4. [Full phase roadmap](PHASES.md): preserved P00–P22 ownership and exit criteria. Then consult [execution rules](EXECUTION.md), [dependency register](LIBRARIES.md), [estimation assumptions](ESTIMATES.md) and [reorientation rationale](REORIENTATION.md) as needed.
 
 The generated Harmony Moment view contains all HM-00–HM-15 contracts; its list is not itself a ready-work queue. Use `python3 scripts/roadmap.py next` and verify accepted prerequisite evidence before beginning a slice.
@@ -91,6 +92,8 @@ characters, substitutions and coordinated view sets with
 [owner-delegated bounded acceptance](../implementation/HM03-ACCEPTANCE.md).
 [HM-04](../implementation/HM04-ACCEPTANCE.md)
 and [HM-13](../implementation/HM13-ACCEPTANCE.md) are accepted bounded contracts;
+the [HM-05 rest mesh/render](../implementation/HM05-ACCEPTANCE.md) contract is
+also accepted;
 their owning full phases remain open. The second-animator working-shot review
 remains an HM-15 gate.
 

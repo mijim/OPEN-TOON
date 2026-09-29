@@ -8,15 +8,15 @@ complete.
 
 | Record | Current classification | Meaning |
 |---|---:|---|
-| Catalog capabilities | 78 `partial`, 205 `not_started`, 0 complete | Working subsets have an evidence path and a stated remaining scope. |
-| Harmony Moment slices | 6 complete, 0 in progress, 10 planned | HM-00, HM-01, HM-02, HM-03, HM-04 and HM-13 are accepted bounded contracts; HM-05 is next. |
-| Full phases P00–P22 | 9 in progress, 14 planned, 0 complete | The implementation ledger covers P00–P11; later phases remain in the roadmap. |
+| Catalog capabilities | 80 `partial`, 203 `not_started`, 0 complete | DEF-008 and DEF-015 gain bounded static mesh subsets; animated acceptance remains open. |
+| Harmony Moment slices | 7 complete, 0 in progress, 9 planned | HM-00–HM-05 and HM-13 are accepted bounded contracts; HM-06 is next. |
+| Full phases P00–P22 | 10 in progress, 13 planned, 0 complete | P09 has a bounded mesh/render foundation but is not a completed deformation phase. |
 | Node inventory | 193 `not_started` | Entries include families; internal HM-04 graph operators are not counted as specified, user-editable inventory effects. |
 | Nonfunctional requirements | 15 `partial_evidence`, 12 `proposed_not_measured`, 0 verified | Bounded checks do not satisfy full performance, device, accessibility or release gates. |
 | Open-source libraries | 9 experimentally adopted, 5 selected for plan, 16 candidates | Adopted flags match installed records; future candidates still need their consumer-specific evidence. |
 
-The current macOS system build has 102 passing CTest entries, a passing native
-mouse/composition/camera workflow and 21 export integration cases within one
+The current macOS system build has 114 passing CTest entries, a passing native
+mouse/composition/camera/mesh workflow and 21 export integration cases within one
 CTest entry. The last Windows/Linux CI evidence belongs to an earlier source
 commit. The experimental.10 arm64 package was verified locally but publication
 was cancelled; experimental.15 remains source only. Physical tablet and
@@ -30,7 +30,7 @@ that had working subsets but still said `not_started`: typed visual layers,
 exposure-preserving drawing ownership, pegs, rigid character breakdown,
 substitutions, coordinated views, internal alpha mattes, camera and graph
 subsets. Studio color configuration, editable nodes/cutters, full character
-poses, audio, deformers and multiplane remain unimplemented where their
+poses, audio, animated deformers and multiplane remain unimplemented where their
 specific behavior has not been delivered.
 
 The owner delegated the HM-03 19-part visual workflow review to the implementer.
@@ -38,6 +38,13 @@ The original PNG assembly matches reference pixels after paint-order setup;
 coordinated views, substitutions, reparenting, undo and reopened output have
 [bounded acceptance evidence](HM03-ACCEPTANCE.md). P08 and the independent
 second-animator HM-15 journey remain open.
+
+[HM-05](HM05-ACCEPTANCE.md) adds a static mesh bind/render subset with
+per-substitution format-8 identity, source-vector retention, a bounded image
+proxy, native mouse editing, checker and original 19-part render evidence.
+DEF-008 and DEF-015 are partial; influence regions and multiple-pose chains
+remain not started. The accepted rest/UV path unlocks HM-06, whose animated
+bone/curve quality and control budget are still mandatory.
 
 `scripts/validate_docs.py` now checks evidence files for nonempty partial
 statuses, library adoption flags, P00–P11 phase-status agreement, the source

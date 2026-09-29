@@ -94,9 +94,13 @@ Separate bind/rest pose from animated state and update it explicitly.
 
 **Initial acceptance:** Resetting returns to the rest pose without deleting keys.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM05-ACCEPTANCE.md](../../../docs/implementation/HM05-ACCEPTANCE.md) — tests/mesh_render_tests.cpp; apps/desktop/mesh_smoke.cpp.
+
+**Remaining scope:** Format-8 per-substitution rest and static pose preview are editable, resettable and undoable. Animated deformer state and reset-with-keys acceptance remain HM-06 work.
 
 ## DEF-009 — Influence regions
 
@@ -164,6 +168,10 @@ Toggle controls and preview quality without changing the final result.
 
 **Initial acceptance:** Hiding controls does not disable the deformer.
 
-**Scope:** `base` · **Level:** `pro` · **Status:** `not_started`.
+**Scope:** `base` · **Level:** `pro` · **Status:** `partial`.
 
 **Specification source:** `proposal`.
+
+**Implementation evidence:** [docs/implementation/HM05-ACCEPTANCE.md](../../../docs/implementation/HM05-ACCEPTANCE.md) — tests/mesh_render_tests.cpp; apps/desktop/mesh_smoke.cpp.
+
+**Remaining scope:** Mesh handles can be hidden by leaving Mesh mode while the static warp persists in output. Preview-quality controls and animated deformer quality remain open.

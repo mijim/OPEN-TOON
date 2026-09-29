@@ -286,6 +286,7 @@ void CanvasItem::paint(QPainter* p) {
         }
         if (editor_->tool() == "Animate" && (hasRegion() || (motionPathEditing_ && motionReferenceValid_)))
             paintMotionPath(p, displayDocument, itemTransform);
+        paintMesh(p, displayDocument, itemTransform);
         paintVectorSelection(p, itemTransform);
         if (hasRegion() && !motionPathEditing_ &&
             (editor_->tool() == "Select" || editor_->tool() == "Marquee" || editor_->tool() == "Lasso" ||
@@ -351,6 +352,10 @@ void CanvasItem::begin(QPointF position, double pressure) {
     try {
         if (editor_->tool() == "Camera") {
             beginCamera(position);
+            return;
+        }
+        if (editor_->tool() == "Mesh") {
+            beginMesh(position);
             return;
         }
         if (editor_->tool() == "Animate" && motionPathEditing_) {
@@ -507,6 +512,10 @@ void CanvasItem::move(QPointF position, double pressure) {
             previewCamera(position);
             return;
         }
+        if (meshVertex_ >= 0) {
+            previewMesh(position);
+            return;
+        }
         if (motionKey_ >= 0) {
             previewMotionPath(position);
             return;
@@ -612,6 +621,10 @@ void CanvasItem::end() {
         commitCamera();
         return;
     }
+    if (meshVertex_ >= 0) {
+        commitMesh();
+        return;
+    }
     if (motionKey_ >= 0) {
         commitMotionPath();
         return;
@@ -680,6 +693,7 @@ void CanvasItem::end() {
 }
 void CanvasItem::cancelGesture() {
     cameraHandle_ = -1;
+    meshVertex_ = -1;
     motionKey_ = -1;
     marqueeOperation_ = 0;
     posePreview_.reset();

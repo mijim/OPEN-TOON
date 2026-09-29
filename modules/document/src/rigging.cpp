@@ -342,6 +342,11 @@ void selectSubstitution(Document& document, Id partId, Frame frame, Id drawing) 
 void removeSubstitution(Document& document, Id partId, Id drawing) {
     auto& layer = part(document, partId);
     checkVariant(layer, drawing);
+    require(std::none_of(layer.bindings.begin(), layer.bindings.end(),
+                         [drawing](const MeshBinding& binding) {
+                             return binding.drawing == drawing;
+                         }),
+            "Remove this substitution's mesh binding first.");
     const Id root = characterFor(document, partId);
     for (const auto& view : document.layer(root).views)
         for (const auto& choice : view.choices)
@@ -504,6 +509,8 @@ Id duplicateCharacter(Document& document, Id rootId, double offsetX, double offs
             exposure.drawing = copyDrawing(exposure.drawing);
         for (auto& variant : source.variants)
             variant.drawing = copyDrawing(variant.drawing);
+        for (auto& binding : source.bindings)
+            binding.drawing = copyDrawing(binding.drawing);
         for (auto& view : source.views) {
             view.id = document.allocateId();
             for (auto& choice : view.choices) {
@@ -560,6 +567,8 @@ Id duplicateRigBranch(Document& document, Id branchId, bool linkedArtwork) {
             exposure.drawing = mapDrawing(exposure.drawing);
         for (auto& variant : source.variants)
             variant.drawing = mapDrawing(variant.drawing);
+        for (auto& binding : source.bindings)
+            binding.drawing = mapDrawing(binding.drawing);
         document.layers.push_back(std::move(source));
     }
     for (auto& view : document.layer(rootId).views) {
@@ -591,6 +600,7 @@ void removeRigBranch(Document& document, Id branchId) {
 void detachPart(Document& document, Id partId) {
     auto& layer = part(document, partId);
     require(layer.keys.empty(), "Detach a part before animating it.");
+    require(layer.bindings.empty(), "Remove this part's mesh bindings before detaching it.");
     require(std::none_of(document.layers.begin(), document.layers.end(),
                          [partId](const Layer& child) { return child.parent == partId; }),
             "Detach child layers first.");

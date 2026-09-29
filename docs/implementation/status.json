@@ -11,7 +11,7 @@
       "id": "P00",
       "status": "in_progress",
       "available": "Qt-free core, CPU reference renderer, locked infrastructure dependencies, bounded OpenToonz source audit and save failure tests.",
-      "remaining": "Renderer comparison, successful reuse extraction/build audit, fill/deformation spikes, device matrix and production budgets."
+      "remaining": "Renderer comparison, successful reuse extraction/build audit, fill spike and broader deformation/renderer comparisons, device matrix and production budgets."
     },
     {
       "id": "P01",
@@ -63,9 +63,9 @@
     },
     {
       "id": "P09",
-      "status": "planned",
-      "available": "No deformation subsystem implemented.",
-      "remaining": "Curve/bone/mesh deformation, constraints, binding/weights, deterministic solvers and reference fixtures."
+      "status": "in_progress",
+      "available": "Accepted bounded HM-05 format-8 per-substitution rest meshes and UVs; direct mouse editing, alpha-bounded image grids, editable vector source through a bounded raster proxy, static pose/reset, undo and matching preview/output rendering.",
+      "remaining": "Animated bone/curve chains, influence regions and weights, multiple-pose rigs, constraints, extreme-bend quality, controls and full reference-shot qualification."
     },
     {
       "id": "P10",
@@ -84,8 +84,8 @@
     "host": "macOS 15.5 arm64; AppleClang 17; Qt 6.11.2",
     "core_and_render_tests": {
       "status": "passed",
-      "count": 99,
-      "command": "ctest --test-dir build/locked --output-on-failure"
+      "count": 114,
+      "command": "ctest --test-dir build/desktop --output-on-failure --parallel 4"
     },
     "native_input_workflow": {
       "status": "passed",
@@ -157,7 +157,8 @@
         "linear canvas preview through revision cache and composition-profile undo",
         "background next-frame publication, timed playback and rapid scrubbing on the native canvas",
         "direct camera pan/rotate/zoom, locked-camera rejection, undo/redo and save/reopen",
-        "camera guides and viewport navigation leave output pixels unchanged"
+        "camera guides and viewport navigation leave output pixels unchanged",
+        "mesh mouse pose/rest drag, preview, undo/redo, unsafe rebind rejection, reset and save/reopen"
       ],
       "limits": "Synthetic mouse/tablet events on macOS; no physical tablet available. Window-layout flush required for occluded native smoke instances."
     },
@@ -243,7 +244,7 @@
         "animated orthographic camera matches reopened preview and two exported PNG frames"
       ]
     },
-    "total_local_ctest_entries": 99,
+    "total_local_ctest_entries": 114,
     "brush_benchmark": {
       "status": "measured",
       "report": "docs/implementation/BRUSH-BENCHMARK.md",
@@ -331,6 +332,21 @@
       ],
       "scope": "One animated orthographic output camera with direct framing handles, guides, format-7 persistence, atomic undo and preview/reopened/PNG parity.",
       "limitations": "No multiplane, perspective, camera switching or physical-tablet qualification; P06 remains in progress."
+    },
+    "deformation_mesh": {
+      "status": "accepted_bounded_contract",
+      "platform": "macOS 15.5 arm64; Apple M1 Pro",
+      "evidence": [
+        "docs/implementation/HM05-ACCEPTANCE.md",
+        "docs/architecture/adr/029-rest-mesh-binding.md",
+        "tests/deformation_tests.cpp",
+        "tests/mesh_render_tests.cpp",
+        "tests/storage_tests.cpp",
+        "apps/desktop/mesh_smoke.cpp",
+        "docs/implementation/hm05-mesh-ui.png"
+      ],
+      "scope": "Format-8 per-substitution rest/pose/UV mesh, alpha-bounded registered image and bounded editable-vector proxy, mouse bind/drag/reset/remove, atomic failure, migration, renderer output and 19-part workload. Optimized 19-part posed scene measured 4.79 ms/frame on M1 Pro.",
+      "limitations": "Static preview mesh only; no animated bones/curves, weights, influence radii, raster-tile or mixed-media binding, production-scale vector workload or cross-platform qualification. P09 remains in progress."
     }
   },
   "ownership": {
@@ -354,7 +370,7 @@
   "planning_priority": {
     "milestone": "HM",
     "roadmap": "docs/planning/roadmap.json",
-    "state": "HM-00_HM-01_HM-02_HM-03_HM-04_HM-13_complete__HM-05_next",
-    "note": "HM-00, HM-01, HM-02 and bounded HM-03, HM-04 and HM-13 have accepted evidence. HM-05 rest binding is the next critical-path contract; HM-07, HM-10 and HM-12 are also eligible. Full P08 and other phases remain open. No full catalog capability is claimed complete."
+    "state": "HM-00_through_HM-05_and_HM-13_complete__HM-06_next",
+    "note": "Bounded HM-05 rest binding and renderer path is accepted; HM-06 bone/curve deformation is next. HM-07, HM-10 and HM-12 remain eligible independent branches. P09 and other full phases remain open; no full DEF catalog capability is claimed complete."
   }
 }
