@@ -444,7 +444,7 @@
     },
     "pcm_audio_timing": {
       "status": "passed_subset",
-      "scope": "Format-16 original PCM16 WAV assets, format-17 repeated clips and format-22 source-sample fades, clip placement/trim/gain and native waveform and fade-handle drags with undo and cancellation, indexed sample-aligned timeline waveform with exact edge queries and visible fade guides, invalid import rejection, undo/redo, save/reopen and format-15/16 backups; deterministic stereo offline mix, 44.1/48 kHz source alignment, exact-length full and selected-frame-range WAV export after reopen and cancellation preservation; bounded miniaudio playback uses the same immutable mix, null-device seek/stop and native Qt Quick playhead smoke; native timeline traversal previews bounded 80 ms rational-sample scrub fragments without document changes; callback-period and skipped-playhead-frame diagnostics retained after preview stop; precomputed 32-tap band-limited rate conversion suppresses a 30 kHz 96 kHz-source tone to 0.000089 RMS while retaining 1 kHz at 0.561 RMS, retains 3 kHz at 0.560 RMS in 8-to-48 kHz upsampling and fits the local callback period; two silent ten-minute CoreAudio probes at 24 and 24000/1001 fps reported 65418/65417 callbacks, zero processing overruns, 569/262 final drift samples and one/two skipped polled frames",
+      "scope": "Format-16 original PCM16 WAV assets, format-17 repeated clips and format-22 source-sample fades, clip placement/trim/gain, source-sharing duplication at the playhead and native waveform and fade-handle drags with undo and cancellation, indexed sample-aligned timeline waveform with exact edge queries and visible fade guides, invalid import rejection, undo/redo, save/reopen and format-15/16 backups; deterministic stereo offline mix, 44.1/48 kHz source alignment, exact-length full and selected-frame-range WAV export after reopen and cancellation preservation; bounded miniaudio playback uses the same immutable mix, null-device seek/stop and native Qt Quick playhead smoke; native timeline traversal previews bounded 80 ms rational-sample scrub fragments without document changes; callback-period and skipped-playhead-frame diagnostics retained after preview stop; precomputed 32-tap band-limited rate conversion suppresses a 30 kHz 96 kHz-source tone to 0.000089 RMS while retaining 1 kHz at 0.561 RMS, retains 3 kHz at 0.560 RMS in 8-to-48 kHz upsampling and fits the local callback period; two silent ten-minute CoreAudio probes at 24 and 24000/1001 fps reported 65418/65417 callbacks, zero processing overruns, 569/262 final drift samples and one/two skipped polled frames",
       "command": "build/locked/open-toon.app/Contents/MacOS/open-toon --hm10-smoke",
       "screenshot": "build/hm10-audio-smoke.png",
       "limits": "Hardware queue latency, underruns, device replacement and ten-minute audiovisual drift with displayed frames unqualified; hardware audible scrub quality, sample-weighted fade waveform, combined PNG/WAV delivery remain open. The callback counter measures processing deadlines, not hardware underruns; the playhead-skip counter does not measure presented frames."
@@ -461,7 +461,7 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.31",
+  "version": "0.2.0-experimental.32",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",

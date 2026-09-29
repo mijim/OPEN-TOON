@@ -197,15 +197,18 @@ waveform; its exact peak index follows the timeline's frame width. Drag the
 waveform to move its clip by whole frames; release commits one undo step and
 Escape cancels. The Audio section in the right panel edits the clip's start
 frame, source in/out samples, linear gain and a repeat count from 1 to 64.
-Enter both sample endpoints and choose **Set** to trim. **Remove clip** removes
-its placement, while the source remains embedded in the project for reuse.
+Enter both sample endpoints and choose **Set** to trim. **Duplicate at
+playhead** creates another placement at the current frame with the same trim,
+gain, repeats and fades; both clips share the embedded source. **Remove clip**
+removes its placement while leaving the source available to its other copies.
 **Linear fades · source samples** sets fade-in and fade-out lengths across
 the whole repeated clip; a repeat boundary does not restart the envelope.
 The waveform shows source peaks and gain with fade guides over the clip;
 preview and WAV export apply the fades. Shortening a trim or repeat count
 clamps fades to fit. Drag the small upper handle at either guide to adjust
 that fade directly; Escape cancels and release makes one undoable edit.
-Import, move, trim, gain and removal are undoable and survive save/reopen.
+Import, duplication, move, trim, gain and removal are undoable and survive
+save/reopen.
 
 The format accepts up to 128 MiB per WAV, 512 MiB total audio, 64 assets and 1,000 clips. Clips
 start on whole scene frames, and source-sample trim uses a half-open interval.

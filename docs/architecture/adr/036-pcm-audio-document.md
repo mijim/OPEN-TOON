@@ -34,6 +34,11 @@ The clip's visible end is the first scene frame whose rational source-sample
 offset reaches its exclusive `outSample`, clamped to scene duration. Timeline
 dragging previews an integer-frame start without changing the document and
 commits one placement command on release; Escape cancels it.
+Duplicating a clip at the current scene frame allocates a new clip ID and
+copies its source reference, trim, gain, repeat count and fades. It does not
+copy the immutable WAV bytes. The operation respects the scene-frame and
+1,000-clip limits and undoes as one command; the copied clip can be edited
+independently after creation.
 
 The source WAV remains part of the project after a clip is removed, allowing
 future reuse. Media resources share immutable buffers across document undo

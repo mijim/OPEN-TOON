@@ -121,6 +121,19 @@ void moveAudioClip(Document& document, Id id, Frame start) {
         throw std::invalid_argument("Audio clip start is outside the scene.");
     clip(document, id).start = start;
 }
+Id duplicateAudioClip(Document& document, Id id, Frame start) {
+    if (start < 0 || start >= document.duration || document.audioClips.size() >= 1000)
+        throw std::invalid_argument("Audio clip copy is outside the scene or clip limit.");
+    const auto original = clip(document, id);
+    if (std::none_of(document.audioAssets.begin(), document.audioAssets.end(),
+                     [&](const auto& asset) { return asset.id == original.asset; }))
+        throw std::invalid_argument("Audio clip source does not exist.");
+    auto copy = original;
+    copy.id = document.allocateId();
+    copy.start = start;
+    document.audioClips.push_back(copy);
+    return copy.id;
+}
 void trimAudioClip(Document& document, Id id, std::uint64_t inSample,
                    std::uint64_t outSample) {
     auto& target = clip(document, id);

@@ -372,6 +372,43 @@ int main(int argc, char** argv) {
                         editor.audioClips().size() != 1)
                         throw std::runtime_error("Native WAV import did not create a clip.");
                     const auto clip = editor.audioClips().front().toMap().value("id").toInt();
+                    editor.setFrame(24);
+                    QCoreApplication::processEvents();
+                    const auto findDuplicateItem = [](auto&& self, QQuickItem* parent,
+                                                   const QString& name) -> QQuickItem* {
+                        if (!parent)
+                            return nullptr;
+                        if (parent->objectName() == name)
+                            return parent;
+                        for (auto* child : parent->childItems())
+                            if (auto* match = self(self, child, name))
+                                return match;
+                        return nullptr;
+                    };
+                    auto* duplicateButton = findDuplicateItem(findDuplicateItem,
+                                                            window->contentItem(),
+                                                            "audioDuplicateClip");
+                    if (!duplicateButton || !duplicateButton->isVisible())
+                        throw std::runtime_error("Audio duplicate button is unavailable.");
+                    const auto duplicatePoint = duplicateButton->mapToScene(QPointF(
+                        duplicateButton->width() / 2, duplicateButton->height() / 2));
+                    QMouseEvent duplicatePress(QEvent::MouseButtonPress, duplicatePoint,
+                                               window->mapToGlobal(duplicatePoint.toPoint()),
+                                               Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                    QMouseEvent duplicateRelease(QEvent::MouseButtonRelease, duplicatePoint,
+                                                 window->mapToGlobal(duplicatePoint.toPoint()),
+                                                 Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+                    QCoreApplication::sendEvent(window, &duplicatePress);
+                    QCoreApplication::sendEvent(window, &duplicateRelease);
+                    QCoreApplication::processEvents();
+                    if (editor.audioClips().size() != 2 ||
+                        editor.document().audioAssets.size() != 1 ||
+                        editor.audioClips().back().toMap().value("start").toInt() != 24)
+                        throw std::runtime_error("Native audio duplication did not reuse the source.");
+                    editor.undo();
+                    if (editor.audioClips().size() != 1)
+                        throw std::runtime_error("Native audio duplication did not undo in one step.");
+                    editor.setFrame(0);
                     const auto peaks = editor.audioWaveform(clip, 0, 3);
                     if (peaks.size() != 3 || peaks[1].toDouble() < 0.99)
                         throw std::runtime_error("Native waveform cue is not sample aligned.");
@@ -558,7 +595,7 @@ int main(int argc, char** argv) {
                     editor.undo();
                     if (editor.document() != baseline)
                         throw std::runtime_error("WAV import did not undo atomically.");
-                    std::cout << "HM-10 audio smoke passed: native PCM16 import, cue waveform, "
+                    std::cout << "HM-10 audio smoke passed: native PCM16 import, shared-source clip duplication/undo, cue waveform, "
                                  "device-clock playhead/seek, waveform drag/undo, audio scrub/repeat, source-sample fades, exact full and selected-range WAV export, timeline screenshot and atomic undo.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {

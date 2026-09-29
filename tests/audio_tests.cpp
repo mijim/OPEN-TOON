@@ -53,6 +53,56 @@ std::vector<std::uint8_t> toneWav(std::uint32_t samples, std::uint32_t sampleRat
 }
 } // namespace
 
+TEST_CASE("Audio clip duplication reuses its source and restores exact cues after reopen") {
+    Session session;
+    Id original = 0, copy = 0;
+    REQUIRE(session.apply("Import cue", [&](Document& d) {
+        original = importPcm16Wav(d, "shared cue", wav(48000, 2002), 0);
+        trimAudioClip(d, original, 0, 24000);
+        setAudioClipRepeats(d, original, 2);
+        setAudioClipGain(d, original, .5);
+        setAudioClipFades(d, original, 200, 200);
+    }));
+    const auto before = session.document();
+    REQUIRE(session.apply("Duplicate cue", [&](Document& d) {
+        copy = duplicateAudioClip(d, original, 24);
+    }));
+    const auto duplicated = session.document();
+    REQUIRE(duplicated.audioAssets.size() == 1);
+    REQUIRE(duplicated.audioClips.size() == 2);
+    REQUIRE(duplicated.audioClips[1].asset == duplicated.audioClips[0].asset);
+    REQUIRE(duplicated.audioClips[1].id == copy);
+    REQUIRE(duplicated.audioClips[1].start == 24);
+    REQUIRE(duplicated.audioClips[1].gain == .5);
+    REQUIRE(duplicated.audioClips[1].repeats == 2);
+    REQUIRE(duplicated.audioClips[1].fadeInSamples == 200);
+    REQUIRE(duplicated.audioClips[1].fadeOutSamples == 200);
+    const AudioMixPlan mix(duplicated, 48000);
+    for (const auto cue : {2002, 26002, 50002, 74002}) {
+        REQUIRE(mix.renderBlock(cue - 1, 1)[0] == 0);
+        REQUIRE(mix.renderBlock(cue, 1)[0] == 16384);
+    }
+    REQUIRE(session.undo());
+    REQUIRE(session.document() == before);
+    REQUIRE(session.redo());
+    REQUIRE(session.document() == duplicated);
+    REQUIRE_THROWS(session.apply("Copy missing clip", [&](Document& d) {
+        (void)duplicateAudioClip(d, copy + 100, 0);
+    }));
+    REQUIRE_THROWS(session.apply("Copy outside scene", [&](Document& d) {
+        (void)duplicateAudioClip(d, original, d.duration);
+    }));
+    REQUIRE(session.document() == duplicated);
+    const auto directory = std::filesystem::temp_directory_path() /
+        ("opentoon-audio-copy-" +
+         std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
+    std::filesystem::create_directories(directory);
+    const auto path = directory / "shared-cue.otoon";
+    REQUIRE(ProjectStore::save(path, duplicated) > 0);
+    REQUIRE(ProjectStore::load(path).document == duplicated);
+    std::filesystem::remove_all(directory);
+}
+
 TEST_CASE("Downsampling suppresses aliased treble and keeps audible passband") {
     auto scene = makeDocument();
     (void)importPcm16Wav(scene, "30 kHz", toneWav(9600, 96000, 30000), 0);

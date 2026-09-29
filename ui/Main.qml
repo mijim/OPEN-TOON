@@ -2275,10 +2275,20 @@ ApplicationWindow {
                                                            editor.setAudioClipFades(modelData.id, Number(audioFadeIn.text), Number(audioFadeOut.text))
                                         }
                                     }
-                                    C.ToolButton {
-                                        text: "Remove clip"
+                                    RowLayout {
                                         Layout.fillWidth: true
-                                        onClicked: editor.removeAudioClip(modelData.id)
+                                        C.ToolButton {
+                                            objectName: "audioDuplicateClip"
+                                            text: "Duplicate at playhead"
+                                            hint: "Copy this clip at the current frame using its original WAV"
+                                            Layout.fillWidth: true
+                                            onClicked: editor.duplicateAudioClip(modelData.id, editor.frame)
+                                        }
+                                        C.ToolButton {
+                                            text: "Remove clip"
+                                            Layout.fillWidth: true
+                                            onClicked: editor.removeAudioClip(modelData.id)
+                                        }
                                     }
                                 }
                             }

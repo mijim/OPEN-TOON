@@ -1,5 +1,13 @@
 # Experimental releases
 
+## 0.2.0-experimental.32 — working source, reusable audio clip placement
+
+- Duplicate a clip at the playhead without copying its embedded WAV. The new
+  placement retains trim, gain, repeats and fades and can be edited separately.
+- Exact PCM cues, one-step undo/redo, invalid-input rollback, save/reopen and
+  a native Qt Quick button click pass. The macOS suite passes 171 CTest entries.
+- Source only; no new public binary or tag. HM-10 hardware qualification remains open.
+
 ## 0.2.0-experimental.31 — working source, integrated shot study
 
 - Add an original 20-second editable project joining the continuous four-limb
