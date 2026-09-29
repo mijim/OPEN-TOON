@@ -1,5 +1,18 @@
 # Experimental releases
 
+## 0.2.0-experimental.68 — working source, named workspace layouts
+
+- Drawing, Animation, Rigging and Compositing layouts select useful existing
+  editor modes and lower panels. Each can be overwritten with the current
+  layout through View > Save current layout as. Manual changes mark the active
+  layout Custom; switching and reopening retain saved personal choices.
+- Controller and native Qt Quick checks cover defaults, customized reopen,
+  malformed settings and unchanged scene, selection and frame. Docking and
+  broader panel arrangements remain open. The locked macOS suite passes
+  202/202 CTest entries and Workspace, HM-07, HM-10 and HM-12 native smokes.
+  The legacy broad UI smoke still fails intermittently on synthetic shortcuts;
+  source only.
+
 ## 0.2.0-experimental.67 — working source, personal workspace layout
 
 - Rig/Animator mode, lower Timeline/Xsheet/Curves/Nodes tab, panel height,

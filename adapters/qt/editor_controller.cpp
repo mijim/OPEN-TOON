@@ -49,6 +49,24 @@ int boundedSetting(QSettings& settings, const QString& key, int fallback,
     const int value = settings.value(key, fallback).toInt(&valid);
     return valid ? std::clamp(value, minimum, maximum) : fallback;
 }
+struct WorkspaceLayout {
+    QString mode;
+    QString tab;
+    int height;
+    int cell;
+    bool timingTools;
+};
+std::optional<WorkspaceLayout> defaultWorkspaceLayout(const QString& name) {
+    if (name == "Drawing")
+        return WorkspaceLayout{"Rig", "Xsheet", 300, 28, false};
+    if (name == "Animation")
+        return WorkspaceLayout{"Animator", "Curves", 360, 28, false};
+    if (name == "Rigging")
+        return WorkspaceLayout{"Rig", "Timeline", 280, 22, false};
+    if (name == "Compositing")
+        return WorkspaceLayout{"Rig", "Nodes", 420, 22, false};
+    return std::nullopt;
+}
 } // namespace
 EditorController::EditorController(QObject* parent) : QObject(parent) {
     resetSelection();
@@ -102,6 +120,9 @@ EditorController::EditorController(QObject* parent) : QObject(parent) {
     bottomPanelHeight_ = boundedSetting(settings, "layout/bottomHeight", 280, 140, 1600);
     timelineCellWidth_ = boundedSetting(settings, "layout/timelineCell", 22, 12, 72);
     timingToolsVisible_ = settings.value("layout/timingTools", false).toBool();
+    const auto preset = settings.value("layout/activePreset", "Custom").toString();
+    if (defaultWorkspaceLayout(preset))
+        workspacePreset_ = preset;
     previousRecovery_ = settings.value("recoveryPath").toString();
     if (!QFileInfo::exists(previousRecovery_))
         previousRecovery_.clear();
@@ -551,8 +572,16 @@ void EditorController::setWorkspaceMode(QString mode) {
     endSelectedCharacterPoseBlend();
     workspaceMode_ = std::move(mode);
     QSettings().setValue("workspaceMode", workspaceMode_);
+    markWorkspaceCustom();
     emit workspaceModeChanged();
     emit poseSelectionChanged();
+}
+void EditorController::markWorkspaceCustom() {
+    if (applyingWorkspacePreset_ || workspacePreset_ == "Custom")
+        return;
+    workspacePreset_ = "Custom";
+    QSettings().setValue("layout/activePreset", workspacePreset_);
+    emit workspaceLayoutChanged();
 }
 void EditorController::setBottomPanelTab(QString tab) {
     if ((tab != "Timeline" && tab != "Xsheet" && tab != "Curves" && tab != "Nodes") ||
@@ -560,6 +589,7 @@ void EditorController::setBottomPanelTab(QString tab) {
         return;
     bottomPanelTab_ = std::move(tab);
     QSettings().setValue("layout/bottomTab", bottomPanelTab_);
+    markWorkspaceCustom();
     emit workspaceLayoutChanged();
 }
 void EditorController::setBottomPanelHeight(int height) {
@@ -568,6 +598,7 @@ void EditorController::setBottomPanelHeight(int height) {
         return;
     bottomPanelHeight_ = height;
     QSettings().setValue("layout/bottomHeight", height);
+    markWorkspaceCustom();
     emit workspaceLayoutChanged();
 }
 void EditorController::setTimelineCellWidth(int width) {
@@ -576,6 +607,7 @@ void EditorController::setTimelineCellWidth(int width) {
         return;
     timelineCellWidth_ = width;
     QSettings().setValue("layout/timelineCell", width);
+    markWorkspaceCustom();
     emit workspaceLayoutChanged();
 }
 void EditorController::setTimingToolsVisible(bool visible) {
@@ -583,6 +615,7 @@ void EditorController::setTimingToolsVisible(bool visible) {
         return;
     timingToolsVisible_ = visible;
     QSettings().setValue("layout/timingTools", visible);
+    markWorkspaceCustom();
     emit workspaceLayoutChanged();
 }
 void EditorController::resetWorkspaceLayout() {
@@ -591,6 +624,52 @@ void EditorController::resetWorkspaceLayout() {
     setBottomPanelHeight(280);
     setTimelineCellWidth(22);
     setTimingToolsVisible(false);
+    markWorkspaceCustom();
+}
+bool EditorController::saveWorkspacePreset(QString name) {
+    if (!defaultWorkspaceLayout(name))
+        return false;
+    QSettings settings;
+    const QString key = "layout/presets/" + name + "/";
+    settings.setValue(key + "mode", workspaceMode_);
+    settings.setValue(key + "tab", bottomPanelTab_);
+    settings.setValue(key + "height", bottomPanelHeight_);
+    settings.setValue(key + "cell", timelineCellWidth_);
+    settings.setValue(key + "timingTools", timingToolsVisible_);
+    settings.setValue("layout/activePreset", name);
+    settings.sync();
+    if (settings.status() != QSettings::NoError)
+        return false;
+    workspacePreset_ = name;
+    emit workspaceLayoutChanged();
+    return true;
+}
+bool EditorController::applyWorkspacePreset(QString name) {
+    const auto defaults = defaultWorkspaceLayout(name);
+    if (!defaults)
+        return false;
+    QSettings settings;
+    const QString key = "layout/presets/" + name + "/";
+    QString mode = settings.value(key + "mode", defaults->mode).toString();
+    if (mode != "Rig" && mode != "Animator")
+        mode = defaults->mode;
+    QString tab = settings.value(key + "tab", defaults->tab).toString();
+    if (tab != "Timeline" && tab != "Xsheet" && tab != "Curves" && tab != "Nodes")
+        tab = defaults->tab;
+    const int height = boundedSetting(settings, key + "height", defaults->height, 140, 1600);
+    const int cell = boundedSetting(settings, key + "cell", defaults->cell, 12, 72);
+    const bool timing = settings.value(key + "timingTools", defaults->timingTools).toBool();
+    applyingWorkspacePreset_ = true;
+    setWorkspaceMode(mode);
+    setBottomPanelTab(tab);
+    setBottomPanelHeight(height);
+    setTimelineCellWidth(cell);
+    setTimingToolsVisible(timing);
+    applyingWorkspacePreset_ = false;
+    workspacePreset_ = name;
+    settings.setValue("layout/activePreset", name);
+    emit workspaceLayoutChanged();
+    return true;
 }
 QString EditorController::substitutionThumbnail(int drawingId) const {
     if (!layer_ || drawingId <= 0)

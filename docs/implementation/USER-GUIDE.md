@@ -403,6 +403,14 @@ tools visibility reopen with the app as personal preferences. Use **View > Reset
 workspace layout** to restore Rig, Timeline, default panel height and frame width,
 and hidden Timing tools. These changes do not edit the project or its current frame.
 
+The header's **Workspace layout** list offers Drawing, Animation, Rigging and
+Compositing starting layouts. **View > Apply workspace layout** offers the same
+choices. Adjust the mode, lower tab, panel height, timeline width or Timing
+tools, then use **View > Save current layout as** to store those controls under
+one of the four names. A manual adjustment shows **Custom** until you save or
+apply a named layout again. Saved layouts are personal to this computer;
+switching them keeps the selected object and current frame.
+
 Curves keeps its actions in a single compact toolbar. **Values** reveals the optional
 frame/value/base-interpolation fields; hiding them gives that space back to the graph.
 Hover the question mark for editing gestures. Buttons, dropdowns, number fields and

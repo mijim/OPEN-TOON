@@ -178,3 +178,6 @@ half-open timeline interval using rational frame-to-sample boundaries.
 
 See [ADR-066](066-personal-workspace-layout.md) for personal lower-workspace
 layout preferences and their separation from document state.
+
+See [ADR-067](067-named-workspace-layouts.md) for four overridable personal
+workspace layouts with scene-independent switching.

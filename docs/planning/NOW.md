@@ -6,14 +6,15 @@ Read in order: **this page → [implementation status](../implementation/STATUS.
 
 The immediate objective is a complete, reliable character-animation **Harmony Moment**, from artwork intake through rigging, deformation, controls, animation and audio, composition and camera to preview, save/reopen and export. This is a bounded workflow milestone; the full P00–P22 roadmap remains intact.
 
-The P01 editor workspace now persists its personal lower-tab, panel height,
-timeline zoom and Timing tools state across app reopen, with a reset action.
-This is a tested UI-002/UI-005 subset; full workspace presets and preference
-coverage remain open.
+The editor workspace persists its personal lower-tab, panel height, timeline
+zoom and Timing tools state across app reopen, with a reset action. Four
+overridable Drawing/Animation/Rigging/Compositing layouts now apply those
+controls without changing the scene, selection or frame. These are tested
+UI-002/UI-005 subsets; full dockable layouts and preference coverage remain open.
 
 **Open critical-path slice: [HM-06](HARMONY-MOMENT.md#hm-06).** HM-05 has accepted bounded [rest/UV and renderer evidence](../implementation/HM05-ACCEPTANCE.md). The [working HM-06 subset](../implementation/HM06-PROGRESS.md) saves bone/curve controls, weights and keys, supports canvas drags, continuous limbs and explicit matching of compatible substitution poses. The 480-frame visual shot passes continuity, native input and reopen checks, including regenerated contour-bound limbs, sampled artwork edges and original headwear in both views. Further extreme-bend and complete-reference review remain before acceptance. Its remaining review is open.
 
-**In-progress slice: [HM-07](HARMONY-MOMENT.md#hm-07).** Format-12 named masked poses capture, apply and blend selected channels and substitutions with undo/reopen evidence. Format-15 publication exposes grouped views, per-Part drawing choices and poses in an Animator dashboard and compact camera viewport panel over the same document. Compatible in-project pose transfer maps unique roles and drawing names; paired left/right roles can create mirrored poses. [The tested subset](../implementation/HM07-PROGRESS.md) leaves general controls, broader retargeting and complete workspace presets open.
+**In-progress slice: [HM-07](HARMONY-MOMENT.md#hm-07).** Format-12 named masked poses capture, apply and blend selected channels and substitutions with undo/reopen evidence. Format-15 publication exposes grouped views, per-Part drawing choices and poses in an Animator dashboard and compact camera viewport panel over the same document. Compatible in-project pose transfer maps unique roles and drawing names; paired left/right roles can create mirrored poses. Four named personal lower-workspace layouts can be applied and overwritten. [The tested subset](../implementation/HM07-PROGRESS.md) leaves general controls, broader retargeting and full dockable workspace presets open.
 
 **In-progress slice: [HM-10](HARMONY-MOMENT.md#hm-10).** Format-16 original PCM16 WAV assets, format-17 sample-contiguous repeats and format-22 source-sample fades and format-23 saved clip mute, format-26 per-clip solo and format-27 stereo balance, undoable clip placement/trim/gain and source-sharing duplication and exact 48 kHz single-pass clip splitting and direct frame-edge trimming including native waveform drag, indexed sample-aligned timeline waveforms, band-limited rate conversion, deterministic full/selected-range offline WAV mix/export, bounded miniaudio device preview with loop/play-once and selected-range transport toggles and timeline fragment scrub pass local tests. An original 480-frame study joins the connected toon, nine mouth changes, eye cutter and exact synthetic audio cues with save/reopen and native Qt Quick checks. [The audio subset](../implementation/HM10-PROGRESS.md) includes two completed silent ten-minute CoreAudio scheduling probes at 24 and 24000/1001 fps. Hardware presentation latency/underruns and audible scrub-quality qualification plus broader rate-ratio quality remain.
 
@@ -39,7 +40,7 @@ Statuses and hard prerequisites below come from `roadmap.json`; acceptance and p
 | [HM-04](HARMONY-MOMENT.md#hm-04) | Bounded contract accepted | HM-01 accepted | P10 owning phase remains open. |
 | [HM-05](HARMONY-MOMENT.md#hm-05) | Bounded contract accepted | HM-03, HM-04 accepted | P09 owning phase remains open. |
 | [HM-06](HARMONY-MOMENT.md#hm-06) | In progress | HM-05 accepted | Extreme-bend quality and interaction budgets remain. |
-| [HM-07](HARMONY-MOMENT.md#hm-07) | In progress | HM-03, HM-04 accepted | Published grouped dashboard and viewport controls, compatible transfer and paired-role mirroring pass; general bindings and workspace presets remain. |
+| [HM-07](HARMONY-MOMENT.md#hm-07) | In progress | HM-03, HM-04 accepted | Published grouped dashboard, viewport controls, compatible transfer, paired-role mirroring and four named personal lower-workspace layouts pass; general bindings and full dockable presets remain. |
 | [HM-08](HARMONY-MOMENT.md#hm-08) | Planned | HM-03, HM-07 | Wait for both contracts. |
 | [HM-09](HARMONY-MOMENT.md#hm-09) | Planned | HM-06, HM-07, HM-08 | Wait for all three contracts. |
 | [HM-10](HARMONY-MOMENT.md#hm-10) | In progress | HM-01 accepted | PCM16 import, saved repeats/fades, direct clip drag, indexed waveform, offline mix/export, device preview and fragment scrub pass; hardware sync remains. |

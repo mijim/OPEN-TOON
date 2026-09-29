@@ -28,8 +28,8 @@
     {
       "id": "P03",
       "status": "in_progress",
-      "available": "Synchronized virtualized timeline/Xsheet, create/hold/clear exposures, insert/remove frames and navigate drawings. Multi-layer range clipboard, independent drawing paste, key paste, cycles, ones/twos/threes, overwrite retiming, Alt-drag moves, markers and bounded Xsheet PDF export. Clear removes selected exposures and pose keys together. Timeline/Xsheet diamonds can be dragged directly; Keys mode adds poses by double-click, with adjustable timeline cell width.",
-      "remaining": "Frame annotations/thumbnails, advanced onion/tracing controls, paperless workflows and artist acceptance."
+      "available": "Synchronized virtualized timeline/Xsheet, create/hold/clear exposures, insert/remove frames and navigate drawings. Multi-layer range clipboard, independent drawing paste, key paste, cycles, ones/twos/threes, overwrite retiming, Alt-drag moves, markers and bounded Xsheet PDF export. Clear removes selected exposures and pose keys together. Timeline/Xsheet diamonds can be dragged directly; Keys mode adds poses by double-click, with adjustable timeline cell width. Four personal Drawing/Animation/Rigging/Compositing lower-workspace layouts can be applied, overwritten and reopened without changing selection or current frame.",
+      "remaining": "Full dockable workspace serialization, frame annotations/thumbnails, advanced onion/tracing controls, paperless workflows and artist acceptance."
     },
     {
       "id": "P04",
@@ -475,11 +475,11 @@
     "behavioral_tests": "tests",
     "raster_brush": "adapters/brush"
   },
-  "version": "0.2.0-experimental.67",
+  "version": "0.2.0-experimental.68",
   "development_policy": {
     "primary_platform": "macOS",
     "verification_cadence": "End of coherent functionality blocks; iterate failures",
-    "release_artifacts": "Historical experimental.11 macOS arm64 ZIP and Ubuntu-built Linux x86_64 AppImage; current experimental.67 work is source only",
+    "release_artifacts": "Historical experimental.11 macOS arm64 ZIP and Ubuntu-built Linux x86_64 AppImage; current experimental.68 work is source only",
     "cross_platform_builds": "Manual release workflow; broader Linux, Windows and device qualification remain open"
   },
   "planning_priority": {

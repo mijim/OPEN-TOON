@@ -429,6 +429,20 @@ ApplicationWindow {
                 text: "Reset workspace layout"
                 onTriggered: editor.resetWorkspaceLayout()
             }
+            Menu {
+                title: "Apply workspace layout"
+                Action { text: "Drawing"; onTriggered: editor.applyWorkspacePreset("Drawing") }
+                Action { text: "Animation"; onTriggered: editor.applyWorkspacePreset("Animation") }
+                Action { text: "Rigging"; onTriggered: editor.applyWorkspacePreset("Rigging") }
+                Action { text: "Compositing"; onTriggered: editor.applyWorkspacePreset("Compositing") }
+            }
+            Menu {
+                title: "Save current layout as"
+                Action { text: "Drawing"; onTriggered: editor.saveWorkspacePreset("Drawing") }
+                Action { text: "Animation"; onTriggered: editor.saveWorkspacePreset("Animation") }
+                Action { text: "Rigging"; onTriggered: editor.saveWorkspacePreset("Rigging") }
+                Action { text: "Compositing"; onTriggered: editor.saveWorkspacePreset("Compositing") }
+            }
         }
         Menu {
             title: "Help"
@@ -490,6 +504,17 @@ ApplicationWindow {
                     onActivated: editor.workspaceMode = currentText
                     Accessible.name: "Workspace"
                     implicitWidth: 112
+                }
+                C.CompactComboBox {
+                    objectName: "workspaceLayoutPicker"
+                    model: ["Custom", "Drawing", "Animation", "Rigging", "Compositing"]
+                    currentIndex: model.indexOf(editor.workspacePreset)
+                    onActivated: {
+                        if (currentIndex > 0)
+                            editor.applyWorkspacePreset(currentText)
+                    }
+                    Accessible.name: "Workspace layout"
+                    implicitWidth: 130
                 }
                 Rectangle {
                     Layout.preferredWidth: stateLabel.implicitWidth + 16

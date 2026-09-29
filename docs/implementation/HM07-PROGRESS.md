@@ -8,6 +8,13 @@ excluded values remain as evaluated there. A discrete substitution changes
 only when its drawing bit is set. The operation validates a candidate and
 creates one undo entry.
 
+The workspace now has Drawing, Animation, Rigging and Compositing starting
+layouts over the existing Rig/Animator mode and lower panels. Each can be
+overwritten with the current personal settings and reopened on the same
+computer. Applying a layout keeps the document, revision, selection and frame
+unchanged. The header picker and View menu expose them; manual changes show
+Custom. This is a bounded UI-002 subset, not arbitrary dockable presets.
+
 Properties now captures either the selected Part or all Parts with a visible
 channel group. The panel selects, applies, renames and removes poses. Character
 poses also have a direct blend slider: transform channels interpolate from the
@@ -33,6 +40,13 @@ without mutation. Unmasked channels retain destination rest values.
 
 ## Evidence
 
+- `tests/export_tests.cpp` checks four factory layouts, a saved override,
+  controller reopen, malformed values and unchanged document, revision,
+  selection and frame. The native workspace smoke clicks the header layout
+  picker and confirms the Animation panel and selected frame. The `.68`
+  macOS HM-07 dashboard smoke passed its published-control input and undo
+  checks; one run measured 49.62 ms p95 against the proposed 50 ms limit,
+  so sustained latency still needs wider qualification.
 - `tests/rigging_tests.cpp`: mixed Part/channel masks, numeric blend endpoints,
   the 50% discrete drawing threshold, excluded channel preservation,
   single-step and coalesced undo/redo, independent copy and branch pruning.
@@ -149,5 +163,5 @@ open. HM-07 is still in progress.
 
 Saved pose masks use explicit Part IDs within one character. Broader cross-rig
 retargeting, broader mirroring, full published controls, general typed widgets,
-conflict/cycle handling, complete workspace layout presets and artist
+conflict/cycle handling, full dockable workspace presets and artist
 acceptance remain open. RIG-012 and HM-07 are partial.

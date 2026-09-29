@@ -61,6 +61,7 @@ class EditorController final : public QObject {
     Q_PROPERTY(QVariantList poseTransferTargets READ poseTransferTargets NOTIFY changed)
     Q_PROPERTY(int selectedCharacterPose READ selectedCharacterPose NOTIFY poseSelectionChanged)
     Q_PROPERTY(QString workspaceMode READ workspaceMode WRITE setWorkspaceMode NOTIFY workspaceModeChanged)
+    Q_PROPERTY(QString workspacePreset READ workspacePreset NOTIFY workspaceLayoutChanged)
     Q_PROPERTY(QString bottomPanelTab READ bottomPanelTab WRITE setBottomPanelTab NOTIFY workspaceLayoutChanged)
     Q_PROPERTY(int bottomPanelHeight READ bottomPanelHeight WRITE setBottomPanelHeight NOTIFY workspaceLayoutChanged)
     Q_PROPERTY(int timelineCellWidth READ timelineCellWidth WRITE setTimelineCellWidth NOTIFY workspaceLayoutChanged)
@@ -170,6 +171,9 @@ class EditorController final : public QObject {
     Q_INVOKABLE void selectCharacterPose(int pose);
     QString workspaceMode() const { return workspaceMode_; }
     void setWorkspaceMode(QString mode);
+    QString workspacePreset() const { return workspacePreset_; }
+    Q_INVOKABLE bool applyWorkspacePreset(QString name);
+    Q_INVOKABLE bool saveWorkspacePreset(QString name);
     QString bottomPanelTab() const { return bottomPanelTab_; }
     void setBottomPanelTab(QString tab);
     int bottomPanelHeight() const { return bottomPanelHeight_; }
@@ -413,6 +417,7 @@ class EditorController final : public QObject {
 
   private:
     bool importImageBatch(QVariantList urls, bool sequence);
+    void markWorkspaceCustom();
     opentoon::Session session_;
     std::vector<opentoon::Frame> poseSelection_;
     opentoon::Id poseSelectionLayer_ = 0;
@@ -422,6 +427,8 @@ class EditorController final : public QObject {
     opentoon::Id selectedView_ = 0;
     opentoon::Id selectedCharacterPose_ = 0;
     QString workspaceMode_ = "Rig";
+    QString workspacePreset_ = "Custom";
+    bool applyingWorkspacePreset_ = false;
     QString bottomPanelTab_ = "Timeline";
     int bottomPanelHeight_ = 280, timelineCellWidth_ = 22;
     bool timingToolsVisible_ = false;

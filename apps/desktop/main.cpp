@@ -219,8 +219,68 @@ int main(int argc, char** argv) {
                         editor.document() != before || editor.documentRevision() != revision ||
                         editor.frame() != 7 || editor.selectedLayer() != layer)
                         throw std::runtime_error("Workspace reset changed the scene or left stale UI state.");
+                    auto* presetPicker = window->findChild<QQuickItem*>("workspaceLayoutPicker");
+                    if (!presetPicker || !presetPicker->isVisible() ||
+                        !editor.applyWorkspacePreset("Compositing"))
+                        throw std::runtime_error("Named workspace layout picker is unavailable.");
+                    QCoreApplication::processEvents();
+                    if (presetPicker->property("currentIndex").toInt() != 4 ||
+                        !window->property("showNodes").toBool() ||
+                        editor.document() != before || editor.documentRevision() != revision ||
+                        editor.frame() != 7 || editor.selectedLayer() != layer)
+                        throw std::runtime_error("Compositing layout changed document state or missed QML.");
+                    window->raise();
+                    window->requestActivate();
+                    QCoreApplication::processEvents();
+                    click("workspaceLayoutPicker");
+                    (void)window->grabWindow();
+                    auto* layoutPopup = presetPicker->property("popup").value<QObject*>();
+                    auto* popupContent = layoutPopup
+                        ? layoutPopup->property("contentItem").value<QQuickItem*>() : nullptr;
+                    QQuickItem* animationChoice = nullptr;
+                    const auto findChoice = [&](const auto& self, QQuickItem* parent) -> void {
+                        if (!parent || animationChoice)
+                            return;
+                        if (parent->isVisible() &&
+                            parent->property("text").toString() == "Animation" &&
+                            parent->width() > 0 && parent->height() > 0) {
+                            animationChoice = parent;
+                            return;
+                        }
+                        for (auto* child : parent->childItems())
+                            self(self, child);
+                    };
+                    findChoice(findChoice, popupContent);
+                    if (!animationChoice)
+                        throw std::runtime_error("Animation layout menu item is unavailable.");
+                    const auto choicePoint = animationChoice->mapToScene(QPointF(
+                        animationChoice->width() / 2, animationChoice->height() / 2));
+                    QMouseEvent choicePress(QEvent::MouseButtonPress, choicePoint,
+                        window->mapToGlobal(choicePoint.toPoint()), Qt::LeftButton,
+                        Qt::LeftButton, Qt::NoModifier);
+                    QMouseEvent choiceRelease(QEvent::MouseButtonRelease, choicePoint,
+                        window->mapToGlobal(choicePoint.toPoint()), Qt::LeftButton,
+                        Qt::NoButton, Qt::NoModifier);
+                    QCoreApplication::sendEvent(window, &choicePress);
+                    QCoreApplication::sendEvent(window, &choiceRelease);
+                    QCoreApplication::processEvents();
+                    if (editor.workspacePreset() != "Animation" ||
+                        editor.bottomPanelTab() != "Curves" ||
+                        editor.document() != before || editor.frame() != 7)
+                        throw std::runtime_error("Native Animation layout choice did not apply.");
+                    editor.setBottomPanelHeight(470);
+                    if (editor.workspacePreset() != "Custom" ||
+                        !editor.saveWorkspacePreset("Drawing") ||
+                        !editor.applyWorkspacePreset("Animation") ||
+                        !editor.applyWorkspacePreset("Drawing") ||
+                        editor.bottomPanelHeight() != 470)
+                        throw std::runtime_error("Named workspace layout did not retain its edited height.");
+                    const auto layoutShot = window->grabWindow();
+                    if (layoutShot.isNull() || !layoutShot.save("build/workspace-layout-smoke.png"))
+                        throw std::runtime_error("Named workspace layout screenshot failed.");
                     std::cout << "Workspace native smoke passed: tab, timeline zoom, timing tools, "
-                                 "splitter drag, preferences reopen and reset without document changes.\n";
+                                 "splitter drag, named layouts, preferences reopen and reset "
+                                 "without document changes.\n";
                     app.exit(0);
                 } catch (const std::exception& error) {
                     std::cerr << error.what() << '\n';
